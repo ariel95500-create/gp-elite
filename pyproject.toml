@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gp-elite"
+version = "0.1.0"
+description = "Régression symbolique par programmation génétique — lois interprétables sur données expérimentales (pur Python/NumPy)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Sabri Hakou" }]
+keywords = [
+    "symbolic-regression", "genetic-programming", "machine-learning",
+    "interpretable-ml", "equation-discovery", "scientific-computing",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = [
+    "numpy>=1.21",
+    "pandas>=1.3",
+    "scikit-learn>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/ariel95500-create/gp-elite"
+Repository = "https://github.com/ariel95500-create/gp-elite"
+Issues = "https://github.com/ariel95500-create/gp-elite/issues"
+
+[project.scripts]
+gp-elite = "gp_elite.cli:main"
+
+[tool.setuptools]
+packages = ["gp_elite"]
+
+[tool.setuptools.package-data]
+gp_elite = ["py.typed"]

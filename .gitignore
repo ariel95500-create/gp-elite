@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+venv/
+.venv/
+
+# Sorties du moteur
+gp_elite_log.csv
+gp_elite_best.txt
+grammar_*.json
+*.png
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/

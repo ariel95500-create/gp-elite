@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "Si vous utilisez GP_ELITE, merci de le citer comme ci-dessous."
+title: "GP_ELITE: Régression symbolique par programmation génétique"
+authors:
+  - name: "Sabri Hakou"
+version: 0.1.0
+date-released: 2026-06-13
+license: MIT
+repository-code: "https://github.com/ariel95500-create/gp-elite"
+keywords:
+  - symbolic regression
+  - genetic programming
+  - interpretable machine learning
+  - equation discovery
