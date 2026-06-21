@@ -8,6 +8,10 @@ GP_ELITE searches for a **mathematical formula** linking your variables to a tar
 
 Pure **Python / NumPy** — no Julia, no compilation, no GPU. `pip install` and you're ready.
 
+![GP_ELITE rediscovers Kepler's Third Law from 8 data points (R² = 1.000000)](kepler_plot.png)
+
+> Given only the 8 planets' distance and orbital period, GP_ELITE rediscovered Kepler's Third Law (`T = a·√a = a^1.5`) in seconds — see [`examples/kepler_demo.py`](examples/kepler_demo.py).
+
 ```python
 from gp_elite import symbolic_regression
 
@@ -134,3 +138,4 @@ MIT — see [LICENSE](LICENSE). Free to use, including commercially, with retent
 ## Citing GP_ELITE
 
 If GP_ELITE is useful in academic work, see [CITATION.cff](CITATION.cff).
+
