@@ -14,13 +14,15 @@ print(result.expression)        # capacity\_SOH = 0.913 - 0.352·tanh(...)
 print(result.r2\_validation)     # 0.996  (sur des données jamais vues)
 ```
 ---
-Pourquoi GP_ELITE ?
-	| | GP_ELITE | Réseaux de neurones | PySR (état de l'art) |
-|---|---|---|---|
-| Sortie | **formule lisible** | boîte noire | formule lisible |
-| Installation | `pip install` (pur Python) | lourde | nécessite **Julia** |
-| Validation anti-surapprentissage | **intégrée** (hold-out) | à faire soi-même | à faire soi-même |
-| Sélection de variables | **rapport d'importance** | non | partielle |
+## Pourquoi GP_ELITE ?
+
+GP_ELITE produit une **formule lisible**, là où un réseau de neurones donne une boîte noire (PySR aussi produit des formules lisibles).
+
+- **Installation** : `pip install`, pur Python — un réseau de neurones est lourd à mettre en place, et PySR nécessite Julia.
+- **Anti-surapprentissage** : validation hold-out **intégrée** — à faire soi-même ailleurs.
+- **Sélection de variables** : rapport d'importance intégré.
+
+La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur.
 ---
 Installation
 ```bash
