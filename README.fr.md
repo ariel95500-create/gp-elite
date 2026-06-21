@@ -15,12 +15,12 @@ print(result.r2\_validation)     # 0.996  (sur des données jamais vues)
 ```
 ---
 Pourquoi GP_ELITE ?
-	GP_ELITE	Réseaux de neurones	PySR (état de l'art)
-Sortie	formule lisible	boîte noire	formule lisible
-Installation	`pip install` (pur Python)	lourde	nécessite Julia
-Validation anti-surapprentissage	intégrée (hold-out)	à faire soi-même	à faire soi-même
-Sélection de variables	rapport d'importance	non	partielle
-La niche de GP_ELITE : zéro barrière d'entrée. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur.
+	| | GP_ELITE | Réseaux de neurones | PySR (état de l'art) |
+|---|---|---|---|
+| Sortie | **formule lisible** | boîte noire | formule lisible |
+| Installation | `pip install` (pur Python) | lourde | nécessite **Julia** |
+| Validation anti-surapprentissage | **intégrée** (hold-out) | à faire soi-même | à faire soi-même |
+| Sélection de variables | **rapport d'importance** | non | partielle |
 ---
 Installation
 ```bash
