@@ -1,4 +1,3 @@
-
 # GP_ELITE
 
 **Genetic-programming symbolic regression — discover interpretable laws from your experimental data.**
