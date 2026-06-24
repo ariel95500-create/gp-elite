@@ -163,6 +163,8 @@ def symbolic_regression(
     finally:
         core._GENERIC_CSV_MODE = False
         core._CUSTOM_LOSS_FN = None   # [CUSTOM-LOSS] ne pas fuiter vers l'appel suivant
+        core._CUSTOM_SEEDS = None         # idem : seeds custom non persistants
+        core._CUSTOM_LOSS_PARSIMONY = 0.0  # idem : parcimonie custom réinitialisée
 
     # ── Métriques ──
     mse_tr = core._pure_mse(best, X_full, y_full)
