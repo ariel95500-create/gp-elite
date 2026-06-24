@@ -1661,6 +1661,10 @@ class Config:
     HOLDOUT_SEED: int       = 1234   # split reproductible
     VAL_R2_TOLERANCE: float = 0.003  # [v23.2] tolérance R² pour sélection parcimonieuse
 
+    # [REPRO] Seed maître propagé depuis l'API. Sert à dériver de façon
+    # déterministe les seeds des workers parallèles (None = non reproductible).
+    SEED: Optional[int] = None
+
     # [v20] Parallélisme des îles (ProcessPoolExecutor, spawn-safe Windows)
     #   None  = AUTO : activé si ≥4 cœurs ET ≥2 îles (sinon séquentiel)
     #   True  = forcé (≥2 îles requis) ; False = toujours séquentiel
@@ -5155,6 +5159,15 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
     n_workers = min(len(islands), _os.cpu_count() or 1)
     ctx = _mp.get_context("spawn")     # identique Windows/Linux/macOS
 
+    # [REPRO] Générateur dédié pour les seeds des workers. Indépendant de
+    # l'état global de `random` (que le maître consomme via fitness/scaling/
+    # etc.), donc la suite de seeds distribués est DÉTERMINISTE pour un seed
+    # donné — condition nécessaire à la reproductibilité du mode parallèle.
+    _seed_base = getattr(cfg, "SEED", None)
+    if _seed_base is None:
+        _seed_base = random.getrandbits(31)
+    _worker_rng = random.Random(_seed_base ^ 0x5DEECE66D)
+
     _syr_y = globals().get("_SYRACUSE_Y_RAW", None) if _SYRACUSE_MODE else None
     _syr_x = globals().get("_SYRACUSE_X_RAW", None) if _SYRACUSE_MODE else None
     # [v22-CSV] snapshot du mode CSV générique pour les workers
@@ -5184,7 +5197,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                                   (isl, gen, n_gens,
                                    FRAGMENT_LIB, COGRAPH, SEQ_MEM,
                                    CURRENT_RESIDUAL_SIG,
-                                   random.getrandbits(31)))
+                                   _worker_rng.getrandbits(31)))
                         for isl in islands]
                 results = [f.result() for f in futs]   # lève si un worker meurt
 
