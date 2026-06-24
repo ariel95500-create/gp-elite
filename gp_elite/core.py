@@ -2036,6 +2036,9 @@ def _is_adjusted_float(value) -> bool:
     """
     if not isinstance(value, float):
         return False
+    if not math.isfinite(value):
+        return True     # inf/nan : constante "ajustée" pathologique (pénalisée),
+                        # et surtout évite OverflowError sur round(inf)
     if abs(value - round(value)) < 1e-9 and abs(value) <= 10.0:
         return False    # constante entière simple : non pénalisée
     return True
@@ -3084,6 +3087,19 @@ def _predict_cached(node, xs_np):
 # dans Operon, PySR, et tous les moteurs SRBench de tête.
 _USE_LINEAR_SCALING: bool = True   # synchronisé sur cfg dans evolve()
 
+# [CUSTOM-LOSS] Fonction de coût personnalisée optionnelle.
+# Signature : loss_fn(predictions: np.ndarray, X: np.ndarray, y: np.ndarray) -> float
+# Si None → comportement par défaut (MSE/corrélation hybride supervisé).
+# Si fournie → REMPLACE entièrement le calcul d'erreur, et le linear scaling
+# est ignoré (il suppose le MSE supervisé). Une valeur basse = meilleur.
+_CUSTOM_LOSS_FN = None
+
+# [CUSTOM-SEEDS] Liste optionnelle d'arbres Node injectés dans la population
+# initiale (un par île, round-robin). Sert à amorcer la recherche avec des
+# briques structurelles pertinentes (ex. X[0]², X[1]² pour une loi d'énergie).
+# Rempli par l'API ; None/vide = pas d'amorçage custom.
+_CUSTOM_SEEDS = None
+
 def _linear_scale_params(preds: np.ndarray, ys_np: np.ndarray):
     """Coefficients OLS (a, b) de  y ≈ a + b·preds.  Retourne (a, b, ok)."""
     pm = float(preds.mean()); ym = float(ys_np.mean())
@@ -3121,6 +3137,22 @@ def raw_mse(node, xs, ys) -> float:
     """
     xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
     ys_np = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+
+    # [CUSTOM-LOSS] Si une fonction de coût est fournie, elle REMPLACE
+    # entièrement le calcul hybride MSE/corrélation. Le linear scaling est
+    # ignoré (il suppose le MSE supervisé). La loss reçoit (preds, X, y) et
+    # doit renvoyer un scalaire à minimiser. Toute erreur/non-fini → pénalité.
+    if _CUSTOM_LOSS_FN is not None:
+        try:
+            with np.errstate(all='ignore'):
+                preds = _predict_cached(node, xs_np)
+                val = float(_CUSTOM_LOSS_FN(preds, xs_np, ys_np))
+            if not math.isfinite(val):
+                return 1000.0
+            return val
+        except Exception:
+            return 1000.0
+
     try:
         with np.errstate(all='ignore'):    # [V42-FIX] silencer les overflow sur trajectoires
             preds     = _predict_cached(node, xs_np)
@@ -3376,7 +3408,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
     if key in _fitness_cache:
         return _fitness_cache[key]
 
-    if role == "cleaner":
+    if role == "cleaner" and _CUSTOM_LOSS_FN is None:
         mse_pur      = _pure_mse(node, xs, ys)
         n            = len(ys)
         k, n_adj     = tree_complexity(node)
@@ -3389,6 +3421,16 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
         score        = (n * math.log(mse_safe)
                         + k * ln_n
                         + _FLOAT_GAMMA * (n_adj ** 2) * ln_n)
+    elif _CUSTOM_LOSS_FN is not None:
+        # [CUSTOM-LOSS] Tous les rôles minimisent la loss custom (via raw_mse,
+        # qui la court-circuite). On ajoute une légère pénalité de parcimonie
+        # pour garder des expressions lisibles, comme pour les explorers.
+        base      = raw_mse(node, xs, ys)
+        size_pen  = tree_size(node)  * cfg.PARSIMONY
+        depth_pen = tree_depth(node) * cfg.DEPTH_PENALTY
+        max_pen   = 0.05 * abs(base) + 1e-8
+        penalty   = min(size_pen + depth_pen, max_pen)
+        score     = base + penalty
     else:
         base      = raw_mse(node, xs, ys)
         size_pen  = tree_size(node)  * cfg.PARSIMONY
@@ -5817,6 +5859,18 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         seed = make_seed(seed_name)
         if seed and slot < len(target_island.population):
             target_island.population[slot] = seed
+
+    # [CUSTOM-SEEDS] Injection des arbres fournis par l'utilisateur (round-robin).
+    # On les place dans des slots distincts pour ne pas écraser les seeds
+    # standard. Chaque île reçoit une copie pour préserver l'isolation.
+    _cseeds = globals().get("_CUSTOM_SEEDS", None)
+    if _cseeds:
+        base = len(seeds)
+        for j, seed_node in enumerate(_cseeds):
+            target_island = islands[j % cfg.N_ISLANDS]
+            slot          = (base + j) // cfg.N_ISLANDS
+            if seed_node is not None and slot < len(target_island.population):
+                target_island.population[slot] = seed_node.copy()
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.

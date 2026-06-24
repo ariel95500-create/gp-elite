@@ -66,6 +66,7 @@ def symbolic_regression(
     parallel: Optional[bool] = None,
     validation_split: float = 0.20,
     seed: Optional[int] = None,
+    loss_fn=None,
     verbose: bool = False,
 ) -> SRResult:
     """Trouve une expression symbolique reliant X à y.
@@ -136,6 +137,19 @@ def symbolic_regression(
     if parallel is not None:
         cfg.PARALLEL_ISLANDS = bool(parallel)
 
+    # [CUSTOM-LOSS] Installe la fonction de coût personnalisée dans le moteur.
+    # Quand elle est active, on force le mode séquentiel : les workers spawn
+    # ne partagent pas la globale (et une fonction Python arbitraire ne se
+    # sérialise pas toujours proprement). Limitation assumée de cette version.
+    core._CUSTOM_LOSS_FN = loss_fn
+    if loss_fn is not None:
+        cfg.PARALLEL_ISLANDS = False
+        # Le linear scaling (a + b·f contre y) suppose un y supervisé : avec
+        # une loss custom (souvent sans y), il dénaturerait le champion (ex.
+        # le réduirait à ~0 face à un y factice). On le désactive globalement.
+        cfg.USE_LINEAR_SCALING = False
+        core._USE_LINEAR_SCALING = False
+
     _placeholder = lambda Xm: np.zeros(Xm.shape[0])
     sink = contextlib.nullcontext() if verbose else contextlib.redirect_stdout(io.StringIO())
     try:
@@ -148,6 +162,7 @@ def symbolic_regression(
         expression = core.to_string(best)
     finally:
         core._GENERIC_CSV_MODE = False
+        core._CUSTOM_LOSS_FN = None   # [CUSTOM-LOSS] ne pas fuiter vers l'appel suivant
 
     # ── Métriques ──
     mse_tr = core._pure_mse(best, X_full, y_full)
