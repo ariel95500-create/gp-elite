@@ -132,6 +132,7 @@ def symbolic_regression(
     cfg.GENERATIONS = int(generations)
     cfg.N_POINTS = len(y)
     cfg.VALIDATION_SPLIT = float(validation_split)
+    cfg.SEED = seed   # [REPRO] propage le seed pour le parallélisme déterministe
     if parallel is not None:
         cfg.PARALLEL_ISLANDS = bool(parallel)
 
