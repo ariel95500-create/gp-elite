@@ -2520,7 +2520,12 @@ def evaluate_vector(node, xs) -> np.ndarray:
         r = np.asarray(r, dtype=float)
         if r.shape == ():          # scalaire → broadcast
             r = np.full(n_rows, float(r))
-        return np.where(np.isfinite(r), r, 0.0)
+        # Remplace les non-finis (inf/nan) par 0, PUIS borne les valeurs
+        # extrêmes-mais-finies (ex. exp() en extrapolation hors domaine) pour
+        # éviter tout overflow en aval (R², carré). Borne large (1e12) qui ne
+        # change rien aux prédictions normales mais neutralise les explosions.
+        r = np.where(np.isfinite(r), r, 0.0)
+        return np.clip(r, -1e12, 1e12)
     except Exception:
         n_rows = xs.shape[0] if isinstance(xs, np.ndarray) else len(xs)
         return np.zeros(n_rows)
