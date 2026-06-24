@@ -3100,6 +3100,11 @@ _CUSTOM_LOSS_FN = None
 # Rempli par l'API ; None/vide = pas d'amorçage custom.
 _CUSTOM_SEEDS = None
 
+# [CUSTOM-LOSS PARSIMONY] Poids de la pénalité de taille pour la loss custom
+# (0 = désactivé). Favorise les lois simples ; utile pour la découverte de
+# lois de conservation (sinon des arbres géants exploitent le bruit numérique).
+_CUSTOM_LOSS_PARSIMONY = 0.0
+
 def _linear_scale_params(preds: np.ndarray, ys_np: np.ndarray):
     """Coefficients OLS (a, b) de  y ≈ a + b·preds.  Retourne (a, b, ok)."""
     pm = float(preds.mean()); ym = float(ys_np.mean())
@@ -3142,6 +3147,10 @@ def raw_mse(node, xs, ys) -> float:
     # entièrement le calcul hybride MSE/corrélation. Le linear scaling est
     # ignoré (il suppose le MSE supervisé). La loss reçoit (preds, X, y) et
     # doit renvoyer un scalaire à minimiser. Toute erreur/non-fini → pénalité.
+    # [CUSTOM-LOSS PARSIMONY] Si _CUSTOM_LOSS_PARSIMONY > 0, on ajoute une
+    # pénalité proportionnelle à la taille de l'arbre : rasoir d'Ockham qui
+    # favorise les lois simples et neutralise les arbres-monstres exploitant
+    # les imperfections numériques (crucial pour la découverte de lois).
     if _CUSTOM_LOSS_FN is not None:
         try:
             with np.errstate(all='ignore'):
@@ -3149,6 +3158,9 @@ def raw_mse(node, xs, ys) -> float:
                 val = float(_CUSTOM_LOSS_FN(preds, xs_np, ys_np))
             if not math.isfinite(val):
                 return 1000.0
+            _pars = globals().get("_CUSTOM_LOSS_PARSIMONY", 0.0)
+            if _pars > 0.0:
+                val += _pars * tree_size(node)
             return val
         except Exception:
             return 1000.0
