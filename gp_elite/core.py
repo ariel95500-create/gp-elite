@@ -1745,6 +1745,12 @@ _GENCSV_POOLS = {
                                                         [2, 2, 2, 2, 2, 2, 1, 1, 3, 1]),
     "poly":     (["+", "-", "*", "/"],                 [4, 4, 5, 2],
                  ["sqrt", "neg", "sq", "cube", "abs"],  [2, 1, 3, 2, 1]),
+    # [CONSERVATION] Pool minimal pour la découverte de lois physiques : pas
+    # d'exp/log/pow (qui génèrent des arbres exploitant le bruit numérique des
+    # dérivées). Juste les briques des invariants courants : +, -, *, carré,
+    # et trigonométrie pour les potentiels (pendule, etc.).
+    "conserve": (["+", "-", "*"],                      [4, 3, 4],
+                 ["sq", "cos", "sin", "neg"],           [4, 3, 3, 1]),
 }
 
 _GENERIC_CSV_MODE: bool       = False
@@ -3121,6 +3127,35 @@ def _linear_scale_params(preds: np.ndarray, ys_np: np.ndarray):
         return 0.0, 1.0, False
     return a, b, True
 
+def _robust_scale_params(preds: np.ndarray, ys_np: np.ndarray, delta: float = 0.5, n_iter: int = 5):
+    """Coefficients (a, b) de y ≈ a + b·preds calés de façon ROBUSTE (Huber)
+    via moindres carrés repondérés itératifs (IRLS). Contrairement à
+    _linear_scale_params (OLS, sensible aux outliers), les points aberrants
+    reçoivent un poids réduit → la droite suit la vraie tendance.
+    Retourne (a, b, ok). 5 itérations suffisent (convergence rapide testée)."""
+    pc = preds - float(preds.mean())
+    if not np.all(np.isfinite(pc)) or np.max(np.abs(pc)) > 1e15:
+        return 0.0, 1.0, False
+    if float(np.dot(pc, pc)) < 1e-12:
+        return 0.0, 1.0, False
+    a, b = float(ys_np.mean()), 1.0
+    f = preds
+    for _ in range(n_iter):
+        r = a + b * f - ys_np
+        s = float(np.std(r)) + 1e-9
+        rs = np.abs(r / s)
+        w = np.where(rs <= delta, 1.0, delta / (rs + 1e-9))   # poids de Huber
+        W = np.sqrt(w)
+        A = np.column_stack([W, f * W])
+        try:
+            sol, *_ = np.linalg.lstsq(A, ys_np * W, rcond=None)
+        except Exception:
+            return 0.0, 1.0, False
+        a, b = float(sol[0]), float(sol[1])
+        if not (math.isfinite(a) and math.isfinite(b)):
+            return 0.0, 1.0, False
+    return a, b, True
+
 def raw_mse(node, xs, ys) -> float:
     """
     [v13.11 — OBJECTIF 1] Fitness Hybride : Corrélation de Pearson + MSE normalisé.
@@ -3155,6 +3190,19 @@ def raw_mse(node, xs, ys) -> float:
         try:
             with np.errstate(all='ignore'):
                 preds = _predict_cached(node, xs_np)
+                # [CUSTOM-LOSS SCALING] En mode supervisé (régression robuste,
+                # quantile...), on cale a + b·preds vers y AVANT d'appeler la
+                # loss. Le scaling MSE en forme fermée donne déjà de bons a,b
+                # même pour une loss robuste, et débloque la calibration des
+                # coefficients (sinon le GP peine à trouver la bonne droite).
+                # Désactivé par défaut (non-supervisé / invariants).
+                if globals().get("_CUSTOM_LOSS_USE_SCALING", False) and float(np.std(preds)) > 1e-9:
+                    if globals().get("_CUSTOM_LOSS_ROBUST", False):
+                        a_ls, b_ls, _ok = _robust_scale_params(preds, ys_np)
+                    else:
+                        a_ls, b_ls, _ok = _linear_scale_params(preds, ys_np)
+                    if _ok:
+                        preds = a_ls + b_ls * preds
                 val = float(_CUSTOM_LOSS_FN(preds, xs_np, ys_np))
             if not math.isfinite(val):
                 return 1000.0
@@ -3266,7 +3314,12 @@ def wrap_linear_scaling(node, xs, ys):
     """
     if node is None:
         return node
-    if not _USE_LINEAR_SCALING:
+    # [ROBUST] En mode régression robuste, on matérialise le scaling ROBUSTE
+    # (IRLS) dans l'arbre final même si le linear scaling MSE est désactivé,
+    # pour que l'expression retournée ait les bons coefficients (insensibles
+    # aux outliers), pas ceux biaisés par le MSE.
+    _robust = globals().get("_CUSTOM_LOSS_ROBUST", False)
+    if not _USE_LINEAR_SCALING and not _robust:
         return node.copy()
     xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
     ys_np = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
@@ -3275,13 +3328,19 @@ def wrap_linear_scaling(node, xs, ys):
             preds = evaluate_vector(node, xs_np)
             if float(np.std(preds)) < 1e-6:
                 return node.copy()
-            a_ls, b_ls, _ok = _linear_scale_params(preds, ys_np)
+            if _robust:
+                a_ls, b_ls, _ok = _robust_scale_params(preds, ys_np)
+            else:
+                a_ls, b_ls, _ok = _linear_scale_params(preds, ys_np)
             if not _ok or (abs(b_ls - 1.0) < 1e-9 and abs(a_ls) < 1e-9):
                 return node.copy()
-            mse_raw = float(np.mean((preds - ys_np) ** 2))
-            mse_ls  = float(np.mean((a_ls + b_ls * preds - ys_np) ** 2))
-        if not math.isfinite(mse_ls) or mse_ls >= mse_raw - 1e-15:
-            return node.copy()
+            # En mode robuste, on accepte le wrap sans exiger une baisse du MSE
+            # (le MSE peut monter alors que la robustesse s'améliore).
+            if not _robust:
+                mse_raw = float(np.mean((preds - ys_np) ** 2))
+                mse_ls  = float(np.mean((a_ls + b_ls * preds - ys_np) ** 2))
+                if not math.isfinite(mse_ls) or mse_ls >= mse_raw - 1e-15:
+                    return node.copy()
         wrapped = Node("+", Node(float(a_ls)),
                        Node("*", Node(float(b_ls)), node.copy()))
         return simplify(wrapped)
@@ -4790,10 +4849,16 @@ def evolve_island(island: Island,
         EARLY_OPEN_CORRELATION   = 0.85  # [FIX] réduit de 0.95 → 0.85 : atteignable sur ND
 
     # Corrélation de Pearson pure du meilleur individu de la génération courante
+    # [FIX-SIGNE] Test sur |r| : une corrélation négative forte (ex. r=-0.86,
+    # relation décroissante) est aussi utile qu'une positive — le linear scaling
+    # gère le signe via un coefficient négatif. Tester r>=seuil sans valeur
+    # absolue bloquait à vie la stigmergie sur tout problème à pente négative
+    # (ex. NASA airfoil, où le meilleur individu a r≈-0.86).
     _best_r   = raw_pearson_r(pop[0], xs, ys)
+    _abs_r    = abs(_best_r) if math.isfinite(_best_r) else 0.0
     _voie_a   = (generation >= BURN_IN_GENERATIONS
-                 and _best_r >= MIN_CORRELATION_REQUIRED)
-    _voie_b   = (_best_r >= EARLY_OPEN_CORRELATION)
+                 and _abs_r >= MIN_CORRELATION_REQUIRED)
+    _voie_b   = (_abs_r >= EARLY_OPEN_CORRELATION)
     _stigm_allowed = _voie_a or _voie_b
 
     if not _stigm_allowed:

@@ -43,10 +43,20 @@ class SRResult:
     depth: int
     feature_names: list
     node: "core.Node"
+    scaler: object = None   # [FIX] scaler interne pour dénormaliser dans predict
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        """Prédit sur des features DÉJÀ normalisées (mêmes échelles que le fit)."""
-        return core.evaluate_vector(self.node, np.asarray(X, dtype=float))
+        """Prédit sur des features BRUTES (mêmes unités que le X passé au fit).
+
+        Applique automatiquement la normalisation interne apprise au fit, donc
+        l'utilisateur fournit des données dans leurs unités d'origine.
+        """
+        Xn = np.asarray(X, dtype=float)
+        if Xn.ndim == 1:
+            Xn = Xn.reshape(-1, 1)
+        if self.scaler is not None:
+            Xn = self.scaler.transform(Xn)
+        return core.evaluate_vector(self.node, Xn)
 
     def __str__(self) -> str:
         r2 = f"{self.r2_validation:.4f}" if self.r2_validation is not None else "n/a"
@@ -67,6 +77,7 @@ def symbolic_regression(
     validation_split: float = 0.20,
     seed: Optional[int] = None,
     loss_fn=None,
+    robust: bool = False,
     verbose: bool = False,
 ) -> SRResult:
     """Trouve une expression symbolique reliant X à y.
@@ -150,6 +161,30 @@ def symbolic_regression(
         cfg.USE_LINEAR_SCALING = False
         core._USE_LINEAR_SCALING = False
 
+    # [ROBUST] Régression robuste aux outliers. Active une loss de Huber par
+    # défaut (sauf loss_fn explicite), un scaling de coefficients robuste
+    # (IRLS, insensible aux points aberrants), en gardant la structure cherchée
+    # par GP. Le linear scaling MSE classique se ferait biaiser par les outliers.
+    if robust:
+        cfg.PARALLEL_ISLANDS = False
+        if loss_fn is None:
+            _delta_h = 1.345
+            def _huber(preds, X, y, _d=_delta_h):
+                r = preds - y; a = np.abs(r)
+                return float(np.mean(np.where(a <= _d, 0.5 * r**2, _d * (a - 0.5 * _d))))
+            core._CUSTOM_LOSS_FN = _huber
+        core._CUSTOM_LOSS_USE_SCALING = True
+        core._CUSTOM_LOSS_ROBUST = True
+        cfg.USE_LINEAR_SCALING = False
+        core._USE_LINEAR_SCALING = False
+        # [ROBUST] Sans le linear scaling MSE (qui d'ordinaire favorise les
+        # formes simples), le mode robuste tend à produire des arbres bouffis
+        # qui sacrifient l'interprétabilité — le cœur de la régression
+        # symbolique. Une légère parcimonie restaure des formules simples ET
+        # robustes (size ~7 au lieu de ~50), au prix d'un R² très légèrement
+        # inférieur.
+        core._CUSTOM_LOSS_PARSIMONY = 0.5
+
     _placeholder = lambda Xm: np.zeros(Xm.shape[0])
     sink = contextlib.nullcontext() if verbose else contextlib.redirect_stdout(io.StringIO())
     try:
@@ -165,6 +200,8 @@ def symbolic_regression(
         core._CUSTOM_LOSS_FN = None   # [CUSTOM-LOSS] ne pas fuiter vers l'appel suivant
         core._CUSTOM_SEEDS = None         # idem : seeds custom non persistants
         core._CUSTOM_LOSS_PARSIMONY = 0.0  # idem : parcimonie custom réinitialisée
+        core._CUSTOM_LOSS_USE_SCALING = False  # idem : scaling custom réinitialisé
+        core._CUSTOM_LOSS_ROBUST = False       # idem : scaling robuste réinitialisé
 
     # ── Métriques ──
     mse_tr = core._pure_mse(best, X_full, y_full)
@@ -186,4 +223,5 @@ def symbolic_regression(
         depth=core.tree_depth(best),
         feature_names=feature_names,
         node=best,
+        scaler=scaler,   # [FIX] permet à predict de dénormaliser automatiquement
     )
