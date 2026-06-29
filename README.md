@@ -77,33 +77,21 @@ result = symbolic_regression(
 
 print(result.expression)        # e.g. 2.0 + 3.0·sqrt(a) - 0.5·b
 print(result.r2_validation)     # quality on the hold-out set
-print(result.size)              # node count (readability)
-```
+print(result.size)              # node count
 
----🛡️ Robust regression (outlier-resistant custom loss)
-Real-world data is dirty. A handful of outliers can drag an ordinary least-squares fit far from the true relationship. GP_ELITE ships a one-switch robust mode that fits the true law even when a sizeable fraction of the data is corrupted.
 
+---
+
+## 🛡️ Robust regression (outlier-resistant custom loss)
+
+Real-world data is dirty. A handful of outliers can drag an ordinary least-squares fit far from the true relationship. GP_ELITE ships a one-switch **robust mode** that fits the *true* law even when a sizeable fraction of the data is corrupted.
+
+```python
 from gp_elite import symbolic_regression
 
 # X, y : your (possibly dirty) data
 result = symbolic_regression(X, y, feature_names=["x"], robust=True)
 print(result.expression)
-Under the hood, robust=True switches the objective to a Huber loss and rescales the final coefficients with an IRLS (Iteratively Reweighted Least Squares) procedure, so the fit is governed by the bulk of the data rather than by a few extreme points. It stays a compact, readable formula.
-Measured behaviour (recovering y = 2x + 1 — RMSE against the true law on clean points, lower is better):
-outliers
-MSE (default)
-robust=True
-0 %
-0.063
-0.063
-10 %
-1.398
-1.374
-20 %
-1.925
-0.543
-With clean data, ordinary MSE wins by a hair — robustness isn't free. With 10–20 % outliers, robust mode recovers the true law while plain MSE derails. Use robust=True when you suspect your data contains outliers.
-See examples/robust_regression.py for the full reproducible benchmark.
 
 ## Full example: battery degradation (NASA data)
 
