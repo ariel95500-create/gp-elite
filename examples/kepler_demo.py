@@ -32,7 +32,7 @@ def main():
         validation_split=0.0,   # only 8 points
         seed=0,
     )
-    pred = res.predict(a.reshape(-1, 1) / np.max(np.abs(a)))
+    pred = res.predict(a.reshape(-1, 1))   # unités BRUTES : predict applique le scaler lui-même
     r2 = 1 - np.sum((pred - T) ** 2) / np.sum((T - T.mean()) ** 2)
 
     print("\n" + "=" * 55)
