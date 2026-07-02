@@ -23,6 +23,16 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
 
 ---
 
+## Nouveautés 0.2.0
+
+- **Constantes par Levenberg–Marquardt** (défaut) : précision machine — la loi de Coulomb `q1·q2/(4πεr²)` récupérée *exactement* (1−R² ≈ 8e-32). 6–14× plus rapide sur les problèmes à constantes.
+- **Fiabilité multi-restart** (`restarts=N`) : runs indépendants sur un hold-out déterministe partagé, archives fusionnées, sélection globale unique.
+- **Front de Pareto** (`result.pareto`) : tout l'escalier complexité ↔ précision, chaque entrée avec son `.predict`.
+- **Mode Prévision / extrapolation** (`extrapolate_feature=`, `extrapolate_direction=`) : sondes hors-domaine anti-divergence, plancher linéaire, sélection-frontière. Aussi en **mode 7** du menu interactif.
+- **Reproductibilité** : résultats identiques à seed égal dans un processus ; entre invocations, lancer avec `PYTHONHASHSEED=0`.
+
+---
+
 ## Pourquoi GP_ELITE ?
 
 | | GP_ELITE | Réseaux de neurones | PySR (état de l'art) |
@@ -133,7 +143,7 @@ Une dégradation saturante avec les cycles, modulée par la température — phy
 
 **Bon** : lois physiques / d'ingénierie à structure multiplicative ou exponentielle, données expérimentales bruitées de taille modeste, problèmes où l'interprétabilité prime.
 
-Sur un sous-ensemble représentatif du **Feynman Symbolic Regression Benchmark** (16 équations physiques), en mode `fast` (~15 s/équation) : **81 % des équations résolues à R² > 0.999**, R² moyen 0.993.
+Sur le **benchmark Feynman gelé** (15 équations, `PYTHONHASHSEED=0`, `restarts=4`) : **10/15 récupérations symboliques exactes (67 %)** à précision machine (1−R² < 1e-9), **14/15 sous 1e-3 (93 %)**. Face-à-face contre **gplearn** (mêmes données/splits, budget généreux pour gplearn) : **67 % vs 40 %** d'exact — GP_ELITE devant sur 9 équations, égalité sur 5, derrière sur 1. Prévision sur données réelles (SOH batterie NASA, vraie extrapolation sur cycles jamais vus) : R² médian **+0.52** contre +0.34 pour la régression linéaire, zéro modèle divergent. Reproduire : `PYTHONHASHSEED=0 python benchmarks/feynman_bench.py 0 15` et `benchmarks/duel.py`.
 
 **Moins bon** : suites chaotiques (ex. temps de vol de Collatz — composante intrinsèquement aléatoire), >15-20 variables (l'espace de recherche explose), gros jeux de données où la précision pure prime sur l'interprétabilité (les modèles d'ensemble dominent alors).
 

@@ -22,6 +22,16 @@ print(result.r2_validation)     # 0.996  (on data never seen during training)
 
 ---
 
+## What's new in 0.2.0
+
+- **Levenberg–Marquardt constant fitting** (default): constants reach machine precision — Coulomb's `q1·q2/(4πεr²)` recovered *exactly* (1−R² ≈ 8e-32). 6–14× faster on constant-heavy problems.
+- **Multi-restart reliability** (`restarts=N`): independent runs share one deterministic hold-out, their candidate archives are merged, and one global selection is made.
+- **Pareto front output** (`result.pareto`): the full complexity ↔ accuracy staircase, each entry with its own `.predict`.
+- **Forecast / extrapolation mode** (`extrapolate_feature=`, `extrapolate_direction=`): out-of-domain divergence probes, a linear safety floor, frontier-based selection. Also available as **mode 7** in the interactive menu.
+- **Reproducibility**: identical results per seed within a process; across invocations, run with `PYTHONHASHSEED=0`.
+
+---
+
 ## Why GP_ELITE?
 
 | | GP_ELITE | Neural networks | PySR (state of the art) |
@@ -132,7 +142,7 @@ A saturating degradation with cycle count, modulated by temperature — physical
 
 **Good at**: physical / engineering laws with multiplicative or exponential structure, modest-size noisy experimental data, problems where interpretability matters most.
 
-On a representative subset of the **Feynman Symbolic Regression Benchmark** (16 physics equations), in `fast` mode (~15 s/equation): **81% of equations solved at R² > 0.999**, mean R² 0.993.
+On the frozen **Feynman benchmark** (15 physics equations, `PYTHONHASHSEED=0`, `restarts=4`): **10/15 exact symbolic recoveries (67%)** at machine precision (1−R² < 1e-9), **14/15 within 1e-3 (93%)**. Head-to-head against **gplearn** on identical data/splits (generous budget for gplearn): **67% vs 40%** exact — GP_ELITE ahead on 9 equations, tied on 5, behind on 1. Real-data forecasting (NASA battery SOH, true extrapolation on unseen cycles): median R² **+0.52** vs +0.34 for linear regression, with zero divergent models. Reproduce: `PYTHONHASHSEED=0 python benchmarks/feynman_bench.py 0 15` and `benchmarks/duel.py`.
 
 **Less good at**: chaotic sequences (e.g. Collatz flight time — an intrinsically random component), >15–20 variables (the search space explodes), large datasets where raw accuracy outweighs interpretability (ensemble models dominate there).
 
@@ -140,6 +150,11 @@ On a representative subset of the **Feynman Symbolic Regression Benchmark** (16 
 
 ## Technical features
 
+- **Levenberg–Marquardt constant optimization** (v0.2): closed-form-quality constants, deterministic, LM/Adam switchable
+- **Multi-restart + merged candidate archives** (v0.2): seed variance turned into reliability
+- **Pareto front API** (v0.2): non-dominated complexity/accuracy staircase
+- **Guarded extrapolation / forecasting mode** (v0.2): beyond-domain probes, linear floor, frontier selection
+- **Composition motif seeding** (v0.2): Pythagorean, reciprocal-sum, Gaussian templates for nested structures
 - **Asymmetric island model** (explorer / cleaner / stigmergic) with periodic migration
 - **Linear scaling** (Keijzer 2003): the engine searches for the *shape*; scale and offset coefficients are solved in closed form
 - **ε-lexicase selection** (La Cava 2016) to preserve behavioral diversity

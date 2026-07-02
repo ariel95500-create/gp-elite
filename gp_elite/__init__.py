@@ -26,9 +26,9 @@ Exemple minimal
 >>> print(result.r2_validation)
 """
 
-from .api import symbolic_regression, SRResult
+from .api import symbolic_regression, SRResult, ParetoEntry
 from . import core
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
-__all__ = ["symbolic_regression", "SRResult", "core", "__version__"]
+__all__ = ["symbolic_regression", "SRResult", "ParetoEntry", "core", "__version__"]

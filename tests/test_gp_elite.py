@@ -128,3 +128,52 @@ def test_validation_can_be_disabled():
 if __name__ == "__main__":
     import sys
     sys.exit(pytest.main([__file__, "-v"]))
+
+
+# ── Tests v0.2.0 : LM, restarts+Pareto, extrapolation ──────────────────────
+
+def test_lm_recovers_exact_constants():
+    """LM doit atteindre la précision machine sur structure exacte (v26)."""
+    _seed(0)
+    x = np.linspace(0, 3, 200).reshape(-1, 1)
+    y = 0.3 * np.exp(1.2 * x[:, 0])
+    tree = core.Node('*', core.Node(1.0),
+                     core.Node('exp', core.Node('*', core.Node(1.0),
+                                                core.Node('X[0]'))))
+    cfg = core.make_cfg_nd(n_features=1, x_min=-2., x_max=2., fast=True,
+                           ultrafast=False, use_seeding=False, use_lib=False,
+                           use_cograph=False, use_seqmem=False)
+    cfg.TERMINALS = ['X[0]']
+    out = core.optimize_constants_adam(tree.copy(), x, y, cfg)  # délègue à LM
+    assert core._pure_mse(out, x, y) < 1e-20
+
+
+def test_restarts_and_pareto():
+    """restarts>1 doit produire un front de Pareto exploitable (v27)."""
+    _seed(0)
+    rng = np.random.RandomState(0)
+    x = np.sort(rng.uniform(0, 3, 120)).reshape(-1, 1)
+    y = 2.0 * x[:, 0] + 1.0
+    r = symbolic_regression(x, y, feature_names=["x"], operators="poly",
+                            generations=5, speed="ultrafast",
+                            validation_split=0.2, seed=0, restarts=2)
+    assert r.pareto and len(r.pareto) >= 1
+    p = r.pareto[0].predict(x[:3])
+    assert np.all(np.isfinite(p))
+    assert r.r2_validation is None or r.r2_validation > 0.99
+
+
+def test_extrapolation_guard_no_divergence():
+    """Le mode extrapolation ne doit jamais livrer un modèle divergent (v25)."""
+    _seed(0)
+    rng = np.random.RandomState(1)
+    x = np.linspace(1, 100, 120).reshape(-1, 1)
+    y = 1.0 - 0.005 * x[:, 0] + rng.normal(0, 0.005, 120)
+    r = symbolic_regression(x, y, feature_names=["cycle"], operators="physical",
+                            generations=8, speed="ultrafast",
+                            validation_split=0.2, seed=0,
+                            extrapolate_feature="cycle",
+                            extrapolate_direction="high")
+    far = r.predict(np.array([[150.0], [200.0], [300.0]]))
+    assert np.all(np.isfinite(far))
+    assert np.all(np.abs(far) < 5.0)        # borné : pas d'explosion hors-plage

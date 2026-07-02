@@ -1599,6 +1599,16 @@ class Config:
     # Optimisation des constantes (Adam)
     CONST_OPT_PROB: float  = 0.15   # [v14.5] Throttling Adam : 15% pour diviser le coût CPU × 5
     CONST_OPT_ITER: int    = 20
+    # [v26-LM] Optimiseur de constantes : True = Levenberg-Marquardt (défaut,
+    # moindres carrés natifs, précision machine, déterministe) ; False = voie
+    # Adam historique (1er ordre). LM est le levier n°1 des moteurs SR de
+    # référence — voir optimize_constants_lm.
+    CONST_OPT_LM: bool     = True
+    # [v28-MOTIFS] Seeding de motifs de composition (sqrt(sq+sq), 1/(1/a+1/b),
+    # gaussienne, log-ratio, 1−cos…) dans la population initiale. Cible les
+    # structures à tremplin que l'évolution n'assemble pas seule.
+    MOTIF_SEEDS: bool      = True
+    MOTIF_SEEDS_N: int     = 32
     ADAM_LR: float         = 0.05
     ADAM_BETA1: float      = 0.9
     ADAM_BETA2: float      = 0.999
@@ -1660,6 +1670,55 @@ class Config:
     VALIDATION_SPLIT: float = 0.20   # fraction hold-out (min 8 points)
     HOLDOUT_SEED: int       = 1234   # split reproductible
     VAL_R2_TOLERANCE: float = 0.003  # [v23.2] tolérance R² pour sélection parcimonieuse
+
+    # [v24-EXTRAP] Mode extrapolation dédié (OPT-IN, n'affecte PAS les runs normaux)
+    #   Quand True, deux changements ciblés, validés empiriquement :
+    #     1. Le hold-out n'est plus un tirage ALÉATOIRE mais la BANDE-FRONTIÈRE
+    #        du domaine (les points les plus au bord). Le R² interne aléatoire
+    #        ne discrimine pas l'extrapolation (≈0.998 pour tous) ; le R² sur la
+    #        frontière, lui, la prédit. Le champion livré est donc celui qui
+    #        tient AU BORD, pas celui qui gratte un epsilon à l'intérieur.
+    #     2. Un candidat LINÉAIRE (OLS, très faible taille) est injecté dans le
+    #        pool de sélection. Une droite ne peut pas diverger hors-plage ; la
+    #        sélection parcimonieuse la choisit quand la loi est quasi-linéaire.
+    #   Laisser False reproduit exactement le comportement standard.
+    #
+    #   RECETTE VALIDÉE (données batterie NASA réelles, v25) — trois pièces :
+    #     1. GARDE ANTI-DIVERGENCE : on sonde le candidat AU-DELÀ du domaine
+    #        (axe d'extrapolation prolongé) et on rejette toute prédiction
+    #        implausible. Sans lui, GP explose à l'extrapolation (exp/pow/x²/
+    #        cube) car la divergence est invisible sur un hold-out interne.
+    #     2. TRAIN COMPLET : split aléatoire (pas frontière) — retirer les
+    #        points de bord du train dégrade l'estimation de la pente.
+    #     3. RESTRICTION À L'AXE QUI TEND : ne nourrir que la (les) feature(s)
+    #        porteuse(s) de tendance. Les features qui n'évoluent pas (temp,
+    #        courant) restent bornées donc passent le garde, mais leur légère
+    #        dérive hors-échantillon BIAISE la prédiction. En prévision pure,
+    #        les exclure (extrapolate_feature=<axe>, entrée = cet axe seul).
+    #   Résultat : R² d'extrapolation médian +0.51 (vs +0.34 pour une régression
+    #   linéaire, vs médiane NÉGATIVE sans ces pièces). GP capture alors une
+    #   structure non-linéaire bornée que la droite manque, SANS diverger.
+    #   ⚠ Le garde neutralise la DIVERGENCE, pas un mauvais ajustement borné :
+    #   la variance entre seeds reste réelle — lancer plusieurs graines et
+    #   garder la meilleure en validation.
+    EXTRAPOLATION_MODE: bool        = False
+    EXTRAPOLATION_FRONTIER_FRAC: float = 0.20  # part du domaine prise comme frontière
+    #   [v24.1] Affinage : axe d'extrapolation. L'extrapolation se fait presque
+    #   toujours le long d'UN seul axe (cycles, temps), pas de tous. Désigner
+    #   cette feature aligne la bande-frontière sur la VRAIE direction
+    #   d'extrapolation, au lieu de prendre les points extrêmes sur n'importe
+    #   quelle feature (qui peut être non pertinente, ex. température).
+    #     EXTRAPOLATION_FEATURE  : index de l'axe (None = toutes, symétrique)
+    #     EXTRAPOLATION_DIRECTION: "both" (deux bords) | "high" (valeurs hautes,
+    #                              cas forecasting) | "low" (valeurs basses)
+    EXTRAPOLATION_FEATURE: Optional[int] = None
+    EXTRAPOLATION_DIRECTION: str         = "both"
+    #   [v25] Type de split en mode extrapolation. LEÇON batterie : entraîner
+    #   sur TOUTES les données (y compris le bord) estime mieux la pente que de
+    #   retirer la frontière pour valider. Défaut False → split aléatoire (train
+    #   complet) + garde anti-divergence + candidat linéaire. True = ancien
+    #   hold-out frontière (à réserver aux cas où l'on veut valider au bord).
+    EXTRAPOLATION_FRONTIER_SPLIT: bool   = False
 
     # [REPRO] Seed maître propagé depuis l'API. Sert à dériver de façon
     # déterministe les seeds des workers parallèles (None = non reproductible).
@@ -3106,6 +3165,66 @@ _CUSTOM_LOSS_FN = None
 # Rempli par l'API ; None/vide = pas d'amorçage custom.
 _CUSTOM_SEEDS = None
 
+# ════════════════════════════════════════════════════════════════
+# [v28-MOTIFS] SEEDING DE MOTIFS DE COMPOSITION
+# ════════════════════════════════════════════════════════════════
+# Constat (banc Feynman v27) : les échecs restants sont des compositions à
+# TREMPLIN — sqrt(sq(a−b)+sq(c−d)), 1/(1/a+1/b) — dont les sous-expressions
+# intermédiaires ont une fitness médiocre : l'évolution ne les assemble pas.
+# Remède éprouvé (AI Feynman, grammar seeding) : injecter dans la population
+# initiale des INSTANCES de motifs physiques canoniques sur des variables
+# tirées au hasard ; l'évolution recombine, LM ajuste les constantes. Le
+# tirage dépend du seed du run → les restarts (v27) COUVRENT les appariements.
+
+def _make_motif_seeds(cfg, n_max: int = 32) -> list:
+    """Instancie des motifs de composition compatibles avec le pool actif."""
+    terms = list(getattr(cfg, "TERMINALS", []) or [])
+    if not terms:
+        return []
+    uops = set(globals().get("_GENERIC_UNARY_OPS", []) or [])
+    rng = random.Random((getattr(cfg, "SEED", 0) or 0) ^ 0x0F1F2F)
+    T = lambda: Node(rng.choice(terms))
+    def T2():                                   # deux terminaux distincts si possible
+        a = rng.choice(terms)
+        b = rng.choice([t for t in terms if t != a] or terms)
+        return Node(a), Node(b)
+    C = lambda lo, hi: Node(round(rng.uniform(lo, hi), 4))
+    inv = lambda x: Node('/', Node(1.0), x)
+    diff = lambda: Node('-', *T2())
+    out = []
+    def add(f):
+        try:
+            nd = f()
+            if nd is not None:
+                out.append(nd)
+        except Exception:
+            pass
+    builders = []
+    if 'sqrt' in uops and 'sq' in uops:
+        builders += [lambda: Node('sqrt', Node('+', Node('sq', diff()), Node('sq', diff()))),
+                     lambda: Node('sqrt', Node('+', Node('sq', T()), Node('sq', T())))]
+    builders += [lambda: inv(Node('+', inv(T()), inv(T()))),                  # 1/(1/a+1/b)
+                 lambda: inv(Node('+', inv(T()), Node('*', T(), inv(T()))))]  # 1/(1/a+c/b)
+    if 'exp' in uops and 'sq' in uops:
+        builders += [lambda: Node('exp', Node('*', C(-1.5, -0.2), Node('sq', T())))]
+    if 'log' in uops:
+        builders += [lambda: Node('log', Node('/', *T2()))]
+    if 'cos' in uops:
+        builders += [lambda: Node('*', T(), Node('-', Node(1.0),
+                                                 Node('cos', Node('*', *T2()))))]
+    if 'sq' in uops:
+        builders += [lambda: Node('sq', diff())]                              # brique
+    builders += [lambda: Node('/', Node('+', *T2()), Node('+', Node(1.0), T())),
+                 lambda: inv(T())]                                            # briques
+    if not builders:
+        return []
+    k = 0
+    while len(out) < n_max and k < n_max * 4:
+        add(builders[k % len(builders)])
+        k += 1
+    return out[:n_max]
+
+
 # [CUSTOM-LOSS PARSIMONY] Poids de la pénalité de taille pour la loss custom
 # (0 = désactivé). Favorise les lois simples ; utile pour la découverte de
 # lois de conservation (sinon des arbres géants exploitent le bruit numérique).
@@ -3750,6 +3869,103 @@ def _invalidate_all_hashes(node: Node):
         if n.right: stack.append(n.right)
 
 
+def optimize_constants_lm(node: Node,
+                          xs: np.ndarray,
+                          ys: np.ndarray,
+                          cfg: Config) -> Node:
+    """
+    [v26-LM] Optimisation des constantes par LEVENBERG-MARQUARDT.
+    Pourquoi : l'ajustement des constantes d'une expression est un problème de
+    MOINDRES CARRÉS — la classe exacte pour laquelle LM est conçu. Adam (1er
+    ordre, différences finies) y converge lentement et s'arrête loin de
+    l'optimum ; LM exploite la structure JᵀJ du problème et atteint la
+    précision machine en 10-30 itérations. C'est le levier n°1 documenté des
+    moteurs SR de référence (Operon : LM natif ; PySR : BFGS/NelderMead).
+    Coût/itération : (n_consts+1) évaluations vectorisées (Jacobienne par
+    différences avant) + résolution d'un système n_consts×n_consts.
+    Déterministe (aucun redémarrage bruité) → runs reproductibles.
+    """
+    child = node.copy()
+    fn, consts = compile_parametric(child)
+    if not consts or fn is None:
+        return child
+
+    nC = len(consts)
+    y  = np.asarray(ys, dtype=float)
+    c  = np.array([cn.value for cn in consts], dtype=float)
+    lo_b = float(cfg.ERC_MIN) * 3.0
+    hi_b = float(cfg.ERC_MAX) * 3.0
+
+    def _resid(cv):
+        with np.errstate(all='ignore'):
+            p = fn(xs, cv)
+        p = np.asarray(p, dtype=float)
+        if p.ndim == 0:
+            p = np.full_like(y, float(p))
+        bad = ~np.isfinite(p)
+        if bad.any():
+            p = np.where(bad, 0.0, p)
+            r = p - y
+            r[bad] = 1e6          # zone invalide : fortement pénalisée
+            return r
+        return p - y
+
+    r = _resid(c)
+    sse_best = float(r @ r)
+    c_best = c.copy()
+    lam = 1e-3
+    max_iter = max(20, int(getattr(cfg, "CONST_OPT_ITER", 30)))
+    for _ in range(max_iter):
+        # Jacobienne par différences avant : J[:, i] = ∂r/∂c_i
+        J = np.empty((len(y), nC), dtype=float)
+        for i in range(nC):
+            h = 1e-6 * (1.0 + abs(c[i]))
+            cp = c.copy(); cp[i] += h
+            J[:, i] = (_resid(cp) - r) / h
+        g  = J.T @ r                      # gradient (½∇SSE)
+        if float(np.max(np.abs(g))) < 1e-14:
+            break
+        JtJ = J.T @ J
+        D = np.diag(np.maximum(np.diag(JtJ), 1e-12))
+        stepped = False
+        for _try in range(8):             # adaptation du damping λ
+            try:
+                delta = np.linalg.solve(JtJ + lam * D, -g)
+            except np.linalg.LinAlgError:
+                lam *= 10.0; continue
+            c_new = np.clip(c + delta, lo_b, hi_b)
+            r_new = _resid(c_new)
+            sse_new = float(r_new @ r_new)
+            if np.isfinite(sse_new) and sse_new < sse_best:
+                rel = (sse_best - sse_new) / max(sse_best, 1e-300)
+                c, r, sse_best = c_new, r_new, sse_new
+                c_best = c.copy()
+                lam = max(lam / 3.0, 1e-12)
+                stepped = True
+                if rel < 1e-13:           # précision machine atteinte
+                    _try = None
+                break
+            lam *= 4.0
+        if not stepped:
+            break                          # λ saturé : optimum local atteint
+        if _try is None:
+            break
+
+    for i, cn in enumerate(consts):
+        cn.value = float(c_best[i])
+    _invalidate_all_hashes(child)
+
+    # Garde anti-dégénérescence : identique à la voie Adam — on n'accepte que
+    # strictement meilleur, sans effondrement de complexité.
+    mse_before  = _pure_mse(node,  xs, ys)
+    mse_after   = _pure_mse(child, xs, ys)
+    k_before, _ = tree_complexity(node)
+    k_after,  _ = tree_complexity(child)
+    if mse_after >= mse_before or k_after < max(1, k_before * 0.4):
+        return node.copy()
+    return child
+
+
 def optimize_constants_adam(node: Node,
                              xs: np.ndarray,
                              ys: np.ndarray,
@@ -3758,7 +3974,12 @@ def optimize_constants_adam(node: Node,
     Optimisation Adam avec compilateur paramétrique f(_x, _c).
     v14 — gain ×10–50 : une seule compilation par structure,
     les constantes varient dans un array NumPy sans recompilation.
+    [v26-LM] Par défaut, cette fonction DÉLÈGUE à Levenberg-Marquardt
+    (optimize_constants_lm), nettement supérieur sur les moindres carrés.
+    Mettre cfg.CONST_OPT_LM=False pour revenir à la voie Adam historique.
     """
+    if bool(getattr(cfg, "CONST_OPT_LM", True)):
+        return optimize_constants_lm(node, xs, ys, cfg)
     child  = node.copy()
     fn, consts = compile_parametric(child)
     if not consts:
@@ -5299,6 +5520,16 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
           f"{n_workers} processus — rounds de {round_len} générations "
           f"(fusion stigmergique à chaque round)")
 
+    # [v29-REPRO] DÉTERMINISME DES WORKERS. Les enfants « spawn » sont des
+    # interpréteurs neufs qui relisent PYTHONHASHSEED au démarrage : non fixé,
+    # chaque worker randomise le hachage des str → l'ordre d'itération des
+    # `set` varie → des tirages différents À ÉTAT RNG IDENTIQUE. On fige donc
+    # le hachage des enfants avant de créer le pool (sans effet sur le parent,
+    # déjà démarré). Combiné aux seeds par (île, round) déjà déterministes et
+    # à la collecte ORDONNÉE des résultats, le mode parallèle devient
+    # reproductible : même seed → même champion.
+    _os.environ["PYTHONHASHSEED"] = "0"
+
     try:
         with _cf.ProcessPoolExecutor(
                 max_workers=n_workers, mp_context=ctx,
@@ -5415,6 +5646,12 @@ _VAL_XS = None          # hold-out features  (None = validation désactivée)
 _VAL_YS = None          # hold-out cible
 _VAL_TRAIN_XS = None    # [v23.1] train features (test de stabilité numérique)
 _VAL_TRAIN_YS = None    # [v23.1] train cible
+# [v25-EXTRAP] Garde-fou anti-divergence : points-sondes AU-DELÀ de la plage
+# d'entraînement (axe d'extrapolation prolongé) + bande de plausibilité dérivée
+# de y. Un candidat dont la prédiction sort de cette bande sur les sondes est
+# rejeté de la sélection — ce que la validation-frontière (interne) ne peut voir.
+_EXTRAP_PROBE_XS = None
+_EXTRAP_BAND = None     # (y_lo, y_hi) plausibles
 _VAL_CANDS: list = []   # [(val_mse, val_se, size, node)] candidats-champions
 _VAL_CANDS_MAX = 64
 
@@ -5446,9 +5683,27 @@ def _is_numerically_stable(cand) -> bool:
             return False
         # tolérance : 100× l'amplitude de la cible (généreux mais borne l'explosion)
         amp = max(1e-9, float(np.max(np.abs(_VAL_TRAIN_YS))) * 100.0 + 10.0)
-        return float(np.max(np.abs(preds))) <= amp
+        if float(np.max(np.abs(preds))) > amp:
+            return False
     except Exception:
         return False
+    # [v25-EXTRAP] Garde-fou anti-divergence HORS-PLAGE. Le test ci-dessus ne
+    # regarde que le domaine d'entraînement ; or l'explosion à l'extrapolation
+    # survient AU-DELÀ. On évalue le candidat sur des sondes où l'axe
+    # d'extrapolation est prolongé bien après le max vu, et on exige que la
+    # prédiction reste dans une bande de plausibilité dérivée de y. Une droite
+    # (ou toute forme bornée par linéaire) passe ; exp/pow/cube/x² sont rejetés.
+    if _EXTRAP_PROBE_XS is not None and _EXTRAP_BAND is not None:
+        try:
+            p2 = evaluate_vector(cand, _EXTRAP_PROBE_XS)
+            if not np.all(np.isfinite(p2)):
+                return False
+            lo, hi = _EXTRAP_BAND
+            if float(np.min(p2)) < lo or float(np.max(p2)) > hi:
+                return False
+        except Exception:
+            return False
+    return True
 
 def _track_val_candidate(cand):
     """Enregistre tout candidat-champion avec son MSE de validation et
@@ -5492,9 +5747,11 @@ def _select_one_se(champion, champ_val):
     meilleur (le plus large des deux). Cas batterie : le 10-nœuds (R²=0.9973)
     et le 29-nœuds (R²=0.9981) diffèrent de 0.08% → le 10-nœuds gagne."""
     pool = list(_VAL_CANDS)
-    if champion is not None and math.isfinite(champ_val):
+    if champion is not None and math.isfinite(champ_val) and _is_numerically_stable(champion):
         pool.append((champ_val, 0.0, tree_size(champion), champion))
     if not pool:
+        # [v25-EXTRAP] Tout a été rejeté par le garde anti-divergence (aucune
+        # forme bornée trouvée) : on retombe sur le champion brut faute de mieux.
         return champion, champ_val
     pool.sort(key=lambda t: t[0])
     best_mse, best_se = pool[0][0], pool[0][1]
@@ -5513,9 +5770,10 @@ def _split_holdout(xs, ys, cfg):
     """Découpe (xs, ys) en (train, val). Retourne (xs_tr, ys_tr) et installe
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
     VALIDATION_SPLIT<=0 ou dataset trop petit (<30 points)."""
-    global _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _VAL_TRAIN_YS
+    global _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _EXTRAP_PROBE_XS, _EXTRAP_BAND
     _VAL_XS = None; _VAL_YS = None
     _VAL_TRAIN_XS = None; _VAL_TRAIN_YS = None
+    _EXTRAP_PROBE_XS = None; _EXTRAP_BAND = None
     _VAL_CANDS.clear()
     frac = float(getattr(cfg, "VALIDATION_SPLIT", 0.0) or 0.0)
     n = len(ys)
@@ -5524,23 +5782,133 @@ def _split_holdout(xs, ys, cfg):
     n_val = max(8, int(round(n * frac)))
     if n - n_val < 20:
         return xs, ys
-    rng = np.random.RandomState(int(getattr(cfg, "HOLDOUT_SEED", 1234)))
-    idx = rng.permutation(n)
-    val_idx = np.sort(idx[:n_val])
-    tr_idx  = np.sort(idx[n_val:])
     xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
     ys_np = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+
+    extrap = bool(getattr(cfg, "EXTRAPOLATION_MODE", False))
+    feat = getattr(cfg, "EXTRAPOLATION_FEATURE", None)
+    direction = str(getattr(cfg, "EXTRAPOLATION_DIRECTION", "both")).lower()
+    Xm = xs_np if xs_np.ndim == 2 else xs_np.reshape(-1, 1)
+    feat_ok = (feat is not None and 0 <= int(feat) < Xm.shape[1])
+
+    # [v25-EXTRAP] GARDE ANTI-DIVERGENCE (indépendant du type de split).
+    # Dès qu'un axe d'extrapolation est désigné, on construit des points-sondes
+    # AU-DELÀ du domaine observé + une bande de plausibilité dérivée de y.
+    # _is_numerically_stable rejette tout candidat dont la prédiction explose
+    # sur ces sondes — LE filtre qui manquait, car la divergence hors-plage
+    # (cycle², exp, pow…) est invisible sur un hold-out interne.
+    if extrap and feat_ok:
+        j = int(feat)
+        lo = Xm.min(axis=0); hi = Xm.max(axis=0)
+        span_j = float(hi[j] - lo[j]) if float(hi[j] - lo[j]) > 1e-12 else 1.0
+        n_probe = 48
+        ext = 1.5 * span_j          # [v27] sondes plus loin (1.5×) et plus denses
+        if direction == "low":
+            grid = np.linspace(lo[j] - ext, lo[j], n_probe)
+        elif direction == "both":
+            grid = np.concatenate([
+                np.linspace(lo[j] - ext, lo[j], n_probe // 2),
+                np.linspace(hi[j], hi[j] + ext, n_probe // 2)])
+        else:  # "high" (forecasting) — prolonge vers le haut
+            grid = np.linspace(hi[j], hi[j] + ext, n_probe)
+        med = np.median(Xm, axis=0)
+        probe = np.tile(med, (len(grid), 1)); probe[:, j] = grid
+        _EXTRAP_PROBE_XS = probe
+        y_lo = float(np.min(ys_np)); y_hi = float(np.max(ys_np))
+        rng_y = max(1e-9, y_hi - y_lo)
+        K = 2.0    # la tendance peut se prolonger de 2 amplitudes, pas exploser
+        _EXTRAP_BAND = (y_lo - K * rng_y, y_hi + K * rng_y)
+
+    # Choix du SPLIT. LEÇON (données batterie) : pour extrapoler, entraîner sur
+    # TOUTES les données — surtout les points de bord — donne une meilleure
+    # PENTE que de les retirer pour valider. Retirer la frontière du train
+    # dégrade l'estimation de tendance et fait dériver l'extrapolation. Le split
+    # frontière reste disponible (EXTRAPOLATION_FRONTIER_SPLIT=True) mais n'est
+    # PLUS le défaut : le mode extrapolation = split aléatoire (train complet)
+    # + garde anti-divergence + candidat linéaire plancher.
+    use_frontier = extrap and bool(getattr(cfg, "EXTRAPOLATION_FRONTIER_SPLIT", False))
+    if use_frontier:
+        lo = Xm.min(axis=0); hi = Xm.max(axis=0)
+        mid = 0.5 * (lo + hi); half = np.maximum(0.5 * (hi - lo), 1e-12)
+        if feat_ok:
+            j = int(feat)
+            signed = (Xm[:, j] - mid[j]) / half[j]
+            edge = signed if direction == "high" else \
+                   (-signed if direction == "low" else np.abs(signed))
+            _bd = f"axe #{j} (sens={direction})"
+        else:
+            edge = np.max(np.abs(Xm - mid) / half, axis=1)
+            _bd = "toutes features"
+        order = np.argsort(-edge, kind="stable")
+        frac_band = float(getattr(cfg, "EXTRAPOLATION_FRONTIER_FRAC", 0.20))
+        n_band = min(max(n_val, int(round(n * frac_band))), n - 20)
+        val_idx = np.sort(order[:n_band]); tr_idx = np.sort(order[n_band:])
+        _split_kind = f"FRONTIÈRE [{_bd}]"; _seed_note = "déterministe"
+    else:
+        rng = np.random.RandomState(int(getattr(cfg, "HOLDOUT_SEED", 1234)))
+        idx = rng.permutation(n)
+        val_idx = np.sort(idx[:n_val]); tr_idx = np.sort(idx[n_val:])
+        _guard = " +garde-divergence" if (extrap and feat_ok) else ""
+        _split_kind = "aléatoire" + _guard
+        _seed_note = f"seed={getattr(cfg,'HOLDOUT_SEED',1234)}"
+
     _VAL_XS = xs_np[val_idx]
     _VAL_YS = ys_np[val_idx]
     xs_tr   = xs_np[tr_idx]
     ys_tr   = ys_np[tr_idx]
     _VAL_TRAIN_XS = xs_tr
     _VAL_TRAIN_YS = ys_tr
-    print(f"[v21-VAL] Hold-out actif : {len(tr_idx)} points train / "
-          f"{n_val} points validation ({frac:.0%}, seed={getattr(cfg,'HOLDOUT_SEED',1234)})")
+    print(f"[v21-VAL] Hold-out {_split_kind} : {len(tr_idx)} points train / "
+          f"{len(val_idx)} points validation ({len(val_idx)/n:.0%}, {_seed_note})")
     print(f"          L'évolution ne voit QUE le train ; champion final "
           f"sélectionné sur la validation.")
     return xs_tr, ys_tr
+
+
+def _make_linear_candidate(xs_tr, ys_tr, cfg):
+    """[v24-EXTRAP] Fabrique un candidat LINÉAIRE OLS  y ≈ a0 + Σ a_i·X[i]  à
+    partir du TRAIN (intérieur du domaine), construit comme un petit arbre Node.
+    Il concourt ensuite dans la sélection finale, qui — en mode extrapolation —
+    juge sur la bande-frontière. Une droite ne peut pas diverger hors-plage :
+    si la loi est quasi-linéaire, la sélection parcimonieuse la préfère aux
+    formes courbes qui sur-ajustent l'intérieur puis dérivent au bord.
+
+    [v24.2] CORRECTIF : si un axe d'extrapolation est désigné
+    (EXTRAPOLATION_FEATURE), le candidat n'est ajusté QUE sur cet axe. Ajuster
+    sur des features qui ne tendent pas (ex. température, courant) injecte des
+    coefficients parasites qui divergent dès que ces features dérivent hors de
+    la plage d'entraînement — un piège déterministe observé sur données réelles."""
+    try:
+        Xall = xs_tr if (isinstance(xs_tr, np.ndarray) and xs_tr.ndim == 2) \
+            else np.asarray(xs_tr, dtype=float).reshape(len(ys_tr), -1)
+        y = np.asarray(ys_tr, dtype=float)
+        terms_all = list(getattr(cfg, "TERMINALS", []))
+        feat = getattr(cfg, "EXTRAPOLATION_FEATURE", None)
+        if feat is not None and 0 <= int(feat) < Xall.shape[1]:
+            cols = [int(feat)]                    # droite sur l'axe désigné seul
+        else:
+            cols = list(range(Xall.shape[1]))     # sinon, toutes les features
+        X = Xall[:, cols]
+        n, d = X.shape
+        if n < d + 2:
+            return None
+        A = np.hstack([np.ones((n, 1)), X])              # [1 | X_cols]
+        coef, *_ = np.linalg.lstsq(A, y, rcond=None)     # [a0, a1, …]
+        if not np.all(np.isfinite(coef)):
+            return None
+        a0 = float(coef[0])
+        scale = max(1e-9, float(np.std(y)))
+        node = Node(round(a0, 8))
+        for k, col in enumerate(cols):
+            ak = float(coef[k + 1])
+            if abs(ak) < 1e-6 * scale:        # coefficient négligeable → omis
+                continue
+            name = terms_all[col] if col < len(terms_all) else f"X[{col}]"
+            term = Node('*', Node(round(ak, 8)), Node(name))
+            node = Node('+', node, term)
+        return node
+    except Exception:
+        return None
 
 
 def _smart_reset_explorers(islands: List["Island"], cfg: Config,
@@ -5677,6 +6045,17 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # lexicase, Adam, stigmergie, parallélisme) ne voit que le TRAIN.
     xs_full, ys_full = xs, ys
     xs, ys = _split_holdout(xs, ys, cfg)
+
+    # [v24-EXTRAP] En mode extrapolation, on ajoute une DROITE (OLS) au pool de
+    # candidats-champions. Elle est ajustée sur le train (intérieur) puis jugée,
+    # comme tous les candidats, sur la bande-frontière. Opt-in : sans effet sur
+    # les runs normaux (EXTRAPOLATION_MODE reste False par défaut).
+    if bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) and _VAL_XS is not None:
+        _lin = _make_linear_candidate(xs, ys, cfg)
+        if _lin is not None:
+            _track_val_candidate(_lin)
+            print(f"[v24-EXTRAP] Candidat linéaire injecté dans la sélection : "
+                  f"{to_string(_lin)}")
 
     # Initialisation des îles (la dernière = île C stigmergique)
     islands = []
@@ -5948,6 +6327,22 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             slot          = (base + j) // cfg.N_ISLANDS
             if seed_node is not None and slot < len(target_island.population):
                 target_island.population[slot] = seed_node.copy()
+    # [v28-MOTIFS] Injection des motifs de composition (round-robin, slots
+    # suivants). Opt-out via cfg.MOTIF_SEEDS=False. Tirage dépendant du SEED :
+    # chaque restart (v27) instancie d'autres appariements de variables.
+    # [v29.1] Les motifs servent la RÉCUPÉRATION (structures riches en-domaine) ;
+    # en mode EXTRAPOLATION ils injectent des formes courbes plausibles dans la
+    # bande mais trompeuses au-delà (mesuré : batterie méd +0.52 → +0.18).
+    # On les coupe donc quand EXTRAPOLATION_MODE est actif.
+    if bool(getattr(cfg, "MOTIF_SEEDS", True)) \
+            and not bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
+        _motifs = _make_motif_seeds(cfg, int(getattr(cfg, "MOTIF_SEEDS_N", 32)))
+        _base2 = len(seeds) + (len(_cseeds) if _cseeds else 0)
+        for j, mnd in enumerate(_motifs):
+            target_island = islands[j % cfg.N_ISLANDS]
+            slot          = (_base2 + j) // cfg.N_ISLANDS
+            if slot < len(target_island.population):
+                target_island.population[slot] = mnd
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.
@@ -6093,20 +6488,51 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # suivi en cours de run bat le champion-train sur le hold-out, il prend
     # sa place. Puis rapport train vs validation, avec alerte surapprentissage.
     if _VAL_XS is not None and global_best is not None:
+        # [v26-LM] POLISSAGE DES FINALISTES : avant la sélection parcimonieuse,
+        # on affine par LM les constantes des meilleurs candidats suivis. Sans
+        # cela, la règle 1-SE compare des structures aux constantes brutes — une
+        # forme simple et EXACTE peut perdre contre un gros arbre simplement
+        # parce que ses constantes n'étaient pas encore ajustées. Coût : ~ms.
+        try:
+            _top = sorted(_VAL_CANDS, key=lambda t: (t[0], t[2]))[:8]
+            for _mse_i, _se_i, _sz_i, _nd_i in _top:
+                _pol = optimize_constants_adam(_nd_i.copy(), xs, ys, cfg)
+                _track_val_candidate(_pol)
+        except Exception:
+            pass
         _champ_val = _holdout_mse(global_best, xs, ys)
         _sel, _sel_val = _select_one_se(global_best, _champ_val)
+        # [v25-EXTRAP] Le garde anti-divergence PRIME sur la parcimonie : si le
+        # champion lui-même diverge hors-plage, il doit céder la place au
+        # meilleur candidat stable, même si ce dernier n'est ni plus petit ni
+        # meilleur en validation interne (sa MSE interne peut être pire — c'est
+        # justement le point : le divergent gagne EN INTERNE et explose DEHORS).
+        _champ_unstable = not _is_numerically_stable(global_best)
         _really_diff = (_sel is not global_best and
-                        (tree_size(_sel) < tree_size(global_best) or
+                        (_champ_unstable or
+                         tree_size(_sel) < tree_size(global_best) or
                          _sel_val < _champ_val * 0.999))
         if _really_diff:
             _sz_sel, _sz_old = tree_size(_sel), tree_size(global_best)
-            if _sz_sel < _sz_old:
+            if _champ_unstable:
+                _why = "champion divergent hors-plage remplacé par un candidat stable"
+            elif _sz_sel < _sz_old:
                 _why = f"plus simple ({_sz_sel} nœuds vs {_sz_old}, R² équivalent)"
             else:
                 _why = f"meilleur en validation (val {_sel_val:.3e} vs {_champ_val:.3e})"
             print(f"[v21-VAL] Sélection parcimonieuse : champion remplacé — {_why}")
             global_best = _sel.copy()
             _champ_val  = _sel_val
+        # [v25-EXTRAP] FILET DE SÉCURITÉ DUR : en mode extrapolation, ne JAMAIS
+        # livrer un modèle qui diverge hors-plage. Si, malgré tout, le champion
+        # final échoue encore au garde (aucun candidat stable n'avait été suivi),
+        # on retombe sur la droite OLS — sûre par construction.
+        if _EXTRAP_PROBE_XS is not None and not _is_numerically_stable(global_best):
+            _lin_fb = _make_linear_candidate(xs, ys, cfg)
+            if _lin_fb is not None and _is_numerically_stable(_lin_fb):
+                print("[v25-EXTRAP] ⚠ Champion encore divergent → repli sur la droite (plancher sûr).")
+                global_best = _lin_fb
+                _champ_val  = _holdout_mse(global_best, xs, ys)
         _champ_train = _pure_mse(global_best, xs, ys)
         _var_val     = float(np.var(_VAL_YS)) if len(_VAL_YS) > 1 else 0.0
         _r2_val      = (1.0 - _champ_val / _var_val) if _var_val > 1e-15 else float("nan")
@@ -7381,9 +7807,10 @@ def _interactive_menu():
     print("    4. Problème N-D unique    — régression multi-variables  [v16-NDIM]")
     print("    5. ★ SYRACUSE / Collatz  — temps de vol, 4 features [log2,v2,odd_part,mod4_1]  [SYRACUSE]")
     print("    6. ★ CSV générique       — régression sur VOS données (n'importe quel fichier)  [v22-CSV]")
+    print("    7. ★ PRÉVISION           — extrapoler une tendance au-delà de VOS données  [v30]")
     print()
-    mode_choice = _ask("  Votre choix [1/2/3/4/5/6] (défaut=1) : ",
-                       valid=["1", "2", "3", "4", "5", "6"], default="1")
+    mode_choice = _ask("  Votre choix [1/2/3/4/5/6/7] (défaut=1) : ",
+                       valid=["1", "2", "3", "4", "5", "6", "7"], default="1")
     print()
 
     # ══════════════════════════════════════════════════════════════════════
@@ -7828,6 +8255,80 @@ def _interactive_menu():
         else:
             print("[ERREUR] Aucune solution trouvée.")
         _pause()
+
+    # ══════════════════════════════════════════════════════════════════════
+    # ══════════════════════════════════════════════════════════════════════
+    # MODE 7 — PRÉVISION [v30] : extrapolation gardée le long d'un axe
+    # (config VALIDÉE : axe seul en entrée, garde anti-divergence, restarts,
+    #  sélection-frontière méta, front de Pareto — via l'API)
+    # ══════════════════════════════════════════════════════════════════════
+    elif mode_choice == "7":
+        print("  ★ Mode PRÉVISION — extrapoler une tendance au-delà des données")
+        print()
+        path = input("  Chemin du fichier CSV : ").strip().strip('"').strip("'")
+        if not path:
+            print("[ERREUR] Aucun chemin fourni."); _pause(); return
+        try:
+            import pandas as _pd7
+            _df7 = _pd7.read_csv(path, sep=None, engine="python")
+            _df7.columns = [str(c).strip() for c in _df7.columns]
+        except Exception as _e:
+            print(f"[ERREUR] Lecture impossible : {_e}"); _pause(); return
+        cols = list(_df7.columns)
+        print(f"\n  Colonnes détectées : {cols}")
+        tgt = input(f"  Colonne CIBLE [défaut = dernière '{cols[-1]}'] : ").strip()
+        target_col = tgt if tgt in cols else cols[-1]
+        others = [c for c in cols if c != target_col]
+        _guess = "cycle" if "cycle" in others else others[0]
+        ax = input(f"  AXE de prévision (la variable qui avance : temps, cycle…) "
+                   f"[défaut='{_guess}'] : ").strip()
+        axis_col = ax if ax in others else _guess
+        dr = _ask("  Sens [h=valeurs hautes/futur (défaut) / l=basses / b=les deux] : ",
+                  valid=["h", "l", "b", ""], default="h")
+        direction = {"h": "high", "l": "low", "b": "both", "": "high"}[dr]
+        rs = input("  Restarts (fiabilité ; défaut=4) : ").strip()
+        n_rs = int(rs) if rs.isdigit() and int(rs) > 0 else 4
+        X7 = _df7[[axis_col]].to_numpy(dtype=float)
+        y7 = _df7[target_col].to_numpy(dtype=float)
+        print(f"\n  ✓ {len(y7)} points | prévision de '{target_col}' le long de "
+              f"'{axis_col}'  (sens={direction}, restarts={n_rs})")
+        print("    Note : en prévision, seules les variables qui TENDENT sont")
+        print("    utilisables — les autres colonnes sont ignorées (validé v25).")
+        import sys as _sys7
+        _sys7.modules.setdefault("core", _sys7.modules[__name__])
+        try:
+            import api as _api7
+        except Exception as _e:
+            print(f"[ERREUR] api.py doit être dans le même dossier ({_e})")
+            _pause(); return
+        print("\n  Évolution en cours (1 à 3 minutes selon la machine)...")
+        _t7 = time.time()
+        r7 = _api7.symbolic_regression(
+            X7, y7, feature_names=[axis_col], operators="physical",
+            generations=30, speed="fast", validation_split=0.20, seed=0,
+            restarts=n_rs, extrapolate_feature=axis_col,
+            extrapolate_direction=direction)
+        print(f"  Terminé en {time.time()-_t7:.0f}s")
+        print("\n" + "=" * 70)
+        print("RÉSULTAT PRÉVISION")
+        print("=" * 70)
+        print(f"  Modèle    : {r7.expression}")
+        print(f"  R² (val)  : {r7.r2_validation:.4f}   taille : {r7.size}")
+        if r7.pareto:
+            print("\n  Front de Pareto (complexité ↔ précision) :")
+            for _e7 in r7.pareto:
+                print("   ", _e7)
+        a_lo, a_hi = float(X7[:, 0].min()), float(X7[:, 0].max())
+        _span = max(a_hi - a_lo, 1e-12)
+        print(f"\n  Projection au-delà des données "
+              f"({axis_col} observé : {a_lo:g} → {a_hi:g}) :")
+        for _fr in (0.10, 0.25, 0.50, 0.75):
+            _av = a_hi + _fr * _span if direction != "low" else a_lo - _fr * _span
+            _pv = float(r7.predict(np.array([[_av]]))[0])
+            print(f"    {axis_col} = {_av:>10.4g}   →   {target_col} ≈ {_pv:.4f}")
+        print("\n  ⚠ Une extrapolation reste une hypothèse : plus on s'éloigne")
+        print("    des données, moins elle est fiable.")
+        _pause(); return
 
     # ══════════════════════════════════════════════════════════════════════
     # MODE 6 — CSV générique [v22-CSV] : régression sur les données de l'utilisateur
