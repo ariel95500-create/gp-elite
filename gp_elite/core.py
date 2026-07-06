@@ -249,9 +249,9 @@ GP_ELITE.py  —  Genetic Programming symbolique haute performance
       Compatibilité totale avec le cache fitness, l'optimiseur Adam et le tri
       de la population (valeur plus basse = meilleure, inchangé).
 
-  47. [OBJECTIF 2] Démarrage Différé + Filtre Qualité (Anti-Puits Empoisonné)
-      Résout le "Puits Empoisonné" : en génération 0, la stigmergie absorbait
-      des fragments issus d'arbres aléatoires → bruit → convergence précoce.
+  47. [OBJECTIF 2] Démarrage Différé + Filtre Qualité (Anti-Poisoned Well)
+      Résout le "Poisoned Well" : en génération 0, la stigmergie absorbait
+      des fragments issus d'arbres randoms → bruit → convergence précoce.
 
       Dans evolve_island(), avant chaque dépôt stigmergique :
         · BURN_IN_GENERATIONS    = 20   (générations de chauffe)
@@ -328,7 +328,7 @@ GP_ELITE.py  —  Genetic Programming symbolique haute performance
       - _invalidate_all_hashes() : invalidation récursive sur tout l'arbre
         (et non plus seulement la racine) → évaluation NumPy toujours fraîche
       - LR adaptative : divisée par 2 après 5 pas sans amélioration
-      - Restart aléatoire depuis les meilleures valeurs si blocage ≥ 10 pas
+      - Restart random depuis les meilleures valeurs si blocage ≥ 10 pas
       - Plus d'itérations quand peu de constantes (≤4) : max_iter × 2
 
   32. Hot zones adaptées par problème (_HOT_ZONES)
@@ -806,8 +806,8 @@ def init_probe_set(cfg: "Config", n_probe: int = 30) -> np.ndarray:
     cfg.N_FEATURES colonnes. Cela garantit la compatibilité avec tous les
     problèmes (1-D à N-D) sans dimension mismatch.
 
-    Stratégie d'échantillonnage : grille régulière + points aléatoires.
-    La grille couvre les extrema et le centre ; les points aléatoires
+    Stratégie d'échantillonnage : grille régulière + points randoms.
+    La grille couvre les extrema et le centre ; les points randoms
     assurent une couverture dense de l'espace intérieur.
     """
     n_feat    = len(cfg.TERMINALS) if hasattr(cfg, 'TERMINALS') else 1
@@ -819,7 +819,7 @@ def init_probe_set(cfg: "Config", n_probe: int = 30) -> np.ndarray:
     rng       = np.random.default_rng(seed=42)   # seed fixe = reproductible
     grid_rows = rng.choice(grid_pts, size=(n_grid, n_feat))
 
-    # Points aléatoires uniformes (couverture dense)
+    # Points randoms uniformes (couverture dense)
     n_rand    = n_probe - n_grid
     rand_rows = rng.uniform(x_lo, x_hi, size=(n_rand, n_feat))
 
@@ -1431,8 +1431,10 @@ class FragmentSequenceMemory:
             "feature_importance": feature_importance_norm,  # [v16-NDIM]
         }
 
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=4)
+        _written = _safe_write(filepath,
+                               lambda f: json.dump(payload, f, indent=4),
+                               what="meta-grammar")
+        filepath = _written or filepath   # downstream messages show the real path
 
         # ── Statistiques de décomposition structurel / spécifique ────────
         SPECIFIC_OPS = {'sin', 'cos', 'tanh', 'exp', 'log', 'sqrt',
@@ -1447,9 +1449,9 @@ class FragmentSequenceMemory:
             else:
                 n_structural += 1
 
-        print(f"\n[TRANSFER-EXPORT] Grammaire séquentielle → {filepath} "
+        print(f"\n[TRANSFER-EXPORT] Sequence grammar → {filepath} "
               f"({len(self.transitions)} transitions : "
-              f"{n_structural} structurelles | {n_specific_} spécifiques).")
+              f"{n_structural} structural | {n_specific_} specific).")
         if feature_importance_norm:
             sorted_fi = sorted(feature_importance_norm.items(),
                                key=lambda kv: -kv[1])
@@ -1463,7 +1465,7 @@ class FragmentSequenceMemory:
 
         Deux modes de transfert :
 
-        structural_only=False (défaut) — transfert différentiel classique :
+        structural_only=False (default) — transfert différentiel classique :
           · Règles génériques (composition : +, -, *, /)
             → decay normal : se transfèrent bien entre problèmes
           · Règles spécifiques (sin, cos, tanh, exp, log, sqrt…)
@@ -1490,7 +1492,7 @@ class FragmentSequenceMemory:
         SPECIFIC_PENALTY = 0.2
 
         if not os.path.exists(filepath):
-            print(f"\n[TRANSFER-IMPORT] Aucun fichier trouvé : {filepath} — démarrage à blanc.")
+            print(f"\n[TRANSFER-IMPORT] No file found: {filepath} — starting blank.")
             return False
 
         with open(filepath, "r", encoding="utf-8") as f:
@@ -1547,12 +1549,12 @@ class FragmentSequenceMemory:
         mode_str = "structural_only" if structural_only else "différentiel"
         if structural_only:
             print(f"\n[TRANSFER-IMPORT] Grammaire {mode_str} depuis {filepath} "
-                  f"({n_generic} règles structurelles decay={decay:.2f} "
-                  f"| {n_filtered} règles spécifiques filtrées).")
+                  f"({n_generic} structural rules decay={decay:.2f} "
+                  f"| {n_filtered} specific rules filtered).")
         else:
-            print(f"\n[TRANSFER-IMPORT] Grammaire injectée depuis {filepath} "
-                  f"({len(self.transitions)} règles : {n_generic} génériques decay={decay:.2f} "
-                  f"| {n_specific} spécifiques decay={decay * SPECIFIC_PENALTY:.3f}).")
+            print(f"\n[TRANSFER-IMPORT] Grammar injected from {filepath} "
+                  f"({len(self.transitions)} rules: {n_generic} generic decay={decay:.2f} "
+                  f"| {n_specific} specific decay={decay * SPECIFIC_PENALTY:.3f}).")
         return True
 
 
@@ -1599,8 +1601,8 @@ class Config:
     # Optimisation des constantes (Adam)
     CONST_OPT_PROB: float  = 0.15   # [v14.5] Throttling Adam : 15% pour diviser le coût CPU × 5
     CONST_OPT_ITER: int    = 20
-    # [v26-LM] Optimiseur de constantes : True = Levenberg-Marquardt (défaut,
-    # moindres carrés natifs, précision machine, déterministe) ; False = voie
+    # [v26-LM] Optimiseur de constantes : True = Levenberg-Marquardt (default,
+    # moindres carrés natifs, précision machine, deterministic) ; False = voie
     # Adam historique (1er ordre). LM est le levier n°1 des moteurs SR de
     # référence — voir optimize_constants_lm.
     CONST_OPT_LM: bool     = True
@@ -1630,7 +1632,7 @@ class Config:
     NOISE_STD: float       = 0.0     # bruit sur les cibles (0 = propre)
 
     # [v16-NDIM] Terminal set dynamique
-    # Mode 1-D (défaut) : ["x"]
+    # Mode 1-D (default) : ["x"]
     # Mode N-D          : ["X[0]", "X[1]", …, "X[n_features-1]"]
     # Généré automatiquement par make_cfg_nd() ou renseigné manuellement.
     TERMINALS: List[str]   = field(default_factory=lambda: ["x"])
@@ -1673,8 +1675,8 @@ class Config:
 
     # [v24-EXTRAP] Mode extrapolation dédié (OPT-IN, n'affecte PAS les runs normaux)
     #   Quand True, deux changements ciblés, validés empiriquement :
-    #     1. Le hold-out n'est plus un tirage ALÉATOIRE mais la BANDE-FRONTIÈRE
-    #        du domaine (les points les plus au bord). Le R² interne aléatoire
+    #     1. Le hold-out n'est plus un tirage ALÉATOIRE mais la BANDE-FRONTIER
+    #        du domaine (les points les plus au bord). Le R² interne random
     #        ne discrimine pas l'extrapolation (≈0.998 pour tous) ; le R² sur la
     #        frontière, lui, la prédit. Le champion livré est donc celui qui
     #        tient AU BORD, pas celui qui gratte un epsilon à l'intérieur.
@@ -1688,7 +1690,7 @@ class Config:
     #        (axe d'extrapolation prolongé) et on rejette toute prédiction
     #        implausible. Sans lui, GP explose à l'extrapolation (exp/pow/x²/
     #        cube) car la divergence est invisible sur un hold-out interne.
-    #     2. TRAIN COMPLET : split aléatoire (pas frontière) — retirer les
+    #     2. TRAIN COMPLET : split random (pas frontière) — retirer les
     #        points de bord du train dégrade l'estimation de la pente.
     #     3. RESTRICTION À L'AXE QUI TEND : ne nourrir que la (les) feature(s)
     #        porteuse(s) de tendance. Les features qui n'évoluent pas (temp,
@@ -1715,13 +1717,13 @@ class Config:
     EXTRAPOLATION_DIRECTION: str         = "both"
     #   [v25] Type de split en mode extrapolation. LEÇON batterie : entraîner
     #   sur TOUTES les données (y compris le bord) estime mieux la pente que de
-    #   retirer la frontière pour valider. Défaut False → split aléatoire (train
+    #   retirer la frontière pour valider. Défaut False → split random (train
     #   complet) + garde anti-divergence + candidat linéaire. True = ancien
     #   hold-out frontière (à réserver aux cas où l'on veut valider au bord).
     EXTRAPOLATION_FRONTIER_SPLIT: bool   = False
 
     # [REPRO] Seed maître propagé depuis l'API. Sert à dériver de façon
-    # déterministe les seeds des workers parallèles (None = non reproductible).
+    # deterministic les seeds des workers parallèles (None = non reproductible).
     SEED: Optional[int] = None
 
     # [v20] Parallélisme des îles (ProcessPoolExecutor, spawn-safe Windows)
@@ -1735,7 +1737,7 @@ class Config:
     PARALLEL_ROUND: int = 0          # 0 = auto : min(10, MIGRATION_INTERVAL)
 
     # [v19] Déduplication sémantique de population (cf. Operon / PySR)
-    USE_SEMANTIC_DEDUP: bool = False # écarte les clones comportementaux ; OFF par défaut :
+    USE_SEMANTIC_DEDUP: bool = False # écarte les clones comportementaux ; OFF par default :
     #   sur cette base le taux de clones est ~14%%, insuffisant pour amortir le
     #   coût du hash sémantique. Activable pour gros POP_SIZE ou problèmes très
     #   convergents (Operon/PySR l'utilisent sur des populations moins diverses).
@@ -1788,7 +1790,7 @@ _BATTERY_UNARY_WEIGHTS  = [4, 3, 3, 2, 3, 1]
 # [v22-CSV] Pools d'opérateurs sélectionnables pour le mode CSV générique ──────
 # L'utilisateur choisit la "physique" de son problème au chargement :
 #   physical : exp/log/sqrt/tanh/pow — lois de décroissance, saturation,
-#              Arrhenius, diffusion (défaut pour données expérimentales)
+#              Arrhenius, diffusion (default pour données expérimentales)
 #   trig     : + sin/cos — phénomènes périodiques/oscillants
 #   full     : tout — quand on ne sait pas a priori
 #   poly     : uniquement +,-,*,/,sq,cube,sqrt — relations algébriques pures
@@ -1888,7 +1890,7 @@ def _active_pools():
 
     Garantit qu'aucun opérateur étranger au problème (sin/cos/tanh en mode
     Syracuse ; sin/cos/tan en mode batterie) ne s'infiltre dans la population
-    via un tirage aléatoire non supervisé.
+    via un tirage random non supervisé.
     """
     if _GENERIC_CSV_MODE:
         b_ops, b_w = _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS
@@ -2858,8 +2860,8 @@ def generate_syracuse_dataset(n_start: int = 2,
 
     Paramètres
     ----------
-    n_start : premier entier (défaut 2)
-    n_end   : dernier entier inclus (défaut 2000)
+    n_start : premier entier (default 2)
+    n_end   : dernier entier inclus (default 2000)
 
     Retourne
     --------
@@ -2973,10 +2975,10 @@ def generate_syracuse_dataset(n_start: int = 2,
     v2_max    = int(feat_v2.max())
     pct_mod   = float((ns % 4 == 1).mean() * 100)
     print(
-        f"[SYRACUSE_COLLATZ] ✓ Dataset généré : {n_samples} échantillons, "
-        f"10 features → normalisées dans [-2.0, 2.0]"
+        f"[SYRACUSE_COLLATZ] ✓ Dataset generated: {n_samples} samples, "
+        f"10 features → normalized to [-2.0, 2.0]"
     )
-    print(f"  Départ       : n ∈ [{n_start}, {n_end}]")
+    print(f"  Start        : n ∈ [{n_start}, {n_end}]")
     print(f"  Temps de vol : min={int(y_min_raw)}  max={int(y_max_raw)}  "
           f"moy={flights.mean():.1f}")
     print(f"  Features     :")
@@ -2986,12 +2988,12 @@ def generate_syracuse_dataset(n_start: int = 2,
     print(f"    X[3] = is_mod4_1(n)        {pct_mod:.1f}% de 1  (indicateur ±1)")
     print(f"    X[4] = log2(n)*log2(v2+1)  interaction 2-adique × trend")
     print(f"    X[5] = log(max_h2/max_h1)  ∈ [0, {lmh2_max:.2f}]  moy={lmh2_mean:.2f}  r=0.73 ★★")
-    print(f"    X[6] = log(traj_step_14)   trajectoire étape 14  r_vol=0.54 [V42]")
-    print(f"    X[7] = log(traj_step_21)   trajectoire étape 21  r_vol=0.66 [V42]")
-    print(f"    X[8] = log(traj_step_28)   trajectoire étape 28  r_vol=0.76 [V42] ★")
-    print(f"    X[9] = log(traj_step_30)   trajectoire étape 30  r_vol=0.77 [V42] ★")
-    print(f"  Opérateurs   : {_SYRACUSE_UNARY_OPS + _SYRACUSE_BINARY_OPS}")
-    print(f"  step/max/min : ✓ conditions IF symboliques activées [V42]")
+    print(f"    X[6] = log(traj_step_14)   trajectory step 14  r_vol=0.54 [V42]")
+    print(f"    X[7] = log(traj_step_21)   trajectory step 21  r_vol=0.66 [V42]")
+    print(f"    X[8] = log(traj_step_28)   trajectory step 28  r_vol=0.76 [V42] ★")
+    print(f"    X[9] = log(traj_step_30)   trajectory step 30  r_vol=0.77 [V42] ★")
+    print(f"  Operators    : {_SYRACUSE_UNARY_OPS + _SYRACUSE_BINARY_OPS}")
+    print(f"  step/max/min : ✓ symbolic IF conditions enabled [V42]")
 
     return X_scaled, y_scaled
 
@@ -3045,7 +3047,7 @@ def build_dataset(func, cfg: Config,
             np.linspace(cfg.X_MIN, cfg.X_MAX, n_regular)
             for _ in range(n_features)
         ])
-        # Points aléatoires
+        # Points randoms
         rows_rnd = np.random.uniform(cfg.X_MIN, cfg.X_MAX,
                                      (n_random, n_features))
         # Points focalisés (hot zones 1-D appliquées à chaque feature)
@@ -3154,7 +3156,7 @@ _USE_LINEAR_SCALING: bool = True   # synchronisé sur cfg dans evolve()
 
 # [CUSTOM-LOSS] Fonction de coût personnalisée optionnelle.
 # Signature : loss_fn(predictions: np.ndarray, X: np.ndarray, y: np.ndarray) -> float
-# Si None → comportement par défaut (MSE/corrélation hybride supervisé).
+# Si None → comportement par default (MSE/corrélation hybride supervisé).
 # Si fournie → REMPLACE entièrement le calcul d'erreur, et le linear scaling
 # est ignoré (il suppose le MSE supervisé). Une valeur basse = meilleur.
 _CUSTOM_LOSS_FN = None
@@ -3163,6 +3165,30 @@ _CUSTOM_LOSS_FN = None
 # initiale (un par île, round-robin). Sert à amorcer la recherche avec des
 # briques structurelles pertinentes (ex. X[0]², X[1]² pour une loi d'énergie).
 # Rempli par l'API ; None/vide = pas d'amorçage custom.
+def _safe_write(filepath, writer, what="file"):
+    """[v0.2.2] An export must NEVER kill a finished run. Try the requested
+    path, then the system temp directory; on total failure, warn and return
+    None. Returns the path actually written, or None."""
+    import tempfile, os as _os
+    _err = None
+    for target in (str(filepath),
+                   _os.path.join(tempfile.gettempdir(),
+                                 _os.path.basename(str(filepath)))):
+        try:
+            with open(target, "w", encoding="utf-8", newline="") as f:
+                writer(f)
+            if target != str(filepath):
+                print(f"  ⚠ Could not write {what} to '{filepath}' — "
+                      f"saved to '{target}' instead.")
+            return target
+        except OSError as e:
+            _err = e
+    print(f"  ⚠ {what} export skipped ({type(_err).__name__}: {_err}). "
+          f"Hint: run from a writable folder — OneDrive / Windows "
+          f"'Controlled Folder Access' can block Python writes.")
+    return None
+
+
 _CUSTOM_SEEDS = None
 
 # ════════════════════════════════════════════════════════════════
@@ -3314,7 +3340,7 @@ def raw_mse(node, xs, ys) -> float:
                 # loss. Le scaling MSE en forme fermée donne déjà de bons a,b
                 # même pour une loss robuste, et débloque la calibration des
                 # coefficients (sinon le GP peine à trouver la bonne droite).
-                # Désactivé par défaut (non-supervisé / invariants).
+                # Désactivé par default (non-supervisé / invariants).
                 if globals().get("_CUSTOM_LOSS_USE_SCALING", False) and float(np.std(preds)) > 1e-9:
                     if globals().get("_CUSTOM_LOSS_ROBUST", False):
                         a_ls, b_ls, _ok = _robust_scale_params(preds, ys_np)
@@ -3642,7 +3668,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
             # Inspiré de GP_SYRACUSE_V16 FIX-A (parsimony_coeff pattern)
             _mono_pen = getattr(cfg, '_mono_pen_cache', None)
             if _mono_pen is None:
-                score += 0.08  # valeur par défaut si gen non disponible
+                score += 0.08  # valeur par default si gen non disponible
             else:
                 score += _mono_pen
 
@@ -3974,7 +4000,7 @@ def optimize_constants_adam(node: Node,
     Optimisation Adam avec compilateur paramétrique f(_x, _c).
     v14 — gain ×10–50 : une seule compilation par structure,
     les constantes varient dans un array NumPy sans recompilation.
-    [v26-LM] Par défaut, cette fonction DÉLÈGUE à Levenberg-Marquardt
+    [v26-LM] Par default, cette fonction DÉLÈGUE à Levenberg-Marquardt
     (optimize_constants_lm), nettement supérieur sur les moindres carrés.
     Mettre cfg.CONST_OPT_LM=False pour revenir à la voie Adam historique.
     """
@@ -4083,7 +4109,7 @@ def optimize_constants_adam(node: Node,
 # [v18-LEX] SÉLECTION ε-LEXICASE  (La Cava, Spector et al., 2016)
 # ════════════════════════════════════════════════════════════════
 # Au lieu d'agréger l'erreur en un scalaire (MSE), chaque événement de
-# sélection parcourt les CAS DE TEST dans un ordre aléatoire et ne garde
+# sélection parcourt les CAS DE TEST dans un ordre random et ne garde
 # que les individus à moins de ε du meilleur sur chaque cas. ε = MAD
 # (median absolute deviation) de l'erreur du cas dans la population.
 # Effet : préserve les SPÉCIALISTES (individus excellents sur un sous-
@@ -4510,7 +4536,7 @@ def build_stigmergic_tree(lib: FragmentLibrary,
     Stratégie en 3 temps :
       1. Tire un fragment racine proportionnellement à τ
       2. Greffe itérative d'autres fragments jusqu'à la taille cible
-      3. Complète les branches ouvertes par des terminaux aléatoires
+      3. Complète les branches ouvertes par des terminaux randoms
 
     Si la bibliothèque est vide → fallback random_tree classique.
 
@@ -4575,7 +4601,7 @@ def build_stigmergic_tree_v2(lib: FragmentLibrary,
       A) Si le co-graphe est assez peuplé (≥ 10 arêtes) :
          1. Tire une paire corrélée (root_frag, companion) via cograph.sample_pair()
          2. Assemble root + companion avec un opérateur binaire pondéré par τ
-         3. Greffe des fragments supplémentaires (compagnons du root ou aléatoires)
+         3. Greffe des fragments supplémentaires (compagnons du root ou randoms)
             jusqu'à la taille cible, en préférant les compagnons connus
 
       B) Sinon : fallback vers build_stigmergic_tree classique.
@@ -4615,7 +4641,7 @@ def build_stigmergic_tree_v2(lib: FragmentLibrary,
 
     bin_op = random.choices(["+", "-", "*"], weights=op_weights)[0]
 
-    # Orientation aléatoire
+    # Orientation random
     if random.random() < 0.5:
         tree = Node(bin_op, root_frag, companion)
     else:
@@ -4703,8 +4729,8 @@ def warm_transfer(decay_lib: float = 0.4,
     kept_frags = len(FRAGMENT_LIB.fragments)
     kept_edges = len(COGRAPH.co)
     kept_trans = len(SEQ_MEM.transitions)
-    print(f"[TRANSFER] Décote appliquée — "
-          f"fragments={kept_frags}  arêtes={kept_edges}  transitions={kept_trans}")
+    print(f"[TRANSFER] Decay applied — "
+          f"fragments={kept_frags}  edges={kept_edges}  transitions={kept_trans}")
 
 
 # ============================================================
@@ -5033,9 +5059,9 @@ def evolve_island(island: Island,
     # [v14.4] top_fits calculé avec la métrique de l'île
     top_fits = [fitness(ind, xs, ys, cfg, role=island.role) for ind in pop[:top_k]]
 
-    # ── OBJECTIF 2 : Démarrage Différé + Filtre Qualité (Anti-Puits Empoisonné) ──
+    # ── OBJECTIF 2 : Démarrage Différé + Filtre Qualité (Anti-Poisoned Well) ──
     # Problème : en génération 0, la stigmergie se remplit de fragments issus
-    # d'arbres aléatoires médiocres -> "bruit" qui converge vers des impasses.
+    # d'arbres randoms médiocres -> "bruit" qui converge vers des impasses.
     #
     # [v14.1 CORRECTION] Logique à deux voies (remplace l'ancien AND strict) :
     #
@@ -5057,7 +5083,7 @@ def evolve_island(island: Island,
     # -------------------------------------------------------------------------
     # [SYRACUSE] La suite de Collatz est fondamentalement chaotique : même une
     # corrélation de 0.10–0.20 représente un signal structurel réel (bien mieux
-    # qu'une valeur aléatoire). Maintenir le seuil à 0.50 bloque définitivement
+    # qu'une valeur random). Maintenir le seuil à 0.50 bloque définitivement
     # la stigmergie sur ce problème et empêche l'accumulation de fragments utiles.
     # En mode normal les seuils classiques v14.1 sont conservés.
     if _SYRACUSE_MODE:
@@ -5088,7 +5114,7 @@ def evolve_island(island: Island,
         # du bruit de diagnostic sans intérêt qui noie les vrais événements stigmergiques.
         # Afficher uniquement les vraies corrélations mesurées (r > -0.99).
         if _best_r > -0.99:
-            print(f"  [Stigmergie Bloquée] Bruit initial ou qualite insuffisante "
+            print(f"  [Stigmergy Blocked] Initial noise or insufficient quality "
                   f"(gen={generation}, r={_best_r:.3f})")
 
     # ── OBJECTIF 3 : Simplification algébrique de l'Élite avant dépôt ──────────
@@ -5239,7 +5265,7 @@ def evolve_island(island: Island,
             pass
         return False
 
-    # Injection aléatoire — utilise le générateur adapté au mode actif
+    # Injection random — utilise le générateur adapté au mode actif
     inject_n = int(len(pop) * cfg.RANDOM_INJECTION)
     _is_nd_mode = (len(cfg.TERMINALS) > 1 or
                    (len(cfg.TERMINALS) == 1 and cfg.TERMINALS[0] != "x"))
@@ -5348,7 +5374,7 @@ def evolve_island(island: Island,
                                              protected=cfg.ELITE_SIZE)
         # [v19] Refill des slots libérés : 70% par MUTATION d'un survivant
         # (préserve la qualité acquise, contrairement à des arbres 100%
-        # aléatoires qui dégradent la population), 30% par injection neuve
+        # randoms qui dégradent la population), 30% par injection neuve
         # (diversité fraîche). C'est le compromis exploration/exploitation
         # standard quand on remplace des clones.
         _refill = 0
@@ -5516,16 +5542,16 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 list(CSV_FEATURE_NAMES), CSV_TARGET_NAME)
                if _GENERIC_CSV_MODE else None)
 
-    print(f"[v20-PAR] Parallélisme actif : {len(islands)} îles / "
-          f"{n_workers} processus — rounds de {round_len} générations "
-          f"(fusion stigmergique à chaque round)")
+    print(f"[v20-PAR] Parallel mode active: {len(islands)} islands / "
+          f"{n_workers} workers — rounds of {round_len} generations "
+          f"(stigmergic merge every round)")
 
     # [v29-REPRO] DÉTERMINISME DES WORKERS. Les enfants « spawn » sont des
     # interpréteurs neufs qui relisent PYTHONHASHSEED au démarrage : non fixé,
     # chaque worker randomise le hachage des str → l'ordre d'itération des
     # `set` varie → des tirages différents À ÉTAT RNG IDENTIQUE. On fige donc
     # le hachage des enfants avant de créer le pool (sans effet sur le parent,
-    # déjà démarré). Combiné aux seeds par (île, round) déjà déterministes et
+    # déjà démarré). Combiné aux seeds par (île, round) déjà deterministics et
     # à la collecte ORDONNÉE des résultats, le mode parallèle devient
     # reproductible : même seed → même champion.
     _os.environ["PYTHONHASHSEED"] = "0"
@@ -5607,7 +5633,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                     _smart_reset_explorers(islands, cfg, gen, _cur_raw)
 
                 if global_best and raw_mse(global_best, xs, ys) < cfg.PERFECT_THRESHOLD:
-                    print(f"[✓] Solution parfaite trouvée à la génération {gen} !")
+                    print(f"[✓] Perfect solution found at generation {gen}!")
                     break
 
                 if global_best:
@@ -5615,9 +5641,9 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                     _es_mse = _holdout_mse(global_best, xs, ys)
                     if _es_mse <= cfg.EARLY_STOPPING_MSE:
                         print(f"\n{'═'*60}")
-                        print(f"  [VICTOIRE] Objectif de précision atteint à la GEN {gen:04d} !")
+                        print(f"  [SUCCESS] Precision target reached at GEN {gen:04d}!")
                         print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {cfg.EARLY_STOPPING_MSE:.2e}")
-                        print(f"  Arrêt précoce — générations restantes économisées.")
+                        print(f"  Early stop — remaining generations saved.")
                         print(f"{'═'*60}\n")
                         break
 
@@ -5627,8 +5653,8 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
         return global_best, global_score, True
 
     except Exception as _par_err:
-        print(f"[v20-PAR] ⚠ Parallélisme indisponible ({type(_par_err).__name__}: "
-              f"{_par_err}) — repli séquentiel automatique.")
+        print(f"[v20-PAR] ⚠ Parallel unavailable ({type(_par_err).__name__}: "
+              f"{_par_err}) — automatic sequential fallback.")
         return global_best, global_score, False
 
 
@@ -5743,7 +5769,7 @@ def _select_one_se(champion, champ_val):
     Le seuil n'est plus un ratio de MSE (sans signification d'un problème à
     l'autre) mais une tolérance exprimée en R² : un candidat qualifie si sa
     perte de R² par rapport au meilleur est ≤ VAL_R2_TOLERANCE (0.3% par
-    défaut), OU s'il est dans la barre d'1 erreur-type statistique du
+    default), OU s'il est dans la barre d'1 erreur-type statistique du
     meilleur (le plus large des deux). Cas batterie : le 10-nœuds (R²=0.9973)
     et le 29-nœuds (R²=0.9981) diffèrent de 0.08% → le 10-nœuds gagne."""
     pool = list(_VAL_CANDS)
@@ -5824,7 +5850,7 @@ def _split_holdout(xs, ys, cfg):
     # PENTE que de les retirer pour valider. Retirer la frontière du train
     # dégrade l'estimation de tendance et fait dériver l'extrapolation. Le split
     # frontière reste disponible (EXTRAPOLATION_FRONTIER_SPLIT=True) mais n'est
-    # PLUS le défaut : le mode extrapolation = split aléatoire (train complet)
+    # PLUS le default : le mode extrapolation = split random (train complet)
     # + garde anti-divergence + candidat linéaire plancher.
     use_frontier = extrap and bool(getattr(cfg, "EXTRAPOLATION_FRONTIER_SPLIT", False))
     if use_frontier:
@@ -5835,21 +5861,21 @@ def _split_holdout(xs, ys, cfg):
             signed = (Xm[:, j] - mid[j]) / half[j]
             edge = signed if direction == "high" else \
                    (-signed if direction == "low" else np.abs(signed))
-            _bd = f"axe #{j} (sens={direction})"
+            _bd = f"axis #{j} (sens={direction})"
         else:
             edge = np.max(np.abs(Xm - mid) / half, axis=1)
-            _bd = "toutes features"
+            _bd = "all features"
         order = np.argsort(-edge, kind="stable")
         frac_band = float(getattr(cfg, "EXTRAPOLATION_FRONTIER_FRAC", 0.20))
         n_band = min(max(n_val, int(round(n * frac_band))), n - 20)
         val_idx = np.sort(order[:n_band]); tr_idx = np.sort(order[n_band:])
-        _split_kind = f"FRONTIÈRE [{_bd}]"; _seed_note = "déterministe"
+        _split_kind = f"FRONTIER [{_bd}]"; _seed_note = "deterministic"
     else:
         rng = np.random.RandomState(int(getattr(cfg, "HOLDOUT_SEED", 1234)))
         idx = rng.permutation(n)
         val_idx = np.sort(idx[:n_val]); tr_idx = np.sort(idx[n_val:])
-        _guard = " +garde-divergence" if (extrap and feat_ok) else ""
-        _split_kind = "aléatoire" + _guard
+        _guard = " +divergence-guard" if (extrap and feat_ok) else ""
+        _split_kind = "random" + _guard
         _seed_note = f"seed={getattr(cfg,'HOLDOUT_SEED',1234)}"
 
     _VAL_XS = xs_np[val_idx]
@@ -5860,8 +5886,8 @@ def _split_holdout(xs, ys, cfg):
     _VAL_TRAIN_YS = ys_tr
     print(f"[v21-VAL] Hold-out {_split_kind} : {len(tr_idx)} points train / "
           f"{len(val_idx)} points validation ({len(val_idx)/n:.0%}, {_seed_note})")
-    print(f"          L'évolution ne voit QUE le train ; champion final "
-          f"sélectionné sur la validation.")
+    print(f"          Evolution sees ONLY the train set; final champion "
+          f"selected on the validation set.")
     return xs_tr, ys_tr
 
 
@@ -5877,7 +5903,7 @@ def _make_linear_candidate(xs_tr, ys_tr, cfg):
     (EXTRAPOLATION_FEATURE), le candidat n'est ajusté QUE sur cet axe. Ajuster
     sur des features qui ne tendent pas (ex. température, courant) injecte des
     coefficients parasites qui divergent dès que ces features dérivent hors de
-    la plage d'entraînement — un piège déterministe observé sur données réelles."""
+    la plage d'entraînement — un piège deterministic observé sur données réelles."""
     try:
         Xall = xs_tr if (isinstance(xs_tr, np.ndarray) and xs_tr.ndim == 2) \
             else np.asarray(xs_tr, dtype=float).reshape(len(ys_tr), -1)
@@ -5915,7 +5941,7 @@ def _smart_reset_explorers(islands: List["Island"], cfg: Config,
                            gen: int, cur_raw: float) -> bool:
     """[v17-SMART-RESET, extrait v20] Réinitialise les îles explorer avec des
     squelettes sémantiques ciblés (fragments corrélés au résidu courant) +
-    squelettes de diversité + 30% d'arbres aléatoires. Retourne True si au
+    squelettes de diversité + 30% d'arbres randoms. Retourne True si au
     moins une île a été réinitialisée. Partagé séquentiel/parallèle."""
     global CURRENT_RESIDUAL_SIG
     _skeleton_seeds = []
@@ -5978,8 +6004,8 @@ def _smart_reset_explorers(islands: List["Island"], cfg: Config,
 
     if _n_explorer_reset > 0:
         n_skel_used = min(len(_skeleton_seeds), 3)
-        print(f"  [SMART-RESET gen={gen}] {_n_explorer_reset} île(s) explorer "
-              f"— {n_skel_used} squelettes sémantiques + 30% aléatoire "
+        print(f"  [SMART-RESET gen={gen}] {_n_explorer_reset} explorer island(s) "
+              f"— {n_skel_used} semantic skeletons + 30% random "
               f"(RAW={cur_raw:.4f})")
         CURRENT_RESIDUAL_SIG = None
         return True
@@ -6017,7 +6043,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # [FIX-E] Réinitialiser le compteur d'usage des features
     n_feats = len(cfg.TERMINALS) if hasattr(cfg, 'TERMINALS') else 1
     reset_feature_usage(n_feats)
-    print(f"[v17-SEMANTIC] Probe set initialisé : {PROBE_X.shape[0]} points × "
+    print(f"[v17-SEMANTIC] Probe set initialized: {PROBE_X.shape[0]} points × "
           f"{PROBE_X.shape[1] if PROBE_X.ndim > 1 else 1} features  "
           f"[{cfg.X_MIN:.1f}, {cfg.X_MAX:.1f}]")
 
@@ -6029,7 +6055,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         _active_ops = _BATTERY_BINARY_OPS + _BATTERY_UNARY_OPS
     else:
         _active_ops = ALL_OPS
-    print(f"Générations : {cfg.GENERATIONS}  |  Ops : {_active_ops}")
+    print(f"Generations : {cfg.GENERATIONS}  |  Ops : {_active_ops}")
     print("=" * 70)
     print()
 
@@ -6049,12 +6075,12 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # [v24-EXTRAP] En mode extrapolation, on ajoute une DROITE (OLS) au pool de
     # candidats-champions. Elle est ajustée sur le train (intérieur) puis jugée,
     # comme tous les candidats, sur la bande-frontière. Opt-in : sans effet sur
-    # les runs normaux (EXTRAPOLATION_MODE reste False par défaut).
+    # les runs normaux (EXTRAPOLATION_MODE reste False par default).
     if bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) and _VAL_XS is not None:
         _lin = _make_linear_candidate(xs, ys, cfg)
         if _lin is not None:
             _track_val_candidate(_lin)
-            print(f"[v24-EXTRAP] Candidat linéaire injecté dans la sélection : "
+            print(f"[v24-EXTRAP] Linear candidate injected into selection: "
                   f"{to_string(_lin)}")
 
     # Initialisation des îles (la dernière = île C stigmergique)
@@ -6064,8 +6090,8 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         islands.append(Island(i, cfg, stigmergic=is_stigmergic))
 
     # [v14.4] Affichage des rôles — placé APRÈS la création de islands
-    _roles_str = ", ".join(f"île {isl.id}={isl.role}" for isl in islands)
-    print(f"GP_ELITE  —  {cfg.N_ISLANDS} îles × {cfg.POP_SIZE // cfg.N_ISLANDS} individus  ({_roles_str})")
+    _roles_str = ", ".join(f"island {isl.id}={isl.role}" for isl in islands)
+    print(f"GP_ELITE  —  {cfg.N_ISLANDS} islands × {cfg.POP_SIZE // cfg.N_ISLANDS} individuals  ({_roles_str})")
     print()
 
     # Initialiser d'abord les îles classiques pour peupler la lib
@@ -6449,7 +6475,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
 
         # Convergence parfaite
         if global_best and raw_mse(global_best, xs, ys) < cfg.PERFECT_THRESHOLD:
-            print(f"[✓] Solution parfaite trouvée à la génération {gen} !")
+            print(f"[✓] Perfect solution found at generation {gen}!")
             break
 
         # [v15] Early Stopping — arrêt précoce si MSE pur sous le seuil absolu
@@ -6458,9 +6484,9 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             _es_mse = _holdout_mse(global_best, xs, ys)
             if _es_mse <= cfg.EARLY_STOPPING_MSE:
                 print(f"\n{'═'*60}")
-                print(f"  [VICTOIRE] Objectif de précision atteint à la GEN {gen:04d} !")
+                print(f"  [SUCCESS] Precision target reached at GEN {gen:04d}!")
                 print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {cfg.EARLY_STOPPING_MSE:.2e}")
-                print(f"  Arrêt précoce — générations restantes économisées.")
+                print(f"  Early stop — remaining generations saved.")
                 print(f"{'═'*60}\n")
                 break
 
@@ -6515,12 +6541,12 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         if _really_diff:
             _sz_sel, _sz_old = tree_size(_sel), tree_size(global_best)
             if _champ_unstable:
-                _why = "champion divergent hors-plage remplacé par un candidat stable"
+                _why = "out-of-range divergent champion replaced by a stable candidate"
             elif _sz_sel < _sz_old:
-                _why = f"plus simple ({_sz_sel} nœuds vs {_sz_old}, R² équivalent)"
+                _why = f"simpler ({_sz_sel} nodes vs {_sz_old}, equivalent R²)"
             else:
                 _why = f"meilleur en validation (val {_sel_val:.3e} vs {_champ_val:.3e})"
-            print(f"[v21-VAL] Sélection parcimonieuse : champion remplacé — {_why}")
+            print(f"[v21-VAL] Parsimonious selection: champion replaced — {_why}")
             global_best = _sel.copy()
             _champ_val  = _sel_val
         # [v25-EXTRAP] FILET DE SÉCURITÉ DUR : en mode extrapolation, ne JAMAIS
@@ -6530,7 +6556,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         if _EXTRAP_PROBE_XS is not None and not _is_numerically_stable(global_best):
             _lin_fb = _make_linear_candidate(xs, ys, cfg)
             if _lin_fb is not None and _is_numerically_stable(_lin_fb):
-                print("[v25-EXTRAP] ⚠ Champion encore divergent → repli sur la droite (plancher sûr).")
+                print("[v25-EXTRAP] ⚠ Champion still divergent → falling back to the line (safe floor).")
                 global_best = _lin_fb
                 _champ_val  = _holdout_mse(global_best, xs, ys)
         _champ_train = _pure_mse(global_best, xs, ys)
@@ -6542,19 +6568,19 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             _ratio = 1.0
         print()
         print("─" * 70)
-        print("[v21-VAL] RAPPORT DE GÉNÉRALISATION (champion final)")
+        print("[v21-VAL] GENERALIZATION REPORT (final champion)")
         print(f"  MSE train      : {_champ_train:.6e}")
-        print(f"  MSE validation : {_champ_val:.6e}   (jamais vu par l'évolution)")
+        print(f"  Validation MSE : {_champ_val:.6e}   (never seen by evolution)")
         print(f"  R² validation  : {_r2_val:.4f}")
         print(f"  Ratio val/train: {_ratio:.2f}")
         if _ratio > 3.0:
             print("  ⚠ SURAPPRENTISSAGE PROBABLE : l'erreur de validation est "
-                  ">3× l'erreur d'entraînement.")
-            print("    Pistes : ↑PARSIMONY, ↓MAX_TREE_SIZE, plus de données.")
+                  ">3× the training error.")
+            print("    Hints: ↑PARSIMONY, ↓MAX_TREE_SIZE, more data.")
         elif _ratio > 1.5:
-            print("  ~ Léger écart train/val — surveiller, mais acceptable.")
+            print("  ~ Slight train/val gap — monitor, but acceptable.")
         else:
-            print("  ✓ Généralisation saine.")
+            print("  ✓ Healthy generalization.")
         print("─" * 70)
 
     # Export CSV (optionnel — silencieux si filesystem en lecture seule)
@@ -6565,16 +6591,16 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                                "size", "depth", "expr", "elapsed"])
             writer.writeheader()
             writer.writerows(log_rows)
-        print(f"[LOG] Historique exporté → {cfg.LOG_CSV}")
+        print(f"[LOG] History exported → {cfg.LOG_CSV}")
     except Exception:
         pass  # filesystem en lecture seule — ignoré silencieusement
 
     # Stats bibliothèque de fragments
     s = FRAGMENT_LIB.stats()
-    print(f"[STIGM] Fragments accumulés : {s['count']}")
+    print(f"[STIGM] Fragments accumulated: {s['count']}")
     print(f"[STIGM] τ max : {s['max_tau']:.4f}  |  τ moyen : {s['mean_tau']:.4f}")
     if s['top_ops']:
-        print(f"[STIGM] Opérateurs dominants : {s['top_ops']}")
+        print(f"[STIGM] Dominant operators: {s['top_ops']}")
     if FRAGMENT_LIB.fragments:
         print("[STIGM] Top 3 fragments :")
         for e in FRAGMENT_LIB.top_fragments(3):
@@ -6584,7 +6610,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # Stats graphe de co-occurrences (Phase 5a)
     cg = COGRAPH.stats()
     print()
-    print(f"[COGRAPH] Arêtes de co-occurrence : {cg['edges']}")
+    print(f"[COGRAPH] Co-occurrence edges: {cg['edges']}")
     print(f"[COGRAPH] co max : {cg['max_co']:.5f}  |  co moyen : {cg['mean_co']:.5f}")
     top_pairs = COGRAPH.top_pairs(5, FRAGMENT_LIB)
     if top_pairs:
@@ -6608,7 +6634,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     return global_best, xs_full, ys_full
 
 # ============================================================
-# RÉSULTAT FINAL
+# FINAL RESULT
 # ============================================================
 
 def print_result(name: str, best: Node,
@@ -6636,35 +6662,35 @@ def print_result(name: str, best: Node,
     # ─────────────────────────────────────────────────────────────────────────────
     print()
     print("=" * 70)
-    print("RÉSULTAT FINAL")
+    print("FINAL RESULT")
     print("=" * 70)
     print()
-    print(f"Cible         : {name}")
+    print(f"Target        : {name}")
     print(f"Expression    : {to_string(best)}")
     # [FIX-LABEL v20.1] Depuis v18, raw_mse() renvoie le score HYBRIDE
     # 5·(1-|r|) + mse/(1+mse) (corrélation + MSE scalé) et non plus un MSE.
     # L'étiquette « Erreur MSE » était donc fausse — le vrai MSE est _pure_mse.
-    print(f"MSE réel      : {_pure_mse(best, xs, ys):.10e}")
-    print(f"Score hybride : {raw_mse(best, xs, ys):.10f}   (5·(1-|r|) + mse/(1+mse))")
+    print(f"True MSE      : {_pure_mse(best, xs, ys):.10e}")
+    print(f"Hybrid score  : {raw_mse(best, xs, ys):.10f}   (5·(1-|r|) + mse/(1+mse))")
     print(f"Fitness       : {fitness(best, xs, ys, cfg):.10f}")
-    print(f"Taille        : {tree_size(best)}")
-    print(f"Profondeur    : {tree_depth(best)}")
+    print(f"Size          : {tree_size(best)}")
+    print(f"Depth         : {tree_depth(best)}")
     print()
 
     # Vérification sur quelques points
-    print("Vérification :")
+    print("Verification:")
     is_nd = isinstance(xs, np.ndarray) and xs.ndim == 2
     if is_nd:
         n_feat = xs.shape[1]
         hdr = "  " + "  ".join(f"X[{i}]" for i in range(n_feat))
-        print(f"{hdr}  {'cible':>14}  {'prédit':>14}  {'erreur':>12}")
+        print(f"{hdr}  {'target':>14}  {'predicted':>14}  {'error':>12}")
         print("  " + "-" * (14 * n_feat + 44))
         for row, y in zip(xs[:8], ys[:8]):
             x_str = "  ".join(f"{v:8.4f}" for v in row)
             pred  = float(evaluate_vector(best, row.reshape(1, -1))[0])
             print(f"  {x_str}  {y:14.8f}  {pred:14.8f}  {abs(pred-y):12.2e}")
     else:
-        print(f"  {'x':>8}  {'cible':>14}  {'prédit':>14}  {'erreur':>12}")
+        print(f"  {'x':>8}  {'target':>14}  {'predicted':>14}  {'error':>12}")
         print("  " + "-" * 52)
         for x, y in zip(xs[:10], ys[:10]):
             pred = evaluate(best, x)
@@ -6716,7 +6742,7 @@ def decoy_report(problem_key: str, best: "Node",
     print("═" * 70)
     print("  RAPPORT DE ROBUSTESSE — VARIABLES LEURRES")
     print("═" * 70)
-    print(f"  Problème   : {problem_key}")
+    print(f"  Problem    : {problem_key}")
     print(f"  Leurre(s)  : {['X['+str(i)+']' for i in decoy_indices]}")
     print(f"  Expression : {to_string(best)}")
     print(SEP)
@@ -6748,11 +6774,11 @@ def decoy_report(problem_key: str, best: "Node",
         print(f"    {icon} {feat:8s} : {score:.4f}{tag}")
         if is_decoy and not ok:
             all_pass = False
-            print(f"      ⚠  Score {score:.4f} > seuil 0.05 — leurre non rejeté par SEQ_MEM")
+            print(f"      ⚠  Score {score:.4f} > threshold 0.05 — decoy not rejected by SEQ_MEM")
 
     # ── 2. Présence structurelle dans le meilleur arbre ───────────────────
     print()
-    print("  [2] Présence dans l'expression finale")
+    print("  [2] Presence in the final expression")
 
     def count_decoy_nodes(node, decoy_set) -> int:
         if node is None:
@@ -6801,7 +6827,7 @@ def decoy_report(problem_key: str, best: "Node",
     print(f"    MSE avec leurre   : {mse_full:.6e}")
     print(f"    MSE sans leurre   : {mse_ablated:.6e}")
     print(f"    {icon3} Variation          : {delta_pct:.2f}%  "
-          f"({'leurre ignoré' if ok3 else 'leurre utilisé !'})")
+          f"({'decoy ignored' if ok3 else 'decoy used!'})")
     if not ok3:
         all_pass = False
 
@@ -6809,13 +6835,13 @@ def decoy_report(problem_key: str, best: "Node",
     print()
     print(SEP)
     if all_pass:
-        print("  ✓ VERDICT : PASS — toutes les variables leurres sont rejetées.")
-        print("    Le système de Feature Importance et le Cleaner fonctionnent")
-        print("    correctement sur ce problème.")
+        print("  ✓ VERDICT: PASS — all decoy variables rejected.")
+        print("    Feature importance and the Cleaner are working")
+        print("    correctly on this problem.")
     else:
-        print("  ✗ VERDICT : FAIL — au moins une variable leurre n'est pas rejetée.")
-        print("    Pistes : augmenter PARSIMONY, réduire FRAG_TAU_MAX,")
-        print("    ou vérifier que l'optimiseur Adam ne neutralise pas X[decoy]")
+        print("  ✗ VERDICT: FAIL — at least one decoy variable is not rejected.")
+        print("    Hints: increase PARSIMONY, reduce FRAG_TAU_MAX,")
+        print("    or check the constant optimizer is not neutralizing X[decoy]")
         print("    par une constante multiplicative proche de 0.")
     print("═" * 70)
     print()
@@ -6839,7 +6865,7 @@ def try_plot(name: str, func, best: Node,
         axes[0].plot(x_plot, y_target, "b-",  lw=2, label="Cible")
         axes[0].plot(x_plot, y_pred,   "r--", lw=2, label=f"GP: {to_string(best)[:50]}")
         axes[0].scatter(xs[:60], ys[:60], s=10, color="gray", alpha=0.5, label="Dataset")
-        axes[0].set_title("Cible vs Expression trouvée")
+        axes[0].set_title("Target vs discovered expression")
         axes[0].legend(fontsize=8)
         axes[0].grid(True, alpha=0.3)
 
@@ -6852,8 +6878,8 @@ def try_plot(name: str, func, best: Node,
                     gens.append(int(row["gen"]))
                     fits.append(float(row["fit"]))
             axes[1].semilogy(gens, fits, "g.-", lw=1.5, markersize=4)
-            axes[1].set_title("Fitness au fil des générations (log)")
-            axes[1].set_xlabel("Génération")
+            axes[1].set_title("Fitness over generations (log)")
+            axes[1].set_xlabel("Generation")
             axes[1].set_ylabel("Fitness (log)")
             axes[1].grid(True, alpha=0.3)
         except Exception:
@@ -6882,13 +6908,13 @@ def run(name: str, func, cfg: Config = None, problem_key: str = '1'):
     if cfg is None:
         cfg = Config()
 
-    random.seed()   # Non-déterministe par défaut
+    random.seed()   # Non-deterministic par default
                     # Utiliser random.seed(42) pour reproductibilité
 
     best, xs, ys = evolve(func, cfg, problem_key)
 
     if best is None:
-        print("[ERREUR] Aucune solution trouvée.")
+        print("[ERROR] No solution found.")
         return
 
     print_result(name, best, xs, ys, cfg)
@@ -6996,7 +7022,7 @@ def _choose_scaler(X_raw, normalize, x_range):
         all_pos = bool(np.all(X_raw > 0))
         mode = "divmax" if all_pos else "minmax"
     if mode in ("divmax", "shiftfree", "div"):
-        return _ShiftFreeScaler(), "divmax (shift-free, préserve les produits)"
+        return _ShiftFreeScaler(), "divmax (shift-free, preserves products)"
     if mode in ("standard", "zscore", "std"):
         from sklearn.preprocessing import StandardScaler as _SS
         return _SS(), "standard (z-score)"
@@ -7010,7 +7036,7 @@ def load_generic_csv(file_path: str,
                      x_range: tuple = (-2.0, 2.0)):
     """[v22-CSV] Charge N'IMPORTE QUEL fichier CSV pour régression symbolique.
 
-    Conventions par défaut (zéro configuration) :
+    Conventions par default (zéro configuration) :
       · dernière colonne numérique = cible (y)
       · toutes les autres colonnes numériques = features (X)
       · colonnes non numériques (texte, dates) ignorées avec avertissement
@@ -7042,24 +7068,24 @@ def load_generic_csv(file_path: str,
     num_df = df.apply(_pd.to_numeric, errors="coerce")
     non_num = [c for c in df.columns if num_df[c].isna().all()]
     if non_num:
-        print(f"[CSV] Colonnes non numériques ignorées : {non_num}")
+        print(f"[CSV] Non-numeric columns ignored: {non_num}")
     num_cols = [c for c in df.columns if c not in non_num]
     if len(num_cols) < 2:
-        raise ValueError(f"Au moins 2 colonnes numériques requises "
-                         f"(features + cible). Détectées : {num_cols}")
+        raise ValueError(f"At least 2 numeric columns required "
+                         f"(features + target). Detected: {num_cols}")
 
     # ── Cible / features ──
     if target_col is None:
         target_col = num_cols[-1]          # convention : dernière colonne
     elif target_col not in num_cols:
-        raise KeyError(f"Colonne cible '{target_col}' absente ou non numérique. "
-                       f"Colonnes numériques : {num_cols}")
+        raise KeyError(f"Target column '{target_col}' missing or non-numeric. "
+                       f"Numeric columns: {num_cols}")
     if feature_cols is None:
         feature_cols = [c for c in num_cols if c != target_col]
     else:
         bad = [c for c in feature_cols if c not in num_cols]
         if bad:
-            raise KeyError(f"Features absentes/non numériques : {bad}")
+            raise KeyError(f"Missing/non-numeric features: {bad}")
 
     # ── Nettoyage NaN ──
     use_cols = feature_cols + [target_col]
@@ -7067,17 +7093,17 @@ def load_generic_csv(file_path: str,
     clean = num_df[use_cols].dropna()
     n_drop = n_before - len(clean)
     if n_drop:
-        print(f"[CSV] {n_drop} ligne(s) avec valeurs manquantes supprimée(s).")
+        print(f"[CSV] {n_drop} row(s) with missing values dropped.")
     n = len(clean)
     if n < 10:
-        raise ValueError(f"Trop peu de données après nettoyage : {n} (min 10).")
+        raise ValueError(f"Too little data after cleaning: {n} (min 10).")
     if n < 30:
-        print(f"[CSV] ⚠ Dataset réduit ({n} lignes) — le GP est plus fiable ≥30.")
+        print(f"[CSV] ⚠ Small dataset ({n} rows) — GP is more reliable with ≥30.")
 
     X_raw = clean[feature_cols].values.astype(np.float64)
     y     = clean[target_col].values.astype(np.float64)
 
-    # ── Normalisation features (shift-free 'auto' par défaut) ──
+    # ── Normalisation features (shift-free 'auto' par default) ──
     scaler, _norm_desc = _choose_scaler(X_raw, normalize, x_range)
     X_scaled = scaler.fit_transform(X_raw)
     print(f"[CSV] Normalisation : {_norm_desc}")
@@ -7085,7 +7111,7 @@ def load_generic_csv(file_path: str,
     # ── Pool d'opérateurs ──
     op_pool = (op_pool or "physical").lower()
     if op_pool not in _GENCSV_POOLS:
-        print(f"[CSV] Pool '{op_pool}' inconnu — 'physical' utilisé.")
+        print(f"[CSV] Unknown pool '{op_pool}' — using 'physical'.")
         op_pool = "physical"
     b_ops, b_w, u_ops, u_w = _GENCSV_POOLS[op_pool]
     _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS = list(b_ops), list(b_w)
@@ -7094,9 +7120,9 @@ def load_generic_csv(file_path: str,
     CSV_FEATURE_NAMES = list(feature_cols)
     CSV_TARGET_NAME   = str(target_col)
 
-    print(f"[CSV] ✓ {n} échantillons | {len(feature_cols)} features → cible '{target_col}'")
+    print(f"[CSV] ✓ {n} samples | {len(feature_cols)} features → target '{target_col}'")
     print(f"      Features : {feature_cols}")
-    print(f"      Pool d'opérateurs : '{op_pool}' "
+    print(f"      Operator pool: '{op_pool}' "
           f"→ {b_ops + u_ops}")
     # Plages brutes par feature (utile pour interpréter la formule)
     for i, c in enumerate(feature_cols):
@@ -7139,7 +7165,7 @@ def load_custom_csv(file_path: str):
     if not os.path.isfile(file_path):
         raise FileNotFoundError(
             f"[BATTERY_SOH] Fichier introuvable : '{file_path}'\n"
-            f"  Répertoire courant : {os.getcwd()}"
+            f"  Current directory: {os.getcwd()}"
         )
 
     df = _pd.read_csv(file_path)
@@ -7153,7 +7179,7 @@ def load_custom_csv(file_path: str):
     if missing:
         raise KeyError(
             f"[BATTERY_SOH] Colonnes manquantes dans '{file_path}' : {missing}\n"
-            f"  Colonnes détectées : {df.columns.tolist()}\n"
+            f"  Detected columns: {df.columns.tolist()}\n"
             f"  Colonnes requises  : {required_cols}"
         )
 
@@ -7162,22 +7188,22 @@ def load_custom_csv(file_path: str):
     df = df[required_cols].dropna()
     n_dropped = n_before - len(df)
     if n_dropped > 0:
-        print(f"[BATTERY_SOH] ⚠  {n_dropped} ligne(s) avec NaN supprimée(s).")
+        print(f"[BATTERY_SOH] ⚠  {n_dropped} row(s) with NaN dropped.")
 
     n_samples = len(df)
     if n_samples < 10:
         raise ValueError(
-            f"[BATTERY_SOH] Trop peu de données après nettoyage : "
+            f"[BATTERY_SOH] Too little data after cleaning: "
             f"{n_samples} ligne(s) (minimum requis : 10).\n"
-            f"  Vérifiez le contenu de '{file_path}'."
+            f"  Check the contents of '{file_path}'."
         )
 
     # Avertissement si le dataset est petit (GP peu fiable sous 30 points)
     if n_samples < 30:
         print(
-            f"[BATTERY_SOH] ⚠  Dataset réduit ({n_samples} lignes). "
+            f"[BATTERY_SOH] ⚠  Small dataset ({n_samples} rows). "
             f"Le GP converge mieux avec ≥ 30 points. "
-            f"Résultats indicatifs."
+            f"Results indicative only."
         )
 
     # ── 4. Extraction X / y ──────────────────────────────────────────────
@@ -7193,8 +7219,8 @@ def load_custom_csv(file_path: str):
     X_scaled = scaler.fit_transform(X_raw)
 
     print(
-        f"[BATTERY_SOH] ✓ CSV chargé : {n_samples} échantillons, "
-        f"3 features → normalisées dans [-2.0, 2.0]"
+        f"[BATTERY_SOH] ✓ CSV loaded: {n_samples} samples, "
+        f"3 features → normalized to [-2.0, 2.0]"
     )
     print(
         f"  Plages brutes  : "
@@ -7215,7 +7241,7 @@ def load_custom_csv(file_path: str):
     global _BATTERY_CSV_MODE
     _BATTERY_CSV_MODE = True
     print(
-        f"  Pool opérateurs: physique batterie "
+        f"  Operator pool: battery physics "
         f"[{', '.join(_BATTERY_UNARY_OPS)}] "
         f"— sin/cos/tan exclus"
     )
@@ -7320,7 +7346,7 @@ DECOY_FEATURES: Dict[str, List[int]] = {
 # ── [v16-NDIM] Poids d'opérateurs boostés pour l'initialisation N-D ────────
 # En mode 1-D les seeds humaines compensaient la faible probabilité de tirer
 # "exp" ou "log". En mode N-D on refuse de tricher : on augmente simplement
-# le poids de ces opérateurs dans le pool d'initialisation aléatoire, et on
+# le poids de ces opérateurs dans le pool d'initialisation random, et on
 # garantit une couverture minimale via _nd_diverse_population().
 # Le GP doit DÉCOUVRIR la structure — on lui donne juste un espace de
 # recherche mieux réparti, pas la réponse.
@@ -7337,7 +7363,7 @@ _ND_UNARY_WEIGHTS_INIT = [3, 3, 2, 2, 1, 1, 3, 1, 3]
 
 def _nd_diverse_population(cfg: Config, n: int) -> List["Node"]:
     """
-    [v16-NDIM] Génère n arbres aléatoires avec couverture garantie des opérateurs.
+    [v16-NDIM] Génère n arbres randoms avec couverture garantie des opérateurs.
     Principe : diviser la population en autant de slots que d'opérateurs unaires,
     puis générer au moins un arbre dont la racine (ou le premier niveau) utilise
     chaque opérateur. Le reste est du Ramped Half-and-Half classique.
@@ -7431,7 +7457,7 @@ def make_cfg_nd(n_features: int,
     [v16-NDIM] Crée une Config adaptée à la régression symbolique N-dimensionnelle.
 
     · TERMINALS est généré dynamiquement : ["X[0]", "X[1]", …, "X[n_features-1]"]
-    · Les seeds (seeding dirigé) sont désactivées par défaut car elles sont
+    · Les seeds (seeding dirigé) sont désactivées par default car elles sont
       spécifiques à "x" ; passer use_seeding=True si vous avez vos propres seeds N-D.
     · Tous les autres hyperparamètres suivent la même logique que make_cfg().
 
@@ -7520,8 +7546,8 @@ def make_cfg(x_min: float, x_max: float,
         USE_LIB                = use_lib,
         USE_COGRAPH            = use_cograph,
         USE_SEQMEM             = use_seqmem,
-        TERMINALS              = ["x"],   # [v16-NDIM] mode 1-D par défaut
-        # [v15] EARLY_STOPPING_MSE = 1e-6 hérité du défaut Config.
+        TERMINALS              = ["x"],   # [v16-NDIM] mode 1-D par default
+        # [v15] EARLY_STOPPING_MSE = 1e-6 hérité du default Config.
     )
 
 
@@ -7599,16 +7625,16 @@ def run_benchmark(keys: List[str],
         _csv_writer = csv.DictWriter(_csv_file, fieldnames=_csv_fields)
         _csv_writer.writeheader()
         _csv_file.flush()
-        print(f"[BENCH] Sauvegarde incrémentale → {out_path}")
+        print(f"[BENCH] Incremental save → {out_path}")
     except Exception as e:
-        print(f"[BENCH] Impossible d'ouvrir {out_path} : {e}")
+        print(f"[BENCH] Could not open {out_path}: {e} — rows will not be saved.")
         _csv_file   = None
         _csv_writer = None
 
     for key in keys:
         name, func, x_min, x_max = PROBLEMS[key]
         print(f"\n{'─'*70}")
-        print(f"  Problème {key}: {name}  [{x_min}, {x_max}]")
+        print(f"  Problem {key}: {name}  [{x_min}, {x_max}]")
         print(f"{'─'*70}")
 
         if transfer and key != keys[0]:
@@ -7646,7 +7672,7 @@ def run_benchmark(keys: List[str],
                         _csv_writer.writerow(row)
                         _csv_file.flush()
                     except Exception as _e:
-                        print(f"\n[BENCH] Erreur écriture CSV : {_e}")
+                        print(f"\n[BENCH] CSV write error: {_e}")
 
                 # Libération mémoire entre chaque run
                 gc.collect()
@@ -7667,7 +7693,7 @@ def run_benchmark(keys: List[str],
     if _csv_file:
         try:
             _csv_file.close()
-            print(f"\n[BENCH] CSV finalisé → {out_path}")
+            print(f"\n[BENCH] CSV finalized → {out_path}")
         except Exception:
             pass
 
@@ -7676,7 +7702,7 @@ def run_benchmark(keys: List[str],
     col_w = 18
     print()
     print("=" * 80)
-    header = f"{'PB':>3}  {'Problème':<24}" + "".join(
+    header = f"{'PB':>3}  {'Problem':<24}" + "".join(
         f"  {cn:>{col_w}}" for cn in cond_names)
     print(header)
     print(f"{'':>3}  {'':24}" + "".join(
@@ -7705,35 +7731,43 @@ def run_benchmark(keys: List[str],
 def _print_menu():
     print("GP_ELITE v13 — Symbolic Regression avec stigmergie adaptative")
     print()
-    print("Problèmes disponibles :")
+    print("Available problems:")
     for k, (n, _, x0, x1) in PROBLEMS.items():
         tag = "★ complexe" if int(k) >= 5 else "  classique"
         print(f"  {k:>2}: {tag}  {n}  [{x0}, {x1}]")
     print()
     print("Commandes :")
-    print("  python GP_ELITE_v13.py <N>                   # problème N avec seeding")
-    print("  python GP_ELITE_v13.py <N> noseed            # problème N sans seeding")
+    print("  python GP_ELITE_v13.py <N>                   # problem N with seeding")
+    print("  python GP_ELITE_v13.py <N> noseed            # problem N without seeding")
     print("  python GP_ELITE_v13.py <N> noseed nolib      # ablation : GP pur")
     print()
     print("  python GP_ELITE_v13.py bench [fast]          # benchmark standard (FULL + NOSEED)")
     print("  python GP_ELITE_v13.py ablation [fast]       # 4 conditions : BASE/+LIB/+CO/+SEQ")
-    print("  python GP_ELITE_v13.py ablation [fast] hard  # problèmes complexes uniquement")
-    print("  python GP_ELITE_v13.py bench_hard            # tous problèmes, 8 runs, transfer")
+    print("  python GP_ELITE_v13.py ablation [fast] hard  # complex problems only")
+    print("  python GP_ELITE_v13.py bench_hard            # all problems, 8 runs, transfer")
     print()
     print("Flags disponibles pour les commandes benchmark/ablation :")
-    print("  fast     → config allégée (pop=300, gen=200)")
-    print("  transfer → warm_transfer entre problèmes consécutifs")
+    print("  fast     → lightweight config (pop=300, gen=200)")
+    print("  transfer → warm_transfer between consecutive problems")
 
 
 def _ask(prompt: str, valid: List[str], default: str = "") -> str:
     """Pose une question et valide la réponse. Retourne default si entrée vide."""
     while True:
         rep = input(prompt).strip()
+        # y/yes → o alias, only for yes/no prompts (never when 'y' is a real
+        # option, e.g. the operator-pool choice [p/t/f/y]).
+        _r = rep.lower()
+        if "o" in valid and "y" not in valid:
+            if _r in ("y", "yes"):
+                rep = "o"
+            elif _r == "no":
+                rep = "n"
         if rep == "" and default:
             return default
         if rep in valid:
             return rep
-        print(f"  → Réponse invalide. Choix possibles : {', '.join(valid)}")
+        print(f"  → Invalid answer. Options: {', '.join(valid)}")
 
 
 def _ask_int(prompt: str, lo: int, hi: int, default: int) -> int:
@@ -7764,12 +7798,12 @@ def _interactive_menu():
 
     print()
     print(SEP2)
-    print("  GP_ELITE v16  —  Régression symbolique (1-D & N-D) par GP")
+    print("  GP_ELITE  —  Symbolic Regression (1-D & N-D) via Genetic Programming")
     print(SEP2)
     print()
 
     # ── Afficher tous les problèmes ──────────────────────────────────────
-    print("  Problèmes 1-D disponibles :")
+    print("  Available 1-D problems:")
     print()
     classic_keys = [k for k in PROBLEMS if int(k) <= 4]
     complex_keys = [k for k in PROBLEMS if int(k) >= 5]
@@ -7784,13 +7818,13 @@ def _interactive_menu():
         name, _, x0, x1 = PROBLEMS[k]
         print(f"    {k:>2}.  {name:<40}  [{x0}, {x1}]")
     print()
-    print("  Problèmes N-D (★★) :")
+    print("  N-D problems (★★):")
     for k, (nd_name, _, n_feat, x0, x1) in ND_PROBLEMS.items():
         if k in DECOY_FEATURES:
             continue   # affichés séparément
         print(f"  {k:>4}.  {nd_name:<46}  {n_feat} vars  [{x0}, {x1}]")
     print()
-    print("  Problèmes N-D avec variable leurre (★★★) :")
+    print("  N-D problems with decoy variable (★★★):")
     for k in DECOY_FEATURES:
         nd_name, _, n_feat, x0, x1 = ND_PROBLEMS[k]
         decoy_idx = DECOY_FEATURES[k]
@@ -7800,16 +7834,16 @@ def _interactive_menu():
 
     # ── Choix du mode ────────────────────────────────────────────────────
     print()
-    print("  Modes disponibles :")
-    print("    1. Problème 1-D unique    — résolution ciblée, options fines")
+    print("  Available modes:")
+    print("    1. Single 1-D problem     — targeted run, fine-grained options")
     print("    2. Ablation               — BASE / +LIB / +CO / +SEQ")
     print("    3. Benchmark standard     — FULL vs NOSEED")
-    print("    4. Problème N-D unique    — régression multi-variables  [v16-NDIM]")
-    print("    5. ★ SYRACUSE / Collatz  — temps de vol, 4 features [log2,v2,odd_part,mod4_1]  [SYRACUSE]")
-    print("    6. ★ CSV générique       — régression sur VOS données (n'importe quel fichier)  [v22-CSV]")
-    print("    7. ★ PRÉVISION           — extrapoler une tendance au-delà de VOS données  [v30]")
+    print("    4. Single N-D problem     — multi-variable regression  [v16-NDIM]")
+    print("    5. ★ SYRACUSE / Collatz  — flight time, 4 features [log2,v2,odd_part,mod4_1]  [SYRACUSE]")
+    print("    6. ★ Generic CSV          — regression on YOUR data (any file)  [v22-CSV]")
+    print("    7. ★ FORECAST             — extrapolate a trend beyond YOUR data  [v30]")
     print()
-    mode_choice = _ask("  Votre choix [1/2/3/4/5/6/7] (défaut=1) : ",
+    mode_choice = _ask("  Your choice [1/2/3/4/5/6/7] (default=1) : ",
                        valid=["1", "2", "3", "4", "5", "6", "7"], default="1")
     print()
 
@@ -7819,7 +7853,7 @@ def _interactive_menu():
     if mode_choice == "1":
         all_keys = list(PROBLEMS.keys())
         key = _ask(
-            f"  Numéro du problème [{'/'.join(all_keys)}] (défaut=5) : ",
+            f"  Problem number [{'/'.join(all_keys)}] (default=5) : ",
             valid=all_keys, default="5"
         )
         name, func, x_min, x_max = PROBLEMS[key]
@@ -7827,25 +7861,25 @@ def _interactive_menu():
         print()
 
         # Options de vitesse
-        fast_rep = _ask("  Mode rapide ? [o/n] (défaut=n, pop=600 gen=400) : ",
+        fast_rep = _ask("  Fast mode? [y/n] (default=n, pop=600 gen=400) : ",
                         valid=["o", "n", ""], default="n")
         fast = (fast_rep == "o")
 
         # Options stigmergiques — une seule question, détail si non
         print()
-        all_on = _ask("  Activer tous les composants stigmergiques ? [o/n] (défaut=o) : ",
+        all_on = _ask("  Enable all stigmergic components? [y/n] (default=y) : ",
                       valid=["o", "n", ""], default="o")
         if all_on != "n":
             use_lib = use_co = use_seq = use_seed = True
         else:
-            print("  Détail des composants (Entrée = désactiver) :")
-            use_lib  = _ask("    Bibliothèque de fragments  [o/n] (défaut=n) : ",
+            print("  Component details (Enter = disable):")
+            use_lib  = _ask("    Fragment library           [y/n] (default=n) : ",
                             valid=["o", "n", ""], default="n") == "o"
-            use_co   = _ask("    Co-graphe                  [o/n] (défaut=n) : ",
+            use_co   = _ask("    Co-graph                   [y/n] (default=n) : ",
                             valid=["o", "n", ""], default="n") == "o"
-            use_seq  = _ask("    Mémoire de séquences       [o/n] (défaut=n) : ",
+            use_seq  = _ask("    Sequence memory            [y/n] (default=n) : ",
                             valid=["o", "n", ""], default="n") == "o"
-            use_seed = _ask("    Seeding dirigé             [o/n] (défaut=n) : ",
+            use_seed = _ask("    Directed seeding           [y/n] (default=n) : ",
                             valid=["o", "n", ""], default="n") == "o"
 
         print()
@@ -7866,9 +7900,9 @@ def _interactive_menu():
         tag = "  [" + ", ".join(flags) + "]" if flags else ""
 
         print(SEP2)
-        print(f"  Lancement : problème {key} — {name}{tag}")
+        print(f"  Launching: problem {key} — {name}{tag}")
         print(f"  Config    : {'fast' if fast else 'normal'}  "
-              f"pop={cfg.POP_SIZE}  gen={cfg.GENERATIONS}  îles={cfg.N_ISLANDS}")
+              f"pop={cfg.POP_SIZE}  gen={cfg.GENERATIONS}  islands={cfg.N_ISLANDS}")
         print(SEP2)
         print()
 
@@ -7886,15 +7920,15 @@ def _interactive_menu():
                 globals()['SEQ_MEM'].export_grammar(f"grammar_meta_p{key}.json")
                 globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
         else:
-            print("[ERREUR] Aucune solution trouvée.")
+            print("[ERROR] No solution found.")
         _pause()
     # ══════════════════════════════════════════════════════════════════════
     elif mode_choice == "2":
-        print("  Sélection des problèmes à tester :")
+        print("  Select the problems to test:")
         print("    a. Tous (P1–P9)")
-        print("    b. Complexes uniquement (P5–P9)  [défaut]")
+        print("    b. Complex only (P5–P9)  [default]")
         print("    c. Choix manuel")
-        scope = _ask("  Votre choix [a/b/c] (défaut=b) : ",
+        scope = _ask("  Your choice [a/b/c] (default=b) : ",
                      valid=["a", "b", "c", ""], default="b")
         if scope in ("b", ""):
             keys = [str(k) for k in range(5, 10)]
@@ -7902,30 +7936,30 @@ def _interactive_menu():
             keys = [str(k) for k in range(1, 10)]
         else:
             print()
-            print("  Entrez les numéros séparés par des espaces (ex: 5 6 9) :")
+            print("  Enter numbers separated by spaces (e.g. 5 6 9):")
             raw = input("  → ").strip().split()
             keys = [k for k in raw if k in PROBLEMS]
             if not keys:
-                print("  Aucun problème valide — utilisation P5–P9.")
+                print("  No valid problem — using P5–P9.")
                 keys = [str(k) for k in range(5, 10)]
 
-        fast_rep = _ask("\n  Vitesse ? [u=ultrafast / f=fast / n=normal] (défaut=u) : ",
+        fast_rep = _ask("\n  Speed? [u=ultrafast / f=fast / n=normal] (default=u) : ",
                         valid=["u", "f", "n", ""], default="u")
         ultrafast = (fast_rep in ("u", ""))
         fast      = (fast_rep == "f")
 
         n_runs = _ask_int(
-            f"  Nombre de runs par condition [1–10] (défaut=3) : ",
+            f"  Runs per condition [1–10] (default=3) : ",
             lo=1, hi=10, default=3
         )
 
         mode_str = 'ultrafast (pop=150, gen=100)' if ultrafast else ('fast' if fast else 'normal')
         print()
         print(SEP2)
-        print(f"  Ablation : {len(keys)} problème(s) × 4 conditions × {n_runs} runs")
-        print(f"  Problèmes : {', '.join(f'P{k}' for k in keys)}")
+        print(f"  Ablation: {len(keys)} problem(s) × 4 conditions × {n_runs} runs")
+        print(f"  Problems : {', '.join(f'P{k}' for k in keys)}")
         print(f"  Config    : {mode_str}")
-        print(f"  Durée estimée : ~{len(keys) * 4 * n_runs * (3 if ultrafast else 8)} min")
+        print(f"  Estimated duration: ~{len(keys) * 4 * n_runs * (3 if ultrafast else 8)} min")
         print(SEP2)
         print()
 
@@ -7937,16 +7971,16 @@ def _interactive_menu():
     # MODE 3 — Benchmark standard
     # ══════════════════════════════════════════════════════════════════════
     elif mode_choice == "3":
-        fast_rep = _ask("  Mode rapide ? [o/n] (défaut=n) : ",
+        fast_rep = _ask("  Fast mode? [y/n] (default=n) : ",
                         valid=["o", "n", ""], default="n")
         fast = (fast_rep == "o")
 
-        transfer_rep = _ask("  Transfert inter-problèmes ? [o/n] (défaut=n) : ",
+        transfer_rep = _ask("  Cross-problem transfer? [y/n] (default=n) : ",
                             valid=["o", "n", ""], default="n")
         transfer = (transfer_rep == "o")
 
         n_runs = _ask_int(
-            f"  Nombre de runs [1–20] (défaut=5) : ",
+            f"  Number of runs [1–20] (default=5) : ",
             lo=1, hi=20, default=5
         )
 
@@ -7969,7 +8003,7 @@ def _interactive_menu():
     elif mode_choice == "4":
         nd_keys = list(ND_PROBLEMS.keys())
         nd_key = _ask(
-            f"  Problème N-D [{'/'.join(nd_keys)}] (défaut=ND1) : ",
+            f"  N-D problem [{'/'.join(nd_keys)}] (default=ND1) : ",
             valid=nd_keys, default="ND1"
         )
         nd_name, nd_func, n_feat, x_min, x_max = ND_PROBLEMS[nd_key]
@@ -7977,7 +8011,7 @@ def _interactive_menu():
         print()
 
         fast_rep = _ask(
-            "  Mode rapide ? [u=ultrafast / f=fast / n=normal / b=boost] (défaut=f) : ",
+            "  Speed? [u=ultrafast / f=fast / n=normal / b=boost] (default=f) : ",
             valid=["u", "f", "n", "b", ""], default="f"
         )
         ultrafast = (fast_rep == "u")
@@ -7993,7 +8027,7 @@ def _interactive_menu():
                     'boost'     if boost     else 'normal')
         print(f"  Config   : {mode_str}")
         if boost:
-            print(f"  ⚡ BOOST : 6 îles × 250 individus — 800 générations")
+            print(f"  ⚡ BOOST: 6 islands × 250 individuals — 800 generations")
         print(SEP2)
         print()
 
@@ -8041,7 +8075,7 @@ def _interactive_menu():
             globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json",
                                                 decay=0.4,
                                                 structural_only=True)
-            print(f"[TRANSFER] Grammaire structurelle chargée (structural_only, decay=0.4)")
+            print(f"[TRANSFER] Structural grammar loaded (structural_only, decay=0.4)")
 
         # [v16-BATTERY] Mode données réelles : remplacement du dataset synthétique
         # par les mesures CSV si le fichier 'nasa_battery_simulation.csv' existe.
@@ -8070,8 +8104,8 @@ def _interactive_menu():
                 nd_key_run = "BATTERY_SOH_CSV"
                 print(f"[BATTERY_SOH] Mode CSV actif — N_POINTS={cfg_nd.N_POINTS}, 3 features (sans leurre)")
             except Exception as _csv_err:
-                print(f"[BATTERY_SOH] ⚠  Erreur CSV, bascule sur données synthétiques.")
-                print(f"  Détail : {_csv_err}")
+                print(f"[BATTERY_SOH] ⚠  CSV error, falling back to synthetic data.")
+                print(f"  Detail: {_csv_err}")
                 _use_csv   = False
                 nd_key_run = nd_key
         else:
@@ -8086,7 +8120,7 @@ def _interactive_menu():
             print_result(nd_name, best, X_data, y_data, cfg_nd)
             y_pred  = evaluate_vector(best, X_data)
             val_mse = float(np.mean((y_pred - y_data) ** 2))
-            print(f"[VALIDATION] MSE sur dataset d'entraînement : {val_mse:.8e}")
+            print(f"[VALIDATION] MSE on training dataset: {val_mse:.8e}")
             # [v16-DECOY] Rapport leurre uniquement en mode synthétique (4 features)
             if nd_key in DECOY_FEATURES and not _use_csv:
                 decoy_report(nd_key, best, X_data, y_data, cfg_nd)
@@ -8094,7 +8128,7 @@ def _interactive_menu():
                 globals()['SEQ_MEM'].export_grammar(f"grammar_meta_{nd_key}.json")
                 globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
         else:
-            print("[ERREUR] Aucune solution trouvée.")
+            print("[ERROR] No solution found.")
         _pause()
 
     # ══════════════════════════════════════════════════════════════════════
@@ -8106,11 +8140,11 @@ def _interactive_menu():
         print()
 
         n_end_raw = _ask_int(
-            "  Entiers de départ jusqu'à N_MAX [100–10000] (défaut=2000) : ",
+            "  Starting integers up to N_MAX [100–10000] (default=2000) : ",
             lo=100, hi=10000, default=2000
         )
         fast_rep = _ask(
-            "  Mode rapide ? [u=ultrafast / f=fast / n=normal] (défaut=f) : ",
+            "  Mode rapide ? [u=ultrafast / f=fast / n=normal] (default=f) : ",
             valid=["u", "f", "n", ""], default="f"
         )
         ultrafast = (fast_rep == "u")
@@ -8118,7 +8152,7 @@ def _interactive_menu():
 
         print()
         print(SEP2)
-        print(f"  [SYRACUSE] Génération du dataset en cours...")
+        print(f"  [SYRACUSE] Generating the dataset...")
 
         _X_syrac, _y_syrac = generate_syracuse_dataset(n_start=2, n_end=n_end_raw)
 
@@ -8173,7 +8207,7 @@ def _interactive_menu():
         if 'SEQ_MEM' in globals() and _grammar_ok:
             globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json",
                                                 decay=0.4, structural_only=True)
-            print(f"[TRANSFER] Grammaire structurelle chargée (structural_only, decay=0.4)")
+            print(f"[TRANSFER] Structural grammar loaded (structural_only, decay=0.4)")
 
         _syrac_func = lambda X: np.zeros(X.shape[0])   # placeholder
 
@@ -8197,9 +8231,9 @@ def _interactive_menu():
             _seed_tree = Node("+", Node(_t[2]),
                               Node("/", _mid, Node(3.902016)))
             FRAGMENT_LIB.deposit(_seed_tree, rank=1, fitness=-9999.0, gen=0)
-            print(f"[SEED] Expression graine déposée → {to_string(_seed_tree)[:80]}...")
+            print(f"[SEED] Seed expression deposited → {to_string(_seed_tree)[:80]}...")
         except Exception as _e:
-            print(f"[SEED] Injection ignorée : {_e}")
+            print(f"[SEED] Injection skipped: {_e}")
 
         best, X_data, y_data = evolve(
             _syrac_func, cfg_syrac, problem_key="SYRACUSE",
@@ -8211,14 +8245,14 @@ def _interactive_menu():
             print_result("Syracuse/Collatz flight time", best, X_data, y_data, cfg_syrac)
             y_pred  = evaluate_vector(best, X_data)
             val_mse = float(np.mean((y_pred - y_data) ** 2))
-            print(f"[VALIDATION] MSE final (espace normalisé) : {val_mse:.8e}")
+            print(f"[VALIDATION] Final MSE (normalized space): {val_mse:.8e}")
             print()
-            print("  Vérification sur quelques valeurs célèbres :")
+            print("  Verification on a few famous values:")
             y_min_r = float(_SYRACUSE_Y_RAW.min())
             y_max_r = float(_SYRACUSE_Y_RAW.max())
             n_min_r = 2.0
             n_max_r = float(n_end_raw)
-            print(f"  {'n':>6}  {'vol_réel':>10}  {'vol_prédit':>12}  {'erreur_abs':>12}")
+            print(f"  {'n':>6}  {'true_ft':>10}  {'pred_ft':>12}  {'abs_err':>12}")
             print("  " + "-" * 46)
             for n_check in [2, 3, 6, 7, 27, 97, 703, 871]:
                 if n_check < 2 or n_check > n_end_raw:
@@ -8250,10 +8284,10 @@ def _interactive_menu():
             if 'SEQ_MEM' in globals():
                 globals()['SEQ_MEM'].export_grammar("grammar_meta_SYRACUSE.json")
                 globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
-                print("[META] Grammaires exportées → grammar_meta_SYRACUSE.json "
+                print("[META] Grammars exported → grammar_meta_SYRACUSE.json "
                       "/ grammar_shared_base.json")
         else:
-            print("[ERREUR] Aucune solution trouvée.")
+            print("[ERROR] No solution found.")
         _pause()
 
     # ══════════════════════════════════════════════════════════════════════
@@ -8263,82 +8297,82 @@ def _interactive_menu():
     #  sélection-frontière méta, front de Pareto — via l'API)
     # ══════════════════════════════════════════════════════════════════════
     elif mode_choice == "7":
-        print("  ★ Mode PRÉVISION — extrapoler une tendance au-delà des données")
+        print("  ★ FORECAST mode — extrapolate a trend beyond the data")
         print()
-        path = input("  Chemin du fichier CSV : ").strip().strip('"').strip("'")
+        path = input("  CSV file path : ").strip().strip('"').strip("'")
         if not path:
-            print("[ERREUR] Aucun chemin fourni."); _pause(); return
+            print("[ERROR] No path provided."); _pause(); return
         try:
             import pandas as _pd7
             _df7 = _pd7.read_csv(path, sep=None, engine="python")
             _df7.columns = [str(c).strip() for c in _df7.columns]
         except Exception as _e:
-            print(f"[ERREUR] Lecture impossible : {_e}"); _pause(); return
+            print(f"[ERROR] Could not read the file: {_e}"); _pause(); return
         cols = list(_df7.columns)
-        print(f"\n  Colonnes détectées : {cols}")
-        tgt = input(f"  Colonne CIBLE [défaut = dernière '{cols[-1]}'] : ").strip()
+        print(f"\n  Detected columns: {cols}")
+        tgt = input(f"  TARGET column [default = last '{cols[-1]}'] : ").strip()
         target_col = tgt if tgt in cols else cols[-1]
         others = [c for c in cols if c != target_col]
         _guess = "cycle" if "cycle" in others else others[0]
-        ax = input(f"  AXE de prévision (la variable qui avance : temps, cycle…) "
-                   f"[défaut='{_guess}'] : ").strip()
+        ax = input(f"  Forecast AXIS (the variable that advances: time, cycle…) "
+                   f"[default='{_guess}'] : ").strip()
         axis_col = ax if ax in others else _guess
-        dr = _ask("  Sens [h=valeurs hautes/futur (défaut) / l=basses / b=les deux] : ",
+        dr = _ask("  Direction [h=high values/future (default) / l=low / b=both] : ",
                   valid=["h", "l", "b", ""], default="h")
         direction = {"h": "high", "l": "low", "b": "both", "": "high"}[dr]
-        rs = input("  Restarts (fiabilité ; défaut=4) : ").strip()
+        rs = input("  Restarts (reliability; default=4) : ").strip()
         n_rs = int(rs) if rs.isdigit() and int(rs) > 0 else 4
         X7 = _df7[[axis_col]].to_numpy(dtype=float)
         y7 = _df7[target_col].to_numpy(dtype=float)
-        print(f"\n  ✓ {len(y7)} points | prévision de '{target_col}' le long de "
-              f"'{axis_col}'  (sens={direction}, restarts={n_rs})")
-        print("    Note : en prévision, seules les variables qui TENDENT sont")
-        print("    utilisables — les autres colonnes sont ignorées (validé v25).")
+        print(f"\n  ✓ {len(y7)} points | forecasting '{target_col}' along "
+              f"'{axis_col}'  (dir={direction}, restarts={n_rs})")
+        print("    Note: for forecasting, only variables that TREND are")
+        print("    usable — other columns are ignored (validated in v25).")
         import sys as _sys7
         _sys7.modules.setdefault("core", _sys7.modules[__name__])
         try:
             import api as _api7
         except Exception as _e:
-            print(f"[ERREUR] api.py doit être dans le même dossier ({_e})")
+            print(f"[ERROR] api.py must be in the same folder ({_e})")
             _pause(); return
-        print("\n  Évolution en cours (1 à 3 minutes selon la machine)...")
+        print("\n  Evolving (1–3 minutes depending on the machine)...")
         _t7 = time.time()
         r7 = _api7.symbolic_regression(
             X7, y7, feature_names=[axis_col], operators="physical",
             generations=30, speed="fast", validation_split=0.20, seed=0,
             restarts=n_rs, extrapolate_feature=axis_col,
             extrapolate_direction=direction)
-        print(f"  Terminé en {time.time()-_t7:.0f}s")
+        print(f"  Done in {time.time()-_t7:.0f}s")
         print("\n" + "=" * 70)
-        print("RÉSULTAT PRÉVISION")
+        print("FORECAST RESULT")
         print("=" * 70)
-        print(f"  Modèle    : {r7.expression}")
+        print(f"  Model     : {r7.expression}")
         print(f"  R² (val)  : {r7.r2_validation:.4f}   taille : {r7.size}")
         if r7.pareto:
-            print("\n  Front de Pareto (complexité ↔ précision) :")
+            print("\n  Pareto front (complexity ↔ accuracy):")
             for _e7 in r7.pareto:
                 print("   ", _e7)
         a_lo, a_hi = float(X7[:, 0].min()), float(X7[:, 0].max())
         _span = max(a_hi - a_lo, 1e-12)
-        print(f"\n  Projection au-delà des données "
-              f"({axis_col} observé : {a_lo:g} → {a_hi:g}) :")
+        print(f"\n  Projection beyond the data "
+              f"({axis_col} observed: {a_lo:g} → {a_hi:g}):")
         for _fr in (0.10, 0.25, 0.50, 0.75):
             _av = a_hi + _fr * _span if direction != "low" else a_lo - _fr * _span
             _pv = float(r7.predict(np.array([[_av]]))[0])
             print(f"    {axis_col} = {_av:>10.4g}   →   {target_col} ≈ {_pv:.4f}")
-        print("\n  ⚠ Une extrapolation reste une hypothèse : plus on s'éloigne")
-        print("    des données, moins elle est fiable.")
+        print("\n  ⚠ An extrapolation remains a hypothesis: the further from")
+        print("    the data, the less reliable it is.")
         _pause(); return
 
     # ══════════════════════════════════════════════════════════════════════
     # MODE 6 — CSV générique [v22-CSV] : régression sur les données de l'utilisateur
     # ══════════════════════════════════════════════════════════════════════
     elif mode_choice == "6":
-        print("  ★ Mode CSV générique — régression symbolique sur VOS données")
+        print("  ★ Generic CSV mode — symbolic regression on YOUR data")
         print()
-        path = input("  Chemin du fichier CSV : ").strip().strip('"').strip("'")
+        path = input("  CSV file path : ").strip().strip('"').strip("'")
         if not path:
-            print("[ERREUR] Aucun chemin fourni.")
+            print("[ERROR] No path provided.")
             _pause(); return
 
         # Aperçu des colonnes pour guider l'utilisateur
@@ -8346,21 +8380,21 @@ def _interactive_menu():
             import pandas as _pdprev
             _prev = _pdprev.read_csv(path, sep=None, engine="python", nrows=5)
             _prev.columns = [str(c).strip() for c in _prev.columns]
-            print(f"\n  Colonnes détectées : {list(_prev.columns)}")
-            print(f"  Aperçu :\n{_prev.head(3).to_string(index=False)}\n")
+            print(f"\n  Detected columns: {list(_prev.columns)}")
+            print(f"  Preview:\n{_prev.head(3).to_string(index=False)}\n")
         except Exception as _e:
-            print(f"[ERREUR] Lecture impossible : {_e}")
+            print(f"[ERROR] Could not read the file: {_e}")
             _pause(); return
 
         cols = list(_prev.columns)
         # Cible
-        tgt = input(f"  Colonne CIBLE [défaut = dernière '{cols[-1]}'] : ").strip()
+        tgt = input(f"  TARGET column [default = last '{cols[-1]}'] : ").strip()
         target_col = tgt if tgt in cols else None
         if tgt and tgt not in cols:
-            print(f"  → '{tgt}' introuvable, dernière colonne utilisée.")
+            print(f"  → '{tgt}' not found, using the last column.")
         # Features (vide = toutes les autres)
-        feat_raw = input("  Colonnes FEATURES séparées par virgule "
-                         "[défaut = toutes les autres] : ").strip()
+        feat_raw = input("  FEATURE columns, comma-separated "
+                         "[default = all others] : ").strip()
         feature_cols = None
         if feat_raw:
             wanted = [c.strip() for c in feat_raw.split(",")]
@@ -8368,34 +8402,34 @@ def _interactive_menu():
             if len(feature_cols) != len(wanted):
                 print(f"  → features retenues : {feature_cols}")
         # Pool d'opérateurs
-        print("\n  Pool d'opérateurs (la 'physique' du problème) :")
-        print("    p = physical  exp/log/sqrt/tanh/pow — décroissance, saturation (défaut)")
-        print("    t = trig      + sin/cos — phénomènes périodiques/oscillants")
-        print("    f = full      tout — quand on ne sait pas a priori")
-        print("    y = poly      +,-,*,/,sq,cube,sqrt — relations algébriques pures")
-        pool_rep = _ask("  Choix [p/t/f/y] (défaut=p) : ",
+        print("\n  Operator pool (the problem's 'physics'):")
+        print("    p = physical  exp/log/sqrt/tanh/pow — decay, saturation (default)")
+        print("    t = trig      + sin/cos — periodic/oscillatory phenomena")
+        print("    f = full      everything — when unsure a priori")
+        print("    y = poly      +,-,*,/,sq,cube,sqrt — pure algebraic relations")
+        pool_rep = _ask("  Choice [p/t/f/y] (default=p) : ",
                         valid=["p", "t", "f", "y", ""], default="p")
         op_pool = {"p": "physical", "t": "trig", "f": "full",
                    "y": "poly", "": "physical"}[pool_rep]
 
-        print("\n  Normalisation des features :")
-        print("    a = auto      shift-free si features positives, sinon minmax (défaut)")
-        print("    d = divmax    shift-free (préserve x·y, x/y — lois multiplicatives)")
-        print("    m = minmax    [-2,2] (borne exp/pow, mais gonfle les produits)")
-        print("    s = standard  z-score (centré-réduit)")
-        norm_rep = _ask("  Choix [a/d/m/s] (défaut=a) : ",
+        print("\n  Feature normalization:")
+        print("    a = auto      shift-free if features positive, else minmax (default)")
+        print("    d = divmax    shift-free (preserves x·y, x/y — multiplicative laws)")
+        print("    m = minmax    [-2,2] (bounds exp/pow, but inflates products)")
+        print("    s = standard  z-score (centered & scaled)")
+        norm_rep = _ask("  Choice [a/d/m/s] (default=a) : ",
                         valid=["a", "d", "m", "s", ""], default="a")
         normalize = {"a": "auto", "d": "divmax", "m": "minmax",
                      "s": "standard", "": "auto"}[norm_rep]
 
-        fast_rep = _ask("\n  Vitesse ? [u=ultrafast / f=fast / n=normal] (défaut=f) : ",
+        fast_rep = _ask("\n  Speed? [u=ultrafast / f=fast / n=normal] (default=f) : ",
                         valid=["u", "f", "n", ""], default="f")
         ultrafast = (fast_rep == "u")
         fast      = (fast_rep in ("f", ""))
 
         print()
         print(SEP2)
-        print("  Chargement des données...")
+        print("  Loading data...")
         try:
             X, y, feat_names, target_name, _scaler = load_generic_csv(
                 path, target_col=target_col, feature_cols=feature_cols,
@@ -8410,12 +8444,12 @@ def _interactive_menu():
                           use_lib=True, use_cograph=True, use_seqmem=True)
         cfg.N_POINTS  = len(y)
         cfg.NOISE_STD = 0.0
-        # Validation hold-out active par défaut sur données réelles (v21)
+        # Validation hold-out active par default sur données réelles (v21)
         cfg.VALIDATION_SPLIT = 0.20
 
         mode_str = ('ultrafast' if ultrafast else 'fast' if fast else 'normal')
         print(f"  Config : {mode_str}  pop={cfg.POP_SIZE}  gen={cfg.GENERATIONS}  "
-              f"îles={cfg.N_ISLANDS}  features={n_feat}")
+              f"islands={cfg.N_ISLANDS}  features={n_feat}")
         print(SEP2)
         print()
 
@@ -8426,7 +8460,7 @@ def _interactive_menu():
                 X_override=X, y_override=y)
         except Exception as _e:
             import traceback as _tbx
-            print(f"[ERREUR] Évolution interrompue : {_e}")
+            print(f"[ERROR] Evolution interrupted: {_e}")
             _tbx.print_exc()
             _pause(); return
 
@@ -8434,13 +8468,13 @@ def _interactive_menu():
             print_result(f"CSV: {target_name} = f({', '.join(feat_names)})",
                          best, X_data, y_data, cfg)
             # Rappel du dictionnaire X[i] → nom de colonne
-            print("\n  Correspondance des variables :")
+            print("\n  Variable mapping:")
             for i, nm in enumerate(feat_names):
                 print(f"    X[{i}] = {nm}")
-            print(f"\n  Note : les features sont normalisées dans [-2, 2]. "
-                  f"La formule s'exprime sur ces valeurs normalisées.")
+            print(f"\n  Note: features are normalized. "
+                  f"The formula is expressed on these normalized values.")
         else:
-            print("[ERREUR] Aucune solution trouvée.")
+            print("[ERROR] No solution found.")
         # Réinitialiser le mode pour ne pas polluer un run suivant
         globals()['_GENERIC_CSV_MODE'] = False
         _pause()
@@ -8450,7 +8484,7 @@ def _pause():
     """Maintient la fenêtre ouverte jusqu'à ce que l'utilisateur appuie sur Entrée."""
     print()
     print("─" * 70)
-    input("  Terminé. Appuyez sur Entrée pour quitter...")
+    input("  Done. Press Enter to quit...")
 
 
 if __name__ == "__main__":
@@ -8505,7 +8539,7 @@ if __name__ == "__main__":
         if noseq:  flags_str.append("sans seqmem")
         tag = "  [" + ", ".join(flags_str) + "]" if flags_str else ""
 
-        print(f"Lancement : problème {key} — {name}{tag}")
+        print(f"Launching: problem {key} — {name}{tag}")
 
         # [v15] MÉTA-APPRENTISSAGE — chargement de la grammaire partagée
         # decay=0.5 : guide sans bloquer la découverte de nouvelles structures
@@ -8525,7 +8559,7 @@ if __name__ == "__main__":
                 # Mise à jour de la base partagée pour le prochain run / problème
                 globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
         else:
-            print("[ERREUR] Aucune solution trouvée.")
+            print("[ERROR] No solution found.")
         _pause()
 
     elif mode == "bench":
@@ -8574,7 +8608,7 @@ if __name__ == "__main__":
             globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json",
                                                 decay=0.4,
                                                 structural_only=True)
-            print(f"[TRANSFER] Grammaire structurelle chargée (structural_only, decay=0.4)")
+            print(f"[TRANSFER] Structural grammar loaded (structural_only, decay=0.4)")
 
         # [v16-BATTERY] Mode données réelles (chemin CLI)
         _csv_file  = 'nasa_battery_simulation.csv'
@@ -8597,8 +8631,8 @@ if __name__ == "__main__":
                 nd_key_run = "BATTERY_SOH_CSV"
                 print(f"[BATTERY_SOH] Mode CSV actif — N_POINTS={cfg_nd.N_POINTS}, 3 features (sans leurre)")
             except Exception as _csv_err:
-                print(f"[BATTERY_SOH] ⚠  Erreur CSV, bascule sur données synthétiques.")
-                print(f"  Détail : {_csv_err}")
+                print(f"[BATTERY_SOH] ⚠  CSV error, falling back to synthetic data.")
+                print(f"  Detail: {_csv_err}")
                 _use_csv   = False
                 nd_key_run = mode
         else:
@@ -8620,7 +8654,7 @@ if __name__ == "__main__":
                 globals()['SEQ_MEM'].export_grammar(f"grammar_meta_{mode}.json")
                 globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
         else:
-            print("[ERREUR] Aucune solution trouvée.")
+            print("[ERROR] No solution found.")
         _pause()
 
     # ── [SYRACUSE] CLI : python GP_ELITE_v16_ndim_SYRACUSE.py SYRACUSE [fast] [ultrafast] ─
@@ -8669,12 +8703,12 @@ if __name__ == "__main__":
             print_result("Syracuse/Collatz flight time", best, X_data, y_data, cfg_syrac)
             y_pred  = evaluate_vector(best, X_data)
             val_mse = float(np.mean((y_pred - y_data) ** 2))
-            print(f"[VALIDATION] MSE final (espace normalisé) : {val_mse:.8e}")
+            print(f"[VALIDATION] Final MSE (normalized space): {val_mse:.8e}")
             if 'SEQ_MEM' in globals():
                 globals()['SEQ_MEM'].export_grammar("grammar_meta_SYRACUSE.json")
                 globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
         else:
-            print("[ERREUR] Aucune solution trouvée.")
+            print("[ERROR] No solution found.")
         _pause()
 
     else:

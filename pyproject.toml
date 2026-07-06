@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gp-elite"
-version = "0.2.0"
+version = "0.2.2"
 description = "Régression symbolique par programmation génétique — lois interprétables sur données expérimentales (pur Python/NumPy)"
 readme = "README.md"
 requires-python = ">=3.9"

@@ -29,6 +29,6 @@ Exemple minimal
 from .api import symbolic_regression, SRResult, ParetoEntry
 from . import core
 
-__version__ = "0.2.0"
+__version__ = "0.2.2"
 
 __all__ = ["symbolic_regression", "SRResult", "ParetoEntry", "core", "__version__"]
