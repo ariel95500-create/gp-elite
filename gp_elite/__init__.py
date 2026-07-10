@@ -27,8 +27,11 @@ Exemple minimal
 """
 
 from .api import symbolic_regression, SRResult, ParetoEntry
+from .stability import stability_analysis
+from .dimensions import check_dimensions, audit_pareto, unit
+from .sklearn_api import GPEliteRegressor
 from . import core
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 
-__all__ = ["symbolic_regression", "SRResult", "ParetoEntry", "core", "__version__"]
+__all__ = ["symbolic_regression", "SRResult", "ParetoEntry", "stability_analysis", "audit_pareto", "check_dimensions", "unit", "GPEliteRegressor", "core", "__version__"]

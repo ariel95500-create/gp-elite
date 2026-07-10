@@ -177,3 +177,82 @@ def test_extrapolation_guard_no_divergence():
     far = r.predict(np.array([[150.0], [200.0], [300.0]]))
     assert np.all(np.isfinite(far))
     assert np.all(np.abs(far) < 5.0)        # borné : pas d'explosion hors-plage
+
+
+# ── Test v0.3 : stabilité structurelle ─────────────────────────────────────
+
+def test_stability_canonical_form():
+    """La forme canonique écrase les constantes mais garde les variables."""
+    from gp_elite.stability import _canonical_form
+    import gp_elite.core as _C
+    n1 = _C.Node('*', _C.Node(0.3), _C.Node('exp', _C.Node('X[0]')))
+    n2 = _C.Node('*', _C.Node(0.29), _C.Node('exp', _C.Node('X[0]')))  # même loi
+    n3 = _C.Node('*', _C.Node(0.3), _C.Node('exp', _C.Node('X[1]')))   # autre var
+    assert _canonical_form(n1) == _canonical_form(n2)
+    assert _canonical_form(n1) != _canonical_form(n3)
+
+
+def test_stability_runs_and_reports():
+    """stability_analysis renvoie fréquence + R² médian sans planter."""
+    from gp_elite import stability_analysis
+    rng = np.random.RandomState(0)
+    x = rng.uniform(1, 4, 60); y = 2.0 * x ** 1.5
+    s = stability_analysis(x.reshape(-1, 1), y, feature_names=["x"],
+                           operators="physical", n_bootstrap=3,
+                           generations=8, speed="ultrafast", seed=0,
+                           verbose=False)
+    assert 0.0 <= s["top_frequency"] <= 1.0
+    assert "median_r2" in s and s["n_bootstrap"] >= 1
+    assert s["forms"] and isinstance(s["forms"][0][0], str)
+
+
+# ── Test v0.3 : cohérence dimensionnelle ───────────────────────────────────
+
+def test_dimensions_catch_and_pass():
+    """Le vérificateur attrape les violations et accepte les formes saines."""
+    import gp_elite.core as _C
+    from gp_elite import check_dimensions, unit
+    # Kepler cohérent
+    kep = _C.Node('*', _C.Node('sqrt', _C.Node('X[0]')), _C.Node('X[0]'))
+    ok, _ = check_dimensions(kep, {0: unit('m')})
+    assert ok
+    # exp d'un argument dimensionné -> violation (cas ziofill)
+    bad = _C.Node('exp', _C.Node('X[0]'))
+    ok2, msg2 = check_dimensions(bad, {0: unit('temperature')})
+    assert not ok2 and "dimensionless" in msg2
+    # addition d'unités incompatibles -> violation
+    add = _C.Node('+', _C.Node('X[0]'), _C.Node('X[1]'))
+    ok3, _ = check_dimensions(add, {0: unit('m'), 1: unit('s')})
+    assert not ok3
+    # ratio cohérent avec cible imposée
+    v = _C.Node('/', _C.Node('X[0]'), _C.Node('X[1]'))
+    ok4, _ = check_dimensions(v, {0: unit('m'), 1: unit('s')},
+                              target_dim={'m': 1, 's': -1})
+    assert ok4
+
+
+# ── Test v0.3 : wrapper scikit-learn ───────────────────────────────────────
+
+def test_sklearn_wrapper_basic():
+    """fit/predict/score + clonage + sympy()."""
+    from gp_elite import GPEliteRegressor
+    from sklearn.base import clone
+    rng = np.random.RandomState(0)
+    X = rng.uniform(1, 5, (80, 1)); y = 2.0 * X[:, 0] ** 1.5
+    est = GPEliteRegressor(operators="physical", generations=12,
+                           speed="ultrafast", random_state=0).fit(X, y)
+    assert est.predict(X[:3]).shape == (3,)
+    assert isinstance(est.sympy(), str) and len(est.sympy()) > 0
+    assert est.n_features_in_ == 1
+    c = clone(est)                      # doit cloner sans état ajusté
+    assert "generations" in c.get_params()
+
+
+def test_sklearn_conformance():
+    """check_estimator complet (marqueur de conformité SRBench)."""
+    import warnings
+    warnings.filterwarnings("ignore")
+    from sklearn.utils.estimator_checks import check_estimator
+    from gp_elite import GPEliteRegressor
+    est = GPEliteRegressor(generations=5, speed="ultrafast", random_state=0)
+    check_estimator(est)                # lève si non conforme

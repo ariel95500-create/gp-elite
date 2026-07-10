@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.3.0 (in progress) — "Trust"
+
+### Added
+- **Residual diagnostics** (`result.diagnostics(X, y)`): a high R² only says
+  the curve passes near the points, not that the model is right. Runs the
+  classic residual checks and prints a plain verdict — *structure* (leftover
+  curvature = a missing term), *normality* (skew/kurtosis = outliers or wrong
+  error model), and *independence* (Durbin-Watson autocorrelation, opt-in via
+  `ordered=True` for time series). See `examples/residual_diagnostics.py`.
+
+- **Structural stability analysis** (`stability_analysis(X, y)`): the direct
+  answer to the launch's most-repeated critique ("resample the data and you
+  get a different formula"). Refits on bootstrap resamples and reports how
+  often each structural form recurs, together with the median fit R². The two
+  numbers separate three regimes honestly: a dominant form at high R² (trust
+  it), several forms at high R² (a real law, not uniquely identified — pick by
+  parsimony), or a recurring form at low R² (signal too weak, trust nothing).
+  See `examples/stability_bootstrap.py`.
+
+
+- **Dimensional consistency audit** (`check_dimensions`, `audit_pareto`): the
+  direct answer to the launch critique that exponents like `temperature/cycle`
+  are physically meaningless. Declare the units of your columns and target; a
+  small unit-algebra walks each formula and flags the physical violations
+  (non-dimensionless arguments to exp/log/sin, adding a length to a time, a
+  dimensioned exponent). It's a post-hoc auditor, not a search constraint
+  (that's heavier, still on the roadmap): it tells you which Pareto forms are
+  candidate laws and which are empirical-only. See `examples/dimensional_audit.py`.
+
+
+- **scikit-learn estimator** (`GPEliteRegressor`): standard fit/predict/score,
+  works in Pipelines / GridSearchCV / cross_val_score, exposes the discovered
+  equation via `.sympy()` and `.equation_`. Passes sklearn's full
+  `check_estimator` conformance suite (sklearn 1.6+ tag API supported). This is
+  the entry ticket for SRBench. A rehearsal harness
+  (`benchmarks/srbench_dryrun.py`) runs the SRBench-style protocol (train/test
+  split, fit through the wrapper, report test R²): internal dry run solved 9/11
+  sampled Feynman equations at R²_test > 0.999.
+
 ## 0.2.2 — 2026-07-06
 
 ### Fixed

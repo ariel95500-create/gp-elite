@@ -105,6 +105,95 @@ class SRResult:
             Xn = self.scaler.transform(Xn)
         return core.evaluate_vector(self.node, Xn)
 
+    def diagnostics(self, X: np.ndarray, y: np.ndarray, verbose: bool = True,
+                    ordered: bool = False):
+        """[v0.3] Residual diagnostics — is this formula trustworthy on (X, y)?
+
+        A high R² says the curve passes near the points; it does NOT say the
+        model is right. These checks catch the ways a good-looking fit can
+        still be wrong:
+
+          - structure : residuals vs the model's own prediction should be
+                        flat. Curvature (a parabola in the residual-vs-fitted
+                        cloud) means a term is missing and the model is
+                        systematically off in some region.
+          - normality : residuals should look Gaussian. Heavy tails / skew
+                        flag outliers or the wrong error model.
+          - independence : only meaningful when rows have a real order (a
+                        time series). Set ordered=True to enable the
+                        Durbin-Watson test; a value far from 2 then means a
+                        trend was missed. Off by default, because on
+                        arbitrarily-ordered rows DW is meaningless.
+
+        Returns a dict of raw numbers; prints a readable verdict if verbose.
+        Pass the SAME data you care about (train to inspect the fit, or a
+        held-out set to check generalization).
+        """
+        X = np.asarray(X, dtype=float)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+        y = np.asarray(y, dtype=float).ravel()
+        yhat = self.predict(X)
+        r = y - yhat
+        n = r.size
+        sd = float(np.std(r)) or 1e-30
+        rs = r / sd
+
+        # (1) structure: how much of the residual variance a smooth quadratic
+        #     can still explain — from the fitted values AND from each feature.
+        #     Order-independent. A missing term shows up as leftover curvature
+        #     against ŷ (usually) or against a raw feature (when ŷ is ~constant,
+        #     i.e. a badly underfit model).
+        denom = float(np.sum((r - r.mean())**2)) or 1e-30
+        def _curv_r2(v):
+            if np.std(v) < 1e-30:
+                return 0.0
+            z = (v - v.mean()) / np.std(v)
+            A = np.c_[np.ones_like(z), z, z**2]
+            coef, *_ = np.linalg.lstsq(A, r, rcond=None)
+            return max(0.0, 1.0 - float(np.sum((r - A @ coef)**2) / denom))
+        struct = _curv_r2(yhat.astype(float))
+        for k in range(X.shape[1]):
+            struct = max(struct, _curv_r2(X[:, k]))
+
+        # (2) normality: excess kurtosis & skew (0,0 for a Gaussian)
+        skew = float(np.mean(rs**3))
+        kurt = float(np.mean(rs**4) - 3.0)
+
+        out = dict(n=n, resid_std=sd, structure_r2=struct,
+                   skew=skew, excess_kurtosis=kurt)
+
+        # (3) independence (opt-in): Durbin-Watson, only if rows are ordered
+        dw = None
+        if ordered:
+            dw = float(np.sum(np.diff(r)**2) / np.sum(r**2)) if np.sum(r**2) > 0 else 2.0
+            out["durbin_watson"] = dw
+
+        if verbose:
+            def flag(ok): return "OK  " if ok else "WARN"
+            s_ok = struct < 0.10
+            n_ok = abs(skew) < 1.0 and abs(kurt) < 2.0
+            print("Residual diagnostics  (n=%d)" % n)
+            print("  [%s] structure   : residual curvature R² = %.3f  "
+                  "(want < 0.10 — else a term is missing)" % (flag(s_ok), struct))
+            print("  [%s] normality   : skew = %+.2f, excess kurtosis = %+.2f  "
+                  "(want ~0 — else outliers / wrong error model)" % (flag(n_ok), skew, kurt))
+            all_ok = s_ok and n_ok
+            if ordered:
+                i_ok = 1.5 < dw < 2.5
+                all_ok = all_ok and i_ok
+                print("  [%s] independence: Durbin-Watson = %.2f  "
+                      "(want ~2 — else autocorrelation)" % (flag(i_ok), dw))
+            else:
+                print("  [ -- ] independence: skipped (pass ordered=True for "
+                      "time-series data)")
+            if all_ok:
+                print("  => residuals look like clean noise: no red flags.")
+            else:
+                print("  => at least one flag: the fit may be good but the "
+                      "model is suspect. Treat the formula with caution.")
+        return out
+
     def __str__(self) -> str:
         r2 = f"{self.r2_validation:.4f}" if self.r2_validation is not None else "n/a"
         return (f"SRResult(expr='{self.expression}', "
