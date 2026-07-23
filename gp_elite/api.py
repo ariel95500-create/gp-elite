@@ -212,6 +212,8 @@ def symbolic_regression(
     parallel: Optional[bool] = None,
     validation_split: float = 0.20,
     seed: Optional[int] = None,
+    units=None,
+    target_units=None,
     loss_fn=None,
     robust: bool = False,
     extrapolate: bool = False,
@@ -304,6 +306,11 @@ def symbolic_regression(
                            fast=fast, ultrafast=ultrafast, use_seeding=False,
                            use_lib=True, use_cograph=True, use_seqmem=True)
     cfg.GENERATIONS = int(generations)
+    # [v0.4] Recherche contrainte par les dimensions (opt-in).
+    if units is not None:
+        from .dim_search import normalize_units_arg
+        cfg.FEAT_DIMS, cfg.TARGET_DIM = normalize_units_arg(
+            units, target_units, n_feat, feature_names)
     cfg.N_POINTS = len(y)
     cfg.VALIDATION_SPLIT = float(validation_split)
     cfg.SEED = seed   # [REPRO] propage le seed pour le parallélisme déterministe
