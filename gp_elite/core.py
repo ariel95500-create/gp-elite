@@ -3482,7 +3482,15 @@ def wrap_linear_scaling(node, xs, ys):
     imprimée corresponde exactement au MSE rapporté (et pour qu'Adam
     puisse ensuite affiner a et b comme n'importe quelle constante).
     Ne wrappe que si le gain est réel et la forme non dégénérée.
+
+    [v0.4] DÉSACTIVÉ en mode dimensionnel : `a + b·f(x)` ajoute une constante
+    adimensionnée à une quantité dimensionnée, ce qui viole l'homogénéité.
+    Le LM ajuste de toute façon les constantes, et les arbres typés portent
+    déjà leur propre coefficient multiplicatif.
     """
+    if _DIM_GATE_DIMS is not None:
+        return node.copy()
+
     if node is None:
         return node
     # [ROBUST] En mode régression robuste, on matérialise le scaling ROBUSTE
