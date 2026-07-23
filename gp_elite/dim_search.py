@@ -165,15 +165,74 @@ def _build(target, depth, feats, rng, cache, budget):
     return Node(round(rng.uniform(-3, 3), 4)) if dimless else None
 
 
+def _monomial_tree(target, feats, rng, max_terms=8):
+    """CHEMIN RAPIDE : resout directement les exposants entiers e_i tels que
+    prod(dim_i ^ e_i) == target (moindres carres + arrondi + verification),
+    puis construit l'arbre produit correspondant. Evite la recherche aveugle,
+    qui coute ~0.65 s/arbre sur des unites composees.
+    Retourne None si aucune solution entiere courte n'est trouvee."""
+    try:
+        import numpy as np
+    except Exception:
+        return None
+    if not feats:
+        return None
+    bases = sorted({b for _, d in feats for b in d} | set(target))
+    if not bases:
+        return None
+    V = np.array([[float(d.get(b, 0.0)) for _, d in feats] for b in bases])
+    yv = np.array([float(target.get(b, 0.0)) for b in bases])
+    try:
+        sol, *_ = np.linalg.lstsq(V, yv, rcond=None)
+    except Exception:
+        return None
+
+    # plusieurs arrondis candidats : la solution moindres carres n'est pas
+    # forcement entiere, on essaie quelques perturbations dans le noyau
+    cands = [np.round(sol)]
+    for _ in range(6):
+        cands.append(np.round(sol + np.array(
+            [rng.uniform(-0.6, 0.6) for _ in range(len(sol))])))
+    for e in cands:
+        if np.linalg.norm(V @ e - yv) > 1e-6:
+            continue
+        if np.abs(e).sum() > max_terms or np.abs(e).max() > 4:
+            continue
+        node = None
+        for i, k in enumerate(e):
+            k = int(k)
+            if k == 0:
+                continue
+            name = feats[i][0]
+            for _ in range(abs(k)):
+                leaf = Node(name)
+                if k > 0:
+                    node = leaf if node is None else Node("*", node, leaf)
+                else:
+                    node = (Node("/", Node(1.0), leaf) if node is None
+                            else Node("/", node, leaf))
+        if node is None:
+            continue
+        # coefficient libre devant, que le LM ajustera
+        return Node("*", Node(round(rng.uniform(-2, 2), 4)), node)
+    return None
+
+
 def typed_random_tree(target_dim, max_depth, feat_dims, rng=None, tries=40):
     """Random tree GUARANTEED to have dimension `target_dim`. None if impossible."""
     rng = rng or random
     fd = _norm_feat_dims(feat_dims)
     feats = _feat_list(fd)
     cache = {}
+    tgt = dict(target_dim)
+    # chemin rapide d'abord (majorite des cas, quasi instantane)
+    for _ in range(3):
+        t = _monomial_tree(tgt, feats, rng)
+        if t is not None:
+            return t
     for _ in range(tries):
         d = rng.randint(2, max(2, max_depth))
-        t = _build(dict(target_dim), d, feats, rng, cache, [4000])
+        t = _build(tgt, d, feats, rng, cache, [4000])
         if t is not None:
             return t
     return None
@@ -258,11 +317,47 @@ def typed_crossover(p1, p2, feat_dims, rng=None):
             _graft(p2, n2, n1.copy()).copy())
 
 
+def _is_const_leaf(n):
+    return (n is not None and n.left is None and n.right is None
+            and isinstance(n.value, (int, float)) and not isinstance(n.value, bool))
+
+
+def _strip_linear_scaling(node):
+    """Retire un enrobage de scaling lineaire AU SOMMET : a + b*f  ->  f.
+
+    wrap_linear_scaling() produit `a + b*inner`. La regle stricte ("une
+    constante ajustee est adimensionnee") rejette l'addition `a + ...`, alors
+    que physiquement `a` est un decalage exprime dans l'unite de la cible.
+    On tolere donc ce motif, mais UNIQUEMENT au sommet de l'arbre : la
+    contrainte reste stricte partout ailleurs.
+    """
+    n = node
+    if n.value == "+" and n.left is not None and n.right is not None:
+        if _is_const_leaf(n.left):
+            n = n.right
+        elif _is_const_leaf(n.right):
+            n = n.left
+    if n.value == "*" and n.left is not None and n.right is not None:
+        if _is_const_leaf(n.left):
+            n = n.right
+        elif _is_const_leaf(n.right):
+            n = n.left
+    return n
+
+
 def is_typed_valid(tree, feat_dims, target_dim):
     """Cheap backstop gate: use in fitness() to reject trees from any path."""
     fd = _norm_feat_dims(feat_dims)
     try:
-        return _eq(_infer(tree, fd), target_dim)
+        if _eq(_infer(tree, fd), target_dim):
+            return True
+    except _DimError:
+        pass
+    inner = _strip_linear_scaling(tree)
+    if inner is tree:
+        return False
+    try:
+        return _eq(_infer(inner, fd), target_dim)
     except _DimError:
         return False
 
