@@ -44,7 +44,8 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
 
     def __init__(self, operators="physical", normalize="auto",
                  generations=40, speed="fast", validation_split=0.20,
-                 restarts=1, robust=False, parallel=None, random_state=0):
+                 restarts=1, robust=False, parallel=None, random_state=0,
+                 units=None, target_units=None):
         # store-only: no logic here (sklearn requirement)
         self.operators = operators
         self.normalize = normalize
@@ -55,6 +56,9 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         self.robust = robust
         self.parallel = parallel
         self.random_state = random_state
+        # [v0.4] Unités physiques (opt-in). None = comportement v0.3.
+        self.units = units
+        self.target_units = target_units
 
     # sklearn tags. The API changed in 1.6: new versions call __sklearn_tags__,
     # older ones call _more_tags. Support both so SRBench works on any version.
@@ -94,6 +98,7 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
             generations=self.generations, speed=self.speed,
             validation_split=self.validation_split, restarts=self.restarts,
             robust=self.robust, parallel=self.parallel,
+            units=self.units, target_units=self.target_units,
             seed=self.random_state)
         self.equation_ = self.model_.expression
         self.is_fitted_ = True
