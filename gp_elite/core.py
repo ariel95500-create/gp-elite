@@ -1565,8 +1565,32 @@ SEQ_MEM = FragmentSequenceMemory()
 # CONFIGURATION GLOBALE
 # ============================================================
 
+_DIM_SEARCH = None
+
+
+def _ds():
+    """[v0.4] Import paresseux de dim_search (évite l'import circulaire :
+    dim_search importe core.Node)."""
+    global _DIM_SEARCH
+    if _DIM_SEARCH is None:
+        from . import dim_search as _m
+        _DIM_SEARCH = _m
+    return _DIM_SEARCH
+
+
+def _dim_active(cfg):
+    return getattr(cfg, "FEAT_DIMS", None) is not None
+
+
 @dataclass
 class Config:
+    # [v0.4] Recherche contrainte par les dimensions physiques.
+    #   FEAT_DIMS  : {0: {"kg":1}, 1: {"m":1,"s":-1}}  (dict par index de feature)
+    #   TARGET_DIM : {"kg":1, "m":2, "s":-2}
+    # None (défaut) = comportement v0.3 strictement inchangé.
+    FEAT_DIMS = None
+    TARGET_DIM = None
+
     # Population et évolution
     POP_SIZE: int          = 800
     GENERATIONS: int       = 400
@@ -3617,6 +3641,15 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
     recalculer la fitness d'un individu inchangé pendant 10 générations.
     Inspiré de GP_SYRACUSE_V16 — gain ~25% sur le temps total.
     """
+    # [v0.4] GARDE-FOU DIMENSIONNEL — rejette tout arbre physiquement incohérent
+    # AVANT toute évaluation, quel que soit le chemin qui l'a produit (mutation
+    # sémantique, refill de déduplication, sous-arbres bannis, bibliothèque...).
+    # C'est ce point qui garantit l'invariant, pas les opérateurs typés seuls.
+    # No-op si FEAT_DIMS is None (chemin v0.3 inchangé).
+    if _dim_active(cfg) and not _ds().is_typed_valid(
+            node, cfg.FEAT_DIMS, cfg.TARGET_DIM):
+        return float("inf")
+
     h   = node.structural_hash()
     # [OPT] Bucket générationnel : même individu → même fitness pendant 10 gens
     gen_bucket = getattr(cfg, '_gen_bucket', 0)
@@ -4897,6 +4930,29 @@ class Island:
         is_nd = (len(self.cfg.TERMINALS) > 1 or
                  (len(self.cfg.TERMINALS) == 1 and self.cfg.TERMINALS[0] != "x"))
 
+        # [v0.4] Population initiale dimensionnellement valide par construction.
+        if _dim_active(self.cfg):
+            ds  = _ds()
+            pop = []
+            fails = 0
+            while len(pop) < n and fails < 20 * n:
+                t = ds.typed_random_tree(self.cfg.TARGET_DIM,
+                                         self.cfg.MAX_INIT_DEPTH,
+                                         self.cfg.FEAT_DIMS, random)
+                if t is None:
+                    fails += 1
+                    continue
+                pop.append(t)
+            if not pop:
+                raise ValueError(
+                    "target_units n'est pas atteignable depuis les unités "
+                    "fournies : aucune expression dimensionnellement valide "
+                    "ne peut être construite.")
+            while len(pop) < n:                    # complète par des copies
+                pop.append(pop[random.randrange(len(pop))].copy())
+            self.population = pop
+            return
+
         if self.stigmergic and FRAGMENT_LIB.fragments:
             # Île stigmergique : construction guidée par la bibliothèque
             self.population = [
@@ -5326,10 +5382,22 @@ def evolve_island(island: Island,
             if random.random() < cfg.CROSSOVER_RATE:
                 parent2 = (_lex.select() if _lex is not None
                            else tournament(pop, xs, ys, cfg, role=island.role))
-                child   = crossover_size_fair(parent1, parent2, cfg)
+                # [v0.4] crossover typé : n'échange que des sous-arbres de même
+                # dimension -> les deux enfants restent valides.
+                if _dim_active(cfg):
+                    child, _ = _ds().typed_crossover(parent1, parent2,
+                                                     cfg.FEAT_DIMS, random)
+                else:
+                    child   = crossover_size_fair(parent1, parent2, cfg)
 
             if random.random() < cfg.MUTATION_RATE:
-                child = mutate(child, xs, ys, cfg, role=island.role)  # [v14.5] rôle transmis
+                # [v0.4] mutation typée : le sous-arbre neuf a la dimension du
+                # sous-arbre remplacé -> validité préservée.
+                if _dim_active(cfg):
+                    child = _ds().typed_mutate(child, cfg.FEAT_DIMS,
+                                               cfg.MAX_MUTATION_DEPTH, random)
+                else:
+                    child = mutate(child, xs, ys, cfg, role=island.role)  # [v14.5] rôle transmis
 
             if random.random() < _sem_rate:
                 child = semantic_mutation(child, xs, ys, cfg, role=island.role)
@@ -5383,7 +5451,11 @@ def evolve_island(island: Island,
             _refill += 1
             if _n_keep > 0 and random.random() < 0.70:
                 parent = new_pop[random.randrange(_n_keep)]
-                child  = mutate(parent, xs, ys, cfg, role=island.role)
+                if _dim_active(cfg):          # [v0.4] refill typé
+                    child = _ds().typed_mutate(parent, cfg.FEAT_DIMS,
+                                               cfg.MAX_MUTATION_DEPTH, random)
+                else:
+                    child  = mutate(parent, xs, ys, cfg, role=island.role)
                 if (tree_size(child) <= cfg.MAX_TREE_SIZE
                         and tree_depth(child) <= cfg.MAX_TREE_DEPTH):
                     new_pop.append(child)
