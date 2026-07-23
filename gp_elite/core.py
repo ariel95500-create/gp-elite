@@ -1566,6 +1566,8 @@ SEQ_MEM = FragmentSequenceMemory()
 # ============================================================
 
 _DIM_SEARCH = None
+_DIM_GATE_DIMS = None       # [v0.4] miroir de cfg.FEAT_DIMS pour _track_val_candidate
+_DIM_GATE_TARGET = None
 
 
 def _ds():
@@ -4932,6 +4934,9 @@ class Island:
 
         # [v0.4] Population initiale dimensionnellement valide par construction.
         if _dim_active(self.cfg):
+            global _DIM_GATE_DIMS, _DIM_GATE_TARGET
+            _DIM_GATE_DIMS   = self.cfg.FEAT_DIMS
+            _DIM_GATE_TARGET = self.cfg.TARGET_DIM
             ds  = _ds()
             pop = []
             fails = 0
@@ -5813,6 +5818,15 @@ def _track_val_candidate(cand):
     sont écartés (overfitting que le hold-out peut manquer)."""
     if cand is None or _VAL_XS is None:
         return
+    # [v0.4] Le pool de validation alimente la SELECTION FINALE (_select_one_se)
+    # sans repasser par fitness() : sans ce filtre, un candidat dimensionnellement
+    # invalide peut etre repeche comme modele final. On ferme la fuite ici.
+    if _DIM_GATE_DIMS is not None:
+        try:
+            if not _ds().is_typed_valid(cand, _DIM_GATE_DIMS, _DIM_GATE_TARGET):
+                return
+        except Exception:
+            return
     if not _is_numerically_stable(cand):
         return
     try:
