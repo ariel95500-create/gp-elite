@@ -1,6 +1,46 @@
 # Changelog
 
-## 0.3.0 (in progress) — "Trust"
+## 0.4.1 — "Lawful" (fixes)
+
+### Fixed
+- **`units=` returned numerically wrong models.** `fitness()` and `raw_mse()`
+  scored candidates on their linearly-scaled form (`a + b·f(x)`), while
+  `wrap_linear_scaling` was disabled under `units=` because the additive offset
+  breaks dimensional homogeneity. The champion was therefore *selected* on a
+  scaled score and *delivered* unscaled: exact structure, wrong constant,
+  negative R². Under `units=` the engine now regresses through the origin
+  (`b·f(x)`, no offset) — dimensionally sound, and materialised in the delivered
+  tree. On `y = ½·m·v²`: R² goes from **-1.89 to 1.000000**, same size (7 nodes),
+  still 1/1 dimensionally valid.
+- **Dimensional state leaked between fits.** `_DIM_GATE_DIMS` / `_DIM_GATE_TARGET`
+  are module globals, set on a `units=` fit and never reset. Any ordinary fit
+  that followed *in the same process* silently ran with the dimensional gate
+  active: the same fit scored R² = 1.000000 in a fresh process and **R² = -1.71**
+  after a `units=` fit. They are now synchronised on every `evolve()` call, and
+  the scale-only flag is propagated to the parallel workers.
+- **Float64 overflow in the Levenberg–Marquardt optimizer.** Unbounded
+  `sq`/`cube`/`*` chains could reach ~1e198 and overflow during the Jacobian
+  products (`overflow encountered in matmul`). Residuals and the Jacobian are
+  now bounded. No change to sane fits.
+
+### Notes
+Non-regression verified without `units=`: 8 fits (2 operator sets x 4 seeds)
+plus the robust and multi-restart modes are byte-identical to 0.4.0.
+
+## 0.4.0 — "Lawful"
+
+### Added
+- **Dimensionally-constrained search** (`units=`, `target_units=`): constructive
+  typed generation, dimension-preserving mutation and crossover, and a validity
+  gate in `fitness()` that rejects unsound candidates from every code path.
+  Units accept plain strings (`"m/s"`, `"kg*m/s^2"`, `"J"`, `"s^-1"`) or
+  dimension dicts, plus per-name and per-index forms.
+- `dim_search.py`, built on the existing `dimensions.py` algebra so that the
+  post-hoc auditor and the constrained search cannot diverge.
+
+Without `units=`, 0.3.0 behaviour is unchanged.
+
+## 0.3.0 — "Trust"
 
 ### Added
 - **Residual diagnostics** (`result.diagnostics(X, y)`): a high R² only says
