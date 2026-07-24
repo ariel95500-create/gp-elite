@@ -25,21 +25,26 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
 
 ---
 
-## Nouveautés 0.4.0 « Lawful »
+## Nouveautés 0.4.1 « Lawful »
 
 - **Recherche sous contrainte dimensionnelle** (`units=`) : déclarez les unités
   physiques de vos colonnes, et le moteur ne construit plus que des expressions
   dimensionnellement saines — génération typée constructive, mutation et
   croisement préservant les dimensions, plus un filtre de validité qui rejette
   les candidats non conformes sur tous les chemins de code. Sur Feynman II.11.3
-  (5 variables, 5 seeds) : sans contrainte, **0/5** modèles sont
-  dimensionnellement valides ; avec `units=`, **5/5 sont valides et 3/5
-  retrouvent la loi exacte**. Coût : environ 16× plus lent.
-- **Garde numérique dans l'optimiseur LM** : des chaînes `sq`/`cube`/`*` non
-  bornées pouvaient dépasser float64 lors des produits jacobiens. Corrigé, sans
-  aucun changement sur les ajustements sains.
-- Sans `units=`, le comportement est **strictement inchangé** (non-régression
-  vérifiée : équation, taille et MSE identiques à seed égal).
+  (5 variables, 5 seeds, budget identique) : sans contrainte, **0/5** modèles
+  sont dimensionnellement valides ; avec `units=`, **5/5 le sont**, et ils sont
+  **2,6× plus compacts** pour un R² légèrement meilleur. Coût : environ 4× plus
+  lent. Tableau complet plus bas.
+- **La 0.4.1 corrige trois bugs** découverts en validant la 0.4.0 : sous
+  `units=`, les candidats étaient notés sur une forme remise à l'échelle mais
+  livrés sans elle (structure juste, constante fausse) ; l'état dimensionnel
+  fuyait vers les fits suivants du même processus ; et l'optimiseur
+  Levenberg–Marquardt pouvait dépasser float64 sur des chaînes `sq`/`cube`/`*`
+  non bornées. Voir [CHANGELOG.md](CHANGELOG.md).
+- Sans `units=`, le comportement est **inchangé** (non-régression vérifiée :
+  8 fits sur deux jeux d'opérateurs et quatre seeds, plus les modes robuste et
+  multi-restart, identiques octet pour octet à la 0.4.0).
 
 Versions précédentes : **0.3.0 « Trust »** (diagnostics, stabilité, audit
 dimensionnel post-hoc), **0.2.0** (constantes par Levenberg–Marquardt,
@@ -158,24 +163,41 @@ dérivées courantes (`N J W Pa Hz C V ohm T`), et les opérateurs `* / ^ ( )` :
 dictionnaires de dimensions (`{"m": 1, "s": -1}`) fonctionnent aussi, de même que
 les formes par nom (`{"X0": "kg"}`) et par indice (`{0: "kg"}`).
 
-**Effet mesuré** — Feynman II.11.3 (5 variables, moteur complet, 5 seeds) :
+**Effet mesuré** — Feynman II.11.3, `x = q·Ef/(m·(w0²−w²))`, 5 variables,
+5 seeds, 40 générations, budget identique par bras :
 
-| | dimensionnellement valides | loi exacte retrouvée |
-|---|---:|---:|
-| défaut | **0 / 5** | 0 / 5 |
-| `units=` | **5 / 5** | **3 / 5** |
+| | sans `units=` | `units=` | sans `units=`, 4× générations |
+|---|---:|---:|---:|
+| dimensionnellement valides | **0 / 5** | **5 / 5** | 0 / 5 |
+| R² test médian | 0.99037 | **0.99786** | 0.99494 |
+| taille médiane du modèle | 58 nœuds | **22 nœuds** | 67 nœuds |
+| secondes / run (médiane) | 18 | 76 | 71 |
 
-Coût : environ 16× plus lent. Reproductible avec `benchmarks/ab_final.py`.
+La troisième colonne donne au bras non contraint quatre fois plus de générations,
+de façon à égaliser le temps machine. Il reste à **0/5** modèles physiquement
+valides, et les produit plus gros : le temps de calcul ne remplace pas la
+contrainte. Les échecs du bras non contraint ne sont pas marginaux — il additionne
+des hertz à des nombres purs, ou élève une grandeur à la puissance d'une fréquence.
+
+**Ce que ça ne fait *pas*.** Sur un jeu de test tiré *hors* du domaine
+d'entraînement (rapport w/w0 poussé de [0.20, 0.67] vers la résonance à
+[0.70, 0.90]), tous les bras s'effondrent — R² médian de 0.26, 0.34 et 0.37
+respectivement. À ces budgets, **aucun bras ne retrouve II.11.3 exactement** :
+`units=` achète des approximations physiquement cohérentes et compactes, pas la
+loi elle-même. Les deux tableaux sont reproductibles avec `benchmarks/ab_ood.py`.
 
 **Quand s'en servir.** Pour découvrir une loi physique quand vous connaissez les
-unités et que la loi est dimensionnellement homogène. **Pas** pour de la
-prédiction en boîte noire : la contrainte écarte les approximations
-dimensionnellement fausses mais numériquement bonnes, et fait donc *baisser* le
-R² lorsque l'objectif est d'ajuster plutôt que de trouver une loi.
+unités et que la loi est dimensionnellement homogène, et pour garantir que ce que
+le moteur rend a au moins un sens physique. **Pas** pour de la prédiction en boîte
+noire : la contrainte écarte les approximations dimensionnellement fausses mais
+numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif est
+d'ajuster plutôt que de trouver une loi.
 
 **Limites.** Les constantes ajustées sont traitées comme sans dimension
 (convention AI Feynman) : une loi dont la constante porte des unités (G, k_B, R)
-exige de fournir cette constante comme variable d'entrée typée.
+exige de fournir cette constante comme variable d'entrée typée. Sous `units=`, la
+mise à l'échelle interne est purement multiplicative (sans décalage additif), ce
+qui maintient chaque candidat dimensionnellement homogène.
 
 ---
 
@@ -210,6 +232,7 @@ Sur le **benchmark Feynman gelé** (15 équations, `PYTHONHASHSEED=0`, `restarts
 ## Caractéristiques techniques
 
 - **Recherche sous contrainte dimensionnelle** (v0.4) : génération typée constructive, mutation et croisement préservant les dimensions, filtre de validité dans `fitness()`
+- **Mise à l'échelle purement multiplicative sous `units=`** (v0.4.1) : régression par l'origine, pour que la forme *notée* soit la forme *livrée*
 - **Garde numérique de l'optimiseur LM** (v0.4) : plus d'overflow float64 sur les chaînes `sq`/`cube`/`*` non bornées
 - **Audit dimensionnel post-hoc** (v0.3) : `dimensions.py` — exactement la même algèbre que la recherche contrainte, l'auditeur et le moteur ne peuvent pas diverger
 - **Optimisation des constantes par Levenberg–Marquardt** (v0.2) : constantes de qualité « forme fermée », déterministe, LM/Adam commutables
