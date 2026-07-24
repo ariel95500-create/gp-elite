@@ -7,6 +7,8 @@
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables, 100-5000 points) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
+Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
+
 Pur **Python / NumPy** — pas de Julia, pas de compilation, pas de GPU. `pip install` et c'est parti.
 
 ![GP_ELITE redécouvre la 3ᵉ loi de Kepler à partir de 8 points (R² = 1.000000)](kepler_plot.png)
@@ -23,13 +25,25 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
 
 ---
 
-## Nouveautés 0.2.0
+## Nouveautés 0.4.0 « Lawful »
 
-- **Constantes par Levenberg–Marquardt** (défaut) : précision machine — la loi de Coulomb `q1·q2/(4πεr²)` récupérée *exactement* (1−R² ≈ 8e-32). 6–14× plus rapide sur les problèmes à constantes.
-- **Fiabilité multi-restart** (`restarts=N`) : runs indépendants sur un hold-out déterministe partagé, archives fusionnées, sélection globale unique.
-- **Front de Pareto** (`result.pareto`) : tout l'escalier complexité ↔ précision, chaque entrée avec son `.predict`.
-- **Mode Prévision / extrapolation** (`extrapolate_feature=`, `extrapolate_direction=`) : sondes hors-domaine anti-divergence, plancher linéaire, sélection-frontière. Aussi en **mode 7** du menu interactif.
-- **Reproductibilité** : résultats identiques à seed égal dans un processus ; entre invocations, lancer avec `PYTHONHASHSEED=0`.
+- **Recherche sous contrainte dimensionnelle** (`units=`) : déclarez les unités
+  physiques de vos colonnes, et le moteur ne construit plus que des expressions
+  dimensionnellement saines — génération typée constructive, mutation et
+  croisement préservant les dimensions, plus un filtre de validité qui rejette
+  les candidats non conformes sur tous les chemins de code. Sur Feynman II.11.3
+  (5 variables, 5 seeds) : sans contrainte, **0/5** modèles sont
+  dimensionnellement valides ; avec `units=`, **5/5 sont valides et 3/5
+  retrouvent la loi exacte**. Coût : environ 16× plus lent.
+- **Garde numérique dans l'optimiseur LM** : des chaînes `sq`/`cube`/`*` non
+  bornées pouvaient dépasser float64 lors des produits jacobiens. Corrigé, sans
+  aucun changement sur les ajustements sains.
+- Sans `units=`, le comportement est **strictement inchangé** (non-régression
+  vérifiée : équation, taille et MSE identiques à seed égal).
+
+Versions précédentes : **0.3.0 « Trust »** (diagnostics, stabilité, audit
+dimensionnel post-hoc), **0.2.0** (constantes par Levenberg–Marquardt,
+multi-restart, front de Pareto, mode extrapolation).
 
 ---
 
@@ -40,6 +54,7 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
 | Sortie | **formule lisible** | boîte noire | formule lisible |
 | Installation | `pip install` (pur Python) | lourde | nécessite **Julia** |
 | Validation anti-surapprentissage | **intégrée** (hold-out) | à faire soi-même | à faire soi-même |
+| Validité physique | **imposée pendant la recherche** (`units=`) | non | non |
 | Sélection de variables | **rapport d'importance** | non | partielle |
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur.
@@ -121,6 +136,49 @@ Voir [`examples/robust_regression.py`](examples/robust_regression.py) pour le be
 
 ---
 
+## ⚖️ Contraintes dimensionnelles (pour les lois physiques)
+
+Déclarez les unités de vos entrées et de votre cible : GP_ELITE ne cherchera plus
+que des expressions dimensionnellement saines — fini les formules qui collent aux
+chiffres tout en étant physiquement dénuées de sens.
+
+```python
+from gp_elite import GPEliteRegressor
+
+est = GPEliteRegressor(
+    units=["kg", "m/s"],      # unités de X0, X1
+    target_units="J",         # unité de la cible
+)
+est.fit(X, y)
+```
+
+Les unités s'écrivent en texte simple — bases SI (`m kg s A K mol cd`), unités
+dérivées courantes (`N J W Pa Hz C V ohm T`), et les opérateurs `* / ^ ( )` :
+`"m/s"`, `"kg*m/s^2"`, `"s^-1"`, `"1"` pour une grandeur sans dimension. Les
+dictionnaires de dimensions (`{"m": 1, "s": -1}`) fonctionnent aussi, de même que
+les formes par nom (`{"X0": "kg"}`) et par indice (`{0: "kg"}`).
+
+**Effet mesuré** — Feynman II.11.3 (5 variables, moteur complet, 5 seeds) :
+
+| | dimensionnellement valides | loi exacte retrouvée |
+|---|---:|---:|
+| défaut | **0 / 5** | 0 / 5 |
+| `units=` | **5 / 5** | **3 / 5** |
+
+Coût : environ 16× plus lent. Reproductible avec `benchmarks/ab_final.py`.
+
+**Quand s'en servir.** Pour découvrir une loi physique quand vous connaissez les
+unités et que la loi est dimensionnellement homogène. **Pas** pour de la
+prédiction en boîte noire : la contrainte écarte les approximations
+dimensionnellement fausses mais numériquement bonnes, et fait donc *baisser* le
+R² lorsque l'objectif est d'ajuster plutôt que de trouver une loi.
+
+**Limites.** Les constantes ajustées sont traitées comme sans dimension
+(convention AI Feynman) : une loi dont la constante porte des unités (G, k_B, R)
+exige de fournir cette constante comme variable d'entrée typée.
+
+---
+
 ## Exemple complet : dégradation de batterie (données NASA)
 
 ```bash
@@ -145,12 +203,20 @@ Une dégradation saturante avec les cycles, modulée par la température — phy
 
 Sur le **benchmark Feynman gelé** (15 équations, `PYTHONHASHSEED=0`, `restarts=4`) : **10/15 récupérations symboliques exactes (67 %)** à précision machine (1−R² < 1e-9), **14/15 sous 1e-3 (93 %)**. Face-à-face contre **gplearn** (mêmes données/splits, budget généreux pour gplearn) : **67 % vs 40 %** d'exact — GP_ELITE devant sur 9 équations, égalité sur 5, derrière sur 1. Prévision sur données réelles (SOH batterie NASA, vraie extrapolation sur cycles jamais vus) : R² médian **+0.52** contre +0.34 pour la régression linéaire, zéro modèle divergent. Reproduire : `PYTHONHASHSEED=0 python benchmarks/feynman_bench.py 0 15` et `benchmarks/duel.py`.
 
-**Moins bon** : suites chaotiques (ex. temps de vol de Collatz — composante intrinsèquement aléatoire), >15-20 variables (l'espace de recherche explose), gros jeux de données où la précision pure prime sur l'interprétabilité (les modèles d'ensemble dominent alors).
+**Moins bon** : suites chaotiques (ex. temps de vol de Collatz — composante intrinsèquement aléatoire), >15-20 variables (l'espace de recherche explose — même si `units=` le réduit nettement quand les unités physiques sont connues), gros jeux de données où la précision pure prime sur l'interprétabilité (les modèles d'ensemble dominent alors).
 
 ---
 
 ## Caractéristiques techniques
 
+- **Recherche sous contrainte dimensionnelle** (v0.4) : génération typée constructive, mutation et croisement préservant les dimensions, filtre de validité dans `fitness()`
+- **Garde numérique de l'optimiseur LM** (v0.4) : plus d'overflow float64 sur les chaînes `sq`/`cube`/`*` non bornées
+- **Audit dimensionnel post-hoc** (v0.3) : `dimensions.py` — exactement la même algèbre que la recherche contrainte, l'auditeur et le moteur ne peuvent pas diverger
+- **Optimisation des constantes par Levenberg–Marquardt** (v0.2) : constantes de qualité « forme fermée », déterministe, LM/Adam commutables
+- **Multi-restart + fusion des archives de candidats** (v0.2) : la variance de seed transformée en fiabilité
+- **API front de Pareto** (v0.2) : escalier non dominé complexité/précision
+- **Mode extrapolation / prévision protégé** (v0.2) : sondes hors-domaine, plancher linéaire, sélection-frontière
+- **Amorçage par motifs de composition** (v0.2) : gabarits pythagoricien, somme d'inverses, gaussienne pour les structures imbriquées
 - **Modèle en îles asymétriques** (explorer / cleaner / stigmergic) avec migration périodique
 - **Linear scaling** (Keijzer 2003) : le moteur cherche la *forme*, les coefficients d'échelle sont résolus en forme fermée
 - **Sélection ε-lexicase** (La Cava 2016) pour préserver la diversité comportementale
