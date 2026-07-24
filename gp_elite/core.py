@@ -1568,6 +1568,9 @@ SEQ_MEM = FragmentSequenceMemory()
 _DIM_SEARCH = None
 _DIM_GATE_DIMS = None       # [v0.4] miroir de cfg.FEAT_DIMS pour _track_val_candidate
 _DIM_GATE_TARGET = None
+# [v0.4.1] Linear scaling PUREMENT multiplicatif (regression par l'origine).
+# Actif en mode dimensionnel : voir _linear_scale_params.
+_LS_SCALE_ONLY = False
 
 
 def _ds():
@@ -3283,7 +3286,26 @@ def _make_motif_seeds(cfg, n_max: int = 32) -> list:
 _CUSTOM_LOSS_PARSIMONY = 0.0
 
 def _linear_scale_params(preds: np.ndarray, ys_np: np.ndarray):
-    """Coefficients OLS (a, b) de  y ≈ a + b·preds.  Retourne (a, b, ok)."""
+    """Coefficients OLS (a, b) de  y ≈ a + b·preds.  Retourne (a, b, ok).
+
+    [v0.4.1] En mode dimensionnel, l'offset `a` ajouterait une constante
+    adimensionnee a une grandeur dimensionnee : on regresse donc PAR L'ORIGINE
+    (a = 0). Un coefficient multiplicatif sans dimension est exactement ce que
+    portent les lois physiques (le 1/2 de 1/2mv², le 4π de Coulomb), donc la
+    forme scalee reste dimensionnellement saine — et surtout MATERIALISABLE
+    dans l'arbre livre, ce que l'offset interdisait.
+    """
+    if _LS_SCALE_ONLY:
+        if not np.all(np.isfinite(preds)) or float(np.max(np.abs(preds))) > 1e15:
+            return 0.0, 1.0, False
+        den = float(np.dot(preds, preds))
+        if den < 1e-12:
+            return 0.0, 1.0, False
+        b = float(np.dot(preds, ys_np)) / den
+        if not math.isfinite(b):
+            return 0.0, 1.0, False
+        return 0.0, b, True
+
     pm = float(preds.mean()); ym = float(ys_np.mean())
     pc = preds - pm
     # [FIX-OVF v20] Clamp avant dot pour éviter overflow sur arbres explosifs
@@ -3483,14 +3505,13 @@ def wrap_linear_scaling(node, xs, ys):
     puisse ensuite affiner a et b comme n'importe quelle constante).
     Ne wrappe que si le gain est réel et la forme non dégénérée.
 
-    [v0.4] DÉSACTIVÉ en mode dimensionnel : `a + b·f(x)` ajoute une constante
-    adimensionnée à une quantité dimensionnée, ce qui viole l'homogénéité.
-    Le LM ajuste de toute façon les constantes, et les arbres typés portent
-    déjà leur propre coefficient multiplicatif.
+    [v0.4.1] En mode dimensionnel, on materialise `b·f(x)` (SANS offset) au
+    lieu de ne rien wrapper. La v0.4 desactivait ce wrap parce que `a + b·f(x)`
+    viole l'homogeneite — mais fitness()/raw_mse continuaient, eux, a NOTER les
+    candidats sur leur forme scalee. Le champion etait donc choisi sur un score
+    scale puis livre non scale : structure correcte, constante fausse, R2
+    negatif. Le scaling par l'origine reconcilie les deux.
     """
-    if _DIM_GATE_DIMS is not None:
-        return node.copy()
-
     if node is None:
         return node
     # [ROBUST] En mode régression robuste, on matérialise le scaling ROBUSTE
@@ -3520,8 +3541,20 @@ def wrap_linear_scaling(node, xs, ys):
                 mse_ls  = float(np.mean((a_ls + b_ls * preds - ys_np) ** 2))
                 if not math.isfinite(mse_ls) or mse_ls >= mse_raw - 1e-15:
                     return node.copy()
-        wrapped = Node("+", Node(float(a_ls)),
-                       Node("*", Node(float(b_ls)), node.copy()))
+        if _LS_SCALE_ONLY:
+            # [v0.4.1] Si l'arbre porte deja une constante multiplicative en
+            # tete, on FUSIONNE au lieu d'empiler : sans cela le modele livre
+            # gagne deux noeuds et une constante redondante (`b · (c · f(x))`),
+            # ce qui degrade la lisibilite et fausse la mesure de parcimonie.
+            if (node.value == "*" and node.left is not None
+                    and isinstance(node.left.value, float)):
+                wrapped = node.copy()
+                wrapped.left = Node(float(b_ls) * float(node.left.value))
+            else:
+                wrapped = Node("*", Node(float(b_ls)), node.copy())
+        else:
+            wrapped = Node("+", Node(float(a_ls)),
+                           Node("*", Node(float(b_ls)), node.copy()))
         return simplify(wrapped)
     except Exception:
         return node.copy()
@@ -5519,7 +5552,8 @@ _PW: dict = {}    # état du worker (initialisé une fois par processus)
 
 def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
                           syracuse_y_raw, syracuse_x_raw,
-                          gencsv=None, battery_mode=False):
+                          gencsv=None, battery_mode=False,
+                          ls_scale_only=False):
     """Initializer du pool : reçoit les données constantes UNE fois par worker.
     [FIX-WIN v20] Sous Windows (spawn), le worker ré-importe le module depuis
     __file__ et l'enregistre sous son nom canonique dans sys.modules, ce qui
@@ -5535,6 +5569,8 @@ def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
             _sys.modules[_key] = _mod
     global PROBE_X, _USE_LINEAR_SCALING, _SYRACUSE_MODE
     global _SYRACUSE_Y_RAW, _SYRACUSE_X_RAW
+    global _LS_SCALE_ONLY                     # [v0.4.1]
+    _LS_SCALE_ONLY = bool(ls_scale_only)
     _PW["xs"] = xs
     _PW["ys"] = ys
     PROBE_X             = probe_x
@@ -5654,7 +5690,8 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 initializer=_parallel_worker_init,
                 initargs=(xs, ys, PROBE_X, _USE_LINEAR_SCALING,
                           _SYRACUSE_MODE, _syr_y, _syr_x,
-                          _gencsv, _BATTERY_CSV_MODE)) as ex:
+                          _gencsv, _BATTERY_CSV_MODE,
+                          _LS_SCALE_ONLY)) as ex:
             gen = 0
             while gen < cfg.GENERATIONS:
                 # Round aligné sur les frontières de migration
@@ -6122,6 +6159,19 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     global PROBE_X, CURRENT_RESIDUAL_SIG     # [v17]
     global _USE_LINEAR_SCALING               # [v18-LS]
     _USE_LINEAR_SCALING = bool(getattr(cfg, "USE_LINEAR_SCALING", True))
+    # [v0.4.1] Les drapeaux dimensionnels sont des GLOBALES de module. Sans
+    # remise a zero ici, un fit avec units= contaminait tous les fits suivants
+    # du meme processus : le garde-fou restait actif sur des donnees sans
+    # dimensions declarees, et le champion livre devenait aberrant.
+    global _DIM_GATE_DIMS, _DIM_GATE_TARGET, _LS_SCALE_ONLY
+    if _dim_active(cfg):
+        _DIM_GATE_DIMS   = cfg.FEAT_DIMS
+        _DIM_GATE_TARGET = cfg.TARGET_DIM
+        _LS_SCALE_ONLY   = True
+    else:
+        _DIM_GATE_DIMS   = None
+        _DIM_GATE_TARGET = None
+        _LS_SCALE_ONLY   = False
     globals()["VAL_R2_TOLERANCE"] = float(getattr(cfg, "VAL_R2_TOLERANCE", 0.003))
     # FIX v13.10 : LOG_CSV relatif au répertoire du script
     _script_dir = os.path.dirname(os.path.abspath(__file__))
