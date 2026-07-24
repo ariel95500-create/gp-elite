@@ -3964,6 +3964,9 @@ def optimize_constants_lm(node: Node,
     c  = np.array([cn.value for cn in consts], dtype=float)
     lo_b = float(cfg.ERC_MIN) * 3.0
     hi_b = float(cfg.ERC_MAX) * 3.0
+    _LM_NUM_CLIP = 1e150   # [v0.4] borne anti-overflow : au-dela, r@r ou J.T@J
+                           # depassent float64. sq/cube/* ne sont pas bornes par
+                           # _SAFE_LIMIT et peuvent sortir ~1e217.
 
     def _resid(cv):
         with np.errstate(all='ignore'):
@@ -3976,8 +3979,8 @@ def optimize_constants_lm(node: Node,
             p = np.where(bad, 0.0, p)
             r = p - y
             r[bad] = 1e6          # zone invalide : fortement pénalisée
-            return r
-        return p - y
+            return np.clip(r, -_LM_NUM_CLIP, _LM_NUM_CLIP)
+        return np.clip(p - y, -_LM_NUM_CLIP, _LM_NUM_CLIP)
 
     r = _resid(c)
     sse_best = float(r @ r)
@@ -3991,6 +3994,10 @@ def optimize_constants_lm(node: Node,
             h = 1e-6 * (1.0 + abs(c[i]))
             cp = c.copy(); cp[i] += h
             J[:, i] = (_resid(cp) - r) / h
+        # [v0.4] jacobienne assainie : sans cela J.T @ J deborde float64
+        J = np.nan_to_num(J, nan=0.0,
+                          posinf=_LM_NUM_CLIP, neginf=-_LM_NUM_CLIP)
+        np.clip(J, -_LM_NUM_CLIP, _LM_NUM_CLIP, out=J)
         g  = J.T @ r                      # gradient (½∇SSE)
         if float(np.max(np.abs(g))) < 1e-14:
             break
