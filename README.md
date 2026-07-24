@@ -24,19 +24,24 @@ print(result.r2_validation)     # 0.996  (on data never seen during training)
 
 ---
 
-## What's new in 0.4.0 "Lawful"
+## What's new in 0.4.1 "Lawful"
 
 - **Dimensionally-constrained search** (`units=`): declare your columns' physical
   units and the engine only ever builds dimensionally sound expressions —
   constructive typed generation, dimension-preserving mutation and crossover,
   plus a validity gate that rejects unsound candidates from every code path.
-  On Feynman II.11.3 (5 variables, 5 seeds): without constraints **0/5** models
-  are dimensionally valid; with `units=`, **5/5 are valid and 3/5 recover the
-  exact law**. Cost: roughly 16x slower.
-- **Numerical guard in the LM optimizer**: unbounded `sq`/`cube`/`*` chains could
-  overflow float64 during the Jacobian products. Fixed, with no change to sane fits.
-- Without `units=`, behaviour is **strictly unchanged** (non-regression verified:
-  identical equation, size and MSE on the same seed).
+  On Feynman II.11.3 (5 variables, 5 seeds, identical budget): without
+  constraints **0/5** models are dimensionally valid; with `units=`, **5/5 are
+  valid**, and they are **2.6x smaller** at a slightly better R². Cost: roughly
+  4x slower. Full table below.
+- **0.4.1 fixes three bugs** found while validating 0.4.0: candidates were scored
+  on a rescaled form but delivered unscaled under `units=` (right structure, wrong
+  constant); dimensional state leaked into later fits in the same process; and the
+  Levenberg–Marquardt optimizer could overflow float64 on unbounded `sq`/`cube`/`*`
+  chains. See [CHANGELOG.md](CHANGELOG.md).
+- Without `units=`, behaviour is **unchanged** (non-regression verified: 8 fits
+  across two operator sets and four seeds, plus the robust and multi-restart
+  modes, byte-identical to 0.4.0).
 
 Earlier releases: **0.3.0 "Trust"** (diagnostics, stability, post-hoc dimensional
 audit), **0.2.0** (Levenberg–Marquardt constant fitting, multi-restart, Pareto
@@ -154,23 +159,40 @@ Units accept plain strings — SI bases (`m kg s A K mol cd`), common derived un
 `"1"` for dimensionless. Dimension dicts (`{"m": 1, "s": -1}`) work too, as do
 per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms.
 
-**Measured effect** — Feynman II.11.3 (5 variables, full engine, 5 seeds):
+**Measured effect** — Feynman II.11.3, `x = q·Ef/(m·(w0²−w²))`, 5 variables,
+5 seeds, 40 generations, identical budget per arm:
 
-| | dimensionally valid | exact law recovered |
-|---|---:|---:|
-| default | **0 / 5** | 0 / 5 |
-| `units=` | **5 / 5** | **3 / 5** |
+| | no `units=` | `units=` | no `units=`, 4x generations |
+|---|---:|---:|---:|
+| dimensionally valid | **0 / 5** | **5 / 5** | 0 / 5 |
+| median test R² | 0.99037 | **0.99786** | 0.99494 |
+| median model size | 58 nodes | **22 nodes** | 67 nodes |
+| median seconds / run | 18 | 76 | 71 |
 
-Cost: roughly 16x slower. Reproduce with `benchmarks/ab_final.py`.
+The third column gives the unconstrained arm four times the generations, so both
+arms cost the same wall-clock time. It still yields **0/5** physically valid
+models, and larger ones: compute does not substitute for the constraint. The
+unconstrained failures are not marginal — they add hertz to dimensionless numbers,
+or raise a quantity to the power of a frequency.
+
+**What it does *not* do.** On a test set drawn *outside* the training domain
+(pushing w/w0 from [0.20, 0.67] towards resonance at [0.70, 0.90]), every arm
+collapses — median R² 0.26, 0.34 and 0.37 respectively. At these budgets **no arm
+recovers II.11.3 exactly**: `units=` buys physically coherent, compact
+approximations, not the law itself. Reproduce both tables with
+`benchmarks/ab_ood.py`.
 
 **When to use it.** For discovering physical laws when you know the units and the
-law is dimensionally homogeneous. **Not** for black-box prediction: the constraint
-rules out dimensionally wrong but numerically good approximations, so it *lowers*
+law is dimensionally homogeneous, and to guarantee that whatever the engine returns
+is at least physically meaningful. **Not** for black-box prediction: the constraint
+rules out dimensionally wrong but numerically good approximations, so it can *lower*
 R² when fitting is the goal rather than finding a law.
 
 **Limitations.** Fitted constants are treated as dimensionless (the AI Feynman
 convention), so a law whose constant carries units (G, k_B, R) needs that constant
-supplied as a typed input variable.
+supplied as a typed input variable. Under `units=` the internal linear scaling is
+multiplicative only (no additive offset), which keeps every candidate dimensionally
+homogeneous.
 
 ---
 
@@ -205,6 +227,7 @@ On the frozen **Feynman benchmark** (15 physics equations, `PYTHONHASHSEED=0`, `
 ## Technical features
 
 - **Dimensionally-constrained search** (v0.4): constructive typed generation, dimension-preserving mutation and crossover, validity gate in `fitness()`
+- **Scale-only linear scaling under `units=`** (v0.4.1): regression through the origin, so the form that is *scored* is the form that is *delivered*
 - **Numerical guard in the LM optimizer** (v0.4): no more float64 overflow on unbounded `sq`/`cube`/`*` chains
 - **Post-hoc dimensional audit** (v0.3): `dimensions.py` — the very same algebra the constrained search uses, so auditor and engine cannot diverge
 - **Levenberg–Marquardt constant optimization** (v0.2): closed-form-quality constants, deterministic, LM/Adam switchable
