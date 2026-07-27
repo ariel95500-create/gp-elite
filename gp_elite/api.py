@@ -214,6 +214,7 @@ def symbolic_regression(
     seed: Optional[int] = None,
     units=None,
     target_units=None,
+    unknown_constant: bool = False,
     loss_fn=None,
     robust: bool = False,
     extrapolate: bool = False,
@@ -285,6 +286,11 @@ def symbolic_regression(
         np.random.seed(seed)
 
     # ── Normalisation (réutilise le sélecteur du moteur) ──
+    # [v0.5] La normalisation est CONSERVEE en mode constante mystere : la
+    # desactiver exposait le moteur aux amplitudes physiques brutes (m1*m2
+    # atteint 1e8 sur la gravitation) que _SAFE_LIMIT = 1e6 ecrete, ce qui
+    # detruisait la recherche. L'estimateur replie les facteurs d'echelle
+    # dans la constante rendue (voir GPEliteRegressor._deduce_constant).
     scaler, _desc = core._choose_scaler(X, normalize, (-2.0, 2.0))
     X_scaled = scaler.fit_transform(X)
 
@@ -311,6 +317,9 @@ def symbolic_regression(
         from .dim_search import normalize_units_arg
         cfg.FEAT_DIMS, cfg.TARGET_DIM = normalize_units_arg(
             units, target_units, n_feat, feature_names)
+        cfg.UNKNOWN_CONST = bool(unknown_constant)   # [v0.5]
+    elif unknown_constant:
+        raise ValueError("unknown_constant=True exige units= et target_units=.")
     cfg.N_POINTS = len(y)
     cfg.VALIDATION_SPLIT = float(validation_split)
     cfg.SEED = seed   # [REPRO] propage le seed pour le parallélisme déterministe

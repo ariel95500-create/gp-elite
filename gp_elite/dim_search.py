@@ -218,12 +218,70 @@ def _monomial_tree(target, feats, rng, max_terms=8):
     return None
 
 
-def typed_random_tree(target_dim, max_depth, feat_dims, rng=None, tries=40):
-    """Random tree GUARANTEED to have dimension `target_dim`. None if impossible."""
+def infer_dim(tree, feat_dims):
+    """[v0.5] Dimension de `tree`, ou None s'il est INTERNEMENT incoherent
+    (addition de grandeurs non homogenes, exposant dimensionne...).
+
+    Sert au mode « constante mystere » : on n'exige plus que l'arbre atteigne
+    la dimension cible, seulement qu'il ait UNE dimension bien definie. La
+    constante de tete absorbe l'ecart avec la cible.
+    """
+    fd = _norm_feat_dims(feat_dims)
+    try:
+        return _infer(tree, fd)
+    except _DimError:
+        return None
+    except Exception:
+        return None
+
+
+def _surrogate_target(feats, rng, max_exp=2):
+    """[v0.5] Tire une dimension ATTEIGNABLE au hasard : le monome
+    prod(dim_i ^ e_i) avec e_i entiers dans [-max_exp, max_exp].
+
+    En mode « constante mystere » la cible n'est plus imposee, mais la
+    generation typee a quand meme besoin d'une cible pour construire. On lui
+    en fournit une tiree au sort : la population initiale couvre ainsi
+    plusieurs classes dimensionnelles, et la selection retient celle qui colle
+    aux donnees. Les trois lois de reference sont dans cet espace :
+    Hooke e=(1), Newton e=(1,1,-2), gaz parfaits e=(1,1,-1).
+    """
+    if not feats:
+        return {}
+    out = {}
+    for _name, d in feats:
+        e = rng.randint(-max_exp, max_exp)
+        if e == 0:
+            continue
+        for b, v in d.items():
+            out[b] = out.get(b, 0.0) + e * float(v)
+    return {k: v for k, v in out.items() if abs(v) > 1e-9}
+
+
+def typed_random_tree(target_dim, max_depth, feat_dims, rng=None, tries=40,
+                      unknown_constant=False):
+    """Random tree GUARANTEED to have dimension `target_dim`. None if impossible.
+
+    [v0.5] Si unknown_constant, `target_dim` est ignore : on tire une cible de
+    substitution atteignable, et l'arbre rendu a une dimension quelconque mais
+    bien definie.
+    """
     rng = rng or random
     fd = _norm_feat_dims(feat_dims)
     feats = _feat_list(fd)
     cache = {}
+    if unknown_constant:
+        for _ in range(6):
+            tgt = _surrogate_target(feats, rng)
+            for _ in range(2):
+                t = _monomial_tree(tgt, feats, rng)
+                if t is not None:
+                    return t
+            t = _build(tgt, rng.randint(2, max(2, max_depth)),
+                       feats, rng, cache, [4000])
+            if t is not None:
+                return t
+        return None
     tgt = dict(target_dim)
     # chemin rapide d'abord (majorite des cas, quasi instantane)
     for _ in range(3):
@@ -345,9 +403,30 @@ def _strip_linear_scaling(node):
     return n
 
 
-def is_typed_valid(tree, feat_dims, target_dim):
-    """Cheap backstop gate: use in fitness() to reject trees from any path."""
+def is_typed_valid(tree, feat_dims, target_dim, unknown_constant=False):
+    """Cheap backstop gate: use in fitness() to reject trees from any path.
+
+    [v0.5] Si unknown_constant, le critere devient la COHERENCE INTERNE seule :
+    l'arbre doit avoir une dimension bien definie, pas necessairement egale a
+    la cible. C'est la constante multiplicative de tete qui porte l'ecart.
+    """
     fd = _norm_feat_dims(feat_dims)
+    if unknown_constant:
+        try:
+            _infer(tree, fd)
+            return True
+        except _DimError:
+            pass
+        except Exception:
+            return False
+        inner = _strip_linear_scaling(tree)
+        if inner is tree:
+            return False
+        try:
+            _infer(inner, fd)
+            return True
+        except Exception:
+            return False
     try:
         if _eq(_infer(tree, fd), target_dim):
             return True

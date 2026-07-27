@@ -1571,6 +1571,10 @@ _DIM_GATE_TARGET = None
 # [v0.4.1] Linear scaling PUREMENT multiplicatif (regression par l'origine).
 # Actif en mode dimensionnel : voir _linear_scale_params.
 _LS_SCALE_ONLY = False
+# [v0.5] Mode « constante mystere » : la constante multiplicative de tete peut
+# PORTER une dimension, deduite par homogeneite (cible / dimension de l'arbre).
+# Leve la limite « constantes sans dimension » de la v0.4.
+_DIM_UNKNOWN_CONST = False
 
 
 def _ds():
@@ -1595,6 +1599,8 @@ class Config:
     # None (défaut) = comportement v0.3 strictement inchangé.
     FEAT_DIMS = None
     TARGET_DIM = None
+    # [v0.5] Autorise la constante de tete a porter une dimension.
+    UNKNOWN_CONST = False
 
     # Population et évolution
     POP_SIZE: int          = 800
@@ -3690,7 +3696,8 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
     # C'est ce point qui garantit l'invariant, pas les opérateurs typés seuls.
     # No-op si FEAT_DIMS is None (chemin v0.3 inchangé).
     if _dim_active(cfg) and not _ds().is_typed_valid(
-            node, cfg.FEAT_DIMS, cfg.TARGET_DIM):
+            node, cfg.FEAT_DIMS, cfg.TARGET_DIM,
+            bool(getattr(cfg, "UNKNOWN_CONST", False))):
         return float("inf")
 
     h   = node.structural_hash()
@@ -4989,18 +4996,26 @@ class Island:
             pop = []
             fails = 0
             while len(pop) < n and fails < 20 * n:
-                t = ds.typed_random_tree(self.cfg.TARGET_DIM,
-                                         self.cfg.MAX_INIT_DEPTH,
-                                         self.cfg.FEAT_DIMS, random)
+                t = ds.typed_random_tree(
+                    self.cfg.TARGET_DIM, self.cfg.MAX_INIT_DEPTH,
+                    self.cfg.FEAT_DIMS, random,
+                    unknown_constant=bool(getattr(self.cfg,
+                                                  "UNKNOWN_CONST", False)))
                 if t is None:
                     fails += 1
                     continue
                 pop.append(t)
             if not pop:
+                if getattr(self.cfg, "UNKNOWN_CONST", False):
+                    raise ValueError(
+                        "aucune expression dimensionnellement cohérente ne "
+                        "peut être construite depuis les unités fournies.")
                 raise ValueError(
                     "target_units n'est pas atteignable depuis les unités "
                     "fournies : aucune expression dimensionnellement valide "
-                    "ne peut être construite.")
+                    "ne peut être construite. Si la loi comporte une constante "
+                    "dimensionnée (G, k_B, R, raideur...), essayez "
+                    "unknown_constant=True.")
             while len(pop) < n:                    # complète par des copies
                 pop.append(pop[random.randrange(len(pop))].copy())
             self.population = pop
@@ -5553,7 +5568,7 @@ _PW: dict = {}    # état du worker (initialisé une fois par processus)
 def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
                           syracuse_y_raw, syracuse_x_raw,
                           gencsv=None, battery_mode=False,
-                          ls_scale_only=False):
+                          ls_scale_only=False, dim_unknown_const=False):
     """Initializer du pool : reçoit les données constantes UNE fois par worker.
     [FIX-WIN v20] Sous Windows (spawn), le worker ré-importe le module depuis
     __file__ et l'enregistre sous son nom canonique dans sys.modules, ce qui
@@ -5571,6 +5586,8 @@ def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
     global _SYRACUSE_Y_RAW, _SYRACUSE_X_RAW
     global _LS_SCALE_ONLY                     # [v0.4.1]
     _LS_SCALE_ONLY = bool(ls_scale_only)
+    global _DIM_UNKNOWN_CONST                 # [v0.5]
+    _DIM_UNKNOWN_CONST = bool(dim_unknown_const)
     _PW["xs"] = xs
     _PW["ys"] = ys
     PROBE_X             = probe_x
@@ -5691,7 +5708,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 initargs=(xs, ys, PROBE_X, _USE_LINEAR_SCALING,
                           _SYRACUSE_MODE, _syr_y, _syr_x,
                           _gencsv, _BATTERY_CSV_MODE,
-                          _LS_SCALE_ONLY)) as ex:
+                          _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST)) as ex:
             gen = 0
             while gen < cfg.GENERATIONS:
                 # Round aligné sur les frontières de migration
@@ -5875,7 +5892,8 @@ def _track_val_candidate(cand):
     # invalide peut etre repeche comme modele final. On ferme la fuite ici.
     if _DIM_GATE_DIMS is not None:
         try:
-            if not _ds().is_typed_valid(cand, _DIM_GATE_DIMS, _DIM_GATE_TARGET):
+            if not _ds().is_typed_valid(cand, _DIM_GATE_DIMS, _DIM_GATE_TARGET,
+                                        _DIM_UNKNOWN_CONST):
                 return
         except Exception:
             return
@@ -6164,14 +6182,17 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # du meme processus : le garde-fou restait actif sur des donnees sans
     # dimensions declarees, et le champion livre devenait aberrant.
     global _DIM_GATE_DIMS, _DIM_GATE_TARGET, _LS_SCALE_ONLY
+    global _DIM_UNKNOWN_CONST                # [v0.5]
     if _dim_active(cfg):
         _DIM_GATE_DIMS   = cfg.FEAT_DIMS
         _DIM_GATE_TARGET = cfg.TARGET_DIM
         _LS_SCALE_ONLY   = True
+        _DIM_UNKNOWN_CONST = bool(getattr(cfg, "UNKNOWN_CONST", False))
     else:
         _DIM_GATE_DIMS   = None
         _DIM_GATE_TARGET = None
         _LS_SCALE_ONLY   = False
+        _DIM_UNKNOWN_CONST = False
     globals()["VAL_R2_TOLERANCE"] = float(getattr(cfg, "VAL_R2_TOLERANCE", 0.003))
     # FIX v13.10 : LOG_CSV relatif au répertoire du script
     _script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -7164,11 +7185,30 @@ class _ShiftFreeScaler:
     def inverse_transform(self, Xs):
         return Xs * self.scale_
 
+class _IdentityScaler:
+    """[v0.5] Ne normalise rien. Utile en mode « constante mystere » : la
+    constante rendue est alors exprimee dans les unites REELLES des colonnes,
+    et non dans un espace remis a l'echelle ou elle n'aurait aucun sens
+    physique. scale_ vaut 1 partout, donc les consommateurs qui replient la
+    normalisation (SRBench model(), audit) restent corrects sans cas special."""
+    def __init__(self):
+        self.scale_ = None
+    def fit_transform(self, X):
+        self.scale_ = np.ones(X.shape[1], dtype=np.float64)
+        return np.asarray(X, dtype=np.float64)
+    def transform(self, X):
+        return np.asarray(X, dtype=np.float64)
+    def inverse_transform(self, Xs):
+        return np.asarray(Xs, dtype=np.float64)
+
+
 def _choose_scaler(X_raw, normalize, x_range):
     """[v23] Sélectionne la normalisation. 'auto' : shift-free si toutes les
     features sont strictement positives (cas multiplicatif typique en
     sciences — masses, distances, températures absolues), sinon MinMax."""
     mode = (normalize or "auto").lower()
+    if mode in ("none", "off", "raw", "identity"):     # [v0.5]
+        return _IdentityScaler(), "none (raw features)"
     if mode == "auto":
         all_pos = bool(np.all(X_raw > 0))
         mode = "divmax" if all_pos else "minmax"

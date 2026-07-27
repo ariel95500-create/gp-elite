@@ -45,7 +45,7 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
     def __init__(self, operators="physical", normalize="auto",
                  generations=40, speed="fast", validation_split=0.20,
                  restarts=1, robust=False, parallel=None, random_state=0,
-                 units=None, target_units=None):
+                 units=None, target_units=None, unknown_constant=False):
         # store-only: no logic here (sklearn requirement)
         self.operators = operators
         self.normalize = normalize
@@ -59,6 +59,9 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         # [v0.4] Unités physiques (opt-in). None = comportement v0.3.
         self.units = units
         self.target_units = target_units
+        # [v0.5] La constante multiplicative de tete peut porter une dimension,
+        # deduite par homogeneite. Requiert units= et target_units=.
+        self.unknown_constant = unknown_constant
 
     # sklearn tags. The API changed in 1.6: new versions call __sklearn_tags__,
     # older ones call _more_tags. Support both so SRBench works on any version.
@@ -99,10 +102,84 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
             validation_split=self.validation_split, restarts=self.restarts,
             robust=self.robust, parallel=self.parallel,
             units=self.units, target_units=self.target_units,
+            unknown_constant=self.unknown_constant,
             seed=self.random_state)
         self.equation_ = self.model_.expression
         self.is_fitted_ = True
+        if self.unknown_constant:
+            self._deduce_constant()
         return self
+
+    # ── [v0.5] constante mystere ────────────────────────────────────────────
+    def _deduce_constant(self):
+        """Deduit dimension et valeur de la constante multiplicative de tete.
+
+        L'arbre livre a la forme  b * f(x)  (mise a l'echelle par l'origine,
+        v0.4.1). Sa dimension physique est celle de f ; pour que le tout ait
+        la dimension cible, b doit porter  cible / dim(f).  On expose :
+            constant_units_  dict de dimensions, ex. {"kg": 1, "s": -2}
+            constant_value_  float, la valeur ajustee de b
+        Les deux valent None si la deduction echoue.
+        """
+        from . import dim_search as DS
+        from . import core as C
+        self.constant_units_ = None
+        self.constant_value_ = None
+        node = getattr(self.model_, "node", None)
+        if node is None:
+            return
+        fd, tgt = DS.normalize_units_arg(
+            self.units, self.target_units, self.n_features_in_,
+            [f"X{i}" for i in range(self.n_features_in_)])
+
+        # b = constante en tete si l'arbre est bien  (const * reste)
+        inner, b = node, None
+        if (node.value == "*" and node.left is not None
+                and isinstance(node.left.value, float)):
+            b, inner = float(node.left.value), node.right
+        dim_inner = DS.infer_dim(inner, fd)
+        if dim_inner is None:
+            return
+        # cible / dim(f)
+        d = dict(tgt)
+        for k, v in dim_inner.items():
+            d[k] = d.get(k, 0.0) - float(v)
+        self.constant_units_ = {k: v for k, v in d.items() if abs(v) > 1e-9}
+
+        if b is None:
+            return
+        # ── Repliage de la normalisation ────────────────────────────────────
+        # L'arbre voit des colonnes normalisees X/s, donc b est exprime dans
+        # cet espace. Pour rendre la constante PHYSIQUE il faut le facteur
+        # rho = prod(s_i ^ -e_i), ou e_i est l'exposant de la colonne i dans
+        # l'expression. On obtient ces exposants en refaisant une inference
+        # dimensionnelle ou chaque colonne porte sa PROPRE pseudo-dimension :
+        # le resultat est directement le vecteur des exposants.
+        scaler = getattr(self.model_, "scaler", None)
+        sc = getattr(scaler, "scale_", None)
+        if sc is None:
+            self.constant_value_ = float(b)
+            return
+        pseudo = {i: {f"__s{i}": 1} for i in range(self.n_features_in_)}
+        expo = DS.infer_dim(inner, pseudo)
+        if expo is None:
+            # Expression non monomiale en les colonnes (ex. m1 + m2) : aucune
+            # constante brute unique n'existe. On laisse None plutot que de
+            # rendre un nombre faux.
+            return
+        rho = 1.0
+        for i in range(self.n_features_in_):
+            e = float(expo.get(f"__s{i}", 0.0))
+            if e:
+                rho *= float(sc[i]) ** (-e)
+        val = float(b) * rho
+        self.constant_value_ = val if C.math.isfinite(val) else None
+
+    def constant_units_string(self):
+        """Les unites deduites, en texte lisible (ex. '[kg / s^2]')."""
+        from .dimensions import _fmt
+        d = getattr(self, "constant_units_", None)
+        return None if d is None else _fmt(d)
 
     def predict(self, X):
         if _HAS_SKLEARN:
