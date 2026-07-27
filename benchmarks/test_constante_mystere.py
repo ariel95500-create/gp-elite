@@ -39,11 +39,23 @@ import argparse
 import os
 import sys
 
-if os.environ.get("PYTHONHASHSEED") != "0":
-    os.environ["PYTHONHASHSEED"] = "0"
-    os.execv(sys.executable, [sys.executable] + sys.argv)
-
 import numpy as np
+
+
+def _forcer_hashseed():
+    """PYTHONHASHSEED doit etre pose AVANT le demarrage de l'interpreteur : on
+    se relance une fois si besoin.
+
+    IMPORTANT — appele UNIQUEMENT depuis __main__. Au niveau du module, ce
+    re-exec se declencherait aussi quand pytest importe ce fichier lors de sa
+    collecte (le nom commence par « test_ », donc pytest le ramasse). Sous
+    Windows os.execv ne remplace pas le processus : il en lance un nouveau et
+    le parent rend la main, ce qui interrompait la collecte de pytest en
+    laissant un processus orphelin tourner en arriere-plan.
+    """
+    if os.environ.get("PYTHONHASHSEED") != "0":
+        os.environ["PYTHONHASHSEED"] = "0"
+        os.execv(sys.executable, [sys.executable] + sys.argv)
 
 RESULTS = []
 
@@ -193,4 +205,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _forcer_hashseed()
     main()
