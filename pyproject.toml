@@ -45,8 +45,15 @@ Issues = "https://github.com/ariel95500-create/gp-elite/issues"
 [project.scripts]
 gp-elite = "gp_elite.cli:main"
 
+# Restreint pytest au dossier tests/. Sans cela pytest ramasse tout fichier
+# nomme test_*.py sous la racine, y compris les scripts de validation longs
+# de benchmarks/ qui ne sont pas des tests unitaires.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [tool.setuptools]
 packages = ["gp_elite"]
 
 [tool.setuptools.package-data]
 gp_elite = ["py.typed"]
+
