@@ -188,11 +188,40 @@ is at least physically meaningful. **Not** for black-box prediction: the constra
 rules out dimensionally wrong but numerically good approximations, so it can *lower*
 R² when fitting is the goal rather than finding a law.
 
-**Limitations.** Fitted constants are treated as dimensionless (the AI Feynman
-convention), so a law whose constant carries units (G, k_B, R) needs that constant
-supplied as a typed input variable. Under `units=` the internal linear scaling is
-multiplicative only (no additive offset), which keeps every candidate dimensionally
-homogeneous.
+**Laws with a dimensioned constant** (`unknown_constant=`). By default, fitted
+constants are dimensionless — the AI Feynman convention — which puts a law like
+Hooke's `F = k·x` out of reach: no dimensionless constant can relate metres to
+newtons, and the search correctly reports that nothing valid can be built. Set
+`unknown_constant=True` and the leading constant is allowed to *carry* a
+dimension, deduced by homogeneity:
+
+```python
+est = GPEliteRegressor(units=["m"], target_units="N", unknown_constant=True)
+est.fit(X, y)
+est.constant_units_string()   # '[kg / s^2]'
+est.constant_value_           # 250.0
+```
+
+The engine then reports not only the shape of the law but the **units and value
+of the missing physical constant**. Measured on three reference laws, 20
+generations, one restart:
+
+| law | structure recovered | deduced units | value | true |
+|---|---|---|---|---|
+| Hooke `F = k·x` | yes | `kg / s²` | 250.0 | 250 |
+| Newton `F = G·m₁·m₂/r²` | yes | `m³ / kg s²` | 6.674e-11 | 6.674e-11 |
+| ideal gas `P = nRT/V` | yes | `kg m² / K mol s²` | 8.31446 | 8.314463 |
+
+Reproduce with `benchmarks/test_constante_mystere.py`. Requires `units=` and
+`target_units=`. If the expression is not a monomial in the input columns
+(`m₁ + m₂`, say), no single raw constant exists and `constant_value_` is `None`
+while the deduced units remain valid.
+
+**Limitations.** Under `units=` the internal linear scaling is multiplicative
+only (no additive offset), which keeps every candidate dimensionally homogeneous.
+Constants are reported in the raw units of the input columns: the equation string
+shows the value in the engine's normalised space, `constant_value_` shows the
+physical one.
 
 ---
 

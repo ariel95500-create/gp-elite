@@ -193,11 +193,41 @@ noire : la contrainte écarte les approximations dimensionnellement fausses mais
 numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif est
 d'ajuster plutôt que de trouver une loi.
 
-**Limites.** Les constantes ajustées sont traitées comme sans dimension
-(convention AI Feynman) : une loi dont la constante porte des unités (G, k_B, R)
-exige de fournir cette constante comme variable d'entrée typée. Sous `units=`, la
-mise à l'échelle interne est purement multiplicative (sans décalage additif), ce
-qui maintient chaque candidat dimensionnellement homogène.
+**Lois à constante dimensionnée** (`unknown_constant=`). Par défaut les
+constantes ajustées sont sans dimension — convention AI Feynman — ce qui met une
+loi comme celle de Hooke, `F = k·x`, hors d'atteinte : aucune constante sans
+dimension ne peut relier des mètres à des newtons, et la recherche signale à
+juste titre qu'aucune expression valide n'est constructible. Avec
+`unknown_constant=True`, la constante de tête est autorisée à *porter* une
+dimension, déduite par homogénéité :
+
+```python
+est = GPEliteRegressor(units=["m"], target_units="N", unknown_constant=True)
+est.fit(X, y)
+est.constant_units_string()   # '[kg / s^2]'
+est.constant_value_           # 250.0
+```
+
+Le moteur ne rend alors plus seulement la forme de la loi, mais **les unités et
+la valeur de la constante physique manquante**. Mesuré sur trois lois de
+référence, 20 générations, un restart :
+
+| loi | structure retrouvée | unités déduites | valeur | réelle |
+|---|---|---|---|---|
+| Hooke `F = k·x` | oui | `kg / s²` | 250.0 | 250 |
+| Newton `F = G·m₁·m₂/r²` | oui | `m³ / kg s²` | 6,674e-11 | 6,674e-11 |
+| gaz parfaits `P = nRT/V` | oui | `kg m² / K mol s²` | 8,31446 | 8,314463 |
+
+Reproductible avec `benchmarks/test_constante_mystere.py`. Exige `units=` et
+`target_units=`. Si l'expression n'est pas un monôme des colonnes d'entrée
+(`m₁ + m₂` par exemple), aucune constante brute unique n'existe :
+`constant_value_` vaut alors `None`, les unités déduites restant valides.
+
+**Limites.** Sous `units=`, la mise à l'échelle interne est purement
+multiplicative (sans décalage additif), ce qui maintient chaque candidat
+dimensionnellement homogène. Les constantes sont rendues dans les unités brutes
+des colonnes : la chaîne de l'équation affiche la valeur dans l'espace normalisé
+du moteur, `constant_value_` donne la valeur physique.
 
 ---
 
