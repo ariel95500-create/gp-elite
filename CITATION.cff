@@ -1,14 +1,25 @@
 cff-version: 1.2.0
-message: "Si vous utilisez GP_ELITE, merci de le citer comme ci-dessous."
-title: "GP_ELITE: Régression symbolique par programmation génétique"
+message: "If you use GP_ELITE, please cite it as below."
+title: "GP_ELITE: Symbolic regression by genetic programming"
+abstract: >-
+  Pure-Python symbolic regression: genetic programming with island
+  parallelism, Levenberg-Marquardt constant optimization, multi-restart
+  with merged candidate archives, a complexity/accuracy Pareto front, and
+  an optional dimensionally-constrained search mode driven by the physical
+  units of the input columns.
 authors:
-  - name: "Sabri Hakou"
-version: 0.1.0
-date-released: 2026-06-13
+  - family-names: Hakou
+    given-names: Sabri
+type: software
+version: 0.4.1
+date-released: 2026-07-27
 license: MIT
 repository-code: "https://github.com/ariel95500-create/gp-elite"
+url: "https://pypi.org/project/gp-elite/"
 keywords:
   - symbolic regression
   - genetic programming
   - interpretable machine learning
   - equation discovery
+  - dimensional analysis
+
