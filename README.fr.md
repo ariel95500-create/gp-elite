@@ -25,9 +25,20 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
 
 ---
 
-## Nouveautés 0.4.1 « Lawful »
+## Nouveautés 0.5.0 « Unknown »
 
-- **Recherche sous contrainte dimensionnelle** (`units=`) : déclarez les unités
+- **La constante mystère** (`unknown_constant=`) : le moteur déduit désormais
+  les **unités et la valeur de la constante physique manquante** d'une loi.
+  Jusqu'à la 0.4.1 les constantes ajustées étaient sans dimension, ce qui mettait
+  hors d'atteinte toute loi dont la constante porte des unités — sur `F = k·x`,
+  aucune constante sans dimension ne peut relier des mètres à des newtons. Sur
+  trois lois de référence dont la réponse est connue d'avance, 20 générations,
+  1 restart : Hooke retrouve `kg/s²` et 250.0, Newton retrouve `m³/kg·s²` et
+  6,674e-11, les gaz parfaits retrouvent `kg·m²/K·mol·s²` et 8,31446 contre
+  8,314463 réel — structure exacte et R² = 1.000000 sur les trois. Détails plus
+  bas.
+
+- **Recherche sous contrainte dimensionnelle** (`units=`, depuis la 0.4) : déclarez les unités
   physiques de vos colonnes, et le moteur ne construit plus que des expressions
   dimensionnellement saines — génération typée constructive, mutation et
   croisement préservant les dimensions, plus un filtre de validité qui rejette
@@ -46,9 +57,10 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
   8 fits sur deux jeux d'opérateurs et quatre seeds, plus les modes robuste et
   multi-restart, identiques octet pour octet à la 0.4.0).
 
-Versions précédentes : **0.3.0 « Trust »** (diagnostics, stabilité, audit
-dimensionnel post-hoc), **0.2.0** (constantes par Levenberg–Marquardt,
-multi-restart, front de Pareto, mode extrapolation).
+Versions précédentes : **0.4.0 « Lawful »** (recherche sous contrainte
+dimensionnelle), **0.3.0 « Trust »** (diagnostics, stabilité, audit dimensionnel
+post-hoc), **0.2.0** (constantes par Levenberg–Marquardt, multi-restart, front de
+Pareto, mode extrapolation).
 
 ---
 
@@ -261,6 +273,7 @@ Sur le **benchmark Feynman gelé** (15 équations, `PYTHONHASHSEED=0`, `restarts
 
 ## Caractéristiques techniques
 
+- **Déduction de la constante mystère** (v0.5) : la constante de tête peut porter une dimension, inférée par homogénéité ; unités et valeur brute exposées sur l'estimateur
 - **Recherche sous contrainte dimensionnelle** (v0.4) : génération typée constructive, mutation et croisement préservant les dimensions, filtre de validité dans `fitness()`
 - **Mise à l'échelle purement multiplicative sous `units=`** (v0.4.1) : régression par l'origine, pour que la forme *notée* soit la forme *livrée*
 - **Garde numérique de l'optimiseur LM** (v0.4) : plus d'overflow float64 sur les chaînes `sq`/`cube`/`*` non bornées

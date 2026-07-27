@@ -24,9 +24,19 @@ print(result.r2_validation)     # 0.996  (on data never seen during training)
 
 ---
 
-## What's new in 0.4.1 "Lawful"
+## What's new in 0.5.0 "Unknown"
 
-- **Dimensionally-constrained search** (`units=`): declare your columns' physical
+- **The mystery constant** (`unknown_constant=`): the engine now deduces the
+  **units and the value of a law's missing physical constant**. Until 0.4.1
+  fitted constants were dimensionless, which put any law whose constant carries
+  units out of reach — on Hooke's `F = k·x`, no dimensionless constant can relate
+  metres to newtons. On three reference laws whose answer is known in advance,
+  20 generations, 1 restart: Hooke recovers `kg/s²` and 250.0, Newton recovers
+  `m³/kg·s²` and 6.674e-11, the ideal gas law recovers `kg·m²/K·mol·s²` and
+  8.31446 against a true 8.314463 — structure exact and R² = 1.000000 on all
+  three. Details below.
+
+- **Dimensionally-constrained search** (`units=`, since 0.4): declare your columns' physical
   units and the engine only ever builds dimensionally sound expressions —
   constructive typed generation, dimension-preserving mutation and crossover,
   plus a validity gate that rejects unsound candidates from every code path.
@@ -43,9 +53,10 @@ print(result.r2_validation)     # 0.996  (on data never seen during training)
   across two operator sets and four seeds, plus the robust and multi-restart
   modes, byte-identical to 0.4.0).
 
-Earlier releases: **0.3.0 "Trust"** (diagnostics, stability, post-hoc dimensional
-audit), **0.2.0** (Levenberg–Marquardt constant fitting, multi-restart, Pareto
-front, extrapolation mode).
+Earlier releases: **0.4.0 "Lawful"** (dimensionally-constrained search),
+**0.3.0 "Trust"** (diagnostics, stability, post-hoc dimensional audit),
+**0.2.0** (Levenberg–Marquardt constant fitting, multi-restart, Pareto front,
+extrapolation mode).
 
 ---
 
@@ -255,6 +266,7 @@ On the frozen **Feynman benchmark** (15 physics equations, `PYTHONHASHSEED=0`, `
 
 ## Technical features
 
+- **Mystery-constant deduction** (v0.5): the leading constant may carry a dimension, inferred by homogeneity; units and raw value exposed on the estimator
 - **Dimensionally-constrained search** (v0.4): constructive typed generation, dimension-preserving mutation and crossover, validity gate in `fitness()`
 - **Scale-only linear scaling under `units=`** (v0.4.1): regression through the origin, so the form that is *scored* is the form that is *delivered*
 - **Numerical guard in the LM optimizer** (v0.4): no more float64 overflow on unbounded `sq`/`cube`/`*` chains
