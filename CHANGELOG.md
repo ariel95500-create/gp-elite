@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.5.0 — "Unknown"
+
+### Added
+- **Mystery-constant mode** (`unknown_constant=True`). Until now, fitted
+  constants were dimensionless (the AI Feynman convention), which put any law
+  whose constant carries units out of reach of the constrained search: on
+  Hooke's `F = k·x`, no dimensionless constant can relate metres to newtons and
+  the engine correctly refused to build anything. The leading multiplicative
+  constant may now *carry* a dimension, deduced by homogeneity as
+  `target / dim(f)`. The estimator exposes `constant_units_`,
+  `constant_value_` and `constant_units_string()`.
+
+  Validated on three reference laws where the answer is known in advance
+  (`benchmarks/test_constante_mystere.py`, 20 generations, 1 restart): Hooke
+  recovers `kg/s²` and 250.0; Newton recovers `m³/kg·s²` and 6.674e-11; the
+  ideal gas law recovers `kg·m²/K·mol·s²` and 8.31446 against a true
+  8.314463. All three at R² = 1.000000, structure exact.
+
+- `normalize="none"` — an identity scaler, for callers who want the engine to
+  see raw columns.
+
+### Implementation notes
+Under `unknown_constant`, the validity gate no longer requires an expression to
+*reach* the target dimension, only to *have* a well-defined one; typed
+generation draws a random reachable surrogate target so the initial population
+spans several dimension classes. Normalisation is deliberately kept on — an
+early version disabled it so the constant would be physical, which broke the
+gravitation case, since raw `m₁·m₂` reaches 1e8 while the engine clamps at
+`_SAFE_LIMIT = 1e6`. Instead the estimator folds the scale factors back into
+the reported constant, recovering the per-column exponents by re-running the
+dimensional inference with one pseudo-dimension per column. A non-monomial
+expression yields `constant_value_ = None` rather than a wrong number.
+
+### Notes
+Opt-in and inert by default: `units=` without `unknown_constant` behaves exactly
+as in 0.4.1, and without `units=` the engine is byte-identical (8 fits across two
+operator sets and four seeds, plus the robust and multi-restart modes). The 19
+repository tests pass, as does `verif_v041.py`.
+
 ## 0.4.1 — "Lawful" (fixes)
 
 ### Fixed
