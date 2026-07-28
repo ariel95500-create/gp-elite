@@ -1,0 +1,28 @@
+name: "Idea or feature request"
+description: "Something GP_ELITE does not do, that would make it useful to you."
+title: "[idea] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas grounded in an actual problem you have are far more likely to be
+        built than general suggestions. Tell us what you were trying to do.
+
+        Answer in **English or French**, whichever you prefer.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What were you trying to do?
+      placeholder: "I know my law is symmetric in two of its variables, but there is no way to tell the engine."
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: "A rough shape is enough — no need for a finished design."
+    validations:
+      required: false
