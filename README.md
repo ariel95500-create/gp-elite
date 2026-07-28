@@ -286,6 +286,23 @@ On the frozen **Feynman benchmark** (15 physics equations, `PYTHONHASHSEED=0`, `
 
 ---
 
+## Did it fail on your data? Please say so
+
+GP_ELITE is tuned on published benchmarks — Feynman, Strogatz — which are clean,
+noise-free and well-scaled. Real measurements are none of those things, and that
+gap is where the engine most needs work.
+
+So if it returns nonsense on your data, that is **useful information, not user
+error**. [Open an issue](https://github.com/ariel95500-create/gp-elite/issues/new/choose)
+with the shape of your data and what you got back. You do not need to share the
+data itself, you do not need to know why it failed, and you can write in English
+or French.
+
+Failure reports on real measurements are the single most valuable contribution
+this project can receive.
+
+---
+
 ## Tests
 
 ```bash

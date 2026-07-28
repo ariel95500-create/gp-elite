@@ -293,6 +293,24 @@ Sur le **benchmark Feynman gelé** (15 équations, `PYTHONHASHSEED=0`, `restarts
 
 ---
 
+## Ça n'a pas marché sur vos données ? Dites-le
+
+GP_ELITE est réglé sur des benchmarks publiés — Feynman, Strogatz — qui sont
+propres, sans bruit et bien échelonnés. Les mesures réelles ne sont rien de tout
+cela, et c'est précisément là que le moteur a le plus besoin de progresser.
+
+Donc s'il vous rend n'importe quoi sur vos données, c'est une **information
+utile, pas une erreur de votre part**.
+[Ouvrez une issue](https://github.com/ariel95500-create/gp-elite/issues/new/choose)
+avec la forme de vos données et ce que vous avez obtenu. Pas besoin de partager
+les données elles-mêmes, pas besoin de savoir pourquoi ça a échoué, et vous
+pouvez écrire en français comme en anglais.
+
+Les rapports d'échec sur mesures réelles sont la contribution la plus précieuse
+que ce projet puisse recevoir.
+
+---
+
 ## Tests
 
 ```bash
