@@ -1,0 +1,94 @@
+name: "Poor or no result on my data"
+description: "GP_ELITE ran, but the law it returned is wrong, unusable, or nonsense."
+title: "[data] "
+labels: ["real-world-data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **This is the most useful kind of report this project can receive.**
+
+        GP_ELITE is tuned on published benchmarks (Feynman, Strogatz) — clean,
+        noise-free, well-scaled. Real measurements are none of those things, and
+        the gap between the two is exactly where the engine needs work.
+
+        A failure on your data is *information*, not user error. You do not need
+        to know why it failed, and you do not need to share the data itself —
+        a description of its shape is usually enough to reproduce the problem.
+
+        Answer in **English or French**, whichever you prefer.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to model?
+      description: One or two sentences. The field and the quantity are enough.
+      placeholder: "Sensor drift as a function of temperature and elapsed time, on a calibration bench."
+    validations:
+      required: true
+
+  - type: textarea
+    id: data
+    attributes:
+      label: What does your data look like?
+      description: >
+        Number of rows and columns, what each column is, its physical unit if
+        you know it, and its typical range. Noise level if you have an idea.
+      placeholder: |
+        420 rows, 3 inputs + 1 target
+          temperature   K      [280, 350]
+          time          s      [0, 86400]
+          supply_voltage V     [4.8, 5.2]
+        target: offset in mV, [-12, 30], noisy (roughly 5% scatter)
+    validations:
+      required: true
+
+  - type: textarea
+    id: call
+    attributes:
+      label: How did you call GP_ELITE?
+      description: The code, or the console-mode options you chose.
+      render: python
+      placeholder: |
+        from gp_elite import GPEliteRegressor
+        est = GPEliteRegressor(operators="physical", generations=60)
+        est.fit(X, y)
+    validations:
+      required: true
+
+  - type: textarea
+    id: got
+    attributes:
+      label: What did it return?
+      description: >
+        The equation, the R² on validation, the model size. Paste it as printed —
+        no need to tidy it up.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect, if you know?
+      description: >
+        A known law, a plausible shape, a baseline you already trust. Leave blank
+        if you genuinely do not know — that case is interesting too.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`python -c \"import gp_elite; print(gp_elite.__version__)\"`"
+      placeholder: "0.5.0"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: units
+    attributes:
+      label: Physical units
+      options:
+        - label: "I know the units of my columns (the `units=` mode may help — say so and we will look at it together)"
+          required: false
