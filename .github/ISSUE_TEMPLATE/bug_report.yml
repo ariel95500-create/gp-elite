@@ -1,0 +1,56 @@
+name: "Bug — crash, error, or wrong behaviour"
+description: "Something raised an exception, hung, or did the opposite of what the documentation says."
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a result that is merely *bad* on your data, use the
+        "Poor or no result on my data" template instead — that is a different
+        problem and gets handled differently.
+
+        Answer in **English or French**, whichever you prefer.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      placeholder: "GPEliteRegressor.fit() raised ValueError when I passed units= with a temperature column."
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Smallest code that reproduces it
+      description: >
+        Random or synthetic data is fine — it does not have to be your real
+        dataset. What matters is that running this reproduces the problem.
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Full traceback or output
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: gp-elite version
+      placeholder: "0.5.0"
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: Python version and OS
+      placeholder: "Python 3.12, Windows 11"
+    validations:
+      required: true
