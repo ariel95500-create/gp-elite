@@ -109,7 +109,7 @@ constrains the search by declared physical units.
 
 # Software design
 
-Three design decisions shaped the library.
+Four design decisions shaped the library.
 
 *Separating structure from coefficients.* Rather than letting evolution
 discover numerical constants by drift, `gp-elite` treats every candidate as a
