@@ -11,8 +11,8 @@ authors:
   - family-names: Hakou
     given-names: Sabri
 type: software
-version: 0.4.1
-date-released: 2026-07-27
+version: 0.5.1
+date-released: 2026-07-28
 license: MIT
 repository-code: "https://github.com/ariel95500-create/gp-elite"
 url: "https://pypi.org/project/gp-elite/"
