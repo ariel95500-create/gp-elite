@@ -21,21 +21,20 @@ bibliography: paper.bib
 # Summary
 
 Symbolic regression searches the space of mathematical expressions for a formula
-that fits a dataset, returning a closed-form equation instead of the opaque
-weights of a black-box model. It is attractive wherever the relationship itself
-is the object of interest rather than the prediction: a degradation law, a sensor
-calibration curve, an engineering correlation, a candidate physical law.
+fitting a dataset, returning a closed-form equation instead of a black box. It is
+attractive wherever the relationship itself is the object of interest rather than
+the prediction: a degradation law, a sensor calibration curve, an engineering
+correlation, a candidate physical law.
 
 `gp-elite` is a symbolic-regression library written entirely in Python and NumPy
 [@harris2020numpy]. It evolves expressions by genetic programming [@koza1992gp]
-and refines the numerical constants of every candidate with a
-Levenberg–Marquardt least-squares optimizer [@levenberg1944; @marquardt1963], so
-that the evolutionary search concentrates on finding the right *structure* while
-a dedicated numerical routine finds the right *coefficients*. It exposes a
-scikit-learn-compatible estimator [@pedregosa2011sklearn], installs with
-`pip install gp-elite` with no compiler and no second language runtime, and
-holds out a validation split by default so that the returned model comes with an
-out-of-sample score rather than a training-set fit.
+and refines each candidate's numerical constants with a Levenberg–Marquardt
+least-squares optimizer [@levenberg1944; @marquardt1963], so that evolution
+concentrates on the right *structure* while a dedicated numerical routine finds
+the right *coefficients*. It exposes a scikit-learn-compatible estimator
+[@pedregosa2011sklearn], installs with `pip install gp-elite` with no compiler
+and no second language runtime, and holds out a validation split by default, so
+the returned model comes with an out-of-sample score.
 
 Since version 0.4, users may declare the physical units of their input columns
 and of the target. The search is then restricted to dimensionally consistent
@@ -44,11 +43,11 @@ validity gate rejects unsound candidates on every code path. The engine can no
 longer return a formula that fits the numbers while adding hertz to a
 dimensionless quantity.
 
-Version 0.5 extends this to laws whose constant is itself dimensioned: the
-leading constant may carry a dimension, deduced by homogeneity, so the engine
-reports not only the shape of a law but the **units and value of its missing
-physical constant** — recovering the gravitational constant, and its units,
-from masses and distances alone.
+Version 0.5 extends this to laws whose constant is itself dimensioned. The
+leading constant may carry a dimension, *deduced* by homogeneity rather than
+declared, so the engine reports not only the shape of a law but the **units and
+value of its missing physical constant** — recovering the gravitational constant,
+and its units, from masses and distances alone.
 
 # Statement of need
 
@@ -58,22 +57,24 @@ symbolic-regression tool that installs in one command, can be read and modified
 in the language they already use, and still recovers precise numerical
 constants. These requirements are usually in tension. Engines that fit constants
 well tend to rely on compiled or non-Python backends; pure-Python engines that
-are easy to install tend not to fit constants at all, leaving the evolutionary
-search to assemble numerical values out of random terminals.
+install easily tend not to fit constants at all, leaving evolution to assemble
+numerical values out of random terminals.
 
-`gp-elite` targets that gap. It is aimed at small-to-medium experimental
-datasets — roughly up to ten variables and a few thousand rows — where
-interpretability matters more than raw predictive accuracy, and where the
-analyst can reasonably be expected to know what their columns mean physically.
+`gp-elite` targets that gap, for small-to-medium experimental datasets — roughly
+up to ten variables and a few thousand rows — where interpretability matters more
+than raw accuracy, and where the analyst knows what their columns mean
+physically.
 
 The dimensional mode addresses a second, more specific problem. In scientific
 applications, an expression that is numerically excellent but dimensionally
 incoherent is not a partial success: it is not a candidate law at all. Making
 dimensional consistency a hard constraint of the search, rather than a
 post-hoc filter, follows a line of work opened by dimensionally aware genetic
-programming [@keijzer1999dimensional] and by the unit-based decomposition used
-in AI Feynman [@udrescu2020feynman], and makes the guarantee available from a
-scikit-learn estimator with a single `units=` argument.
+programming [@keijzer1999dimensional], continued by the unit-based decomposition
+of AI Feynman [@udrescu2020feynman] and by the units-constrained generation of
+`PhySO` [@tenachi2023physo]. What `gp-elite` adds is not the idea but its
+availability without a deep-learning stack, from a scikit-learn estimator with a
+single `units=` argument.
 
 That line of work carries a restriction this implementation initially inherited:
 fitted constants are dimensionless. Under it, a law as elementary as Hooke's
@@ -97,35 +98,47 @@ integers.
 `gp-elite` is positioned deliberately between the two: pure Python and
 `pip`-installable like `gplearn`, but with Levenberg–Marquardt constant
 refinement, linear scaling [@keijzer2003scaling], and $\epsilon$-lexicase
-selection [@lacava2016lexicase] as in the compiled engines. On a frozen
-15-equation subset of the Feynman benchmark, under identical data and splits and
-with a generous budget granted to the baseline, it recovers 10/15 equations
-exactly at machine precision against 6/15 for `gplearn`. The claim made here is
-not that it competes with `Operon` or `PySR` on speed or on large-scale
-accuracy — it does not — but that it occupies a niche neither of them fills.
+selection [@lacava2016lexicase] as in the compiled engines. Against `gplearn`
+under identical data, splits and a generous budget granted to the baseline, on a
+fixed 15-equation subset of the Feynman problems chosen before any measurement,
+it recovers 10/15 exactly at machine precision against 6/15. That figure is a
+head-to-head with one baseline on a subset, not a benchmark-wide result, and is
+not comparable to rates published on the full 120-equation Feynman set. The
+claim made here is not that `gp-elite` competes with `Operon` or `PySR` on speed
+or on large-scale accuracy — it does not.
 
-The dimensional mode has no equivalent among the packages above: none of them
-constrains the search by declared physical units.
+**Dimensionally-constrained search is not new.** `PhySO` [@tenachi2023physo]
+constrains equation generation to obey dimensional analysis by construction,
+using deep reinforcement learning with an in-situ units-consistency mechanism,
+and reports a substantial gain from doing so on the Feynman benchmark. It is the
+closest relative of the mode described here, and the approach it took —
+constraining generation rather than filtering results — is the same one.
+
+`gp-elite` differs in three respects rather than in kind. It reaches the
+constraint through genetic programming and a typed grammar rather than a learned
+policy, so it carries no deep-learning dependency: `numpy`, `pandas` and
+`scikit-learn`, no `torch`, no GPU. It runs the same algebra for the constrained
+search and for its post-hoc audit, so the two cannot disagree. And it treats the
+units of a law's constant as an *unknown to be deduced* rather than an input to
+be declared, which — to the authors' knowledge — has no counterpart in the
+packages cited above.
 
 # Software design
 
 Four design decisions shaped the library.
 
-*Separating structure from coefficients.* Rather than letting evolution
-discover numerical constants by drift, `gp-elite` treats every candidate as a
+*Separating structure from coefficients.* Every candidate is treated as a
 parametric template whose constants are fitted by Levenberg–Marquardt, with
-scale and offset additionally solved in closed form via linear scaling. Search
-pressure is thereby spent on shape, which is what genetic programming is good
-at, and not on arithmetic, which it is bad at.
+scale and offset solved in closed form via linear scaling. Search pressure is
+thereby spent on shape, which genetic programming is good at, rather than on
+arithmetic, which it is not.
 
-*Constraining rather than filtering.* Dimensional consistency could have been
-implemented as a post-hoc audit of the final model. That was in fact the v0.3
-behaviour, and it proved unsatisfying: on the tested problem it reported that
-none of the returned models were physically meaningful, without offering a
-remedy. Version 0.4 moves the check inside the search, reusing the same
-dimensional algebra so that auditor and engine cannot diverge. The cost is a
-roughly fourfold slowdown; the benefit is that every returned model is valid by
-construction.
+*Constraining rather than filtering.* v0.3 audited dimensions post hoc, which
+proved unsatisfying: on the tested problem it reported that none of the returned
+models were physically meaningful, without offering a remedy. v0.4 moves the
+check inside the search, reusing the same algebra so that auditor and engine
+cannot diverge. The cost is a roughly fourfold slowdown; the benefit is that
+every returned model is valid by construction.
 
 *Deducing rather than requiring.* Under `unknown_constant=True` the validity
 gate no longer requires an expression to *reach* the target dimension, only to
@@ -136,40 +149,35 @@ selection retains the one that fits.
 
 *Reporting honestly by default.* The estimator holds out a validation split,
 selects a parsimonious champion within an $R^2$ tolerance, and exposes a
-complexity/accuracy Pareto front. The intent is that a user who does nothing
-special still receives a model whose reported score was not measured on its own
-training data.
+complexity/accuracy Pareto front, so that a user who does nothing special still
+receives a model whose reported score was not measured on its training data.
 
 # Research impact statement
 
-The software is released on PyPI under the MIT licence and is accompanied by a
-test suite and by benchmark scripts that regenerate every number quoted in its
-documentation.
+The software is released on PyPI under the MIT licence, with a test suite and
+benchmark scripts that regenerate every number quoted in its documentation.
 
 The dimensional mode has been evaluated in a controlled A/B experiment on
-Feynman equation II.11.3, with five seeds and an identical budget per arm
-(`benchmarks/ab_ood.py`). Without constraints, 0/5 returned models are
-dimensionally valid; with `units=`, 5/5 are valid, and they are 2.6 times
-smaller (22 versus 58 nodes) at a slightly better test $R^2$. A third arm gives
-the unconstrained search four times the number of generations, equalising
-wall-clock time: it still returns 0/5 valid models, and larger ones. The same
-experiment also bounds the claim. On a test set drawn *outside* the training
-domain, every arm collapses, and no arm recovers the target law exactly at the
-budgets tested; a large-budget run confirms this, converging reproducibly to a
-denominator that is linear where the true law is a difference of squares.
-The constraint therefore buys physically coherent and compact approximations,
-not the law itself.
+Feynman equation II.11.3, five seeds, identical budget per arm
+(`benchmarks/ab_ood.py`). Unconstrained, 0/5 returned models are dimensionally
+valid; with `units=`, 5/5 are valid and 2.6 times smaller (22 versus 58 nodes) at
+a slightly better test $R^2$. A third arm grants the unconstrained search four
+times the generations, equalising wall-clock time: still 0/5 valid, and larger.
+The same experiment bounds the claim. On a test set drawn *outside* the training
+domain every arm collapses, and none recovers the target law at the budgets
+tested; a large-budget run converges reproducibly to a denominator linear where
+the true law is a difference of squares. The constraint buys physically coherent
+and compact approximations, not the law itself.
 
 The mystery-constant mode is validated on three reference laws whose answer is
 known in advance (`benchmarks/test_constante_mystere.py`, 20 generations, one
-restart). Hooke's law returns `kg·s⁻²` and 250.0 for a true 250; Newton's law of
-gravitation returns `m³·kg⁻¹·s⁻²` and 6.674e-11 for a true 6.674e-11; the ideal
-gas law returns `kg·m²·s⁻²·mol⁻¹·K⁻¹` and 8.31446 for a true 8.314463. Structure
-is exact and $R^2 = 1.000000$ in all three cases, on two independent platforms.
+restart). Hooke's law returns `kg·s⁻²` and 250.0 for a true 250; gravitation
+returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
+`kg·m²·s⁻²·mol⁻¹·K⁻¹` and 8.31446 for a true 8.314463. Structure is exact and
+$R^2 = 1.000000$ in all three, on two independent platforms.
 
 An integration for the SRBench living benchmark [@lacava2021srbench] has been
-submitted as a pull request and builds successfully in that project's continuous
-integration.
+submitted as a pull request and builds successfully in that project's CI.
 
 # AI usage disclosure
 
