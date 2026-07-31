@@ -25,9 +25,16 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
 
 ---
 
-## Nouveautés 0.5.0 « Unknown »
+## Nouveautés 0.6.0 « Bench »
 
-- **La constante mystère** (`unknown_constant=`) : le moteur déduit désormais
+- **Les unités physiques depuis la console** (mode 6) : la contrainte
+  dimensionnelle et la déduction de constante ci-dessous n'étaient accessibles
+  que par l'API Python, alors que le mode 6 s'adresse précisément à qui connaît
+  les unités de ses colonnes. Le mode 6 les demande désormais et propose de
+  déduire une constante dimensionnée inconnue — voir *Utilisation* plus haut.
+  Refuser prend une touche.
+
+- **La constante mystère** (0.5) (`unknown_constant=`) : le moteur déduit désormais
   les **unités et la valeur de la constante physique manquante** d'une loi.
   Jusqu'à la 0.4.1 les constantes ajustées étaient sans dimension, ce qui mettait
   hors d'atteinte toute loi dont la constante porte des unités — sur `F = k·x`,

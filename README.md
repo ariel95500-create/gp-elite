@@ -24,9 +24,15 @@ print(result.r2_validation)     # 0.996  (on data never seen during training)
 
 ---
 
-## What's new in 0.5.0 "Unknown"
+## What's new in 0.6.0 "Bench"
 
-- **The mystery constant** (`unknown_constant=`): the engine now deduces the
+- **Physical units from the console** (mode 6): the dimensional constraint and
+  the constant deduction below were reachable only from the Python API, while
+  mode 6 targets exactly the user who knows what their columns mean. Mode 6 now
+  asks for the units and offers to deduce an unknown dimensioned constant — see
+  *Usage* above. Declining takes one keystroke.
+
+- **The mystery constant** (0.5) (`unknown_constant=`): the engine now deduces the
   **units and the value of a law's missing physical constant**. Until 0.4.1
   fitted constants were dimensionless, which put any law whose constant carries
   units out of reach — on Hooke's `F = k·x`, no dimensionless constant can relate
