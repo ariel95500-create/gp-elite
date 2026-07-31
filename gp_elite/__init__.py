@@ -32,6 +32,6 @@ from .dimensions import check_dimensions, audit_pareto, unit
 from .sklearn_api import GPEliteRegressor
 from . import core
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = ["symbolic_regression", "SRResult", "ParetoEntry", "stability_analysis", "audit_pareto", "check_dimensions", "unit", "GPEliteRegressor", "core", "__version__"]
