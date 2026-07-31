@@ -8613,6 +8613,60 @@ def _interactive_menu():
         normalize = {"a": "auto", "d": "divmax", "m": "minmax",
                      "s": "standard", "": "auto"}[norm_rep]
 
+        # ── [v0.6] Contrainte dimensionnelle ────────────────────────────
+        # La fonctionnalité phare de la 0.4/0.5 n'était accessible que depuis
+        # l'API Python, alors que le mode CSV s'adresse précisément à qui
+        # connaît les unités de ses colonnes.
+        feat_dims_cli = target_dim_cli = None
+        unknown_const_cli = False
+        _fcols = feature_cols if feature_cols else [c for c in cols
+                                                    if c != (target_col or cols[-1])]
+        print("\n  Physical units (optional — restricts the search to")
+        print("  dimensionally consistent formulas):")
+        print("    Leave blank to skip. Examples: kg | m/s | kg*m/s^2 | s^-1 | 1")
+        _u_raw = input(f"  Units for {_fcols}, comma-separated : ").strip()
+        if _u_raw:
+            _u_list = [u.strip() for u in _u_raw.split(",")]
+            _t_raw = input(f"  Unit for TARGET "
+                           f"'{target_col or cols[-1]}' : ").strip()
+            if len(_u_list) != len(_fcols):
+                print(f"  → {len(_u_list)} units for {len(_fcols)} columns: "
+                      f"units ignored.")
+            elif not _t_raw:
+                print("  → no target unit: units ignored.")
+            else:
+                try:
+                    from .dim_search import (normalize_units_arg as _nua,
+                                             parse_unit_string as _pus,
+                                             _DERIVED as _DRV)
+                    # Une unité inconnue n'est pas rejetée : elle devient une
+                    # dimension à part entière. Pratique pour des grandeurs
+                    # exotiques, dangereux pour une faute de frappe — « metre »
+                    # au lieu de « m » créerait une base incompatible et la
+                    # recherche ne trouverait plus rien. On prévient.
+                    _si = {"m", "kg", "s", "A", "K", "mol", "cd"}
+                    _known = _si | set(_DRV) | {"1"}
+                    _odd = sorted({b for u in _u_list + [_t_raw]
+                                   for b in _pus(u)} - _known)
+                    if _odd:
+                        print(f"  ⚠ unrecognised unit base(s): {_odd}")
+                        print("    They are treated as new dimensions, which is "
+                              "intended only if\n    they really are. Known: "
+                              "m kg s A K mol cd, plus "
+                              f"{' '.join(sorted(_DRV))}.")
+                    feat_dims_cli, target_dim_cli = _nua(
+                        _u_list, _t_raw, len(_fcols), _fcols)
+                    print("  → dimensional constraint ACTIVE.")
+                    print("\n  If the law carries a dimensioned constant that is")
+                    print("  not among your columns (G, k_B, R, a stiffness...),")
+                    print("  the engine can deduce its units and value.")
+                    _uc = _ask("  Deduce an unknown constant? [y/N] : ",
+                               valid=["y", "n", ""], default="n")
+                    unknown_const_cli = (_uc == "y")
+                except Exception as _ue:
+                    print(f"  → units not understood ({_ue}); units ignored.")
+                    feat_dims_cli = target_dim_cli = None
+
         fast_rep = _ask("\n  Speed? [u=ultrafast / f=fast / n=normal] (default=f) : ",
                         valid=["u", "f", "n", ""], default="f")
         ultrafast = (fast_rep == "u")
@@ -8637,6 +8691,10 @@ def _interactive_menu():
         cfg.NOISE_STD = 0.0
         # Validation hold-out active par default sur données réelles (v21)
         cfg.VALIDATION_SPLIT = 0.20
+        if feat_dims_cli is not None:                      # [v0.6]
+            cfg.FEAT_DIMS     = feat_dims_cli
+            cfg.TARGET_DIM    = target_dim_cli
+            cfg.UNKNOWN_CONST = unknown_const_cli
 
         mode_str = ('ultrafast' if ultrafast else 'fast' if fast else 'normal')
         print(f"  Config : {mode_str}  pop={cfg.POP_SIZE}  gen={cfg.GENERATIONS}  "
@@ -8664,11 +8722,83 @@ def _interactive_menu():
                 print(f"    X[{i}] = {nm}")
             print(f"\n  Note: features are normalized. "
                   f"The formula is expressed on these normalized values.")
+            if feat_dims_cli is not None:                  # [v0.6]
+                print("\n  Dimensional constraint was active: every candidate "
+                      "was\n  dimensionally consistent by construction.")
+                if unknown_const_cli:
+                    _u, _v = _deduce_console_constant(
+                        best.node if hasattr(best, "node") else best,
+                        feat_dims_cli, target_dim_cli, _scaler, n_feat)
+                    if _u is not None:
+                        from .dimensions import _fmt as _fmtdim
+                        print(f"  Deduced constant units : {_fmtdim(_u)}")
+                    if _v is not None:
+                        print(f"  Deduced constant value : {_v:.6g}")
+                    elif _u is not None:
+                        print("  Value not recoverable in raw units "
+                              "(non-monomial form, or shifting normalization).")
         else:
             print("[ERROR] No solution found.")
         # Réinitialiser le mode pour ne pas polluer un run suivant
         globals()['_GENERIC_CSV_MODE'] = False
         _pause()
+
+
+def _deduce_console_constant(node, feat_dims, target_dim, scaler, n_feat):
+    """[v0.6] Unités et valeur de la constante de tête, pour le mode console.
+
+    Le mode CSV appelle evolve() directement et non l'estimateur scikit-learn :
+    il n'a donc pas accès à GPEliteRegressor._deduce_constant. On refait ici le
+    même calcul.
+
+    L'arbre livré a la forme b * f(x) (mise à l'échelle par l'origine). Sa
+    dimension physique est celle de f ; pour que le tout ait la dimension cible,
+    b doit porter cible / dim(f). La valeur de b est exprimée dans l'espace
+    normalisé : on la ramène aux unités réelles en repliant les facteurs
+    d'échelle, dont les exposants s'obtiennent en refaisant une inférence
+    dimensionnelle où chaque colonne porte sa propre pseudo-dimension.
+
+    Retourne (dict_unites, valeur) ; l'un ou l'autre peut être None.
+    """
+    try:
+        from . import dim_search as _DS
+    except ImportError:
+        import gp_elite.dim_search as _DS
+    if node is None:
+        return None, None
+
+    inner, b = node, None
+    if (node.value == "*" and node.left is not None
+            and isinstance(node.left.value, float)):
+        b, inner = float(node.left.value), node.right
+
+    dim_inner = _DS.infer_dim(inner, feat_dims)
+    if dim_inner is None:
+        return None, None
+    d = dict(target_dim)
+    for k, v in dim_inner.items():
+        d[k] = d.get(k, 0.0) - float(v)
+    units = {k: v for k, v in d.items() if abs(v) > 1e-9}
+
+    if b is None:
+        return units, None
+    # Le repliage n'a de sens que pour une mise à l'échelle purement
+    # multiplicative : minmax et standard décalent, et aucune constante brute
+    # unique n'existe alors.
+    sc = getattr(scaler, "scale_", None)
+    if sc is None or not isinstance(scaler, (_ShiftFreeScaler, _IdentityScaler)):
+        return units, None
+    pseudo = {i: {f"__s{i}": 1} for i in range(n_feat)}
+    expo = _DS.infer_dim(inner, pseudo)
+    if expo is None:
+        return units, None
+    rho = 1.0
+    for i in range(n_feat):
+        e = float(expo.get(f"__s{i}", 0.0))
+        if e:
+            rho *= float(sc[i]) ** (-e)
+    val = float(b) * rho
+    return units, (val if math.isfinite(val) else None)
 
 
 def _pause():
