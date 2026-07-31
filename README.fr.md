@@ -101,6 +101,23 @@ gp-elite
 
 Choisissez le mode **6 (CSV générique)**, indiquez votre fichier, et laissez les valeurs par défaut. GP_ELITE détecte les colonnes, sépare un jeu de validation, évolue, et affiche la loi trouvée avec son rapport de généralisation.
 
+Depuis la 0.6, le mode 6 demande aussi les **unités physiques** de vos colonnes.
+Les déclarer est facultatif — passer prend une touche — mais si vous le faites,
+la recherche se restreint aux formules dimensionnellement cohérentes, et le
+moteur peut déduire les unités et la valeur d'une constante physique manquante.
+Sur un CSV à deux colonnes de la loi de Hooke :
+
+```
+  Units for ['allongement'], comma-separated : m
+  Unit for TARGET 'force' : N
+  Deduce an unknown constant? [y/N] : y
+  ...
+  Deduced constant units : [kg / s^2]
+  Deduced constant value : 250
+```
+
+Tout ce que l'API `units=` propose est désormais accessible sans écrire de Python.
+
 ### Par programmation (notebooks, pipelines)
 
 ```python

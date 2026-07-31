@@ -97,6 +97,23 @@ gp-elite
 
 Choose mode **6 (generic CSV)**, point to your file, and keep the defaults. GP_ELITE detects the columns, holds out a validation set, evolves, and prints the discovered law with its generalization report.
 
+Since 0.6, mode 6 also asks for the **physical units** of your columns. Declaring
+them is optional, and skipping is one keystroke — but if you do declare them, the
+search is restricted to dimensionally consistent formulas, and the engine can
+deduce the units and value of a missing physical constant. On a two-column CSV of
+Hooke's law it returns:
+
+```
+  Units for ['elongation'], comma-separated : m
+  Unit for TARGET 'force' : N
+  Deduce an unknown constant? [y/N] : y
+  ...
+  Deduced constant units : [kg / s^2]
+  Deduced constant value : 250
+```
+
+Everything the `units=` API offers is now reachable without writing Python.
+
 ### Programmatically (notebooks, pipelines)
 
 ```python
