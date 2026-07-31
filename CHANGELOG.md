@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.6.0 — "Bench"
+
+### Added
+- **Physical units in the console** (mode 6, generic CSV). The dimensional
+  constraint and the mystery-constant deduction were reachable only from the
+  Python API, while mode 6 targets exactly the user who knows what their columns
+  mean. Mode 6 now asks for the units of the feature columns and of the target,
+  then offers to deduce an unknown dimensioned constant. Declining is one
+  keystroke and the previous behaviour is unchanged. Verified end to end on a
+  Hooke's-law CSV: returns `[kg / s^2]` and 250.0 against a true 250, on two
+  independent platforms.
+- Unrecognised unit bases are now flagged. `normalize_units_arg` accepts any
+  token as a new dimension — useful for exotic quantities, dangerous for a typo,
+  since `metre` instead of `m` silently creates an incompatible base and the
+  search then finds nothing. The console lists unknown bases and names the
+  recognised ones, without blocking.
+
+### Notes
+Constant values are folded back into the raw units of the input columns. This is
+only possible under multiplicative normalisation (`auto` on positive features,
+or `divmax`); with `minmax` or `standard`, which shift, the units are reported
+without a value and the reason is stated.
+
 ## 0.5.0 — "Unknown"
 
 ### Added
