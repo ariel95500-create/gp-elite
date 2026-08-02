@@ -24,59 +24,29 @@ print(result.r2_validation)     # 0.996  (on data never seen during training)
 
 ---
 
-## What's new in 0.6.0 "Bench"
-
-- **Physical units from the console** (mode 6): the dimensional constraint and
-  the constant deduction below were reachable only from the Python API, while
-  mode 6 targets exactly the user who knows what their columns mean. Mode 6 now
-  asks for the units and offers to deduce an unknown dimensioned constant — see
-  *Usage* above. Declining takes one keystroke.
-
-- **The mystery constant** (0.5) (`unknown_constant=`): the engine now deduces the
-  **units and the value of a law's missing physical constant**. Until 0.4.1
-  fitted constants were dimensionless, which put any law whose constant carries
-  units out of reach — on Hooke's `F = k·x`, no dimensionless constant can relate
-  metres to newtons. On three reference laws whose answer is known in advance,
-  20 generations, 1 restart: Hooke recovers `kg/s²` and 250.0, Newton recovers
-  `m³/kg·s²` and 6.674e-11, the ideal gas law recovers `kg·m²/K·mol·s²` and
-  8.31446 against a true 8.314463 — structure exact and R² = 1.000000 on all
-  three. Details below.
-
-- **Dimensionally-constrained search** (`units=`, since 0.4): declare your columns' physical
-  units and the engine only ever builds dimensionally sound expressions —
-  constructive typed generation, dimension-preserving mutation and crossover,
-  plus a validity gate that rejects unsound candidates from every code path.
-  On Feynman II.11.3 (5 variables, 5 seeds, identical budget): without
-  constraints **0/5** models are dimensionally valid; with `units=`, **5/5 are
-  valid**, and they are **2.6x smaller** at a slightly better R². Cost: roughly
-  4x slower. Full table below.
-- **0.4.1 fixes three bugs** found while validating 0.4.0: candidates were scored
-  on a rescaled form but delivered unscaled under `units=` (right structure, wrong
-  constant); dimensional state leaked into later fits in the same process; and the
-  Levenberg–Marquardt optimizer could overflow float64 on unbounded `sq`/`cube`/`*`
-  chains. See [CHANGELOG.md](CHANGELOG.md).
-- Without `units=`, behaviour is **unchanged** (non-regression verified: 8 fits
-  across two operator sets and four seeds, plus the robust and multi-restart
-  modes, byte-identical to 0.4.0).
-
-Earlier releases: **0.4.0 "Lawful"** (dimensionally-constrained search),
-**0.3.0 "Trust"** (diagnostics, stability, post-hoc dimensional audit),
-**0.2.0** (Levenberg–Marquardt constant fitting, multi-restart, Pareto front,
-extrapolation mode).
-
 ---
 
-## Why GP_ELITE?
+## Is this for you?
 
-| | GP_ELITE | Neural networks | PySR (state of the art) |
-|---|---|---|---|
-| Output | **readable formula** | black box | readable formula |
-| Installation | `pip install` (pure Python) | heavy | requires **Julia** |
-| Overfitting guard | **built-in** (hold-out) | do it yourself | do it yourself |
-| Physical validity | **enforced during search** (`units=`) | no | no |
-| Variable selection | **importance report** | no | partial |
+You probably want GP_ELITE if **at least one** of these is true:
 
-GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer.
+- **You have a table of measurements and want the formula, not a prediction.**
+  A degradation curve, a sensor calibration, an engineering correlation. You care
+  about the *shape* of the relationship, and you intend to read it, sanity-check
+  it, maybe publish it.
+- **You cannot install a second language runtime.** A locked-down university
+  machine, a corporate laptop without admin rights, a CI container you do not
+  control. `pip install gp-elite` and its three dependencies are all you need —
+  no compiler, no Julia, no GPU.
+- **You know the physical units of your columns.** Declare them and the search
+  will only ever build dimensionally sound formulas — and can tell you the units
+  *and value* of a physical constant that is not in your data at all.
+- **You are teaching or learning genetic programming.** The engine is plain
+  Python you can read, step through and modify, and it ships with an interactive
+  console that needs no code at all.
+
+If none of these fit, other tools may serve you better — `PySR` and `Operon` are
+faster and more accurate at scale, and this README says so plainly further down.
 
 ---
 
@@ -277,6 +247,23 @@ A saturating degradation with cycle count, modulated by temperature — physical
 
 ---
 
+## Is it solid?
+
+A fair question for a project you have never heard of. Here is where it stands
+against the alternatives, and where it does not.
+
+| | GP_ELITE | Neural networks | PySR (state of the art) |
+|---|---|---|---|
+| Output | **readable formula** | black box | readable formula |
+| Installation | `pip install` (pure Python) | heavy | requires **Julia** |
+| Overfitting guard | **built-in** (hold-out) | do it yourself | do it yourself |
+| Physical validity | **enforced during search** (`units=`) | no | no |
+| Variable selection | **importance report** | no | partial |
+
+GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer.
+
+---
+
 ## What is GP_ELITE good (and less good) at?
 
 **Good at**: physical / engineering laws with multiplicative or exponential structure, modest-size noisy experimental data, problems where interpretability matters most.
@@ -308,6 +295,16 @@ On the frozen **Feynman benchmark** (15 physics equations, `PYTHONHASHSEED=0`, `
 - **Transferable stigmergic memory** across runs (grammar export/import)
 
 ---
+
+## What's new
+
+**0.6 "Bench"** — physical units are now available from the interactive console
+(mode 6), not just the Python API. **0.5 "Unknown"** — the engine deduces the
+units *and* value of a law's missing physical constant. **0.4 "Lawful"** —
+dimensionally-constrained search. **0.3 "Trust"** — diagnostics and stability.
+
+Full history, with the measurements behind each claim, in
+[CHANGELOG.md](CHANGELOG.md).
 
 ## Did it fail on your data? Please say so
 

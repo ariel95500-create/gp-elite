@@ -25,63 +25,33 @@ print(result.r2_validation)     # 0.996  (sur des données jamais vues)
 
 ---
 
-## Nouveautés 0.6.0 « Bench »
-
-- **Les unités physiques depuis la console** (mode 6) : la contrainte
-  dimensionnelle et la déduction de constante ci-dessous n'étaient accessibles
-  que par l'API Python, alors que le mode 6 s'adresse précisément à qui connaît
-  les unités de ses colonnes. Le mode 6 les demande désormais et propose de
-  déduire une constante dimensionnée inconnue — voir *Utilisation* plus haut.
-  Refuser prend une touche.
-
-- **La constante mystère** (0.5) (`unknown_constant=`) : le moteur déduit désormais
-  les **unités et la valeur de la constante physique manquante** d'une loi.
-  Jusqu'à la 0.4.1 les constantes ajustées étaient sans dimension, ce qui mettait
-  hors d'atteinte toute loi dont la constante porte des unités — sur `F = k·x`,
-  aucune constante sans dimension ne peut relier des mètres à des newtons. Sur
-  trois lois de référence dont la réponse est connue d'avance, 20 générations,
-  1 restart : Hooke retrouve `kg/s²` et 250.0, Newton retrouve `m³/kg·s²` et
-  6,674e-11, les gaz parfaits retrouvent `kg·m²/K·mol·s²` et 8,31446 contre
-  8,314463 réel — structure exacte et R² = 1.000000 sur les trois. Détails plus
-  bas.
-
-- **Recherche sous contrainte dimensionnelle** (`units=`, depuis la 0.4) : déclarez les unités
-  physiques de vos colonnes, et le moteur ne construit plus que des expressions
-  dimensionnellement saines — génération typée constructive, mutation et
-  croisement préservant les dimensions, plus un filtre de validité qui rejette
-  les candidats non conformes sur tous les chemins de code. Sur Feynman II.11.3
-  (5 variables, 5 seeds, budget identique) : sans contrainte, **0/5** modèles
-  sont dimensionnellement valides ; avec `units=`, **5/5 le sont**, et ils sont
-  **2,6× plus compacts** pour un R² légèrement meilleur. Coût : environ 4× plus
-  lent. Tableau complet plus bas.
-- **La 0.4.1 corrige trois bugs** découverts en validant la 0.4.0 : sous
-  `units=`, les candidats étaient notés sur une forme remise à l'échelle mais
-  livrés sans elle (structure juste, constante fausse) ; l'état dimensionnel
-  fuyait vers les fits suivants du même processus ; et l'optimiseur
-  Levenberg–Marquardt pouvait dépasser float64 sur des chaînes `sq`/`cube`/`*`
-  non bornées. Voir [CHANGELOG.md](CHANGELOG.md).
-- Sans `units=`, le comportement est **inchangé** (non-régression vérifiée :
-  8 fits sur deux jeux d'opérateurs et quatre seeds, plus les modes robuste et
-  multi-restart, identiques octet pour octet à la 0.4.0).
-
-Versions précédentes : **0.4.0 « Lawful »** (recherche sous contrainte
-dimensionnelle), **0.3.0 « Trust »** (diagnostics, stabilité, audit dimensionnel
-post-hoc), **0.2.0** (constantes par Levenberg–Marquardt, multi-restart, front de
-Pareto, mode extrapolation).
-
 ---
 
-## Pourquoi GP_ELITE ?
+## Est-ce pour vous ?
 
-| | GP_ELITE | Réseaux de neurones | PySR (état de l'art) |
-|---|---|---|---|
-| Sortie | **formule lisible** | boîte noire | formule lisible |
-| Installation | `pip install` (pur Python) | lourde | nécessite **Julia** |
-| Validation anti-surapprentissage | **intégrée** (hold-out) | à faire soi-même | à faire soi-même |
-| Validité physique | **imposée pendant la recherche** (`units=`) | non | non |
-| Sélection de variables | **rapport d'importance** | non | partielle |
+GP_ELITE est probablement fait pour vous si **au moins une** de ces phrases vous
+correspond :
 
-La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur.
+- **Vous avez un tableau de mesures et vous voulez la formule, pas une
+  prédiction.** Une courbe de dégradation, une calibration de capteur, une
+  corrélation d'ingénierie. C'est la *forme* de la relation qui vous intéresse,
+  et vous comptez la lire, la vérifier, peut-être la publier.
+- **Vous ne pouvez pas installer un second environnement d'exécution.** Machine
+  universitaire verrouillée, poste d'entreprise sans droits administrateur,
+  conteneur d'intégration continue que vous ne maîtrisez pas. `pip install
+  gp-elite` et ses trois dépendances suffisent — pas de compilateur, pas de
+  Julia, pas de GPU.
+- **Vous connaissez les unités physiques de vos colonnes.** Déclarez-les et la
+  recherche ne construira que des formules dimensionnellement saines — et pourra
+  vous donner les unités *et la valeur* d'une constante physique qui ne figure
+  même pas dans vos données.
+- **Vous enseignez ou apprenez la programmation génétique.** Le moteur est du
+  Python que vous pouvez lire, exécuter pas à pas et modifier, avec une interface
+  console qui ne demande aucun code.
+
+Si rien de tout cela ne vous correspond, d'autres outils vous serviront mieux :
+`PySR` et `Operon` sont plus rapides et plus précis à grande échelle, et ce
+README le dit franchement plus bas.
 
 ---
 
@@ -285,6 +255,23 @@ Une dégradation saturante avec les cycles, modulée par la température — phy
 
 ---
 
+## Est-ce solide ?
+
+Question légitime pour un projet dont vous n'avez jamais entendu parler. Voici
+ce que ça vaut face aux alternatives, et ce que ça ne vaut pas.
+
+| | GP_ELITE | Réseaux de neurones | PySR (état de l'art) |
+|---|---|---|---|
+| Sortie | **formule lisible** | boîte noire | formule lisible |
+| Installation | `pip install` (pur Python) | lourde | nécessite **Julia** |
+| Validation anti-surapprentissage | **intégrée** (hold-out) | à faire soi-même | à faire soi-même |
+| Validité physique | **imposée pendant la recherche** (`units=`) | non | non |
+| Sélection de variables | **rapport d'importance** | non | partielle |
+
+La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur.
+
+---
+
 ## Sur quoi GP_ELITE est-il bon (et moins bon) ?
 
 **Bon** : lois physiques / d'ingénierie à structure multiplicative ou exponentielle, données expérimentales bruitées de taille modeste, problèmes où l'interprétabilité prime.
@@ -316,6 +303,17 @@ Sur le **benchmark Feynman gelé** (15 équations, `PYTHONHASHSEED=0`, `restarts
 - **Mémoire stigmergique transférable** entre exécutions (export/import de grammaires)
 
 ---
+
+## Nouveautés
+
+**0.6 « Bench »** — les unités physiques sont désormais accessibles depuis
+l'interface console (mode 6), et plus seulement par l'API Python.
+**0.5 « Unknown »** — le moteur déduit les unités *et* la valeur de la constante
+physique manquante d'une loi. **0.4 « Lawful »** — recherche sous contrainte
+dimensionnelle. **0.3 « Trust »** — diagnostics et stabilité.
+
+Historique complet, avec les mesures qui étayent chaque affirmation, dans
+[CHANGELOG.md](CHANGELOG.md).
 
 ## Ça n'a pas marché sur vos données ? Dites-le
 
