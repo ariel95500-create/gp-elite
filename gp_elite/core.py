@@ -1570,6 +1570,68 @@ _DIM_GATE_DIMS = None       # [v0.4] miroir de cfg.FEAT_DIMS pour _track_val_can
 _DIM_GATE_TARGET = None
 # [v0.4.1] Linear scaling PUREMENT multiplicatif (regression par l'origine).
 # Actif en mode dimensionnel : voir _linear_scale_params.
+# ═══════════════════════════════════════════════════════════════════════════
+# [v0.7] JOURNAL D'EXÉCUTION — observabilité du moteur
+#
+# Pourquoi. Cinq défauts trouvés en juillet 2026 avaient la même nature : non
+# pas une erreur de logique, mais une INTERACTION INVISIBLE entre mécanismes.
+# L'état dimensionnel qui fuyait d'un fit au suivant ; la notation faite sur une
+# forme mise à l'échelle et la livraison sur une autre ; le feu vert stigmergique
+# qui gouvernait aussi le nettoyage des introns ; un burn-in qui bloquait
+# structurellement un mécanisme sans que rien ne le signale. Chacun a coûté des
+# heures de mesure alors qu'une ligne de sortie l'aurait révélé.
+#
+# RÈGLE ABSOLUE : ce journal est en ÉCRITURE SEULE. Rien de ce qui y est
+# enregistré n'est jamais relu par le moteur. Ajouter une entrée ne peut donc
+# pas modifier un résultat — sans quoi on ajouterait au problème qu'on prétend
+# résoudre.
+# ═══════════════════════════════════════════════════════════════════════════
+class _RunTrace:
+    """Collecteur d'événements. Aucune de ses valeurs ne pilote quoi que ce soit."""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.first = {}      # premier événement d'un type : {clé: description}
+        self.count = {}      # compteurs
+        self.value = {}      # dernière valeur observée
+
+    def once(self, key, description):
+        """Enregistre le PREMIER événement de ce type et ignore les suivants."""
+        if key not in self.first:
+            self.first[key] = description
+
+    def bump(self, key, by=1):
+        self.count[key] = self.count.get(key, 0) + by
+
+    def set(self, key, val):
+        self.value[key] = val
+
+    def lines(self):
+        """Le journal, prêt à afficher. Liste vide si rien n'a été observé."""
+        out = []
+        for k in ("dim_mode", "unknown_const", "ls_mode"):
+            if k in self.value:
+                out.append(f"  {k:<22} {self.value[k]}")
+        for k, d in self.first.items():
+            out.append(f"  {k:<22} {d}")
+        for k, c in sorted(self.count.items()):
+            out.append(f"  {k:<22} {c}")
+        return out
+
+    def report(self, title="JOURNAL D'EXÉCUTION"):
+        ls = self.lines()
+        if not ls:
+            return
+        print(f"\n  {title}")
+        print("  " + "-" * 58)
+        for l in ls:
+            print(l)
+
+
+TRACE = _RunTrace()
+
 _LS_SCALE_ONLY = False
 # [v0.5] Mode « constante mystere » : la constante multiplicative de tete peut
 # PORTER une dimension, deduite par homogeneite (cible / dimension de l'arbre).
@@ -3698,6 +3760,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
     if _dim_active(cfg) and not _ds().is_typed_valid(
             node, cfg.FEAT_DIMS, cfg.TARGET_DIM,
             bool(getattr(cfg, "UNKNOWN_CONST", False))):
+        TRACE.bump("candidats_rejetes_dim")     # [v0.7]
         return float("inf")
 
     h   = node.structural_hash()
@@ -5232,6 +5295,18 @@ def evolve_island(island: Island,
     _voie_b   = (_abs_r >= EARLY_OPEN_CORRELATION)
     _stigm_allowed = _voie_a or _voie_b
 
+    # [v0.7] Le moment et la VOIE d'ouverture. C'est l'information qui manquait
+    # quand on cherchait pourquoi la stigmergie semblait inopérante à budget
+    # court : le burn-in de 15 générations la bloquait structurellement, et sur
+    # certains problèmes la voie B ouvrait au contraire dès la génération 0.
+    if _stigm_allowed:
+        TRACE.once("stigmergie_ouverte",
+                   f"génération {generation} par la voie "
+                   f"{'B (r >= %.2f)' % EARLY_OPEN_CORRELATION if _voie_b else 'A (après burn-in)'}"
+                   f", r = {_best_r:+.3f}")
+    else:
+        TRACE.bump("stigmergie_bloquee_gen")
+
     if not _stigm_allowed:
         # Bruit trop élevé et burn-in non terminé : signaler et bloquer les dépôts.
         # [SYRACUSE] Supprimer le message pour r=-1.000 (arbre constant) : c'est
@@ -5263,7 +5338,15 @@ def evolve_island(island: Island,
     # La simplification est faite en place ; si l'arbre change, le hash précédent
     # est purgé du cache fitness pour éviter une entrée stale.
     # ─────────────────────────────────────────────────────────────────────────────
+    # [v0.7] La simplification de l'élite est gardée par le feu vert
+    # STIGMERGIQUE, ce qui n'a rien d'évident à la lecture : un paramètre de
+    # phéromones décide du nettoyage des introns. Couplage mesuré comme
+    # bénéfique dans la configuration par défaut, donc conservé — mais tracé,
+    # pour qu'il ne surprenne plus personne.
     if _stigm_allowed:
+        TRACE.once("simplification_elite",
+                   f"première à la génération {generation} "
+                   f"(gardée par le feu vert stigmergique)")
         _limit_clean = max(top_k, top_k_seq)
         for i in range(min(_limit_clean, len(pop))):
             _old_hash   = pop[i].structural_hash()
@@ -6183,16 +6266,24 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # dimensions declarees, et le champion livre devenait aberrant.
     global _DIM_GATE_DIMS, _DIM_GATE_TARGET, _LS_SCALE_ONLY
     global _DIM_UNKNOWN_CONST                # [v0.5]
+    TRACE.reset()                            # [v0.7] un journal par exécution
     if _dim_active(cfg):
         _DIM_GATE_DIMS   = cfg.FEAT_DIMS
         _DIM_GATE_TARGET = cfg.TARGET_DIM
         _LS_SCALE_ONLY   = True
         _DIM_UNKNOWN_CONST = bool(getattr(cfg, "UNKNOWN_CONST", False))
+        TRACE.set("dim_mode", "ACTIF — la recherche est contrainte par les unités")
+        TRACE.set("unknown_const",
+                  "OUI — la constante de tête peut porter une dimension"
+                  if _DIM_UNKNOWN_CONST else "non")
+        TRACE.set("ls_mode", "multiplicatif seul (régression par l'origine)")
     else:
         _DIM_GATE_DIMS   = None
         _DIM_GATE_TARGET = None
         _LS_SCALE_ONLY   = False
         _DIM_UNKNOWN_CONST = False
+        TRACE.set("dim_mode", "inactif (aucune unité déclarée)")
+        TRACE.set("ls_mode", "affine (a + b·f) si linear scaling actif")
     globals()["VAL_R2_TOLERANCE"] = float(getattr(cfg, "VAL_R2_TOLERANCE", 0.003))
     # FIX v13.10 : LOG_CSV relatif au répertoire du script
     _script_dir = os.path.dirname(os.path.abspath(__file__))
