@@ -1,10 +1,12 @@
 # GP_ELITE
-
 **Genetic-programming symbolic regression — discover interpretable laws from your experimental data.**
 
-*[🇫🇷 Version française](README.fr.md)*
+Declare your units and the search only ever builds dimensionally valid equations — a hard
+constraint, not a soft penalty. The operating envelope is measured, not claimed: how many
+points it needs, how much noise it tolerates, and where it fails.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.ipynb) **Try it in your browser** — no install, four cells, ten minutes.
+*[🇫🇷 Version française](README.fr.md)*
+[![Open In Colab](...)] **Try it in your browser** — no install, five steps, fifteen minutes.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables, 100–5000 points) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose–response curves, physical laws.
 
