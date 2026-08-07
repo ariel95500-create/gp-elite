@@ -2,11 +2,18 @@
 
 **Régression symbolique par programmation génétique — pour découvrir des lois interprétables sur vos données expérimentales.**
 
+Déclarez vos unités, et la recherche ne construit jamais que des équations
+dimensionnellement valides — une contrainte dure, pas une pénalité douce.
+L'enveloppe de fonctionnement est mesurée, pas revendiquée : combien de points
+il faut, combien de bruit elle tolère, et où elle échoue.
+
 *[🇬🇧 English version](README.md)*
 
-[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, quatre cellules, dix minutes.
+[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, cinq étapes, quinze minutes.
 
-GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables, 100-5000 points) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
+GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
+
+L'enveloppe de fonctionnement est mesurée, pas revendiquée : la récupération tient de quelques dizaines de points à dix mille et au-delà, le temps de calcul est plat jusqu'à environ 500 points puis croît de façon sous-linéaire, et 500 points ou plus sont recommandés pour obtenir des expressions canoniques et lisibles sur les cibles difficiles.
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
