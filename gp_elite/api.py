@@ -365,7 +365,18 @@ def symbolic_regression(
         if loss_fn is None:
             _delta_h = 1.345
             def _huber(preds, X, y, _d=_delta_h):
-                r = preds - y; a = np.abs(r)
+                # [FIX-ROBUST] Résidus STANDARDISÉS par une échelle robuste de y
+                # (1.4826*MAD ~ sigma). Sans cela la perte dépend de l'UNITÉ de y :
+                # combinée à une parcimonie absolue, elle rendait une constante
+                # moins coûteuse que la forme vraie dès que std(y) était petit
+                # (I.8.14, I.12.2, I.16.6 renvoyaient une constante ou une droite,
+                # même SANS bruit). delta=1.345 retrouve ici son sens statistique
+                # usuel : un seuil exprimé en écarts-types de résidu.
+                med = float(np.median(y))
+                s = 1.4826 * float(np.median(np.abs(y - med)))
+                if not (s > 0.0 and np.isfinite(s)):
+                    s = float(np.std(y)) or 1.0
+                r = (preds - y) / s; a = np.abs(r)
                 return float(np.mean(np.where(a <= _d, 0.5 * r**2, _d * (a - 0.5 * _d))))
             core._CUSTOM_LOSS_FN = _huber
         core._CUSTOM_LOSS_USE_SCALING = True
@@ -378,7 +389,13 @@ def symbolic_regression(
         # symbolique. Une légère parcimonie restaure des formules simples ET
         # robustes (size ~7 au lieu de ~50), au prix d'un R² très légèrement
         # inférieur.
-        core._CUSTOM_LOSS_PARSIMONY = 0.5
+        # [FIX-ROBUST] La perte standardisée vit dans ~[0, 1] (~0.5 pour un
+        # modèle constant). L'ancienne pénalité de 0.5/noeud la DOMINAIT : une
+        # forme vraie de 10 noeuds coûtait 5.0, contre ~1.0 pour une constante
+        # — la structure ne pouvait mathématiquement pas gagner. 0.005/noeud
+        # conserve le rasoir d'Ockham (arbre-monstre de 60 noeuds : +0.30)
+        # sans jamais interdire la forme vraie (+0.05).
+        core._CUSTOM_LOSS_PARSIMONY = 0.005
 
     _placeholder = lambda Xm: np.zeros(Xm.shape[0])
     sink = contextlib.nullcontext() if verbose else contextlib.redirect_stdout(io.StringIO())
