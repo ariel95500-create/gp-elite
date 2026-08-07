@@ -6,7 +6,7 @@ constraint, not a soft penalty. The operating envelope is measured, not claimed:
 points it needs, how much noise it tolerates, and where it fails.
 
 *[🇫🇷 Version française](README.fr.md)*
-[![Open In Colab](...)] **Try it in your browser** — no install, five steps, fifteen minutes.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.ipynb) **Try it in your browser** — no install, five steps, fifteen minutes.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables, 100–5000 points) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose–response curves, physical laws.
 
