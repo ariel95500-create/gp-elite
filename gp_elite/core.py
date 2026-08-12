@@ -7293,13 +7293,64 @@ class _IdentityScaler:
         return np.asarray(Xs, dtype=np.float64)
 
 
+# [v0.7] Seuil de bascule entre « ne pas normaliser » et « normaliser ».
+# MESURÉ par benchmarks/feynman_scale_ratio.py (96 runs : 8 équations
+# x 6 décades de disparité x 2 modes, moteur 0.6.0, PYTHONHASHSEED=0) :
+#     ratio ~2    none 8/8 exactes (7 canoniques) | auto 6/8 (6)  -> none
+#     ratio ~10   none 6/8 (4)                    | auto 6/8 (5)  -> égalité
+#     ratio ~100  none 5/8 (4)                    | auto 6/8 (6)  -> auto
+#     ratio ~1e6  none 4/8 (2)                    | auto 6/8 (5)  -> auto
+# `auto` s'est révélé parfaitement invariant d'échelle (6/8 sur six
+# décades) ; son seul coût est de perdre deux équations quand la
+# normalisation est inutile. Les jeux bien échelonnés ont un ratio naturel
+# de 1.0 à 7.4 : le seuil de 10 laisse de la marge des deux côtés.
+SCALE_RATIO_THRESHOLD = 10.0
+
+
+def _scale_ratio(X_raw):
+    """Rapport d'échelle entre colonnes : max(écart-type) / min(écart-type),
+    calculé sur les seules colonnes NON CONSTANTES (sinon une colonne de
+    variance nulle donnerait un ratio infini). Renvoie 1.0 quand moins de
+    deux colonnes varient — il n'y a alors rien à comparer."""
+    X = np.asarray(X_raw, dtype=np.float64)
+    if X.ndim != 2 or X.shape[1] < 2:
+        return 1.0
+    with np.errstate(invalid="ignore"):
+        sd = np.std(X, axis=0)
+    sd = sd[np.isfinite(sd) & (sd > 0.0)]
+    if sd.size < 2:
+        return 1.0
+    return float(sd.max() / sd.min())
+
+
 def _choose_scaler(X_raw, normalize, x_range):
-    """[v23] Sélectionne la normalisation. 'auto' : shift-free si toutes les
-    features sont strictement positives (cas multiplicatif typique en
-    sciences — masses, distances, températures absolues), sinon MinMax."""
+    """[v23] Sélectionne la normalisation.
+
+    'auto'  : shift-free si toutes les features sont strictement positives
+              (cas multiplicatif typique en sciences — masses, distances,
+              températures absolues), sinon MinMax. NE SE DEMANDE JAMAIS
+              s'il faut normaliser, seulement comment.
+    'smart' : [v0.7] teste d'abord la disparité d'échelle entre colonnes.
+              En dessous de SCALE_RATIO_THRESHOLD, ne normalise pas (les
+              features brutes préservent produits, différences et
+              lisibilité des constantes) ; au-dessus, délègue à 'auto'.
+    'none'  : jamais de normalisation.
+
+    Limite connue et NON MESURÉE de 'smart' : le test ne capte que la
+    disparité RELATIVE entre colonnes. Des features toutes à la même
+    échelle extrême (toutes ~1e-9, ou toutes ~1e12) donnent un ratio de 1
+    et ne seront pas normalisées. Ne pas ajouter de garde-fou sur l'échelle
+    absolue sans l'avoir mesuré."""
     mode = (normalize or "auto").lower()
     if mode in ("none", "off", "raw", "identity"):     # [v0.5]
         return _IdentityScaler(), "none (raw features)"
+    if mode == "smart":                                # [v0.7]
+        ratio = _scale_ratio(X_raw)
+        if ratio < SCALE_RATIO_THRESHOLD:
+            return _IdentityScaler(), (
+                f"none (smart: scale ratio {ratio:.1f} < "
+                f"{SCALE_RATIO_THRESHOLD:g})")
+        mode = "auto"
     if mode == "auto":
         all_pos = bool(np.all(X_raw > 0))
         mode = "divmax" if all_pos else "minmax"
