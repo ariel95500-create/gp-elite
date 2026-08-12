@@ -9,6 +9,18 @@ bug n°2 — polissage LM en MSE — n'est pas traité).
   set PYTHONHASHSEED=0 && python benchmarks\\validate_robust_fix.py
 """
 import os, sys, io, contextlib
+import multiprocessing
+
+# [FIX-SPAWN] Sous Windows, le multiprocessing de Python utilise `spawn` :
+# chaque processus enfant RÉ-IMPORTE ce module. Sans cette garde, l'enfant
+# ré-exécute tout le script (affichage dupliqué, processus qui se
+# multiplient, temps de calcul faussés). On sort immédiatement si nous ne
+# sommes pas le processus principal.
+if multiprocessing.current_process().name != "MainProcess":
+    import sys as _s; _s.exit(0)
+multiprocessing.freeze_support()
+
+
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
