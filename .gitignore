@@ -20,3 +20,5 @@ grammar_*.json
 .DS_Store
 .idea/
 .vscode/
+# Sorties console des bancs (redondantes avec la télémétrie .jsonl)
+run_*.txt
