@@ -1,0 +1,61 @@
+{
+ "dataset": "nikuradse_2",
+ "engine": "0.6.0",
+ "n": 362,
+ "features": [
+  "log_v_k_nu"
+ ],
+ "target": "target",
+ "normalize": "none",
+ "generations": 30,
+ "seconds": 381.2,
+ "r2_linear": -0.0049954594668575325,
+ "r2_log": 0.28287746561524707,
+ "champion": {
+  "size": 41,
+  "r2": 0.9771772091821244,
+  "expr": "(0.589692 + (1.157949 * (tanh(((tanh(pow(log_v_k_nu, log_v_k_nu)) * log_v_k_nu) + pow(sqrt(log_v_k_nu), 1.631328))) - (((tanh(((log_v_k_nu + -0.298915))\u00b2) * log_v_k_nu) + pow(sqrt(log_v_k_nu), ((15.0 / log_v_k_nu) / (10.680858 + log_v_k_nu)))) * log(tanh(pow(log_v_k_nu, log_v_k_nu)))))))"
+ },
+ "pareto": [
+  {
+   "size": 9,
+   "r2": 0.8127539727252456,
+   "expr": "(2.279085 + (-0.669923 * exp(tanh(log(log(log_v_k_nu))))))"
+  },
+  {
+   "size": 13,
+   "r2": 0.7956041832171779,
+   "expr": "(2.075655 + (-0.368297 * (pow(tanh(log_v_k_nu), -0.536093) + tanh(log(log(log_v_k_nu))))))"
+  },
+  {
+   "size": 14,
+   "r2": 0.8845653801438146,
+   "expr": "(1.380771 + (-0.715465 * tanh(log(log(sqrt((tanh(log_v_k_nu) * (-1.519281 * log_v_k_nu))))))))"
+  },
+  {
+   "size": 15,
+   "r2": 0.907150044346921,
+   "expr": "(1.181133 + (-0.456139 * (tanh(log(log(log_v_k_nu))) - tanh(exp((log(log_v_k_nu) + log_v_k_nu))))))"
+  },
+  {
+   "size": 16,
+   "r2": 0.9383926941136114,
+   "expr": "(0.852706 + (0.791097 * (log_v_k_nu / (log_v_k_nu - ((log(log_v_k_nu) + sqrt(log_v_k_nu)) / exp(log_v_k_nu))))))"
+  },
+  {
+   "size": 29,
+   "r2": 0.7683038809308531,
+   "expr": "(1.672549 + (-0.122484 * (log_v_k_nu * ((-sqrt(((log_v_k_nu - -0.873091) * (-7.191007 - log(log_v_k_nu))))) / (log_v_k_nu / ((log(log_v_k_nu) + sqrt(log_v_k_nu)) / (pow(log_v_k_nu, log_v_k_nu))\u00b2))))))"
+  },
+  {
+   "size": 34,
+   "r2": 0.9669801162549098,
+   "expr": "(-0.890811 + (1.580719 * pow(pow(1.388638, ((pow(log_v_k_nu, -1.889959) * (1.874921 * log_v_k_nu)) / abs((-5.426371 + log_v_k_nu)))), (5.342375 * tanh(((log_v_k_nu * (abs((-3.711893 + log_v_k_nu)) * sqrt((log_v_k_nu)\u00b2))) / 2.026972))))))"
+  },
+  {
+   "size": 41,
+   "r2": 0.9771772091821244,
+   "expr": "(0.589692 + (1.157949 * (tanh(((tanh(pow(log_v_k_nu, log_v_k_nu)) * log_v_k_nu) + pow(sqrt(log_v_k_nu), 1.631328))) - (((tanh(((log_v_k_nu + -0.298915))\u00b2) * log_v_k_nu) + pow(sqrt(log_v_k_nu), ((15.0 / log_v_k_nu) / (10.680858 + log_v_k_nu)))) * log(tanh(pow(log_v_k_nu, log_v_k_nu)))))))"
+  }
+ ]
+}
