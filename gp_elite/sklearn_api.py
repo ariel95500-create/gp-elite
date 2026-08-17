@@ -199,8 +199,32 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         return self.model_.predict(X)
 
     # SRBench convention: expose the symbolic model
-    def sympy(self):
-        """Return the discovered equation as a string (SRBench reads this)."""
+    def sympy(self, feature_names=None):
+        """Return the discovered equation as a **sympy-parsable** string.
+
+        The string can be read back with ``sympy.sympify(...)`` and evaluates
+        numerically the same as ``predict``. Operators are mapped explicitly
+        (``sq`` -> ``**2``, ``cube`` -> ``**3``, ``max2`` -> ``Max``,
+        ``step`` -> ``Heaviside``, ...), so no operator ever comes out as an
+        undefined sympy function. For the human-readable form (with ² and ³),
+        use :meth:`pretty`.
+
+        Note: features are named ``X0, X1, ...`` unless ``feature_names`` is
+        given; this is the raw-feature expression, before input scaling.
+        """
+        check_is_fitted(self, "model_") if _HAS_SKLEARN else None
+        from .core import node_to_sympy
+        node = getattr(self.model_, "node", None)
+        if node is None:                     # fallback: legacy display string
+            return self.equation_
+        return node_to_sympy(node, feature_names)
+
+    def pretty(self):
+        """Return the equation in human-readable form (uses ² and ³).
+
+        This is the display string; it is **not** guaranteed to be
+        sympy-parsable. For a parsable form use :meth:`sympy`.
+        """
         check_is_fitted(self, "model_") if _HAS_SKLEARN else None
         return self.equation_
 

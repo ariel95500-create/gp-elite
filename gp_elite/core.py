@@ -2142,6 +2142,88 @@ def to_string(node) -> str:
     # "x" (1-D) ou "X[i]" (N-D) : retourné tel quel
     return str(v)
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Conversion en chaîne SYMPY-parsable (distincte de to_string, qui est un
+# affichage lisible où sq->² et cube->³ ne sont pas du sympy valide).
+# Source unique : réutilisée par GPEliteRegressor.sympy() et par le wrapper
+# SRBench, pour qu'ils ne divergent jamais.
+# ─────────────────────────────────────────────────────────────────────────────
+
+_SYMPY_UNARY = {
+    "neg":     lambda a: "(-(%s))" % a,
+    "abs":     lambda a: "Abs(%s)" % a,
+    "inv":     lambda a: "(1/(%s))" % a,
+    "sq":      lambda a: "((%s)**2)" % a,
+    "cube":    lambda a: "((%s)**3)" % a,
+    "sqrt":    lambda a: "sqrt(Abs(%s))" % a,   # sqrt du moteur est garde-fou domaine
+    "log":     lambda a: "log(Abs(%s))" % a,    # log du moteur est garde-fou domaine
+    "exp":     lambda a: "exp(%s)" % a,
+    "sin":     lambda a: "sin(%s)" % a,
+    "cos":     lambda a: "cos(%s)" % a,
+    "tan":     lambda a: "tan(%s)" % a,
+    "tanh":    lambda a: "tanh(%s)" % a,
+    "step":    lambda a: "Heaviside(%s)" % a,
+    "is_even": lambda a: "(1 - Mod(floor(%s), 2))" % a,
+}
+_SYMPY_BINARY = {
+    "+":    lambda a, b: "((%s) + (%s))" % (a, b),
+    "-":    lambda a, b: "((%s) - (%s))" % (a, b),
+    "*":    lambda a, b: "((%s) * (%s))" % (a, b),
+    "/":    lambda a, b: "((%s) / (%s))" % (a, b),
+    "pow":  lambda a, b: "((%s)**(%s))" % (a, b),
+    "max2": lambda a, b: "Max((%s), (%s))" % (a, b),
+    "min2": lambda a, b: "Min((%s), (%s))" % (a, b),
+}
+
+
+def node_to_sympy(node, feature_names=None):
+    """Retourne une chaine SYMPY-parsable pour l'arbre `node`.
+
+    Contrairement a to_string (affichage lisible, non parsable a cause de ²/³),
+    cette forme se relit avec sympy.sympify() et s'evalue numeriquement a
+    l'identique de predict(). `feature_names` mappe X[i] -> nom de colonne.
+    Leve ValueError sur un operateur non reconnu (jamais un fallback silencieux
+    qui produirait une fonction indefinie comme cube(x) au lieu de x**3).
+    """
+    if node is None:
+        return "0"
+    if node.left is None and node.right is None:
+        v = node.value
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            return "%.12g" % float(v)
+        # numpy scalars : np.float64 herite de float, mais pas np.int64 de int
+        try:
+            import numpy as _np
+            if isinstance(v, (_np.integer, _np.floating)):
+                return "%.12g" % float(v)
+        except Exception:
+            pass
+        s = str(v)
+        if s.startswith("X[") and s.endswith("]"):
+            try:
+                i = int(s[2:-1])
+            except ValueError:
+                return s
+            if feature_names and i < len(feature_names):
+                return feature_names[i]
+            return "X%d" % i
+        return s
+    op = node.value
+    if node.right is None:
+        a = node_to_sympy(node.left, feature_names)
+        f = _SYMPY_UNARY.get(op)
+        if f is None:
+            raise ValueError("node_to_sympy: unmapped unary operator %r" % op)
+        return f(a)
+    a = node_to_sympy(node.left, feature_names)
+    b = node_to_sympy(node.right, feature_names)
+    f = _SYMPY_BINARY.get(op)
+    if f is None:
+        raise ValueError("node_to_sympy: unmapped binary operator %r" % op)
+    return f(a, b)
+
+
 # ============================================================
 # MÉTRIQUES
 # ============================================================
