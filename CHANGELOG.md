@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.6.1
+
+### Fixed
+- **`sympy()` now returns a sympy-parsable string.** It previously returned the
+  human-readable display form, where `sq` renders as `²` and `cube` as `³`,
+  which `sympy.sympify()` cannot parse — so on a majority of fitted models the
+  method that promises sympy handed back a string sympy rejected. Operators are
+  now mapped explicitly (`sq`→`**2`, `cube`→`**3`, `max2`→`Max`, `min2`→`Min`,
+  `step`→`Heaviside`, `is_even`→`Mod`, with domain-guarded `sqrt`/`log`), and an
+  unmapped operator raises instead of silently producing an undefined function.
+  The returned string is numerically equivalent to `predict()` (checked to
+  ~1e-10). Conversion is centralized in `core.node_to_sympy`.
+
+### Added
+- **`pretty()`** returns the previous human-readable form (with `²` and `³`),
+  for display. Use `sympy()` for a parsable string.
+
 ## 0.6.0 — "Bench"
 
 ### Added
