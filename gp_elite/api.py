@@ -234,7 +234,11 @@ def symbolic_regression(
     normalize : 'auto' | 'divmax' | 'minmax' | 'standard'
                 'auto' = shift-free si toutes les features sont positives
     generations : nombre de générations
-    speed : 'ultrafast' | 'fast' | 'normal'  — taille population / îles
+    speed : 'ultrafast' | 'fast' | 'thorough' | 'normal'
+        Taille de population et nombre d'îles. 'fast' (défaut) pour explorer
+        rapidement ; 'thorough' pour CHERCHER UNE LOI : population 400, 4 îles,
+        et generations=200 par défaut — nettement plus lent, mais c'est le
+        régime où la récupération exacte devient possible.
     parallel : True force le multi-processus, False le désactive,
                None = auto (≥4 cœurs)
     validation_split : fraction hold-out (0.0 = pas de validation)
@@ -307,9 +311,10 @@ def symbolic_regression(
 
     fast = (speed == "fast")
     ultrafast = (speed == "ultrafast")
+    thorough = (speed == "thorough")
 
     cfg = core.make_cfg_nd(n_features=n_feat, x_min=-2.0, x_max=2.0,
-                           fast=fast, ultrafast=ultrafast, use_seeding=False,
+                           fast=fast, ultrafast=ultrafast, thorough=thorough, use_seeding=False,
                            use_lib=True, use_cograph=True, use_seqmem=True)
     cfg.GENERATIONS = int(generations)
     # [v0.4] Recherche contrainte par les dimensions (opt-in).

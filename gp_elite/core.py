@@ -7864,6 +7864,7 @@ def make_cfg_nd(n_features: int,
                 x_max: float = 3.0,
                 fast: bool = False,
                 ultrafast: bool = False,
+                thorough: bool = False,
                 use_seeding: bool = False,
                 use_lib: bool = True,
                 use_cograph: bool = True,
@@ -7881,7 +7882,7 @@ def make_cfg_nd(n_features: int,
         best, X, y = evolve(ND_PROBLEMS["ND1"][1], cfg, problem_key="ND1")
     """
     cfg = make_cfg(x_min=x_min, x_max=x_max,
-                   fast=fast, ultrafast=ultrafast,
+                   fast=fast, ultrafast=ultrafast, thorough=thorough,
                    use_seeding=use_seeding,
                    use_lib=use_lib, use_cograph=use_cograph,
                    use_seqmem=use_seqmem)
@@ -7913,6 +7914,7 @@ _EXTRA_SEEDS: Dict[str, list] = {
 def make_cfg(x_min: float, x_max: float,
              fast: bool = False,
              ultrafast: bool = False,
+                thorough: bool = False,
              use_seeding: bool = True,
              use_lib: bool = True, use_cograph: bool = True,
              use_seqmem: bool = True) -> Config:
@@ -7924,8 +7926,15 @@ def make_cfg(x_min: float, x_max: float,
     """
     if ultrafast:
         pop, gen, islands = 150, 100, 2
+    elif thorough:
+        # [MESURE] pop=400 bat 300 et 800 a budget egal (15 comparaisons
+        # appariees gagnees sur 18, 3 equations). Mode destine a la DECOUVERTE
+        # de lois : budget eleve, plus lent, recuperation exacte accessible.
+        pop, gen, islands = 400, 400, 4
     elif fast:
-        pop, gen, islands = 300, 200, 3
+        # [MESURE] 300 -> 400 : meilleur a budget egal, sans surcout de temps
+        # (le temps suit le produit pop x generations, pas la population seule).
+        pop, gen, islands = 400, 200, 3
     else:
         pop, gen, islands = 600, 400, 4
 

@@ -6,7 +6,7 @@ SRBench, whose harness expects a scikit-learn regressor exposing the discovered
 equation.
 
     from gp_elite import GPEliteRegressor
-    est = GPEliteRegressor(operators="physical", generations=40).fit(X, y)
+    est = GPEliteRegressor(operators="physical", generations=None).fit(X, y)
     est.predict(X_new)
     est.sympy()          # the equation as a string
 
@@ -43,12 +43,13 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
     """
 
     def __init__(self, operators="physical", normalize="auto",
-                 generations=40, speed="fast", validation_split=0.20,
+                 generations=None, speed="fast", validation_split=0.20,
                  restarts=1, robust=False, parallel=None, random_state=0,
                  units=None, target_units=None, unknown_constant=False):
         # store-only: no logic here (sklearn requirement)
         self.operators = operators
         self.normalize = normalize
+        # None = choisi selon `speed` au moment du fit (voir _resolve_generations).
         self.generations = generations
         self.speed = speed
         self.validation_split = validation_split
@@ -78,6 +79,20 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
             pass
         return tags
 
+    _GENS_BY_SPEED = {"ultrafast": 30, "fast": 40, "normal": 60, "thorough": 200}
+
+    def _resolve_generations(self):
+        """generations=None -> valeur adaptee au preset `speed`.
+
+        'thorough' vise la DECOUVERTE de lois : 200 generations contre 40 en
+        mode rapide. Mesure sur Feynman II.11.3 : a 40 generations la loi
+        exacte n'est jamais retrouvee ; a 200 elle l'est sur 1 seed sur 3.
+        Un entier explicite l'emporte toujours.
+        """
+        if self.generations is not None:
+            return int(self.generations)
+        return self._GENS_BY_SPEED.get(self.speed, 40)
+
     def fit(self, X, y):
         if validate_data is not None:
             X, y = validate_data(self, X, y, y_numeric=True,
@@ -98,7 +113,7 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         self.model_ = symbolic_regression(
             X, y, feature_names=names,
             operators=self.operators, normalize=self.normalize,
-            generations=self.generations, speed=self.speed,
+            generations=self._resolve_generations(), speed=self.speed,
             validation_split=self.validation_split, restarts=self.restarts,
             robust=self.robust, parallel=self.parallel,
             units=self.units, target_units=self.target_units,
