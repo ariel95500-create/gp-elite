@@ -9,7 +9,7 @@ description = "Régression symbolique par programmation génétique — lois int
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "Sabri Hakou" }]
+authors = [{name = "Sabri Hakou", email = "ariel95500@gmail.com"}]
 keywords = [
     "symbolic-regression", "genetic-programming", "machine-learning",
     "interpretable-ml", "equation-discovery", "scientific-computing",
