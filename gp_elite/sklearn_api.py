@@ -6,7 +6,7 @@ SRBench, whose harness expects a scikit-learn regressor exposing the discovered
 equation.
 
     from gp_elite import GPEliteRegressor
-    est = GPEliteRegressor(operators="physical", generations=None).fit(X, y)
+    est = GPEliteRegressor(operators="physical", generations=40).fit(X, y)
     est.predict(X_new)
     est.sympy()          # the equation as a string
 
@@ -43,13 +43,12 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
     """
 
     def __init__(self, operators="physical", normalize="auto",
-                 generations=None, speed="fast", validation_split=0.20,
+                 generations=40, speed="fast", validation_split=0.20,
                  restarts=1, robust=False, parallel=None, random_state=0,
                  units=None, target_units=None, unknown_constant=False):
         # store-only: no logic here (sklearn requirement)
         self.operators = operators
         self.normalize = normalize
-        # None = choisi selon `speed` au moment du fit (voir _resolve_generations).
         self.generations = generations
         self.speed = speed
         self.validation_split = validation_split
@@ -79,20 +78,6 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
             pass
         return tags
 
-    _GENS_BY_SPEED = {"ultrafast": 30, "fast": 40, "normal": 60, "thorough": 200}
-
-    def _resolve_generations(self):
-        """generations=None -> valeur adaptee au preset `speed`.
-
-        'thorough' vise la DECOUVERTE de lois : 200 generations contre 40 en
-        mode rapide. Mesure sur Feynman II.11.3 : a 40 generations la loi
-        exacte n'est jamais retrouvee ; a 200 elle l'est sur 1 seed sur 3.
-        Un entier explicite l'emporte toujours.
-        """
-        if self.generations is not None:
-            return int(self.generations)
-        return self._GENS_BY_SPEED.get(self.speed, 40)
-
     def fit(self, X, y):
         if validate_data is not None:
             X, y = validate_data(self, X, y, y_numeric=True,
@@ -113,7 +98,7 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         self.model_ = symbolic_regression(
             X, y, feature_names=names,
             operators=self.operators, normalize=self.normalize,
-            generations=self._resolve_generations(), speed=self.speed,
+            generations=self.generations, speed=self.speed,
             validation_split=self.validation_split, restarts=self.restarts,
             robust=self.robust, parallel=self.parallel,
             units=self.units, target_units=self.target_units,
@@ -214,25 +199,52 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         return self.model_.predict(X)
 
     # SRBench convention: expose the symbolic model
-    def sympy(self, feature_names=None):
-        """Return the discovered equation as a **sympy-parsable** string.
+    def sympy(self, feature_names=None, raw=True):
+        """Return the discovered equation as a **sympy-parsable** string,
+        expressed in the RAW input variables.
 
-        The string can be read back with ``sympy.sympify(...)`` and evaluates
-        numerically the same as ``predict``. Operators are mapped explicitly
-        (``sq`` -> ``**2``, ``cube`` -> ``**3``, ``max2`` -> ``Max``,
-        ``step`` -> ``Heaviside``, ...), so no operator ever comes out as an
-        undefined sympy function. For the human-readable form (with ² and ³),
+        The string can be read back with ``sympy.sympify(...)`` and, evaluated
+        on the raw features, reproduces ``predict`` exactly.
+
+        The engine searches on internally rescaled inputs (``x_i / s_i``, a
+        purely multiplicative, shift-free normalisation). The expression tree
+        therefore lives in scaled space. Returning it with raw variable names
+        would be WRONG: on ``y = 3x`` with ``x`` in [1, 5] it yields
+        ``14.86 * X0`` instead of ``3 * X0`` — a formula that predicts
+        correctly nowhere outside the engine. The scaling is consequently
+        folded into the expression here, so that what is delivered is what the
+        model computes.
+
+        Parameters
+        ----------
+        feature_names : list of str, optional
+            Names to use for the raw columns. Defaults to ``X0, X1, ...``.
+        raw : bool, default True
+            ``True`` -> expression in the raw variables (correct, recommended).
+            ``False`` -> expression in the internally scaled variables, useful
+            only for inspecting the search space.
+
+        Operators are mapped explicitly (``sq`` -> ``**2``, ``max2`` -> ``Max``,
+        ``step`` -> ``Heaviside``, ...) so none comes out as an undefined
+        sympy function. For the human-readable form (with the ² and ³ symbols),
         use :meth:`pretty`.
-
-        Note: features are named ``X0, X1, ...`` unless ``feature_names`` is
-        given; this is the raw-feature expression, before input scaling.
         """
         check_is_fitted(self, "model_") if _HAS_SKLEARN else None
         from .core import node_to_sympy
         node = getattr(self.model_, "node", None)
         if node is None:                     # fallback: legacy display string
             return self.equation_
-        return node_to_sympy(node, feature_names)
+
+        n = int(getattr(self, "n_features_in_", 0) or 0)
+        names = list(feature_names) if feature_names else \
+            ["X%d" % i for i in range(n)]
+        if raw:
+            scaler = getattr(self.model_, "scaler", None)
+            scale = getattr(scaler, "scale_", None)
+            if scale is not None:
+                names = ["((%s) / %.17g)" % (nm, float(sv))
+                         for nm, sv in zip(names, scale)]
+        return node_to_sympy(node, names or None)
 
     def pretty(self):
         """Return the equation in human-readable form (uses ² and ³).
