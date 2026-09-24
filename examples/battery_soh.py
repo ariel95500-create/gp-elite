@@ -28,17 +28,17 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 from gp_elite import symbolic_regression
-import gp_elite.core as core
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CSV = os.path.join(HERE, "nasa_battery_simulation.csv")
 
 
 def fit_gp(Xtr, ytr, feat, seed=0):  # seed fixed for reproducibility
-    """Fit GP_ELITE and return (result, scaler) so test data uses the same scale."""
+    """Fit GP_ELITE. result.predict() takes RAW features: the internal scaling
+    learned at fit time is applied automatically. (An earlier version of this
+    example also scaled the test data itself, so predictions were computed on
+    doubly-scaled inputs and the reported R2 was wrong.)"""
     import random
-    scaler, _ = core._choose_scaler(Xtr, "auto", (-2.0, 2.0))
-    scaler.fit_transform(Xtr)
     random.seed(seed); np.random.seed(seed)
     res = symbolic_regression(
         Xtr, ytr, feature_names=feat,
@@ -46,7 +46,7 @@ def fit_gp(Xtr, ytr, feat, seed=0):  # seed fixed for reproducibility
         generations=60, speed="fast", validation_split=0.0, seed=seed,
         parallel=False,  # deterministic + reproducible for this demo
     )
-    return res, scaler
+    return res
 
 
 def main():
@@ -55,7 +55,7 @@ def main():
     X = df[feat].values
     y = df["capacity_SOH"].values
     n = len(y)
-    print(f"NASA battery data: {n} sequential cycles, target SOH in "
+    print(f"Battery data (SIMULATED, see README): {n} sequential cycles, target SOH in "
           f"[{y.min():.3f}, {y.max():.3f}]\n")
 
     # Optional black-box baselines (skip gracefully if not installed)
@@ -73,8 +73,8 @@ def main():
     print("=" * 62)
     print("PROTOCOL 1 — random split (INTERPOLATION, leaks info)")
     print("=" * 62)
-    res, scaler = fit_gp(Xtr, ytr, feat)
-    print(f"  GP_ELITE   R² = {r2_score(yte, res.predict(scaler.transform(Xte))):+.3f}")
+    res = fit_gp(Xtr, ytr, feat)
+    print(f"  GP_ELITE   R² = {r2_score(yte, res.predict(Xte)):+.3f}")
     if have_bb:
         m = xgb.XGBRegressor(n_estimators=300, max_depth=4, learning_rate=0.05,
                              random_state=42).fit(Xtr, ytr)
@@ -89,8 +89,8 @@ def main():
     print(f"PROTOCOL 2 — forward split (EXTRAPOLATION, the real task)")
     print(f"  train on cycles 1..{cut}, predict {cut+1}..{n} (never seen)")
     print("=" * 62)
-    res, scaler = fit_gp(Xtr, ytr, feat)
-    r2_gp = r2_score(yte, res.predict(scaler.transform(Xte)))
+    res = fit_gp(Xtr, ytr, feat)
+    r2_gp = r2_score(yte, res.predict(Xte))
     if have_bb:
         m = xgb.XGBRegressor(n_estimators=300, max_depth=4, learning_rate=0.05,
                              random_state=42).fit(Xtr, ytr)

@@ -165,6 +165,11 @@ def bilan(out="feyn_results.jsonl"):
     c = collections.Counter(r["status"] for r in rows)
     print("-" * 65)
     print(f"{'TOTAL':<20}{c['EXACT']:>8}{c['NEAR']:>8}{c['MISS']:>8}{len(rows):>8}")
+    cf = collections.Counter(r.get("status_front", r["status"]) for r in rows)
+    print(f"\nModele rendu (champion)      : {c['EXACT']}/{len(rows)} exacts, "
+          f"{c['EXACT'] + c['NEAR']}/{len(rows)} a moins de 1e-3")
+    print(f"Loi presente dans le front   : {cf['EXACT']}/{len(rows)} exacts "
+          f"(meilleur point du front, choisi sur le test : metrique secondaire)")
     print(f"\nExact = récupération symbolique (1−R² < 1e-9). Une famille où")
     print("MISS domine est un point dur identifié, donc une piste de travail.")
     manques = [r["name"] for r in rows if r["status"] == "MISS"]
@@ -196,13 +201,19 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
             pe = e.predict(X[te])
             v1 = float(np.mean((pe-y[te])**2)/v)
             if v1 < pb: pb, pb_size = v1, e.size
-        status = "EXACT" if pb < 1e-9 else ("NEAR" if pb < 1e-3 else "MISS")
+        # [v0.7] Le STATUT juge le modele RENDU (le champion), comme le recoit
+        # l'utilisateur. Le meilleur point du front, choisi en regardant le
+        # test, n'est qu'une metrique SEPAREE : « la loi figure dans le front
+        # rendu ». Auparavant le statut reposait sur ce second chiffre, ce qui
+        # surestimait ce qu'obtient un utilisateur par defaut.
+        def _st(e): return "EXACT" if e < 1e-9 else ("NEAR" if e < 1e-3 else "MISS")
+        status = _st(one_minus_r2)
         rec = dict(name=name, formula=formula, nv=nv, famille=_fam(p),
-                   status=status,
+                   status=status, status_front=_st(pb),
                    one_minus_r2=one_minus_r2, pareto_best=pb, pb_size=pb_size,
                    time=round(dt,1), size=r.size, expr=r.expression[:90])
         with open(out, "a") as fh: fh.write(json.dumps(rec)+"\n")
-        print(f"  {name:<10} {status:<6} champ={one_minus_r2:.1e} pareto={pb:.1e}"
+        print(f"  {name:<10} {status:<6} champ={one_minus_r2:.1e} front={pb:.1e}"
               f"  ({dt:.0f}s)  {formula}")
         sys.stdout.flush()
 
