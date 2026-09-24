@@ -404,7 +404,15 @@ def _strip_linear_scaling(node):
 
 
 def is_typed_valid(tree, feat_dims, target_dim, unknown_constant=False):
-    """Cheap backstop gate: use in fitness() to reject trees from any path.
+    """Porte de validite. STRICTEMENT alignee sur dimensions.check_dimensions.
+
+    Une tolerance avait ete introduite ici pour accepter l'enrobage `a + b*f`
+    produit par wrap_linear_scaling. Elle creait une DIVERGENCE avec
+    l'auditeur : `1 + 2*x` avec x en metres etait REJETE par l'auditeur et
+    ACCEPTE par la porte, ce qui vidait de sa substance la promesse d'une
+    seule source de verite. Depuis que le scaling est multiplicatif seul sous
+    units= (_LS_SCALE_ONLY, v0.4.1), l'enrobage additif n'apparait plus : la
+    tolerance est retiree et les deux verdicts coincident a nouveau.
 
     [v0.5] Si unknown_constant, le critere devient la COHERENCE INTERNE seule :
     l'arbre doit avoir une dimension bien definie, pas necessairement egale a
@@ -415,33 +423,12 @@ def is_typed_valid(tree, feat_dims, target_dim, unknown_constant=False):
         try:
             _infer(tree, fd)
             return True
-        except _DimError:
-            pass
-        except Exception:
-            return False
-        inner = _strip_linear_scaling(tree)
-        if inner is tree:
-            return False
-        try:
-            _infer(inner, fd)
-            return True
         except Exception:
             return False
     try:
-        if _eq(_infer(tree, fd), target_dim):
-            return True
-    except _DimError:
-        pass
-    inner = _strip_linear_scaling(tree)
-    if inner is tree:
-        return False
-    try:
-        return _eq(_infer(inner, fd), target_dim)
+        return _eq(_infer(tree, fd), target_dim)
     except _DimError:
         return False
-
-
-# ── normalisation de l'argument utilisateur `units=` ────────────────────────
 
 def normalize_units_arg(units, target_units, n_features, feature_names=None):
     """Convertit l'argument utilisateur en (FEAT_DIMS, TARGET_DIM).
@@ -510,11 +497,17 @@ _DERIVED = {
 
 
 def parse_unit_string(s):
-    """'m/s' -> {'m':1,'s':-1} ; 'kg*m/s^2' -> {'kg':1,'m':1,'s':-2} ; 'J' -> ...
+    """'m/s' -> {'m':1,'s':-1} ; 'kg*m/s^2' -> ... ; 'J' -> {kg,m^2,s^-2}
 
-    Reconnait les unites de base SI, les unites derivees usuelles, et les
-    operateurs * / ^ ( ). Un jeton inconnu devient sa propre dimension de base
-    (comme dimensions.unit), donc 'widget' -> {'widget': 1}.
+    Reconnait les unites SI de base, les unites derivees usuelles, et les
+    operateurs * / ^ ( ).
+
+    [CORRECTIF] Validation STRICTE de la chaine. La version precedente
+    acceptait silencieusement des entrees mal formees : 'm garbage' -> {'m':1},
+    'm/(s' -> {'m':1,'s':-1}, 'kg**m' -> {'kg':1,'*':1}, '@@@' -> {}. Une unite
+    mal saisie produisait alors une contrainte dimensionnelle fausse SANS
+    aucun avertissement, ce qui est pire que pas de contrainte du tout.
+    Toute chaine invalide leve desormais ValueError.
     """
     import re
     from .dimensions import _mul, _inv, _pow, unit as _unit
@@ -522,7 +515,34 @@ def parse_unit_string(s):
     txt = str(s).strip()
     if txt in ("", "1", "-", "none", "dimensionless"):
         return {}
+
+    # 1) aucun caractere etranger
+    if re.search(r"[^A-Za-z0-9_.\*/^()+\-\s]", txt):
+        raise ValueError("unite invalide %r : caractere non autorise" % s)
     toks = re.findall(r"[A-Za-z_]+|-?\d+(?:\.\d+)?|[*/^()]", txt)
+    if "".join(toks) != re.sub(r"\s+", "", txt):
+        raise ValueError("unite invalide %r : jeton non reconnu" % s)
+    if toks.count("(") != toks.count(")"):
+        raise ValueError("unite invalide %r : parentheses desequilibrees" % s)
+
+    # 2) grammaire : deux unites accolees, ou deux operateurs de suite,
+    #    ou un operateur en fin de chaine, sont des erreurs
+    def kind(t):
+        if t in "*/^": return "op"
+        if t in "()":  return t
+        return "num" if re.fullmatch(r"-?\d+(?:\.\d+)?", t) else "sym"
+    prev = None
+    for t in toks:
+        k = kind(t)
+        if prev in ("sym", "num", ")") and k in ("sym", "num", "("):
+            raise ValueError("unite invalide %r : operateur manquant entre "
+                             "%r et %r" % (s, prev_tok, t))
+        if prev == "op" and k == "op":
+            raise ValueError("unite invalide %r : deux operateurs consecutifs" % s)
+        prev, prev_tok = k, t
+    if prev == "op":
+        raise ValueError("unite invalide %r : se termine par un operateur" % s)
+
     pos = [0]
 
     def peek():
@@ -544,7 +564,10 @@ def parse_unit_string(s):
             pos[0] += 1
             e = peek()
             pos[0] += 1
-            d = _pow(d, float(e))
+            try:
+                d = _pow(d, float(e))
+            except (TypeError, ValueError):
+                raise ValueError("unite invalide %r : exposant illisible" % s)
         return d
 
     def expr():
@@ -556,4 +579,8 @@ def parse_unit_string(s):
             d = _mul(d, r) if op == "*" else _mul(d, _inv(r))
         return d
 
-    return expr()
+    out = expr()
+    if pos[0] != len(toks):
+        raise ValueError("unite invalide %r : fin de chaine inattendue" % s)
+    return out
+

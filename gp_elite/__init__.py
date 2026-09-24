@@ -32,6 +32,16 @@ from .dimensions import check_dimensions, audit_pareto, unit
 from .sklearn_api import GPEliteRegressor
 from . import core
 
-__version__ = "0.6.1"
+# [CORRECTIF] La chaine etait saisie a la main et a derive de pyproject.toml
+# (elle annoncait "0.6.0" dans le paquet publie en 0.6.1). On la lit desormais
+# dans les metadonnees d'installation : une seule source de verite.
+try:
+    from importlib.metadata import version as _pkg_version, PackageNotFoundError
+    try:
+        __version__ = _pkg_version("gp-elite")
+    except PackageNotFoundError:          # execute depuis les sources
+        __version__ = "0.6.2"
+except ImportError:                        # Python < 3.8
+    __version__ = "0.6.2"
 
 __all__ = ["symbolic_regression", "SRResult", "ParetoEntry", "stability_analysis", "audit_pareto", "check_dimensions", "unit", "GPEliteRegressor", "core", "__version__"]
