@@ -72,6 +72,8 @@ class SRResult:
     Attributs
     ---------
     expression       : str   — la formule trouvée (noms de colonnes si fournis)
+    time_limit_reached : bool — l'échéance `time_limit` a interrompu la recherche
+    restarts_completed : int  — redémarrages effectivement lancés
     r2_validation    : float — R² sur le hold-out (None si validation désactivée)
     mse_validation   : float — MSE sur le hold-out
     mse_train        : float — MSE sur l'entraînement
@@ -91,6 +93,11 @@ class SRResult:
     node: "core.Node"
     scaler: object = None   # [FIX] scaler interne pour dénormaliser dans predict
     pareto: Optional[list] = None   # [v27] front de Pareto (liste de ParetoEntry)
+    # [v0.7-TIME] Diagnostic du budget de temps : vrai si l'echeance a
+    # interrompu au moins une evolution ; nombre de redemarrages effectivement
+    # lances (peut etre inferieur a `restarts` si le temps est epuise).
+    time_limit_reached: bool = False
+    restarts_completed: int = 1
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Prédit sur des features BRUTES (mêmes unités que le X passé au fit).
@@ -221,6 +228,7 @@ def symbolic_regression(
     extrapolate_feature=None,
     extrapolate_direction: str = "both",
     restarts: int = 1,
+    time_limit: Optional[float] = None,
     verbose: bool = False,
 ) -> SRResult:
     """Trouve une expression symbolique reliant X à y.
@@ -251,6 +259,16 @@ def symbolic_regression(
                   features. Désigner un axe implique extrapolate=True.
     extrapolate_direction : 'both' (deux bords) | 'high' (valeurs hautes, cas
                   prévision/forecasting) | 'low' (valeurs basses).
+    time_limit : budget de temps TOTAL en secondes (None = pas de limite).
+                  La recherche s'arrête proprement à l'échéance et rend le
+                  meilleur modèle trouvé — au lieu d'être interrompue sans
+                  résultat par un minuteur externe. Le temps restant est
+                  partagé équitablement entre les redémarrages non encore
+                  lancés ; un redémarrage qui converge tôt libère son temps
+                  pour les suivants. La première génération s'exécute
+                  toujours, pour garantir un modèle. Précision : environ une
+                  génération au-delà de l'échéance, plus la sélection finale
+                  (typiquement < 1 % du temps total).
     restarts : nombre d'évolutions indépendantes (seeds espacés). Les archives
                   de candidats de TOUS les runs sont fusionnées — le hold-out
                   étant déterministe et identique entre runs, leurs MSE de
@@ -406,6 +424,16 @@ def symbolic_regression(
     sink = contextlib.nullcontext() if verbose else contextlib.redirect_stdout(io.StringIO())
     n_restarts = max(1, int(restarts))
     _base_seed = seed if seed is not None else 0
+    # [v0.7-TIME] Echeance globale ; partagee ensuite entre redemarrages.
+    import time as _time
+    if time_limit is not None:
+        time_limit = float(time_limit)
+        if not (time_limit > 0 and np.isfinite(time_limit)):
+            raise ValueError("time_limit must be a positive number of seconds "
+                             "(got %r)" % (time_limit,))
+    _hard_deadline = (_time.time() + time_limit) if time_limit is not None else None
+    _time_hit = False
+    _restarts_done = 0
     # [v29-REPRO] Avertissement unique : sans PYTHONHASHSEED figé, deux
     # invocations distinctes de Python peuvent produire des champions
     # différents à seed égal (hachage str aléatoire de CPython).
@@ -425,6 +453,15 @@ def symbolic_regression(
         merged = {}             # expr_str -> (mse, se, size, node)  (dédup)
         X_full = y_full = None
         for k in range(n_restarts):
+            if _hard_deadline is not None:
+                _remaining = _hard_deadline - _time.time()
+                if k > 0 and _remaining <= 0:
+                    _time_hit = True
+                    break                      # temps epuise : on garde l'acquis
+                # part egale du temps restant pour ce redemarrage
+                cfg.DEADLINE = _time.time() + max(0.0, _remaining) / (n_restarts - k)
+            else:
+                cfg.DEADLINE = None
             sk = _base_seed + 1000 * k
             random.seed(sk); np.random.seed(sk)
             cfg.SEED = sk
@@ -432,6 +469,8 @@ def symbolic_regression(
                 best, X_full, y_full = core.evolve(
                     _placeholder, cfg, problem_key="GENERIC_CSV",
                     X_override=X_scaled, y_override=y)
+            _restarts_done += 1
+            _time_hit = _time_hit or bool(getattr(core, "_TIME_LIMIT_HIT", False))
             _vm = core._holdout_mse(best, X_full, y_full)
             champions.append((best.copy(), _vm))
             for (m, se, sz, nd) in list(getattr(core, "_VAL_CANDS", [])):
@@ -573,4 +612,6 @@ def symbolic_regression(
         node=best,
         scaler=scaler,   # [FIX] permet à predict de dénormaliser automatiquement
         pareto=pareto_entries or None,   # [v27] front complexité/précision
+        time_limit_reached=bool(_time_hit),
+        restarts_completed=int(_restarts_done),
     )

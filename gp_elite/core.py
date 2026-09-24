@@ -1832,6 +1832,13 @@ class Config:
     # Toute erreur du pool => repli séquentiel automatique et silencieux.
     PARALLEL_ISLANDS: Optional[bool] = None
     PARALLEL_ROUND: int = 0          # 0 = auto : min(10, MIGRATION_INTERVAL)
+    # [v0.7-TIME] Echeance ABSOLUE (time.time()) au-dela de laquelle l'evolution
+    # s'arrete proprement et rend le meilleur modele trouve. None = pas de
+    # limite. Posee par symbolic_regression(time_limit=...) ; verifiee avant
+    # chaque generation (sequentiel), avant chaque ronde (maitre parallele) et
+    # avant chaque generation DANS les processus fils. La premiere generation
+    # s'execute toujours, pour garantir un modele.
+    DEADLINE: Optional[float] = None
 
     # [v19] Déduplication sémantique de population (cf. Operon / PySR)
     USE_SEMANTIC_DEDUP: bool = False # écarte les clones comportementaux ; OFF par default :
@@ -5791,7 +5798,12 @@ def _island_round_task(payload):
     xs, ys = _PW["xs"], _PW["ys"]
     cfg = island.cfg
     best_local = None
+    _deadline = getattr(cfg, "DEADLINE", None)
     for gen in range(gen_start, gen_start + n_gens):
+        # [v0.7-TIME] Echeance atteinte : on rend l'ile en l'etat. Jamais a la
+        # generation 0, pour qu'au moins une generation produise un modele.
+        if _deadline is not None and gen > 0 and time.time() >= _deadline:
+            break
         if gen % 10 == 0:
             _fitness_cache.clear()
         _SIMPLIFY_CACHE.clear()
@@ -5804,10 +5816,77 @@ def _island_round_task(payload):
             best_local = nb
     return (island, best_local, FRAGMENT_LIB, COGRAPH, SEQ_MEM)
 
+# ── [v0.7-PAR] Parallelisme sur pour les scripts sans garde __main__ ──────
+# Les iles paralleles utilisent le demarrage « spawn » (identique sur tous les
+# systemes). Un processus fils spawn RE-EXECUTE le script principal de
+# l'utilisateur. Sans `if __name__ == "__main__":`, chaque fils refait donc
+# tout le calcul avant de servir : mesure sur 800 points, le script est
+# execute 3 fois et le mode parallele met 9,0 s contre 4,6 s en sequentiel.
+# Les exemples du README n'ont pas cette garde : c'est le cas par defaut d'un
+# nouvel utilisateur sur une machine a 4 coeurs ou plus.
+#
+# Detection : pendant la creation du pool, le parent pose GP_ELITE_POOL_CHILD
+# dans l'environnement, que les fils heritent. Un fils qui atteint evolve()
+# pendant son demarrage est forcement en train de re-executer le script : il
+# se termine SANS bruit, le pool du parent se brise, le parent bascule en
+# sequentiel, previent une seule fois, et ne retente plus le parallele.
+_POOL_CHILD_ENV = "GP_ELITE_POOL_CHILD"
+_PARALLEL_BROKEN = False     # vrai apres un pool brise : plus de tentative
+_PARALLEL_WARNED = False
+
+
+def _exit_if_reimported_by_worker():
+    """Termine un fils gp-elite qui est en train de RE-EXECUTER le script.
+
+    Attention : pendant cette phase, multiprocessing.parent_process() n'est
+    PAS encore renseigne (il ne l'est qu'au demarrage du travailleur, apres
+    la re-execution). Les indicateurs fiables sont ceux qu'utilise
+    multiprocessing lui-meme pour detecter la phase d'amorcage :
+    l'attribut `_inheriting` du processus courant, et le nom `__mp_main__`
+    donne au module principal re-importe. La variable d'environnement
+    restreint la detection aux fils crees par gp-elite.
+    """
+    if os.environ.get(_POOL_CHILD_ENV) != "1":
+        return
+    try:
+        import multiprocessing as _mp
+        bootstrapping = bool(getattr(_mp.current_process(), "_inheriting", False))
+    except Exception:
+        bootstrapping = False
+    main_mod = sys.modules.get("__main__")
+    if bootstrapping or getattr(main_mod, "__name__", "") == "__mp_main__":
+        sys.exit(0)          # silencieux : le parent gere le repli
+
+
+def _warn_unguarded_main(err):
+    """Avertissement unique, sur stderr (non capture par le mode silencieux)."""
+    global _PARALLEL_WARNED
+    if _PARALLEL_WARNED:
+        return
+    _PARALLEL_WARNED = True
+    import warnings
+    main_file = getattr(sys.modules.get("__main__"), "__file__", None)
+    if main_file:
+        msg = ("gp-elite: parallel islands could not start, most likely "
+               "because the script %r is not protected by "
+               "`if __name__ == \"__main__\":` (required by multiprocessing). "
+               "Continuing SEQUENTIALLY: results are identical, only slower. "
+               "Wrap your top-level code in that guard to use several cores, "
+               "or pass parallel=False to silence this message."
+               % os.path.basename(main_file))
+    else:
+        msg = ("gp-elite: parallel islands could not start (%s); continuing "
+               "sequentially. Pass parallel=False to silence this message."
+               % type(err).__name__)
+    warnings.warn(msg, RuntimeWarning, stacklevel=3)
+
+
 def _parallel_enabled(cfg) -> bool:
     """AUTO : parallèle si ≥4 cœurs et ≥2 îles ; True force ; False bloque."""
     flag = getattr(cfg, "PARALLEL_ISLANDS", None)
     if flag is False or cfg.N_ISLANDS < 2:
+        return False
+    if _PARALLEL_BROKEN:          # [v0.7-PAR] deja echoue dans ce processus
         return False
     if flag is True:
         return True
@@ -5864,7 +5943,10 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
     # déjà démarré). Combiné aux seeds par (île, round) déjà deterministics et
     # à la collecte ORDONNÉE des résultats, le mode parallèle devient
     # reproductible : même seed → même champion.
+    _prev_hash = _os.environ.get("PYTHONHASHSEED")
+    _prev_child = _os.environ.get(_POOL_CHILD_ENV)
     _os.environ["PYTHONHASHSEED"] = "0"
+    _os.environ[_POOL_CHILD_ENV] = "1"      # [v0.7-PAR] herite par les fils
 
     try:
         with _cf.ProcessPoolExecutor(
@@ -5875,7 +5957,15 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                           _gencsv, _BATTERY_CSV_MODE,
                           _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST)) as ex:
             gen = 0
+            _deadline = getattr(cfg, "DEADLINE", None)
             while gen < cfg.GENERATIONS:
+                # [v0.7-TIME] Echeance atteinte : pas de nouvelle ronde.
+                if _deadline is not None and gen > 0 and time.time() >= _deadline:
+                    TRACE.set("time_limit", "atteint (parallele, gen %d)" % gen)
+                    globals()["_TIME_LIMIT_HIT"] = True
+                    print(f"[TIME] Time limit reached at generation {gen} — "
+                          f"returning the best model so far.")
+                    break
                 # Round aligné sur les frontières de migration
                 nxt_mig = ((gen // cfg.MIGRATION_INTERVAL) + 1) * cfg.MIGRATION_INTERVAL
                 n_gens  = min(round_len, cfg.GENERATIONS - gen, max(1, nxt_mig - gen))
@@ -5966,7 +6056,21 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
     except Exception as _par_err:
         print(f"[v20-PAR] ⚠ Parallel unavailable ({type(_par_err).__name__}: "
               f"{_par_err}) — automatic sequential fallback.")
+        # [v0.7-PAR] Un pool BRISE (fils termines) ne se reparera pas au
+        # prochain appel : on cesse d'essayer dans ce processus, et on dit
+        # pourquoi, une fois, sur stderr.
+        if type(_par_err).__name__ == "BrokenProcessPool":
+            globals()["_PARALLEL_BROKEN"] = True
+            _warn_unguarded_main(_par_err)
         return global_best, global_score, False
+    finally:
+        # [v0.7-PAR] Ne laisser aucune trace dans l'environnement de
+        # l'utilisateur (ses propres sous-processus en heriteraient).
+        for _k, _v in (("PYTHONHASHSEED", _prev_hash), (_POOL_CHILD_ENV, _prev_child)):
+            if _v is None:
+                _os.environ.pop(_k, None)
+            else:
+                _os.environ[_k] = _v
 
 
 # ════════════════════════════════════════════════════════════════
@@ -5979,6 +6083,8 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
 # suivi séparé du meilleur individu EN VALIDATION, early-stopping et
 # sélection finale sur la validation, rapport de généralisation.
 
+_TIME_LIMIT_HIT = False  # [v0.7-TIME] vrai si le dernier evolve() a ete
+                         # interrompu par l'echeance cfg.DEADLINE
 _VAL_XS = None          # hold-out features  (None = validation désactivée)
 _VAL_YS = None          # hold-out cible
 _VAL_TRAIN_XS = None    # [v23.1] train features (test de stabilité numérique)
@@ -6341,6 +6447,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     global _fitness_cache, _PARAMETRIC_CACHE
     global PROBE_X, CURRENT_RESIDUAL_SIG     # [v17]
     global _USE_LINEAR_SCALING               # [v18-LS]
+    _exit_if_reimported_by_worker()          # [v0.7-PAR]
     _USE_LINEAR_SCALING = bool(getattr(cfg, "USE_LINEAR_SCALING", True))
     # [v0.4.1] Les drapeaux dimensionnels sont des GLOBALES de module. Sans
     # remise a zero ici, un fit avec units= contaminait tous les fits suivants
@@ -6372,6 +6479,10 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     if not os.path.isabs(cfg.LOG_CSV):
         cfg = copy.copy(cfg)
         cfg.LOG_CSV = os.path.join(_script_dir, cfg.LOG_CSV)
+    # [v0.7-TIME] Le drapeau d'arret au temps est un etat GLOBAL : il doit
+    # etre remis a zero a chaque evolve(), sinon il fuit d'un ajustement au
+    # suivant dans un meme processus.
+    globals()["_TIME_LIMIT_HIT"] = False
     # FIX v13.7 : vider les caches entre runs pour éviter les biais
     # inter-problèmes (hash structurel identique, domaine différent).
     _fitness_cache    = {}
@@ -6743,7 +6854,15 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     _plateau_threshold = 40   # générations sans amélioration globale
     _last_global_raw   = float('inf')
 
+    _deadline = getattr(cfg, "DEADLINE", None)
     for gen in range(cfg.GENERATIONS if _seq_needed else 0):
+        # [v0.7-TIME] Echeance atteinte : arret propre, meilleur modele conserve.
+        if _deadline is not None and gen > 0 and time.time() >= _deadline:
+            TRACE.set("time_limit", "atteint (sequentiel, gen %d)" % gen)
+            globals()["_TIME_LIMIT_HIT"] = True
+            print(f"[TIME] Time limit reached at generation {gen} — "
+                  f"returning the best model so far.")
+            break
         # [OPT] Cache fitness vidé toutes les 10 générations (aligné sur gen//10).
         # Entre deux vidages, la clé (hash, role, gen//10) garantit la fraîcheur.
         # Évite de recalculer la fitness d'individus stables entre générations.
@@ -6839,6 +6958,8 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         if gen > 0 and gen % cfg.MIGRATION_INTERVAL == 0:
             migrate(islands)
 
+    if _deadline is not None and time.time() >= _deadline:
+        globals()["_TIME_LIMIT_HIT"] = True
     # Optimisation finale des constantes sur le meilleur
     # [v14.4] Correction du bug de référence : copy.deepcopy() avant Adam+simplify
     # pour garantir que global_best n'est jamais corrompu si des nœuds sont
