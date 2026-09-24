@@ -1,0 +1,69 @@
+# Contributing to GP_ELITE
+
+Thank you for considering a contribution. Bug reports are the most valuable
+contribution of all — especially "it did not find a law on my data": see the
+issue templates, they ask for exactly what is needed to reproduce.
+
+## Development setup
+
+```bash
+git clone https://github.com/ariel95500-create/gp-elite.git
+cd gp-elite
+python -m pip install -e ".[test]"
+```
+
+## Running the tests
+
+```bash
+PYTHONHASHSEED=0 python -m pytest tests/ -q          # Linux / macOS
+set PYTHONHASHSEED=0 && python -m pytest tests/ -q   # Windows
+```
+
+`PYTHONHASHSEED=0` makes results identical across interpreter runs. The same
+suite runs on every push (Linux, Python 3.9–3.14, and Windows).
+
+`tests/test_guarantees.py` pins down defects that once existed unnoticed
+(wrong exported formula, dimensional gate disagreeing with the auditor,
+`operators=` ignored, files written into the install directory...). Each of
+those tests was checked to **fail on the code that had the defect**. A new
+guarantee test is only useful if it fails without the fix — please check that
+too.
+
+## Scripts that use parallel islands
+
+Parallel islands start worker processes with the `spawn` method, which re-runs
+your script's top-level code in every worker. Protect it:
+
+```python
+if __name__ == "__main__":
+    main()
+```
+
+Without the guard, GP_ELITE detects the situation, falls back to sequential
+(same results, one core) and warns once.
+
+## Claims and benchmarks
+
+A number that appears in the README, the release notes or the paper must be
+reproducible from a released version installed with `pip install gp-elite`,
+with the exact command given next to it. In particular:
+
+- judge every method on the model it **returns** — never on the best candidate
+  selected by looking at the test set;
+- report mean, median **and** worst case, and count failures (R² < 0);
+- run one process per measurement: the engine keeps some module-level state,
+  so fits chained in one process are not independent experiments;
+- state the hypothesis and the success criterion **before** running.
+
+## Pull requests
+
+Keep them focused, add a test, and describe what you measured. For anything
+that changes default behaviour, include a before/after comparison on
+`benchmarks/feynman_bench.py`.
+
+## Conduct and contact
+
+Be kind and assume good faith. This project follows the
+[Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/),
+version 2.1. Conduct concerns, security issues or anything you prefer not to
+post publicly: ariel95500@gmail.com.
