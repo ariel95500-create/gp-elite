@@ -44,15 +44,23 @@ def _ops_in(tree, acc):
 # space but labelled with raw variable names: on y = 3x with x in [1, 5] it
 # returned 14.86*X0, off by 58.75 on the raw data.
 
-def _formula_matches_predict(est, Xd):
+def _eval_sympy_string(s, cols):
+    """Evaluate a formula string with sympy on the columns {name: values}."""
     sympy = pytest.importorskip("sympy")
-    expr = sympy.sympify(est.sympy())
+    loc = {k: sympy.Symbol(k) for k in cols}
+    expr = sympy.sympify(s, locals=loc)
     syms = sorted(expr.free_symbols, key=lambda z: z.name)
-    fn = sympy.lambdify(syms, expr, [{"Heaviside": lambda t: np.heaviside(t, 0.5)}, "numpy"])
+    fn = sympy.lambdify(syms, expr, [{"Heaviside": lambda t, h=0.5: np.heaviside(t, h)},
+                                     "numpy"])
+    n = len(next(iter(cols.values())))
+    with np.errstate(all="ignore"):
+        v = np.asarray(fn(*[cols[z.name] for z in syms]), dtype=complex)
+    return v if v.ndim else np.full(n, complex(v))
+
+
+def _formula_matches_predict(est, Xd):
     cols = {"X%d" % i: Xd[:, i] for i in range(Xd.shape[1])}
-    v = np.asarray(fn(*[cols[z.name] for z in syms]), dtype=float)
-    if v.ndim == 0:
-        v = np.full(len(Xd), float(v))
+    v = _eval_sympy_string(est.sympy(), cols)
     return float(np.max(np.abs(v - est.predict(Xd))))
 
 
@@ -69,6 +77,103 @@ def test_exported_formula_equals_predict_on_raw_data(case):
         kw = dict(units=["kg", "m/s"], target_units="J")
     est = GPEliteRegressor(generations=6, random_state=0, parallel=False, **kw).fit(Xd, y)
     assert _formula_matches_predict(est, Xd) < 1e-6
+
+
+# Up to 0.7 only the division-by-max normalisation was folded, and only in
+# sympy(): `expression` stayed in scaled space, and with min-max (the default
+# for ANY column with a non-positive value, hence every SRBench black-box
+# problem, whose inputs are standardised) or z-score the export was off by
+# orders of magnitude (89 on a target of amplitude ~20). The review asked for
+# exactly this property test: divmax, minmax, standard, one and several
+# variables.
+
+from gp_elite import formula as FM                      # noqa: E402
+from sklearn.preprocessing import MinMaxScaler, StandardScaler   # noqa: E402
+
+_SCALERS = {
+    "divmax": lambda: core._ShiftFreeScaler(),
+    "minmax": lambda: MinMaxScaler(feature_range=(-2.0, 2.0)),
+    "standard": lambda: StandardScaler(),
+    "none": lambda: core._IdentityScaler(),
+}
+
+# Trees chosen to hit every folding rule, including the protected operators
+# whose engine semantics differ from plain maths on signed arguments.
+_FOLD_TREES = [
+    N("*", N(2.5), X(0)),
+    N("+", N(1.0), N("*", X(0), X(1))),
+    N("/", X(0), N("+", X(1), N(3.0))),
+    N("pow", X(0), N(2.0)),                       # sign-aware even power
+    N("pow", X(0), N(3.0)),
+    N("pow", X(1), N(-1.0)),
+    N("pow", X(0), N(1.5)),                       # |u|^1.5
+    N("pow", X(0), N(0.0)),                       # engine: sign(u)
+    N("sqrt", X(1)),
+    N("log", N("*", N(0.5), X(0))),
+    N("exp", N("neg", X(1))),
+    N("tanh", N("-", X(0), X(1))),
+    N("sq", N("+", X(0), N(0.25))),
+    N("cube", X(1)),
+    N("abs", N("-", X(0), N(1.0))),
+    N("sin", N("*", N(3.0), X(0))),
+    N("-", N("pow", X(0), N(2.0)), N("sq", X(1))),
+    N("/", N(1.0), N("sqrt", N("+", N("sq", X(0)), N("sq", X(1))))),
+]
+
+
+@pytest.mark.parametrize("kind", sorted(_SCALERS))
+@pytest.mark.parametrize("signed", [False, True])
+def test_raw_formula_folding_is_exact(kind, signed):
+    """Every rule of the folding, for every scaler: text AND sympy forms
+    reproduce the engine's predictions on the raw data."""
+    r = np.random.RandomState(3)
+    Xd = r.uniform(-4.0 if signed else 0.5, 5.0, (70, 2))
+    sc = _SCALERS[kind]()
+    Xs = sc.fit_transform(Xd)
+    cols = {"a": Xd[:, 0], "b": Xd[:, 1]}
+    for tree in _FOLD_TREES:
+        p = core.evaluate_vector(tree, Xs)
+        rf = FM.raw_formula(tree, sc, Xd, ["a", "b"])
+        assert rf.exact, (kind, core.to_string(tree), rf.max_error)
+        tol = 1e-6 * max(np.max(np.abs(p)), 1e-12)
+        for s in (rf.sympy(), FM.to_text(rf.tree, ["a", "b"], rf._positive,
+                                         _parsable=True)):
+            assert np.max(np.abs(_eval_sympy_string(s, cols) - p)) <= tol, \
+                (kind, core.to_string(tree), s)
+
+
+@pytest.mark.parametrize("normalize", ["divmax", "minmax", "standard", "none", "auto"])
+@pytest.mark.parametrize("data", ["positive_1var", "signed_2var"])
+def test_delivered_formula_is_the_model(normalize, data):
+    """End to end: expression, sympy() and every Pareto entry are written in
+    the raw variables and reproduce predict() on the raw data."""
+    r = np.random.RandomState(1)
+    if data == "positive_1var":
+        Xd = r.uniform(1, 5, (80, 1)); y = 3.0 * Xd[:, 0] + 2.0; names = ["x"]
+    else:
+        Xd = r.uniform(-3, 3, (80, 2)); y = 2.0 * Xd[:, 0] * Xd[:, 1] + Xd[:, 0] ** 2
+        names = ["u", "v"]
+    res = symbolic_regression(Xd, y, feature_names=names, normalize=normalize,
+                              generations=6, parallel=False, seed=0)
+    cols = {nm: Xd[:, i] for i, nm in enumerate(names)}
+    tol = 1e-6 * max(np.max(np.abs(res.predict(Xd))), 1e-12)
+    assert res.formula_exact is True
+    assert np.max(np.abs(_eval_sympy_string(res.sympy(), cols)
+                         - res.predict(Xd))) <= tol
+    for e in res.pareto or []:
+        assert np.max(np.abs(_eval_sympy_string(e.sympy(), cols)
+                             - e.predict(Xd))) <= \
+            1e-6 * max(np.max(np.abs(e.predict(Xd))), 1e-12)
+    # the display names the raw columns, never the engine's X[i]
+    assert "X[" not in res.expression
+
+
+def test_three_x_is_printed_three_x():
+    """The review's example: y = 3x, x in [1, 5], used to print 14.86*x."""
+    Xd = np.linspace(1, 5, 40).reshape(-1, 1)
+    res = symbolic_regression(Xd, 3.0 * Xd[:, 0], feature_names=["x"],
+                              generations=5, parallel=False, seed=0)
+    assert res.expression == "3 * x"
 
 
 # ── 2. Dimensional semantics: one source of truth ───────────────────────────

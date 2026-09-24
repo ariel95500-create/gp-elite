@@ -36,6 +36,37 @@ except ImportError:
                 "que ce fichier, puis importez-le depuis votre script : "
                 "from api import symbolic_regression")
 
+try:                                    # [v0.7] formule en variables brutes
+    from . import formula as _formula
+except ImportError:
+    import formula as _formula
+
+
+def _build_raw_formula(node, scaler, X_raw, names):
+    """[v0.7] Formula of `node` in the RAW variables, checked against predict.
+
+    Returns (RawFormula or None, display string). None only if the scaler is
+    not a per-column affine map (never the case for the engine's own
+    scalers): the display then carries the variable transformation
+    explicitly instead of silently showing a scaled-space formula.
+    """
+    try:
+        rf = _formula.raw_formula(node, scaler, X_raw, names)
+        return rf, rf.text()
+    except Exception:
+        with contextlib.redirect_stdout(io.StringIO()):
+            s = core.to_string(node)
+        return None, "%s   [scaled inputs: %s]" % (
+            s, _formula.scaled_expression_note(scaler, X_raw, names))
+
+
+def _sympy_or_raise(obj, feature_names):
+    if obj.formula is None:
+        raise RuntimeError("no raw-variable formula available for this model "
+                           "(its input scaler is not a per-column affine map)")
+    return obj.formula.sympy(list(feature_names) if feature_names is not None
+                             else None)
+
 
 @dataclass
 class ParetoEntry:
@@ -43,7 +74,8 @@ class ParetoEntry:
 
     Chaque entrée est un modèle candidat non-dominé : aucun autre candidat
     n'est à la fois plus simple ET plus précis. `predict` accepte des X bruts
-    (mêmes unités qu'au fit), comme SRResult.predict.
+    (mêmes unités qu'au fit), comme SRResult.predict. `expression` est la
+    formule en variables BRUTES (voir SRResult).
     """
     expression: str
     size: int
@@ -51,6 +83,15 @@ class ParetoEntry:
     r2_validation: Optional[float]
     node: "core.Node"
     scaler: object = None
+    formula: object = None          # [v0.7] formula.RawFormula (variables brutes)
+
+    @property
+    def formula_exact(self) -> Optional[bool]:
+        return None if self.formula is None else self.formula.exact
+
+    def sympy(self, feature_names=None) -> str:
+        """Sympy-parsable formula in the raw variables (see SRResult.sympy)."""
+        return _sympy_or_raise(self, feature_names)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         Xn = np.asarray(X, dtype=float)
@@ -71,17 +112,35 @@ class SRResult:
 
     Attributs
     ---------
-    expression       : str   — la formule trouvée (noms de colonnes si fournis)
+    expression       : str   — la formule trouvée, écrite dans les variables
+                               BRUTES (celles passées au fit) : évaluée sur ces
+                               données, elle reproduit predict(). [v0.7]
+                               Jusqu'en 0.6.x elle était écrite dans l'espace
+                               normalisé interne, avec les noms bruts : fausse
+                               sur les données brutes.
+    formula_exact    : bool  — la formule reproduit predict() sur les données
+                               d'entraînement (vérifié au fit, jamais supposé).
+                               False signale qu'un garde-fou numérique du
+                               moteur agit quelque part sur ces données.
     time_limit_reached : bool — l'échéance `time_limit` a interrompu la recherche
     restarts_completed : int  — redémarrages effectivement lancés
-    r2_validation    : float — R² sur le hold-out (None si validation désactivée)
-    mse_validation   : float — MSE sur le hold-out
-    mse_train        : float — MSE sur l'entraînement
-    size             : int   — nombre de nœuds de l'arbre
+    r2_validation    : float — R² sur le hold-out interne (None si validation
+                               désactivée). Ce hold-out sert à CHOISIR le
+                               modèle (sélection du champion, des redémarrages,
+                               du front de Pareto) : c'est une mesure de
+                               sélection, optimiste, pas une estimation
+                               indépendante de la généralisation. Pour celle-ci,
+                               gardez votre propre jeu de test hors du fit.
+    mse_validation   : float — MSE sur ce même hold-out
+    mse_train        : float — MSE sur la partie entraînement (hors hold-out)
+    size             : int   — nombre de nœuds de l'arbre de recherche
     depth            : int   — profondeur de l'arbre
     feature_names    : list  — noms des variables
-    node             : core.Node — l'arbre brut (pour évaluation / inspection)
-    predict          : callable — predict(X_norm) -> ndarray
+    node             : core.Node — l'arbre dans l'espace NORMALISÉ du moteur
+                               (celui qu'évalue predict après normalisation)
+    formula          : formula.RawFormula — l'arbre en variables brutes
+    predict          : callable — predict(X_brut) -> ndarray
+    sympy            : callable — sympy(noms) -> chaîne sympy exacte
     """
     expression: str
     r2_validation: Optional[float]
@@ -98,6 +157,21 @@ class SRResult:
     # lances (peut etre inferieur a `restarts` si le temps est epuise).
     time_limit_reached: bool = False
     restarts_completed: int = 1
+    formula: object = None          # [v0.7] formula.RawFormula (variables brutes)
+
+    @property
+    def formula_exact(self) -> Optional[bool]:
+        return None if self.formula is None else self.formula.exact
+
+    def sympy(self, feature_names=None) -> str:
+        """The formula as a sympy-parsable string, in the RAW variables.
+
+        ``sympy.sympify(result.sympy())`` evaluated on the raw inputs gives
+        ``result.predict`` (see ``formula_exact``). Constants keep full float
+        precision. Names default to ``feature_names``; pass valid Python
+        identifiers if the column names are not.
+        """
+        return _sympy_or_raise(self, feature_names)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Prédit sur des features BRUTES (mêmes unités que le X passé au fit).
@@ -594,13 +668,28 @@ def symbolic_regression(
         core._CUSTOM_LOSS_ROBUST = False       # idem : scaling robuste réinitialisé
 
     # ── Métriques ──
-    mse_tr = core._pure_mse(best, X_full, y_full)
+    # [v0.7] mse_train sur la partie ENTRAINEMENT seulement : auparavant sur
+    # toutes les données, hold-out compris (signalé par la revue externe).
+    tr_xs = getattr(core, "_VAL_TRAIN_XS", None)
+    tr_ys = getattr(core, "_VAL_TRAIN_YS", None)
+    if val_xs is None or tr_xs is None or tr_ys is None or len(tr_ys) == 0:
+        tr_xs, tr_ys = X_full, y_full
+    mse_tr = core._pure_mse(best, tr_xs, tr_ys)
     r2_val = mse_val = None
     if val_xs is not None and val_ys is not None and len(val_ys) > 1:
         preds = core.evaluate_vector(best, val_xs)
         mse_val = float(np.mean((preds - val_ys) ** 2))
         var = float(np.var(val_ys))
         r2_val = (1.0 - mse_val / var) if var > 1e-15 else float("nan")
+
+    # ── [v0.7] La formule LIVRÉE, en variables brutes, vérifiée ──
+    # L'arbre vit dans l'espace normalisé du moteur ; l'afficher avec les noms
+    # bruts donnait une formule fausse sur les données brutes (revue externe,
+    # bloquant n°1). On la réécrit en variables brutes et on vérifie qu'elle
+    # reproduit predict() sur les données d'entraînement.
+    raw_formula, expression = _build_raw_formula(best, scaler, X, feature_names)
+    for e in pareto_entries:
+        e.formula, e.expression = _build_raw_formula(e.node, scaler, X, feature_names)
 
     return SRResult(
         expression=expression,
@@ -615,4 +704,5 @@ def symbolic_regression(
         pareto=pareto_entries or None,   # [v27] front complexité/précision
         time_limit_reached=bool(_time_hit),
         restarts_completed=int(_restarts_done),
+        formula=raw_formula,
     )

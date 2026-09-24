@@ -9139,8 +9139,28 @@ def _interactive_menu():
             print("\n  Variable mapping:")
             for i, nm in enumerate(feat_names):
                 print(f"    X[{i}] = {nm}")
-            print(f"\n  Note: features are normalized. "
-                  f"The formula is expressed on these normalized values.")
+            print(f"\n  Note: the 'Expression' above uses the engine's "
+                  f"internally rescaled columns.")
+            # [v0.7] La meme loi, ecrite dans les colonnes de l'utilisateur et
+            # verifiee sur ses donnees (formula.py). C'est elle qu'il faut
+            # recopier : l'expression normalisee n'est pas valable telle quelle
+            # sur les donnees brutes.
+            try:
+                try:
+                    from . import formula as _fm
+                except ImportError:
+                    import formula as _fm
+                _Xraw = _scaler.inverse_transform(np.asarray(X_data, dtype=float))
+                _rf = _fm.raw_formula(best.node if hasattr(best, "node") else best,
+                                      _scaler, _Xraw, list(feat_names))
+                print("\n  Formula in YOUR columns (checked on your data):")
+                print(f"    {target_name} = {_rf.text()}")
+                if not _rf.exact:
+                    print("    (!) differs from the engine's predictions on some rows:"
+                          " a numerical safety\n        net of the engine is active "
+                          "there (max gap %.3g)." % _rf.max_error)
+            except Exception as _fe:
+                print(f"\n  (formula in raw columns unavailable: {_fe})")
             if feat_dims_cli is not None:                  # [v0.6]
                 print("\n  Dimensional constraint was active: every candidate "
                       "was\n  dimensionally consistent by construction.")

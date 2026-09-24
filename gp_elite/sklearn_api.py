@@ -181,6 +181,14 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         if sc is None:
             self.constant_value_ = float(b)
             return
+        # [v0.7] Le repliage ci-dessous suppose une normalisation SANS
+        # decalage (x_s = x / s). Avec min-max ou z-score (colonnes signees
+        # sous normalize='auto'), chaque variable devient a*(x - x0) : la
+        # formule brute n'est plus un monome et aucune constante brute unique
+        # n'existe. On rend None plutot qu'un nombre faux (scale_ d'un
+        # MinMaxScaler est un MULTIPLICATEUR, pas un diviseur).
+        if type(scaler).__name__ not in ("_ShiftFreeScaler", "_IdentityScaler"):
+            return
         pseudo = {i: {f"__s{i}": 1} for i in range(self.n_features_in_)}
         expo = DS.infer_dim(inner, pseudo)
         if expo is None:
@@ -227,14 +235,14 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         The string can be read back with ``sympy.sympify(...)`` and, evaluated
         on the raw features, reproduces ``predict`` exactly.
 
-        The engine searches on internally rescaled inputs (``x_i / s_i``, a
-        purely multiplicative, shift-free normalisation). The expression tree
-        therefore lives in scaled space. Returning it with raw variable names
-        would be WRONG: on ``y = 3x`` with ``x`` in [1, 5] it yields
-        ``14.86 * X0`` instead of ``3 * X0`` — a formula that predicts
-        correctly nowhere outside the engine. The scaling is consequently
-        folded into the expression here, so that what is delivered is what the
-        model computes.
+        The engine searches on internally rescaled inputs (each column goes
+        through an affine map: ``x / max|x|`` for positive data, min-max for
+        signed data, z-score on request), so the evolved tree lives in scaled
+        space. Returning it with raw variable names would be WRONG: on
+        ``y = 3x`` with ``x`` in [1, 5] it yields ``14.86 * X0`` instead of
+        ``3 * X0``. Since 0.7 the formula is rewritten in the raw variables for
+        EVERY normalisation, and checked against ``predict`` on the training
+        data at fit time (``model_.formula_exact``).
 
         Parameters
         ----------
@@ -245,10 +253,11 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
             ``False`` -> expression in the internally scaled variables, useful
             only for inspecting the search space.
 
-        Operators are mapped explicitly (``sq`` -> ``**2``, ``max2`` -> ``Max``,
-        ``step`` -> ``Heaviside``, ...) so none comes out as an undefined
-        sympy function. For the human-readable form (with the ² and ³ symbols),
-        use :meth:`pretty`.
+        Protected operators are written as the engine computes them where it
+        matters: ``sqrt(Abs(u))`` / ``log(Abs(u))`` unless ``u`` is positive
+        on all training rows, ``sign(u)*Abs(u)**2`` for an even power of a
+        base that changes sign. For the human-readable form, use
+        :meth:`pretty`.
         """
         check_is_fitted(self, "model_") if _HAS_SKLEARN else None
         from .core import node_to_sympy
@@ -260,11 +269,7 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         names = list(feature_names) if feature_names else \
             ["X%d" % i for i in range(n)]
         if raw:
-            scaler = getattr(self.model_, "scaler", None)
-            scale = getattr(scaler, "scale_", None)
-            if scale is not None:
-                names = ["((%s) / %.17g)" % (nm, float(sv))
-                         for nm, sv in zip(names, scale)]
+            return self.model_.sympy(names)
         return node_to_sympy(node, names or None)
 
     def pretty(self):
