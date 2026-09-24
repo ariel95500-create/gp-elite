@@ -1849,6 +1849,10 @@ class Config:
 
     # Sorties
     LOG_CSV: str           = "gp_elite_log.csv"
+    # [v0.7] Une bibliotheque n'ecrit pas de fichier en silence. L'API met ce
+    # drapeau a False ; le mode console le garde (journal dans le DOSSIER
+    # COURANT, plus dans le dossier d'installation du paquet).
+    WRITE_LOG_CSV: bool    = True
     SAVE_BEST: str         = "gp_elite_best.txt"
 
 
@@ -3780,60 +3784,6 @@ def count_distinct_features(node: "Node", terminals: List[str]) -> int:
 def fitness(node, xs: List[float], ys: List[float], cfg: Config,
             role: str = "explorer") -> float:
     """
-    [v14.4 — Asymétrie des Îles] Fitness conditionnelle selon le rôle de l'île.
-
-    Chaque île évalue les individus avec sa propre métrique, ce qui crée une
-    pression sélective spécialisée sans pour autant contraindre toutes les îles
-    au même régime. La migration fait ensuite circuler les bons individus entre
-    les îles, permettant à l'exploratrice de fournir des sous-structures
-    complexes que la nettoyeuse simplifiera ensuite.
-
-    ── role == "cleaner" (Île Nettoyeuse) ──────────────────────────────────────
-    Métrique BIC stricte (v14.x) :
-        fitness = n·ln(max(MSE_pur, 1e-15)) + k·ln(n) + γ·n_adj²·ln(n)
-    Rasoir d'Ockham forcé : les constantes ajustées et les introns coûtent cher.
-    But : détruire le bloat, promouvoir l'élégance symbolique.
-
-    ── role == "explorer" ou "stigmergic" (Îles Exploratrices) ────────────────
-    Métrique v13.12 : MSE hybride (Pearson+MSE) + pénalité linéaire plafonnée.
-        base      = raw_mse(node, xs, ys)          # fitness hybride Pearson+MSE
-        size_pen  = tree_size(node) * cfg.PARSIMONY
-        depth_pen = tree_depth(node) * cfg.DEPTH_PENALTY
-        penalty   = min(size_pen + depth_pen, 0.05 * base + 1e-8)
-        fitness   = base + penalty
-    Liberté de construire des sous-structures complexes comme sin(1/x) sans
-    être massacrée par le BIC lors de la phase d'assemblage transitoire.
-
-    Cache : clé (hash, role) — un même arbre peut avoir deux scores différents
-    selon le rôle. Invalidation via _fitness_cache.clear() à chaque génération.
-    """
-    h   = node.structural_hash()
-    key = (h, role)
-    if key in _fitness_cache:
-        return _fitness_cache[key]
-
-    if role == "cleaner":
-        # ── BIC strict (v14.2) ───────────────────────────────────────────────
-        mse_pur      = _pure_mse(node, xs, ys)
-        n            = len(ys)
-        k, n_adj     = tree_complexity(node)
-        ln_n         = math.log(n)
-        mse_safe     = max(mse_pur, 1e-15)
-        score        = (n * math.log(mse_safe)
-                        + k * ln_n
-                        + _FLOAT_GAMMA * (n_adj ** 2) * ln_n)
-    else:
-        # ── Explorer / Stigmergic : MSE hybride + pénalité linéaire (v13.12) ─
-        base      = raw_mse(node, xs, ys)
-        size_pen  = tree_size(node)  * cfg.PARSIMONY
-        depth_pen = tree_depth(node) * cfg.DEPTH_PENALTY
-        max_pen   = 0.05 * base + 1e-8
-        penalty   = min(size_pen + depth_pen, max_pen)
-        score     = base + penalty
-
-def fitness(node, xs: List[float], ys: List[float], cfg: Config,
-            role: str = "explorer") -> float:
-    """
     [v14.4] Fitness conditionnelle par rôle d'île.
     [FIX-A v17] Pénalité mono-feature : force l'exploration multi-variable
     en mode Syracuse — corrige le blocage sur X[2] seul.
@@ -4810,13 +4760,13 @@ def build_stigmergic_tree(lib: FragmentLibrary,
         r = random.random()
         if r < 0.45:
             # Wrapper binaire : op(tree, frag)
-            op = random.choices(["+", "-", "*"], weights=[3, 2, 3])[0]
+            op = _pool_choice(["+", "-", "*"], [3, 2, 3], fallback="+") or "+"
             tree = Node(op, tree, frag) if random.random() < 0.5 else Node(op, frag, tree)
         elif r < 0.65:
             # Wrapper unaire autour de l'arbre
-            op = random.choices(["sin", "cos", "neg", "sq"],
-                                weights=[2, 2, 1, 2])[0]
-            tree = Node(op, tree)
+            op = _pool_choice(["sin", "cos", "neg", "sq"], [2, 2, 1, 2])
+            if op is not None:
+                tree = Node(op, tree)
         else:
             # Insertion profonde : remplacer un terminal par le fragment
             terminals = [(n, p, s) for n, p, s in get_all_nodes(tree)
@@ -4910,11 +4860,12 @@ def build_stigmergic_tree_v2(lib: FragmentLibrary,
 
         r = random.random()
         if r < 0.45:
-            op = random.choices(["+", "-", "*"], weights=[3, 2, 3])[0]
+            op = _pool_choice(["+", "-", "*"], [3, 2, 3], fallback="+") or "+"
             tree = Node(op, tree, frag) if random.random() < 0.5 else Node(op, frag, tree)
         elif r < 0.65:
-            op = random.choices(["sin", "cos", "neg", "sq"], weights=[2, 2, 1, 2])[0]
-            tree = Node(op, tree)
+            op = _pool_choice(["sin", "cos", "neg", "sq"], [2, 2, 1, 2])
+            if op is not None:
+                tree = Node(op, tree)
         else:
             terminals = [(n, p, s) for n, p, s in get_all_nodes(tree)
                          if n.left is None and n.right is None and p is not None]
@@ -5152,7 +5103,8 @@ class Island:
                     self.cfg.TARGET_DIM, self.cfg.MAX_INIT_DEPTH,
                     self.cfg.FEAT_DIMS, random,
                     unknown_constant=bool(getattr(self.cfg,
-                                                  "UNKNOWN_CONST", False)))
+                                                  "UNKNOWN_CONST", False)),
+                    ops=_active_pool_ops())
                 if t is None:
                     fails += 1
                     continue
@@ -5635,7 +5587,8 @@ def evolve_island(island: Island,
                 # sous-arbre remplacé -> validité préservée.
                 if _dim_active(cfg):
                     child = _ds().typed_mutate(child, cfg.FEAT_DIMS,
-                                               cfg.MAX_MUTATION_DEPTH, random)
+                                               cfg.MAX_MUTATION_DEPTH, random,
+                                               ops=_active_pool_ops())
                 else:
                     child = mutate(child, xs, ys, cfg, role=island.role)  # [v14.5] rôle transmis
 
@@ -5693,7 +5646,8 @@ def evolve_island(island: Island,
                 parent = new_pop[random.randrange(_n_keep)]
                 if _dim_active(cfg):          # [v0.4] refill typé
                     child = _ds().typed_mutate(parent, cfg.FEAT_DIMS,
-                                               cfg.MAX_MUTATION_DEPTH, random)
+                                               cfg.MAX_MUTATION_DEPTH, random,
+                                               ops=_active_pool_ops())
                 else:
                     child  = mutate(parent, xs, ys, cfg, role=island.role)
                 if (tree_size(child) <= cfg.MAX_TREE_SIZE
@@ -5816,6 +5770,33 @@ def _island_round_task(payload):
             best_local = nb
     return (island, best_local, FRAGMENT_LIB, COGRAPH, SEQ_MEM)
 
+def _active_pool_ops():
+    """[v0.7] Operateurs autorises pour le generateur TYPE (units=). Le pool
+    `operators=` vit dans _GENERIC_BINARY_OPS / _GENERIC_UNARY_OPS, restaures
+    aussi dans les processus paralleles. None = pas de filtrage (hors mode
+    CSV generique, comportement historique)."""
+    if not _GENERIC_CSV_MODE:
+        return None
+    return frozenset(_GENERIC_BINARY_OPS) | frozenset(_GENERIC_UNARY_OPS)
+
+
+def _pool_choice(ops, weights, fallback="neg"):
+    """[v0.7] Tire un operateur de `ops`, RESTREINT au pool `operators=`.
+
+    Les constructeurs stigmergiques enveloppaient leurs arbres avec un unaire
+    tire de ["sin", "cos", "neg", "sq"] code en dur : du cos apparaissait
+    dans le front de Pareto avec le pool 'physical', qui n'en contient pas.
+    Un seul tirage aleatoire comme avant : pour un pool qui contient deja ces
+    operateurs, le comportement est strictement inchange."""
+    pool = _active_pool_ops()
+    if pool is not None:
+        pairs = [(o, w) for o, w in zip(ops, weights) if o in pool]
+        if not pairs:
+            return fallback if fallback in pool else None
+        ops, weights = [p[0] for p in pairs], [p[1] for p in pairs]
+    return random.choices(ops, weights=weights)[0]
+
+
 # ── [v0.7-PAR] Parallelisme sur pour les scripts sans garde __main__ ──────
 # Les iles paralleles utilisent le demarrage « spawn » (identique sur tous les
 # systemes). Un processus fils spawn RE-EXECUTE le script principal de
@@ -5833,6 +5814,10 @@ def _island_round_task(payload):
 _POOL_CHILD_ENV = "GP_ELITE_POOL_CHILD"
 _PARALLEL_BROKEN = False     # vrai apres un pool brise : plus de tentative
 _PARALLEL_WARNED = False
+
+
+class _SkipLogExport(Exception):
+    """Export du journal desactive (API) : sortie propre du bloc d'ecriture."""
 
 
 def _exit_if_reimported_by_worker():
@@ -6088,6 +6073,25 @@ _TIME_LIMIT_HIT = False  # [v0.7-TIME] vrai si le dernier evolve() a ete
 _VAL_XS = None          # hold-out features  (None = validation désactivée)
 _VAL_YS = None          # hold-out cible
 _VAL_TRAIN_XS = None    # [v23.1] train features (test de stabilité numérique)
+# [v0.7-NEAR] GARDE DE STABILITE PRES DU DOMAINE (mode par defaut).
+# Constat : sur donnees reelles (210_cloud, validation croisee), un modele a
+# donne R2 = -1.7e10 sur des points jamais vus, alors qu'il etait sain sur
+# l'entrainement et la validation. La garde hors-plage existante n'agit qu'en
+# mode extrapolate=True. Principe retenu : sonder par combinaisons de PAIRES
+# de points reels, x = l*xi + (1-l)*xj avec l dans [-0.1, 1.1] -- l'interieur
+# de l'enveloppe des donnees plus un leger debordement le long des directions
+# ou elles s'etendent vraiment. Une vraie loi ne peut pas diverger la ou des
+# mesures existent en continu. Mesure sur les 41 lois du banc Feynman : 0 vraie
+# loi jugee instable jusqu'a 10 % de debordement (pire ecart 2.8 etendues de y,
+# seuil 50) ; a 20 %, 5/41 le seraient (lois relativistes : la sonde traverse
+# v = c). Usage : DEPARTAGE seulement, entre candidats statistiquement
+# indiscernables -- jamais un rejet d'un candidat qui se detache.
+_NEAR_PROBE_XS = None
+_NEAR_BAND = None          # (centre, demi-largeur) en unites de y
+_NEAR_CACHE = {}
+_NEAR_GUARD_SWAPS = 0      # nombre de departages effectifs (diagnostic, tests)
+_NEAR_EXT = 0.10
+_NEAR_K = 50.0
 _VAL_TRAIN_YS = None    # [v23.1] train cible
 # [v25-EXTRAP] Garde-fou anti-divergence : points-sondes AU-DELÀ de la plage
 # d'entraînement (axe d'extrapolation prolongé) + bande de plausibilité dérivée
@@ -6185,6 +6189,48 @@ def _track_val_candidate(cand):
     except Exception:
         pass
 
+def _build_near_probes(xs_np, ys_np, n=400):
+    """[v0.7-NEAR] Sondes par paires de points reels. Generateur DEDIE : ne
+    consomme pas l'etat aleatoire global du moteur (sinon tous les resultats
+    changeraient, garde active ou non)."""
+    global _NEAR_PROBE_XS, _NEAR_BAND
+    Xm = xs_np if xs_np.ndim == 2 else xs_np.reshape(-1, 1)
+    if len(Xm) < 2:
+        return
+    rng = np.random.RandomState(20260924)
+    i = rng.randint(0, len(Xm), n); j = rng.randint(0, len(Xm), n)
+    lam = rng.uniform(-_NEAR_EXT, 1.0 + _NEAR_EXT, (n, 1))
+    _NEAR_PROBE_XS = lam * Xm[i] + (1.0 - lam) * Xm[j]
+    y = np.asarray(ys_np, dtype=float)
+    r = float(np.ptp(y)) if len(y) else 0.0
+    _NEAR_BAND = (float(np.median(y)), _NEAR_K * max(r, 1e-12))
+
+
+def _near_domain_stable(cand) -> bool:
+    """[v0.7-NEAR] Vrai si le candidat reste fini et dans la bande sur les
+    sondes pres du domaine. Resultat mis en cache par expression."""
+    if _NEAR_PROBE_XS is None or _NEAR_BAND is None or cand is None:
+        return True
+    try:
+        key = to_string(cand)
+    except Exception:
+        key = None
+    if key is not None and key in _NEAR_CACHE:
+        return _NEAR_CACHE[key]
+    try:
+        with np.errstate(all="ignore"):
+            p = np.asarray(evaluate_vector(cand, _NEAR_PROBE_XS), dtype=float)
+        if p.ndim == 0:
+            p = np.full(len(_NEAR_PROBE_XS), float(p))
+        c, half = _NEAR_BAND
+        ok = bool(np.all(np.isfinite(p)) and float(np.max(np.abs(p - c))) <= half)
+    except Exception:
+        ok = False
+    if key is not None:
+        _NEAR_CACHE[key] = ok
+    return ok
+
+
 def _select_one_se(champion, champ_val):
     """[v23.2] Sélection parcimonieuse par TOLÉRANCE R².
 
@@ -6216,6 +6262,17 @@ def _select_one_se(champion, champ_val):
     thr = best_mse + max(best_se, r2_band)
     eligible = [t for t in pool if t[0] <= thr]
     eligible.sort(key=lambda t: (t[2], t[0]))   # plus petit, puis meilleur MSE
+    # [v0.7-NEAR] DEPARTAGE : parmi les candidats que les donnees ne savent pas
+    # distinguer, le plus petit qui NE DIVERGE PAS pres du domaine. Si aucun
+    # n'est stable, comportement historique inchange.
+    if not _near_domain_stable(eligible[0][3]):
+        stable = [t for t in eligible if _near_domain_stable(t[3])]
+        if stable:
+            globals()["_NEAR_GUARD_SWAPS"] = _NEAR_GUARD_SWAPS + 1
+            TRACE.set("near_guard", "champion divergent pres du domaine "
+                      "remplace par un candidat equivalent stable")
+            m, _, _, node = stable[0]
+            return node, m
     m, _, _, node = eligible[0]
     return node, m
 
@@ -6224,9 +6281,11 @@ def _split_holdout(xs, ys, cfg):
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
     VALIDATION_SPLIT<=0 ou dataset trop petit (<30 points)."""
     global _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _EXTRAP_PROBE_XS, _EXTRAP_BAND
+    global _NEAR_PROBE_XS, _NEAR_BAND
     _VAL_XS = None; _VAL_YS = None
     _VAL_TRAIN_XS = None; _VAL_TRAIN_YS = None
     _EXTRAP_PROBE_XS = None; _EXTRAP_BAND = None
+    _NEAR_PROBE_XS = None; _NEAR_BAND = None; _NEAR_CACHE.clear()
     _VAL_CANDS.clear()
     frac = float(getattr(cfg, "VALIDATION_SPLIT", 0.0) or 0.0)
     n = len(ys)
@@ -6311,6 +6370,7 @@ def _split_holdout(xs, ys, cfg):
     ys_tr   = ys_np[tr_idx]
     _VAL_TRAIN_XS = xs_tr
     _VAL_TRAIN_YS = ys_tr
+    _build_near_probes(xs_np, ys_np)          # [v0.7-NEAR]
     print(f"[v21-VAL] Hold-out {_split_kind} : {len(tr_idx)} points train / "
           f"{len(val_idx)} points validation ({len(val_idx)/n:.0%}, {_seed_note})")
     print(f"          Evolution sees ONLY the train set; final champion "
@@ -6474,11 +6534,14 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         TRACE.set("dim_mode", "inactif (aucune unité déclarée)")
         TRACE.set("ls_mode", "affine (a + b·f) si linear scaling actif")
     globals()["VAL_R2_TOLERANCE"] = float(getattr(cfg, "VAL_R2_TOLERANCE", 0.003))
-    # FIX v13.10 : LOG_CSV relatif au répertoire du script
-    _script_dir = os.path.dirname(os.path.abspath(__file__))
+    # [v0.7] Journal relatif au DOSSIER COURANT de l'utilisateur. L'ancienne
+    # resolution (dossier du module) ecrivait dans site-packages a chaque
+    # ajustement -- y compris depuis l'API --, echouait en silence sur une
+    # installation en lecture seule et entrelacait les ecritures de processus
+    # concurrents.
     if not os.path.isabs(cfg.LOG_CSV):
         cfg = copy.copy(cfg)
-        cfg.LOG_CSV = os.path.join(_script_dir, cfg.LOG_CSV)
+        cfg.LOG_CSV = os.path.join(os.getcwd(), cfg.LOG_CSV)
     # [v0.7-TIME] Le drapeau d'arret au temps est un etat GLOBAL : il doit
     # etre remis a zero a chaque evolve(), sinon il fuit d'un ajustement au
     # suivant dans un meme processus.
@@ -7051,6 +7114,8 @@ def evolve(func, cfg: Config, problem_key: str = '1',
 
     # Export CSV (optionnel — silencieux si filesystem en lecture seule)
     try:
+        if not getattr(cfg, "WRITE_LOG_CSV", True):
+            raise _SkipLogExport()
         with open(cfg.LOG_CSV, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(
                 f, fieldnames=["gen", "island", "fit", "raw",

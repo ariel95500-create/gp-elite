@@ -36,6 +36,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+test = ["pytest>=7.0", "sympy>=1.9"]
 
 [project.urls]
 Homepage = "https://github.com/ariel95500-create/gp-elite"

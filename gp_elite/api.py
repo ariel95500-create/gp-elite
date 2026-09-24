@@ -335,6 +335,7 @@ def symbolic_regression(
                            fast=fast, ultrafast=ultrafast, thorough=thorough, use_seeding=False,
                            use_lib=True, use_cograph=True, use_seqmem=True)
     cfg.GENERATIONS = int(generations)
+    cfg.WRITE_LOG_CSV = False      # [v0.7] l'API n'ecrit aucun fichier
     # [v0.4] Recherche contrainte par les dimensions (opt-in).
     if units is not None:
         from .dim_search import normalize_units_arg

@@ -37,6 +37,14 @@ from .dimensions import (_infer, _mul, _inv, _pow, _eq, _is_dimensionless,
 _TRANSCENDENTAL = ("exp", "log", "sin", "cos", "tanh")
 
 
+def _ok(op, ops):
+    """[v0.7] Respect du pool `operators=`. ops=None : aucun filtrage
+    (comportement historique) ; sinon, seuls les operateurs du pool sont
+    produits. Sans ce filtre, le generateur type produisait sin/cos meme avec
+    le pool par defaut 'physical', qui n'en contient pas."""
+    return ops is None or op in ops
+
+
 # ── canonical hashable key for a dimension dict ─────────────────────────────
 
 def _key(d):
@@ -89,7 +97,7 @@ def _reachable(target, feats, _cache):
 
 # ── constructive generation ─────────────────────────────────────────────────
 
-def _build(target, depth, feats, rng, cache, budget):
+def _build(target, depth, feats, rng, cache, budget, ops=None):
     """Return a tree of dimension exactly `target`, or None."""
     budget[0] -= 1
     if budget[0] <= 0 or not _reachable(target, feats, cache):
@@ -109,54 +117,61 @@ def _build(target, depth, feats, rng, cache, budget):
     if dimless and rng.random() < 0.12:
         return Node(round(rng.uniform(-3, 3), 4))
 
-    prods = [("neg",), ("abs",), ("+",), ("-",), ("sqrt",), ("sq",)]
+    prods = [("neg",), ("abs",), ("+",), ("-",), ("sqrt",), ("sq",), ("cube",)]
     if dimless:
         prods += [(f,) for f in _TRANSCENDENTAL]
     factors = [d for _, d in feats] + [dict(DIMENSIONLESS)]
     for A in factors:
         prods.append(("*", A))
         prods.append(("/", A))
+    # cube n'etait pas produit historiquement : seulement si le pool le demande
+    prods = [p for p in prods if _ok(p[0], ops) and
+             (p[0] != "cube" or ops is not None)]
     rng.shuffle(prods)
 
     for p in prods:
         op = p[0]
         if op in ("neg", "abs"):
-            c = _build(target, depth - 1, feats, rng, cache, budget)
+            c = _build(target, depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node(op, c)
         elif op in ("+", "-"):
-            l = _build(target, depth - 1, feats, rng, cache, budget)
+            l = _build(target, depth - 1, feats, rng, cache, budget, ops)
             if l is None:
                 continue
-            r = _build(target, depth - 1, feats, rng, cache, budget)
+            r = _build(target, depth - 1, feats, rng, cache, budget, ops)
             if r is not None:
                 return Node(op, l, r)
         elif op == "sqrt":
-            c = _build(_pow(target, 2), depth - 1, feats, rng, cache, budget)
+            c = _build(_pow(target, 2), depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node("sqrt", c)
         elif op == "sq":
-            c = _build(_pow(target, 0.5), depth - 1, feats, rng, cache, budget)
+            c = _build(_pow(target, 0.5), depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node("sq", c)
+        elif op == "cube":
+            c = _build(_pow(target, 1.0 / 3.0), depth - 1, feats, rng, cache, budget, ops)
+            if c is not None:
+                return Node("cube", c)
         elif op in _TRANSCENDENTAL:
-            c = _build(dict(DIMENSIONLESS), depth - 1, feats, rng, cache, budget)
+            c = _build(dict(DIMENSIONLESS), depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node(op, c)
         elif op == "*":
             A = p[1]
-            l = _build(A, depth - 1, feats, rng, cache, budget)
+            l = _build(A, depth - 1, feats, rng, cache, budget, ops)
             if l is None:
                 continue
-            r = _build(_mul(target, _inv(A)), depth - 1, feats, rng, cache, budget)
+            r = _build(_mul(target, _inv(A)), depth - 1, feats, rng, cache, budget, ops)
             if r is not None:
                 return Node("*", l, r)
         elif op == "/":
             A = p[1]
-            l = _build(A, depth - 1, feats, rng, cache, budget)
+            l = _build(A, depth - 1, feats, rng, cache, budget, ops)
             if l is None:
                 continue
-            r = _build(_mul(A, _inv(target)), depth - 1, feats, rng, cache, budget)
+            r = _build(_mul(A, _inv(target)), depth - 1, feats, rng, cache, budget, ops)
             if r is not None:
                 return Node("/", l, r)
 
@@ -165,7 +180,7 @@ def _build(target, depth, feats, rng, cache, budget):
     return Node(round(rng.uniform(-3, 3), 4)) if dimless else None
 
 
-def _monomial_tree(target, feats, rng, max_terms=8):
+def _monomial_tree(target, feats, rng, max_terms=8, ops=None):
     """CHEMIN RAPIDE : resout directement les exposants entiers e_i tels que
     prod(dim_i ^ e_i) == target (moindres carres + arrondi + verification),
     puis construit l'arbre produit correspondant. Evite la recherche aveugle,
@@ -198,6 +213,8 @@ def _monomial_tree(target, feats, rng, max_terms=8):
             continue
         if np.abs(e).sum() > max_terms or np.abs(e).max() > 4:
             continue
+        if not _ok("/", ops) and np.any(e < 0):
+            continue                     # pool sans division : exposants >= 0
         node = None
         for i, k in enumerate(e):
             k = int(k)
@@ -259,7 +276,7 @@ def _surrogate_target(feats, rng, max_exp=2):
 
 
 def typed_random_tree(target_dim, max_depth, feat_dims, rng=None, tries=40,
-                      unknown_constant=False):
+                      unknown_constant=False, ops=None):
     """Random tree GUARANTEED to have dimension `target_dim`. None if impossible.
 
     [v0.5] Si unknown_constant, `target_dim` est ignore : on tire une cible de
@@ -274,23 +291,23 @@ def typed_random_tree(target_dim, max_depth, feat_dims, rng=None, tries=40,
         for _ in range(6):
             tgt = _surrogate_target(feats, rng)
             for _ in range(2):
-                t = _monomial_tree(tgt, feats, rng)
+                t = _monomial_tree(tgt, feats, rng, ops=ops)
                 if t is not None:
                     return t
             t = _build(tgt, rng.randint(2, max(2, max_depth)),
-                       feats, rng, cache, [4000])
+                       feats, rng, cache, [4000], ops)
             if t is not None:
                 return t
         return None
     tgt = dict(target_dim)
     # chemin rapide d'abord (majorite des cas, quasi instantane)
     for _ in range(3):
-        t = _monomial_tree(tgt, feats, rng)
+        t = _monomial_tree(tgt, feats, rng, ops=ops)
         if t is not None:
             return t
     for _ in range(tries):
         d = rng.randint(2, max(2, max_depth))
-        t = _build(tgt, d, feats, rng, cache, [4000])
+        t = _build(tgt, d, feats, rng, cache, [4000], ops)
         if t is not None:
             return t
     return None
@@ -320,7 +337,7 @@ def _graft(root, old, new):
     return Node(root.value, l, r)
 
 
-def typed_mutate(tree, feat_dims, max_depth, rng=None):
+def typed_mutate(tree, feat_dims, max_depth, rng=None, ops=None):
     """Replace a random subtree by a fresh one of the SAME dimension."""
     rng = rng or random
     fd = _norm_feat_dims(feat_dims)
@@ -335,7 +352,7 @@ def typed_mutate(tree, feat_dims, max_depth, rng=None):
             continue
         for _ in range(12):
             sub = _build(d, rng.randint(1, max(2, max_depth)), feats, rng,
-                         cache, [2000])
+                         cache, [2000], ops)
             if sub is not None:
                 return _graft(tree, pick, sub).copy()
     return tree
