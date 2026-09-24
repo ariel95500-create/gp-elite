@@ -3,12 +3,12 @@
 Why this module exists
 ----------------------
 The engine searches on rescaled inputs. Every column goes through an affine
-map ``x_s = a*x + b`` (division by max|x| for positive data, min-max for
-signed data, z-score or identity on request), so the tree it evolves lives in
-*scaled* space. Printing that tree with the raw column names gives a formula
-that is wrong on raw data: up to 0.6.x, ``y = 3x`` came out as ``14.86*x``,
-and any dataset with a non-positive value exported a formula off by orders of
-magnitude, while ``predict()`` was right all along.
+map ``x_s = a*x + b`` (division by max|x| by default; min-max, z-score or
+identity on request), so the tree it evolves lives in *scaled* space.
+Printing that tree with the raw column names gives a formula that is wrong on
+raw data: up to 0.6.x, ``y = 3x`` came out as ``15.0*x``, and with min-max or
+z-score scaling the exported formula was off by orders of magnitude, while
+``predict()`` was right all along.
 
 This module rewrites the tree in the raw variables, folds the rescaling
 constants into the formula's own constants, and CHECKS the result: evaluated

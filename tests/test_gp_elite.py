@@ -68,7 +68,9 @@ def test_auto_normalization_choice():
     sc_pos, desc_pos = core._choose_scaler(pos, "auto", (-2, 2))
     sc_sig, desc_sig = core._choose_scaler(signed, "auto", (-2, 2))
     assert "divmax" in desc_pos      # features positives → shift-free
-    assert "minmax" in desc_sig      # features signées → minmax
+    # [v0.7] signées aussi : min-max cassait la structure multiplicative
+    # (x0*x1 exact 0/5 contre 5/5, mesure dans le CHANGELOG 0.7.0)
+    assert "divmax" in desc_sig
 
 
 def test_symbolic_regression_linear_law():

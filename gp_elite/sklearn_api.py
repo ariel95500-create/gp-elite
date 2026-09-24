@@ -236,9 +236,9 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         on the raw features, reproduces ``predict`` exactly.
 
         The engine searches on internally rescaled inputs (each column goes
-        through an affine map: ``x / max|x|`` for positive data, min-max for
-        signed data, z-score on request), so the evolved tree lives in scaled
-        space. Returning it with raw variable names would be WRONG: on
+        through an affine map: ``x / max|x|`` by default, min-max or z-score
+        on request), so the evolved tree lives in scaled space. Returning it
+        with raw variable names would be WRONG: on
         ``y = 3x`` with ``x`` in [1, 5] it yields ``14.86 * X0`` instead of
         ``3 * X0``. Since 0.7 the formula is rewritten in the raw variables for
         EVERY normalisation, and checked against ``predict`` on the training

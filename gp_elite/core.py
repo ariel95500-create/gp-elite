@@ -7594,10 +7594,19 @@ def _scale_ratio(X_raw):
 def _choose_scaler(X_raw, normalize, x_range):
     """[v23] Sélectionne la normalisation.
 
-    'auto'  : shift-free si toutes les features sont strictement positives
-              (cas multiplicatif typique en sciences — masses, distances,
-              températures absolues), sinon MinMax. NE SE DEMANDE JAMAIS
-              s'il faut normaliser, seulement comment.
+    'auto'  : [v0.7] shift-free (division par max|x|) pour TOUTES les
+              données. Jusqu'en 0.6 : shift-free seulement si toutes les
+              features étaient strictement positives, sinon MinMax — qui
+              remplace chaque variable par a*(x - x0) et casse la structure
+              multiplicative. Mesuré avant le changement (critère fixé
+              avant, 8 lois à entrées signées x 5 seeds, puis 6 jeux PMLB
+              standardisés comme dans SRBench x 5 plis) : récupérations
+              exactes 17/40 contre 2/40 ; R² test médian sur données réelles
+              0.813 contre 0.791, écart apparié médian -0.005 (9 plis
+              meilleurs sur 30, non significatif), aucun effondrement de
+              part et d'autre ; formules livrées plus courtes (médiane 15
+              nœuds contre 19). NE SE DEMANDE JAMAIS s'il faut normaliser,
+              seulement comment.
     'smart' : [v0.7] teste d'abord la disparité d'échelle entre colonnes.
               En dessous de SCALE_RATIO_THRESHOLD, ne normalise pas (les
               features brutes préservent produits, différences et
@@ -7620,8 +7629,7 @@ def _choose_scaler(X_raw, normalize, x_range):
                 f"{SCALE_RATIO_THRESHOLD:g})")
         mode = "auto"
     if mode == "auto":
-        all_pos = bool(np.all(X_raw > 0))
-        mode = "divmax" if all_pos else "minmax"
+        mode = "divmax"
     if mode in ("divmax", "shiftfree", "div"):
         return _ShiftFreeScaler(), "divmax (shift-free, preserves products)"
     if mode in ("standard", "zscore", "std"):
@@ -9023,7 +9031,7 @@ def _interactive_menu():
                    "y": "poly", "": "physical"}[pool_rep]
 
         print("\n  Feature normalization:")
-        print("    a = auto      shift-free if features positive, else minmax (default)")
+        print("    a = auto      shift-free: each column / its max |value| (default)")
         print("    d = divmax    shift-free (preserves x·y, x/y — multiplicative laws)")
         print("    m = minmax    [-2,2] (bounds exp/pow, but inflates products)")
         print("    s = standard  z-score (centered & scaled)")

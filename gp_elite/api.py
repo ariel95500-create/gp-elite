@@ -313,8 +313,12 @@ def symbolic_regression(
     y : ndarray (n_samples,)             — cible
     feature_names : noms des colonnes (sinon X0, X1, …) — apparaissent dans la formule
     operators : 'physical' | 'trig' | 'full' | 'poly'  — pool d'opérateurs
-    normalize : 'auto' | 'divmax' | 'minmax' | 'standard'
-                'auto' = shift-free si toutes les features sont positives
+    normalize : 'auto' | 'divmax' | 'minmax' | 'standard' | 'none'
+                'auto' = 'divmax' : chaque colonne divisée par son max|x|,
+                sans décalage (préserve x*y, x/y, x^n). [v0.7] Aussi pour les
+                colonnes signées, qui passaient auparavant en min-max.
+                Quelle que soit la normalisation, `expression` et `sympy()`
+                sont rendus dans les variables brutes.
     generations : nombre de générations
     speed : 'ultrafast' | 'fast' | 'thorough' | 'normal'
         Taille de population et nombre d'îles. 'fast' (défaut) pour explorer
