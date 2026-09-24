@@ -142,7 +142,44 @@ def _mat(c, t):
     if t.value == "/" and t.left is not None and _is_num(t.left.value) \
             and float(t.left.value) == 1.0:
         return Node("/", Node(c), t.right)           # c * (1/u)  ->  c / u
+    if t.value in ("+", "-") and _all_terms_scaled(t):
+        return _distribute(c, t)                     # c*(a*u + b*v) -> ca*u + cb*v
     return Node("*", Node(c), t)
+
+
+def _const_factor(nd):
+    """k if nd is k, k*u, k/u or -(k*u)...; else None."""
+    if nd.left is None and nd.right is None:
+        return float(nd.value) if _is_num(nd.value) else None
+    if nd.value in ("*", "/") and nd.left is not None and _is_num(nd.left.value) \
+            and nd.left.left is None and nd.left.right is None:
+        return float(nd.left.value)
+    if nd.value == "neg" and nd.left is not None:
+        k = _const_factor(nd.left)
+        return None if k is None else -k
+    return None
+
+
+def _all_terms_scaled(t):
+    """Every additive term of the sum t already carries a constant factor, so
+    distributing a constant over it adds no constant and removes one."""
+    if t.value in ("+", "-") and t.right is not None:
+        return _all_terms_scaled(t.left) and _all_terms_scaled(t.right)
+    return _const_factor(t) is not None
+
+
+def _distribute(c, t):
+    if t.value in ("+", "-") and t.right is not None:
+        return Node(t.value, _distribute(c, t.left), _distribute(c, t.right))
+    if t.left is None and t.right is None:           # constant
+        return Node(c * float(t.value))
+    if t.value == "neg":
+        return _distribute(-c, t.left)
+    k = float(t.left.value)                          # k*u or k/u
+    kc = c * k
+    if t.value == "*":
+        return _mat(kc, t.right)
+    return Node("/", Node(kc), t.right)
 
 
 def _const_eval(op, *vals):
@@ -485,11 +522,22 @@ def to_text(node, names=None, positive=None, _parsable=False):
             return "%s(%s)" % (v, A[0]), _ATOM               # exp, sin, step...
         A, B = f(nd.left), f(nd.right)
         if v in ("+", "-"):
-            if B[1] == _UMINUS and B[0].startswith("-"):     # a + -b  ->  a - b
+            # a + -b -> a - b ; also a + -2 * x -> a - 2 * x (the leading
+            # minus of a product or quotient belongs to the whole term)
+            if B[1] >= _MUL and B[0].startswith("-"):
                 op = "-" if v == "+" else "+"
                 return "%s %s %s" % (A[0], op, B[0][1:]), _ADD
             rhs = par(B, _MUL) if v == "-" else B[0]
             return "%s %s %s" % (A[0], v, rhs), _ADD
+        if v == "*" and not _parsable and nd.left.left is None \
+                and nd.left.right is None and _is_num(nd.left.value) \
+                and num(nd.left.value) in ("1", "-1"):
+            # a factor that prints as 1 (e.g. 1.0000000002) is noise at the
+            # displayed precision: "x * y", not "1 * x * y"
+            if num(nd.left.value) == "1":
+                return B
+            s = "(%s)" % B[0] if (B[1] < _MUL or B[0].startswith("-")) else B[0]
+            return "-" + s, _UMINUS
         if v in ("*", "/"):
             lhs = par(A, _MUL)
             # right operand: a sum always needs (); a product only under "/"

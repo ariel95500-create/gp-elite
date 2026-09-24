@@ -61,9 +61,15 @@ Keep them focused, add a test, and describe what you measured. For anything
 that changes default behaviour, include a before/after comparison on
 `benchmarks/feynman_bench.py`.
 
+## Getting help
+
+Questions about using GP_ELITE are welcome as
+[issues](https://github.com/ariel95500-create/gp-elite/issues) — there is no
+separate forum. Say what you ran, what you expected and what you got; the
+shape of your data is enough, the data itself is not needed.
+
 ## Conduct and contact
 
-Be kind and assume good faith. This project follows the
-[Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/),
-version 2.1. Conduct concerns, security issues or anything you prefer not to
-post publicly: ariel95500@gmail.com.
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) (Contributor Covenant 2.1). For a
+security problem, do not open an issue: follow [SECURITY.md](SECURITY.md).
+Anything you prefer not to post publicly: ariel95500@gmail.com.
