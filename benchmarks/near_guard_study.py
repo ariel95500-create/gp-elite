@@ -43,6 +43,7 @@ def main():
     out = []
     for k, (tr, te) in enumerate(KFold(5, shuffle=True, random_state=seed).split(X)):
         swaps0 = C._NEAR_GUARD_SWAPS
+        exact0 = getattr(C, "_EXACT_PRIORITY_SWAPS", 0)
         res = symbolic_regression(X[tr], y[tr], generations=40, speed="fast",
                                   restarts=1, parallel=False, seed=seed)
         c, rngy = float(np.median(y[tr])), max(float(np.ptp(y[tr])), 1e-12)
@@ -59,6 +60,7 @@ def main():
         out.append(dict(dataset=name, seed=seed, fold=k, arm=arm,
                         champ_expr=res.expression, champ_size=int(res.size),
                         champ_test_r2=r2(y[te], pc), swapped=C._NEAR_GUARD_SWAPS > swaps0,
+                        exact_priority=getattr(C, "_EXACT_PRIORITY_SWAPS", 0) > exact0,
                         pareto_sig=[x["expr"] for x in cands], cands=cands))
     with open(OUT, "a") as fh:
         for o in out: fh.write(json.dumps(o) + "\n")

@@ -26,9 +26,10 @@ Lancement :
 Options :
   --explore-only   s'arrête après l'inspection des données
   --gens 40          budget de générations (défaut 30)
-  --normalize none   force le mode de normalisation. IMPORTANT : sous 'auto'
-                     les expressions sont en variables normalisées et leurs
-                     constantes ne sont pas physiquement lisibles.
+  --normalize none   force le mode de normalisation. Depuis la 0.7, les
+                     expressions sont rendues dans les variables brutes quel
+                     que soit ce mode (auparavant, sous 'auto', elles étaient
+                     écrites en variables normalisées).
 """
 import os, sys, io, json, time, contextlib
 
@@ -111,11 +112,8 @@ norm = "auto" if ratio > 20 else "none"
 if "--normalize" in sys.argv:
     norm = sys.argv[sys.argv.index("--normalize") + 1]
     print(f"  -> forcé par --normalize : '{norm}'")
-if norm == "auto":
-    print("  ATTENTION : sous normalize='auto', les expressions renvoyées sont")
-    print("  écrites en variables NORMALISÉES. Leurs constantes ne se lisent pas")
-    print("  physiquement. Pour une expression interprétable en unités réelles,")
-    print("  relancer avec  --normalize none  et comparer les deux.")
+# [v0.7] Plus d'avertissement : les expressions sont rendues en variables
+# brutes pour toute normalisation (gp_elite/formula.py).
 
 n_nan = int(np.isnan(X).sum() + np.isnan(y).sum())
 print(f"valeurs manquantes : {n_nan}")

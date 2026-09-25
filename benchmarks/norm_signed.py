@@ -82,12 +82,16 @@ def run_B(name, arm):
         sx, sy = StandardScaler(), StandardScaler()       # comme evaluate_model.py
         Xtr = sx.fit_transform(X[tr]); Xte = sx.transform(X[te])
         ytr = sy.fit_transform(y[tr].reshape(-1, 1)).ravel()
+        from gp_elite import core as _C
+        ex0 = getattr(_C, "_EXACT_PRIORITY_SWAPS", 0)
         r = symbolic_regression(Xtr, ytr, operators="physical", normalize=arm,
                                 generations=40, speed="fast", restarts=1,
                                 parallel=False, seed=0)
+        exact_prio = getattr(_C, "_EXACT_PRIORITY_SWAPS", 0) > ex0
         p = sy.inverse_transform(r.predict(Xte).reshape(-1, 1)).ravel()
         r2 = 1.0 - one_minus_r2(y[te], p) * 1.0
         out.append(dict(part="B", dataset=name, arm=arm, fold=k, r2=r2,
+                        exact_priority=bool(exact_prio),
                         size=int(r.size), raw_size=int(_size(r.formula.tree)) if r.formula else None,
                         exact=bool(r.formula_exact), expr=r.expression[:160]))
         print("%-24s %-7s fold %d  R2=%.4f  size=%d" % (name, arm, k, r2, r.size), flush=True)

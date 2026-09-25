@@ -6139,6 +6139,8 @@ _NEAR_PROBE_XS = None
 _NEAR_BAND = None          # (centre, demi-largeur) en unites de y
 _NEAR_CACHE = {}
 _NEAR_GUARD_SWAPS = 0      # nombre de departages effectifs (diagnostic, tests)
+_EXACT_REL = 1e-12           # [v0.7-EXACT] plancher « exact » relatif a var(y_val)
+_EXACT_PRIORITY_SWAPS = 0   # [v0.7-EXACT] nombre de fois ou la regle a change le choix
 _NEAR_EXT = 0.10
 _NEAR_K = 50.0
 _VAL_TRAIN_YS = None    # [v23.1] train cible
@@ -6309,6 +6311,24 @@ def _select_one_se(champion, champ_val):
     # Seuil = best + max(barre statistique 1-SE, bande de tolérance R²)
     r2_band = tol_r2 * var_val if var_val > 1e-15 else best_mse * 0.20
     thr = best_mse + max(best_se, r2_band)
+    # [v0.7-EXACT] PRIORITÉ À L'EXACTITUDE. La tolérance R² existe pour ne
+    # pas surajuster le BRUIT. Quand le meilleur candidat reproduit le
+    # hold-out à la précision numérique (MSE <= 1e-12 x variance : aucune
+    # donnée mesurée n'y arrive, seule une loi exacte sur données non
+    # bruitées), il n'y a pas de bruit à éviter : on ne remplace pas la loi
+    # exacte par une approximation plus courte (vu sur Feynman I.18.12 :
+    # r*F*sin(th) exacte dans le front, rendu 0.0776 + 0.9967*r*F*sin(1.0106*th)).
+    # Seuls les candidats eux aussi exacts restent éligibles ; le plus petit
+    # gagne. Sans effet dès que le meilleur MSE dépasse ce plancher.
+    exact_floor = _EXACT_REL * var_val
+    if var_val > 1e-15 and best_mse <= exact_floor:
+        loose = min((t for t in pool if t[0] <= thr), key=lambda t: (t[2], t[0]))
+        thr = exact_floor
+        tight = min((t for t in pool if t[0] <= thr), key=lambda t: (t[2], t[0]))
+        if tight[3] is not loose[3]:
+            globals()["_EXACT_PRIORITY_SWAPS"] = _EXACT_PRIORITY_SWAPS + 1
+            TRACE.set("exact_priority", "loi exacte préférée à une "
+                      "approximation plus courte")
     eligible = [t for t in pool if t[0] <= thr]
     eligible.sort(key=lambda t: (t[2], t[0]))   # plus petit, puis meilleur MSE
     # [v0.7-NEAR] DEPARTAGE : parmi les candidats que les donnees ne savent pas

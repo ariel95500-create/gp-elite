@@ -350,7 +350,18 @@ def _tidy(nd):
 def to_raw_tree(node, a, b):
     """Scaled-space tree -> equivalent raw-space tree (engine operators)."""
     c, t = _fold(node, a, b)
-    return _tidy(_mat(c, t))
+    tree = _tidy(_mat(c, t))
+    # Collecting like terms can leave constant subtrees behind (terms that
+    # cancel, e.g. a denominator reduced to a number): fold again, in the raw
+    # variables this time (identity map), until nothing changes.
+    one, zero = np.ones(len(a)), np.zeros(len(a))
+    for _ in range(3):
+        c, t = _fold(tree, one, zero)
+        again = _tidy(_mat(c, t))
+        if to_sympy_string(again) == to_sympy_string(tree):
+            break
+        tree = again
+    return tree
 
 
 def substitute_only(node, a, b):

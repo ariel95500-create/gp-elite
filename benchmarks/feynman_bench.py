@@ -186,6 +186,8 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
         idx = rng.permutation(200); tr, te = idx[:140], idx[140:]
         names = [f"v{k}" for k in range(nv)]
         t0 = time.time()
+        import gp_elite.core as _C
+        _ex0 = getattr(_C, "_EXACT_PRIORITY_SWAPS", 0)
         with contextlib.redirect_stdout(io.StringIO()):
             r = symbolic_regression(X[tr], y[tr], feature_names=names,
                                     operators=pool, generations=30, speed="fast",
@@ -211,7 +213,8 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
         rec = dict(name=name, formula=formula, nv=nv, famille=_fam(PROBS[i]),
                    status=status, status_front=_st(pb),
                    one_minus_r2=one_minus_r2, pareto_best=pb, pb_size=pb_size,
-                   time=round(dt,1), size=r.size, expr=r.expression[:90])
+                   time=round(dt,1), size=r.size, expr=r.expression[:90],
+                   exact_priority=getattr(_C, "_EXACT_PRIORITY_SWAPS", 0) > _ex0)
         with open(out, "a") as fh: fh.write(json.dumps(rec)+"\n")
         print(f"  {name:<10} {status:<6} champ={one_minus_r2:.1e} front={pb:.1e}"
               f"  ({dt:.0f}s)  {formula}")

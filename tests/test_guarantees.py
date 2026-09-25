@@ -422,3 +422,31 @@ def test_identical_fits_in_one_process_are_identical():
     first = symbolic_regression(x.reshape(-1, 1), y, **kw).expression
     second = symbolic_regression(x.reshape(-1, 1), y, **kw).expression
     assert first == second
+
+
+# ── 8. A law found exactly is not traded for a shorter approximation ───────
+# The final choice keeps the smallest candidate within 0.3 % of R² of the
+# best, to avoid fitting noise. On Feynman I.18.12 that returned
+# 0.0776 + 0.9967*r*F*sin(1.0106*th) while r*F*sin(th), exact, was in the
+# front. When the best candidate reproduces the hold-out to numerical
+# precision there is no noise to avoid: only exact candidates stay eligible.
+
+def _pick(monkeypatch, cands):
+    monkeypatch.setattr(core, "_VAL_YS", np.linspace(-1.0, 1.0, 50))
+    monkeypatch.setattr(core, "_VAL_CANDS", list(cands))
+    monkeypatch.setattr(core, "_NEAR_PROBE_XS", None)
+    return core._select_one_se(None, float("inf"))[0]
+
+
+def test_exact_law_is_not_traded_for_an_approximation(monkeypatch):
+    exact = N("*", X(0), X(1))
+    approx = X(0)
+    got = _pick(monkeypatch, [(1e-31, 0.0, 14, exact), (3e-4, 1e-5, 12, approx)])
+    assert got is exact
+
+
+def test_parsimony_tolerance_unchanged_on_noisy_data(monkeypatch):
+    big = N("*", X(0), X(1))
+    small = X(0)
+    got = _pick(monkeypatch, [(1e-2, 1e-4, 14, big), (1.05e-2, 1e-4, 12, small)])
+    assert got is small
