@@ -22,3 +22,6 @@ grammar_*.json
 .vscode/
 # Sorties console des bancs (redondantes avec la télémétrie .jsonl)
 run_*.txt
+
+# PMLB downloads (checked by content hash in benchmarks/pmlb_frozen.py)
+benchmarks/_pmlb_cache/

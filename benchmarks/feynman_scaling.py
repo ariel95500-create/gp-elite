@@ -40,6 +40,8 @@ Options :
   --sizes 25,100,1000  grille de tailles personnalisée
   --eq I.16.6,I.12.1   sous-ensemble d'équations
   --bilan              bilan seul depuis le jsonl
+  --out fichier.jsonl  fichier de résultats (défaut : benchmarks/feyn_scaling.jsonl,
+                       mesures de la 0.6.0 ; une autre version doit écrire ailleurs)
 """
 import os, sys, json, time, io, re, contextlib, hashlib, datetime
 
@@ -48,7 +50,6 @@ try:
 except Exception:
     pass
 
-EXPECTED_ENGINE = "0.6.0"
 
 # La racine du dépôt passe AVANT tout : sinon un gp_elite installé par pip
 # (potentiellement plus ancien) masque la copie du dépôt.
@@ -137,13 +138,25 @@ def _done():
     return keys
 
 def _check_engine():
+    """[v0.7] Un fichier de résultats = une version du moteur. On refuse
+    d'ajouter des mesures d'une version à un fichier qui en contient d'une
+    autre (les comparaisons n'auraient aucune valeur) ; --out permet de
+    mesurer une nouvelle version dans un fichier neuf."""
     print(f"gp_elite {ENGINE}  <-  {os.path.abspath(gp_elite.__file__)}")
-    if ENGINE != EXPECTED_ENGINE:
-        print(f"\n!! ARRÊT : moteur {ENGINE}, attendu {EXPECTED_ENGINE}.")
-        print("   Le scaling doit tourner sur la MÊME version que les autres")
-        print("   bancs, sinon les comparaisons n'ont aucune valeur.")
-        print("   Le chemin ci-dessus pointe-t-il vers ton dépôt ou vers")
-        print("   site-packages ? Passer outre volontairement : --force")
+    print(f"résultats : {OUT}")
+    versions = set()
+    if os.path.exists(OUT):
+        with open(OUT, encoding="utf-8") as fh:
+            for line in fh:
+                try:
+                    versions.add(json.loads(line).get("engine_version"))
+                except Exception:
+                    pass
+    autres = sorted(v for v in versions if v and v != ENGINE)
+    if autres:
+        print(f"\n!! ARRÊT : {OUT} contient des mesures du moteur {autres},")
+        print(f"   et le moteur chargé est {ENGINE}. Mesurez dans un fichier")
+        print("   neuf : --out <fichier>.  Passer outre volontairement : --force")
         if "--force" not in sys.argv:
             sys.exit(1)
         print("   (--force : on continue malgré tout)\n")
@@ -310,6 +323,7 @@ if __name__ == "__main__":
     if "--arm" in argv:   arm = argv[argv.index("--arm") + 1]
     if "--sizes" in argv: sizes = [int(x) for x in argv[argv.index("--sizes") + 1].split(",")]
     if "--eq" in argv:    eqs = set(argv[argv.index("--eq") + 1].split(","))
+    if "--out" in argv:   OUT = os.path.abspath(argv[argv.index("--out") + 1])
     if os.environ.get("PYTHONHASHSEED") != "0":
         print("!! ATTENTION : PYTHONHASHSEED != 0 — relancer avec "
               "PYTHONHASHSEED=0 pour la reproductibilité.")
