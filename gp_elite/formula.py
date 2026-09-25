@@ -144,6 +144,11 @@ def _mat(c, t):
         return Node("/", Node(c), t.right)           # c * (1/u)  ->  c / u
     if t.value in ("+", "-") and _all_terms_scaled(t):
         return _distribute(c, t)                     # c*(a*u + b*v) -> ca*u + cb*v
+    if t.value == "*" and t.right is not None:       # c*((a*u + b*v)*w) -> (ca*u + cb*v)*w
+        for f, other, left in ((t.left, t.right, True), (t.right, t.left, False)):
+            if f.value in ("+", "-") and f.right is not None and _all_terms_scaled(f):
+                d = _distribute(c, f)
+                return Node("*", d, other) if left else Node("*", other, d)
     return Node("*", Node(c), t)
 
 
@@ -291,10 +296,61 @@ def _fold(node, a, b):
     return 1.0, Node(v, _mat(c1, t1), _mat(c2, t2))
 
 
+def _flatten_sum(nd, sign, out):
+    """Additive terms of a sum as (coefficient, core); core None = constant."""
+    v = nd.value
+    if v == "+" and nd.right is not None:
+        _flatten_sum(nd.left, sign, out)
+        _flatten_sum(nd.right, sign, out)
+    elif v == "-" and nd.right is not None:
+        _flatten_sum(nd.left, sign, out)
+        _flatten_sum(nd.right, -sign, out)
+    elif v == "neg":
+        _flatten_sum(nd.left, -sign, out)
+    elif nd.left is None and nd.right is None and _is_num(v):
+        out.append((sign * float(v), None))
+    elif v == "*" and nd.left is not None and nd.left.left is None \
+            and nd.left.right is None and _is_num(nd.left.value):
+        out.append((sign * float(nd.left.value), nd.right))
+    else:
+        out.append((sign * 1.0, nd))
+    return out
+
+
+def _tidy(nd):
+    """Collect like terms in every sum: 0.32*v + u + 0.33*v -> 0.65*v + u.
+    Exact algebra (only coefficients of structurally identical terms are
+    added), so the function is unchanged; the fit-time check still applies."""
+    if nd is None or (nd.left is None and nd.right is None):
+        return nd
+    if nd.value in ("+", "-") and nd.right is not None:
+        groups = []                                  # [coef, core], first-seen order
+        for coef, core in _flatten_sum(nd, 1.0, []):
+            core = _tidy(core) if core is not None else None
+            for g in groups:
+                if (g[1] is None and core is None) or \
+                        (g[1] is not None and core is not None and _same(g[1], core)):
+                    g[0] += coef
+                    break
+            else:
+                groups.append([coef, core])
+        terms = [(c, t) for c, t in groups if c != 0.0]
+        if not terms:
+            return Node(0.0)
+        acc = _mat(terms[0][0], terms[0][1])
+        for c, t in terms[1:]:
+            if c < 0:
+                acc = Node("-", acc, _mat(-c, t))
+            else:
+                acc = Node("+", acc, _mat(c, t))
+        return acc
+    return Node(nd.value, _tidy(nd.left), _tidy(nd.right))
+
+
 def to_raw_tree(node, a, b):
     """Scaled-space tree -> equivalent raw-space tree (engine operators)."""
     c, t = _fold(node, a, b)
-    return _mat(c, t)
+    return _tidy(_mat(c, t))
 
 
 def substitute_only(node, a, b):
