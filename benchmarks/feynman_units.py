@@ -39,7 +39,6 @@ try:
 except Exception:
     pass
 
-EXPECTED_ENGINE = "0.6.0"          # version de référence des trois bras
 
 # [correctif] La racine du dépôt passe AVANT tout : sinon un gp_elite installé
 # par pip (potentiellement plus ancien) masque la copie du dépôt. C'est ce qui
@@ -55,20 +54,30 @@ import numpy as np
 ENGINE = getattr(gp_elite, "__version__", "?")
 
 def _check_engine():
+    """[v0.7] Un fichier de résultats = une version du moteur (--out pour en
+    mesurer une autre dans un fichier neuf)."""
     print(f"gp_elite {ENGINE}  <-  {os.path.abspath(gp_elite.__file__)}")
-    if ENGINE != EXPECTED_ENGINE:
-        print(f"\n!! ARRÊT : moteur {ENGINE}, attendu {EXPECTED_ENGINE}.")
-        print("   Les trois bras (auto/none/units) doivent tourner sur la MÊME")
-        print("   version, sinon la comparaison n'a aucune valeur.")
-        print("   Diagnostic : le chemin ci-dessus pointe-t-il vers ton dépôt")
-        print("   ou vers site-packages ? Si site-packages, désinstalle la copie")
-        print("   pip (pip uninstall gp-elite) ou lance depuis la racine du")
-        print("   dépôt. Pour passer outre volontairement : --force")
+    print(f"résultats : {OUT}")
+    versions = set()
+    if os.path.exists(OUT):
+        with open(OUT, encoding="utf-8") as fh:
+            for line in fh:
+                try:
+                    versions.add(json.loads(line).get("engine_version"))
+                except Exception:
+                    pass
+    autres = sorted(v for v in versions if v and v != ENGINE)
+    if autres:
+        print(f"\n!! ARRÊT : {OUT} contient des mesures du moteur {autres}, et")
+        print(f"   le moteur chargé est {ENGINE}. Mesurez dans un fichier neuf :")
+        print("   --out <fichier>.  Passer outre volontairement : --force")
         if "--force" not in sys.argv:
             sys.exit(1)
         print("   (--force : on continue malgré tout)\n")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "feyn_units.jsonl") \
       if "__file__" in globals() else "feyn_units.jsonl"
+if "--out" in sys.argv:
+    OUT = os.path.abspath(sys.argv[sys.argv.index("--out") + 1])
 
 R = np.random.RandomState
 def U(rng, lo, hi, n): return rng.uniform(lo, hi, n)
@@ -227,13 +236,17 @@ def run_range(i0, i1):
         pb, pb_size = pb_entry["err_test"], pb_entry["size"]
         pb_train = pb_entry["err_train"]
 
-        status = "EXACT" if pb < 1e-9 else ("NEAR" if pb < 1e-3 else "MISS")
-        census = _census(pb_entry["expr"])
+        # [v0.7] Statut du modèle RENDU ; le meilleur point du front (choisi
+        # sur le test) n'est qu'une métrique secondaire (status_front).
+        _st = lambda e: "EXACT" if e < 1e-9 else ("NEAR" if e < 1e-3 else "MISS")
+        status = _st(champ_te)
+        census = _census(r.expression)
         suspects = sorted((set(census) & _SUSPECT) - _expected(formula))
 
         rec = dict(
             # hérités
             name=name, formula=formula, normalize="none", status=status,
+            status_front=_st(pb),
             one_minus_r2=champ_te, pareto_best=pb, pb_size=pb_size,
             time=round(dt, 1), expr=r.expression[:90],
             # traçabilité
@@ -270,6 +283,9 @@ def bilan():
             line = line.strip()
             if line:
                 rows.append(json.loads(line))
+    for r in rows:                       # [v0.7] statut du modèle rendu
+        r["status"] = ("EXACT" if r["one_minus_r2"] < 1e-9 else
+                       "NEAR" if r["one_minus_r2"] < 1e-3 else "MISS")
     by = {r["name"]: r for r in rows}
     ordered = [by[p[0]] for p in PROBS if p[0] in by]
     n_ex = sum(1 for r in ordered if r["status"] == "EXACT")
@@ -309,8 +325,16 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] in ("--bilan", "--summary"):
         bilan()
     else:
-        a = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-        b = int(sys.argv[2]) if len(sys.argv) > 2 else len(PROBS)
+        _pos, _skip = [], False
+        for _x in sys.argv[1:]:
+            if _skip:
+                _skip = False; continue
+            if _x == "--out":
+                _skip = True; continue
+            if not _x.startswith("--"):
+                _pos.append(_x)
+        a = int(_pos[0]) if len(_pos) > 0 else 0
+        b = int(_pos[1]) if len(_pos) > 1 else len(PROBS)
         print(f"=== BANC FEYNMAN, BRAS UNITS — équations {a}..{b-1} ===")
         run_range(a, b)
         bilan()

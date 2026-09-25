@@ -311,10 +311,30 @@ def _flatten_sum(nd, sign, out):
         out.append((sign * float(v), None))
     elif v == "*" and nd.left is not None and nd.left.left is None \
             and nd.left.right is None and _is_num(nd.left.value):
-        out.append((sign * float(nd.left.value), nd.right))
+        k = float(nd.left.value)
+        inner = nd.right
+        if inner is not None and inner.value in ("+", "-") and inner.right is not None:
+            # k*(S + c) = k*S + k*c : the constant leaves the parenthesis and
+            # joins the other constants (no constant is added)
+            sub = _flatten_sum(inner, 1.0, [])
+            c0 = sum(c for c, t in sub if t is None)
+            rest = [(c, t) for c, t in sub if t is not None]
+            if c0 != 0.0 and rest:
+                out.append((sign * k * c0, None))
+                out.append((sign * k, _rebuild_sum(rest)))
+                return out
+        out.append((sign * k, inner))
     else:
         out.append((sign * 1.0, nd))
     return out
+
+
+def _rebuild_sum(terms):
+    """[(coef, core)] -> tree, writing negative coefficients as subtractions."""
+    acc = _mat(terms[0][0], terms[0][1])
+    for c, t in terms[1:]:
+        acc = Node("-", acc, _mat(-c, t)) if c < 0 else Node("+", acc, _mat(c, t))
+    return acc
 
 
 def _tidy(nd):
@@ -337,13 +357,7 @@ def _tidy(nd):
         terms = [(c, t) for c, t in groups if c != 0.0]
         if not terms:
             return Node(0.0)
-        acc = _mat(terms[0][0], terms[0][1])
-        for c, t in terms[1:]:
-            if c < 0:
-                acc = Node("-", acc, _mat(-c, t))
-            else:
-                acc = Node("+", acc, _mat(c, t))
-        return acc
+        return _rebuild_sum(terms)
     return Node(nd.value, _tidy(nd.left), _tidy(nd.right))
 
 
