@@ -1,0 +1,11 @@
+Recovering y = 2x + 1 from data with outliers
+(RMSE vs the TRUE law on clean points, 5 seeds: median [worst])
+
+   outliers |    MSE (default) |      robust=True | lower median
+  --------------------------------------------------------------
+         0% |   0.063 [ 0.063] |   0.063 [ 0.063] | tie
+        10% |   1.398 [ 1.398] |   0.237 [ 0.237] | robust
+        20% |   1.925 [ 1.925] |   1.925 [ 1.925] | tie
+
+  Read the table, not a slogan: robustness costs a little on clean
+  data and pays off only when the outliers are numerous enough.

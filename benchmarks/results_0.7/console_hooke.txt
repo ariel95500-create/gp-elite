@@ -1,0 +1,188 @@
+
+══════════════════════════════════════════════════════════════════════
+  GP_ELITE  —  Symbolic Regression (1-D & N-D) via Genetic Programming
+══════════════════════════════════════════════════════════════════════
+
+  Available 1-D problems:
+
+  Classiques :
+     1.  sin(x²) + x·cos(x)                        [-3.0, 3.0]
+     2.  x³ - x² + x - 1                           [-3.0, 3.0]
+     3.  exp(-x²)·sin(2x)                          [-2.5, 2.5]
+     4.  log(1+x²)·cos(x)                          [-2.5, 2.5]
+
+  Complexes (★) :
+     5.  x·sin(x²)·cos(x/2)                        [-3.0, 3.0]
+     6.  exp(-|x|)·(x²-1)                          [-4.0, 4.0]
+     7.  sinc(x)·cos(x²)  [sinc=sin(x)/x]          [-3.0, 3.0]
+     8.  sin(πx)/(x²+1)                            [-3.0, 3.0]
+     9.  tanh(x)·exp(-x²/4)                        [-3.5, 3.5]
+    10.  x³·sin(1/x)                               [0.2, 3.0]
+
+  N-D problems (★★):
+   ND1.  X[:,0]·sin(X[:,1]) + X[:,2]²                    3 vars  [-3.0, 3.0]
+   ND2.  exp(-X[:,0]²)·cos(X[:,1])                       2 vars  [-2.5, 2.5]
+   ND3.  X[:,0]³ - X[:,1]·X[:,2]                         3 vars  [-3.0, 3.0]
+   ND4.  sin(X[:,0]+X[:,1]) · exp(-X[:,2]²/2)            3 vars  [-2.5, 2.5]
+   ND5.  X[:,0]·X[:,1] / (1 + X[:,2]²)                   3 vars  [-3.0, 3.0]
+  SYRACUSE.  Collatz flight time — 4 features [log2,v2,odd_part,mod4_1]  10 vars  [-2.0, 2.0]
+
+  N-D problems with decoy variable (★★★):
+   ND1_DECOY.  X[:,0]·sin(X[:,1]) + X[:,2]²  [+X[3] LEURRE]    4 vars  leurre=X[3]
+   ND3_DECOY.  X[:,0]³ - X[:,1]·X[:,2]  [+X[3] LEURRE]         4 vars  leurre=X[3]
+   ND5_DECOY.  X[:,0]·X[:,1]/(1+X[:,2]²)  [+X[3] LEURRE]       4 vars  leurre=X[3]
+  BATTERY_SOH.  1 - 0.02·exp(X[0])·X[1] - 0.005·X[2]²  [+X[3] LEURRE]  4 vars  leurre=X[3]
+
+──────────────────────────────────────────────────────────────────────
+
+  Available modes:
+    1. Single 1-D problem     — targeted run, fine-grained options
+    2. Ablation               — BASE / +LIB / +CO / +SEQ
+    3. Benchmark standard     — FULL vs NOSEED
+    4. Single N-D problem     — multi-variable regression  [v16-NDIM]
+    5. ★ SYRACUSE / Collatz  — flight time, 4 features [log2,v2,odd_part,mod4_1]  [SYRACUSE]
+    6. ★ Generic CSV          — regression on YOUR data (any file)  [v22-CSV]
+    7. ★ FORECAST             — extrapolate a trend beyond YOUR data  [v30]
+
+  Your choice [1/2/3/4/5/6/7] (default=1) : 
+  ★ Generic CSV mode — symbolic regression on YOUR data
+
+  CSV file path : 
+  Detected columns: ['elongation', 'force']
+  Preview:
+ elongation     force
+   0.059393 14.848304
+   0.074367 18.591761
+   0.064249 16.062176
+
+  TARGET column [default = last 'force'] :   FEATURE columns, comma-separated [default = all others] : 
+  Operator pool (the problem's 'physics'):
+    p = physical  exp/log/sqrt/tanh/pow — decay, saturation (default)
+    t = trig      + sin/cos — periodic/oscillatory phenomena
+    f = full      everything — when unsure a priori
+    y = poly      +,-,*,/,sq,cube,sqrt — pure algebraic relations
+  Choice [p/t/f/y] (default=p) : 
+  Feature normalization:
+    a = auto      shift-free: each column / its max |value| (default)
+    d = divmax    shift-free (preserves x·y, x/y — multiplicative laws)
+    m = minmax    [-2,2] (bounds exp/pow, but inflates products)
+    s = standard  z-score (centered & scaled)
+  Choice [a/d/m/s] (default=a) : 
+  Physical units (optional — restricts the search to
+  dimensionally consistent formulas):
+    Leave blank to skip. Examples: kg | m/s | kg*m/s^2 | s^-1 | 1
+  Units for ['elongation'], comma-separated :   Unit for TARGET 'force' :   → dimensional constraint ACTIVE.
+
+  If the law carries a dimensioned constant that is
+  not among your columns (G, k_B, R, a stiffness...),
+  the engine can deduce its units and value.
+  Deduce an unknown constant? [y/N] : 
+  Speed? [u=ultrafast / f=fast / n=normal] (default=f) : 
+══════════════════════════════════════════════════════════════════════
+  Loading data...
+[CSV] Normalisation : divmax (shift-free, preserves products)
+[CSV] ✓ 150 samples | 1 features → target 'force'
+      Features : ['elongation']
+      Operator pool: 'physical' → ['+', '-', '*', '/', 'pow', 'exp', 'log', 'sqrt', 'tanh', 'sq', 'neg', 'abs']
+        X[0] = elongation           ∈ [0.01042, 0.0999]
+      Cible 'force' ∈ [2.606, 24.97]  moy=13.98
+  Config : fast  pop=400  gen=200  islands=3  features=1
+══════════════════════════════════════════════════════════════════════
+
+[v17-SEMANTIC] Probe set initialized: 30 points × 1 features  [-2.0, 2.0]
+======================================================================
+Generations : 200  |  Ops : ['+', '-', '*', '/', 'pow', 'sin', 'cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube']
+======================================================================
+
+[v21-VAL] Hold-out random : 120 points train / 30 points validation (20%, seed=1234)
+          Evolution sees ONLY the train set; final champion selected on the validation set.
+GP_ELITE  —  3 islands × 133 individuals  (island 0=explorer, island 1=cleaner, island 2=stigmergic)
+
+[GEN 0000|I0] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (0.2s)
+  EXPR = (24.974004 * elongation)
+
+[GEN 0000|I2] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (0.6s)
+  EXPR = (24.974004 * elongation)
+
+
+════════════════════════════════════════════════════════════
+  [SUCCESS] Precision target reached at GEN 0000!
+  MSE (hold-out si actif) = 6.70e-09  ≤  seuil = 1.00e-06
+  Early stop — remaining generations saved.
+════════════════════════════════════════════════════════════
+
+
+──────────────────────────────────────────────────────────────────────
+[v21-VAL] GENERALIZATION REPORT (final champion)
+  MSE train      : 5.297422e-09
+  Validation MSE : 6.696502e-09   (never seen by evolution)
+  R² validation  : 1.0000
+  Ratio val/train: 1.26
+  ✓ Healthy generalization.
+──────────────────────────────────────────────────────────────────────
+[LOG] History exported → /tmp/claude-0/console/gp_elite_log.csv
+[STIGM] Fragments accumulated: 7
+[STIGM] τ max : 0.6486  |  τ moyen : 0.3698
+[STIGM] Dominant operators: [('*', 3), ('/', 2), ('sqrt', 1), ('sq', 1)]
+[STIGM] Top 3 fragments :
+  τ=0.649  freq=4  sqrt((2.0 * (elongation)²))
+  τ=0.649  freq=4  (elongation)²
+  τ=0.625  freq=57  (-0.9752 * elongation)
+
+[COGRAPH] Co-occurrence edges: 6
+[COGRAPH] co max : 1.33948  |  co moyen : 0.68795
+[COGRAPH] Top 5 paires co-occurrentes :
+  co=1.3395  [(2.0 * (elongation)²)]  ×  [sqrt((2.0 * (elongation)²))]
+  co=1.3395  [(elongation)²]  ×  [sqrt((2.0 * (elongation)²))]
+  co=1.3395  [(2.0 * (elongation)²)]  ×  [(elongation)²]
+  co=0.0364  [(1.0 / (2.0 * (1.0 / elongation)))]  ×  [(2.0 * (1.0 / elongation))]
+  co=0.0364  [(1.0 / (2.0 * (1.0 / elongation)))]  ×  [(1.0 / elongation)]
+
+[SEQ_MEM] Transitions apprises : 22  (poids total : 170.63)
+[SEQ_MEM] Top 5 transitions :
+  root.root.unary           → *
+  *.root.unary              → *
+  root.sqrt.left            → const
+  root.sqrt.right           → sq
+  sqrt.*.unary              → X[0]
+
+======================================================================
+FINAL RESULT
+======================================================================
+
+Target        : CSV: force = f(elongation)
+Expression    : (24.974004 * elongation′)
+True MSE      : 5.5764939618e-09
+Hybrid score  : 0.0000000059   (5·(1-|r|) + mse/(1+mse))
+Fitness       : 0.0000000162
+Size          : 3
+Depth         : 2
+
+Verification:
+  X[0]          target       predicted         error
+  ----------------------------------------------------------
+    0.5945     14.84830400     14.84825255      5.15e-05
+    0.7444     18.59176100     18.59175319      7.81e-06
+    0.6432     16.06217600     16.06225276      7.68e-05
+    0.5910     14.75987200     14.75975253      1.19e-04
+    0.4818     12.03223300     12.03225206      1.91e-05
+    0.6820     17.03261800     17.03250292      1.15e-04
+    0.4943     12.34571200     12.34575212      4.01e-05
+    0.9035     22.56489300     22.56500387      1.11e-04
+
+[SAVE] Meilleure solution → gp_elite_best.txt
+
+  Note: 'Expression' above is the engine's internal form, on
+  rescaled columns (a prime marks a rescaled column, e.g.
+  elongation′). Use the formula below.
+
+  Formula in YOUR columns (checked on your data):
+    force = 250 * elongation
+
+  Dimensional constraint was active: every candidate was
+  dimensionally consistent by construction.
+  Deduced constant units : [kg / s^2]
+  Deduced constant value : 250
+
+──────────────────────────────────────────────────────────────────────
+  Done. Press Enter to quit...

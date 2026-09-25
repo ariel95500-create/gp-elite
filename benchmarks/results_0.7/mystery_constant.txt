@@ -1,0 +1,57 @@
+gp_elite : /home/claude/repo/gp_elite  (0.7.0)
+budget   : 25 generations x 2 restart(s)
+
+==================================================================
+  Hooke  F = k*x
+==================================================================
+  unites entrees   : ['m']   cible : N
+  constante attendue : [kg / s^2]   valeur 250
+
+  equation   : (250.0*X0)
+  R2         : 1.000000
+  constante deduite : [kg / s^2]
+  valeur ajustee    : 250
+
+  [OK ] R2 > 0.999
+  [OK ] dimension de la constante correcte
+  [OK ] valeur a 2% pres
+
+==================================================================
+  Newton F = G*m1*m2/r^2
+==================================================================
+  unites entrees   : ['kg', 'kg', 'm']   cible : N
+  constante attendue : [m^3 / kg s^2]   valeur 6.674e-11
+
+  equation   : (6.674e-11*(((X0*X1)/X2)/X2))
+  R2         : 1.000000
+  constante deduite : [m^3 / kg s^2]
+  valeur ajustee    : 6.674e-11
+
+  [OK ] R2 > 0.999
+  [OK ] dimension de la constante correcte
+  [OK ] valeur a 2% pres
+
+==================================================================
+  Gaz    P = n*R*T/V
+==================================================================
+  unites entrees   : ['mol', 'K', 'm^3']   cible : Pa
+  constante attendue : [kg m^2 / K mol s^2]   valeur 8.31446
+
+  equation   : (8.314462618*((X0*X1)/X2))
+  R2         : 1.000000
+  constante deduite : [kg m^2 / K mol s^2]
+  valeur ajustee    : 8.31446
+
+  [OK ] R2 > 0.999
+  [OK ] dimension de la constante correcte
+  [OK ] valeur a 2% pres
+
+==================================================================
+  BILAN
+==================================================================
+  Hooke  F = k*x               REUSSI
+  Newton F = G*m1*m2/r^2       REUSSI
+  Gaz    P = n*R*T/V           REUSSI
+
+  3/3 cas valides
+  La constante mystere fonctionne sur les trois lois.

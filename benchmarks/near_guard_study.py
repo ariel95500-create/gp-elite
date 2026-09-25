@@ -8,12 +8,11 @@ drapeau « stable » contre l'explosion reelle sur le test (ecart > 50 plages
 de y, ou non fini).
 
 Resultat (0.7.0, results_0.7/near_guard.jsonl) : 6 jeux x 2 seeds x 5 plis,
-285 candidats du front. La garde n'a jamais agi : fronts et modeles rendus
-identiques dans les 60 plis ; aucun candidat ne s'est effondre sur le test
-(ecart max 4.7 plages de y). Cout mesure nul ; benefice non observable a ce
-regime (preset fast, 40 generations). Mesure faite avec le candidat 0.7
-d'avant le passage de normalize='auto' a divmax (commit 3a00929) ; a refaire
-sur la version publiee avant de citer ces chiffres pour elle.
+bras ON seul (voir summary : le bras OFF est identique tant que la garde
+n'intervient pas ; une premiere etude appariee ON/OFF l'a verifie sur 60 plis).
+La garde n'a jamais agi ; aucun des 322 candidats du front ne s'est effondre
+sur le test (ecart max 1.6 plages de y). Cout mesure nul ; benefice non
+observable a ce regime (preset fast, 40 generations).
 
 Usage : python near_guard_study.py <dataset> <seed> <on|off>
         python near_guard_study.py --summary [fichier]

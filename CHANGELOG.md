@@ -24,6 +24,14 @@ every number the README quotes on the released code. One default changes
   tests cover division-by-max, min-max, z-score and no scaling, one and several
   variables, signed and positive data; 1,500 random trees were checked against
   sympy with no discrepancy (`gp_elite/formula.py`, `tests/test_guarantees.py`).
+- **A model is evaluated with its own constants.** Compiled functions,
+  predictions, fitness values and simplified forms were cached under a hash
+  that rounds constants to 4 decimals, so two trees differing only further
+  down shared one entry: `predict()` could compute with the constants of
+  another model (compiled earlier, possibly in an earlier fit of the same
+  process), `simplify()` merged `1.00001*x + 1.00002*x` into `2*(1.00001*x)`,
+  and two identical fits in a row could return different models (measured in
+  robust mode). Every cache of values is now keyed on the exact tree.
 - `mse_train` was computed on all rows, hold-out included; it now uses the
   training rows only. `r2_validation` is documented for what it is: the
   hold-out also chooses the returned model, so it is an optimistic selection
@@ -63,13 +71,28 @@ every number the README quotes on the released code. One default changes
   `a*(x - x0)` and breaks multiplicative structure). Decided on a criterion
   written before measuring (`benchmarks/norm_signed.py`, raw results in
   `benchmarks/results_0.7/`). On 8 laws with signed inputs × 5 seeds: exact
-  recoveries 17/40 against 2/40, near ones 28 against 27. On 6 real PMLB
-  datasets standardised as SRBench does × 5 folds: median test R² 0.813
-  against 0.791, but mean 0.751 against 0.767 and worst fold 0.016 against
-  0.377; divmax is better on 9 of 30 paired folds, median paired difference
-  −0.005, no collapse on either side. On real data this is a wash with one bad
-  fold; on laws it is a clear gain, and the delivered formulas are shorter
-  (median 15 nodes against 19). `normalize="minmax"` remains available.
+  recoveries 24/40 against 10/40, near ones 33 against 31. On 6 real PMLB
+  datasets standardised as SRBench does × 5 folds: median test R² 0.819
+  against 0.788, mean 0.759 against 0.757, worst fold 0.016 against 0.398;
+  divmax is better on 17 of 30 paired folds, no collapse on either side, and
+  the delivered formulas are shorter (median 12 nodes against 17). On real
+  data it is roughly a wash with one bad fold; on laws it is a clear gain.
+  `normalize="minmax"` remains available.
+- **A law found exactly is no longer traded for a shorter approximation.**
+  The final choice keeps the smallest candidate within 0.3 % of R² of the
+  best, to avoid fitting noise. On Feynman I.18.12 it returned
+  `0.0776 + 0.9967*r*F*sin(1.0106*th)` while `r*F*sin(th)`, exact, was in the
+  front. When the best candidate reproduces the hold-out to numerical
+  precision (MSE ≤ 1e-12 × variance) there is no noise to avoid, and only
+  exact candidates stay eligible. Measured: the rule never fired on the 60
+  real-data fits of the normalisation study nor on the 60 of the guard study;
+  on the Feynman benchmark it turns I.18.12 into an exact recovery.
+- Unknown option values raise `ValueError`: `operators="phsyical"` used to
+  become `"physical"`, `speed="fats"` the `normal` preset, and
+  `normalize="divmx"` min-max scaling, silently.
+- The console (mode 6) printed the engine's internal expression with the real
+  column names (`24.97 * elongation` for the law `250 * elongation`); rescaled
+  columns now carry a prime, and the law in your columns follows.
 - **Scripts without an `if __name__ == "__main__":` guard** no longer run
   three times over on Windows and macOS when parallel islands start: the
   engine detects it, finishes on one core with the same result and warns
@@ -78,12 +101,36 @@ every number the README quotes on the released code. One default changes
   installation directory or the current one.
 - Near-domain guard at the final selection: among candidates the parsimony
   rule considers equivalent, one that explodes just outside the data (a pole
-  between two training points) is no longer preferred. {GUARD_MEASURE}
+  between two training points) is no longer preferred. Measured cost: none —
+  on 60 real-data folds (6 PMLB datasets × 2 seeds × 5 folds,
+  `benchmarks/near_guard_study.py`) it never intervened, and none of the 322
+  front candidates exploded on the test folds. Its benefit is shown on
+  constructed cases (a spurious pole between training points, in
+  `tests/test_guarantees.py`). The one real collapse seen with 0.6 (210_cloud,
+  thorough preset, one fold at R² = −8e10) could not be reproduced on another
+  platform, so whether the guard would have caught it is not verified.
 - Benchmarks judge every method on the model it returns. `duel.py` used to
   score GP_ELITE on the best point of its Pareto front chosen by looking at
   the test set, and gplearn on its single returned program;
   `feynman_bench.py` reported the front. `examples/robust_regression.py` kept
   the best of three runs by comparing with the true law.
+
+### Measured on this release
+Every figure in the README was re-measured on 0.7.0 (raw results and logs in
+`benchmarks/results_0.7/`, commands in its README), each method judged on the
+model it returns:
+- Feynman benchmark, 15 equations, one seed: 11/15 exact (1−R² < 1e-9 on
+  held-out data), 13/15 within 1e-3; with `units=` declared, 14/15 exact, each
+  in its textbook form. Against gplearn on the same data: 11/15 against 6/15
+  exact.
+- `units=` on Feynman II.11.3, 5 seeds: 5/5 dimensionally valid against 0/5,
+  median size 19 against 61 nodes, and one run in five recovers the exact law
+  (none did in 0.6).
+- Robust mode: error divided by six at 10 % outliers, no gain at 20 % on the
+  bundled example (the 0.6 table showed a best-of-three chosen with the true
+  law).
+- Data size (`normalize="none"`, 5 equations): 4 of 5 exact at every size from
+  500 to 10,000 points.
 
 ### Project
 - Continuous integration on Linux (Python 3.9–3.14) and Windows.

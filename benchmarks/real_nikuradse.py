@@ -74,20 +74,18 @@ URL = (f"https://github.com/EpistasisLab/pmlb/raw/master/datasets/"
        f"{DATASET}/{DATASET}.tsv.gz")
 
 print(f"\n=== téléchargement de {DATASET} ===")
-df = None
+# [v0.7] Données figées par empreinte (pmlb_frozen.py) : le fichier est
+# téléchargé une fois, mis en cache dans benchmarks/_pmlb_cache/ et vérifié.
+# Hors ligne : déposer nikuradse_1.tsv.gz dans ce dossier de cache.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import pmlb_frozen
 try:
-    df = pd.read_csv(URL, sep="\t", compression="gzip")
-    print(f"  source : dépôt PMLB (master)")
+    df = pmlb_frozen.load_frame(DATASET)
+    print("  source : PMLB, contenu vérifié par SHA-256")
 except Exception as exc:
-    print(f"  téléchargement direct impossible ({type(exc).__name__}: {exc})")
-    try:
-        from pmlb import fetch_data
-        df = fetch_data(DATASET)
-        print("  source : paquet pmlb")
-    except Exception as exc2:
-        sys.exit(f"Impossible de récupérer les données : {exc2}\n"
-                 f"Solution de repli : ouvrir {URL} dans un navigateur,\n"
-                 f"enregistrer le fichier à côté du script, puis relancer.")
+    sys.exit(f"Impossible de récupérer les données : {exc}\n"
+             f"Solution de repli : ouvrir {URL} dans un navigateur et\n"
+             f"enregistrer le fichier dans {pmlb_frozen.CACHE}, puis relancer.")
 print(f"forme : {df.shape[0]} lignes x {df.shape[1]} colonnes")
 print(f"colonnes : {list(df.columns)}")
 
