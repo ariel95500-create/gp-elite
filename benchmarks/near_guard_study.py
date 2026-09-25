@@ -67,23 +67,33 @@ def main():
     print(name, seed, arm, ["%.3g" % o["champ_test_r2"] for o in out], flush=True)
 
 def summary(path=OUT):
+    """Bras ON seul suffit : la garde n'agit qu'au choix final et ses sondes
+    ne consomment aucun tirage aleatoire (tests/test_guarantees.py), donc tant
+    qu'elle n'intervient pas, le bras OFF est identique par construction (60
+    plis sur 60 dans la premiere etude appariee). Si des plis OFF existent,
+    l'appariement est verifie."""
     rows = [json.loads(l) for l in open(path) if l.strip()]
     key = lambda r: (r["dataset"], r["seed"], r["fold"])
     on = {key(r): r for r in rows if r["arm"] == "on"}
     off = {key(r): r for r in rows if r["arm"] == "off"}
-    ks = sorted(set(on) & set(off))
-    print("plis apparies            :", len(ks))
-    print("fronts identiques        :", sum(on[k]["pareto_sig"] == off[k]["pareto_sig"] for k in ks))
-    print("modeles rendus identiques:", sum(on[k]["champ_expr"] == off[k]["champ_expr"] for k in ks))
-    print("interventions de la garde:", sum(on[k]["swapped"] for k in ks))
+    ks = sorted(on)
+    print("plis (bras ON)            :", len(ks))
+    print("interventions de la garde :", sum(on[k]["swapped"] for k in ks))
+    if any("exact_priority" in on[k] for k in ks):
+        print("regle d'exactitude active :", sum(bool(on[k].get("exact_priority")) for k in ks))
     c = [x for k in ks for x in on[k]["cands"]]
     expl = lambda x: (not np.isfinite(x["test_dev"])) or x["test_dev"] > 50
-    print("candidats du front       : %d ; instables %d ; effondres sur le test %d ; ecart max %.1f plages de y"
-          % (len(c), sum(not x["stable"] for x in c), sum(expl(x) for x in c), max(x["test_dev"] for x in c)))
-    for arm, d in (("on", on), ("off", off)):
-        v = np.array([d[k]["champ_test_r2"] for k in ks])
-        print("R2 test %-3s : moyenne %.4f  mediane %.4f  pire %.4f  effondrements %d"
-              % (arm, v.mean(), np.median(v), v.min(), int((v < 0).sum())))
+    print("candidats du front        : %d ; instables %d ; effondres sur le test %d ; ecart max %.1f plages de y"
+          % (len(c), sum(not x["stable"] for x in c), sum(expl(x) for x in c),
+             max((x["test_dev"] for x in c), default=float("nan"))))
+    v = np.array([on[k]["champ_test_r2"] for k in ks])
+    print("R2 test du modele rendu   : moyenne %.4f  mediane %.4f  pire %.4f  effondrements %d"
+          % (v.mean(), np.median(v), v.min(), int((v < 0).sum())))
+    both = sorted(set(on) & set(off))
+    if both:
+        print("plis apparies ON/OFF      : %d ; fronts identiques %d ; modeles identiques %d"
+              % (len(both), sum(on[k]["pareto_sig"] == off[k]["pareto_sig"] for k in both),
+                 sum(on[k]["champ_expr"] == off[k]["champ_expr"] for k in both)))
 
 
 if __name__ == "__main__":

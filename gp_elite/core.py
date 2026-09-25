@@ -9210,14 +9210,21 @@ def _interactive_menu():
             _pause(); return
 
         if best:
-            print_result(f"CSV: {target_name} = f({', '.join(feat_names)})",
-                         best, X_data, y_data, cfg)
-            # Rappel du dictionnaire X[i] → nom de colonne
-            print("\n  Variable mapping:")
-            for i, nm in enumerate(feat_names):
-                print(f"    X[{i}] = {nm}")
-            print(f"\n  Note: the 'Expression' above uses the engine's "
-                  f"internally rescaled columns.")
+            # [v0.7] L'expression brute du moteur vit dans l'espace NORMALISÉ.
+            # L'afficher avec les noms réels (« 24.97 * elongation » pour une
+            # loi 250 * elongation) induisait en erreur : pendant cet
+            # affichage, chaque colonne porte un prime (elongation′ = colonne
+            # remise à l'échelle), et la loi dans les colonnes réelles suit.
+            _names_real = list(globals().get("CSV_FEATURE_NAMES") or feat_names)
+            globals()["CSV_FEATURE_NAMES"] = [f"{nm}′" for nm in _names_real]
+            try:
+                print_result(f"CSV: {target_name} = f({', '.join(feat_names)})",
+                             best, X_data, y_data, cfg)
+            finally:
+                globals()["CSV_FEATURE_NAMES"] = _names_real
+            print("\n  Note: 'Expression' above is the engine's internal form, on")
+            print("  rescaled columns (a prime marks a rescaled column, e.g.")
+            print(f"  {feat_names[0]}′). Use the formula below.")
             # [v0.7] La meme loi, ecrite dans les colonnes de l'utilisateur et
             # verifiee sur ses donnees (formula.py). C'est elle qu'il faut
             # recopier : l'expression normalisee n'est pas valable telle quelle

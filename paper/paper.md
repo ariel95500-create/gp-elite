@@ -14,7 +14,7 @@ authors:
 affiliations:
   - index: 1
     name: Independent Researcher, France
-date: 28 July 2026
+date: 26 September 2026
 bibliography: paper.bib
 ---
 
@@ -101,9 +101,11 @@ refinement, linear scaling [@keijzer2003scaling], and $\epsilon$-lexicase
 selection [@lacava2016lexicase] as in the compiled engines. Against `gplearn`
 under identical data, splits and a generous budget granted to the baseline, on a
 fixed 15-equation subset of the Feynman problems chosen before any measurement,
-it recovers 10/15 exactly at machine precision against 6/15. That figure is a
-head-to-head with one baseline on a subset, not a benchmark-wide result, and is
-not comparable to rates published on the full 120-equation Feynman set. The
+and each method judged on the model it returns, it recovers 11/15 exactly at
+machine precision against 6/15 (version 0.7.0, `benchmarks/duel.py`). That
+figure is a single-seed head-to-head with one baseline on a subset, not a
+benchmark-wide result, and is not comparable to rates published on the full
+120-equation Feynman set. The
 claim made here is not that `gp-elite` competes with `Operon` or `PySR` on speed
 or on large-scale accuracy — it does not.
 
@@ -137,8 +139,9 @@ arithmetic, which it is not.
 proved unsatisfying: on the tested problem it reported that none of the returned
 models were physically meaningful, without offering a remedy. v0.4 moves the
 check inside the search, reusing the same algebra so that auditor and engine
-cannot diverge. The cost is a roughly fourfold slowdown; the benefit is that
-every returned model is valid by construction.
+cannot diverge. The cost is a slowdown of about 2.5 times on the problem
+measured below; the benefit is that every returned model is valid by
+construction.
 
 *Deducing rather than requiring.* Under `unknown_constant=True` the validity
 gate no longer requires an expression to *reach* the target dimension, only to
@@ -149,8 +152,11 @@ selection retains the one that fits.
 
 *Reporting honestly by default.* The estimator holds out a validation split,
 selects a parsimonious champion within an $R^2$ tolerance, and exposes a
-complexity/accuracy Pareto front, so that a user who does nothing special still
-receives a model whose reported score was not measured on its training data.
+complexity/accuracy Pareto front. The returned formula is written in the user's
+own variables, with the internal rescaling folded back into its constants, and
+the fit checks that it reproduces the model's predictions. The reported score
+comes from held-out rows; since those rows also choose among candidates, it is
+documented as an optimistic selection score, not a generalisation estimate.
 
 # Research impact statement
 
@@ -159,31 +165,33 @@ benchmark scripts that regenerate every number quoted in its documentation.
 
 The dimensional mode has been evaluated in a controlled A/B experiment on
 Feynman equation II.11.3, five seeds, identical budget per arm
-(`benchmarks/ab_ood.py`). Unconstrained, 0/5 returned models are dimensionally
-valid; with `units=`, 5/5 are valid and 2.6 times smaller (22 versus 58 nodes) at
-a slightly better test $R^2$. A third arm grants the unconstrained search four
-times the generations, equalising wall-clock time: still 0/5 valid, and larger.
+(`benchmarks/ab_ood.py`, version 0.7.0). Unconstrained, 0/5 returned models are
+dimensionally valid; with `units=`, 5/5 are valid and about three times smaller
+(median 19 versus 61 nodes) at a slightly better test $R^2$ (0.99952 versus
+0.99625). A third arm grants the unconstrained search four times the
+generations, more wall-clock time than the constrained arm: still 0/5 valid.
 The same experiment bounds the claim. On a test set drawn *outside* the training
-domain every arm collapses, and none recovers the target law at the budgets
-tested; a large-budget run converges reproducibly to a denominator linear where
-the true law is a difference of squares. The constraint buys physically coherent
-and compact approximations, not the law itself.
+domain, approximations collapse (median $R^2$ 0.45 unconstrained, 0.65
+constrained); one constrained run in five recovers the exact law, which holds
+there. The constraint mostly buys physically coherent and compact
+approximations; it finds the law itself only occasionally at these budgets.
 
 The mystery-constant mode is validated on three reference laws whose answer is
-known in advance (`benchmarks/test_constante_mystere.py`, 20 generations, one
-restart). Hooke's law returns `kg·s⁻²` and 250.0 for a true 250; gravitation
+known in advance (`benchmarks/test_constante_mystere.py`, 25 generations, two
+restarts). Hooke's law returns `kg·s⁻²` and 250.0 for a true 250; gravitation
 returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
 `kg·m²·s⁻²·mol⁻¹·K⁻¹` and 8.31446 for a true 8.314463. Structure is exact and
 $R^2 = 1.000000$ in all three, on two independent platforms.
 
 An integration for the SRBench living benchmark [@lacava2021srbench] has been
-submitted as a pull request and builds successfully in that project's CI.
+merged into that project and is staged for its next evaluation round.
 
 # AI usage disclosure
 
 Generative AI was used extensively in the development of this software, and in
 the writing of its documentation and of this paper. The assistant was Claude
-(Anthropic), used across several model versions between May and July 2026.
+(Anthropic), used across several model versions between May and September
+2026.
 
 The project began as the author's own work, before any AI involvement: the
 expression representation and tree-generation strategies, the protected
@@ -201,8 +209,10 @@ numerical and statistical layers, namely Levenberg–Marquardt constant
 refinement replacing Adam, linear scaling, the Pareto front, $\epsilon$-lexicase
 selection, the robust loss, the dimensionally-constrained search and the
 deduction of dimensioned constants; diagnosis and correction of specific
-defects, including a float64 overflow in the Levenberg–Marquardt optimizer and
-two defects in the dimensional mode;
+defects, including a float64 overflow in the Levenberg–Marquardt optimizer,
+two defects in the dimensional mode, an exported formula left in the internal
+scaled space, and a cache that could evaluate a model with the constants of
+another;
 packaging and release engineering; the benchmark and non-regression scripts
 distributed in the repository; and the drafting of the documentation and of
 this paper.
