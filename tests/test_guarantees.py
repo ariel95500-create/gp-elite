@@ -450,3 +450,13 @@ def test_parsimony_tolerance_unchanged_on_noisy_data(monkeypatch):
     small = X(0)
     got = _pick(monkeypatch, [(1e-2, 1e-4, 14, big), (1.05e-2, 1e-4, 12, small)])
     assert got is small
+
+
+# ── 9. A typo is an error, not a silent substitution ────────────────────────
+
+@pytest.mark.parametrize("kw", [dict(operators="phsyical"), dict(speed="fats"),
+                                dict(normalize="divmx")])
+def test_unknown_option_values_are_rejected(kw):
+    Xd = np.random.RandomState(0).uniform(1, 3, (40, 1))
+    with pytest.raises(ValueError):
+        symbolic_regression(Xd, Xd[:, 0], generations=2, parallel=False, **kw)

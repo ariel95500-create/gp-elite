@@ -391,13 +391,25 @@ def symbolic_regression(
     # atteint 1e8 sur la gravitation) que _SAFE_LIMIT = 1e6 ecrete, ce qui
     # detruisait la recherche. L'estimateur replie les facteurs d'echelle
     # dans la constante rendue (voir GPEliteRegressor._deduce_constant).
+    # [v0.7] Valeurs inconnues REFUSÉES. Auparavant une faute de frappe
+    # passait en silence : operators='phsyical' -> 'physical', speed='fats'
+    # -> preset 'normal', normalize='divmx' -> min-max.
+    pool = (operators or "physical").lower()
+    if pool not in core._GENCSV_POOLS:
+        raise ValueError("operators=%r is not one of %s"
+                         % (operators, sorted(core._GENCSV_POOLS)))
+    if speed not in ("ultrafast", "fast", "normal", "thorough"):
+        raise ValueError("speed=%r is not one of ['ultrafast', 'fast', "
+                         "'normal', 'thorough']" % (speed,))
+    _norms = ("auto", "divmax", "shiftfree", "div", "minmax", "standard",
+              "zscore", "std", "none", "off", "raw", "identity", "smart")
+    if (normalize or "auto").lower() not in _norms:
+        raise ValueError("normalize=%r is not one of ['auto', 'divmax', "
+                         "'minmax', 'standard', 'none', 'smart']" % (normalize,))
     scaler, _desc = core._choose_scaler(X, normalize, (-2.0, 2.0))
     X_scaled = scaler.fit_transform(X)
 
     # ── Pool d'opérateurs + noms de colonnes (mode CSV générique) ──
-    pool = (operators or "physical").lower()
-    if pool not in core._GENCSV_POOLS:
-        pool = "physical"
     b_ops, b_w, u_ops, u_w = core._GENCSV_POOLS[pool]
     core._GENERIC_BINARY_OPS, core._GENERIC_BINARY_WEIGHTS = list(b_ops), list(b_w)
     core._GENERIC_UNARY_OPS, core._GENERIC_UNARY_WEIGHTS = list(u_ops), list(u_w)
