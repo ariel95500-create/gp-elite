@@ -1,5 +1,101 @@
 # Changelog
 
+## 0.7.0 — "Sound"
+
+This release fixes what an external review of 0.6.1 found, and re-measures
+every number the README quotes on the released code. One default changes
+(`normalize="auto"`, measured below); no new search heuristic.
+
+### Fixed — the delivered formula
+- **The formula is written in your variables, for every normalisation, and
+  checked.** The engine searches on rescaled inputs, and up to 0.6.1 the tree
+  was printed with the raw column names but the scaled values: `y = 3x` on
+  `x` in [1, 5] came out as `15.0 * x`. `sympy()` folded the scaling only for
+  the division-by-max normalisation; with min-max (then the default for any
+  column with a non-positive value) or z-score, the exported formula was off
+  by 70 on a target of amplitude 28. The 0.6.1 entry below says `sympy()` is
+  numerically equivalent to `predict()`: that held only without scaling.
+  Now `expression`, `equation_`, `pretty()`, `sympy()`, every Pareto entry and
+  the console (mode 6) give the formula in the raw variables, with the
+  rescaling folded into its constants, and the fit checks that it reproduces
+  `predict()` on the training data (`result.formula_exact`). Protected
+  operators are written as the engine computes them where it matters on the
+  data (`sqrt(|u|)` when `u` changes sign, sign-aware even powers). Property
+  tests cover division-by-max, min-max, z-score and no scaling, one and several
+  variables, signed and positive data; 1,500 random trees were checked against
+  sympy with no discrepancy (`gp_elite/formula.py`, `tests/test_guarantees.py`).
+- `mse_train` was computed on all rows, hold-out included; it now uses the
+  training rows only. `r2_validation` is documented for what it is: the
+  hold-out also chooses the returned model, so it is an optimistic selection
+  score, not an independent estimate of generalisation.
+- `unknown_constant=True` with a shifting normalisation (`minmax`,
+  `standard`) returned a wrong constant value through the estimator (the
+  console already declined); it now returns `None`, as documented in 0.6.0.
+
+### Fixed — dimensional guarantees
+- The engine's validity gate and the post-hoc auditor share one semantics:
+  `1 + 2·x` with `x` in metres is rejected by both (the gate accepted it).
+- A power with a non-constant exponent requires a dimensionless base (`x^z`
+  with `x` in metres used to pass as metres).
+- Unit strings are fully validated: `m garbage`, `m/(s` and `m/s2` raise
+  instead of being silently read as something else.
+- `operators=` is respected everywhere: the typed generator used `sin`, `exp`,
+  `sqrt`... under `operators="poly"`, and the stigmergic builders could insert
+  `sin`/`cos` under `operators="physical"`. 48 fits across all pools, 0
+  out-of-pool operator.
+
+### Added
+- **`time_limit=`** (seconds): the search stops cleanly at the deadline and
+  returns the best model found so far, instead of being killed without a
+  result by an external timer. Remaining time is shared between restarts;
+  `result.time_limit_reached` and `result.restarts_completed` say what
+  happened. Overshoot measured at about one generation (15 s budget: 16.2 s
+  sequential, 16.6 s parallel); without `time_limit` results are
+  bit-identical to before.
+- **`speed="thorough"`**: population 400, four islands, 200 generations by
+  default, the regime for looking for an exact law. The `normal` preset
+  population goes from 300 to 400 (better at equal budget, same time).
+- `SRResult.sympy()`, `ParetoEntry.sympy()`, `formula_exact`.
+
+### Changed
+- **`normalize="auto"` divides every column by its max |value|**, signed
+  columns included (they went through min-max, which turns each variable into
+  `a*(x - x0)` and breaks multiplicative structure). Decided on a criterion
+  written before measuring (`benchmarks/norm_signed.py`, raw results in
+  `benchmarks/results_0.7/`). On 8 laws with signed inputs × 5 seeds: exact
+  recoveries 17/40 against 2/40, near ones 28 against 27. On 6 real PMLB
+  datasets standardised as SRBench does × 5 folds: median test R² 0.813
+  against 0.791, but mean 0.751 against 0.767 and worst fold 0.016 against
+  0.377; divmax is better on 9 of 30 paired folds, median paired difference
+  −0.005, no collapse on either side. On real data this is a wash with one bad
+  fold; on laws it is a clear gain, and the delivered formulas are shorter
+  (median 15 nodes against 19). `normalize="minmax"` remains available.
+- **Scripts without an `if __name__ == "__main__":` guard** no longer run
+  three times over on Windows and macOS when parallel islands start: the
+  engine detects it, finishes on one core with the same result and warns
+  once (measured: 9.0 s and three executions before, 5.9 s after).
+- The API writes no file. It used to write `gp_elite_log.csv` into the
+  installation directory or the current one.
+- Near-domain guard at the final selection: among candidates the parsimony
+  rule considers equivalent, one that explodes just outside the data (a pole
+  between two training points) is no longer preferred. {GUARD_MEASURE}
+- Benchmarks judge every method on the model it returns. `duel.py` used to
+  score GP_ELITE on the best point of its Pareto front chosen by looking at
+  the test set, and gplearn on its single returned program;
+  `feynman_bench.py` reported the front. `examples/robust_regression.py` kept
+  the best of three runs by comparing with the true law.
+
+### Project
+- Continuous integration on Linux (Python 3.9–3.14) and Windows.
+- `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`; `CITATION.cff`
+  updated; `__version__` read from the installed metadata.
+- Real datasets used by the studies are frozen by content hash
+  (`benchmarks/pmlb_frozen.py`).
+- `examples/battery_soh.py` normalised its test data twice; its data file is a
+  simulation and is now labelled as such everywhere.
+- Removed a dead first definition of `fitness()`, silently overwritten by the
+  second.
+
 ## 0.6.1
 
 ### Fixed

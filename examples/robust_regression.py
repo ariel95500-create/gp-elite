@@ -75,7 +75,9 @@ def main():
         a = rmse_per_seed(X, y, y_true, clean, robust=False)
         b = rmse_per_seed(X, y, y_true, clean, robust=True)
         ma, mb = np.median(a), np.median(b)
-        winner = "robust" if mb < ma else ("default" if ma < mb else "tie")
+        # a difference invisible at the printed precision is a tie
+        winner = ("tie" if round(ma, 3) == round(mb, 3) else
+                  "robust" if mb < ma else "default")
         print(f"  {int(frac*100):>8}% | {ma:>7.3f} [{a.max():>6.3f}] | "
               f"{mb:>7.3f} [{b.max():>6.3f}] | {winner}")
     print("\n  Read the table, not a slogan: robustness costs a little on clean")

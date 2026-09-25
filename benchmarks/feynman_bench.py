@@ -191,8 +191,8 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
                                     operators=pool, generations=30, speed="fast",
                                     validation_split=0.15, seed=0, restarts=4)
         dt = time.time()-t0
-        p = r.predict(X[te]); v = np.var(y[te])
-        one_minus_r2 = float(np.mean((p-y[te])**2)/v)
+        pred = r.predict(X[te]); v = np.var(y[te])
+        one_minus_r2 = float(np.mean((pred-y[te])**2)/v)
         # [Pareto-best] la règle 1-SE peut livrer un champion jusqu'à ~3e-3 sous
         # le meilleur trouvé ; pour la RÉCUPÉRATION, on mesure aussi le meilleur
         # point du front sur le test.
@@ -208,7 +208,7 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
         # surestimait ce qu'obtient un utilisateur par defaut.
         def _st(e): return "EXACT" if e < 1e-9 else ("NEAR" if e < 1e-3 else "MISS")
         status = _st(one_minus_r2)
-        rec = dict(name=name, formula=formula, nv=nv, famille=_fam(p),
+        rec = dict(name=name, formula=formula, nv=nv, famille=_fam(PROBS[i]),
                    status=status, status_front=_st(pb),
                    one_minus_r2=one_minus_r2, pareto_best=pb, pb_size=pb_size,
                    time=round(dt,1), size=r.size, expr=r.expression[:90])

@@ -2018,7 +2018,7 @@ def _active_pools():
 
 
 class Node:
-    __slots__ = ("value", "left", "right", "_hash", "_chash")
+    __slots__ = ("value", "left", "right", "_hash", "_chash", "_ehash")
 
     def __init__(self, value, left=None, right=None):
         self.value = value
@@ -2026,6 +2026,7 @@ class Node:
         self.right = right
         self._hash  = None
         self._chash = None   # [v18] canonical_hash mémoïsé
+        self._ehash = None   # [v0.7] exact_hash mémoïsé
 
     def copy(self):
         """Copie profonde ITÉRATIVE (post-ordre) — aucune limite de profondeur.
@@ -2075,6 +2076,44 @@ class Node:
                     stack.append((nd.right, False))
         return self._hash
 
+    def exact_hash(self) -> int:
+        """[v0.7] Hash avec les valeurs EXACTES des constantes.
+
+        structural_hash() arrondit les constantes a 4 decimales : c'est voulu
+        pour la deduplication de population (1.00001 et 1.00002 y sont le
+        meme individu). Mais tout cache qui stocke une VALEUR calculee a
+        partir d'un arbre (fonction compilee dont les constantes sont en dur,
+        predictions, fitness, forme simplifiee) doit etre indexe sur l'arbre
+        EXACT. Jusqu'en 0.6, evaluate_vector(1.00002*x) rendait 1.00001*x si
+        ce dernier avait ete compile avant -- y compris lors d'un ajustement
+        precedent du meme processus : predict() pouvait calculer avec les
+        constantes d'un autre modele, et deux ajustements identiques
+        successifs pouvaient diverger."""
+        if self._ehash is not None:
+            return self._ehash
+        stack = [(self, False)]
+        while stack:
+            nd, processed = stack.pop()
+            if nd._ehash is not None:
+                continue
+            if processed:
+                if nd.left is None and nd.right is None:
+                    v = nd.value
+                    nd._ehash = hash(("leaf", float(v).hex()
+                                      if isinstance(v, float) else v))
+                elif nd.right is None:
+                    nd._ehash = hash(("unary", nd.value, nd.left._ehash))
+                else:
+                    nd._ehash = hash(("binary", nd.value,
+                                      nd.left._ehash, nd.right._ehash))
+            else:
+                stack.append((nd, True))
+                if nd.left  is not None and nd.left._ehash  is None:
+                    stack.append((nd.left,  False))
+                if nd.right is not None and nd.right._ehash is None:
+                    stack.append((nd.right, False))
+        return self._ehash
+
     def canonical_hash(self) -> int:
         """Hash canonique (constantes -> 'C'), MÉMOÏSÉ et itératif.
         [OPT v18] L'ancienne version recalculait récursivement à chaque appel
@@ -2106,6 +2145,7 @@ class Node:
     def invalidate_hash(self):
         self._hash  = None
         self._chash = None
+        self._ehash = None
 
 # ============================================================
 # AFFICHAGE
@@ -2685,8 +2725,11 @@ def compile_to_numpy(node):
     """
     Compile l'arbre en f(x_array) -> np.ndarray, mis en cache par hash structural.
     Utilisé par evaluate_vector et raw_mse.
+    [v0.7] Indexé par exact_hash : les constantes sont écrites en dur dans le
+    code compilé, deux arbres qui ne diffèrent qu'au-delà de la 4e décimale
+    ne peuvent pas partager une fonction.
     """
-    h = node.structural_hash()
+    h = node.exact_hash()
     if h in _COMPILE_CACHE:
         return _COMPILE_CACHE[h]
     code = _to_np_code(node)
@@ -2779,7 +2822,12 @@ def evaluate_vector(node, xs) -> np.ndarray:
     else:
         x_in = np.asarray(xs, dtype=float)
     try:
-        r = fn(x_in)
+        # [v0.7] sq/cube/* ne sont pas proteges : un debordement donne inf,
+        # remplace juste apres. Sans errstate, NumPy imprimait des
+        # « RuntimeWarning: overflow » chez l'utilisateur (sans effet sur le
+        # resultat, qui est identique).
+        with np.errstate(all="ignore"):
+            r = fn(x_in)
         n_rows = x_in.shape[0]
         r = np.asarray(r, dtype=float)
         if r.shape == ():          # scalaire → broadcast
@@ -3320,7 +3368,7 @@ def _predict_cached(node, xs_np):
     # Sans cela, une prédiction calculée sur le TRAIN (134 pts) était renvoyée
     # pour une requête sur le dataset COMPLET (168 pts) → mismatch de forme →
     # exception silencieuse → MSE rapporté à 1e6 alors que le modèle est bon.
-    h = (node.structural_hash(), id(xs_np), xs_np.shape[0])
+    h = (node.exact_hash(), id(xs_np), xs_np.shape[0])   # [v0.7] exact
     r = _PRED_CACHE.get(h)
     if r is not None:
         return r
@@ -3802,7 +3850,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
         TRACE.bump("candidats_rejetes_dim")     # [v0.7]
         return float("inf")
 
-    h   = node.structural_hash()
+    h   = node.exact_hash()          # [v0.7] exact : voir Node.exact_hash
     # [OPT] Bucket générationnel : même individu → même fitness pendant 10 gens
     gen_bucket = getattr(cfg, '_gen_bucket', 0)
     key = (h, role, gen_bucket)
@@ -3948,7 +3996,7 @@ def simplify(node: Node) -> Node:
     """
     if node is None:
         return node
-    h = node.structural_hash()
+    h = node.exact_hash()                    # [v0.7] exact : voir Node.exact_hash
     cached = _SIMPLIFY_CACHE.get(h)
     if cached is not None:
         return cached.copy()                 # jamais d'objet partagé
@@ -3973,7 +4021,7 @@ def _simplify_tree(root: Node) -> Node:
             out[id(nd)] = _simplify_node(nd.value, l, r)
         else:
             # Cache structurel au niveau du sous-arbre (lecture seule, copie)
-            c = _SIMPLIFY_CACHE.get(nd.structural_hash())
+            c = _SIMPLIFY_CACHE.get(nd.exact_hash())
             if c is not None:
                 out[id(nd)] = c.copy()
                 continue
@@ -4013,12 +4061,12 @@ def _simplify_node(v, left, right) -> Node:
         # expr + expr -> 2.0 * expr
         if (left is not None and right is not None
                 and not _is_float(left) and not _is_float(right)
-                and left.structural_hash() == right.structural_hash()):
+                and left.exact_hash() == right.exact_hash()):
             return Node("*", Node(2.0), left)
     if v == "-":
         if _is_const(right, 0):  return left
         if _is_const(left,  0):  return Node("neg", right)
-        if left and right and left.structural_hash() == right.structural_hash():
+        if left and right and left.exact_hash() == right.exact_hash():
             return Node(0.0)
     if v == "*":
         if _is_const(right, 1):  return left
@@ -4032,13 +4080,13 @@ def _simplify_node(v, left, right) -> Node:
     if v == "/":
         if _is_const(right, 1):  return left
         if _is_const(left,  0):  return Node(0.0)
-        if left and right and left.structural_hash() == right.structural_hash():
+        if left and right and left.exact_hash() == right.exact_hash():
             return Node(1.0)
         # (a * b) / a = b  et  (a * b) / b = a
         if left is not None and left.value == "*":
-            lh = left.left.structural_hash()  if left.left  else None
-            rh = left.right.structural_hash() if left.right else None
-            dh = right.structural_hash()      if right      else None
+            lh = left.left.exact_hash()  if left.left  else None
+            rh = left.right.exact_hash() if left.right else None
+            dh = right.exact_hash()      if right      else None
             if lh and lh == dh: return left.right
             if rh and rh == dh: return left.left
     if v == "pow":
@@ -4076,6 +4124,7 @@ def _invalidate_all_hashes(node: Node):
         n = stack.pop()
         n._hash  = None
         n._chash = None
+        n._ehash = None
         if n.left:  stack.append(n.left)
         if n.right: stack.append(n.right)
 
@@ -6208,11 +6257,11 @@ def _build_near_probes(xs_np, ys_np, n=400):
 
 def _near_domain_stable(cand) -> bool:
     """[v0.7-NEAR] Vrai si le candidat reste fini et dans la bande sur les
-    sondes pres du domaine. Resultat mis en cache par expression."""
+    sondes pres du domaine. Resultat mis en cache par arbre EXACT."""
     if _NEAR_PROBE_XS is None or _NEAR_BAND is None or cand is None:
         return True
     try:
-        key = to_string(cand)
+        key = cand.exact_hash()
     except Exception:
         key = None
     if key is not None and key in _NEAR_CACHE:

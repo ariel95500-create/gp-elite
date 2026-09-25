@@ -62,12 +62,17 @@ def summary(out="duel_results.jsonl"):
     rows = list({json.loads(l)["name"]: json.loads(l) for l in open(out) if l.strip()}.values())
     n = len(rows)
     a = collections.Counter(r["gpe"] for r in rows); b = collections.Counter(r["gpl"] for r in rows)
-    win = sum(1 for r in rows if r["gpe_err"] < r["gpl_err"] * 0.999)
-    lose = sum(1 for r in rows if r["gpl_err"] < r["gpe_err"] * 0.999)
+    # [v0.7] Comparaison par STATUT (EXACT > NEAR > MISS). Comparer les
+    # erreurs brutes departageait deux recuperations exactes sur du bruit
+    # d'arrondi (1e-32 contre 0) et comptait des « defaites » fictives.
+    rank = {"EXACT": 2, "NEAR": 1, "MISS": 0}
+    win = sum(1 for r in rows if rank[r["gpe"]] > rank[r["gpl"]])
+    lose = sum(1 for r in rows if rank[r["gpe"]] < rank[r["gpl"]])
     print(f"{n} equations, chaque methode jugee sur le modele qu'elle rend :")
     print(f"  GP_ELITE : {a['EXACT']}/{n} exacts, {a['EXACT'] + a['NEAR']}/{n} a moins de 1e-3")
     print(f"  gplearn  : {b['EXACT']}/{n} exacts, {b['EXACT'] + b['NEAR']}/{n} a moins de 1e-3")
-    print(f"  GP_ELITE meilleur sur {win}, moins bon sur {lose}, egalite sur {n - win - lose}")
+    print(f"  par statut : GP_ELITE devant sur {win}, derriere sur {lose}, "
+          f"egalite sur {n - win - lose}")
 
 
 if __name__ == "__main__":

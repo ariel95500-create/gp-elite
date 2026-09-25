@@ -387,3 +387,38 @@ def test_parallel_fallback_for_scripts_without_main_guard(tmp_path):
     assert out.returncode == 0, out.stderr[-2000:]
     lines = [l for l in out.stdout.splitlines() if l.startswith(("WARNINGS", "SAME"))]
     assert "WARNINGS 1" in lines and "SAME True" in lines, out.stdout[-1500:]
+
+
+# ── 7. A model is evaluated with its own constants ──────────────────────────
+# Compiled functions, predictions, fitness values and simplified forms were
+# cached under a hash that rounds constants to 4 decimals. Two trees that
+# differ only further down shared one entry: predict() could compute with the
+# constants of another model (compiled earlier, possibly in an earlier fit of
+# the same process), and two identical fits in a row could diverge.
+
+def test_evaluation_never_reuses_another_trees_constants():
+    Xd = np.ones((3, 1))
+    a = core.evaluate_vector(N("*", N(1.00001), X(0)), Xd)
+    b = core.evaluate_vector(N("*", N(1.00002), X(0)), Xd)
+    assert a[0] == 1.00001 and b[0] == 1.00002
+
+
+def test_simplify_never_merges_different_constants():
+    t = N("+", N("*", N(1.00001), X(0)), N("*", N(1.00002), X(0)))
+    v = core.evaluate_vector(core.simplify(t), np.array([[2.0]]))[0]
+    assert v == pytest.approx(2.0 * (1.00001 + 1.00002), rel=1e-12)
+
+
+def test_identical_fits_in_one_process_are_identical():
+    """Measured before the fix: in robust mode the second of two identical
+    fits returned a different model."""
+    r = np.random.RandomState(42)
+    x = np.linspace(0, 10, 80)
+    y = 2.0 * x + 1.0 + r.normal(0, 0.5, 80)
+    idx = r.choice(80, 16, replace=False)
+    y[idx] += r.choice([-1, 1], 16) * r.uniform(15, 30, 16)
+    kw = dict(feature_names=["x"], operators="poly", generations=35,
+              validation_split=0.0, seed=0, robust=True, parallel=False)
+    first = symbolic_regression(x.reshape(-1, 1), y, **kw).expression
+    second = symbolic_regression(x.reshape(-1, 1), y, **kw).expression
+    assert first == second
