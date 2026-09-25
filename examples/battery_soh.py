@@ -1,25 +1,19 @@
 """
-Battery degradation: interpolation vs extrapolation (NASA data).
+Battery degradation: interpolation vs extrapolation (SIMULATED data).
 
-This example demonstrates an important, often-overlooked point in time-series
-regression: a RANDOM train/test split leaks information when samples are
-sequential (predicting cycle 49 from cycles 48 and 50 is just interpolation).
-The honest task is EXTRAPOLATION — train on early cycles, predict later ones
-the model has never seen.
+The data file, nasa_battery_simulation.csv, holds 168 simulated charge cycles
+(cycle number, temperature, current, capacity state of health). Its origin is
+not documented beyond its name: this is a demonstration of a protocol, not a
+result on real batteries.
 
-We compare GP_ELITE (one equation) against XGBoost and RandomForest (black-box
-ensembles) under both protocols. The result is instructive:
+The point it makes holds for any sequential data: a RANDOM train/test split
+leaks information (predicting cycle 49 from cycles 48 and 50 is just
+interpolation). The honest task is EXTRAPOLATION: train on early cycles,
+predict later ones the model has never seen. GP_ELITE (one equation) is
+compared with tree ensembles under both protocols; the conclusions printed
+are read from the numbers of the run, not written in advance.
 
-  - Interpolation (random split): everyone scores high. Misleading.
-  - Extrapolation (forward split): the black-box ensembles collapse to
-    negative R² (worse than predicting the mean), because trees can only
-    echo values seen in training. A continuous equation keeps tracking the
-    trend.
-
-This is the real argument for symbolic regression on physical data: not raw
-accuracy, but an interpretable law that extrapolates.
-
-Requires: pip install xgboost scikit-learn
+Requires: scikit-learn (a dependency of gp-elite); xgboost optional.
 Usage:    python examples/battery_soh.py
 """
 import os
@@ -58,14 +52,14 @@ def main():
     print(f"Battery data (SIMULATED, see README): {n} sequential cycles, target SOH in "
           f"[{y.min():.3f}, {y.max():.3f}]\n")
 
-    # Optional black-box baselines (skip gracefully if not installed)
+    # Black-box baselines: RandomForest always (scikit-learn is a dependency),
+    # XGBoost if installed.
+    from sklearn.ensemble import RandomForestRegressor
     try:
         import xgboost as xgb
-        from sklearn.ensemble import RandomForestRegressor
-        have_bb = True
     except ImportError:
-        have_bb = False
-        print("(xgboost/scikit-learn not installed — showing GP_ELITE only)\n")
+        xgb = None
+        print("(xgboost not installed: RandomForest is the only black-box baseline)\n")
 
     # ---- Protocol 1: RANDOM split (interpolation — leaks, misleading) ----
     from sklearn.model_selection import train_test_split
@@ -74,12 +68,15 @@ def main():
     print("PROTOCOL 1 — random split (INTERPOLATION, leaks info)")
     print("=" * 62)
     res = fit_gp(Xtr, ytr, feat)
-    print(f"  GP_ELITE   R² = {r2_score(yte, res.predict(Xte)):+.3f}")
-    if have_bb:
+    print(f"  GP_ELITE      R² = {r2_score(yte, res.predict(Xte)):+.3f}")
+    rf = RandomForestRegressor(n_estimators=300, random_state=42).fit(Xtr, ytr)
+    print(f"  RandomForest  R² = {r2_score(yte, rf.predict(Xte)):+.3f}")
+    if xgb is not None:
         m = xgb.XGBRegressor(n_estimators=300, max_depth=4, learning_rate=0.05,
                              random_state=42).fit(Xtr, ytr)
-        print(f"  XGBoost    R² = {r2_score(yte, m.predict(Xte)):+.3f}")
-    print("  -> high scores all around, but this is interpolation. Misleading.\n")
+        print(f"  XGBoost       R² = {r2_score(yte, m.predict(Xte)):+.3f}")
+    print("  -> a random split of sequential data is interpolation: it flatters")
+    print("     every method.\n")
 
     # ---- Protocol 2: FORWARD split (extrapolation — the honest task) ----
     cut = int(n * 0.85)
@@ -91,17 +88,23 @@ def main():
     print("=" * 62)
     res = fit_gp(Xtr, ytr, feat)
     r2_gp = r2_score(yte, res.predict(Xte))
-    if have_bb:
+    rf = RandomForestRegressor(n_estimators=300, random_state=42).fit(Xtr, ytr)
+    bb = {"RandomForest (300)": r2_score(yte, rf.predict(Xte))}
+    if xgb is not None:
         m = xgb.XGBRegressor(n_estimators=300, max_depth=4, learning_rate=0.05,
                              random_state=42).fit(Xtr, ytr)
-        rf = RandomForestRegressor(n_estimators=300, random_state=42).fit(Xtr, ytr)
-        print(f"  XGBoost (300 trees)    R² = {r2_score(yte, m.predict(Xte)):+.3f}")
-        print(f"  RandomForest (300)     R² = {r2_score(yte, rf.predict(Xte)):+.3f}")
-    print(f"  GP_ELITE (one equation) R² = {r2_gp:+.3f}")
+        bb["XGBoost (300 trees)"] = r2_score(yte, m.predict(Xte))
+    for name, v in bb.items():
+        print(f"  {name:<24}R² = {v:+.3f}")
+    print(f"  {'GP_ELITE (one equation)':<24}R² = {r2_gp:+.3f}")
     print(f"\n  Equation: SOH = {res.expression}")
-    print("\n  -> Black-box ensembles collapse to negative R² out-of-domain.")
-    print("     The equation keeps tracking the degradation trend.")
-    print("     That's the case for symbolic regression on physical data.")
+    best = max(bb.values())
+    if r2_gp > best:
+        print("\n  -> On this split the equation extrapolates better than the tree")
+        print("     ensembles, which can only repeat values seen in training.")
+    else:
+        print("\n  -> On this split the tree ensembles do as well as the equation or")
+        print("     better: extrapolation is not won in advance.")
 
 
 if __name__ == "__main__":

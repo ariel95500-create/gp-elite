@@ -631,6 +631,9 @@ def to_text(node, names=None, positive=None, _parsable=False):
                     if k % 2:
                         return "%s%s%s" % (par(A, _ATOM), POW, e), _POW
                     return "sign(%s) * %s%s%s" % (A[0], ABS % A[0], POW, e), _MUL
+            if nd.left.left is None and nd.left.right is None and _is_num(nd.left.value):
+                # |c| of a number is just a number: |-8.5|^u -> 8.5^u
+                return "%s%s%s" % (num(abs(float(nd.left.value))), POW, e), _POW
             return "%s%s%s" % (ABS % A[0], POW, e), _POW
         return "%s(%s, %s)" % (v, A[0], B[0]), _ATOM
 

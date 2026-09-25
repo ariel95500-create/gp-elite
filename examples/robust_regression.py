@@ -21,8 +21,9 @@ WHAT THIS SHOWS:
   user can make, and printed its conclusions whatever the numbers said.)
 
 HONEST NOTE:
-  Robustness trades a little efficiency on clean data for gains on dirty
-  data. Use `robust=True` when you suspect outliers, not by default.
+  Measured on 0.7.0: robust mode cuts the error six-fold at 10 % outliers,
+  and does no better than the default at 20 % on this example. It is a tool
+  to try when you suspect outliers, not a guarantee.
 
 Requires: pip install gp-elite
 Usage:    python examples/robust_regression.py
@@ -80,8 +81,9 @@ def main():
                   "robust" if mb < ma else "default")
         print(f"  {int(frac*100):>8}% | {ma:>7.3f} [{a.max():>6.3f}] | "
               f"{mb:>7.3f} [{b.max():>6.3f}] | {winner}")
-    print("\n  Read the table, not a slogan: robustness costs a little on clean")
-    print("  data and pays off only when the outliers are numerous enough.")
+    print("\n  robust=True changes the loss, not the search: whether it helps")
+    print("  depends on the data. Read the table, and compare both modes on a")
+    print("  hold-out of your own before trusting either.")
 
 
 if __name__ == "__main__":

@@ -121,6 +121,9 @@ def _census(expr):
 def _expected(formula):
     return set(re.findall(r"\b(sin|cos|tanh|tan|exp|log|sqrt|abs)\b", formula))
 
+def _st(err):
+    return "EXACT" if err < 1e-9 else ("NEAR" if err < 1e-3 else "MISS")
+
 def _err(e, X, y, var):
     return float(np.mean((e.predict(X) - y) ** 2) / var)
 
@@ -219,16 +222,18 @@ def run(sizes, eq_filter, arm):
                 front.sort(key=lambda d: d["size"])
                 pbe = min(front, key=lambda d: d["err_test"])
                 pb, pb_size = pbe["err_test"], pbe["size"]
-                status = ("EXACT" if pb < 1e-9 else
-                          "NEAR" if pb < 1e-3 else "MISS")
-                census = _census(pbe["expr"])
+                # [v0.7] Le STATUT juge le modele RENDU (le champion). Le
+                # meilleur point du front, choisi en regardant le test, n'est
+                # qu'une metrique secondaire (status_front).
+                status = _st(champ_te)
+                census = _census(r.expression)
                 suspects = sorted((set(census) & _SUSPECT) - _expected(formula))
                 clean = bool(status == "EXACT" and not suspects
-                             and pb_size <= CANON_SIZE.get(name, 99) + 4)
+                             and int(r.size) <= CANON_SIZE.get(name, 99) + 4)
 
                 rec = dict(
                     name=name, formula=formula, n_total=N, rep=rep, arm=arm,
-                    status=status, clean_recovery=clean,
+                    status=status, status_front=_st(pb), clean_recovery=clean,
                     one_minus_r2=champ_te, pareto_best=pb, pb_size=pb_size,
                     time=round(dt, 1),
                     in_readme_claim=bool(CLAIM_LO <= N <= CLAIM_HI),
@@ -246,8 +251,8 @@ def run(sizes, eq_filter, arm):
                 with open(OUT, "a", encoding="utf-8") as fh:
                     fh.write(json.dumps(rec) + "\n")
                 mark = "propre" if clean else ("" if status != "EXACT" else "non-canonique")
-                print(f"  N={N:<6} rep={rep}  {status:<6} pb={pb:.1e} "
-                      f"size={pb_size:<4} {dt:6.1f}s  {mark}")
+                print(f"  N={N:<6} rep={rep}  {status:<6} champ={champ_te:.1e} "
+                      f"front={pb:.1e} size={int(r.size):<4} {dt:6.1f}s  {mark}")
                 sys.stdout.flush()
 
 # ── bilan ───────────────────────────────────────────────────────────────────
@@ -258,6 +263,14 @@ def bilan():
     rows = [r for r in rows if r.get("status") != "ERROR"]
     if not rows:
         print("(aucun résultat exploitable)"); return
+    # [v0.7] statut recalcule depuis le modele RENDU (one_minus_r2), meme pour
+    # les enregistrements anterieurs dont le statut venait du front ; le
+    # front reste affiche a part, comme metrique secondaire.
+    for r in rows:
+        r["status_front"] = _st(r["pareto_best"])
+        r["status"] = _st(r["one_minus_r2"])
+        if r["status"] != "EXACT":
+            r["clean_recovery"] = False
     sizes = sorted({r["n_total"] for r in rows})
     names = [p[1] for p in PROBS if any(r["name"] == p[1] for r in rows)]
 
@@ -287,17 +300,18 @@ def bilan():
             if N == CLAIM_HI: line += "|"
         print(line)
 
-    print(f"\n=== taux de récupération et coût par taille ===")
-    print(f"{'N':>7}  {'exactes':>9}  {'propres':>9}  {'temps méd.':>11}  README")
+    print(f"\n=== taux de récupération et coût par taille (modèle rendu) ===")
+    print(f"{'N':>7}  {'exactes':>9}  {'<1e-3':>9}  {'front ex.':>9}  {'temps méd.':>11}  README")
     for N in sizes:
         sub = [r for r in rows if r["n_total"] == N]
         if not sub: continue
         ex = sum(1 for r in sub if r["status"] == "EXACT")
-        cl = sum(1 for r in sub if r.get("clean_recovery"))
+        nr = sum(1 for r in sub if r["status"] in ("EXACT", "NEAR"))
+        fr = sum(1 for r in sub if r["status_front"] == "EXACT")
         ts = sorted(r["time"] for r in sub)
         med = ts[len(ts)//2]
         inside = "dans la plage" if CLAIM_LO <= N <= CLAIM_HI else "HORS plage"
-        print(f"{N:>7}  {ex:>4}/{len(sub):<4}  {cl:>4}/{len(sub):<4}  "
+        print(f"{N:>7}  {ex:>4}/{len(sub):<4}  {nr:>4}/{len(sub):<4}  {fr:>4}/{len(sub):<4}  "
               f"{med:>9.1f}s  {inside}")
 
     lo = [r for r in rows if r["n_total"] < CLAIM_LO]
