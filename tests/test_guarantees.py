@@ -373,30 +373,53 @@ def test_fit_writes_no_file(tmp_path, monkeypatch):
     assert touched == set(), touched
 
 
-def test_parallel_fallback_for_scripts_without_main_guard(tmp_path):
+@pytest.mark.parametrize("n_rows", [120, 3000])
+def test_parallel_fallback_for_scripts_without_main_guard(tmp_path, n_rows):
     """A script without `if __name__ == "__main__":` used to be re-run by every
     worker process (measured: 3 runs, parallel twice slower than sequential).
     It must now fall back to sequential, warn once, and give the sequential
-    result."""
+    result. With 3000 rows the data no longer fit in the pipe that starts a
+    worker: the parent then blocked forever on it once the worker had exited
+    (fixed by handing the data to the workers through a file)."""
     script = tmp_path / "unguarded.py"
     script.write_text(textwrap.dedent("""
         import warnings, numpy as np
         from gp_elite import symbolic_regression
         r = np.random.RandomState(0)
-        X = r.uniform(1, 4, (120, 2)); y = X[:, 0] * X[:, 1]
+        X = r.uniform(1, 4, (%d, 3)); y = X[:, 0] * X[:, 1]
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             a = symbolic_regression(X, y, generations=3, parallel=True, seed=0)
         b = symbolic_regression(X, y, generations=3, parallel=False, seed=0)
         print("WARNINGS", sum("__main__" in str(x.message) for x in w))
         print("SAME", a.expression == b.expression)
-    """))
+    """) % n_rows)
     env = dict(os.environ, PYTHONHASHSEED="0")
     out = subprocess.run([sys.executable, str(script)], capture_output=True,
-                         text=True, timeout=300, env=env, cwd=str(tmp_path))
+                         text=True, timeout=180, env=env, cwd=str(tmp_path))
     assert out.returncode == 0, out.stderr[-2000:]
     lines = [l for l in out.stdout.splitlines() if l.startswith(("WARNINGS", "SAME"))]
     assert "WARNINGS 1" in lines and "SAME True" in lines, out.stdout[-1500:]
+
+
+def test_parallel_workers_are_quiet_when_the_fit_is(tmp_path):
+    """verbose=False silences the fit; its worker processes printed their
+    progress anyway (on machines with four cores or more, every fit)."""
+    script = tmp_path / "guarded.py"
+    script.write_text(textwrap.dedent("""
+        import numpy as np
+        from gp_elite import symbolic_regression
+        if __name__ == "__main__":
+            r = np.random.RandomState(0)
+            X = r.uniform(1, 4, (400, 5)); y = X[:, 0] * X[:, 1] / X[:, 2] + 0.3 * X[:, 3]
+            symbolic_regression(X, y, generations=3, parallel=True, seed=0)
+            print("DONE")
+    """))
+    env = dict(os.environ, PYTHONHASHSEED="0")
+    out = subprocess.run([sys.executable, str(script)], capture_output=True,
+                         text=True, timeout=180, env=env, cwd=str(tmp_path))
+    assert out.returncode == 0, out.stderr[-2000:]
+    assert out.stdout.strip() == "DONE", out.stdout[-1500:]
 
 
 # ── 7. A model is evaluated with its own constants ──────────────────────────

@@ -5776,11 +5776,17 @@ def evolve_island(island: Island,
 
 _PW: dict = {}    # état du worker (initialisé une fois par processus)
 
-def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
-                          syracuse_y_raw, syracuse_x_raw,
+def _parallel_worker_init(data_path, use_ls, syracuse_mode,
                           gencsv=None, battery_mode=False,
-                          ls_scale_only=False, dim_unknown_const=False):
+                          ls_scale_only=False, dim_unknown_const=False,
+                          quiet=False):
     """Initializer du pool : reçoit les données constantes UNE fois par worker.
+    [v0.7-PAR] Les tableaux (xs, ys, sondes, series Syracuse) arrivent par un
+    fichier temporaire, pas par initargs : les initargs sont ecrits dans le
+    tube de demarrage du fils, et au-dela de sa capacite (64 Ko sous Linux)
+    le parent y reste bloque si le fils meurt pendant son amorcage -- ce que
+    fait justement un fils qui re-execute un script sans garde __main__. Le
+    repli sequentiel promis devenait un blocage definitif des ~3000 lignes.
     [FIX-WIN v20] Sous Windows (spawn), le worker ré-importe le module depuis
     __file__ et l'enregistre sous son nom canonique dans sys.modules, ce qui
     évite le ModuleNotFoundError quand le fichier s'appelle GP_ELITE_v20_PARALLEL
@@ -5799,6 +5805,15 @@ def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
     _LS_SCALE_ONLY = bool(ls_scale_only)
     global _DIM_UNKNOWN_CONST                 # [v0.5]
     _DIM_UNKNOWN_CONST = bool(dim_unknown_const)
+    import pickle as _pickle
+    if quiet:
+        # [v0.7-PAR] Le parent est silencieux (symbolic_regression(verbose=
+        # False) redirige sa sortie) : ses workers le sont aussi. Sans cela,
+        # sur une machine a 4 coeurs ou plus, leurs messages de progression
+        # s'affichaient chez l'utilisateur malgre verbose=False.
+        _sys.stdout = open(_os.devnull, "w")
+    with open(data_path, "rb") as _fh:
+        xs, ys, probe_x, syracuse_y_raw, syracuse_x_raw = _pickle.load(_fh)
     _PW["xs"] = xs
     _PW["ys"] = ys
     PROBE_X             = probe_x
@@ -6018,14 +6033,24 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
     _os.environ["PYTHONHASHSEED"] = "0"
     _os.environ[_POOL_CHILD_ENV] = "1"      # [v0.7-PAR] herite par les fils
 
+    # [v0.7-PAR] Donnees des workers par fichier temporaire (voir
+    # _parallel_worker_init) : le message de demarrage reste petit.
+    import pickle as _pickle, tempfile as _tempfile
+    _data_path = None
     try:
+        with _tempfile.NamedTemporaryFile(prefix="gp_elite_pool_", suffix=".pkl",
+                                          delete=False) as _fh:
+            _data_path = _fh.name
+            _pickle.dump((xs, ys, PROBE_X, _syr_y, _syr_x), _fh,
+                         protocol=_pickle.HIGHEST_PROTOCOL)
         with _cf.ProcessPoolExecutor(
                 max_workers=n_workers, mp_context=ctx,
                 initializer=_parallel_worker_init,
-                initargs=(xs, ys, PROBE_X, _USE_LINEAR_SCALING,
-                          _SYRACUSE_MODE, _syr_y, _syr_x,
+                initargs=(_data_path, _USE_LINEAR_SCALING,
+                          _SYRACUSE_MODE,
                           _gencsv, _BATTERY_CSV_MODE,
-                          _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST)) as ex:
+                          _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST,
+                          sys.stdout is not sys.__stdout__)) as ex:
             gen = 0
             _deadline = getattr(cfg, "DEADLINE", None)
             while gen < cfg.GENERATIONS:
@@ -6134,6 +6159,11 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
             _warn_unguarded_main(_par_err)
         return global_best, global_score, False
     finally:
+        if _data_path is not None:
+            try:
+                _os.remove(_data_path)
+            except OSError:
+                pass
         # [v0.7-PAR] Ne laisser aucune trace dans l'environnement de
         # l'utilisateur (ses propres sous-processus en heriteraient).
         for _k, _v in (("PYTHONHASHSEED", _prev_hash), (_POOL_CHILD_ENV, _prev_child)):

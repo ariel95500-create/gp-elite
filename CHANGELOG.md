@@ -26,8 +26,9 @@ the evolutionary search itself has no new heuristic.
   operators are written as the engine computes them where it matters on the
   data (`sqrt(|u|)` when `u` changes sign, sign-aware even powers). Property
   tests cover division-by-max, min-max, z-score and no scaling, one and several
-  variables, signed and positive data; 1,500 random trees were checked against
-  sympy with no discrepancy (`gp_elite/formula.py`, `tests/test_guarantees.py`).
+  variables, signed and positive data (`tests/test_guarantees.py`); of 1,500
+  random trees, the 1,448 whose formula is reported exact all reproduce
+  `predict()` once parsed by sympy (`benchmarks/formula_fuzz.py`).
 - **A model is evaluated with its own constants.** Compiled functions,
   predictions, fitness values and simplified forms were cached under a hash
   that rounds constants to 4 decimals, so two trees differing only further
@@ -72,16 +73,18 @@ the evolutionary search itself has no new heuristic.
 - `operators=` is respected everywhere: the typed generator used `sin`, `exp`,
   `sqrt`... under `operators="poly"`, and the stigmergic builders could insert
   `sin`/`cos` under `operators="physical"`. 48 fits across all pools, 0
-  out-of-pool operator.
+  out-of-pool operator (`benchmarks/pools_check.py`).
 
 ### Added
 - **`time_limit=`** (seconds): the search stops cleanly at the deadline and
   returns the best model found so far, instead of being killed without a
   result by an external timer. Remaining time is shared between restarts;
   `result.time_limit_reached` and `result.restarts_completed` say what
-  happened. Overshoot measured at about one generation (15 s budget: 16.2 s
-  sequential, 16.6 s parallel); without `time_limit` results are
-  bit-identical to before.
+  happened. Overshoot measured at one to two seconds on a 15 s budget
+  (17.0 s sequential, 16.0 s parallel, 3,000 rows,
+  `benchmarks/time_limit_check.py`): the final polishing and selection run
+  after the last generation. Without `time_limit` results are bit-identical
+  to before.
 - **`speed="thorough"`**: population 400, four islands, 200 generations by
   default in both `symbolic_regression` and `GPEliteRegressor`, the regime
   for looking for an exact law. `GPEliteRegressor(generations=None)` now takes
@@ -125,6 +128,11 @@ the evolutionary search itself has no new heuristic.
   start method on every system, Linux included, and re-import the script):
   the engine detects it, finishes on one core with the same result and warns
   once (measured on Linux: 9.0 s and three executions before, 5.9 s after).
+  The workers now receive the data through a temporary file: passed in the
+  message that starts them, data from about 3,000 rows up no longer fit in
+  the pipe, and once a worker had exited the parent waited on it forever.
+- With `verbose=False`, the worker processes of parallel islands no longer
+  print their progress.
 - The API writes no file. It used to write `gp_elite_log.csv` into the
   installation directory or the current one.
 - Near-domain guard at the final selection: among candidates the parsimony
