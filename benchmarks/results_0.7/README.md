@@ -21,8 +21,11 @@ only add benchmark scripts and change how a formula is printed
 (`a * (1 / b)` is written `a / b`); `39d731c+modified` marks the few records
 written while that printing change was in the working tree, before it was
 committed. The commits after them, up to the release,
-change documentation, a docstring, and add the warning given when a formula
-departs from `predict()`; none changes which model a fit returns.
+change documentation and docstrings, add the warning given when a formula
+departs from `predict()`, and change how parallel workers receive their data
+and whether they print; none changes which model a fit returns (the
+measurements here run sequentially, and a parallel fit was checked to return
+the same model before and after).
 
 An earlier campaign (25 and 26 September, before the change to the power
 operator) is superseded by this one and is not kept here.
