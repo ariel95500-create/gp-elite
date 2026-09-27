@@ -26,6 +26,7 @@ Lancer avec PYTHONHASHSEED=0.
 """
 import numpy as np, time, json, sys, io, contextlib
 from gp_elite import symbolic_regression
+import provenance
 
 R = np.random.RandomState  # échantillonneurs déterministes par problème
 
@@ -215,6 +216,7 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
                    one_minus_r2=one_minus_r2, pareto_best=pb, pb_size=pb_size,
                    time=round(dt,1), size=r.size, expr=r.expression[:90],
                    exact_priority=getattr(_C, "_EXACT_PRIORITY_SWAPS", 0) > _ex0)
+        rec.update(provenance.fields())
         with open(out, "a") as fh: fh.write(json.dumps(rec)+"\n")
         print(f"  {name:<10} {status:<6} champ={one_minus_r2:.1e} front={pb:.1e}"
               f"  ({dt:.0f}s)  {formula}")

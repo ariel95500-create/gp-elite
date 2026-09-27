@@ -50,6 +50,8 @@ import time
 
 import numpy as np
 
+import provenance
+
 OUT = "ab_ood_results.jsonl"      # surchargeable par --out
 
 UNITS = ["A*s", "V/m", "kg", "s^-1", "s^-1"]      # q, Ef, m, w0, w
@@ -277,6 +279,7 @@ def main():
                          fits_indomain=False, recovered=False, size=0,
                          seconds=0, equation="",
                          dim_msg=f"ERREUR {type(e).__name__}: {e}")
+            r.update(provenance.fields())
             with open(OUT, "a") as fh:
                 fh.write(json.dumps(r) + "\n")
             if r["recovered"]:

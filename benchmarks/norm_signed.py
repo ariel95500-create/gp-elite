@@ -25,6 +25,7 @@ Toute la campagne : 8 lois + 6 jeux, deux bras, environ 2 h sur un coeur.
 import os, sys, json, numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pmlb_frozen
+import provenance
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results_0.7", "norm_signed.jsonl")
 
 LAWS = [  # (nom, n_var, f, pool)
@@ -138,6 +139,8 @@ if __name__ == "__main__":
         sys.exit(0)
     part, what, arm = sys.argv[1], sys.argv[2], sys.argv[3]
     rows = run_A(int(what), arm) if part == "A" else run_B(what, arm)
+    prov = provenance.fields()
     with open(OUT, "a") as fh:
         for r in rows:
+            r.update(prov)
             fh.write(json.dumps(r) + "\n")

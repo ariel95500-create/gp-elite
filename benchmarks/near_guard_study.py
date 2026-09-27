@@ -20,6 +20,7 @@ Usage : python near_guard_study.py <dataset> <seed> <on|off>
 import os, sys, json, numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pmlb_frozen
+import provenance
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results_0.7", "near_guard.jsonl")
 
 def load(name):
@@ -61,8 +62,11 @@ def main():
                         champ_test_r2=r2(y[te], pc), swapped=C._NEAR_GUARD_SWAPS > swaps0,
                         exact_priority=getattr(C, "_EXACT_PRIORITY_SWAPS", 0) > exact0,
                         pareto_sig=[x["expr"] for x in cands], cands=cands))
+    prov = provenance.fields()
     with open(OUT, "a") as fh:
-        for o in out: fh.write(json.dumps(o) + "\n")
+        for o in out:
+            o.update(prov)
+            fh.write(json.dumps(o) + "\n")
     print(name, seed, arm, ["%.3g" % o["champ_test_r2"] for o in out], flush=True)
 
 def summary(path=OUT):

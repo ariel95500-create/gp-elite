@@ -6,6 +6,7 @@ import numpy as np, time, json, sys, io, contextlib, warnings
 warnings.filterwarnings("ignore")
 from feynman_bench import PROBS
 from gp_elite import symbolic_regression
+import provenance
 from gplearn.genetic import SymbolicRegressor
 from gplearn.functions import make_function
 
@@ -50,6 +51,7 @@ def run_range(i0, i1, out="duel_results.jsonl"):
         rec = dict(name=name, gpe=status(eg), gpe_err=eg, gpe_t=round(tg,1),
                    gpe_front=status(eg_front), gpe_front_err=eg_front,
                    gpl=status(el), gpl_err=el, gpl_t=round(tl,1))
+        rec.update(provenance.fields())
         with open(out, "a") as fh: fh.write(json.dumps(rec) + "\n")
         print(f"  {name:<10} GPE:{status(eg):<6}{eg:.1e} ({tg:>3.0f}s) | "
               f"gplearn:{status(el):<6}{el:.1e} ({tl:>3.0f}s)")
