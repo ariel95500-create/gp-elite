@@ -3,18 +3,22 @@
 ## 0.7.0 — "Sound"
 
 This release fixes what an external review of 0.6.1 found, and re-measures
-every number the README quotes on the released code. One default changes
-(`normalize="auto"`, measured below); no new search heuristic.
+every number the README quotes on the released code. Two defaults change:
+`normalize="auto"` (measured below) and the population of the default `fast`
+preset (300 → 400). The final selection gains two rules, both measured below;
+the evolutionary search itself has no new heuristic.
 
 ### Fixed — the delivered formula
 - **The formula is written in your variables, for every normalisation, and
   checked.** The engine searches on rescaled inputs, and up to 0.6.1 the tree
   was printed with the raw column names but the scaled values: `y = 3x` on
-  `x` in [1, 5] came out as `15.0 * x`. `sympy()` folded the scaling only for
-  the division-by-max normalisation; with min-max (then the default for any
-  column with a non-positive value) or z-score, the exported formula was off
-  by 70 on a target of amplitude 28. The 0.6.1 entry below says `sympy()` is
-  numerically equivalent to `predict()`: that held only without scaling.
+  `x` in [1, 5] came out as `15.0 * x`, in `expression` as in `sympy()`. (The
+  development branch after 0.6.1 folded the scaling into `sympy()` for the
+  division-by-max normalisation only; with min-max, then the default for any
+  column with a non-positive value, or z-score, its exported formula was
+  still off by 70 on a target of amplitude 28.) The 0.6.1 entry below says
+  `sympy()` is numerically equivalent to `predict()`: that held only without
+  scaling.
   Now `expression`, `equation_`, `pretty()`, `sympy()`, every Pareto entry and
   the console (mode 6) give the formula in the raw variables, with the
   rescaling folded into its constants, and the fit checks that it reproduces
@@ -32,6 +36,17 @@ every number the README quotes on the released code. One default changes
   process), `simplify()` merged `1.00001*x + 1.00002*x` into `2*(1.00001*x)`,
   and two identical fits in a row could return different models (measured in
   robust mode). Every cache of values is now keyed on the exact tree.
+- **A power with a variable exponent no longer jumps where the exponent is an
+  integer.** The engine's power keeps the sign of its base for a constant
+  integer exponent (`pow(u, 3)` is `u³`), but it applied that branch row by
+  row to exponents that depend on the variables as well: the model jumped
+  wherever such an exponent landed exactly on an integer, which division by
+  max|x| guarantees on a column's extreme row. The search could exploit the
+  jump as a row indicator, and no readable formula reproduced the model: on
+  the standardised PMLB dataset 561_cpu the delivered formula and `predict()`
+  differed by 0.97 on 2 rows (`formula_exact` was False). A variable exponent
+  now always gives `|u|^v`, the function the formula prints. This changes
+  the search, which is why every figure below was measured after it.
 - `mse_train` was computed on all rows, hold-out included; it now uses the
   training rows only. `r2_validation` is documented for what it is: the
   hold-out also chooses the returned model, so it is an optimistic selection
@@ -61,8 +76,10 @@ every number the README quotes on the released code. One default changes
   sequential, 16.6 s parallel); without `time_limit` results are
   bit-identical to before.
 - **`speed="thorough"`**: population 400, four islands, 200 generations by
-  default, the regime for looking for an exact law. The `normal` preset
-  population goes from 300 to 400 (better at equal budget, same time).
+  default in both `symbolic_regression` and `GPEliteRegressor`, the regime
+  for looking for an exact law. `GPEliteRegressor(generations=None)` now takes
+  its default from `speed` (30, 40, 60 and 200 generations for `ultrafast`,
+  `fast`, `normal` and `thorough`; it was 40 for every preset).
 - `SRResult.sympy()`, `ParetoEntry.sympy()`, `formula_exact`.
 
 ### Changed
@@ -87,6 +104,8 @@ every number the README quotes on the released code. One default changes
   exact candidates stay eligible. Measured: the rule never fired on the 60
   real-data fits of the normalisation study nor on the 60 of the guard study;
   on the Feynman benchmark it turns I.18.12 into an exact recovery.
+- The default `fast` preset uses a population of 400 instead of 300, so each
+  generation evaluates a third more candidates.
 - Unknown option values raise `ValueError`: `operators="phsyical"` used to
   become `"physical"`, `speed="fats"` the `normal` preset, and
   `normalize="divmx"` min-max scaling, silently.
@@ -94,9 +113,10 @@ every number the README quotes on the released code. One default changes
   column names (`24.97 * elongation` for the law `250 * elongation`); rescaled
   columns now carry a prime, and the law in your columns follows.
 - **Scripts without an `if __name__ == "__main__":` guard** no longer run
-  three times over on Windows and macOS when parallel islands start: the
-  engine detects it, finishes on one core with the same result and warns
-  once (measured: 9.0 s and three executions before, 5.9 s after).
+  three times over when parallel islands start (the workers use the `spawn`
+  start method on every system, Linux included, and re-import the script):
+  the engine detects it, finishes on one core with the same result and warns
+  once (measured on Linux: 9.0 s and three executions before, 5.9 s after).
 - The API writes no file. It used to write `gp_elite_log.csv` into the
   installation directory or the current one.
 - Near-domain guard at the final selection: among candidates the parsimony
@@ -135,7 +155,8 @@ model it returns:
 ### Project
 - Continuous integration on Linux (Python 3.9–3.14) and Windows.
 - `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`; `CITATION.cff`
-  updated; `__version__` read from the installed metadata.
+  updated; `__version__` read from the installed metadata (the 0.6.1 wheel
+  reported `0.6.0`).
 - Real datasets used by the studies are frozen by content hash
   (`benchmarks/pmlb_frozen.py`).
 - `examples/battery_soh.py` normalised its test data twice; its data file is a

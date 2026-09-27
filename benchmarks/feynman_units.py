@@ -27,7 +27,7 @@ Sortie : feyn_units.jsonl — format enrichi (télémétrie v2)
 Reprise : relancer le script reprend là où il s'est arrêté.
 
 Lancement (PYTHONHASHSEED=0 obligatoire pour la reproductibilité) :
-  Windows :  set PYTHONHASHSEED=0 && python benchmarks\\feynman_units.py
+  Windows :  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_units.py
   Linux   :  PYTHONHASHSEED=0 python3 benchmarks/feynman_units.py
 Options :  feynman_units.py [i0] [i1]   → tranche d'équations
            feynman_units.py --bilan     → bilan seul depuis le jsonl

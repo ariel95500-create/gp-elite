@@ -35,7 +35,7 @@ y = lambda^(-1/2) - 2·log10(r/k), mais À VÉRIFIER.)
 
 Lancement :
   python benchmarks\\real_nikuradse_2.py --explore-only      <- D'ABORD
-  set PYTHONHASHSEED=0 && python benchmarks\\real_nikuradse_2.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\real_nikuradse_2.py
 Options :
   --normalize none|auto   (défaut : choisi d'après le rapport d'échelle)
   --gens 30

@@ -53,8 +53,9 @@ SEEDS = 5
 
 
 def rmse_per_seed(X, y, y_true, clean, robust):
-    """RMSE vs the TRUE law on the clean points, one value per seed."""
-    out = []
+    """RMSE vs the TRUE law on the clean points, and the returned formula,
+    one of each per seed."""
+    out, formulas = [], []
     for s in range(SEEDS):
         r = symbolic_regression(
             X, y, feature_names=["x"], operators="poly",
@@ -63,7 +64,16 @@ def rmse_per_seed(X, y, y_true, clean, robust):
         )
         p = r.predict(X)
         out.append(float(np.sqrt(np.mean((p[clean] - y_true[clean]) ** 2))))
-    return np.array(out)
+        formulas.append(r.expression)
+    return np.array(out), formulas
+
+
+def _distinct(formulas):
+    """Each distinct formula with the number of seeds that returned it."""
+    seen = {}
+    for f in formulas:
+        seen[f] = seen.get(f, 0) + 1
+    return sorted(seen.items(), key=lambda kv: -kv[1])
 
 
 def main():
@@ -71,16 +81,26 @@ def main():
     print("(RMSE vs the TRUE law on clean points, %d seeds: median [worst])\n" % SEEDS)
     print(f"  {'outliers':>9} | {'MSE (default)':>16} | {'robust=True':>16} | lower median")
     print("  " + "-" * 62)
+    returned = []
     for frac in [0.0, 0.10, 0.20]:
         X, y, y_true, clean = make_data(frac)
-        a = rmse_per_seed(X, y, y_true, clean, robust=False)
-        b = rmse_per_seed(X, y, y_true, clean, robust=True)
+        a, fa = rmse_per_seed(X, y, y_true, clean, robust=False)
+        b, fb = rmse_per_seed(X, y, y_true, clean, robust=True)
         ma, mb = np.median(a), np.median(b)
         # a difference invisible at the printed precision is a tie
         winner = ("tie" if round(ma, 3) == round(mb, 3) else
                   "robust" if mb < ma else "default")
         print(f"  {int(frac*100):>8}% | {ma:>7.3f} [{a.max():>6.3f}] | "
               f"{mb:>7.3f} [{b.max():>6.3f}] | {winner}")
+        returned.append((frac, fa, fb))
+    print("\n  Formulas returned (distinct formulas, with how many of the %d seeds"
+          % SEEDS)
+    print("  returned each):")
+    for frac, fa, fb in returned:
+        for label, fs in (("default", fa), ("robust ", fb)):
+            for k, (f, n) in enumerate(_distinct(fs)):
+                head = f"  {int(frac*100):>4}% {label}" if k == 0 else " " * 15
+                print(f"{head}  [{n}/{SEEDS}]  y = {f}")
     print("\n  robust=True changes the loss, not the search: whether it helps")
     print("  depends on the data. Read the table, and compare both modes on a")
     print("  hold-out of your own before trusting either.")

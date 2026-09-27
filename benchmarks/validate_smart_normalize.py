@@ -7,7 +7,7 @@ VALIDATION DU MODE normalize="smart"  — à lancer APRÈS application du patch
                       inchangés ? PARTIE CRITIQUE : le bras `auto` est gelé.
   C. banc Feynman   — `smart` reproduit-il le bras `none` (14/15) ? (~8 min)
 
-  set PYTHONHASHSEED=0 && python benchmarks\\validate_smart_normalize.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\validate_smart_normalize.py
   options :  --skip-c   ne lance que A et B (instantané)
 
 NOTE TECHNIQUE — pourquoi tout est dans main() sous une garde :

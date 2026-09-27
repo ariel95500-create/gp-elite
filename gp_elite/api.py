@@ -288,7 +288,7 @@ def symbolic_regression(
     *,
     operators: str = "physical",
     normalize: str = "auto",
-    generations: int = 100,
+    generations: Optional[int] = None,
     speed: str = "fast",
     parallel: Optional[bool] = None,
     validation_split: float = 0.20,
@@ -319,7 +319,8 @@ def symbolic_regression(
                 colonnes signées, qui passaient auparavant en min-max.
                 Quelle que soit la normalisation, `expression` et `sympy()`
                 sont rendus dans les variables brutes.
-    generations : nombre de générations
+    generations : nombre de générations. None (défaut) = 200 avec
+                  speed='thorough', 100 sinon.
     speed : 'ultrafast' | 'fast' | 'thorough' | 'normal'
         Taille de population et nombre d'îles. 'fast' (défaut) pour explorer
         rapidement ; 'thorough' pour CHERCHER UNE LOI : population 400, 4 îles,
@@ -424,6 +425,11 @@ def symbolic_regression(
     cfg = core.make_cfg_nd(n_features=n_feat, x_min=-2.0, x_max=2.0,
                            fast=fast, ultrafast=ultrafast, thorough=thorough, use_seeding=False,
                            use_lib=True, use_cograph=True, use_seqmem=True)
+    # [v0.7] 'thorough' annonçait 200 générations, mais symbolic_regression
+    # imposait toujours son défaut de 100 (seul GPEliteRegressor appliquait
+    # le preset) : le défaut dépend maintenant du preset.
+    if generations is None:
+        generations = 200 if thorough else 100
     cfg.GENERATIONS = int(generations)
     cfg.WRITE_LOG_CSV = False      # [v0.7] l'API n'ecrit aucun fichier
     # [v0.4] Recherche contrainte par les dimensions (opt-in).

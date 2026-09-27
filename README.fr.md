@@ -5,7 +5,7 @@
 Déclarez vos unités, et la recherche ne construit jamais que des équations
 dimensionnellement valides — une contrainte dure, pas une pénalité douce.
 L'enveloppe de fonctionnement est mesurée, pas revendiquée : combien de points
-il faut, combien de bruit elle tolère, et où elle échoue.
+il faut, comment le temps de calcul augmente, et où elle échoue.
 
 *[🇬🇧 English version](README.md)*
 
@@ -13,7 +13,7 @@ il faut, combien de bruit elle tolère, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-L'enveloppe de fonctionnement est mesurée, pas revendiquée. Sur cinq équations de Feynman, le modèle rendu retrouve la loi exacte dans 4 cas sur 5 à chaque taille de 500 à 10 000 points, et dans 12 runs sur 15 de 50 à 200 points ; le temps de calcul est multiplié par 2,5 environ de 1 000 à 10 000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
+Sur cinq équations de Feynman, le modèle rendu retrouve la loi exacte dans 4 cas sur 5 à chaque taille de 500 à 10 000 points, et dans 12 runs sur 15 à chaque taille de 50 à 200 points (9 sur 15 à 25 points) ; le temps de calcul médian est multiplié par 2,5 environ de 1 000 à 10 000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -97,12 +97,12 @@ moteur peut déduire les unités et la valeur d'une constante physique manquante
 Sur un CSV à deux colonnes de la loi de Hooke :
 
 ```
-  Units for ['allongement'], comma-separated : m
+  Units for ['elongation'], comma-separated : m
   Unit for TARGET 'force' : N
   Deduce an unknown constant? [y/N] : y
   ...
   Formula in YOUR columns (checked on your data):
-    force = 250 * allongement
+    force = 250 * elongation
   Deduced constant units : [kg / s^2]
   Deduced constant value : 250
 ```
@@ -148,8 +148,9 @@ exacte, sans garantie.
   choix final — le levier le plus efficace quand le budget le permet.
 
 **Scripts et îles parallèles.** Sur une machine à quatre cœurs ou plus, les îles
-tournent dans des processus parallèles. Sous Windows et macOS, ces processus
-ré-importent votre script : gardez le code de premier niveau sous
+tournent dans des processus parallèles. Ces processus sont démarrés en mode
+`spawn` sur tous les systèmes (Linux compris) et ré-importent votre script :
+gardez le code de premier niveau sous
 `if __name__ == "__main__":`, comme ci-dessus. Sans cette garde, GP_ELITE détecte
 la situation, termine sur un cœur avec le même résultat, et le signale une fois.
 Rien à faire dans un notebook.
@@ -225,7 +226,7 @@ les formes par nom (`{"X0": "kg"}`) et par indice (`{0: "kg"}`). Une chaîne mal
 formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devinée.
 
 **Effet mesuré** — Feynman II.11.3, `x = q·Ef/(m·(w0²−w²))`, 5 variables,
-5 seeds, 40 générations, budget identique par bras :
+5 seeds, 40 générations, budget identique pour les deux premiers bras :
 
 | | sans `units=` | `units=` | sans `units=`, 4× générations |
 |---|---:|---:|---:|
@@ -239,9 +240,10 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 La troisième colonne donne au bras non contraint quatre fois plus de générations —
 ici plus de temps machine que le bras contraint (170 s contre 93 s). Il reste à
 **0/5** modèles physiquement valides : le calcul ne remplace pas la contrainte. Les
-échecs du bras non contraint ne sont pas marginaux — il additionne des hertz à des
-nombres purs ou à des kilogrammes, ou élève une grandeur à la puissance d'une
-fréquence.
+échecs sans contrainte ne sont pas marginaux : sur les dix runs non contraints, les
+modèles additionnent des hertz à des kilogrammes, à des nombres purs ou à des termes
+de champ électrique, des coulombs ou des mètres à des nombres purs, ou élèvent une
+grandeur à la puissance d'une fréquence ou d'une charge.
 
 **Ce que ça ne fait *pas*.** Sur un jeu de test tiré *hors* du domaine
 d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), les
@@ -306,7 +308,7 @@ Le fichier [`examples/nasa_battery_simulation.csv`](examples/nasa_battery_simula
 contient 168 cycles de charge **simulés** (numéro de cycle, température, courant,
 état de santé de la capacité). Son origine n'est pas documentée au-delà de son nom :
 considérez-le comme une démonstration de la démarche, pas comme un résultat sur de
-vraies batteries. GP_ELITE y rend :
+vraies batteries. Le script y affiche (extrait) :
 
 ```
 PROTOCOL 1 — random split (INTERPOLATION, leaks info)
@@ -364,7 +366,7 @@ unités physiques déclarées (`units=`, même budget, sans normalisation), 14/1
 exactes, chacune sous sa forme de manuel (`benchmarks/feynman_units.py`). Une seed sur
 quinze équations est une vitrine, pas une comparaison statistique. Reproduire :
 `PYTHONHASHSEED=0 python benchmarks/feynman_bench.py 0 15` et
-`python benchmarks/duel.py`.
+`PYTHONHASHSEED=0 python benchmarks/duel.py`.
 
 **Moins bon** : suites chaotiques (ex. temps de vol de Collatz — composante intrinsèquement aléatoire), >15-20 variables (l'espace de recherche explose — même si `units=` le réduit nettement quand les unités physiques sont connues), gros jeux de données où la précision pure prime sur l'interprétabilité (les modèles d'ensemble dominent alors).
 
@@ -430,7 +432,7 @@ que ce projet puisse recevoir. Voir [CONTRIBUTING.md](CONTRIBUTING.md).
 ```bash
 pip install -e ".[test]"
 PYTHONHASHSEED=0 python -m pytest tests/ -q          # Linux / macOS
-set PYTHONHASHSEED=0 && python -m pytest tests/ -q   # Windows
+set "PYTHONHASHSEED=0" && python -m pytest tests/ -q   # Windows
 ```
 
 `tests/test_guarantees.py` fige chaque défaut trouvé jusqu'ici — chaque test a été

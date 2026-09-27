@@ -36,7 +36,7 @@ Ce banc NE REMPLACE RIEN : il se rapporte à côté des bras auto / none / units
 Sortie : feyn_pools.jsonl (télémétrie v2)   |   Reprise automatique.
 
 Lancement :
-  set PYTHONHASHSEED=0 && python benchmarks\\feynman_pools.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_pools.py
 Options :
   --pools physical,full   sous-ensemble de pools
   --eq I.12.1,I.16.6      sous-ensemble d'équations

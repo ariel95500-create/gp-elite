@@ -101,8 +101,9 @@ refinement, linear scaling [@keijzer2003scaling], and $\epsilon$-lexicase
 selection [@lacava2016lexicase] as in the compiled engines. Against `gplearn`
 under identical data, splits and a generous budget granted to the baseline, on a
 fixed 15-equation subset of the Feynman problems chosen before any measurement,
-and each method judged on the model it returns, it recovers 11/15 exactly at
-machine precision against 6/15 (version 0.7.0, `benchmarks/duel.py`). That
+and each method judged on the model it returns, it recovers 11/15 exactly
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.7.0,
+`benchmarks/duel.py`). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
 120-equation Feynman set. The
@@ -164,9 +165,9 @@ The software is released on PyPI under the MIT licence, with a test suite and
 benchmark scripts that regenerate every number quoted in its documentation.
 
 The dimensional mode has been evaluated in a controlled A/B experiment on
-Feynman equation II.11.3, five seeds, identical budget per arm
-(`benchmarks/ab_ood.py`, version 0.7.0). Unconstrained, 0/5 returned models are
-dimensionally valid; with `units=`, 5/5 are valid and about three times smaller
+Feynman equation II.11.3, five seeds, identical budget for the unconstrained
+and constrained arms (`benchmarks/ab_ood.py`, version 0.7.0). Unconstrained,
+0/5 returned models are dimensionally valid; with `units=`, 5/5 are valid and about three times smaller
 (median 19 versus 61 nodes) at a slightly better test $R^2$ (0.99952 versus
 0.99625). A third arm grants the unconstrained search four times the
 generations, more wall-clock time than the constrained arm: still 0/5 valid.
@@ -181,7 +182,7 @@ known in advance (`benchmarks/test_constante_mystere.py`, 25 generations, two
 restarts). Hooke's law returns `kg·s⁻²` and 250.0 for a true 250; gravitation
 returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
 `kg·m²·s⁻²·mol⁻¹·K⁻¹` and 8.31446 for a true 8.314463. Structure is exact and
-$R^2 = 1.000000$ in all three, on two independent platforms.
+$R^2 = 1.000000$ in all three.
 
 An integration for the SRBench living benchmark [@lacava2021srbench] has been
 merged into that project and is staged for its next evaluation round.

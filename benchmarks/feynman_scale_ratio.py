@@ -43,7 +43,7 @@ RandomState(1000+i). Seuls varient l'échelle et le mode de normalisation.
 Sortie : feyn_scale_ratio.jsonl   |   Reprise automatique.
 
 Lancement :
-  set PYTHONHASHSEED=0 && python benchmarks\\feynman_scale_ratio.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_scale_ratio.py
 Options :
   --exps 0,1,2,3,4,6     décades testées (défaut)
   --modes none,auto

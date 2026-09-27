@@ -22,7 +22,7 @@ qu'on n'a pas regardées.
 
 Lancement :
   python -m pip install pandas
-  set PYTHONHASHSEED=0 && python benchmarks\\real_nikuradse.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\real_nikuradse.py
 Options :
   --explore-only   s'arrête après l'inspection des données
   --gens 40          budget de générations (défaut 30)

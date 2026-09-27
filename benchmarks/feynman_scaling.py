@@ -19,6 +19,11 @@ N=3200 qu'à N=200 ; I.16.6 passe de 4.1e-3 (MISS) à 3.8e-4 (NEAR) entre
 N=200 et N=1000, en 93 s contre 116 s. => hypothèse B favorisée, à
 confirmer sur machine de référence.
 
+[0.7] Le README n'annonce plus de plage de tailles : il cite l'enveloppe
+mesurée par ce banc (moteur 0.7.0 : 12 runs exacts sur 15 à chaque taille de
+50 à 200 points, 4 sur 5 à chaque taille de 500 à 10 000). CLAIM_LO/CLAIM_HI
+bornent désormais cette plage citée (champ in_readme_claim).
+
 PROTOCOLE — identique au banc Feynman SAUF la taille :
   normalize="none", operators=pool d'origine, generations=30, speed="fast",
   validation_split=0.15, seed=0, restarts=4, split 70/30.
@@ -33,7 +38,7 @@ Sortie : feyn_scaling.jsonl — télémétrie v2 (même esprit que le bras units
 Reprise : relancer reprend là où le script s'est arrêté.
 
 Lancement :
-  Windows :  set PYTHONHASHSEED=0 && python benchmarks\\feynman_scaling.py
+  Windows :  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_scaling.py
   Linux   :  PYTHONHASHSEED=0 python3 benchmarks/feynman_scaling.py
 Options :
   --arm none|auto      bras de normalisation (défaut : none)
@@ -72,7 +77,7 @@ def U(rng, lo, hi, n): return rng.uniform(lo, hi, n)
 # 100..5000 : la plage annoncée par le README
 # 10000     : AU-DELÀ de la borne haute annoncée
 SIZES = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
-CLAIM_LO, CLAIM_HI = 100, 5000
+CLAIM_LO, CLAIM_HI = 50, 10000      # [0.7] plage citée par le README (100-5000 avant)
 REPEATS_SMALL, SMALL_N = 3, 200      # 3 tirages si N <= 200, sinon 1
 
 # ── sous-ensemble représentatif (indices = ceux du banc Feynman) ────────────
@@ -110,9 +115,9 @@ _SUSPECT = {"sin","cos","tanh","tan","exp","log","sqrt"}
 def _census(expr):
     c = {}
     for op in _OPS:
+        # \btan\s*\( ne reconnait pas « tanh( » : aucune soustraction a faire
+        # (l'ancienne soustrayait tanh une seconde fois : tan = -1).
         k = len(re.findall(r"\b%s\s*\(" % op, expr))
-        if op == "tan":
-            k -= len(re.findall(r"\btanh\s*\(", expr))
         if k: c[op] = k
     sq = expr.count("\u00b2")
     if sq: c["square"] = sq
@@ -126,6 +131,33 @@ def _st(err):
 
 def _err(e, X, y, var):
     return float(np.mean((e.predict(X) - y) ** 2) / var)
+
+def _score(rec):
+    """Champs dérivés, recalculés depuis les champs bruts d'un
+    enregistrement : statut du modèle RENDU (one_minus_r2), statut du
+    meilleur point du front (pareto_best, métrique secondaire), opérateurs
+    suspects et propreté jugés sur l'expression RENDUE (expr_full).
+    Sert au run comme au bilan, pour que les enregistrements écrits par une
+    version antérieure du script (statut et opérateurs lus sur le front)
+    soient jugés comme les nouveaux."""
+    size = rec.get("size")
+    if size is None:                 # enregistrements antérieurs : taille du
+        for d in rec.get("front", []):  # rendu retrouvée dans le front
+            if d.get("expr") == rec.get("expr_full") or d["err_test"] == rec["one_minus_r2"]:
+                size = d["size"]
+                break
+    status = _st(rec["one_minus_r2"])
+    census = _census(rec.get("expr_full", ""))
+    suspects = sorted((set(census) & _SUSPECT) - _expected(rec.get("formula", "")))
+    clean = bool(status == "EXACT" and not suspects and size is not None
+                 and int(size) <= CANON_SIZE.get(rec["name"], 99) + 4)
+    rec.update(status=status, status_front=_st(rec["pareto_best"]),
+               clean_recovery=clean, ops_census=census, suspect_ops=suspects,
+               ops_suspects=bool(suspects),
+               in_readme_claim=bool(CLAIM_LO <= rec["n_total"] <= CLAIM_HI))
+    if size is not None:
+        rec["size"] = int(size)
+    return rec
 
 def _done():
     if not os.path.exists(OUT): return set()
@@ -224,19 +256,11 @@ def run(sizes, eq_filter, arm):
                 pb, pb_size = pbe["err_test"], pbe["size"]
                 # [v0.7] Le STATUT juge le modele RENDU (le champion). Le
                 # meilleur point du front, choisi en regardant le test, n'est
-                # qu'une metrique secondaire (status_front).
-                status = _st(champ_te)
-                census = _census(r.expression)
-                suspects = sorted((set(census) & _SUSPECT) - _expected(formula))
-                clean = bool(status == "EXACT" and not suspects
-                             and int(r.size) <= CANON_SIZE.get(name, 99) + 4)
-
+                # qu'une metrique secondaire (status_front). Voir _score.
                 rec = dict(
                     name=name, formula=formula, n_total=N, rep=rep, arm=arm,
-                    status=status, status_front=_st(pb), clean_recovery=clean,
                     one_minus_r2=champ_te, pareto_best=pb, pb_size=pb_size,
-                    time=round(dt, 1),
-                    in_readme_claim=bool(CLAIM_LO <= N <= CLAIM_HI),
+                    size=int(r.size), time=round(dt, 1),
                     n_train=ntr, n_test=N - ntr, n_vars=nv, pool=pool,
                     engine_version=ENGINE,
                     pythonhashseed=os.environ.get("PYTHONHASHSEED"),
@@ -245,9 +269,9 @@ def run(sizes, eq_filter, arm):
                     validation_split=0.15, normalize=arm,
                     X_hash=dhash, y_hash=yhash,
                     expr_full=r.expression, front=front,
-                    ops_census=census, suspect_ops=suspects,
-                    ops_suspects=bool(suspects),
                 )
+                _score(rec)
+                status, clean = rec["status"], rec["clean_recovery"]
                 with open(OUT, "a", encoding="utf-8") as fh:
                     fh.write(json.dumps(rec) + "\n")
                 mark = "propre" if clean else ("" if status != "EXACT" else "non-canonique")
@@ -263,21 +287,18 @@ def bilan():
     rows = [r for r in rows if r.get("status") != "ERROR"]
     if not rows:
         print("(aucun résultat exploitable)"); return
-    # [v0.7] statut recalcule depuis le modele RENDU (one_minus_r2), meme pour
-    # les enregistrements anterieurs dont le statut venait du front ; le
-    # front reste affiche a part, comme metrique secondaire.
+    # [v0.7] champs derives recalcules (voir _score), meme pour les
+    # enregistrements anterieurs dont le statut venait du front ; le front
+    # reste affiche a part, comme metrique secondaire.
     for r in rows:
-        r["status_front"] = _st(r["pareto_best"])
-        r["status"] = _st(r["one_minus_r2"])
-        if r["status"] != "EXACT":
-            r["clean_recovery"] = False
+        _score(r)
     sizes = sorted({r["n_total"] for r in rows})
     names = [p[1] for p in PROBS if any(r["name"] == p[1] for r in rows)]
 
     print(f"\n=== SCALING — statut par équation et par taille "
           f"(moteur {ENGINE}) ===")
     print("    (E=EXACT propre, e=EXACT non-canonique, N=NEAR, M=MISS ; "
-          "| = bornes annoncées du README)")
+          "| = plage citée par le README)")
     hdr = "équation   "
     for N in sizes:
         hdr += ("|" if N == CLAIM_LO else " ") + f"{N:>6}"

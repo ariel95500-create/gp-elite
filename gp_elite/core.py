@@ -2481,6 +2481,38 @@ def _np_safe_pow(a, b):
         r = np.where(is_int, r_int, r_real)
     return np.where(np.isfinite(r) & (np.abs(r) < _SAFE_LIMIT), r, 1.0)
 
+def _np_safe_pow_var(a, b):
+    """[v0.7] Puissance a exposant VARIABLE : |a|^b sur toutes les lignes.
+
+    La branche entiere de _np_safe_pow (sign(a)*|a|^n) sert aux exposants
+    CONSTANTS (pow(u, 3) garde le signe de u). Appliquee ligne par ligne a un
+    exposant variable, elle rendait la fonction discontinue : la ou
+    l'exposant tombait exactement sur un entier, le resultat changeait de
+    signe. Avec la division par max|x|, une colonne vaut exactement ±1 sur
+    sa ligne extreme, donc le cas se produisait a coup sur ; la recherche
+    pouvait s'en servir comme d'un indicateur de ligne, et aucune formule
+    lisible ne reproduisait le modele (561_cpu standardise : formule et
+    predict() en desaccord de 0.97 sur 2 lignes). Memes garde-fous que
+    _np_safe_pow (exposant et base bornes, resultat non fini ou enorme -> 1).
+    """
+    b = np.clip(b, -6.0, 6.0)
+    a = np.clip(a, -100.0, 100.0)
+    with np.errstate(all='ignore'):
+        r = np.power(np.abs(a) + 1e-12, b)
+    return np.where(np.isfinite(r) & (np.abs(r) < _SAFE_LIMIT), r, 1.0)
+
+def _is_const_subtree(node) -> bool:
+    """[v0.7] Vrai si le sous-arbre ne contient aucune variable (x, X[i]) :
+    c'est lui qui decide de la semantique de pow (exposant constant :
+    branche entiere signee ; exposant variable : |a|^b), a la compilation
+    comme dans la formule livree (gp_elite/formula.py)."""
+    if node is None:
+        return True
+    v = node.value
+    if node.left is None and node.right is None:
+        return not (v == "x" or (isinstance(v, str) and v.startswith("X[")))
+    return _is_const_subtree(node.left) and _is_const_subtree(node.right)
+
 def _np_safe_tan(a):
     with np.errstate(all='ignore'):
         r = np.tan(a)
@@ -2550,6 +2582,7 @@ _NP_GLOBALS = {
     "np":          np,
     "_safe_div":   _np_safe_div,
     "_safe_pow":   _np_safe_pow,
+    "_safe_powv":  _np_safe_pow_var,   # [v0.7] exposant variable
     "_safe_tan":   _np_safe_tan,
     "_safe_exp":   _np_safe_exp,
     "_safe_log":   _np_safe_log,
@@ -2588,7 +2621,8 @@ def _to_np_code(node) -> str:
     if v == "/":
         return f"_safe_div({_to_np_code(node.left)}, {_to_np_code(node.right)})"
     if v == "pow":
-        return f"_safe_pow({_to_np_code(node.left)}, {_to_np_code(node.right)})"
+        fn = "_safe_pow" if _is_const_subtree(node.right) else "_safe_powv"
+        return f"{fn}({_to_np_code(node.left)}, {_to_np_code(node.right)})"
     if v == "sin":
         return f"np.sin({_to_np_code(node.left)})"
     if v == "cos":
@@ -2662,7 +2696,9 @@ def _to_np_code_parametric(node, const_list: list) -> str:
         if v == "-":   return f"({_code(n.left)} - {_code(n.right)})"
         if v == "*":   return f"({_code(n.left)} * {_code(n.right)})"
         if v == "/":   return f"_safe_div({_code(n.left)}, {_code(n.right)})"
-        if v == "pow": return f"_safe_pow({_code(n.left)}, {_code(n.right)})"
+        if v == "pow":
+            fn = "_safe_pow" if _is_const_subtree(n.right) else "_safe_powv"
+            return f"{fn}({_code(n.left)}, {_code(n.right)})"
         if v == "sin":  return f"np.sin({_code(n.left)})"
         if v == "cos":  return f"np.cos({_code(n.left)})"
         if v == "tan":  return f"_safe_tan({_code(n.left)})"

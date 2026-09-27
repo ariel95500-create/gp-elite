@@ -17,11 +17,13 @@ The outcome of that check is reported (``exact``), never assumed.
 
 Protected operators
 -------------------
-The engine evaluates ``sqrt(|u|)``, ``log(|u|)`` and a sign-aware power
-(``core._np_safe_pow``: ``|u|^p`` for a non-integer ``p``, ``sign(u)*|u|^n``
-for an integer ``n``). Where the argument is positive on every training row,
-the plain mathematical form is printed (``sqrt(u)``, ``log(u)``, ``u^p``): on
-the data domain it is the same function. Elsewhere the explicit form is
+The engine evaluates ``sqrt(|u|)``, ``log(|u|)`` and a power that is
+sign-aware for a constant integer exponent (``core._np_safe_pow``:
+``sign(u)*|u|^n`` for an integer ``n``, ``|u|^p`` for a non-integer ``p``)
+and plain ``|u|^v`` for an exponent that depends on the variables
+(``core._np_safe_pow_var``). Where the argument is positive on every
+training row, the plain mathematical form is printed (``sqrt(u)``,
+``log(u)``, ``u^p``): on the data domain it is the same function. Elsewhere the explicit form is
 printed (``sqrt(|u|)``, ``sign(u)*|u|^2``...). Divisions are printed plainly:
 the engine's protection only acts within 1e-8 of a pole.
 """

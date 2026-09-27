@@ -270,7 +270,10 @@ def test_time_limit_rejects_invalid_values(bad):
 
 def test_time_limit_stops_and_returns_a_model():
     r = np.random.RandomState(0)
-    Xd = r.uniform(1, 4, (400, 3)); y = Xd[:, 0] * Xd[:, 1] / Xd[:, 2]
+    Xd = r.uniform(1, 4, (400, 3))
+    # noisy target: no exact fit exists, so the search cannot end early on a
+    # perfect score and must be stopped by the time limit
+    y = Xd[:, 0] * Xd[:, 1] / Xd[:, 2] + r.normal(0.0, 0.1, 400)
     t0 = time.time()
     res = symbolic_regression(Xd, y, generations=5000, parallel=False, seed=0, time_limit=3.0)
     dt = time.time() - t0
@@ -460,3 +463,56 @@ def test_unknown_option_values_are_rejected(kw):
     Xd = np.random.RandomState(0).uniform(1, 3, (40, 1))
     with pytest.raises(ValueError):
         symbolic_regression(Xd, Xd[:, 0], generations=2, parallel=False, **kw)
+
+
+# ── 10. A preset does what its documentation announces ─────────────────────
+# speed="thorough" was documented as 200 generations, but symbolic_regression
+# kept its own default of 100 (only GPEliteRegressor applied the preset).
+
+class _Captured(Exception):
+    pass
+
+
+@pytest.mark.parametrize("kw,expected", [(dict(speed="thorough"), 200),
+                                         (dict(), 100),
+                                         (dict(speed="thorough", generations=7), 7)])
+def test_thorough_preset_runs_its_announced_generations(monkeypatch, kw, expected):
+    seen = {}
+
+    def fake_evolve(fn, cfg, **_):
+        seen["generations"] = cfg.GENERATIONS
+        raise _Captured
+
+    monkeypatch.setattr(core, "evolve", fake_evolve)
+    Xd = np.random.RandomState(0).uniform(1, 3, (40, 1))
+    with pytest.raises(_Captured):
+        symbolic_regression(Xd, Xd[:, 0], parallel=False, **kw)
+    assert seen["generations"] == expected
+
+
+# ── 11. A variable exponent never switches the power to its integer branch ──
+# The engine's power is sign-aware for a CONSTANT integer exponent (pow(u, 3)
+# keeps the sign of u). Applied row by row to an exponent that depends on the
+# variables, that branch made the model jump wherever the exponent landed on
+# an integer (with division by max|x| a column is exactly ±1 on its extreme
+# row, so it always happened), the search could use the jump as a row
+# indicator, and no readable formula reproduced the model: on standardised
+# 561_cpu the delivered formula and predict() were 0.97 apart on 2 rows.
+
+def test_variable_exponent_power_is_continuous_and_printed_exactly():
+    r = np.random.RandomState(0)
+    Xd = np.column_stack([r.uniform(-3.0, -0.5, 60), r.uniform(0.2, 2.0, 60)])
+    Xd[7, 1] = 2.0                    # the exponent lands exactly on an integer
+    for kind in ("divmax", "none"):
+        sc = _SCALERS[kind]()
+        Xs = sc.fit_transform(Xd)
+        tree = N("pow", X(0), X(1))
+        p = core.evaluate_vector(tree, Xs)
+        assert p[7] > 0, kind         # |u|^v on that row too, like its neighbours
+        rf = FM.raw_formula(tree, sc, Xd, ["a", "b"])
+        assert rf.exact, (kind, rf.max_error)
+        # an exponent built from constants only keeps the sign-aware branch
+        const_tree = N("pow", X(0), N("neg", N(2.0)))
+        pc = core.evaluate_vector(const_tree, Xs)
+        assert np.all(pc < 0), kind
+        assert FM.raw_formula(const_tree, sc, Xd, ["a", "b"]).exact, kind

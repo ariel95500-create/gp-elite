@@ -3,14 +3,14 @@
 
 Declare your units and the search only ever builds dimensionally valid equations — a hard
 constraint, not a soft penalty. The operating envelope is measured, not claimed: how many
-points it needs, how much noise it tolerates, and where it fails.
+points it needs, how its runtime grows, and where it fails.
 
 *[🇫🇷 Version française](README.fr.md)*
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.ipynb) **Try it in your browser** — no install, five steps, fifteen minutes.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-The operating envelope is measured, not claimed. On five Feynman equations, the returned model recovers the exact law in 4 cases out of 5 at every size from 500 to 10,000 points, and in 12 runs out of 15 from 50 to 200 points; runtime grows about 2.5-fold from 1,000 to 10,000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
+On five Feynman equations, the returned model recovers the exact law in 4 cases out of 5 at every size from 500 to 10,000 points, and in 12 runs out of 15 at each size from 50 to 200 points (9 out of 15 at 25 points); the median runtime grows about 2.5-fold from 1,000 to 10,000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -141,8 +141,9 @@ guarantee.
   choice — the most effective lever when the budget allows it.
 
 **Scripts and parallel islands.** On machines with four cores or more, islands run
-in parallel worker processes. On Windows and macOS those workers re-import your
-script, so keep the top-level code under `if __name__ == "__main__":`, as above.
+in parallel worker processes. Those workers are started with `spawn` on every
+system (Linux included) and re-import your script, so keep the top-level code
+under `if __name__ == "__main__":`, as above.
 Without the guard GP_ELITE detects the situation, finishes on one core with the
 same result, and says so once. Notebooks need nothing.
 
@@ -215,7 +216,7 @@ per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms. A malformed string
 (`"m/(s"`, `"kg^"`, `"m garbage"`) raises an error instead of being guessed.
 
 **Measured effect** — Feynman II.11.3, `x = q·Ef/(m·(w0²−w²))`, 5 variables,
-5 seeds, 40 generations, identical budget per arm:
+5 seeds, 40 generations, identical budget for the first two arms:
 
 | | no `units=` | `units=` | no `units=`, 4x generations |
 |---|---:|---:|---:|
@@ -229,8 +230,9 @@ per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms. A malformed string
 The third column gives the unconstrained arm four times the generations — here more
 wall-clock time than the constrained arm (170 s against 93 s). It still yields **0/5**
 physically valid models: compute does not substitute for the constraint. The
-unconstrained failures are not marginal — they add hertz to dimensionless numbers or to
-kilograms, or raise a quantity to the power of a frequency.
+unconstrained failures are not marginal: across the ten unconstrained runs, the models
+add hertz to kilograms, to pure numbers or to electric-field terms, add coulombs or
+metres to pure numbers, or raise a quantity to the power of a frequency or of a charge.
 
 **What it does *not* do.** On a test set drawn *outside* the training domain (w/w0
 pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), approximations collapse
@@ -290,8 +292,8 @@ python examples/battery_soh.py
 The file [`examples/nasa_battery_simulation.csv`](examples/nasa_battery_simulation.csv)
 holds 168 **simulated** charge cycles (cycle number, temperature, current, capacity
 state of health). Its origin is not documented beyond its name, so treat this as a
-demonstration of the workflow, not as a result on real batteries. On it, GP_ELITE
-returns:
+demonstration of the workflow, not as a result on real batteries. On it, the script
+prints (abridged):
 
 ```
 PROTOCOL 1 — random split (INTERPOLATION, leaks info)
@@ -347,7 +349,7 @@ equations, tied on 6, behind on 1. With the physical units declared (`units=`, s
 budget, no normalisation), 14/15 come back exact, each in its textbook form
 (`benchmarks/feynman_units.py`). One seed on fifteen equations is a showcase, not a
 statistical comparison. Reproduce: `PYTHONHASHSEED=0 python benchmarks/feynman_bench.py 0 15`
-and `python benchmarks/duel.py`.
+and `PYTHONHASHSEED=0 python benchmarks/duel.py`.
 
 **Less good at**: chaotic sequences (e.g. Collatz flight time — an intrinsically random component), >15–20 variables (the search space explodes — though `units=` substantially narrows it when physical units are known), large datasets where raw accuracy outweighs interpretability (ensemble models dominate there).
 
@@ -411,7 +413,8 @@ this project can receive. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```bash
 pip install -e ".[test]"
-PYTHONHASHSEED=0 python -m pytest tests/ -q
+PYTHONHASHSEED=0 python -m pytest tests/ -q          # Linux / macOS
+set "PYTHONHASHSEED=0" && python -m pytest tests/ -q   # Windows
 ```
 
 `tests/test_guarantees.py` pins down every defect found so far — each test was

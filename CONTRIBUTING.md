@@ -16,7 +16,7 @@ python -m pip install -e ".[test]"
 
 ```bash
 PYTHONHASHSEED=0 python -m pytest tests/ -q          # Linux / macOS
-set PYTHONHASHSEED=0 && python -m pytest tests/ -q   # Windows
+set "PYTHONHASHSEED=0" && python -m pytest tests/ -q   # Windows
 ```
 
 `PYTHONHASHSEED=0` makes results identical across interpreter runs. The same
