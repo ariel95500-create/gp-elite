@@ -5,7 +5,7 @@ Declare your units and the search only ever builds dimensionally valid equations
 constraint, not a soft penalty. The operating envelope is measured, not claimed: how many
 points it needs, how its runtime grows, and where it fails.
 
-*[🇫🇷 Version française](README.fr.md)*
+*[🇫🇷 Version française](https://github.com/ariel95500-create/gp-elite/blob/main/README.fr.md)*
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.ipynb) **Try it in your browser** — no install, five steps, fifteen minutes.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
@@ -16,9 +16,9 @@ Since **0.4 "Lawful"** you can also declare the physical units of your columns �
 
 Pure **Python / NumPy** — no Julia, no compilation, no GPU. `pip install` and you're ready.
 
-![GP_ELITE rediscovers Kepler's Third Law from 8 data points (R² = 1.000000)](kepler_plot.png)
+![GP_ELITE rediscovers Kepler's Third Law from 8 data points (R² = 1.000000)](https://raw.githubusercontent.com/ariel95500-create/gp-elite/main/kepler_plot.png)
 
-> Given only the 8 planets' distance and orbital period, GP_ELITE rediscovered Kepler's Third Law, `T = a·√a = a^1.5` — see [`examples/kepler_demo.py`](examples/kepler_demo.py).
+> Given only the 8 planets' distance and orbital period, GP_ELITE rediscovered Kepler's Third Law, `T = a·√a = a^1.5` — see [`examples/kepler_demo.py`](https://github.com/ariel95500-create/gp-elite/blob/main/examples/kepler_demo.py).
 
 ```python
 import numpy as np
@@ -296,7 +296,7 @@ only (no additive offset), which keeps every candidate dimensionally homogeneous
 python examples/battery_soh.py
 ```
 
-The file [`examples/nasa_battery_simulation.csv`](examples/nasa_battery_simulation.csv)
+The file [`examples/nasa_battery_simulation.csv`](https://github.com/ariel95500-create/gp-elite/blob/main/examples/nasa_battery_simulation.csv)
 holds 168 **simulated** charge cycles (cycle number, temperature, current, capacity
 state of health). Its origin is not documented beyond its name, so treat this as a
 demonstration of the workflow, not as a result on real batteries. On it, the script
@@ -396,8 +396,8 @@ console. **0.5 "Unknown"** — units *and* value of a law's missing constant.
 diagnostics and stability.
 
 Full history, with the measurements behind each claim, in
-[CHANGELOG.md](CHANGELOG.md). Every benchmark behind a number here lives in
-[`benchmarks/`](benchmarks/), with its raw results.
+[CHANGELOG.md](https://github.com/ariel95500-create/gp-elite/blob/main/CHANGELOG.md). Every benchmark behind a number here lives in
+[`benchmarks/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks), with its raw results.
 
 ## Did it fail on your data? Please say so
 
@@ -412,7 +412,7 @@ data itself, you do not need to know why it failed, and you can write in English
 or French.
 
 Failure reports on real measurements are the single most valuable contribution
-this project can receive. See [CONTRIBUTING.md](CONTRIBUTING.md).
+this project can receive. See [CONTRIBUTING.md](https://github.com/ariel95500-create/gp-elite/blob/main/CONTRIBUTING.md).
 
 ---
 
@@ -432,8 +432,8 @@ checked to fail on the code that had the defect. The suite runs on every push
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Free to use, including commercially, with retention of the copyright notice.
+MIT — see [LICENSE](https://github.com/ariel95500-create/gp-elite/blob/main/LICENSE). Free to use, including commercially, with retention of the copyright notice.
 
 ## Citing GP_ELITE
 
-If GP_ELITE is useful in academic work, see [CITATION.cff](CITATION.cff).
+If GP_ELITE is useful in academic work, see [CITATION.cff](https://github.com/ariel95500-create/gp-elite/blob/main/CITATION.cff).
