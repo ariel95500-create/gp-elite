@@ -80,8 +80,8 @@ the evolutionary search itself has no new heuristic.
   returns the best model found so far, instead of being killed without a
   result by an external timer. Remaining time is shared between restarts;
   `result.time_limit_reached` and `result.restarts_completed` say what
-  happened. Overshoot measured at one to two seconds on a 15 s budget
-  (17.0 s sequential, 16.0 s parallel, 3,000 rows,
+  happened. Overshoot measured at under two seconds on a 15 s budget
+  (16.6 s sequential, 15.4 s parallel, 3,000 rows,
   `benchmarks/time_limit_check.py`): the final polishing and selection run
   after the last generation. Without `time_limit` results are bit-identical
   to before.
@@ -123,14 +123,16 @@ the evolutionary search itself has no new heuristic.
 - The console (mode 6) printed the engine's internal expression with the real
   column names (`24.97 * elongation` for the law `250 * elongation`); rescaled
   columns now carry a prime, and the law in your columns follows.
-- **Scripts without an `if __name__ == "__main__":` guard** no longer run
-  three times over when parallel islands start (the workers use the `spawn`
-  start method on every system, Linux included, and re-import the script):
-  the engine detects it, finishes on one core with the same result and warns
-  once (measured on Linux: 9.0 s and three executions before, 5.9 s after).
-  The workers now receive the data through a temporary file: passed in the
-  message that starts them, data from about 3,000 rows up no longer fit in
-  the pipe, and once a worker had exited the parent waited on it forever.
+- **Scripts without an `if __name__ == "__main__":` guard** no longer have
+  their whole computation run again by every worker process when parallel
+  islands start (the workers use the `spawn` start method on every system,
+  Linux included, and re-import the script): the engine detects it, finishes
+  on one core with the same result and warns once (measured on Linux, 800
+  rows: 8.8 s, against 7.9 s for a plain sequential fit). Checked on
+  Python 3.9, 3.11 and 3.14, with 120 and 3,000 rows: the workers receive the
+  data through a temporary file and are probed with empty tasks first, as
+  otherwise the parent could wait forever on a worker that had already exited
+  (from about 3,000 rows, and on Python 3.9 at any size).
 - With `verbose=False`, the worker processes of parallel islands no longer
   print their progress.
 - The API writes no file. It used to write `gp_elite_log.csv` into the
