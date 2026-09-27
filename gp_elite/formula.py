@@ -621,6 +621,13 @@ def to_text(node, names=None, positive=None, _parsable=False):
                 return B
             s = "(%s)" % B[0] if (B[1] < _MUL or B[0].startswith("-")) else B[0]
             return "-" + s, _UMINUS
+        if v == "*" and nd.right.value == "/" and nd.right.left is not None \
+                and nd.right.left.left is None and nd.right.left.right is None \
+                and _is_num(nd.right.left.value) and float(nd.right.left.value) == 1.0:
+            # a * (1 / b) -> a / b  (not "a * 1 / b")
+            D = f(nd.right.right)
+            rhs = "(%s)" % D[0] if D[1] <= _UMINUS else D[0]
+            return "%s / %s" % (par(A, _MUL), rhs), _MUL
         if v in ("*", "/"):
             lhs = par(A, _MUL)
             # right operand: a sum always needs (); a product only under "/"

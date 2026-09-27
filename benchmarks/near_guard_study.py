@@ -14,7 +14,7 @@ La garde n'a jamais agi ; aucun des 322 candidats du front ne s'est effondre
 sur le test (ecart max 1.6 plages de y). Cout mesure nul ; benefice non
 observable a ce regime (preset fast, 40 generations).
 
-Usage : python near_guard_study.py <dataset> <seed> <on|off>
+Usage : python near_guard_study.py <dataset> <seed> <on|off> [--out fichier]
         python near_guard_study.py --summary [fichier]
 """
 import os, sys, json, numpy as np
@@ -100,6 +100,10 @@ def summary(path=OUT):
 
 
 if __name__ == "__main__":
+    if "--out" in sys.argv:                      # fichier de resultats choisi
+        i = sys.argv.index("--out")
+        OUT = os.path.abspath(sys.argv[i + 1])
+        del sys.argv[i:i + 2]
     if sys.argv[1:2] == ["--summary"]:
         summary(sys.argv[2] if len(sys.argv) > 2 else OUT)
     else:

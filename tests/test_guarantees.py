@@ -120,6 +120,7 @@ _FOLD_TREES = [
     N("/", N(1.0), N("sqrt", N("+", N("sq", X(0)), N("sq", X(1))))),
     N("*", N(3.0), N("+", N("sq", X(0)), N("neg", N("sq", X(1))))),   # distribution
     N("*", N(1.0000000002), N("*", X(0), X(1))),                        # "1 *" noise
+    N("*", X(1), N("/", N(2.0), N("+", X(0), N(6.0)))),                # a * (1 / b)
 ]
 
 
@@ -168,6 +169,12 @@ def test_delivered_formula_is_the_model(normalize, data):
             1e-6 * max(np.max(np.abs(e.predict(Xd))), 1e-12)
     # the display names the raw columns, never the engine's X[i]
     assert "X[" not in res.expression
+
+
+def test_product_by_a_reciprocal_prints_as_a_division():
+    """The folding writes c/u as c * (1/u); it used to print "v2 * 1 / v1"."""
+    tree = N("*", X(1), N("/", N(1.0), N("*", X(0), X(2))))
+    assert FM.to_text(tree, ["a", "b", "c"]) == "b / (a * c)"
 
 
 def test_three_x_is_printed_three_x():

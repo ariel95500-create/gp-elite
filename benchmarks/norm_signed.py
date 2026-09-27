@@ -18,6 +18,7 @@ rempli, 'auto' passe a divmax. Detail dans le CHANGELOG 0.7.0.
 
 Usage : python norm_signed.py A <law_index> <arm>      (5 seeds, arm = minmax|divmax)
         python norm_signed.py B <dataset> <arm>         (5 plis, seed 0)
+        ... [--out fichier]                             (defaut : results_0.7/norm_signed.jsonl)
         python norm_signed.py --summary [fichier]       (tableaux du CHANGELOG)
 Un processus par point de mesure (regle 4 du protocole) ; PYTHONHASHSEED=0.
 Toute la campagne : 8 lois + 6 jeux, deux bras, environ 2 h sur un coeur.
@@ -134,6 +135,10 @@ def summary(path=OUT):
 
 
 if __name__ == "__main__":
+    if "--out" in sys.argv:                      # fichier de resultats choisi
+        i = sys.argv.index("--out")
+        OUT = os.path.abspath(sys.argv[i + 1])
+        del sys.argv[i:i + 2]
     if sys.argv[1:2] == ["--summary"]:
         summary(sys.argv[2] if len(sys.argv) > 2 else OUT)
         sys.exit(0)
