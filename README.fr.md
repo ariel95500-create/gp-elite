@@ -13,7 +13,7 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman, le modèle rendu retrouve la loi exacte dans 4 cas sur 5 à chaque taille de 500 à 10 000 points, et dans 12 runs sur 15 à chaque taille de 50 à 200 points (9 sur 15 à 25 points) ; le temps de calcul médian est multiplié par 2,5 environ de 1 000 à 10 000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
+Sur cinq équations de Feynman, le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, est manquée à toutes les tailles. Le temps de calcul médian double à peu près de 1 000 à 10 000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -126,16 +126,16 @@ if __name__ == "__main__":        # nécessaire dans un script, voir la note plu
         speed="fast",             # 'ultrafast' | 'fast' | 'normal' | 'thorough'
         seed=0,
     )
-    print(resultat.expression)      # 4.69402 + 1.25599 * (0.201558 * a - 0.400369 * b + tanh(0.201558 * a)² + log(a))
-    print(resultat.r2_validation)   # 0.999987
-    print(resultat.size)            # 16
+    print(resultat.expression)      # 8.27088 + 2.49792 * (0.201558 * a - 0.200185 * b - exp(-0.591087 * a) - exp(-0.034099 * a)) + 0.0319226 * a
+    print(resultat.r2_validation)   # 0.999998
+    print(resultat.size)            # 25
     print(resultat.sympy())         # la même formule, lisible par sympy
 ```
 
 À ce budget, la recherche rend une approximation, pas la loi qu'on lui a donnée : le
-terme en `b` est juste (1.25599 × −0.400369 ≈ −0.503·b), tandis que `3·√a` est approché
-par une combinaison de `a`, `tanh(a)²` et `log(a)` — une formule qui colle au hold-out
-à R² 0.99999 et qui n'est pourtant pas la loi. C'est en lisant la formule qu'on s'en
+terme en `b` est juste (2.49792 × −0.200185 ≈ −0.500·b), tandis que `3·√a` est approché
+par une combinaison de `a` et de deux exponentielles — une formule qui colle au hold-out
+à R² 0.999998 et qui n'est pourtant pas la loi. C'est en lisant la formule qu'on s'en
 aperçoit ; `restarts=` et `speed="thorough"` consacrent plus de calcul à la forme
 exacte, sans garantie.
 
@@ -162,7 +162,15 @@ Rien à faire dans un notebook.
   l'échelle dans ses constantes, et l'ajustement vérifie qu'elle reproduit
   `predict()` sur vos données (`resultat.formula_exact`). `resultat.sympy()` donne
   la même formule sous forme de chaîne lisible par `sympy.sympify`. (Avant la 0.7,
-  les constantes affichées étaient celles de l'espace normalisé interne.)
+  les constantes affichées étaient celles de l'espace normalisé interne.) La
+  formule est la fonction mathématique pure : là où l'un des garde-fous
+  numériques du moteur agit sur vos données (une puissance bornée parce que sa
+  base dépasse 100 ou son exposant 6 en valeur absolue, ou sa valeur un million ;
+  une division par un dénominateur à moins de 1e-8 de zéro), elle s'écarte de
+  `predict()` sur ces lignes,
+  `formula_exact` vaut False et l'ajustement le signale. C'était le cas pour 6 des
+  70 ajustements faits avec la normalisation par défaut dans
+  `benchmarks/norm_signed.py`.
 - **`r2_validation` est un score de sélection.** Le hold-out sur lequel il est
   calculé sert aussi à choisir le modèle rendu parmi les candidats : il est donc
   optimiste. Pour estimer comment la formule généralise, gardez vos propres
@@ -190,11 +198,13 @@ En interne, `robust=True` bascule l'objectif vers une **loss de Huber** et recal
 |               10 % | 1.398 [1.398] | **0.237** [0.237] |
 |               20 % | 1.925 [1.925] | 1.925 [1.925] |
 
-Sur données propres, les deux modes rendent le même modèle. Avec 10 % de valeurs
-aberrantes, le mode robuste divise l'erreur par six. Avec 20 %, sur cet exemple, il ne
-fait pas mieux que le défaut : les cinq seeds convergent vers la même droite dans les
-deux modes. La robustesse est un outil à essayer quand on soupçonne des valeurs
-aberrantes, pas une garantie — comparez les deux modes sur vos propres données.
+Sur données propres, les deux modes rendent des droites légèrement différentes, aussi
+proches l'une que l'autre de la vraie loi. Avec 10 % de valeurs aberrantes, le mode
+robuste divise l'erreur par six. Avec 20 %, sur cet exemple, il ne fait pas mieux que le
+défaut : dans les deux modes, les cinq seeds rendent la même droite, tirée par les
+valeurs aberrantes (`y = 4.23319 + 1.32825 * x`). La robustesse est un outil à essayer
+quand on soupçonne des valeurs aberrantes, pas une garantie — comparez les deux modes
+sur vos propres données.
 (Jusqu'en 0.6, ce tableau montrait le meilleur de trois runs, choisi en comparant avec
 la vraie loi, ce qu'aucun utilisateur ne peut faire.)
 
@@ -231,25 +241,25 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 | | sans `units=` | `units=` | sans `units=`, 4× générations |
 |---|---:|---:|---:|
 | dimensionnellement valides | **0 / 5** | **5 / 5** | 0 / 5 |
-| loi exacte retrouvée (tient hors domaine) | 0 / 5 | **1 / 5** | 0 / 5 |
-| R² test médian | 0.99625 | **0.99952** | 0.99753 |
-| R² hors domaine médian | 0.45 | **0.65** | 0.45 |
-| taille médiane du modèle | 61 nœuds | **19 nœuds** | 30 nœuds |
-| secondes / run (médiane) | 38 | 93 | 170 |
+| loi exacte retrouvée (tient hors domaine) | 0 / 5 | **2 / 5** | 0 / 5 |
+| R² test médian | 0.98661 | **0.99957** | 0.99333 |
+| R² hors domaine médian | 0.10 | **0.65** | 0.45 |
+| taille médiane du modèle | 41 nœuds | **17 nœuds** | 53 nœuds |
+| secondes / run (médiane) | 22 | 57 | 104 |
 
 La troisième colonne donne au bras non contraint quatre fois plus de générations —
-ici plus de temps machine que le bras contraint (170 s contre 93 s). Il reste à
+ici plus de temps machine que le bras contraint (104 s contre 57 s). Il reste à
 **0/5** modèles physiquement valides : le calcul ne remplace pas la contrainte. Les
 échecs sans contrainte ne sont pas marginaux : sur les dix runs non contraints, les
-modèles additionnent des hertz à des kilogrammes, à des nombres purs ou à des termes
-de champ électrique, des coulombs ou des mètres à des nombres purs, ou élèvent une
-grandeur à la puissance d'une fréquence ou d'une charge.
+modèles additionnent des hertz à des kilogrammes, à des nombres purs ou à des
+coulombs, un champ électrique à des coulombs, ou prennent la tangente hyperbolique
+d'une charge ou d'une fréquence.
 
 **Ce que ça ne fait *pas*.** Sur un jeu de test tiré *hors* du domaine
 d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), les
-approximations s'effondrent dans tous les bras. Un run contraint sur cinq a trouvé la
-loi exacte, qui y tient (R² = 1.00000) ; les autres sont des approximations
-physiquement cohérentes et compactes, pas la loi. Temps mesurés sur un conteneur
+approximations s'effondrent dans tous les bras. Deux runs contraints sur cinq ont
+trouvé la loi exacte, qui y tient (R² = 1.00000) ; les trois autres sont des
+approximations physiquement cohérentes et compactes, pas la loi. Temps mesurés sur un conteneur
 Linux à 2 cœurs, un run par cœur. Reproductible avec `benchmarks/ab_ood.py`.
 
 **Quand s'en servir.** Pour découvrir une loi physique quand vous connaissez les
@@ -312,16 +322,16 @@ vraies batteries. Le script y affiche (extrait) :
 
 ```
 PROTOCOL 1 — random split (INTERPOLATION, leaks info)
-  GP_ELITE      R² = +0.992
+  GP_ELITE      R² = +0.991
   RandomForest  R² = +0.997
   XGBoost       R² = +0.997
 
 PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
   RandomForest (300)      R² = -2.515
   XGBoost (300 trees)     R² = -2.324
-  GP_ELITE (one equation) R² = +0.865
+  GP_ELITE (one equation) R² = +0.594
 
-  Equation: SOH = 0.220034 - 0.276279 * (tanh(0.00704225 * cycle) - exp(0.51573 * courant))
+  Equation: SOH = 0.563502 - 0.0192492 * sqrt(cycle) + 0.118299 * courant + 0.0162273 * (courant²)²
 ```
 
 Un découpage aléatoire de données séquentielles est de l'interpolation, qui flatte
@@ -355,13 +365,14 @@ La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un 
 **Bon** : lois physiques / d'ingénierie à structure multiplicative ou exponentielle, données expérimentales de taille modeste, problèmes où l'interprétabilité prime.
 
 Sur le **banc Feynman gelé** (15 équations de physique, `PYTHONHASHSEED=0`,
-`restarts=4`, une seed), jugé sur le modèle qu'il rend : **11/15 récupérations
+`restarts=4`, une seed), jugé sur le modèle qu'il rend : **12/15 récupérations
 symboliques exactes** (1−R² < 1e-9 sur des données tenues à l'écart) et **13/15 sous
 1e-3** ; les échecs sont I.16.6 (addition relativiste des vitesses, une forme
-rationnelle imbriquée) et II.15.4 (−μB·cos θ). Face-à-face contre **gplearn** sur les
-mêmes données et découpages (population 2000 × 30 générations), chaque méthode jugée
-sur le modèle qu'elle rend : **11/15 contre 6/15** exactes, 13/15 contre 7/15 sous
-1e-3 — GP_ELITE devant sur 8 équations, à égalité sur 6, derrière sur 1. Avec les
+rationnelle imbriquée) et III.15.12 (2U·(1 − cos kd), le cosinus d'un produit).
+Face-à-face contre **gplearn** sur les mêmes données et découpages (population
+2000 × 30 générations), chaque méthode jugée sur le modèle qu'elle rend : **12/15 contre
+6/15** exactes, 13/15 contre 7/15 sous 1e-3 — GP_ELITE devant sur 7 équations, à
+égalité sur 8, derrière sur aucune. Avec les
 unités physiques déclarées (`units=`, même budget, sans normalisation), 14/15 reviennent
 exactes, chacune sous sa forme de manuel (`benchmarks/feynman_units.py`). Une seed sur
 quinze équations est une vitrine, pas une comparaison statistique. Reproduire :

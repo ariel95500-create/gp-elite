@@ -3,7 +3,7 @@ Battery data (SIMULATED, see README): 168 sequential cycles, target SOH in [0.64
 ==============================================================
 PROTOCOL 1 — random split (INTERPOLATION, leaks info)
 ==============================================================
-  GP_ELITE      R² = +0.992
+  GP_ELITE      R² = +0.991
   RandomForest  R² = +0.997
   XGBoost       R² = +0.997
   -> a random split of sequential data is interpolation: it flatters
@@ -15,9 +15,9 @@ PROTOCOL 2 — forward split (EXTRAPOLATION, the real task)
 ==============================================================
   RandomForest (300)      R² = -2.515
   XGBoost (300 trees)     R² = -2.324
-  GP_ELITE (one equation) R² = +0.865
+  GP_ELITE (one equation) R² = +0.594
 
-  Equation: SOH = 0.220034 - 0.276279 * (tanh(0.00704225 * cycle) - exp(0.51573 * courant))
+  Equation: SOH = 0.563502 - 0.0192492 * sqrt(cycle) + 0.118299 * courant + 0.0162273 * (courant²)²
 
   -> On this split the equation extrapolates better than the tree
      ensembles, which can only repeat values seen in training.

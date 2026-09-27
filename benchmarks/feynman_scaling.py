@@ -20,9 +20,10 @@ N=200 et N=1000, en 93 s contre 116 s. => hypothèse B favorisée, à
 confirmer sur machine de référence.
 
 [0.7] Le README n'annonce plus de plage de tailles : il cite l'enveloppe
-mesurée par ce banc (moteur 0.7.0 : 12 runs exacts sur 15 à chaque taille de
-50 à 200 points, 4 sur 5 à chaque taille de 500 à 10 000). CLAIM_LO/CLAIM_HI
-bornent désormais cette plage citée (champ in_readme_claim).
+mesurée par ce banc (moteur 0.7.0 : les quatre équations autres que I.16.6
+retrouvées exactement à chaque taille de 25 à 10 000 points, à chaque tirage ;
+I.16.6 manquée partout ; temps médian ×2 de 1 000 à 10 000 points).
+CLAIM_LO/CLAIM_HI bornent désormais cette plage citée (champ in_readme_claim).
 
 PROTOCOLE — identique au banc Feynman SAUF la taille :
   normalize="none", operators=pool d'origine, generations=30, speed="fast",
@@ -77,7 +78,7 @@ def U(rng, lo, hi, n): return rng.uniform(lo, hi, n)
 # 100..5000 : la plage annoncée par le README
 # 10000     : AU-DELÀ de la borne haute annoncée
 SIZES = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
-CLAIM_LO, CLAIM_HI = 50, 10000      # [0.7] plage citée par le README (100-5000 avant)
+CLAIM_LO, CLAIM_HI = 25, 10000      # [0.7] plage citée par le README (100-5000 avant)
 REPEATS_SMALL, SMALL_N = 3, 200      # 3 tirages si N <= 200, sinon 1
 
 # ── sous-ensemble représentatif (indices = ceux du banc Feynman) ────────────

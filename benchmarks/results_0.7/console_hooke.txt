@@ -98,10 +98,10 @@ Generations : 200  |  Ops : ['+', '-', '*', '/', 'pow', 'sin', 'cos', 'log', 'sq
           Evolution sees ONLY the train set; final champion selected on the validation set.
 GP_ELITE  —  3 islands × 133 individuals  (island 0=explorer, island 1=cleaner, island 2=stigmergic)
 
-[GEN 0000|I0] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (0.2s)
+[GEN 0000|I0] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (0.1s)
   EXPR = (24.974004 * elongation)
 
-[GEN 0000|I2] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (0.6s)
+[GEN 0000|I2] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (0.3s)
   EXPR = (24.974004 * elongation)
 
 
@@ -121,24 +121,22 @@ GP_ELITE  —  3 islands × 133 individuals  (island 0=explorer, island 1=cleane
   ✓ Healthy generalization.
 ──────────────────────────────────────────────────────────────────────
 [LOG] History exported → /tmp/claude-0/console/gp_elite_log.csv
-[STIGM] Fragments accumulated: 7
-[STIGM] τ max : 0.6486  |  τ moyen : 0.3698
-[STIGM] Dominant operators: [('*', 3), ('/', 2), ('sqrt', 1), ('sq', 1)]
+[STIGM] Fragments accumulated: 4
+[STIGM] τ max : 0.3729  |  τ moyen : 0.2797
+[STIGM] Dominant operators: [('*', 2), ('sqrt', 1), ('sq', 1)]
 [STIGM] Top 3 fragments :
-  τ=0.649  freq=4  sqrt((2.0 * (elongation)²))
-  τ=0.649  freq=4  (elongation)²
-  τ=0.625  freq=57  (-0.9752 * elongation)
+  τ=0.373  freq=4  sqrt((2.0 * (elongation)²))
+  τ=0.373  freq=4  (elongation)²
+  τ=0.328  freq=61  (0.8908 * elongation)
 
-[COGRAPH] Co-occurrence edges: 6
-[COGRAPH] co max : 1.33948  |  co moyen : 0.68795
+[COGRAPH] Co-occurrence edges: 3
+[COGRAPH] co max : 1.33948  |  co moyen : 1.33948
 [COGRAPH] Top 5 paires co-occurrentes :
   co=1.3395  [(2.0 * (elongation)²)]  ×  [sqrt((2.0 * (elongation)²))]
   co=1.3395  [(elongation)²]  ×  [sqrt((2.0 * (elongation)²))]
   co=1.3395  [(2.0 * (elongation)²)]  ×  [(elongation)²]
-  co=0.0364  [(1.0 / (2.0 * (1.0 / elongation)))]  ×  [(2.0 * (1.0 / elongation))]
-  co=0.0364  [(1.0 / (2.0 * (1.0 / elongation)))]  ×  [(1.0 / elongation)]
 
-[SEQ_MEM] Transitions apprises : 22  (poids total : 170.63)
+[SEQ_MEM] Transitions apprises : 20  (poids total : 167.09)
 [SEQ_MEM] Top 5 transitions :
   root.root.unary           → *
   *.root.unary              → *

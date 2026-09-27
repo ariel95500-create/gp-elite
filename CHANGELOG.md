@@ -47,6 +47,13 @@ the evolutionary search itself has no new heuristic.
   differed by 0.97 on 2 rows (`formula_exact` was False). A variable exponent
   now always gives `|u|^v`, the function the formula prints. This changes
   the search, which is why every figure below was measured after it.
+- **A formula that departs from the model is never delivered silently.** The
+  formula is the plain mathematical function; where one of the engine's
+  numerical safety nets acts on the training data (a clipped or capped power,
+  a division by a near-zero denominator), it departs from `predict()` on those
+  rows. `formula_exact` is then False and the fit warns with the number of
+  rows concerned. Measured: 6 of the 70 fits made with the default
+  normalisation in `benchmarks/norm_signed.py`.
 - `mse_train` was computed on all rows, hold-out included; it now uses the
   training rows only. `r2_validation` is documented for what it is: the
   hold-out also chooses the returned model, so it is an optimistic selection
@@ -88,22 +95,23 @@ the evolutionary search itself has no new heuristic.
   `a*(x - x0)` and breaks multiplicative structure). Decided on a criterion
   written before measuring (`benchmarks/norm_signed.py`, raw results in
   `benchmarks/results_0.7/`). On 8 laws with signed inputs × 5 seeds: exact
-  recoveries 24/40 against 10/40, near ones 33 against 31. On 6 real PMLB
-  datasets standardised as SRBench does × 5 folds: median test R² 0.819
-  against 0.788, mean 0.759 against 0.757, worst fold 0.016 against 0.398;
-  divmax is better on 17 of 30 paired folds, no collapse on either side, and
-  the delivered formulas are shorter (median 12 nodes against 17). On real
-  data it is roughly a wash with one bad fold; on laws it is a clear gain.
+  recoveries 20/40 against 7/40, near ones 30 against 27. On 6 real PMLB
+  datasets standardised as SRBench does × 5 folds: median test R² 0.808
+  against 0.808, mean 0.781 against 0.775, worst fold 0.406 against 0.399;
+  divmax is better on 16 of 30 paired folds, no collapse on either side, and
+  the delivered formulas are shorter (median 16 nodes against 20). On real
+  data it is a wash; on laws it is a clear gain.
   `normalize="minmax"` remains available.
 - **A law found exactly is no longer traded for a shorter approximation.**
   The final choice keeps the smallest candidate within 0.3 % of R² of the
-  best, to avoid fitting noise. On Feynman I.18.12 it returned
-  `0.0776 + 0.9967*r*F*sin(1.0106*th)` while `r*F*sin(th)`, exact, was in the
-  front. When the best candidate reproduces the hold-out to numerical
+  best, to avoid fitting noise. Without the new rule, on Feynman I.18.12 it
+  returned `0.0776 + 0.9967*r*F*sin(1.0106*th)` while `r*F*sin(th)`, exact,
+  was in the front. When the best candidate reproduces the hold-out to numerical
   precision (MSE ≤ 1e-12 × variance) there is no noise to avoid, and only
   exact candidates stay eligible. Measured: the rule never fired on the 60
   real-data fits of the normalisation study nor on the 60 of the guard study;
-  on the Feynman benchmark it turns I.18.12 into an exact recovery.
+  on the Feynman benchmark it acted on two equations, I.14.4 and I.6.20a,
+  both returned exact.
 - The default `fast` preset uses a population of 400 instead of 300, so each
   generation evaluates a third more candidates.
 - Unknown option values raise `ValueError`: `operators="phsyical"` used to
@@ -123,8 +131,10 @@ the evolutionary search itself has no new heuristic.
   rule considers equivalent, one that explodes just outside the data (a pole
   between two training points) is no longer preferred. Measured cost: none —
   on 60 real-data folds (6 PMLB datasets × 2 seeds × 5 folds,
-  `benchmarks/near_guard_study.py`) it never intervened, and none of the 322
-  front candidates exploded on the test folds. Its benefit is shown on
+  `benchmarks/near_guard_study.py`) it never intervened, and none of the 299
+  front candidates exploded on the test folds. One fold (210_cloud, 108
+  rows) returned a poor model, test R² −0.58, without any candidate
+  exploding: the guard targets poles, not a weak fit. Its benefit is shown on
   constructed cases (a spurious pole between training points, in
   `tests/test_guarantees.py`). The one real collapse seen with 0.6 (210_cloud,
   thorough preset, one fold at R² = −8e10) could not be reproduced on another
@@ -139,18 +149,20 @@ the evolutionary search itself has no new heuristic.
 Every figure in the README was re-measured on 0.7.0 (raw results and logs in
 `benchmarks/results_0.7/`, commands in its README), each method judged on the
 model it returns:
-- Feynman benchmark, 15 equations, one seed: 11/15 exact (1−R² < 1e-9 on
+- Feynman benchmark, 15 equations, one seed: 12/15 exact (1−R² < 1e-9 on
   held-out data), 13/15 within 1e-3; with `units=` declared, 14/15 exact, each
-  in its textbook form. Against gplearn on the same data: 11/15 against 6/15
-  exact.
+  in its textbook form. Against gplearn on the same data: 12/15 against 6/15
+  exact, ahead on 7 equations, behind on none.
 - `units=` on Feynman II.11.3, 5 seeds: 5/5 dimensionally valid against 0/5,
-  median size 19 against 61 nodes, and one run in five recovers the exact law
+  median size 17 against 41 nodes, and two runs in five recover the exact law
   (none did in 0.6).
 - Robust mode: error divided by six at 10 % outliers, no gain at 20 % on the
   bundled example (the 0.6 table showed a best-of-three chosen with the true
   law).
-- Data size (`normalize="none"`, 5 equations): 4 of 5 exact at every size from
-  500 to 10,000 points.
+- Data size (`normalize="none"`, 5 equations): the four equations other than
+  I.16.6 recovered exactly at every size from 25 to 10,000 points, in every
+  run; I.16.6 missed at every size; median time ×2 from 1,000 to 10,000
+  points.
 
 ### Project
 - Continuous integration on Linux (Python 3.9–3.14) and Windows.

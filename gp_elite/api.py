@@ -710,6 +710,19 @@ def symbolic_regression(
     # bloquant n°1). On la réécrit en variables brutes et on vérifie qu'elle
     # reproduit predict() sur les données d'entraînement.
     raw_formula, expression = _build_raw_formula(best, scaler, X, feature_names)
+    if raw_formula is not None and not raw_formula.exact:
+        # [v0.7] Jamais en silence : la formule affichee est la fonction
+        # mathematique sans les garde-fous numeriques du moteur ; la ou l'un
+        # d'eux agit, elle s'ecarte de predict(), qui reste le modele.
+        import warnings
+        warnings.warn(
+            "GP_ELITE: the formula printed for the returned model departs from "
+            "predict() on %d of %d training rows (largest gap %.3g): there a "
+            "numerical safety net of the engine acts (a power capped at 1e6 or "
+            "clipped, a division by a near-zero denominator...). predict() is "
+            "the model; result.formula_exact is False."
+            % (raw_formula.rows_off, len(y), raw_formula.max_error),
+            RuntimeWarning, stacklevel=2)
     for e in pareto_entries:
         e.formula, e.expression = _build_raw_formula(e.node, scaler, X, feature_names)
 

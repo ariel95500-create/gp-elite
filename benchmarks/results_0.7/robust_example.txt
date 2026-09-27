@@ -7,5 +7,15 @@ Recovering y = 2x + 1 from data with outliers
         10% |   1.398 [ 1.398] |   0.237 [ 0.237] | robust
         20% |   1.925 [ 1.925] |   1.925 [ 1.925] | tie
 
-  Read the table, not a slogan: robustness costs a little on clean
-  data and pays off only when the outliers are numerous enough.
+  Formulas returned (distinct formulas, with how many of the 5 seeds
+  returned each):
+     0% default  [5/5]  y = 0.914431 + 2.00473 * x
+     0% robust   [5/5]  y = 0.885403 + 2.01275 * x
+    10% default  [5/5]  y = 2.88509 + 1.53912 * x
+    10% robust   [5/5]  y = 1.20418 + 1.93211 * x
+    20% default  [5/5]  y = 4.23319 + 1.32825 * x
+    20% robust   [5/5]  y = 4.23319 + 1.32825 * x
+
+  robust=True changes the loss, not the search: whether it helps
+  depends on the data. Read the table, and compare both modes on a
+  hold-out of your own before trusting either.

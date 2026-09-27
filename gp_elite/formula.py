@@ -693,17 +693,21 @@ class RawFormula:
                  protected division near a pole...): the formula is then the
                  mathematical function without that safety net.
     max_error  : largest |formula - predict| on the training data
+    rows_off   : number of training rows where the formula departs from
+                 ``predict()`` (0 when exact)
     folded     : False if the readable folding failed and the plain
                  substitution (x -> a*x + b) was used instead
     """
 
-    def __init__(self, tree, names, positive, exact, max_error, folded=True):
+    def __init__(self, tree, names, positive, exact, max_error, folded=True,
+                 rows_off=0):
         self.tree = tree
         self.names = list(names) if names is not None else None
         self._positive = positive
         self.exact = bool(exact)
         self.max_error = float(max_error)
         self.folded = bool(folded)
+        self.rows_off = int(rows_off)
 
     def text(self, names=None):
         return to_text(self.tree, names if names is not None else self.names,
@@ -739,25 +743,29 @@ def raw_formula(node, scaler, X_raw, feature_names=None, predictions=None):
         v = evaluate(tree, X_raw, pos)
         scale = max(float(np.max(np.abs(p))) if p.size else 0.0,
                     float(np.std(p)) if p.size else 0.0, 1e-300)
+        with np.errstate(all="ignore"):
+            gap = np.abs(v - p)
+        off = ~np.isfinite(gap) | (gap > 1e-7 * scale)
+        n_off = int(np.sum(off))
         if not np.all(np.isfinite(v)):
-            return pos, False, float("inf")
-        err = float(np.max(np.abs(v - p))) if p.size else 0.0
-        return pos, err <= 1e-7 * scale, err
+            return pos, False, float("inf"), n_off
+        err = float(np.max(gap)) if p.size else 0.0
+        return pos, err <= 1e-7 * scale, err, n_off
 
     folded = True
     try:
         tree = to_raw_tree(node, a, b)
-        pos, ok, err = _check(tree)
+        pos, ok, err, n_off = _check(tree)
         if not ok:                                   # folding must never cost
             alt = substitute_only(node, a, b)        # exactness: compare with
-            pos2, ok2, err2 = _check(alt)            # the plain substitution
+            pos2, ok2, err2, n_off2 = _check(alt)    # the plain substitution
             if ok2:
-                tree, pos, ok, err, folded = alt, pos2, ok2, err2, False
+                tree, pos, ok, err, n_off, folded = alt, pos2, ok2, err2, n_off2, False
     except (ValueError, RecursionError, OverflowError, ZeroDivisionError):
         tree = substitute_only(node, a, b)
-        pos, ok, err = _check(tree)
+        pos, ok, err, n_off = _check(tree)
         folded = False
-    return RawFormula(tree, feature_names, pos, ok, err, folded)
+    return RawFormula(tree, feature_names, pos, ok, err, folded, n_off)
 
 
 def scaled_expression_note(scaler, X_raw, feature_names):

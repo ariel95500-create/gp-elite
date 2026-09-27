@@ -523,3 +523,33 @@ def test_variable_exponent_power_is_continuous_and_printed_exactly():
         pc = core.evaluate_vector(const_tree, Xs)
         assert np.all(pc < 0), kind
         assert FM.raw_formula(const_tree, sc, Xd, ["a", "b"]).exact, kind
+
+
+# ── 12. A formula that departs from the model is never delivered silently ───
+# The printed formula is the mathematical function without the engine's
+# numerical safety nets. Where one of them acts on the data (a division by a
+# near-zero denominator here), the formula departs from predict(): the rows
+# are counted and the user is warned; result.formula_exact says False.
+
+def test_rows_where_a_safety_net_acts_are_counted():
+    Xd = np.array([[1.0], [2.0], [3.0], [4.0]])
+    sc = core._IdentityScaler()
+    sc.fit_transform(Xd)
+    rf = FM.raw_formula(N("/", N(1.0), N("-", X(0), N(2.0))), sc, Xd, ["x"])
+    assert rf.exact is False and rf.rows_off == 1
+
+
+def test_inexact_formula_triggers_a_warning(monkeypatch):
+    import gp_elite.api as API
+    real = API._formula.raw_formula
+
+    def inexact(node, scaler, X_raw, feature_names=None, predictions=None):
+        rf = real(node, scaler, X_raw, feature_names, predictions)
+        rf.exact, rf.rows_off, rf.max_error = False, 2, 0.5
+        return rf
+
+    monkeypatch.setattr(API._formula, "raw_formula", inexact)
+    Xd = np.random.RandomState(0).uniform(1, 3, (40, 1))
+    with pytest.warns(RuntimeWarning, match="departs from predict"):
+        res = symbolic_regression(Xd, 2 * Xd[:, 0], generations=2, parallel=False, seed=0)
+    assert res.formula_exact is False

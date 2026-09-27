@@ -10,9 +10,11 @@ de y, ou non fini).
 Resultat (0.7.0, results_0.7/near_guard.jsonl) : 6 jeux x 2 seeds x 5 plis,
 bras ON seul (voir summary : le bras OFF est identique tant que la garde
 n'intervient pas ; une premiere etude appariee ON/OFF l'a verifie sur 60 plis).
-La garde n'a jamais agi ; aucun des 322 candidats du front ne s'est effondre
-sur le test (ecart max 1.6 plages de y). Cout mesure nul ; benefice non
-observable a ce regime (preset fast, 40 generations).
+La garde n'a jamais agi ; aucun des 299 candidats du front ne s'est effondre
+sur le test (ecart max 1.4 plages de y). Cout mesure nul ; benefice non
+observable a ce regime (preset fast, 40 generations). Un pli (210_cloud,
+seed 1, pli 3) rend un modele mediocre (R2 test -0.58) sans qu'aucun
+candidat n'explose : la garde vise les poles, pas un ajustement faible.
 
 Usage : python near_guard_study.py <dataset> <seed> <on|off> [--out fichier]
         python near_guard_study.py --summary [fichier]

@@ -10,7 +10,7 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations, the returned model recovers the exact law in 4 cases out of 5 at every size from 500 to 10,000 points, and in 12 runs out of 15 at each size from 50 to 200 points (9 out of 15 at 25 points); the median runtime grows about 2.5-fold from 1,000 to 10,000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
+On five Feynman equations, the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, is missed at every size. The median runtime roughly doubles from 1,000 to 10,000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -119,16 +119,16 @@ if __name__ == "__main__":        # needed in scripts, see the note below
         speed="fast",             # 'ultrafast' | 'fast' | 'normal' | 'thorough'
         seed=0,
     )
-    print(result.expression)      # 4.69402 + 1.25599 * (0.201558 * a - 0.400369 * b + tanh(0.201558 * a)² + log(a))
-    print(result.r2_validation)   # 0.999987
-    print(result.size)            # 16
+    print(result.expression)      # 8.27088 + 2.49792 * (0.201558 * a - 0.200185 * b - exp(-0.591087 * a) - exp(-0.034099 * a)) + 0.0319226 * a
+    print(result.r2_validation)   # 0.999998
+    print(result.size)            # 25
     print(result.sympy())         # the same formula, parsable by sympy
 ```
 
 At this budget the search returns an approximation, not the law it was given: the `b`
-term is right (1.25599 × −0.400369 ≈ −0.503·b), while `3·√a` is approximated by a
-combination of `a`, `tanh(a)²` and `log(a)` — a formula that fits the hold-out to
-R² 0.99999 and is still not the law. Reading the formula is how you find out;
+term is right (2.49792 × −0.200185 ≈ −0.500·b), while `3·√a` is approximated by a
+combination of `a` and two exponentials — a formula that fits the hold-out to
+R² 0.999998 and is still not the law. Reading the formula is how you find out;
 `restarts=` and `speed="thorough"` spend more compute on the exact form, without a
 guarantee.
 
@@ -154,7 +154,13 @@ same result, and says so once. Notebooks need nothing.
   constants, and the fit checks that the formula reproduces `predict()` on your
   data (`result.formula_exact`). `result.sympy()` gives the same formula as a
   string `sympy.sympify` can parse. (Before 0.7, the displayed constants were
-  those of the internal scaled space.)
+  those of the internal scaled space.) The formula is the plain mathematical
+  function: where one of the engine's numerical safety nets acts on your data
+  (a power clipped because its base exceeds 100 or its exponent 6 in absolute
+  value, or its value a million; a division by a denominator within 1e-8 of
+  zero), it departs from `predict()` on those rows, `formula_exact` is False
+  and the fit warns. That was the case for 6 of
+  the 70 fits made with the default normalisation in `benchmarks/norm_signed.py`.
 - **`r2_validation` is a selection score.** The hold-out it is computed on is also
   used to choose the returned model among the candidates, so it is optimistic.
   To estimate how the formula generalises, keep a test set of your own out of the
@@ -182,10 +188,11 @@ Under the hood, `robust=True` switches the objective to a **Huber loss** and res
 |     10 % |   1.398 [1.398] | **0.237** [0.237] |
 |     20 % |   1.925 [1.925] |   1.925 [1.925] |
 
-On clean data both modes return the same model. With 10 % outliers, robust mode cuts
-the error six-fold. With 20 %, on this example, it does no better than the default: all
-five seeds converge to the same line in both modes. Robustness is a tool to try when
-you suspect outliers, not a guarantee — compare both modes on data of your own.
+On clean data the two modes return slightly different lines, equally close to the true
+law. With 10 % outliers, robust mode cuts the error six-fold. With 20 %, on this
+example, it does no better than the default: in both modes all five seeds return the
+same line, pulled by the outliers (`y = 4.23319 + 1.32825 * x`). Robustness is a tool to
+try when you suspect outliers, not a guarantee — compare both modes on data of your own.
 (Up to 0.6 this table reported the best of three runs, picked by comparing with the
 true law, which no user can do.)
 
@@ -221,24 +228,24 @@ per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms. A malformed string
 | | no `units=` | `units=` | no `units=`, 4x generations |
 |---|---:|---:|---:|
 | dimensionally valid | **0 / 5** | **5 / 5** | 0 / 5 |
-| exact law recovered (holds out of domain) | 0 / 5 | **1 / 5** | 0 / 5 |
-| median test R² | 0.99625 | **0.99952** | 0.99753 |
-| median out-of-domain R² | 0.45 | **0.65** | 0.45 |
-| median model size | 61 nodes | **19 nodes** | 30 nodes |
-| median seconds / run | 38 | 93 | 170 |
+| exact law recovered (holds out of domain) | 0 / 5 | **2 / 5** | 0 / 5 |
+| median test R² | 0.98661 | **0.99957** | 0.99333 |
+| median out-of-domain R² | 0.10 | **0.65** | 0.45 |
+| median model size | 41 nodes | **17 nodes** | 53 nodes |
+| median seconds / run | 22 | 57 | 104 |
 
 The third column gives the unconstrained arm four times the generations — here more
-wall-clock time than the constrained arm (170 s against 93 s). It still yields **0/5**
+wall-clock time than the constrained arm (104 s against 57 s). It still yields **0/5**
 physically valid models: compute does not substitute for the constraint. The
 unconstrained failures are not marginal: across the ten unconstrained runs, the models
-add hertz to kilograms, to pure numbers or to electric-field terms, add coulombs or
-metres to pure numbers, or raise a quantity to the power of a frequency or of a charge.
+add hertz to kilograms, to pure numbers or to coulombs, add an electric field to
+coulombs, or take the tanh of a charge or of a frequency.
 
 **What it does *not* do.** On a test set drawn *outside* the training domain (w/w0
 pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), approximations collapse
-in every arm. One constrained run in five found the exact law, which holds there
-(R² = 1.00000); the others are physically coherent, compact approximations, not the
-law. Timings are from a 2-core Linux container, one run per core. Reproduce with
+in every arm. Two constrained runs in five found the exact law, which holds there
+(R² = 1.00000); the other three are physically coherent, compact approximations, not
+the law. Timings are from a 2-core Linux container, one run per core. Reproduce with
 `benchmarks/ab_ood.py`.
 
 **When to use it.** For discovering physical laws when you know the units and the
@@ -297,16 +304,16 @@ prints (abridged):
 
 ```
 PROTOCOL 1 — random split (INTERPOLATION, leaks info)
-  GP_ELITE      R² = +0.992
+  GP_ELITE      R² = +0.991
   RandomForest  R² = +0.997
   XGBoost       R² = +0.997
 
 PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
   RandomForest (300)      R² = -2.515
   XGBoost (300 trees)     R² = -2.324
-  GP_ELITE (one equation) R² = +0.865
+  GP_ELITE (one equation) R² = +0.594
 
-  Equation: SOH = 0.220034 - 0.276279 * (tanh(0.00704225 * cycle) - exp(0.51573 * courant))
+  Equation: SOH = 0.563502 - 0.0192492 * sqrt(cycle) + 0.118299 * courant + 0.0162273 * (courant²)²
 ```
 
 A random split of sequential data is interpolation and flatters every method. On the
@@ -339,13 +346,13 @@ GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a tec
 **Good at**: physical / engineering laws with multiplicative or exponential structure, modest-size experimental data, problems where interpretability matters most.
 
 On the frozen **Feynman benchmark** (15 physics equations, `PYTHONHASHSEED=0`,
-`restarts=4`, one seed), judged on the model it returns: **11/15 exact symbolic
+`restarts=4`, one seed), judged on the model it returns: **12/15 exact symbolic
 recoveries** (1−R² < 1e-9 on held-out data) and **13/15 within 1e-3**; the misses are
-I.16.6 (relativistic velocity addition, a nested rational form) and II.15.4
-(−μB·cos θ). Head-to-head against **gplearn** on identical data and splits
-(population 2000 × 30 generations), each method judged on its returned model:
-**11/15 against 6/15** exact, 13/15 against 7/15 within 1e-3 — GP_ELITE ahead on 8
-equations, tied on 6, behind on 1. With the physical units declared (`units=`, same
+I.16.6 (relativistic velocity addition, a nested rational form) and III.15.12
+(2U·(1 − cos kd), a cosine of a product). Head-to-head against **gplearn** on identical
+data and splits (population 2000 × 30 generations), each method judged on its returned
+model: **12/15 against 6/15** exact, 13/15 against 7/15 within 1e-3 — GP_ELITE ahead on
+7 equations, tied on 8, behind on none. With the physical units declared (`units=`, same
 budget, no normalisation), 14/15 come back exact, each in its textbook form
 (`benchmarks/feynman_units.py`). One seed on fifteen equations is a showcase, not a
 statistical comparison. Reproduce: `PYTHONHASHSEED=0 python benchmarks/feynman_bench.py 0 15`

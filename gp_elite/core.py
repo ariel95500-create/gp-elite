@@ -7706,11 +7706,12 @@ def _choose_scaler(X_raw, normalize, x_range):
               multiplicative. Mesuré sur la version publiée (critère fixé
               avant ; 8 lois à entrées signées x 5 seeds, puis 6 jeux PMLB
               standardisés comme dans SRBench x 5 plis ;
-              benchmarks/norm_signed.py) : récupérations exactes 24/40 contre
-              10/40 ; R² test médian sur données réelles 0.819 contre 0.788,
-              moyenne 0.759 contre 0.757, meilleur sur 17 plis appariés sur
-              30, aucun effondrement de part et d'autre ; formules livrées
-              plus courtes (médiane 12 nœuds contre 17). NE SE DEMANDE
+              benchmarks/norm_signed.py) : récupérations exactes 20/40 contre
+              7/40 ; R² test médian sur données réelles 0.808 contre 0.808,
+              moyenne 0.781 contre 0.775, pire pli 0.406 contre 0.399,
+              meilleur sur 16 plis appariés sur 30, aucun effondrement de
+              part et d'autre ; formules livrées plus courtes (médiane 16
+              nœuds contre 20). NE SE DEMANDE
               JAMAIS s'il faut normaliser, seulement comment.
     'smart' : [v0.7] teste d'abord la disparité d'échelle entre colonnes.
               En dessous de SCALE_RATIO_THRESHOLD, ne normalise pas (les

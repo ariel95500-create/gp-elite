@@ -6,62 +6,59 @@ the paper and the "Measured on this release" section of the 0.7.0 entry of
 with `PYTHONHASHSEED=0`, one process per measurement, each method judged on
 the model it **returns**.
 
-Environment: Linux container with 2 CPU cores, Python 3.11, NumPy 2.4,
-scikit-learn 1.8, gplearn 0.4.3, xgboost 3.2. Times depend on the machine; the
-other figures do not (runs are deterministic at a given seed).
+Environment: Linux container with 2 CPU cores (two measurements at a time, one
+per core), Python 3.11, NumPy 2.4, scikit-learn 1.8, gplearn 0.4.3,
+xgboost 3.2. Times depend on the machine; the other figures do not (runs are
+deterministic at a given seed).
 
 ## Provenance
 
-The measurements were run on 25 and 26 September 2026 with the search and
-selection code of commit `871e1e3` ("Selection finale : une loi exacte n'est
-plus echangee contre une approximation plus courte"). The commits after it
-and before the release change how a formula is printed, the console display,
-the validation of option values, the default number of generations of
-`speed="thorough"` and the documentation. Apart from that default, which no
-measurement here uses, none changes which model a fit returns. Printed formulas stored in the files
-(`expr`, `equation`, `expr_full`) may therefore be written slightly
-differently by the released version, for the same model.
+Everything here was measured on 27 September 2026, between 21:31 and 23:07,
+with the search and selection code of commit `c4578a2` (the last change to the
+search: a power with a variable exponent is `|u|^v` on every row). Records
+that carry a `commit` field show `39d731c` or `8430393`: those two commits
+only add benchmark scripts and change how a formula is printed
+(`a * (1 / b)` is written `a / b`); `39d731c+modified` marks the few records
+written while that printing change was in the working tree, before it was
+committed. The commits after them, up to the release,
+change documentation, a docstring, and add the warning given when a formula
+departs from `predict()`; none changes which model a fit returns.
 
-Spot checks on the released code: the README usage example
-(`usage_example.txt`) and the `units=` study runs `untyped`, `untyped_fair`
-and `typed` at seed 4 were re-run and returned the same models (same R²
-values and sizes). In that study the `untyped_fair` run at seed 4 returns the
-same model as the `untyped` run at seed 4: with the same seed, the 120 extra
-generations never produced a better candidate.
+An earlier campaign (25 and 26 September, before the change to the power
+operator) is superseded by this one and is not kept here.
 
-`scaling.jsonl` was written by an earlier version of `feynman_scaling.py`
-that derived `status`, `suspect_ops` and `clean_recovery` from the best point
-of the Pareto front (chosen by looking at the test set) instead of the
-returned model. Those derived fields were recomputed on 26 September from the
-raw fields stored in each record (`one_minus_r2`, `pareto_best`, `expr_full`,
-`front`) with the scoring of the current script (`_score`); each record says
-so in its `rescored` field. The raw measurements are unchanged, and the
-README figures come from `one_minus_r2`, which was always the returned model.
+`scaling.jsonl`: the field `in_readme_claim` of the 25-point records was
+recomputed after the range cited by the README became 25 to 10,000 points
+(field `rescored`); every other field is as measured.
 
 ## Files
 
 | File | Claim | Command (from the repository root) |
 |---|---|---|
-| `feynman15.jsonl` | Feynman 15: 11/15 exact, 13/15 within 1e-3 | `python benchmarks/feynman_bench.py 0 15` |
-| `duel_gplearn.jsonl` | 11/15 against 6/15 for gplearn; ahead 8, tied 6, behind 1 | `python benchmarks/duel.py` |
+| `feynman15.jsonl` | Feynman 15: 12/15 exact, 13/15 within 1e-3; misses I.16.6 and III.15.12 | `python benchmarks/feynman_bench.py 0 15` |
+| `duel_gplearn.jsonl` | 12/15 against 6/15 for gplearn; ahead 7, tied 8, behind 0 | `python benchmarks/duel.py` |
 | `feynman15_units.jsonl` | with `units=`: 14/15 exact, textbook forms | `python benchmarks/feynman_units.py --out <file>` |
-| `units_ab_ood.jsonl` | II.11.3: 0/5 against 5/5 valid, 1/5 exact law, sizes, times, the violations listed in the README | `python benchmarks/ab_ood.py` |
-| `scaling.jsonl` | recovery and time from 25 to 10,000 points | `python benchmarks/feynman_scaling.py --out <file>`; summary: `--out <file> --bilan` |
-| `norm_signed.jsonl` | `normalize="auto"` decision: 24/40 against 10/40, real-data R² | `python benchmarks/norm_signed.py A <i> <arm>` / `B <dataset> <arm>`, then `--summary` |
-| `near_guard.jsonl` | near-domain guard: never intervenes, no collapse | `python benchmarks/near_guard_study.py <dataset> <seed> on`, then `--summary` |
+| `units_ab_ood.jsonl` | II.11.3: 0/5 against 5/5 valid, 2/5 exact law, sizes, times, the violations listed in the README | `python benchmarks/ab_ood.py --out <file>` |
+| `scaling.jsonl` | four equations exact at every size from 25 to 10,000 points, I.16.6 missed at every size, median time ×2 from 1,000 to 10,000 | `python benchmarks/feynman_scaling.py --out <file>`; summary: `--out <file> --bilan` |
+| `norm_signed.jsonl` | `normalize="auto"` decision: 20/40 against 7/40, real-data R² 0.808 against 0.808; `formula_exact` False in 6 of the 70 default-normalisation fits | `python benchmarks/norm_signed.py A <i> <arm>` / `B <dataset> <arm>`, then `--summary` |
+| `near_guard.jsonl` | near-domain guard: never intervenes, 299 candidates, no explosion; one poor fold (210_cloud) | `python benchmarks/near_guard_study.py <dataset> <seed> on`, then `--summary` |
+| `readme_kepler.txt` | README first example: `0.00279171 + 0.999396 * a * sqrt(a)` | the README's first code block, plus `print(result.formula_exact)` |
 | `usage_example.txt` | README "Programmatically" example: printed formula, `r2_validation`, size | the code block of that README section, saved as a script and run |
 | `robust_example.txt` | robust table and the formulas each mode returns | `python examples/robust_regression.py` |
 | `mystery_constant.txt` | Hooke, Newton, ideal gas: units and values | `python benchmarks/test_constante_mystere.py` |
 | `battery_example.txt` | simulated battery: interpolation vs extrapolation | `python examples/battery_soh.py` |
 | `kepler_demo.txt` | `T = 0.00279171 + 0.999396 * a * sqrt(a)` | `python examples/kepler_demo.py` |
 | `console_hooke.txt` | console mode 6 transcript on a Hooke CSV | `gp-elite` (mode 6, units `m` and `N`, deduce the constant) |
+| `notebook_snippets.txt` | the figures in the notebooks' text (Kepler, Hooke, Coulomb, torque, Nikuradse short run...) | `python benchmarks/notebook_claims.py <snippet>` |
 
 Every command runs with `PYTHONHASHSEED=0` set: `PYTHONHASHSEED=0 python ...`
 on Linux and macOS, `set "PYTHONHASHSEED=0" && python ...` in the Windows
 command prompt (with the quotes: without them `cmd` stores `0 ` with a trailing
 space, which Python refuses).
 
-The Nikuradse figures of the notebooks come from `python benchmarks/real_nikuradse.py`,
-whose telemetry is `benchmarks/real_nikuradse_auto.json`.
+The Nikuradse figures of the notebooks under the full protocol come from
+`python benchmarks/real_nikuradse.py`, whose telemetry is
+`benchmarks/real_nikuradse_auto.json`; `kepler_plot.png` comes from
+`python examples/kepler_plot.py`.
 
 The real datasets (PMLB) are checked by content hash in `benchmarks/pmlb_frozen.py`.
