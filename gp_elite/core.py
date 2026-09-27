@@ -5776,6 +5776,11 @@ def evolve_island(island: Island,
 
 _PW: dict = {}    # état du worker (initialisé une fois par processus)
 
+def _pool_probe():
+    """[v0.7-PAR] Tache vide : prouve qu'un worker a fini de demarrer."""
+    return True
+
+
 def _parallel_worker_init(data_path, use_ls, syracuse_mode,
                           gencsv=None, battery_mode=False,
                           ls_scale_only=False, dim_unknown_const=False,
@@ -6051,6 +6056,15 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                           _gencsv, _BATTERY_CSV_MODE,
                           _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST,
                           sys.stdout is not sys.__stdout__)) as ex:
+            # [v0.7-PAR] Sonde : des taches vides d'abord. Un script sans
+            # garde __main__ fait terminer chaque worker pendant son demarrage
+            # (_exit_if_reimported_by_worker) ; la sonde echoue alors en
+            # BrokenProcessPool et on bascule en sequentiel. Sans elle, la
+            # premiere ronde (iles entieres, plus que la capacite d'un tube)
+            # restait coincee dans la file d'envoi : Python 3.9 attend ce fil
+            # d'envoi pour fermer le pool, et le repli promis ne venait jamais.
+            for _f in [ex.submit(_pool_probe) for _ in range(n_workers)]:
+                _f.result()
             gen = 0
             _deadline = getattr(cfg, "DEADLINE", None)
             while gen < cfg.GENERATIONS:
