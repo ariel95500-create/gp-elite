@@ -376,6 +376,7 @@ GP_ELITE.py  —  Genetic Programming symbolique haute performance
 """
 
 from __future__ import annotations
+import bisect
 import math
 import random
 import numpy as np
@@ -442,6 +443,20 @@ class FragmentLibrary:
     def __init__(self):
         self.fragments: Dict[int, FragmentEntry] = {}
         self.generation = 0
+        self._sampling = None   # [v0.8] tables de tirage (voir begin_sampling)
+
+    # [v0.8] Tables de tirage figées. sample() reconstruisait à CHAQUE appel la
+    # liste des candidats et leurs poids sémantiques en parcourant toute la
+    # bibliothèque, alors qu'elle ne change qu'aux dépôts et évaporations.
+    # Entre begin_sampling() et end_sampling(), fenêtre pendant laquelle
+    # l'appelant garantit que la bibliothèque n'est pas modifiée (la
+    # reproduction d'une île), chaque table est calculée une fois, à
+    # l'identique, puis réutilisée : mêmes tirages, bit pour bit.
+    def begin_sampling(self):
+        self._sampling = {}
+
+    def end_sampling(self):
+        self._sampling = None
 
     def _structural_quality(self, node: "Node") -> float:
         """
@@ -488,12 +503,19 @@ class FragmentLibrary:
             pass
         return False
 
+    def __getstate__(self):
+        # [v0.8] une table de tirage ne traverse jamais un processus
+        st = dict(self.__dict__)
+        st["_sampling"] = None
+        return st
+
     def merge_from(self, other: "FragmentLibrary"):
         """[v20-PAR] Fusionne la bibliothèque d'un worker dans celle du maître.
         Chaque worker part du MÊME instantané puis dépose/évapore localement :
         on fusionne par MAX de phéromone (signal le plus fort conservé, pas
         de double comptage de l'instantané commun), freq/last_gen par max,
         best_fitness par min."""
+        self._sampling = None
         for h, e in other.fragments.items():
             mine = self.fragments.get(h)
             if mine is None:
@@ -515,6 +537,7 @@ class FragmentLibrary:
 
     def deposit(self, individual: Node, rank: int, fitness: float, gen: int):
         """Dépose τ = quality/rank sur tous les sous-arbres valides d'un individu."""
+        self._sampling = None
         delta_base = 1.0 / rank
         nodes = get_all_nodes(individual)
         seen  = set()
@@ -618,6 +641,7 @@ class FragmentLibrary:
         40 % du τ total. Avec 11 opérateurs, on garantit une diversité
         minimale équivalente à ~2.5 opérateurs toujours représentés.
         """
+        self._sampling = None
         rate  = evap_rate if evap_rate is not None else self.EVAP_RATE
         t_max = tau_max   if tau_max   is not None else 1e9
 
@@ -682,16 +706,39 @@ class FragmentLibrary:
         [OPT] Calcul sémantique vectorisé en batch — toutes les signatures
         sont empilées en une matrice et le calcul de corrélation est fait
         en une seule passe matricielle plutôt que N appels séquentiels.
+        [v0.8] Table de tirage réutilisée dans une fenêtre begin_sampling().
         """
+        res_sig = CURRENT_RESIDUAL_SIG
+        cache = getattr(self, "_sampling", None)
+        if cache is not None:
+            key = (min_size, max_size, root_op)
+            ent = cache.get(key)
+            if ent is None or ent[0] is not res_sig:
+                ent = (res_sig,) + self._sample_table(min_size, max_size,
+                                                      root_op, res_sig)
+                cache[key] = ent
+            _, candidates, cumsum, total = ent
+        else:
+            candidates, cumsum, total = self._sample_table(min_size, max_size,
+                                                           root_op, res_sig)
+        if candidates is None or total <= 0:
+            return None
+        # Tirage pondéré via cumsum (plus rapide que boucle cumul)
+        r = random.random() * total
+        idx = int(np.searchsorted(cumsum, r))
+        idx = min(idx, len(candidates) - 1)
+        return candidates[idx][1].node.copy()  # [v19-OPT] copy itératif (≈50× vs deepcopy)
+
+    def _sample_table(self, min_size, max_size, root_op, res_sig):
+        """(candidats, poids cumulés, total) du tirage de sample()."""
         candidates = [
             (h, e) for h, e in self.fragments.items()
             if min_size <= e.size <= max_size
             and (root_op is None or e.root_op == root_op)
         ]
         if not candidates:
-            return None
+            return None, None, None
 
-        res_sig = CURRENT_RESIDUAL_SIG
         taus    = np.array([e.tau for _, e in candidates], dtype=np.float64)
 
         if res_sig is not None:
@@ -735,14 +782,7 @@ class FragmentLibrary:
             weights = taus * 0.5
 
         total = float(weights.sum())
-        if total <= 0:
-            return None
-        # Tirage pondéré via cumsum (plus rapide que boucle cumul)
-        r = random.random() * total
-        cumsum = np.cumsum(weights)
-        idx = int(np.searchsorted(cumsum, r))
-        idx = min(idx, len(candidates) - 1)
-        return candidates[idx][1].node.copy()  # [v19-OPT] copy itératif (≈50× vs deepcopy)
+        return candidates, np.cumsum(weights), total
 
     def top_fragments(self, n: int = 5) -> List[FragmentEntry]:
         return sorted(self.fragments.values(), key=lambda e: -e.tau)[:n]
@@ -932,13 +972,44 @@ class FragmentCoGraph:
     def __init__(self):
         # co[(h_i, h_j)] = poids, avec h_i < h_j (non-orienté)
         self.co: Dict[Tuple[int, int], float] = {}
+        self._sampling = None   # [v0.8] tables de tirage (voir begin_sampling)
+
+    # [v0.8] Même principe que FragmentLibrary.begin_sampling : sample_pair et
+    # sample_companion parcouraient toutes les arêtes (jusqu'à 2 000) à chaque
+    # appel. Dans la fenêtre, où ni le graphe ni la bibliothèque ne changent,
+    # les tables sont construites une fois dans l'ordre exact du parcours
+    # d'origine, et le tirage « premier cumul >= r » se fait par bisection :
+    # même résultat que la boucle, les poids étant positifs.
+    def begin_sampling(self, lib: "FragmentLibrary"):
+        self._sampling = {"lib": lib, "pair": None, "adj": None, "comp": {}}
+
+    def end_sampling(self):
+        self._sampling = None
+
+    @staticmethod
+    def _cumulate(ws):
+        """Cumuls dans l'ordre (mêmes additions que la boucle d'origine),
+        ou None si un poids négatif ou non fini interdit la bisection."""
+        cum, acc = [], 0.0
+        for w in ws:
+            if not (w >= 0.0) or w == float("inf"):
+                return None
+            acc += w
+            cum.append(acc)
+        return cum
 
     @staticmethod
     def _key(h1: int, h2: int) -> Tuple[int, int]:
         return (h1, h2) if h1 < h2 else (h2, h1)
 
+    def __getstate__(self):
+        st = dict(self.__dict__)
+        st["_sampling"] = None
+        return st
+
     def merge_from(self, other: "FragmentCoGraph"):
         """[v20-PAR] Fusion par MAX d'arête (même logique que FragmentLibrary)."""
+        self._sampling = None
         co = self.co
         for k, w in other.co.items():
             if w > co.get(k, 0.0):
@@ -956,6 +1027,7 @@ class FragmentCoGraph:
         MAX_LOCAL_PAIRS premières paires (les fragments sont déjà triés par τ).
         """
         MAX_LOCAL = 12   # max de fragments par individu pris en compte
+        self._sampling = None
         hs = hashes[:MAX_LOCAL]
         delta = 1.0 / (rank * rank)
         for i in range(len(hs)):
@@ -987,6 +1059,7 @@ class FragmentCoGraph:
 
     def evaporate(self):
         """Évaporation + élagage des arêtes faibles + limite MAX_EDGES."""
+        self._sampling = None
         to_del = [k for k, v in self.co.items() if v * self.EVAP_RATE < self.MIN_CO]
         for k in to_del:
             del self.co[k]
@@ -1005,6 +1078,32 @@ class FragmentCoGraph:
         au poids de co-occurrence.
         Ne retourne que des fragments encore présents dans `lib`.
         """
+        cache = getattr(self, "_sampling", None)
+        if cache is not None and cache["lib"] is lib:
+            ent = cache["comp"].get(h_root)
+            if ent is None:
+                adj = cache["adj"]
+                if adj is None:
+                    adj = cache["adj"] = self._adjacency(lib)
+                cands = adj.get(h_root, [])
+                ent = (cands, sum(w for _, w in cands),
+                       self._cumulate(w for _, w in cands))
+                cache["comp"][h_root] = ent
+            candidates, total, cum = ent
+            if not candidates or total <= 0:
+                return None
+            r = random.random() * total
+            if cum is not None:
+                i = bisect.bisect_left(cum, r)
+                h_other = candidates[i][0] if i < len(candidates) else candidates[-1][0]
+                return lib.fragments[h_other].node.copy()
+            cumul = 0.0
+            for h_other, w in candidates:
+                cumul += w
+                if r <= cumul:
+                    return lib.fragments[h_other].node.copy()
+            return lib.fragments[candidates[-1][0]].node.copy()
+
         candidates: List[Tuple[Tuple[int, int], float]] = []
         for (h1, h2), w in self.co.items():
             other = h2 if h1 == h_root else (h1 if h2 == h_root else None)
@@ -1020,7 +1119,6 @@ class FragmentCoGraph:
         if total <= 0:
             return None
 
-        import copy as _copy
         r = random.random() * total
         cumul = 0.0
         for h_other, w in candidates:
@@ -1028,6 +1126,22 @@ class FragmentCoGraph:
             if r <= cumul:
                 return lib.fragments[h_other].node.copy()  # [v19-OPT]
         return lib.fragments[candidates[-1][0]].node.copy()  # [v19-OPT]
+
+    def _adjacency(self, lib: "FragmentLibrary") -> dict:
+        """h -> [(voisin, poids)] dans l'ordre de parcours de self.co, voisins
+        limités aux fragments présents dans lib (filtre de sample_companion)."""
+        adj: dict = {}
+        frags = lib.fragments
+        for (h1, h2), w in self.co.items():
+            if h1 == h2:
+                if h2 in frags:
+                    adj.setdefault(h1, []).append((h2, w))
+                continue
+            if h2 in frags:
+                adj.setdefault(h1, []).append((h2, w))
+            if h1 in frags:
+                adj.setdefault(h2, []).append((h1, w))
+        return adj
 
     def sample_pair(self, lib: "FragmentLibrary"
                     ) -> Tuple[Optional[Any], Optional[Any]]:
@@ -1039,22 +1153,34 @@ class FragmentCoGraph:
         if not self.co or not lib.fragments:
             return None, None
 
-        # Construire la distribution sur les arêtes valides
-        valid: List[Tuple[Tuple[int, int], float]] = []
-        for (h1, h2), w in self.co.items():
-            if h1 in lib.fragments and h2 in lib.fragments:
-                tau_prod = lib.fragments[h1].tau * lib.fragments[h2].tau
-                valid.append(((h1, h2), w * tau_prod))
+        cache = getattr(self, "_sampling", None)
+        if cache is not None and cache["lib"] is lib:
+            ent = cache["pair"]
+            if ent is None:
+                valid = self._pair_table(lib)
+                ent = cache["pair"] = (valid, sum(w for _, w in valid),
+                                       self._cumulate(w for _, w in valid))
+            valid, total, cum = ent
+        else:
+            valid, total, cum = self._pair_table(lib), None, None
+            if valid:
+                total = sum(w for _, w in valid)
 
         if not valid:
             return None, None
-
-        total = sum(w for _, w in valid)
         if total <= 0:
             return None, None
 
-        import copy as _copy
         r = random.random() * total
+        if cum is not None:
+            i = bisect.bisect_left(cum, r)
+            if i < len(valid):
+                (h1, h2), _ = valid[i]
+                if random.random() < 0.5:
+                    h1, h2 = h2, h1
+                return lib.fragments[h1].node.copy(), lib.fragments[h2].node.copy()
+            (h1, h2), _ = valid[-1]
+            return (lib.fragments[h1].node.copy(), lib.fragments[h2].node.copy())
         cumul = 0.0
         for (h1, h2), w in valid:
             cumul += w
@@ -1068,6 +1194,16 @@ class FragmentCoGraph:
         (h1, h2), _ = valid[-1]
         return (lib.fragments[h1].node.copy(),  # [v19-OPT]
                 lib.fragments[h2].node.copy())
+
+    def _pair_table(self, lib: "FragmentLibrary") -> list:
+        """Distribution de sample_pair sur les arêtes valides (ordre de self.co)."""
+        valid: List[Tuple[Tuple[int, int], float]] = []
+        frags = lib.fragments
+        for (h1, h2), w in self.co.items():
+            if h1 in frags and h2 in frags:
+                tau_prod = frags[h1].tau * frags[h2].tau
+                valid.append(((h1, h2), w * tau_prod))
+        return valid
 
     def top_pairs(self, n: int = 5, lib: "FragmentLibrary" = None
                   ) -> List[Tuple[float, str, str]]:
@@ -5061,6 +5197,8 @@ def warm_transfer(decay_lib: float = 0.4,
     decay_co  : taux de rétention pour FragmentCoGraph (co)
     decay_seq : taux de rétention pour FragmentSequenceMemory
     """
+    FRAGMENT_LIB.end_sampling()
+    COGRAPH.end_sampling()
     # Fragment library : décote τ
     for e in FRAGMENT_LIB.fragments.values():
         e.tau *= decay_lib
@@ -5370,6 +5508,7 @@ def migrate(islands: List[Island]):
     # d'un run précédent) reçoivent ici leur signature à jour.
     # On limite à 40 fragments max par migration pour ne pas ralentir les échanges.
     _refreshed = 0
+    FRAGMENT_LIB.end_sampling()
     for h, e in FRAGMENT_LIB.fragments.items():
         if e.semantic_signature is None and _refreshed < 40:
             e.semantic_signature = compute_semantic_sig(e.node, PROBE_X)
@@ -5588,6 +5727,12 @@ def evolve_island(island: Island,
 
     found_better = False
 
+    # [v0.8] Fenêtre de tirage figé (voir FragmentLibrary.begin_sampling) :
+    # d'ici à la fin de la reproduction, les mémoires stigmergiques ne sont
+    # que lues. Tout dépôt ou évaporation referme de toute façon la fenêtre.
+    FRAGMENT_LIB.begin_sampling()
+    COGRAPH.begin_sampling(FRAGMENT_LIB)
+
     if best_fit < island.best_score:
         island.best_score = best_fit
         island.best       = best.copy()
@@ -5783,6 +5928,9 @@ def evolve_island(island: Island,
                 child = random_tree(cfg.MAX_INIT_DEPTH, cfg)
 
         new_pop.append(child)
+
+    FRAGMENT_LIB.end_sampling()
+    COGRAPH.end_sampling()
 
     # [v19] Déduplication sémantique : on retire les clones comportementaux
     # (hors élite, déjà en tête de new_pop), puis on REMPLIT les slots libérés

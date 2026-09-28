@@ -184,3 +184,82 @@ def test_block_lexicase_matches_case_by_case():
             assert np.array_equal(state_a[1], state_b[1]) and state_a[2] == state_b[2]
             n_checked += 1
     assert n_checked == 960
+
+
+def _toy_memories(rng):
+    """A fragment library and a co-occurrence graph filled with random
+    entries, as the search would leave them."""
+    lib = core.FragmentLibrary()
+    hashes = []
+    for i in range(60):
+        node = core.Node("+", core.Node("X[%d]" % (i % 3)), core.Node(float(i)))
+        h = 1000 + i
+        sig = rng.normal(size=5) if i % 4 else None
+        lib.fragments[h] = core.FragmentEntry(
+            node=node, tau=float(rng.uniform(0.01, 3.0)), freq=1,
+            best_fitness=1.0, last_gen=0, size=int(rng.randint(2, 16)),
+            depth=2, root_op=["+", "*", "sin"][i % 3], semantic_signature=sig)
+        hashes.append(h)
+    cog = core.FragmentCoGraph()
+    for _ in range(400):
+        a, b = rng.choice(hashes + [5, 6, 7], 2)    # 5, 6, 7: not in the library
+        cog.co[cog._key(int(a), int(b))] = float(rng.uniform(0.001, 2.0))
+    return lib, cog
+
+
+def test_frozen_sampling_tables_draw_the_same():
+    """Inside begin_sampling()/end_sampling() the library and the graph reuse
+    precomputed tables; every draw must equal the draw of the 0.7 path."""
+    import random as pyrandom
+    rng = np.random.RandomState(3)
+    lib, cog = _toy_memories(rng)
+    old_sig = core.CURRENT_RESIDUAL_SIG
+    try:
+        for res_sig in (None, rng.normal(size=5)):
+            core.CURRENT_RESIDUAL_SIG = res_sig
+            roots = list(lib.fragments)[:12] + [5]
+            calls = [("sample", (2, 15, None)), ("sample", (3, 8, "+")),
+                     ("sample", (40, 50, None)), ("pair", ())]
+            calls += [("comp", (h,)) for h in roots]
+
+            def run(frozen):
+                pyrandom.seed(11)
+                if frozen:
+                    lib.begin_sampling()
+                    cog.begin_sampling(lib)
+                out = []
+                for _ in range(30):
+                    for kind, args in calls:
+                        if kind == "sample":
+                            r = lib.sample(*args)
+                            out.append(None if r is None else core.to_string(r))
+                        elif kind == "pair":
+                            a, b = cog.sample_pair(lib)
+                            out.append((core.to_string(a), core.to_string(b)))
+                        else:
+                            r = cog.sample_companion(args[0], lib)
+                            out.append(None if r is None else core.to_string(r))
+                lib.end_sampling()
+                cog.end_sampling()
+                return out, pyrandom.random()
+
+            assert run(False) == run(True)
+    finally:
+        core.CURRENT_RESIDUAL_SIG = old_sig
+
+
+def test_memories_never_carry_a_sampling_table_across_processes():
+    import pickle
+    rng = np.random.RandomState(4)
+    lib, cog = _toy_memories(rng)
+    lib.begin_sampling()
+    cog.begin_sampling(lib)
+    lib.sample(2, 15)
+    cog.sample_pair(lib)
+    lib2 = pickle.loads(pickle.dumps(lib))
+    cog2 = pickle.loads(pickle.dumps(cog))
+    assert lib2._sampling is None and cog2._sampling is None
+    # any change to a memory closes the window
+    lib.evaporate()
+    cog.evaporate()
+    assert lib._sampling is None and cog._sampling is None
