@@ -176,7 +176,8 @@ more than twice as small (median 17 versus 41 nodes) at a better test $R^2$
 times the generations, more wall-clock time than the constrained arm: still
 0/5 valid. The same experiment bounds the claim. On a test set drawn *outside*
 the training domain, approximations collapse (median $R^2$ 0.10 for the
-unconstrained runs, 0.34 to 0.65 for the three constrained approximations);
+unconstrained runs at equal budget, 0.45 with four times the generations,
+0.34 to 0.65 for the three constrained approximations);
 the two other constrained runs recovered the exact law, which holds there. The constraint mostly buys physically coherent
 and compact approximations; it finds the law itself only in some runs at these
 budgets.

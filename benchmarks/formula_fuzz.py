@@ -3,8 +3,9 @@
 1,500 random expression trees (1 to 3 variables, the four normalisations,
 signed and positive data). For every tree whose formula is reported exact,
 the sympy() string is parsed by sympy, evaluated on the raw data and compared
-with predict(). The others are the trees where a numerical safety net of the
-engine acts on the data; they are reported inexact (formula_exact False).
+with predict(). The others are reported inexact (formula_exact False): almost
+all because a numerical safety net of the engine acts on the data, rarely
+because rounding ruins an ill-conditioned expression (see below).
 
     PYTHONHASHSEED=0 python benchmarks/formula_fuzz.py
 

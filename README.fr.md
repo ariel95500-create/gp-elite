@@ -141,9 +141,12 @@ exacte, sans garantie.
 
 - `speed` : `'ultrafast' | 'fast' (défaut) | 'normal' | 'thorough'`. `'thorough'`
   (population 400, quatre îles, 200 générations) est le régime pour chercher une
-  loi exacte ; il est plusieurs fois plus lent.
+  loi exacte ; avec deux fois plus de générations que par défaut, il est plus
+  lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
-  le meilleur modèle trouvé, au lieu d'être interrompue sans résultat.
+  le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
+  sélection finale qui suit ajoute un peu (environ deux secondes pour un budget
+  de 15 s dans notre mesure).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 

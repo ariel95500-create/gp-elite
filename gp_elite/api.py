@@ -324,8 +324,8 @@ def symbolic_regression(
     speed : 'ultrafast' | 'fast' | 'thorough' | 'normal'
         Taille de population et nombre d'îles. 'fast' (défaut) pour explorer
         rapidement ; 'thorough' pour CHERCHER UNE LOI : population 400, 4 îles,
-        et generations=200 par défaut — nettement plus lent, mais c'est le
-        régime où la récupération exacte devient possible.
+        et generations=200 par défaut — plus lent, plus de calcul consacré à
+        la forme exacte, sans garantie de la trouver.
     parallel : True force le multi-processus, False le désactive,
                None = auto (≥4 cœurs)
     validation_split : fraction hold-out (0.0 = pas de validation)

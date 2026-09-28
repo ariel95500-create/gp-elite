@@ -134,9 +134,12 @@ guarantee.
 
 - `speed`: `'ultrafast' | 'fast' (default) | 'normal' | 'thorough'`. `'thorough'`
   (population 400, four islands, 200 generations) is the regime for looking for an
-  exact law; it is several times slower.
+  exact law; with twice the default number of generations, it is slower, and not
+  guaranteed to do better.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
-  best model found so far, instead of being killed without a result.
+  best model found so far, instead of being killed without a result; the final
+  selection that follows adds a little (about two seconds for a 15 s budget in
+  our measurement).
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
 
