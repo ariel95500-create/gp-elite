@@ -9,11 +9,11 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 *[🇬🇧 English version](README.md)*
 
-[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, cinq étapes, quinze minutes.
+[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, quatre étapes, dix minutes.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman, le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, est manquée à toutes les tailles. Le temps de calcul médian double à peu près de 1 000 à 10 000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, est manquée à toutes les tailles. Le temps de calcul médian double à peu près de 1 000 à 10 000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -145,7 +145,7 @@ exacte, sans garantie.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat.
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
-  choix final — le levier le plus efficace quand le budget le permet.
+  choix final.
 
 **Scripts et îles parallèles.** Sur une machine à quatre cœurs ou plus, les îles
 tournent dans des processus parallèles. Ces processus sont démarrés en mode
@@ -166,10 +166,10 @@ Rien à faire dans un notebook.
   formule est la fonction mathématique pure : là où l'un des garde-fous
   numériques du moteur agit sur vos données (une puissance bornée parce que sa
   base dépasse 100 ou son exposant 6 en valeur absolue, ou sa valeur un million ;
-  une division par un dénominateur à moins de 1e-8 de zéro), elle s'écarte de
-  `predict()` sur ces lignes,
-  `formula_exact` vaut False et l'ajustement le signale. C'était le cas pour 6 des
-  70 ajustements faits avec la normalisation par défaut dans
+  une division par un dénominateur à moins de 1e-8 de zéro), ou, rarement, là où
+  l'arrondi ruine une expression mal conditionnée, elle s'écarte de `predict()` sur
+  ces lignes, `formula_exact` vaut False et l'ajustement le signale. C'était le cas
+  pour 6 des 70 ajustements faits avec la normalisation par défaut dans
   `benchmarks/norm_signed.py`.
 - **`r2_validation` est un score de sélection.** Le hold-out sur lequel il est
   calculé sert aussi à choisir le modèle rendu parmi les candidats : il est donc

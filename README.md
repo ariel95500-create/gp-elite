@@ -10,7 +10,7 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations, the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, is missed at every size. The median runtime roughly doubles from 1,000 to 10,000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
+On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, is missed at every size. The median runtime roughly doubles from 1,000 to 10,000 points (`benchmarks/feynman_scaling.py`, version 0.7.0).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -138,7 +138,7 @@ guarantee.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result.
 - `restarts=`: independent evolutions whose candidates are merged before the final
-  choice — the most effective lever when the budget allows it.
+  choice.
 
 **Scripts and parallel islands.** On machines with four cores or more, islands run
 in parallel worker processes. Those workers are started with `spawn` on every
@@ -158,8 +158,9 @@ same result, and says so once. Notebooks need nothing.
   function: where one of the engine's numerical safety nets acts on your data
   (a power clipped because its base exceeds 100 or its exponent 6 in absolute
   value, or its value a million; a division by a denominator within 1e-8 of
-  zero), it departs from `predict()` on those rows, `formula_exact` is False
-  and the fit warns. That was the case for 6 of
+  zero), or, rarely, where rounding ruins an ill-conditioned expression, it
+  departs from `predict()` on those rows, `formula_exact` is False and the fit
+  warns. That was the case for 6 of
   the 70 fits made with the default normalisation in `benchmarks/norm_signed.py`.
 - **`r2_validation` is a selection score.** The hold-out it is computed on is also
   used to choose the returned model among the candidates, so it is optimistic.

@@ -1,15 +1,18 @@
 # Measurements behind the 0.7.0 README
 
 Every measured figure quoted in `README.md`, `README.fr.md`, the notebooks,
-the paper and the "Measured on this release" section of the 0.7.0 entry of
-`CHANGELOG.md` comes from one of the files below, produced by the 0.7.0 code
-with `PYTHONHASHSEED=0`, one process per measurement, each method judged on
-the model it **returns**.
+the paper and the 0.7.0 entry of `CHANGELOG.md` comes from one of the files
+below, produced by the 0.7.0 code with `PYTHONHASHSEED=0`, one process per
+measurement, each method judged on the model it **returns**. The exceptions
+are the observations the CHANGELOG explicitly attributes to an earlier state
+of the engine, which explain why a fix was made.
 
 Environment: Linux container with 2 CPU cores (two measurements at a time, one
 per core), Python 3.11, NumPy 2.4, scikit-learn 1.8, gplearn 0.4.3,
-xgboost 3.2. Times depend on the machine; the other figures do not (runs are
-deterministic at a given seed).
+xgboost 3.2. Times depend on the machine and vary from run to run; the other
+figures do not (runs are deterministic at a given seed; the console fixes no
+seed, so the internal statistics it prints differ from one run to the next,
+while the law and constant quoted from it come out the same).
 
 ## Provenance
 
@@ -52,6 +55,9 @@ recomputed after the range cited by the README became 25 to 10,000 points
 | `battery_example.txt` | simulated battery: interpolation vs extrapolation | `python examples/battery_soh.py` |
 | `kepler_demo.txt` | `T = 0.00279171 + 0.999396 * a * sqrt(a)` | `python examples/kepler_demo.py` |
 | `console_hooke.txt` | console mode 6 transcript on a Hooke CSV | `gp-elite` (mode 6, units `m` and `N`, deduce the constant) |
+| `formula_fuzz.txt` | 1,500 random trees: 1,448 formulas exact, all matching `predict()` through sympy; 51 inexact because of a safety net, 1 by rounding | `python benchmarks/formula_fuzz.py` |
+| `pools_check.txt` | `operators=` respected: 48 fits, 0 out-of-pool operator | `python benchmarks/pools_check.py` |
+| `time_limit_check.txt` | `time_limit=`: 17.3 s sequential and 16.5 s parallel for a 15 s budget | `python benchmarks/time_limit_check.py` |
 | `notebook_snippets.txt` | the figures in the notebooks' text (Kepler, Hooke, Coulomb, torque, Nikuradse short run...) | `python benchmarks/notebook_claims.py <snippet>` |
 
 Every command runs with `PYTHONHASHSEED=0` set: `PYTHONHASHSEED=0 python ...`

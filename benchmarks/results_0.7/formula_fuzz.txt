@@ -1,0 +1,4 @@
+{('divmax', True, True): 350, ('minmax', True, True): 354, ('none', True, True): 372, ('minmax', False, True): 10, ('inexact because of', 'safety net'): 51, ('standard', True, True): 370, ('divmax', False, True): 16, ('none', False, True): 11, ('standard', False, True): 15, ('minmax', True, False): 2, ('inexact because of', 'rewriting'): 1}
+exact: 1448 inexact: 52
+inexact because of a safety net: 51 | introduced by rewriting: 1
+sympy mismatches among exact: 0

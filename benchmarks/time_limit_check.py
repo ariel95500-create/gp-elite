@@ -2,6 +2,11 @@
 
     PYTHONHASHSEED=0 python benchmarks/time_limit_check.py
 
+Resultat 0.7.0 (conteneur Linux, 2 coeurs, benchmarks/results_0.7/time_limit_check.txt) :
+15/16 ; 15 s de budget -> 17,3 s en sequentiel (le critere T + 1 generation + 1 s
+est depasse de 0,4 s : le polissage et la selection finale suivent la derniere
+generation), 16,5 s en parallele. D'un run a l'autre, 16,6 a 17,3 s en sequentiel.
+
 
 Criteres fixes AVANT mesure :
   - duree reelle <= T + une generation + 1 s (sequentiel ET parallele)

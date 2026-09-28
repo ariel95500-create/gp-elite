@@ -90,9 +90,8 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         """generations=None -> valeur adaptee au preset `speed`.
 
         'thorough' vise la DECOUVERTE de lois : 200 generations contre 40 en
-        mode rapide. Mesure sur Feynman II.11.3 : a 40 generations la loi
-        exacte n'est jamais retrouvee ; a 200 elle l'est sur 1 seed sur 3.
-        Un entier explicite l'emporte toujours.
+        mode rapide (et population 400 sur 4 iles). Un entier explicite
+        l'emporte toujours.
         """
         if self.generations is not None:
             return int(self.generations)

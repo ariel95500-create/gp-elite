@@ -9,6 +9,10 @@ engine acts on the data; they are reported inexact (formula_exact False).
     PYTHONHASHSEED=0 python benchmarks/formula_fuzz.py
 
 Result on 0.7.0: 1,448 exact, 52 inexact, 0 sympy mismatch among the exact.
+Of the 52 inexact: 51 because a safety net of the engine acts on the data
+(the scaled tree itself departs from the plain mathematics), 1 introduced by
+rewriting in raw variables (a sine of a doubly exponential argument, where
+rounding alone changes the value).
 """
 import numpy as np, random, sympy as sp, sys
 from gp_elite import core, formula as F
@@ -46,6 +50,13 @@ for trial in range(1500):
     key = (kind, rf.exact, rf.folded)
     stats[key] = stats.get(key, 0) + 1
     # independent check of the sympy string (only where the formula claims exactness)
+    if not rf.exact:
+        v0 = F.evaluate(t, Xs)            # the scaled tree, plain mathematics
+        sc0 = max(np.max(np.abs(p)), np.std(p), 1e-300)
+        with np.errstate(all="ignore"):
+            same0 = np.all(np.isfinite(v0)) and np.max(np.abs(v0 - p)) <= 1e-7 * sc0
+        cause = "rewriting" if same0 else "safety net"
+        stats[("inexact because of", cause)] = stats.get(("inexact because of", cause), 0) + 1
     if rf.exact:
         s = rf.sympy()
         e = sp.sympify(s, locals={n: sp.Symbol(n) for n in ["a","b","c"]})
@@ -58,7 +69,9 @@ for trial in range(1500):
         if not (err <= 1e-6 * scale):
             bad.append((kind, core.to_string(t), s[:200], err, scale))
 print(stats)
-print("exact:", sum(v for k, v in stats.items() if k[1]),
-      "inexact:", sum(v for k, v in stats.items() if not k[1]))
+print("exact:", sum(v for k, v in stats.items() if k[1] is True),
+      "inexact:", sum(v for k, v in stats.items() if k[1] is False))
+print("inexact because of a safety net:", stats.get(("inexact because of", "safety net"), 0),
+      "| introduced by rewriting:", stats.get(("inexact because of", "rewriting"), 0))
 print("sympy mismatches among exact:", len(bad))
 for b in bad[:8]: print(b)

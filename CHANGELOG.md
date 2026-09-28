@@ -3,10 +3,12 @@
 ## 0.7.0 — "Sound"
 
 This release fixes what an external review of 0.6.1 found, and re-measures
-every number the README quotes on the released code. Two defaults change:
-`normalize="auto"` (measured below) and the population of the default `fast`
-preset (300 → 400). The final selection gains two rules, both measured below;
-the evolutionary search itself has no new heuristic.
+every number the README quotes on the released code. Defaults that change:
+`normalize="auto"` (measured below), the population of the default `fast`
+preset (300 → 400), and the number of generations of `speed="thorough"` and,
+in `GPEliteRegressor`, of each preset (below). The final selection gains two
+rules, both measured below; the evolutionary search itself has no new
+heuristic.
 
 ### Fixed — the delivered formula
 - **The formula is written in your variables, for every normalisation, and
@@ -16,7 +18,7 @@ the evolutionary search itself has no new heuristic.
   development branch after 0.6.1 folded the scaling into `sympy()` for the
   division-by-max normalisation only; with min-max, then the default for any
   column with a non-positive value, or z-score, its exported formula was
-  still off by 70 on a target of amplitude 28.) The 0.6.1 entry below says
+  still wrong.) The 0.6.1 entry below says
   `sympy()` is numerically equivalent to `predict()`: that held only without
   scaling.
   Now `expression`, `equation_`, `pretty()`, `sympy()`, every Pareto entry and
@@ -28,7 +30,8 @@ the evolutionary search itself has no new heuristic.
   tests cover division-by-max, min-max, z-score and no scaling, one and several
   variables, signed and positive data (`tests/test_guarantees.py`); of 1,500
   random trees, the 1,448 whose formula is reported exact all reproduce
-  `predict()` once parsed by sympy (`benchmarks/formula_fuzz.py`).
+  `predict()` once parsed by sympy; of the 52 others, 51 involve a safety net
+  of the engine and one an ill-conditioned expression (`benchmarks/formula_fuzz.py`).
 - **A model is evaluated with its own constants.** Compiled functions,
   predictions, fitness values and simplified forms were cached under a hash
   that rounds constants to 4 decimals, so two trees differing only further
@@ -43,16 +46,16 @@ the evolutionary search itself has no new heuristic.
   row to exponents that depend on the variables as well: the model jumped
   wherever such an exponent landed exactly on an integer, which division by
   max|x| guarantees on a column's extreme row. The search could exploit the
-  jump as a row indicator, and no readable formula reproduced the model: on
-  the standardised PMLB dataset 561_cpu the delivered formula and `predict()`
-  differed by 0.97 on 2 rows (`formula_exact` was False). A variable exponent
-  now always gives `|u|^v`, the function the formula prints. This changes
+  jump as a row indicator, and no readable formula reproduced the model (seen
+  on the standardised PMLB dataset 561_cpu, where `formula_exact` was False).
+  A variable exponent now always gives `|u|^v`, the function the formula
+  prints. This changes
   the search, which is why every figure below was measured after it.
 - **A formula that departs from the model is never delivered silently.** The
   formula is the plain mathematical function; where one of the engine's
   numerical safety nets acts on the training data (a clipped or capped power,
-  a division by a near-zero denominator), it departs from `predict()` on those
-  rows. `formula_exact` is then False and the fit warns with the number of
+  a division by a near-zero denominator), or, rarely, where rounding ruins an
+  ill-conditioned expression, it departs from `predict()` on those rows. `formula_exact` is then False and the fit warns with the number of
   rows concerned. Measured: 6 of the 70 fits made with the default
   normalisation in `benchmarks/norm_signed.py`.
 - `mse_train` was computed on all rows, hold-out included; it now uses the
@@ -72,19 +75,22 @@ the evolutionary search itself has no new heuristic.
   instead of being silently read as something else.
 - `operators=` is respected everywhere: the typed generator used `sin`, `exp`,
   `sqrt`... under `operators="poly"`, and the stigmergic builders could insert
-  `sin`/`cos` under `operators="physical"`. 48 fits across all pools, 0
-  out-of-pool operator (`benchmarks/pools_check.py`).
+  `sin`/`cos` under `operators="physical"`. 48 fits with the `poly` and
+  `physical` pools, with and without `units=`: 0 out-of-pool operator
+  (`benchmarks/pools_check.py`).
 
 ### Added
 - **`time_limit=`** (seconds): the search stops cleanly at the deadline and
   returns the best model found so far, instead of being killed without a
   result by an external timer. Remaining time is shared between restarts;
   `result.time_limit_reached` and `result.restarts_completed` say what
-  happened. Overshoot measured at under two seconds on a 15 s budget
-  (16.6 s sequential, 15.4 s parallel, 3,000 rows,
+  happened. Overshoot measured at about two seconds on a 15 s budget
+  (17.3 s sequential, 16.5 s parallel, 3,000 rows,
   `benchmarks/time_limit_check.py`): the final polishing and selection run
-  after the last generation. Without `time_limit` results are bit-identical
-  to before.
+  after the last generation. That is more than the one generation plus one
+  second the check had set in advance for the sequential case. A budget that is not reached changes nothing:
+  same model with and without `time_limit=3600` (checked on one problem, and
+  by a test).
 - **`speed="thorough"`**: population 400, four islands, 200 generations by
   default in both `symbolic_regression` and `GPEliteRegressor`, the regime
   for looking for an exact law. `GPEliteRegressor(generations=None)` now takes
@@ -107,9 +113,9 @@ the evolutionary search itself has no new heuristic.
   `normalize="minmax"` remains available.
 - **A law found exactly is no longer traded for a shorter approximation.**
   The final choice keeps the smallest candidate within 0.3 % of R² of the
-  best, to avoid fitting noise. Without the new rule, on Feynman I.18.12 it
-  returned `0.0776 + 0.9967*r*F*sin(1.0106*th)` while `r*F*sin(th)`, exact,
-  was in the front. When the best candidate reproduces the hold-out to numerical
+  best, to avoid fitting noise. The rule was found on Feynman I.18.12, where
+  an earlier state of the engine returned `0.0776 + 0.9967*r*F*sin(1.0106*th)`
+  while `r*F*sin(th)`, exact, was in the front. When the best candidate reproduces the hold-out to numerical
   precision (MSE ≤ 1e-12 × variance) there is no noise to avoid, and only
   exact candidates stay eligible. Measured: the rule never fired on the 60
   real-data fits of the normalisation study nor on the 60 of the guard study;
@@ -127,8 +133,7 @@ the evolutionary search itself has no new heuristic.
   their whole computation run again by every worker process when parallel
   islands start (the workers use the `spawn` start method on every system,
   Linux included, and re-import the script): the engine detects it, finishes
-  on one core with the same result and warns once (measured on Linux, 800
-  rows: 8.8 s, against 7.9 s for a plain sequential fit). Checked on
+  on one core with the same result and warns once. Checked on
   Python 3.9, 3.11 and 3.14, with 120 and 3,000 rows: the workers receive the
   data through a temporary file and are probed with empty tasks first, as
   otherwise the parent could wait forever on a worker that had already exited

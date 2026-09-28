@@ -33,8 +33,8 @@ least-squares optimizer [@levenberg1944; @marquardt1963], so that evolution
 concentrates on the right *structure* while a dedicated numerical routine finds
 the right *coefficients*. It exposes a scikit-learn-compatible estimator
 [@pedregosa2011sklearn], installs with `pip install gp-elite` with no compiler
-and no second language runtime, and holds out a validation split by default, so
-the returned model comes with an out-of-sample score.
+and no second language runtime, and holds out a validation split by default to
+choose the returned model.
 
 Since version 0.4, users may declare the physical units of their input columns
 and of the target. The search is then restricted to dimensionally consistent
@@ -99,8 +99,10 @@ integers.
 `pip`-installable like `gplearn`, but with Levenberg–Marquardt constant
 refinement, linear scaling [@keijzer2003scaling], and $\epsilon$-lexicase
 selection [@lacava2016lexicase] as in the compiled engines. Against `gplearn`
-under identical data, splits and a generous budget granted to the baseline, on a
-fixed 15-equation subset of the Feynman problems chosen before any measurement,
+under identical data and splits, with a larger population budget for the
+baseline (2000 programs over 30 generations, against 400 over 30 generations
+and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
+before any measurement,
 and each method judged on the model it returns, it recovers 12/15 exactly
 ($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.7.0,
 `benchmarks/duel.py`). That
@@ -162,7 +164,8 @@ documented as an optimistic selection score, not a generalisation estimate.
 # Research impact statement
 
 The software is released on PyPI under the MIT licence, with a test suite and
-benchmark scripts that regenerate every number quoted in its documentation.
+benchmark scripts that regenerate the measured figures quoted in its
+documentation.
 
 The dimensional mode has been evaluated in a controlled A/B experiment on
 Feynman equation II.11.3, five seeds, identical budget for the unconstrained
@@ -172,9 +175,9 @@ more than twice as small (median 17 versus 41 nodes) at a better test $R^2$
 (0.99957 versus 0.98661). A third arm grants the unconstrained search four
 times the generations, more wall-clock time than the constrained arm: still
 0/5 valid. The same experiment bounds the claim. On a test set drawn *outside*
-the training domain, approximations collapse (median $R^2$ 0.10
-unconstrained, 0.65 constrained); two constrained runs in five recover the
-exact law, which holds there. The constraint mostly buys physically coherent
+the training domain, approximations collapse (median $R^2$ 0.10 for the
+unconstrained runs, 0.34 to 0.65 for the three constrained approximations);
+the two other constrained runs recovered the exact law, which holds there. The constraint mostly buys physically coherent
 and compact approximations; it finds the law itself only in some runs at these
 budgets.
 
@@ -186,7 +189,7 @@ returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
 $R^2 = 1.000000$ in all three.
 
 An integration for the SRBench living benchmark [@lacava2021srbench] has been
-merged into that project and is staged for its next evaluation round.
+merged into that project ahead of its next evaluation round.
 
 # AI usage disclosure
 
@@ -225,9 +228,10 @@ results to trust, which claims to make — remained the author's throughout.
 Every correction was accompanied by an executable check: the overflow was
 reproduced before being fixed and re-tested afterwards, and the absence of
 regression was verified by comparing fits before and after each change on a
-fixed set of seeds. The benchmark figures quoted in this paper were produced by
-the author on their own machine using the scripts in the repository, and the
-project's test suite passes on the released version. The scientific claims and
+fixed set of seeds. The benchmark figures quoted in this paper were produced
+with the scripts in the repository, whose raw results, machine and dates are
+recorded in `benchmarks/results_0.7/`, and the project's test suite passes on
+the released version. The scientific claims and
 their stated limits are the author's own, as is responsibility for the whole.
 
 # Acknowledgements

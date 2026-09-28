@@ -717,10 +717,11 @@ def symbolic_regression(
         import warnings
         warnings.warn(
             "GP_ELITE: the formula printed for the returned model departs from "
-            "predict() on %d of %d training rows (largest gap %.3g): there a "
-            "numerical safety net of the engine acts (a power capped at 1e6 or "
-            "clipped, a division by a near-zero denominator...). predict() is "
-            "the model; result.formula_exact is False."
+            "predict() on %d of %d training rows (largest gap %.3g), most "
+            "often because a numerical safety net of the engine acts there (a "
+            "power capped at 1e6 or clipped, a division by a near-zero "
+            "denominator...). predict() is the model; result.formula_exact is "
+            "False."
             % (raw_formula.rows_off, len(y), raw_formula.max_error),
             RuntimeWarning, stacklevel=2)
     for e in pareto_entries:
