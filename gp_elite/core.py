@@ -2448,18 +2448,37 @@ def safe_sqrt(x: float) -> float:
 # OPÉRATIONS SÉCURISÉES — vectorisées NumPy
 # ============================================================
 
+# [v0.8] ufuncs appelés directement : np.clip passe par plusieurs couches
+# Python (~3 µs par appel), ce qui dominait le coût des opérations protégées
+# sur les petits jeux de données. min(max(a, lo), hi) donne exactement
+# np.clip(a, lo, hi), NaN compris (propagé par np.maximum comme par np.clip).
+_np_minimum = np.minimum
+_np_maximum = np.maximum
+_np_abs = np.abs
+_np_isfinite = np.isfinite
+
 def _np_safe_div(a, b):
     """
     Division protégée NumPy.
     [v16-FIX] np.where évalue les DEUX branches avant de choisir : si a/b déborde
     en float64 même quand |b|>1e-8, le RuntimeWarning est levé.
     Solution : clipper a en amont et remplacer b~0 par 1.0 avant la division.
+    [v0.8] Mêmes valeurs, bit pour bit, que la version 0.7 (vérifié par
+    tests/test_speed_equivalence.py) : bornes par np.minimum/np.maximum au
+    lieu de np.clip (dont l'enveloppe Python coûtait plus que le calcul sur
+    les petits jeux de données), masque calculé une fois, et division directe
+    quand aucun dénominateur n'est proche de zéro (le cas courant). Sans
+    dénominateur minuscule, |a| <= 1e6 et |b| >= 1e-8 : la division ne peut
+    ni déborder ni lever d'avertissement.
     """
-    a = np.clip(a, -_SAFE_LIMIT, _SAFE_LIMIT)
-    b_safe = np.where(np.abs(b) < 1e-8, 1.0, b)
-    with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
-        r = np.where(np.abs(b) < 1e-8, a, a / b_safe)
-    return np.where(np.isfinite(r), r, 0.0)
+    a = _np_minimum(_np_maximum(a, -_SAFE_LIMIT), _SAFE_LIMIT)
+    small = _np_abs(b) < 1e-8
+    if small.any():
+        with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
+            r = np.where(small, a, a / np.where(small, 1.0, b))
+    else:
+        r = a / b
+    return np.where(_np_isfinite(r), r, 0.0)
 
 def _np_safe_pow(a, b):
     """
@@ -2469,17 +2488,29 @@ def _np_safe_pow(a, b):
     Les features de trajectoire X[6]-X[9] peuvent atteindre ~7 (log1p de grandes
     valeurs), et sq(X[7]) ≈ 49 — pow(49, 8) = 1.9e13 qui déborde float32 dans
     certains contextes. On clippe la base à [-100, 100] avant la puissance.
+    [v0.8] Exposant scalaire (le cas de la compilation : _safe_pow ne reçoit
+    que des exposants constants) : une seule des deux branches est calculée,
+    au lieu des deux puis d'un choix. Mêmes valeurs bit pour bit.
     """
-    b = np.clip(b, -6.0, 6.0)   # exposant limité : base^6 suffisant pour GP
-    a = np.clip(a, -100.0, 100.0)  # base clippée : évite pow(large, large)
+    b = _np_minimum(_np_maximum(b, -6.0), 6.0)   # exposant limité : base^6 suffisant pour GP
+    a = _np_minimum(_np_maximum(a, -100.0), 100.0)  # base clippée : évite pow(large, large)
     with np.errstate(all='ignore'):
-        b_int = np.round(b)
-        is_int = np.abs(b - b_int) < 1e-6
-        r_int  = np.sign(a) * np.power(np.abs(a) + 1e-12, np.abs(b_int))
-        r_int  = np.where(b_int >= 0, r_int, 1.0 / (np.abs(r_int) + 1e-12) * np.sign(r_int))
-        r_real = np.power(np.abs(a) + 1e-12, b)
-        r = np.where(is_int, r_int, r_real)
-    return np.where(np.isfinite(r) & (np.abs(r) < _SAFE_LIMIT), r, 1.0)
+        if np.ndim(b) == 0:
+            b_int = np.round(b)
+            if abs(b - b_int) < 1e-6:
+                r = np.sign(a) * np.power(_np_abs(a) + 1e-12, _np_abs(b_int))
+                if not b_int >= 0:
+                    r = 1.0 / (_np_abs(r) + 1e-12) * np.sign(r)
+            else:
+                r = np.power(_np_abs(a) + 1e-12, b)
+        else:
+            b_int = np.round(b)
+            is_int = np.abs(b - b_int) < 1e-6
+            r_int  = np.sign(a) * np.power(np.abs(a) + 1e-12, np.abs(b_int))
+            r_int  = np.where(b_int >= 0, r_int, 1.0 / (np.abs(r_int) + 1e-12) * np.sign(r_int))
+            r_real = np.power(np.abs(a) + 1e-12, b)
+            r = np.where(is_int, r_int, r_real)
+    return np.where(_np_isfinite(r) & (_np_abs(r) < _SAFE_LIMIT), r, 1.0)
 
 def _np_safe_pow_var(a, b):
     """[v0.7] Puissance a exposant VARIABLE : |a|^b sur toutes les lignes.
@@ -2495,11 +2526,11 @@ def _np_safe_pow_var(a, b):
     predict() en desaccord de 0.97 sur 2 lignes). Memes garde-fous que
     _np_safe_pow (exposant et base bornes, resultat non fini ou enorme -> 1).
     """
-    b = np.clip(b, -6.0, 6.0)
-    a = np.clip(a, -100.0, 100.0)
+    b = _np_minimum(_np_maximum(b, -6.0), 6.0)
+    a = _np_minimum(_np_maximum(a, -100.0), 100.0)
     with np.errstate(all='ignore'):
-        r = np.power(np.abs(a) + 1e-12, b)
-    return np.where(np.isfinite(r) & (np.abs(r) < _SAFE_LIMIT), r, 1.0)
+        r = np.power(_np_abs(a) + 1e-12, b)
+    return np.where(_np_isfinite(r) & (_np_abs(r) < _SAFE_LIMIT), r, 1.0)
 
 def _is_const_subtree(node) -> bool:
     """[v0.7] Vrai si le sous-arbre ne contient aucune variable (x, X[i]) :
@@ -2525,8 +2556,8 @@ def _np_safe_exp(a):
     comme exp(-X[:,0]²) sur des valeurs négatives légitimement grandes.
     """
     with np.errstate(over='ignore', invalid='ignore'):
-        r = np.exp(np.clip(a, -88.0, 88.0))
-    return np.where(np.isfinite(r), r, 0.0)
+        r = np.exp(_np_minimum(_np_maximum(a, -88.0), 88.0))
+    return np.where(_np_isfinite(r), r, 0.0)
 
 def _np_safe_log(a):
     return np.log(np.abs(a) + 1e-12)
@@ -4456,7 +4487,7 @@ def semantic_dedup(population, xs, ys, cfg, protected=0):
 
 
 class EpsilonLexicaseSelector:
-    __slots__ = ("pop", "E", "eps", "n_cases", "_case_buf")
+    __slots__ = ("pop", "E", "eps", "n_cases", "_case_buf", "_ET")
 
     def __init__(self, population: List["Node"], xs, ys):
         xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
@@ -4481,11 +4512,55 @@ class EpsilonLexicaseSelector:
         # [v19-OPT] buffer d'ordre des cas réutilisé (shuffle in-place) :
         # évite une allocation np.random.permutation par sélection.
         self._case_buf = np.arange(self.n_cases)
+        # [v0.8] erreurs rangées par cas (C, P) : une ligne = un cas.
+        self._ET = np.ascontiguousarray(self.E.T)
 
     def select(self) -> "Node":
-        # [v19-OPT] Filtrage incrémental sur des INDICES Python (cand est une
-        # liste d'ints), ce qui évite le fancy-indexing NumPy self.E[cand, c]
-        # (qui alloue un tableau à chaque cas). On indexe colonne par colonne.
+        """Sélection ε-lexicase, par BLOCS de cas.
+
+        [v0.8] Même résultat, tirage pour tirage, que le filtrage cas par cas
+        (_select_reference, gardée pour les tests) : les cas sont parcourus
+        dans le même ordre aléatoire, et le hasard n'est consommé qu'aux mêmes
+        endroits. Ce qui change : quand les candidats restants passent tous
+        les cas d'un bloc (fréquent, car la mise à l'échelle linéaire rend
+        beaucoup d'individus équivalents), le bloc entier est franchi en une
+        opération NumPy au lieu d'une boucle Python par cas. Sur 5 000
+        lignes, la sélection parcourait ainsi les 5 000 cas à chaque parent
+        et prenait près de la moitié du temps de calcul.
+
+        Pourquoi c'est exact : tant que personne n'est éliminé, l'ensemble des
+        candidats ne change pas, donc les seuils (min + ε) calculés d'un coup
+        sur le bloc sont ceux que le parcours cas par cas aurait calculés. Au
+        premier cas du bloc qui élimine quelqu'un, on applique ce cas seul et
+        on repart du cas suivant."""
+        np.random.shuffle(self._case_buf)
+        order = self._case_buf
+        ET = self._ET
+        eps = self.eps
+        n = order.shape[0]
+        c = order[0]
+        col = ET[c]
+        cand = np.flatnonzero(col <= col.min() + eps[c])
+        pos, B = 1, 8
+        while cand.shape[0] > 1 and pos < n:
+            blk = order[pos:pos + B]
+            sub = ET[blk[:, None], cand]                 # (b, k)
+            ok = sub <= (sub.min(axis=1) + eps[blk])[:, None]
+            rows_ok = ok.all(axis=1)
+            if rows_ok.all():                            # bloc sans élimination
+                pos += blk.shape[0]
+                B = min(2 * B, 1024)
+                continue
+            j = int(rows_ok.argmin())                    # premier cas qui élimine
+            cand = cand[ok[j]]
+            pos += j + 1
+            B = 8
+        idx = int(cand[0]) if cand.shape[0] == 1 else int(cand[np.random.randint(cand.shape[0])])
+        return self.pop[idx].copy()
+
+    def _select_reference(self) -> "Node":
+        """Filtrage cas par cas (version 0.7), gardé comme référence : les
+        tests vérifient que select() rend le même individu à chaque tirage."""
         np.random.shuffle(self._case_buf)
         E = self.E
         eps = self.eps
