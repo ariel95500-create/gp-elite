@@ -745,3 +745,39 @@ def test_grouped_normalisation_shares_one_factor_between_comparable_columns():
     res = symbolic_regression(X4, y, normalize="grouped", generations=5,
                               parallel=False, seed=0)
     assert res.formula_exact
+
+
+# ── 16. The search is judged the same way whatever the unit of y ────────────
+
+def test_early_stop_threshold_follows_the_scale_of_y(monkeypatch):
+    """The early stop was an absolute MSE of 1e-6: reached by an
+    approximation at 1 - R² = 6e-5 on a target of variance 0.02, never by
+    the exact law in larger units. It is now relative to var(y)."""
+    cfg = core.Config()
+    y = np.random.RandomState(0).uniform(0.0, 0.4, 50)
+    monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
+    monkeypatch.setattr(core, "_VAL_YS", y)
+    t1 = core._early_stop_threshold(cfg, y)
+    monkeypatch.setattr(core, "_VAL_YS", 1000.0 * y)
+    t2 = core._early_stop_threshold(cfg, 1000.0 * y)
+    assert np.isclose(t2 / t1, 1e6)
+    assert t1 <= 1e-12 * np.var(y) * 1.000001
+
+
+def test_constant_fitting_judges_the_scaled_form():
+    """Levenberg-Marquardt fits the constants of the form the search judges,
+    a + b·f. On y = 3 sin(2x) + 1 the tree sin(c·x) used to converge to
+    c = 1.878 (constants fitted as if f alone had to match y)."""
+    x = np.linspace(0.1, 3, 80).reshape(-1, 1)
+    y = 3 * np.sin(2.0 * x[:, 0]) + 1
+    cfg = core.Config()
+    old = core._USE_LINEAR_SCALING
+    core._USE_LINEAR_SCALING = True
+    try:
+        for c0 in (1.5, 2.3):
+            t = N("sin", N("*", N(c0), X(0)))
+            r = core.optimize_constants_lm(t, x, y, cfg)
+            c = [n.value for n in core._collect_constants_ordered(r)][0]
+            assert abs(c - 2.0) < 1e-8
+    finally:
+        core._USE_LINEAR_SCALING = old
