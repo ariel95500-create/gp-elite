@@ -219,6 +219,8 @@ def run_one(job):
                err=e, r2=1.0 - e, formula_exact=r.formula_exact,
                time_limit_reached=bool(getattr(r, "time_limit_reached", False)),
                expr=r.expression[:160], engine_file=gp_elite.__file__)
+    if hasattr(C, "_POLISH_ADMITTED"):     # polished variants admitted (0.8)
+        rec["polish_admitted"] = int(C._POLISH_ADMITTED)
     if job["kind"] == "feyn":
         rec["status"] = ("EXACT" if e < 1e-9 else "NEAR" if e < 1e-3
                          else "MISS")
