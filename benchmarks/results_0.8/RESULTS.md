@@ -74,3 +74,29 @@ out-of-domain splits, flagging models whose range grows more than tenfold
 catches 3 of the 8 collapses and raises 5 false alarms, and on Feynman exact
 laws themselves grow that much (median 4, 90th percentile 362, as q^4 does).
 No such warning is shipped.
+
+## Campaign 3 — one scale factor for comparable columns (C8) against C1
+
+Records: `campaign3_T.jsonl` (C8's 265 fits; C1's are those of campaign 2).
+Summary: `campaign3_T_summary.txt`.
+
+| | C1 | C8 |
+|---|---|---|
+| Feynman, exact laws (205 runs) | 69 | 75 |
+| runs exact for one arm only | 8 | 14 (sign test p = 0.29) |
+| ahead / behind on equations | | 6 / 4 |
+| Real data, 5 folds: test R² median (mean, worst) | 0.810 (0.750, 0.016) | 0.813 (0.786, 0.262) |
+| Real data, out of domain: test R² median | 0.630 | 0.695 |
+| collapses (test R² < 0), folds + out of domain | 4 | 6 |
+
+**H5 fails** on its real-data criterion: C8 has two more collapses than C1
+(criterion: none more), although its median test R² is higher both in the
+folds and out of domain. On Feynman its gain (+6) sits exactly at the
+threshold and within the scatter between equivalent arms. The gains are where
+the change was meant to act, laws that add or subtract variables of the same
+kind (I.8.14: 0 to 5 of 5; II.2.42: 1 to 3; II.15.4: 0 to 2), and the losses
+are not explained (I.27.6: 3 to 0). The grouped factor is therefore **not the
+default**; it is offered as an option, `normalize="grouped"`, with these
+numbers. The confirmation campaign on seeds 5 to 9 (3b) was stopped after 47
+fits once the decision no longer depended on it (`campaign3b_T_stopped.jsonl`,
+not used).
