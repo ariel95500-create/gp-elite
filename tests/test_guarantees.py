@@ -777,7 +777,9 @@ def test_constant_fitting_judges_the_scaled_form():
     y = 3 * np.sin(2.0 * x[:, 0]) + 1
     cfg = core.Config()
     old = core._USE_LINEAR_SCALING
+    old_so = core._LS_SCALE_ONLY
     core._USE_LINEAR_SCALING = True
+    core._LS_SCALE_ONLY = False
     try:
         for c0 in (1.5, 2.3):
             t = N("sin", N("*", N(c0), X(0)))
@@ -786,6 +788,7 @@ def test_constant_fitting_judges_the_scaled_form():
             assert abs(c - 2.0) < 1e-8
     finally:
         core._USE_LINEAR_SCALING = old
+        core._LS_SCALE_ONLY = old_so
 
 
 # ── 17. The formula delivered is the model, when the data allow it ──────────
@@ -886,7 +889,12 @@ def _ls_residual(tree, Xs, y):
     return float(np.mean((y - (a + b * p)) ** 2) / np.var(y))
 
 
-def test_weighted_sums_turn_a_right_structure_exact():
+def test_weighted_sums_turn_a_right_structure_exact(monkeypatch):
+    # a units= fit earlier in the process leaves scale-only scaling on:
+    # these tests call the engine directly, without a fit that resets it
+    monkeypatch.setattr(core, "_LS_SCALE_ONLY", False)
+    monkeypatch.setattr(core, "_CUSTOM_LOSS_FN", None)
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
     rng = np.random.RandomState(1006)
     Xr = rng.uniform(1, 5, (140, 4))
     y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2)
@@ -906,6 +914,11 @@ def test_weighted_sums_turn_a_right_structure_exact():
 
 
 def test_final_polish_offers_the_exact_variant(monkeypatch):
+    # a units= fit earlier in the process leaves scale-only scaling on:
+    # these tests call the engine directly, without a fit that resets it
+    monkeypatch.setattr(core, "_LS_SCALE_ONLY", False)
+    monkeypatch.setattr(core, "_CUSTOM_LOSS_FN", None)
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
     rng = np.random.RandomState(1006)
     Xr = rng.uniform(1, 5, (200, 4))
     y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2)
@@ -940,6 +953,10 @@ def test_polished_model_keeps_its_own_scale_and_offset(monkeypatch):
     used to come back with the old a and b: on y = 3 sin(2x) + 1 the raw
     MSE went from 0.39 to 271 (the scaled form: 2e-31). The scale and
     offset are now refitted into the tree's own constants."""
+    # a units= fit earlier in the process leaves scale-only scaling on:
+    # these tests call the engine directly, without a fit that resets it
+    monkeypatch.setattr(core, "_LS_SCALE_ONLY", False)
+    monkeypatch.setattr(core, "_CUSTOM_LOSS_FN", None)
     monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
     x = np.linspace(0.1, 3, 80).reshape(-1, 1)
     y = 3 * np.sin(2.0 * x[:, 0]) + 1
@@ -983,6 +1000,11 @@ def test_polish_never_replaces_an_approximation_by_another(monkeypatch):
     """A polished variant enters the final selection only if it reproduces the
     hold-out to numerical precision: on data that no law fits exactly, the
     polish leaves the candidate pool as it was."""
+    # a units= fit earlier in the process leaves scale-only scaling on:
+    # these tests call the engine directly, without a fit that resets it
+    monkeypatch.setattr(core, "_LS_SCALE_ONLY", False)
+    monkeypatch.setattr(core, "_CUSTOM_LOSS_FN", None)
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
     rng = np.random.RandomState(7)
     Xr = rng.uniform(1, 5, (200, 4))
     y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2) \
@@ -1021,6 +1043,7 @@ def test_polish_never_replaces_an_approximation_by_another(monkeypatch):
 
 def _set_pool(monkeypatch, pool):
     b_ops, _bw, u_ops, _uw = core._GENCSV_POOLS[pool]
+    monkeypatch.setattr(core, "_LS_SCALE_ONLY", False)     # see section 19
     monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
     monkeypatch.setattr(core, "_GENERIC_BINARY_OPS", list(b_ops))
     monkeypatch.setattr(core, "_GENERIC_UNARY_OPS", list(u_ops))
