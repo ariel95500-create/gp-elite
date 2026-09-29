@@ -392,12 +392,28 @@ from collections import deque
 from typing import Optional, List, Tuple, Dict, Any
 
 # [v16-BATTERY] Dépendances pour la lecture de données réelles (CSV NASA)
-try:
-    import pandas as _pd
-    from sklearn.preprocessing import MinMaxScaler as _MinMaxScaler
-    _CSV_DEPS_OK = True
-except ImportError:
-    _CSV_DEPS_OK = False
+# [v0.8] Importées à la demande : pandas et scikit-learn représentaient les
+# trois quarts du temps d'`import gp_elite` (près d'une seconde), payés aussi
+# par chaque processus parallèle au démarrage, alors que la recherche n'en
+# utilise aucun. Seuls les chargeurs CSV et normalize="minmax" en ont besoin.
+def _csv_deps():
+    """(pandas, MinMaxScaler), ou ImportError si l'un manque."""
+    import pandas as pd
+    from sklearn.preprocessing import MinMaxScaler
+    return pd, MinMaxScaler
+
+
+def _csv_deps_ok() -> bool:
+    try:
+        _csv_deps()
+        return True
+    except ImportError:
+        return False
+
+
+def _MinMaxScaler(*args, **kwargs):
+    from sklearn.preprocessing import MinMaxScaler
+    return MinMaxScaler(*args, **kwargs)
 
 # ============================================================
 # BIBLIOTHÈQUE DE FRAGMENTS — SUBSTRAT STIGMERGIQUE
@@ -419,6 +435,18 @@ class FragmentEntry:
     # Vecteur numpy de shape (N_PROBE,) — sortie du fragment sur PROBE_X.
     # None tant que non calculée (fragments déposés avant initialisation du probe).
     semantic_signature: Optional[np.ndarray] = None
+
+
+# [v0.8] Sonde de _is_semantically_trivial (construite une fois) et verdicts
+# mémorisés, vidés en même temps que le cache de simplification.
+_TRIVIAL_PROBE_X = np.array([
+    [-2.0, -1.5,  0.3,  1.0],
+    [-1.0, -0.5,  0.7,  2.0],
+    [ 0.5,  0.1,  1.1, -0.5],
+    [ 1.5,  1.0, -0.3, -1.5],
+    [ 2.5,  2.0, -1.0, -2.5],
+])
+_TRIVIAL_CACHE: dict = {}
 
 
 class FragmentLibrary:
@@ -483,20 +511,27 @@ class FragmentLibrary:
         Détecte les fragments sémantiquement nuls ou triviaux.
         [v16-NDIM] Génère une mini-matrice X de test (5 lignes) compatible
         avec le mode N-D ; en mode 1-D le vecteur xs reste un 1-D array.
+        [v0.8] Verdict mémorisé par arbre exact jusqu'au prochain vidage du
+        cache de simplification (_clear_simplify_caches) : dans cet
+        intervalle, simplify(node) rendrait de toute façon la forme déjà
+        calculée, donc le verdict est le même. Les dépôts testaient les mêmes
+        sous-arbres à chaque génération (5 % du temps total).
         """
+        h = node.exact_hash()
+        v = _TRIVIAL_CACHE.get(h)
+        if v is not None:
+            return v
+        v = self._is_semantically_trivial_uncached(node)
+        _TRIVIAL_CACHE[h] = v
+        return v
+
+    def _is_semantically_trivial_uncached(self, node: "Node") -> bool:
         simplified = simplify(node)  # [v19-OPT] simplify ne mute plus l'entrée
         if simplified.left is None and simplified.right is None:
             return True
         # Sonde N-D générique : matrice 5×4 couvrant les features 0–3
-        test_X = np.array([
-            [-2.0, -1.5,  0.3,  1.0],
-            [-1.0, -0.5,  0.7,  2.0],
-            [ 0.5,  0.1,  1.1, -0.5],
-            [ 1.5,  1.0, -0.3, -1.5],
-            [ 2.5,  2.0, -1.0, -2.5],
-        ])
         try:
-            vals = evaluate_vector(simplified, test_X)
+            vals = evaluate_vector(simplified, _TRIVIAL_PROBE_X)
             if np.std(vals) < 1e-6:
                 return True
         except Exception:
@@ -2165,25 +2200,32 @@ class Node:
         self._ehash = None   # [v0.7] exact_hash mémoïsé
 
     def copy(self):
-        """Copie profonde ITÉRATIVE (post-ordre) — aucune limite de profondeur.
+        """Copie profonde ITÉRATIVE — aucune limite de profondeur.
         [FIX-REC v18] L'ancienne version récursive levait RecursionError sur
-        les arbres profonds produits par les constructeurs stigmergiques."""
-        out = {}
-        stack = [(self, False)]
+        les arbres profonds produits par les constructeurs stigmergiques.
+        [v0.8] Chaque nœud neuf est créé une fois puis relié à son parent
+        (plus de dictionnaire id -> copie ni de double passage par la pile) :
+        2,3 fois plus rapide, même arbre.
+        NB : ne PAS propager _hash/_chash/_ehash — les mutations in-place
+        (point_mutation) n'invalident que le nœud touché ; des hashes hérités
+        sur les ancêtres seraient périmés -> faux hits de cache."""
+        root = Node(self.value)
+        stack = [(self, root)]
+        pop = stack.pop
+        push = stack.append
         while stack:
-            nd, processed = stack.pop()
-            if processed:
-                # NB : ne PAS propager _hash/_chash — les mutations in-place
-                # (point_mutation) n'invalident que le nœud touché ; des hashes
-                # hérités sur les ancêtres seraient périmés -> faux hits de cache.
-                out[id(nd)] = Node(nd.value,
-                          out.pop(id(nd.left))  if nd.left  is not None else None,
-                          out.pop(id(nd.right)) if nd.right is not None else None)
-            else:
-                stack.append((nd, True))
-                if nd.left  is not None: stack.append((nd.left,  False))
-                if nd.right is not None: stack.append((nd.right, False))
-        return out[id(self)]
+            src, dst = pop()
+            l = src.left
+            if l is not None:
+                nl = dst.left = Node(l.value)
+                if l.left is not None or l.right is not None:
+                    push((l, nl))
+            r = src.right
+            if r is not None:
+                nr = dst.right = Node(r.value)
+                if r.left is not None or r.right is not None:
+                    push((r, nr))
+        return root
 
     def structural_hash(self) -> int:
         """Hash structurel, mémoïsé, calcul ITÉRATIF post-ordre.
@@ -2225,29 +2267,36 @@ class Node:
         precedent du meme processus : predict() pouvait calculer avec les
         constantes d'un autre modele, et deux ajustements identiques
         successifs pouvaient diverger."""
-        if self._ehash is not None:
-            return self._ehash
-        stack = [(self, False)]
+        h = self._ehash
+        if h is not None:
+            return h
+        # [v0.8] pré-ordre puis parcours inverse (enfants avant parents) :
+        # mêmes valeurs de hash, moins d'allocations que la pile à drapeaux.
+        stack = [self]
+        order = []
+        pop = stack.pop
+        push = stack.append
+        add = order.append
         while stack:
-            nd, processed = stack.pop()
-            if nd._ehash is not None:
-                continue
-            if processed:
-                if nd.left is None and nd.right is None:
-                    v = nd.value
-                    nd._ehash = hash(("leaf", float(v).hex()
-                                      if isinstance(v, float) else v))
-                elif nd.right is None:
-                    nd._ehash = hash(("unary", nd.value, nd.left._ehash))
-                else:
-                    nd._ehash = hash(("binary", nd.value,
-                                      nd.left._ehash, nd.right._ehash))
+            nd = pop()
+            add(nd)
+            l = nd.left
+            if l is not None and l._ehash is None:
+                push(l)
+            r = nd.right
+            if r is not None and r._ehash is None:
+                push(r)
+        for nd in reversed(order):
+            l = nd.left
+            r = nd.right
+            if l is None and r is None:
+                v = nd.value
+                nd._ehash = hash(("leaf", v.hex()
+                                  if isinstance(v, float) else v))
+            elif r is None:
+                nd._ehash = hash(("unary", nd.value, l._ehash))
             else:
-                stack.append((nd, True))
-                if nd.left  is not None and nd.left._ehash  is None:
-                    stack.append((nd.left,  False))
-                if nd.right is not None and nd.right._ehash is None:
-                    stack.append((nd.right, False))
+                nd._ehash = hash(("binary", nd.value, l._ehash, r._ehash))
         return self._ehash
 
     def canonical_hash(self) -> int:
@@ -4185,6 +4234,12 @@ def _is_const(n, v: float) -> bool:
 
 _SIMPLIFY_CACHE: dict = {}   # hash → simplified Node (resets each generation)
 
+
+def _clear_simplify_caches():
+    """Vide le cache de simplification et ceux qui en dépendent."""
+    _SIMPLIFY_CACHE.clear()
+    _TRIVIAL_CACHE.clear()
+
 def simplify(node: Node) -> Node:
     """Simplification algébrique avec cache structurel.
 
@@ -4224,7 +4279,8 @@ def _simplify_tree(root: Node) -> Node:
             out[id(nd)] = _simplify_node(nd.value, l, r)
         else:
             # Cache structurel au niveau du sous-arbre (lecture seule, copie)
-            c = _SIMPLIFY_CACHE.get(nd.exact_hash())
+            h = nd._ehash
+            c = _SIMPLIFY_CACHE.get(h if h is not None else nd.exact_hash())
             if c is not None:
                 out[id(nd)] = c.copy()
                 continue
@@ -5868,7 +5924,10 @@ def evolve_island(island: Island,
             # [v14.5] Adam uniquement si l'enfant est prometteur ET élitiste (top 25%)
             if random.random() < cfg.CONST_OPT_PROB:
                 child_mse = raw_mse(child, xs, ys)
-                _elite_threshold = sorted(raw_mse(ind, xs, ys) for ind in pop[:max(4, len(pop)//4)])[-1]
+                # [v0.8] _elite_threshold n'est plus recalculé ici pour chaque
+                # enfant : `pop` ne change pas pendant la reproduction, la
+                # valeur est celle calculée une fois avant la boucle (le
+                # recalcul coûtait ~6 % du temps total).
                 if child_mse < _elite_threshold:
                     child = optimize_constants_adam(child, xs, ys, cfg)
             child = simplify(child)
@@ -6088,7 +6147,7 @@ def _island_round_task(payload):
             break
         if gen % 10 == 0:
             _fitness_cache.clear()
-        _SIMPLIFY_CACHE.clear()
+        _clear_simplify_caches()
         if _SYRACUSE_MODE:
             _t = gen / max(cfg.GENERATIONS - 1, 1)
             cfg._mono_pen_cache = 0.10 - _t * 0.07
@@ -7305,7 +7364,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             _fitness_cache.clear()
         # [OPT] Vider le cache de simplification pour libérer la mémoire
         # et éviter des résultats périmés après mutations.
-        _SIMPLIFY_CACHE.clear()
+        _clear_simplify_caches()
         # [FIX-A] Mettre à jour la pénalité mono-feature progressive
         # 0.10 en gen=0 → 0.03 en fin de run (décroissance linéaire)
         if _SYRACUSE_MODE:
@@ -8032,9 +8091,10 @@ def load_generic_csv(file_path: str,
     global _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS
     global CSV_FEATURE_NAMES, CSV_TARGET_NAME
 
-    if not _CSV_DEPS_OK:
+    if not _csv_deps_ok():
         raise ImportError("pandas et scikit-learn requis : "
                           "pip install pandas scikit-learn")
+    _pd = _csv_deps()[0]
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"Fichier introuvable : '{file_path}'  "
                                 f"(cwd : {os.getcwd()})")
@@ -8136,12 +8196,13 @@ def load_custom_csv(file_path: str):
     FileNotFoundError / KeyError si le fichier ou les colonnes manquent.
     ValueError  si le fichier contient moins de 10 lignes utiles.
     """
-    if not _CSV_DEPS_OK:
+    if not _csv_deps_ok():
         raise ImportError(
             "[BATTERY_SOH] pandas et scikit-learn sont requis pour charger "
             "des données CSV réelles.\n"
             "Installez-les avec : pip install pandas scikit-learn"
         )
+    _pd = _csv_deps()[0]
 
     # ── 1. Lecture & nettoyage des noms de colonnes ──────────────────────
     if not os.path.isfile(file_path):

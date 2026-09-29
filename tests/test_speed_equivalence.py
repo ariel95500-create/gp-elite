@@ -254,8 +254,13 @@ def test_memories_never_carry_a_sampling_table_across_processes():
     lib, cog = _toy_memories(rng)
     lib.begin_sampling()
     cog.begin_sampling(lib)
-    lib.sample(2, 15)
-    cog.sample_pair(lib)
+    old_sig = core.CURRENT_RESIDUAL_SIG
+    core.CURRENT_RESIDUAL_SIG = None      # toy signatures have 5 probes
+    try:
+        lib.sample(2, 15)
+        cog.sample_pair(lib)
+    finally:
+        core.CURRENT_RESIDUAL_SIG = old_sig
     lib2 = pickle.loads(pickle.dumps(lib))
     cog2 = pickle.loads(pickle.dumps(cog))
     assert lib2._sampling is None and cog2._sampling is None
