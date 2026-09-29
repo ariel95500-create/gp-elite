@@ -244,3 +244,27 @@ those C5a delivers; the few differences come from the search itself, whose
 number of generations in 30 seconds varies with the load of the machine. The
 restricted polish is kept. Its cost is the time of the final selection: about
 0.7 s more per fit at these sizes (140 to 500 rows).
+
+## Campaign 6 — power-law seeds (C6) against C5x
+
+Records: `campaign6_T.jsonl` (C6's 275 fits, 29 September 2026, 13:50 to
+14:44; C5x's are those of campaign 5b). Summary: `campaign6_T_summary.txt`.
+
+| | C5x | C6 |
+|---|---|---|
+| Feynman, exact laws (205 runs) | 75 | 90 |
+| runs exact for one arm only | 3 | 18 (sign test p = 0.002) |
+| ahead / behind on equations | | 7 / 2 |
+| R7raw (70 fits): paired difference, median (better / worse) | | +0.000 (25 / 20) |
+| R7raw collapses (test R² < 0) | 6 | 8 |
+
+The gains are where the seeds were meant to act: I.12.2 from 2 to 5 exact
+laws out of 5, I.32.5 from 1 to 5, III.19.51 from 0 to 5, II.38.3 from 4 to
+5 (and I.44.4 from 0 to 2, I.27.6 and II.24.17 by one; I.8.14 and I.11.19
+lose one each). **H8 fails** on its collapse criterion: 8 collapses against 6
+out of domain on R7raw. Three out-of-domain fits of 228_elusage return the
+monomial with fitted exponents, 16.0 + 9.48e6·X0^-3.38·X1^0.177, at R² = -12
+(C5x: -0.38, 0.19, 0.33), on data that a power law explains poorly (the
+log-log regression leaves 19 % of the variance of log y); 561_cpu, out of
+domain, seed 1, drops from 0.865 to -4475. The seeds as measured are not kept;
+campaign 6b tests them restricted to data that follow a power law.

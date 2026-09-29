@@ -386,3 +386,35 @@ than it is behind. On R7raw (70 paired fits), the median of the paired
 differences of test R² is at least -0.005 and C6 has no more collapses than
 C5x. Refuted if C6 recovers no more exact laws than C5x, or if the median
 R7raw difference is below -0.01; the seeds are then left out.
+
+---
+
+# Decision on campaign 6, and campaign 6b — written before campaign 6b runs
+
+Written on 29 September 2026 at 14:47. Campaign 6 has ended: H8 fails on its
+collapse criterion (8 against 6 on R7raw, out of domain), although C6
+recovers 90 exact laws on F41 against 75 (`RESULTS.md`). The collapses come
+from monomials fitted to data that are not power laws. On the training data
+of F41, the log-log regression explains all of the variance of log|y| for the
+fourteen laws that are monomials (R² = 1.000000), and at most 99.99 % for the
+others; on the seven real datasets in their units, at most 93 % (nikuradse_1;
+228_elusage 81 %).
+
+**Campaign 6b** tests the seeds restricted to data that follow a power law:
+the seeds are placed only if the log-log regression explains at least 99.9 %
+of the variance of log|y| on the training rows. Everything else is as in
+campaign 6.
+
+| Arm | Engine |
+|---|---|
+| C5x | commit `0b23fed` (campaign 5b) |
+| C6x | commit `f34b3d9`: C6 with the restriction |
+
+**Problems.** As in campaign 6: F41 and R7raw, C6x's 275 fits, two at a time;
+C5x's are those of campaign 5b.
+
+**H8b.** The restricted seeds are kept if, on F41, C6x recovers at least 6
+more exact laws than C5x and is ahead on more equations than it is behind,
+and, on R7raw (70 paired fits), the median paired difference of test R² is at
+least -0.005 and C6x has no more collapses than C5x (6). Otherwise the seeds
+are left out.
