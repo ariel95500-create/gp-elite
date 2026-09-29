@@ -144,3 +144,43 @@ delivered as it is. On y = 3 sin(2x) + 1 with 25 points, two seeds out of
 four returned a model with R² = -48.8 and -234.8 on its own training points.
 The correction is measured in campaign 5 and kept whatever its outcome, as a
 correction of an evaluation.
+
+## Campaign 5 — correction of the scale after Levenberg-Marquardt (C5a), and polish of the finalists (C5)
+
+Records: `campaign5_T.jsonl` (C5a and C5 side by side on F41, R6 and R7raw,
+740 fits with the R7raw runs of C4, 29 September 2026, 09:36 to 12:21; C4's
+F41 and R6 fits are those of campaign 4). The first start of the campaign,
+stopped after 72 fits and amended before the restart (`PLAN.md`), is kept in
+`campaign5_T_stopped.jsonl` and not used. Small data: `small_data_C5.jsonl`
+(`benchmarks/small_data_check.py`).
+
+**The correction (C5a against C4)** is kept, as planned. It costs nothing
+measurable: 64 exact laws against 63 on F41 (ahead on one equation, behind on
+none), and on real data (R6 and R7raw, 130 paired fits) a median paired
+difference of +0.000 and 11 collapses on each side. On the small-data check
+(five laws, 25 points, four seeds, no hold-out), C4 delivered two models whose
+scale and offset were stale, with test R² -1403 and -9.3; C5a, none (worst
+test R² 0.998).
+
+**The polish (C5 against C5a):**
+
+| | C5a | C5 |
+|---|---|---|
+| Feynman, exact laws (205 runs) | 64 | 75 |
+| runs exact for one arm only | 0 | 11 (sign test p = 0.001) |
+| ahead / behind on equations | | 4 / 0 |
+| R6 (60 fits): paired difference, median (better / worse) | | +0.000 (9 / 7) |
+| R6 collapses | 5 | 6 |
+| R7raw (70 fits): paired difference, median (better / worse) | | +0.000 (4 / 10) |
+| R7raw collapses | 6 | 6 |
+| inexact formulas, 335 fits | 21 | 21 |
+| time beyond the 30 s budget, median | 0.4 s | 1.1 s |
+
+The gains are where the polish was meant to act: I.8.14 goes from 0 to 5 exact
+laws out of 5, II.2.42 from 0 to 4, I.32.5 from 0 to 1 and I.6.20a from 3 to
+4. **H7 fails** on its collapse criterion nonetheless (12 against 11 on real
+data), and C5 is worse than C5a on more real fits than it is better (17
+against 13): variants of the polish win the final selection on the hold-out
+and extrapolate worse (547_no2, out of domain, seed 1: R² 0.362 with C5a,
+-0.359 with C5). The polish as measured is not kept; campaign 5b tests a
+restriction of it that removes this mechanism.
