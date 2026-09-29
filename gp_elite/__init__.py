@@ -54,8 +54,8 @@ try:
     try:
         __version__ = _pkg_version("gp-elite")
     except PackageNotFoundError:          # execute depuis les sources
-        __version__ = "0.7.0"
+        __version__ = "0.8.0"
 except ImportError:                        # Python < 3.8
-    __version__ = "0.7.0"
+    __version__ = "0.8.0"
 
 __all__ = ["symbolic_regression", "SRResult", "ParetoEntry", "stability_analysis", "audit_pareto", "check_dimensions", "unit", "GPEliteRegressor", "core", "__version__"]
