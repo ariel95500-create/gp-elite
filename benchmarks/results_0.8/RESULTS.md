@@ -200,9 +200,10 @@ now works on y divided by a power of ten when the standard deviation of y lies
 outside [1e-3, 1e3] (every campaign target lies inside, so nothing changed
 there), the model is returned in the units of y, and only a null column keeps
 the factor 1 in the division by max|x|. `benchmarks/scale_check.py`, eleven
-input and target scales from 1e-34 to 1e30: before, 5 correct laws out of 11
-(R² from -1.99 to 1.000); after, 11 out of 11 (R² ≥ 0.9999, formula exact).
-Output: `scale_check.txt`.
+input and target scales from 1e-34 to 1e30: before, the law was recovered at
+2 scales out of 11 (training R² from -1.99 to 1.000); after, at 10 out of 11,
+the eleventh returning an approximation at R² = 0.99991, and every formula
+reproduces predict(). Output: `scale_check.txt`.
 
 **The rounding noise of constants in the printed formula.** An exact law was
 printed 8.88178e-16 + v1 * v2 / v3; a constant term that is at most 1e-12 of
