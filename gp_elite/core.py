@@ -2809,6 +2809,28 @@ _NP_GLOBALS = {
     "_min2":       _np_min2,      # [V42] min(a, b) — sélection de branche
 }
 
+def _float_literal(v) -> str:
+    """[v0.8] Littéral Python d'une constante, sûr dans toute expression.
+
+    Jusqu'en 0.7 le compilateur écrivait repr(v) tel quel : sq(-0.5) donnait
+    le code « (-0.5 ** 2) », que Python lit -(0.5 ** 2) = -0.25, puisque **
+    lie plus fort que le moins unaire. evaluate_vector rendait donc -0.25 là
+    où l'arbre, la formule livrée, l'évaluation scalaire et l'optimisation
+    des constantes valent +0.25 (0,8 % des arbres évalués pendant une
+    recherche contenaient ce motif). Les constantes négatives sont désormais
+    parenthésées, et les non-finies écrites float('inf') / float('nan')
+    (leur nom nu levait NameError à l'appel)."""
+    v = float(v)
+    if v != v:
+        return "float('nan')"
+    if v == float("inf"):
+        return "float('inf')"
+    if v == float("-inf"):
+        return "(-float('inf'))"
+    r = repr(v)
+    return "(" + r + ")" if r.startswith("-") else r
+
+
 def _to_np_code(node) -> str:
     """Traduit récursivement un arbre en expression Python/NumPy (string).
     [v16-NDIM] Supporte les terminaux "X[i]" → "_x[:, i]"
@@ -2827,7 +2849,7 @@ def _to_np_code(node) -> str:
         except ValueError:
             return "0.0"
     if isinstance(v, float):
-        return repr(v)
+        return _float_literal(v)             # [v0.8] voir _float_literal
     if v == "+":
         return f"({_to_np_code(node.left)} + {_to_np_code(node.right)})"
     if v == "-":
@@ -2907,7 +2929,7 @@ def _to_np_code_parametric(node, const_list: list) -> str:
                 return "0.0"
         if isinstance(v, float):
             idx = const_idx.get(id(n))
-            return f"_c[{idx}]" if idx is not None else repr(v)
+            return f"_c[{idx}]" if idx is not None else _float_literal(v)
         if v == "+":   return f"({_code(n.left)} + {_code(n.right)})"
         if v == "-":   return f"({_code(n.left)} - {_code(n.right)})"
         if v == "*":   return f"({_code(n.left)} * {_code(n.right)})"

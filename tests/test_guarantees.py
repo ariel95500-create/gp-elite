@@ -576,3 +576,20 @@ def test_inexact_formula_triggers_a_warning(monkeypatch):
     with pytest.warns(RuntimeWarning, match="departs from predict"):
         res = symbolic_regression(Xd, 2 * Xd[:, 0], generations=2, parallel=False, seed=0)
     assert res.formula_exact is False
+
+
+# ── 13. Every evaluator of the engine gives a tree the same value ───────────
+# Up to 0.7 the vectorised evaluator wrote a negative constant under a square
+# as "(-0.5 ** 2)", which Python reads -(0.5 ** 2): sq(-0.5) evaluated to
+# -0.25 during the search while the scalar evaluator, the constant optimiser
+# and the delivered formula gave +0.25 (0.8 % of the trees evaluated in a
+# search contained the pattern).
+
+def test_square_of_a_negative_constant_is_positive_in_every_evaluator():
+    t = N("*", N("sq", N(-0.5)), X(0))
+    xs = np.array([[1.0], [2.0], [-3.0]])
+    expected = np.array([0.25, 0.5, -0.75])
+    assert np.array_equal(core.evaluate_vector(t, xs), expected)
+    assert [core.evaluate(t, row) for row in xs] == list(expected)
+    fn, consts = core.compile_parametric(t)
+    assert np.array_equal(fn(xs, np.array([c.value for c in consts])), expected)
