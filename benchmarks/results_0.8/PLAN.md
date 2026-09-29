@@ -391,7 +391,7 @@ R7raw difference is below -0.01; the seeds are then left out.
 
 # Decision on campaign 6, and campaign 6b — written before campaign 6b runs
 
-Written on 29 September 2026 at 14:47. Campaign 6 has ended: H8 fails on its
+Written on 29 September 2026 at 14:46. Campaign 6 has ended: H8 fails on its
 collapse criterion (8 against 6 on R7raw, out of domain), although C6
 recovers 90 exact laws on F41 against 75 (`RESULTS.md`). The collapses come
 from monomials fitted to data that are not power laws. On the training data
