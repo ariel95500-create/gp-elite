@@ -169,3 +169,25 @@ most 0.6 on F15 and on R6. Refuted above 0.8.
 **H2', quality at equal work.** On F15, exact recoveries of F are at least
 those of A. On R6, the median of the paired differences of test R² (F - A) is
 at least -0.005 and F has no more collapses than A.
+
+---
+
+# Campaign 3b — confirmation on new seeds, written before it runs
+
+Written on 29 September 2026 at 09:05, after the Feynman part of campaign 3
+(C8 75 exact laws, C1 69: +6, exactly the threshold of H5; 6 equations ahead,
+4 behind; runs exact for one arm only: 14 for C8, 8 for C1, two-sided sign
+test p = 0.29) and before its real-data part and before any run of 3b.
+Campaigns 1 and 2 showed that two arms that should be equivalent differ by
+about six exact laws on 205 runs: a +6 is within that scatter, so H5 is not
+decided on seeds 0 to 4 alone (protocol rule 7: an ambiguous cell is run
+again with more seeds before anything is said about it).
+
+Arms C1 (`580aabf`) and C8 (`a16deab`), F41 with engine seeds 5 to 9 (205
+runs per arm, side by side), budget T.
+
+**Decision.** The grouped normalisation becomes the default only if (i) on
+seeds 5 to 9 alone C8 recovers more exact laws than C1, (ii) over seeds 0 to 9
+(410 paired runs) the two-sided sign test on the runs exact for one arm only
+gives p < 0.10 in favour of C8, and (iii) the real-data criteria of H5 hold in
+campaign 3. Otherwise `normalize="auto"` keeps one factor per column.

@@ -52,21 +52,26 @@ REAL = ["210_cloud", "228_elusage", "712_chscase_geyser1", "561_cpu",
 
 # ─────────────────────────────────────────────────────────────── jobs ──
 
-def jobs_for(budget):
+def jobs_for(budget, seeds=None, feynman_only=False):
     import feynman_bench as F
     n_feyn = len(F.PROBS) if budget == "T" else 15
+    seeds = SEEDS if seeds is None else seeds
     out = []
     for i in range(n_feyn):
-        for s in SEEDS:
+        for s in seeds:
             out.append(dict(kind="feyn", problem=F.PROBS[i][0], index=i,
                             split="test", seed=s))
+    if feynman_only:
+        for j in out:
+            j["budget"] = budget
+        return out
     for name in REAL:
         for k in range(5):
             out.append(dict(kind="real", problem=name, split="fold%d" % k,
                             seed=0))
     if budget == "T":
         for name in REAL:
-            for s in SEEDS:
+            for s in seeds:
                 out.append(dict(kind="real", problem=name, split="ood",
                                 seed=s))
     for j in out:
@@ -233,7 +238,7 @@ def _git_commit(path):
         return None
 
 
-def drive(arms, budget, out, workers):
+def drive(arms, budget, out, workers, seeds=None, feynman_only=False):
     done = set()
     if os.path.exists(out):
         for line in open(out):
@@ -241,7 +246,7 @@ def drive(arms, budget, out, workers):
                 done.add(job_key(json.loads(line)))
     commits = {a: _git_commit(p) for a, p in arms.items()}
     todo = []
-    for j in jobs_for(budget):
+    for j in jobs_for(budget, seeds, feynman_only):
         group = []
         for a in arms:
             jj = dict(j, arm=a, commit=commits[a])
@@ -303,12 +308,14 @@ def drive(arms, budget, out, workers):
 
 # ──────────────────────────────────────────────────────────── summary ──
 
-def summary(paths, budget):
+def summary(paths, budget, keep_arms=None):
     import collections
     rows = []
     for p in paths:
         rows += [json.loads(l) for l in open(p) if l.strip()]
     rows = [r for r in rows if r["budget"] == budget]
+    if keep_arms:
+        rows = [r for r in rows if r["arm"] in keep_arms]
     arms = sorted({r["arm"] for r in rows})
     by = {}
     for r in rows:
@@ -395,11 +402,16 @@ def main():
                    help="NAME=PATH (directory that contains gp_elite/)")
     r.add_argument("--out", required=True)
     r.add_argument("--workers", type=int, default=2)
+    r.add_argument("--seeds", default=None,
+                   help="comma-separated engine seeds (default 0,1,2,3,4)")
+    r.add_argument("--feynman-only", action="store_true")
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
     s.add_argument("paths", nargs="+")
     s.add_argument("--budget", required=True, choices=sorted(BUDGETS))
+    s.add_argument("--arms", default=None,
+                   help="comma-separated arms to compare (default: all)")
     j = sub.add_parser("jobs")
     j.add_argument("--budget", required=True, choices=sorted(BUDGETS))
     a = ap.parse_args()
@@ -408,9 +420,12 @@ def main():
     elif a.cmd == "run":
         arms = dict(x.split("=", 1) for x in a.arm)
         drive({k: os.path.abspath(v) for k, v in arms.items()}, a.budget,
-              os.path.abspath(a.out), a.workers)
+              os.path.abspath(a.out), a.workers,
+              [int(x) for x in a.seeds.split(",")] if a.seeds else None,
+              a.feynman_only)
     elif a.cmd == "summary":
-        summary(a.paths, a.budget)
+        summary(a.paths, a.budget,
+                a.arms.split(",") if a.arms else None)
     elif a.cmd == "jobs":
         for jj in jobs_for(a.budget):
             print(json.dumps(jj))
