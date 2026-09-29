@@ -289,3 +289,38 @@ II.38.3 from 4 to 5. No equation is lost. On the real datasets, whose log-log
 regression explains at most 93 % of the variance of log y, no seed is placed,
 and the models are those of C5x up to the variation of the search with the
 load of the machine. The restricted seeds are kept.
+
+## Budget G — 0.7.0 (A) against the release (F) at equal work
+
+Records: `budgetG.jsonl` (210 fits, 29 September 2026, 15:47 to 16:20, then,
+after an interruption of the machine, 22:46 to 23:12; the fits cut by the
+interruption left no record and were run in full at the resumption). 100
+generations, no time limit, two fits at a time. A is 0.7.0 (`e847605`), F the
+0.8.0 release (`b0e12cf`). Summary: `budgetG_summary.txt`.
+
+| | A (0.7.0) | F (0.8.0) |
+|---|---|---|
+| Feynman 15, exact laws (75 runs) | 46 | 54 |
+| ahead / behind on equations | | 3 / 1 |
+| median time per fit, Feynman 15 | 12.3 s | 0.5 s |
+| per-fit time ratio F/A, median (quartiles), Feynman 15 | | 0.44 (0.14, 0.58) |
+| Real data, 5 folds: test R² median (mean, worst) | 0.815 (0.785, 0.406) | 0.810 (0.777, 0.372) |
+| paired folds, F better / worse (median difference) | | 9 / 14 (-0.000) |
+| collapses (test R² < 0) | 0 | 0 |
+| per-fit time ratio F/A, median (quartiles), real data | | 0.58 (0.52, 0.61) |
+| inexact formulas, 105 fits | 5 | 1 |
+
+**H1' holds**: the median time ratio is 0.44 on the Feynman equations and
+0.58 on the real datasets (at most 0.6 required on each). **H2' holds**: 54
+exact laws against 46 (at least as many required), a median real-data
+difference of -0.000 (at least -0.005 required) and no collapse on either
+side. F gains I.12.2, I.8.14 and II.3.24 and loses one run of I.6.20a. On the
+real folds, F is worse on more folds than it is better (14 against 9, mean
+difference -0.008); within the criterion, and reported.
+
+At equal work the speed-up measured on the engine alone (2.2 to 3.6 times on
+13 reference configurations, identical models) is partly spent by what the
+quality changes add: the final polish, and the search itself when it no
+longer stops at an absolute MSE of 1e-6. On the Feynman equations the median
+fit takes 0.5 s instead of 12.3 s mostly because the exact laws are found at
+the first generations.
