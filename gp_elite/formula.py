@@ -380,6 +380,40 @@ def to_raw_tree(node, a, b):
     return tree
 
 
+_NOISE_REL = 1e-12
+
+
+def drop_noise_constants(tree, X):
+    """Remove from every sum a constant term that is only rounding noise, at
+    most 1e-12 of the largest value the sum takes on the data: an exact law
+    printed ``8.88178e-16 + v1 * v2 / v3`` reads ``v1 * v2 / v3``.  [v0.8]
+    The function changes by less than 1e-12 of its own scale; raw_formula
+    keeps the result only if it still passes the fit-time check."""
+    X = np.asarray(X, dtype=float)
+
+    def rec(nd, in_sum=False):
+        if nd is None:
+            return None
+        if nd.left is None and nd.right is None:
+            return Node(nd.value)
+        is_sum = nd.value in ("+", "-") and nd.right is not None
+        if is_sum and not in_sum:
+            terms = _flatten_sum(nd, 1.0, [])
+            consts = [c for c, t in terms if t is None]
+            rest = [(c, t) for c, t in terms if t is not None]
+            if consts and rest:
+                with np.errstate(all="ignore"):
+                    vals = evaluate(nd, X)
+                if vals.size and np.all(np.isfinite(vals)):
+                    m = float(np.max(np.abs(vals)))
+                    if m > 0.0 and abs(sum(consts)) <= _NOISE_REL * m:
+                        return _rebuild_sum([(c, rec(t)) for c, t in rest])
+        return Node(nd.value, rec(nd.left, is_sum),
+                    rec(nd.right, is_sum) if nd.right is not None else None)
+
+    return rec(tree)
+
+
 def substitute_only(node, a, b):
     """Raw-space tree WITHOUT folding: each variable replaced by a*x + b.
     Fallback if folding ever failed; same function, less readable."""
@@ -756,6 +790,11 @@ def raw_formula(node, scaler, X_raw, feature_names=None, predictions=None):
     try:
         tree = to_raw_tree(node, a, b)
         pos, ok, err, n_off = _check(tree)
+        if ok:                                       # [v0.8] rounding-noise terms
+            clean = drop_noise_constants(tree, X_raw)
+            pos_c, ok_c, err_c, n_off_c = _check(clean)
+            if ok_c:
+                tree, pos, err, n_off = clean, pos_c, err_c, n_off_c
         if not ok:                                   # folding must never cost
             alt = substitute_only(node, a, b)        # exactness: compare with
             pos2, ok2, err2, n_off2 = _check(alt)    # the plain substitution

@@ -808,3 +808,18 @@ def test_faithful_formula_preferred_among_equivalent_candidates(monkeypatch):
                                              (1e-3, 0.0, 7, plain)])
     chosen = core._select_one_se(None, float("inf"))[0]
     assert chosen is plain
+
+
+def test_rounding_noise_constant_is_not_printed():
+    """An exact law used to be printed with the rounding noise of its offset,
+    8.88178e-16 + v1 * v2 / v3. A constant term that is at most 1e-12 of the
+    sum it belongs to is dropped from the printed formula, which is still
+    checked against the model; a real constant is kept."""
+    from gp_elite import formula as F
+    rng = np.random.RandomState(0)
+    Xr = rng.uniform(1, 5, (50, 4))
+    t = N("+", N(8.88178e-16), N("/", N("*", X(1), X(2)), X(3)))
+    f = F.raw_formula(t, None, Xr, ["a", "b", "c", "d"])
+    assert f.exact and f.text() == "b * c / d"
+    t2 = N("+", N(0.5), N("*", X(0), X(1)))
+    assert F.raw_formula(t2, None, Xr, ["a", "b", "c", "d"]).text() == "0.5 + a * b"
