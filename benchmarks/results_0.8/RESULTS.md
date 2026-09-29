@@ -268,3 +268,24 @@ monomial with fitted exponents, 16.0 + 9.48e6·X0^-3.38·X1^0.177, at R² = -12
 log-log regression leaves 19 % of the variance of log y); 561_cpu, out of
 domain, seed 1, drops from 0.865 to -4475. The seeds as measured are not kept;
 campaign 6b tests them restricted to data that follow a power law.
+
+## Campaign 6b — power-law seeds, only for data that follow a power law (C6x) against C5x
+
+Records: `campaign6b_T.jsonl` (C6x's 275 fits, 29 September 2026, 14:47 to
+15:41; C5x's are those of campaign 5b). Summary: `campaign6b_T_summary.txt`.
+
+| | C5x | C6x |
+|---|---|---|
+| Feynman, exact laws (205 runs) | 75 | 88 |
+| runs exact for one arm only | 0 | 13 (sign test p = 0.0002) |
+| ahead / behind on equations | | 4 / 0 |
+| R7raw (70 fits): paired difference, median (better / worse) | | +0.000 (3 / 1) |
+| R7raw collapses (test R² < 0) | 6 | 6 |
+
+**H8b holds** on each of its criteria. The four equations gained are the ones
+the seeds were designed for, and on each of them every run now returns the
+exact law: I.12.2 from 2 to 5 of 5, I.32.5 from 1 to 5, III.19.51 from 0 to 5,
+II.38.3 from 4 to 5. No equation is lost. On the real datasets, whose log-log
+regression explains at most 93 % of the variance of log y, no seed is placed,
+and the models are those of C5x up to the variation of the search with the
+load of the machine. The restricted seeds are kept.
