@@ -73,3 +73,44 @@ the fit returns. Also reported, without deciding anything: close
 (1 - R² < 1e-3), out-of-domain error of the models that are not exact,
 model size, generations completed in the time budget, and the count of
 out-of-domain collapses.
+
+---
+
+# Campaign 2 — two quality changes, written before its first run
+
+Written on 29 September 2026, while campaign 1 was running and before any
+run of campaign 2. None of its results had been seen.
+
+| Arm | Engine |
+|---|---|
+| B1 | 0.8 branch at commit `cf7a7d3`: campaign 1's B, plus the input checks and the tree hashes made independent of PYTHONHASHSEED |
+| C1 | commit `580aabf`: B1 plus two changes that alter the search |
+
+The two changes of C1:
+
+- **Relative early stop.** The search stopped as soon as the hold-out MSE
+  fell under 1e-6, an absolute value that depends on the unit of y. On a
+  target of variance 0.02 (Feynman I.6.20a), a model at 1 - R² = 6e-5
+  reached it at the sixth generation, and the final selection returned an
+  approximation at 1 - R² = 2e-3 while the exact law was within reach. C1
+  stops early only on a law exact to numerical precision (1 - R² <= 1e-12
+  on the hold-out).
+- **Levenberg-Marquardt in variable projection.** The constants were fitted
+  so that the tree alone matches y, while the search judges the tree after
+  the implicit linear scaling a + b·f. On y = 3 sin(2x) + 1, the tree
+  sin(c·x) converged to c = 1.878 (MSE 0.16); fitting a and b by least
+  squares inside the residual gives c = 2 exactly.
+
+Same problems, budget T (30 s per fit), seeds and protocol as campaign 1.
+
+**H4, C1 finds more exact laws in the same time without losing elsewhere.**
+Decision criteria: on F41, exact recoveries of C1 exceed those of B1 by at
+least 6 over the 205 runs, and C1 is ahead on more equations than it is
+behind. On R6 (folds and out of domain together), the median of the paired
+differences of test R² (C1 - B1) is at least -0.005, and C1 has no more
+collapses (test R² < 0) than B1. Refuted if C1 recovers no more exact laws
+than B1, or if the median real-data difference is below -0.01; in either
+case both changes are left out of the release unless a separate campaign
+supports one of them on its own. The early stop can only make fits longer:
+the median time of the Feynman fits is reported, and the out-of-domain
+error of the models that are not exact is reported for both arms.
