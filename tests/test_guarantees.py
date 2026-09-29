@@ -1012,7 +1012,7 @@ def test_polish_never_replaces_an_approximation_by_another(monkeypatch):
     assert sorted(round(c[0], 12) for c in core._VAL_CANDS) == without
 
 
-# ── 19. A pure power law is seeded, not left to chance ──────────────────────
+# ── 20. A pure power law is seeded, not left to chance ──────────────────────
 # In the 0.8 decision bench, laws that are a mere product of powers of the
 # variables (Feynman I.12.2, I.32.5, III.19.51) came back exact in 1, 2 and
 # 0 runs out of 5 at 30 s; the other runs returned formulas of 50 to 70
