@@ -100,3 +100,47 @@ default**; it is offered as an option, `normalize="grouped"`, with these
 numbers. The confirmation campaign on seeds 5 to 9 (3b) was stopped after 47
 fits once the decision no longer depended on it (`campaign3b_T_stopped.jsonl`,
 not used).
+
+## Campaign 4 — formula-faithful tie-break and companion lookup (C4) against C1
+
+Records: `campaign4_T.jsonl` (C4's 265 fits, 29 September 2026, 08:06 to
+09:16; C1's are those of campaign 2). Eight Feynman fits (I.11.19 seeds 1 to
+4, I.15.10 seeds 0 to 3) ran while a micro-benchmark was also using the
+machine; they were run again after the campaign, and their first records are
+kept apart (`campaign4_T_perturbed_replaced.jsonl`, not used; no exact
+outcome differs between the two). Summary: `campaign4_T_summary.txt`.
+
+| | C1 | C4 |
+|---|---|---|
+| inexact formulas (`formula_exact` False), 265 fits | 28 | 11 |
+| of which on real data (60 fits) | 6 | 0 |
+| Feynman, exact laws (205 runs) | 69 | 63 |
+| runs exact for one arm only | 11 | 5 (sign test p = 0.21) |
+| ahead / behind on equations | | 3 / 6 |
+| Real data, 5 folds: test R² median (mean, worst) | 0.810 (0.750, 0.016) | 0.810 (0.771, 0.372) |
+| Real data, out of domain: test R² median (worst) | 0.630 (-64.1) | 0.630 (-224.1) |
+| paired difference, folds + out of domain: median | | +0.000 |
+| collapses (test R² < 0), folds + out of domain | 4 | 4 |
+
+**H6 holds** on each of its criteria: 11 inexact formulas against 28 (at
+most 14 required), 63 exact laws against 69 (at least 63 required: the loss
+sits exactly at the tolerance set from the scatter between equivalent arms),
+a median real-data difference of +0.000 (at least -0.005 required) and as many
+collapses. Both changes are kept.
+
+The laws lost deserve a remark, because one of them exposed a defect. On
+I.6.20a, seeds 3 and 4, the search found a numerically exact form (hold-out
+MSE 2.6e-12 times the variance) just above the floor under which the final
+selection keeps only exact candidates (1e-12); the tolerance of 0.3 % of R²
+then admitted a shorter approximation, returned at 1 - R² = 2.3e-3. The
+polish of the finalists, which could have brought that form under the floor,
+produced candidates the selection discarded as divergent: Levenberg-Marquardt
+in variable projection (kept after campaign 2) fits a' + b'·tree, and on a
+finalist that already carries its scale and offset, a + b·f, the fitted tree
+kept the old a and b, which drift to the bounds of the constants (±15). The
+same fault reaches the user directly when a fit has no hold-out (fewer than
+30 points, or `validation_split=0`): the champion polished at the end is then
+delivered as it is. On y = 3 sin(2x) + 1 with 25 points, two seeds out of
+four returned a model with R² = -48.8 and -234.8 on its own training points.
+The correction is measured in campaign 5 and kept whatever its outcome, as a
+correction of an evaluation.

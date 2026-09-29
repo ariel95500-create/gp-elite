@@ -1,0 +1,29 @@
+Budget T, arms ['C1', 'C4'], 530 fits
+
+Feynman: 205 paired fits (41 equations)
+  C1  exact  69  near  36  miss 100   time median 30.3 s   generations median 73
+  C4  exact  63  near  36  miss 106   time median 30.3 s   generations median 69
+  C4 ahead on 3 equations, behind on 6
+    ahead : I.11.19 (0->1), I.12.2 (1->2), II.15.4 (0->1)
+    behind: I.18.12 (2->0), I.27.6 (3->2), I.32.5 (2->0), I.6.20a (5->3), II.2.42 (1->0), III.15.12 (1->0)
+  time ratio C4/C1: median 1.00
+  C1 out of domain, models not exact: n=136, median 1-R2 0.0264, collapses (R2<0) 16
+  C4 out of domain, models not exact: n=142, median 1-R2 0.0305, collapses (R2<0) 15
+
+Real data, folds: 30 paired fits
+  C1  R2 median 0.8095  mean 0.7502  worst 0.0163  collapses 0   time median 30.4 s   generations median 84
+  C4  R2 median 0.8095  mean 0.7709  worst 0.3715  collapses 0   time median 30.3 s   generations median 81
+  paired difference C4 - C1: median +0.0000  mean +0.0208   C4 better on 13, worse on 8
+  time ratio C4/C1: median 1.00
+
+Real data, out of domain: 30 paired fits
+  C1  R2 median 0.6298  mean -2.3148  worst -64.0558  collapses 4   time median 30.3 s   generations median 85
+  C4  R2 median 0.6298  mean -7.0168  worst -224.1165  collapses 4   time median 30.3 s   generations median 83
+  paired difference C4 - C1: median +0.0000  mean -4.7020   C4 better on 11, worse on 11
+  time ratio C4/C1: median 1.00
+
+Real data, folds + out of domain: 60 paired fits
+  C1  R2 median 0.7354  mean -0.7823  worst -64.0558  collapses 4   time median 30.3 s   generations median 85
+  C4  R2 median 0.7548  mean -3.1229  worst -224.1165  collapses 4   time median 30.3 s   generations median 82
+  paired difference C4 - C1: median +0.0000  mean -2.3406   C4 better on 24, worse on 19
+  time ratio C4/C1: median 1.00

@@ -226,3 +226,64 @@ equivalent arms); on R6 the median paired difference of test R² is at least
 criterion fails, the tie-break is dropped and the companion fix is kept if
 the other criteria hold; if the exact-law or real-data criteria fail, both
 are dropped.
+
+---
+
+# Decision on campaign 4, and campaign 5 — written before campaign 5 runs
+
+Written on 29 September 2026 at 09:55. Campaign 4 has ended and H6 holds
+(`RESULTS.md`): C4 (`ff32450`) is merged into the 0.8 branch. Its analysis
+found a fault introduced by campaign 2's variable projection (the scale and
+offset carried by a finalist or by the final champion are left stale by
+Levenberg-Marquardt). No Feynman or PMLB fit of the change below has been
+run; it was checked on constructed cases (tests) and on four fits of 25
+points, quoted below because they show the fault, not as evidence of a gain.
+
+| Arm | Engine |
+|---|---|
+| C4 | commit `ff32450` (campaign 4) |
+| C5a | commit `f250f5d`: C4 plus the correction alone |
+| C5 | commit `106f616`: C4 plus the correction and the polish |
+
+**The correction** (`_refit_scaling`). After Levenberg-Marquardt, the scale
+and offset materialised in the final champion and in each polished finalist
+are refitted into the tree's own constants. On y = 3 sin(2x) + 1 with 25
+points (no hold-out), seeds 0 to 3: training R² -48.8, 1.000, 1.000, -234.8
+before, 0.961, 1.000, 1.000, 0.892 after. It is kept whatever the outcome of
+this campaign (it corrects an evaluation); its effect is reported (C5a
+against C4) and investigated if it costs more than 6 exact laws, more than
+0.01 of median paired R², or more than one collapse.
+
+**The polish** (what this campaign decides; `FINAL_POLISH`). For each of the
+eight finalists of the final selection, two more kinds of candidates: the
+same tree with its constants fitted by Levenberg-Marquardt for up to 100
+iterations instead of 20, and variants in which each term of a sum or a
+difference carries its own coefficient (A ± B becomes a·A ± b·B; one variant
+for the innermost sums only, one for all sums), fitted the same way. They go
+through the same final selection as every other candidate. Motivation, from
+campaign 2's C1: I.8.14, sqrt((x2-x1)² + (y2-y1)²), came back 5 times out of
+5 as sqrt((x2' - x3')² + (x1' - x0')²) on the normalised columns (1 - R² =
+1.8e-4), where each column's own factor 1/max|x| calls for a coefficient on
+each term of the differences; II.2.42 likewise; II.15.4 as
+-μB·sin(-10.985 - 1.00432 θ), the right form with unfinished constants.
+Expected: gains on I.8.14, II.2.42 and II.15.4, no loss elsewhere.
+
+**Problems.** Budget T, as in campaigns 1 to 4. F41 (seeds 0 to 4) and R6
+(5 folds and the out-of-domain split, seeds 0 to 4) for C5a and C5, side by
+side (530 fits); C4's are those of campaign 4. R7raw, new (`--raw-real` of
+`decision_bench.py`): the six PMLB datasets and nikuradse_1 in their own
+units, not standardised, 5 folds and the out-of-domain split (seeds 0 to 4),
+C5a and C5 side by side, then C4 alone two fits at a time (210 fits).
+Reported without deciding: `benchmarks/small_data_check.py` (five laws, 25
+points, four seeds, no hold-out) for the three arms.
+
+**H7, the polish finds more exact laws without losing on real data (C5
+against C5a).** On F41, C5 recovers at least 6 more exact laws than C5a (the
+scatter measured between equivalent arms) and is ahead on more equations
+than it is behind. On real data (R6 and R7raw together, 130 paired fits), the
+median of the paired differences of test R² is at least -0.005 and C5 has no
+more collapses (test R² < 0) than C5a. Refuted if C5 recovers no more exact
+laws than C5a, or if the median real-data difference is below -0.01; the
+polish is then left out (`FINAL_POLISH` off) and only the correction ships.
+Reported without deciding: runtime of the final selection (fit time beyond
+the budget), sizes, equations gained and lost, out-of-domain errors.
