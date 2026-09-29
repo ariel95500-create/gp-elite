@@ -725,3 +725,23 @@ def test_same_seed_same_model_across_python_launches():
         assert p.returncode == 0, p.stderr[-2000:]
         outs.append([l for l in p.stdout.splitlines() if l.startswith("EXPR")][-1])
     assert outs[0] == outs[1] == outs[2]
+
+
+def test_faithful_formula_preferred_among_equivalent_candidates(monkeypatch):
+    """Among candidates the data cannot tell apart, the final choice prefers
+    one whose printed formula reproduces the model (no safety net acting on
+    the data) over a shorter one that relies on a protected division."""
+    Xd = np.array([[1.0, 2.0], [2.0, 3.0], [3.0, 1.0], [4.0, 2.5]] * 10)
+    y = Xd[:, 0] * 0.5
+    net = N("/", X(0), N("-", X(1), N(2.0)))        # size 5, pole on the data
+    plain = N("*", N(0.5), X(0))                    # size 3 ... make it larger
+    plain = N("+", N("*", N(0.5), X(0)), N("*", N(0.0), X(1)))   # size 7
+    monkeypatch.setattr(core, "_VAL_TRAIN_XS", Xd)
+    monkeypatch.setattr(core, "_VAL_XS", None)
+    monkeypatch.setattr(core, "_VAL_YS", y)
+    monkeypatch.setattr(core, "_NEAR_PROBE_XS", None)
+    core._FAITHFUL_CACHE.clear()
+    monkeypatch.setattr(core, "_VAL_CANDS", [(1e-3, 0.0, 5, net),
+                                             (1e-3, 0.0, 7, plain)])
+    chosen = core._select_one_se(None, float("inf"))[0]
+    assert chosen is plain

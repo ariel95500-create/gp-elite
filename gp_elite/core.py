@@ -6950,6 +6950,48 @@ _NEAR_CACHE = {}
 _NEAR_GUARD_SWAPS = 0      # nombre de departages effectifs (diagnostic, tests)
 _EXACT_REL = 1e-12           # [v0.7-EXACT] plancher « exact » relatif a var(y_val)
 _EXACT_PRIORITY_SWAPS = 0   # [v0.7-EXACT] nombre de fois ou la regle a change le choix
+
+_FAITHFUL_SWAPS = 0          # [v0.8] departages par la fidelite de la formule
+_FAITHFUL_CACHE: Dict[int, bool] = {}
+
+
+def _formula_faithful(node) -> bool:
+    """[v0.8] Vrai si la fonction mathématique de l'arbre (sans garde-fou
+    numérique) reproduit l'évaluation du moteur sur les données de
+    l'ajustement (entraînement et hold-out, espace normalisé), avec la
+    tolérance du contrôle de gp_elite.formula (1e-7 relatif)."""
+    xs = [x for x in (_VAL_TRAIN_XS, _VAL_XS) if x is not None]
+    if node is None or not xs:
+        return True
+    try:
+        key = node.exact_hash()
+    except Exception:
+        key = None
+    if key is not None and key in _FAITHFUL_CACHE:
+        return _FAITHFUL_CACHE[key]
+    ok = True
+    try:
+        try:
+            from . import formula as _F
+        except ImportError:                  # core.py lancé comme script
+            import formula as _F
+        for X in xs:
+            p = np.asarray(evaluate_vector(node, X), dtype=float)
+            with np.errstate(all="ignore"):
+                v = np.asarray(_F.evaluate(node, X), dtype=float)
+                if v.ndim == 0:
+                    v = np.full(p.shape, float(v))
+                scale = max(float(np.max(np.abs(p))) if p.size else 0.0,
+                            float(np.std(p)) if p.size else 0.0, 1e-300)
+                gap = np.abs(v - p)
+            if not np.all(np.isfinite(gap)) or float(np.max(gap)) > 1e-7 * scale:
+                ok = False
+                break
+    except Exception:
+        ok = False
+    if key is not None:
+        _FAITHFUL_CACHE[key] = ok
+    return ok
 _NEAR_EXT = 0.10
 _NEAR_K = 50.0
 _VAL_TRAIN_YS = None    # [v23.1] train cible
@@ -7166,6 +7208,23 @@ def _select_one_se(champion, champ_val):
                       "approximation plus courte")
     eligible = [t for t in pool if t[0] <= thr]
     eligible.sort(key=lambda t: (t[2], t[0]))   # plus petit, puis meilleur MSE
+    # [v0.8] DEPARTAGE PAR LA FIDÉLITÉ DE LA FORMULE. Parmi les candidats que
+    # les données ne savent pas distinguer, on préfère le plus petit dont la
+    # formule imprimée reproduit le modèle, c'est-à-dire sur lequel aucun
+    # garde-fou numérique (division protégée, puissance bornée) n'agit sur
+    # les données : sinon la formule livrée s'écarte de predict() et
+    # l'utilisateur reçoit un avertissement (formula_exact False). Stable
+    # près du domaine d'abord, comme ci-dessous.
+    if not (_formula_faithful(eligible[0][3])
+            and _near_domain_stable(eligible[0][3])):
+        both = [t for t in eligible
+                if _formula_faithful(t[3]) and _near_domain_stable(t[3])]
+        if both:
+            globals()["_FAITHFUL_SWAPS"] = _FAITHFUL_SWAPS + 1
+            TRACE.set("faithful_formula", "candidat dont la formule reproduit "
+                      "le modèle préféré à un équivalent plus court")
+            m, _, _, node = both[0]
+            return node, m
     # [v0.7-NEAR] DEPARTAGE : parmi les candidats que les donnees ne savent pas
     # distinguer, le plus petit qui NE DIVERGE PAS pres du domaine. Si aucun
     # n'est stable, comportement historique inchange.
@@ -7190,6 +7249,7 @@ def _split_holdout(xs, ys, cfg):
     _VAL_TRAIN_XS = None; _VAL_TRAIN_YS = None
     _EXTRAP_PROBE_XS = None; _EXTRAP_BAND = None
     _NEAR_PROBE_XS = None; _NEAR_BAND = None; _NEAR_CACHE.clear()
+    _FAITHFUL_CACHE.clear()
     _VAL_CANDS.clear()
     frac = float(getattr(cfg, "VALIDATION_SPLIT", 0.0) or 0.0)
     n = len(ys)
