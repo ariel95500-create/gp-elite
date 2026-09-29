@@ -378,6 +378,7 @@ GP_ELITE.py  —  Genetic Programming symbolique haute performance
 from __future__ import annotations
 import bisect
 import math
+import operator
 import random
 import numpy as np
 import copy
@@ -3290,6 +3291,76 @@ def evaluate(node, x) -> float:
         return 0.0
     return 0.0
 
+# [v0.8] INTERPRÉTEUR — même calcul que le code compilé, sans le compiler.
+# Compiler un arbre (génération du source, compile(), exec) coûte ~5 µs par
+# nœud, et la grande majorité des arbres de la recherche ne sont évalués
+# qu'une ou deux fois : 11 % du temps total y passait. L'interpréteur applique
+# nœud par nœud EXACTEMENT les opérations qu'écrit _to_np_code (mêmes
+# fonctions, mêmes opérandes, mêmes littéraux) ; le code compilé n'est plus
+# produit que pour un arbre évalué au moins _COMPILE_AFTER fois. Mêmes
+# valeurs bit pour bit (tests/test_speed_equivalence.py). Les arbres de plus
+# de _INTERP_MAX_DEPTH niveaux passent toujours par le compilateur, pour en
+# garder le comportement exact (y compris ses replis).
+
+_INTERP_MAX_DEPTH = 100
+_COMPILE_AFTER = 3
+_EVAL_COUNTS: Dict[int, int] = {}
+_NAN = float("nan")
+
+
+class _InterpTooDeep(Exception):
+    pass
+
+
+def _sq(a):
+    return a ** 2
+
+
+def _cube(a):
+    return a ** 3
+
+
+_INTERP_BINARY = {"+": operator.add, "-": operator.sub, "*": operator.mul,
+                  "/": _np_safe_div, "max2": _np_max2, "min2": _np_min2}
+_INTERP_UNARY = {"sin": np.sin, "cos": np.cos, "tan": _np_safe_tan,
+                 "tanh": np.tanh, "exp": _np_safe_exp, "log": _np_safe_log,
+                 "sqrt": _np_safe_sqrt, "abs": np.abs, "neg": operator.neg,
+                 "sq": _sq, "cube": _cube, "is_even": _np_is_even,
+                 "step": _np_step}
+
+
+def _interp(n, x, d):
+    """Valeur de l'arbre n sur x, selon les règles de _to_np_code."""
+    if n is None:
+        return 0.0
+    v = n.value
+    if v == "x":
+        return x
+    if isinstance(v, str) and v.startswith("X[") and v.endswith("]"):
+        try:
+            idx = int(v[2:-1])
+        except ValueError:
+            return 0.0
+        return x[:, idx]
+    if isinstance(v, float):
+        v = float(v)                       # le littéral de _float_literal
+        return _NAN if v != v else v
+    if not isinstance(v, str):             # _to_np_code : aucun opérateur
+        return 0.0
+    if d >= _INTERP_MAX_DEPTH:
+        raise _InterpTooDeep()
+    f = _INTERP_BINARY.get(v)
+    if f is not None:
+        return f(_interp(n.left, x, d + 1), _interp(n.right, x, d + 1))
+    f = _INTERP_UNARY.get(v)
+    if f is not None:
+        return f(_interp(n.left, x, d + 1))
+    if v == "pow":
+        f = _np_safe_pow if _is_const_subtree(n.right) else _np_safe_pow_var
+        return f(_interp(n.left, x, d + 1), _interp(n.right, x, d + 1))
+    return 0.0
+
+
 def evaluate_vector(node, xs) -> np.ndarray:
     """Évalue sur un vecteur (1-D) ou une matrice (N-D) via le compilateur NumPy.
     [v16-NDIM]
@@ -3297,18 +3368,38 @@ def evaluate_vector(node, xs) -> np.ndarray:
       · xs 2-D (n_samples, n_features) → mode N-D, _x[:, i] accès par feature
     La fonction compilée reçoit _x tel quel ; _to_np_code génère le bon indexage.
     """
-    fn = compile_to_numpy(node)
+    h = node.exact_hash()
+    fn = _COMPILE_CACHE.get(h)
+    if fn is None:
+        k = _EVAL_COUNTS.get(h, 0) + 1
+        if k >= _COMPILE_AFTER:
+            fn = compile_to_numpy(node)
+            _EVAL_COUNTS.pop(h, None)
+        else:
+            _EVAL_COUNTS[h] = k
+            if len(_EVAL_COUNTS) > 65536:
+                _EVAL_COUNTS.clear()
     if isinstance(xs, np.ndarray):
         x_in = xs
     else:
         x_in = np.asarray(xs, dtype=float)
+    if fn is None:
+        try:
+            with np.errstate(all="ignore"):
+                r = _interp(node, x_in, 0)
+        except _InterpTooDeep:
+            fn = compile_to_numpy(node)
+        except Exception:
+            n_rows = xs.shape[0] if isinstance(xs, np.ndarray) else len(xs)
+            return np.zeros(n_rows)
     try:
         # [v0.7] sq/cube/* ne sont pas proteges : un debordement donne inf,
         # remplace juste apres. Sans errstate, NumPy imprimait des
         # « RuntimeWarning: overflow » chez l'utilisateur (sans effet sur le
         # resultat, qui est identique).
-        with np.errstate(all="ignore"):
-            r = fn(x_in)
+        if fn is not None:
+            with np.errstate(all="ignore"):
+                r = fn(x_in)
         n_rows = x_in.shape[0]
         r = np.asarray(r, dtype=float)
         if r.shape == ():          # scalaire → broadcast
@@ -3318,7 +3409,7 @@ def evaluate_vector(node, xs) -> np.ndarray:
         # éviter tout overflow en aval (R², carré). Borne large (1e12) qui ne
         # change rien aux prédictions normales mais neutralise les explosions.
         r = np.where(np.isfinite(r), r, 0.0)
-        return np.clip(r, -1e12, 1e12)
+        return _np_minimum(_np_maximum(r, -1e12), 1e12)
     except Exception:
         n_rows = xs.shape[0] if isinstance(xs, np.ndarray) else len(xs)
         return np.zeros(n_rows)

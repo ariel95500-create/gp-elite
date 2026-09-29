@@ -338,3 +338,61 @@ def test_levenberg_marquardt_returns_the_same_constants(monkeypatch):
         assert core.to_string(a) == core.to_string(b)
         assert [float(n.value).hex() for n in core._collect_constants_ordered(a)] == \
                [float(n.value).hex() for n in core._collect_constants_ordered(b)]
+
+
+# ------------------------------------------------------ tree interpreter
+
+def test_interpreter_matches_compiled_code():
+    """evaluate_vector interprets a tree until it has been evaluated a few
+    times, then compiles it. Both must give the same values, bit for bit,
+    for every operator, special constant and malformed leaf."""
+    import random as pyrandom
+    rng = pyrandom.Random(0)
+    nr = np.random.RandomState(0)
+    X2 = nr.uniform(-3, 3, (30, 3))
+    X2[3] = 0.0
+    X1 = nr.uniform(-3, 3, 30)
+    specials = [0.0, -0.0, 1.0, -1.0, -0.5, 1e-9, 1e300, -1e300,
+                float("inf"), float("nan"), 1e-320]
+    un = _UN + ["is_even", "unknown_op"]
+
+    def tree(d):
+        if d == 0 or rng.random() < 0.3:
+            u = rng.random()
+            if u < 0.4:
+                return core.Node(rng.uniform(-3, 3))
+            if u < 0.5:
+                return core.Node(float(rng.choice(specials)))
+            if u < 0.53:
+                return core.Node(rng.choice(["X[9]", "X[abc]", "x", 3]))
+            return core.Node("X[%d]" % rng.randrange(3))
+        if rng.random() < 0.6:
+            right = tree(d - 1) if rng.random() > 0.03 else None
+            return core.Node(rng.choice(_BIN), tree(d - 1), right)
+        return core.Node(rng.choice(un), tree(d - 1))
+
+    def compiled(t, x):
+        h = t.exact_hash()
+        core._COMPILE_CACHE[h] = core.compile_to_numpy(t)
+        try:
+            return core.evaluate_vector(t, x)
+        finally:
+            core._COMPILE_CACHE.pop(h, None)
+
+    n = 0
+    for _ in range(1500):
+        t = tree(rng.randint(0, 6))
+        for x in (X2, X1):
+            core._EVAL_COUNTS.clear()
+            core._COMPILE_CACHE.pop(t.exact_hash(), None)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                assert _same(core.evaluate_vector(t, x), compiled(t, x)), \
+                    core._to_np_code(t)
+            n += 1
+    deep = core.Node("X[0]")
+    for _ in range(150):                       # beyond the interpreter's depth
+        deep = core.Node("sin", deep)
+    core._EVAL_COUNTS.clear()
+    assert _same(core.evaluate_vector(deep, X2), compiled(deep, X2))
+    assert n == 3000
