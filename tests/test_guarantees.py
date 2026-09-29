@@ -718,13 +718,18 @@ def test_same_seed_same_model_across_python_launches():
         "                          restarts=2, parallel=False, seed=5)\n"
         "print('EXPR', res.expression)\n")
     outs = []
-    for hs in ("0", "1", "12345"):
+    for hs in ("0", "1", "12345", None):
         env = dict(os.environ, PYTHONHASHSEED=hs)
+        if hs is None:                   # the usual case: not set at all
+            del env["PYTHONHASHSEED"]
         p = subprocess.run([sys.executable, "-c", code], env=env,
                            capture_output=True, text=True, timeout=600)
         assert p.returncode == 0, p.stderr[-2000:]
         outs.append([l for l in p.stdout.splitlines() if l.startswith("EXPR")][-1])
-    assert outs[0] == outs[1] == outs[2]
+        # 0.7 printed a note asking for PYTHONHASHSEED=0 once per process;
+        # with verbose=False the fit now prints nothing at all.
+        assert [l for l in p.stdout.splitlines() if not l.startswith("EXPR")] == []
+    assert outs[0] == outs[1] == outs[2] == outs[3]
 
 
 def test_grouped_normalisation_shares_one_factor_between_comparable_columns():

@@ -8,7 +8,6 @@ via la CLI `gp-elite` ou `python -m gp_elite`.
 """
 from __future__ import annotations
 
-_HASHSEED_WARNED = False
 import io
 import random
 import contextlib
@@ -703,16 +702,10 @@ def symbolic_regression(
     _hard_deadline = (_time.time() + time_limit) if time_limit is not None else None
     _time_hit = False
     _restarts_done = 0
-    # [v29-REPRO] Avertissement unique : sans PYTHONHASHSEED figé, deux
-    # invocations distinctes de Python peuvent produire des champions
-    # différents à seed égal (hachage str aléatoire de CPython).
-    global _HASHSEED_WARNED
-    import os as _os
-    if _os.environ.get("PYTHONHASHSEED") is None and not _HASHSEED_WARNED:
-        _HASHSEED_WARNED = True
-        print("[GP_ELITE] Note reproductibilité : lancez avec PYTHONHASHSEED=0 "
-              "pour des résultats identiques entre invocations (les répétitions "
-              "dans ce processus sont déjà déterministes).")
+    # [v0.8] La note « lancez avec PYTHONHASHSEED=0 », imprimée une fois par
+    # processus jusqu'à la 0.7, est retirée : les hachages d'arbres ne
+    # dépendent plus du hachage des chaînes de CPython, et seed= suffit
+    # (tests/test_guarantees.py, section 15).
     try:
         # ── [v27] MULTI-RESTART : n évolutions indépendantes, archives fusionnées ──
         # Validité de la fusion : _split_holdout est déterministe (HOLDOUT_SEED
