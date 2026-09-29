@@ -64,8 +64,173 @@ def _sympy_or_raise(obj, feature_names):
     if obj.formula is None:
         raise RuntimeError("no raw-variable formula available for this model "
                            "(its input scaler is not a per-column affine map)")
-    return obj.formula.sympy(list(feature_names) if feature_names is not None
-                             else None)
+    names = list(feature_names) if feature_names is not None else obj.formula.names
+    bad = _names_misread_by_sympy(names or [])
+    if bad:
+        import warnings
+        warnings.warn(
+            "GP_ELITE: sympy.sympify would misread the variable name%s %s in "
+            "this string (a sympy constant or function, a Python keyword, or "
+            "not an identifier: sympify reads E as 2.718..., I as sqrt(-1)). "
+            "Use .sympy_expr(), which builds the expression with one Symbol "
+            "per column, or pass other names to .sympy()."
+            % ("s" if len(bad) > 1 else "", ", ".join(repr(b) for b in bad)),
+            UserWarning, stacklevel=3)
+    return obj.formula.sympy(names)
+
+
+_SYMPY_NAMES = None
+
+
+def _names_misread_by_sympy(names):
+    """[v0.8] Names that sympy.sympify would not read as a plain symbol."""
+    global _SYMPY_NAMES
+    import keyword
+    if _SYMPY_NAMES is None:
+        try:
+            ns = {}
+            exec("from sympy import *", ns)
+            _SYMPY_NAMES = frozenset(ns)
+        except ImportError:
+            _SYMPY_NAMES = frozenset()
+    return [str(n) for n in names
+            if not str(n).isidentifier() or keyword.iskeyword(str(n))
+            or str(n) in _SYMPY_NAMES]
+
+
+def _sympy_expr(obj, feature_names):
+    """The formula as a sympy expression with one Symbol per column, whatever
+    the column names are."""
+    if obj.formula is None:
+        raise RuntimeError("no raw-variable formula available for this model "
+                           "(its input scaler is not a per-column affine map)")
+    import sympy
+    names = list(feature_names) if feature_names is not None else obj.formula.names
+    names = [str(n) for n in (names or [])]
+    ph = ["_gpe_var%d" % i for i in range(len(names))]
+    text = obj.formula.sympy(ph)
+    return sympy.sympify(text, locals={p: sympy.Symbol(n)
+                                       for p, n in zip(ph, names)})
+
+
+# ── [v0.8] Données d'entrée : refuser clairement plutôt que calculer faux ────
+# Jusqu'en 0.7, une valeur manquante (NaN) ou infinie dans X ou y passait
+# sans erreur : l'ajustement rendait une formule sans rapport avec les
+# données, sans le moindre avertissement. Et predict() prenait un échantillon
+# 1-D pour une colonne, acceptait un nombre de colonnes faux, et rendait 0
+# pour une ligne contenant NaN. Les messages sont en anglais, comme le reste
+# des erreurs de l'API.
+
+def _column_names(X, n):
+    cols = getattr(X, "columns", None)
+    if cols is not None and len(cols) == n:
+        return [str(c) for c in cols]
+    return ["X%d" % i for i in range(n)]
+
+
+def _to_float_matrix(X, what="X"):
+    """X as a 2-D float array; a clear error names a non-numeric column."""
+    try:
+        return np.asarray(X, dtype=float)
+    except (TypeError, ValueError):
+        pass
+    obj = np.asarray(X, dtype=object)
+    if obj.ndim == 1:
+        obj = obj.reshape(-1, 1)
+    names = _column_names(X, obj.shape[1] if obj.ndim == 2 else 1)
+    if obj.ndim == 2:
+        for j in range(obj.shape[1]):
+            for i in range(obj.shape[0]):
+                try:
+                    float(obj[i, j])
+                except (TypeError, ValueError):
+                    raise ValueError(
+                        "%s column %r is not numeric (row %d holds %r). "
+                        "Convert it to numbers or leave it out."
+                        % (what, names[j], i, obj[i, j])) from None
+    raise ValueError("%s must contain numbers only" % what)
+
+
+def _check_finite(A, what, names=None):
+    bad = ~np.isfinite(A)
+    if bad.any():
+        rows, cols = np.nonzero(bad.reshape(A.shape[0], -1))
+        where = "row %d" % rows[0]
+        if names is not None and A.ndim == 2:
+            where += ", column %r" % names[cols[0]]
+        raise ValueError(
+            "%s contains %d missing or infinite value%s in %d row%s (first: "
+            "%s). gp-elite needs complete numeric data: remove or impute "
+            "these rows." % (what, int(bad.sum()), "s" if bad.sum() > 1 else "",
+                             len(set(rows.tolist())),
+                             "s" if len(set(rows.tolist())) > 1 else "", where))
+
+
+def _prepare_fit_data(X, y, feature_names):
+    """Validated (X 2-D float, y 1-D float, feature names) for a fit."""
+    if feature_names is None and getattr(X, "columns", None) is not None:
+        feature_names = _column_names(X, len(X.columns))
+    Xa = _to_float_matrix(X, "X")
+    ya = _to_float_matrix(y, "y")
+    if ya.ndim == 2 and ya.shape[1] == 1:
+        ya = ya.ravel()
+    if ya.ndim != 1:
+        raise ValueError("y must be a single target: 1-D, or 2-D with one "
+                         "column (got shape %s)" % (ya.shape,))
+    if Xa.ndim == 1 and len(Xa) == len(ya):
+        Xa = Xa.reshape(-1, 1)          # one variable
+    if Xa.ndim != 2:
+        raise ValueError("X must be 2-D (n_samples, n_features), got shape %s"
+                         % (Xa.shape,))
+    if len(Xa) != len(ya):
+        raise ValueError("X has %d rows but y has %d values" % (len(Xa), len(ya)))
+    if len(ya) < 3:
+        raise ValueError("at least 3 samples are needed (got %d)" % len(ya))
+    if Xa.shape[1] < 1:
+        raise ValueError("X has no column")
+    if feature_names is None:
+        feature_names = ["X%d" % i for i in range(Xa.shape[1])]
+    feature_names = [str(n) for n in feature_names]
+    if len(feature_names) != Xa.shape[1]:
+        raise ValueError("feature_names has %d names but X has %d columns"
+                         % (len(feature_names), Xa.shape[1]))
+    _check_finite(Xa, "X", feature_names)
+    _check_finite(ya, "y")
+    return Xa, ya, feature_names
+
+
+def _predict_inputs(X, n_features):
+    """X for predict(): 2-D, with the number of columns of the fit."""
+    Xn = _to_float_matrix(X, "X")
+    if Xn.ndim == 1:
+        if n_features is None or n_features == 1:
+            Xn = Xn.reshape(-1, 1)
+        else:
+            raise ValueError(
+                "X is 1-D but the model uses %d variables: pass an array of "
+                "shape (n_samples, %d); for a single sample, "
+                "X.reshape(1, -1)" % (n_features, n_features))
+    if Xn.ndim != 2:
+        raise ValueError("X must be 2-D (n_samples, n_features), got shape %s"
+                         % (Xn.shape,))
+    if n_features is not None and Xn.shape[1] != n_features:
+        raise ValueError("X has %d column%s but the model was fitted on %d"
+                         % (Xn.shape[1], "s" if Xn.shape[1] != 1 else "",
+                            n_features))
+    return Xn
+
+
+def _predict_raw(node, scaler, X, n_features):
+    """Predictions on raw inputs. A row with a missing or infinite input gets
+    NaN (it used to get 0, a plausible-looking wrong value)."""
+    Xn = _predict_inputs(X, n_features)
+    bad = ~np.isfinite(Xn).all(axis=1)
+    Xs = scaler.transform(Xn) if scaler is not None else Xn
+    out = core.evaluate_vector(node, Xs)
+    if bad.any():
+        out = np.array(out, dtype=float)
+        out[bad] = np.nan
+    return out
 
 
 @dataclass
@@ -84,6 +249,7 @@ class ParetoEntry:
     node: "core.Node"
     scaler: object = None
     formula: object = None          # [v0.7] formula.RawFormula (variables brutes)
+    n_features: Optional[int] = None   # [v0.8] colonnes attendues par predict
 
     @property
     def formula_exact(self) -> Optional[bool]:
@@ -93,13 +259,14 @@ class ParetoEntry:
         """Sympy-parsable formula in the raw variables (see SRResult.sympy)."""
         return _sympy_or_raise(self, feature_names)
 
+    def sympy_expr(self, feature_names=None):
+        """The formula as a sympy expression (see SRResult.sympy_expr)."""
+        return _sympy_expr(self, feature_names)
+
     def predict(self, X: np.ndarray) -> np.ndarray:
-        Xn = np.asarray(X, dtype=float)
-        if Xn.ndim == 1:
-            Xn = Xn.reshape(-1, 1)
-        if self.scaler is not None:
-            Xn = self.scaler.transform(Xn)
-        return core.evaluate_vector(self.node, Xn)
+        """Predictions on RAW inputs (same units as the fit). A row with a
+        missing or infinite input gets NaN."""
+        return _predict_raw(self.node, self.scaler, X, self.n_features)
 
     def __str__(self):
         r2 = f"{self.r2_validation:.6f}" if self.r2_validation is not None else "n/a"
@@ -168,10 +335,19 @@ class SRResult:
 
         ``sympy.sympify(result.sympy())`` evaluated on the raw inputs gives
         ``result.predict`` (see ``formula_exact``). Constants keep full float
-        precision. Names default to ``feature_names``; pass valid Python
-        identifiers if the column names are not.
+        precision. Names default to ``feature_names``. A name that sympify
+        would not read as a plain symbol (E, I, N, S, beta, lambda, a name
+        with a space...) triggers a warning: use ``sympy_expr()`` then.
         """
         return _sympy_or_raise(self, feature_names)
+
+    def sympy_expr(self, feature_names=None):
+        """The formula as a sympy expression, one ``sympy.Symbol`` per column
+        named after it. Unlike ``sympify(result.sympy())``, it is right for
+        any column name: a column called E stays a symbol instead of becoming
+        Euler's number. Requires sympy.
+        """
+        return _sympy_expr(self, feature_names)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Prédit sur des features BRUTES (mêmes unités que le X passé au fit).
@@ -179,12 +355,8 @@ class SRResult:
         Applique automatiquement la normalisation interne apprise au fit, donc
         l'utilisateur fournit des données dans leurs unités d'origine.
         """
-        Xn = np.asarray(X, dtype=float)
-        if Xn.ndim == 1:
-            Xn = Xn.reshape(-1, 1)
-        if self.scaler is not None:
-            Xn = self.scaler.transform(Xn)
-        return core.evaluate_vector(self.node, Xn)
+        return _predict_raw(self.node, self.scaler, X,
+                            len(self.feature_names) if self.feature_names else None)
 
     def diagnostics(self, X: np.ndarray, y: np.ndarray, verbose: bool = True,
                     ordered: bool = False):
@@ -368,19 +540,12 @@ def symbolic_regression(
     --------
     SRResult
     """
-    X = np.asarray(X, dtype=float)
-    y = np.asarray(y, dtype=float)
-    if X.ndim != 2:
-        raise ValueError(f"X doit être 2-D (n_samples, n_features), reçu {X.shape}")
-    if y.ndim != 1 or len(y) != len(X):
-        raise ValueError("y doit être 1-D de même longueur que X")
+    # [v0.8] Entrées vérifiées : NaN/infini refusés avec la ligne et la
+    # colonne en cause, colonne non numérique nommée, y en colonne accepté,
+    # X 1-D pris comme une seule variable, noms de colonnes d'un DataFrame
+    # repris comme noms de variables.
+    X, y, feature_names = _prepare_fit_data(X, y, feature_names)
     n_feat = X.shape[1]
-
-    if feature_names is None:
-        feature_names = [f"X{i}" for i in range(n_feat)]
-    feature_names = list(feature_names)
-    if len(feature_names) != n_feat:
-        raise ValueError("feature_names doit avoir une entrée par colonne de X")
 
     if seed is not None:
         random.seed(seed)
@@ -680,7 +845,7 @@ def symbolic_regression(
                     pareto_entries.append(ParetoEntry(
                         expression=core.to_string(nd), size=int(sz),
                         mse_validation=float(m), r2_validation=_r2,
-                        node=nd.copy(), scaler=scaler))
+                        node=nd.copy(), scaler=scaler, n_features=n_feat))
     finally:
         core._GENERIC_CSV_MODE = False
         core._CUSTOM_LOSS_FN = None   # [CUSTOM-LOSS] ne pas fuiter vers l'appel suivant
