@@ -151,3 +151,21 @@ model sizes, the out-of-domain error of the models that are not exact.
 
 To halve the cost, C1's fits are those of campaign 2; C8's fits run two at a
 time, as every fit of these campaigns does (two processes on the two cores).
+
+---
+
+# Amendment to budget G, written before any run of it
+
+Written on 29 September 2026 at 08:15, before budget G was run. Campaign 1
+compared A and B at equal time; since then, campaign 2 changed the engine
+(C1 kept), so an equal-work comparison of A with B (`c7b5934`) would describe
+an engine that will not be released. Budget G will compare A (0.7.0) with F,
+the release candidate at the end of the quality campaigns, on the same
+problems (F15 x 5 seeds, R6 x 5 folds, 100 generations, no time limit).
+
+**H1', speed at equal work.** The median of the per-fit time ratios F/A is at
+most 0.6 on F15 and on R6. Refuted above 0.8.
+
+**H2', quality at equal work.** On F15, exact recoveries of F are at least
+those of A. On R6, the median of the paired differences of test R² (F - A) is
+at least -0.005 and F has no more collapses than A.
