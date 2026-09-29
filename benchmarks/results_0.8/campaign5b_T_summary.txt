@@ -1,0 +1,9 @@
+F41 (205 paired): exact C5a 64  C5x 75  one-arm C5a 0 C5x 11  p=0.0010
+   ahead: I.32.5 (0->1), I.6.20a (3->4), I.8.14 (0->5), II.2.42 (0->4)  | behind: 
+R6         60 paired: median diff (C5x - C5a) +0.0000  mean +0.0018  better 4 worse 3  collapses C5a 5  C5x 5
+R7raw      70 paired: median diff (C5x - C5a) +0.0000  mean -0.0005  better 1 worse 4  collapses C5a 6  C5x 6
+R6+R7raw  130 paired: median diff (C5x - C5a) +0.0000  mean +0.0006  better 5 worse 7  collapses C5a 11  C5x 11
+polish variants admitted on real data: 0 in 0 fits
+polish variants admitted on F41: 221 in 42 fits
+inexact formulas: C5a 21  C5x 21 (of 335)
+time beyond 30 s, median: C5a 0.36  C5x 1.08

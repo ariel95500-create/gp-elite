@@ -341,3 +341,48 @@ more exact laws than C5a and is ahead on more equations than it is behind,
 and, on real data (R6 and R7raw together, 130 paired fits), the median paired
 difference of test R² is at least -0.005 and C5x has no more collapses than
 C5a (11). Otherwise only the correction ships.
+
+---
+
+# Decision on campaign 5b, and campaign 6 — written before campaign 6 runs
+
+Written on 29 September 2026 at 13:48. Campaign 5b has ended and H7b holds
+(`RESULTS.md`): the correction and the restricted polish (C5x, `0b23fed`) go
+into the release. No Feynman or PMLB fit of the change below has been run; it
+was checked on constructed data (tests) only, including one fit of 5
+generations on data of the form of I.12.2 (a test, not evidence).
+
+| Arm | Engine |
+|---|---|
+| C5x | commit `0b23fed` (campaign 5b) |
+| C6 | commit `fe8bbcd`: C5x plus the change below |
+
+**The change: power-law seeds.** When the target and some input columns keep
+a constant sign, the exponents of |y| ≈ c·Π|x_j|^a_j are fitted by least
+squares on the logarithms (the normalisation by max|x| leaves them unchanged),
+and two individuals are placed in the initial population of each island: the
+monomial whose exponents are rounded to the nearest half-integer, built with
+the pool's `*`, `/`, `sq`, `cube` and `sqrt`, and, when the pool has `pow` and
+the exponents are not half-integers, the monomial with the fitted exponents,
+which Levenberg-Marquardt then refines. They are judged like any other
+individual. Nothing is injected when the target changes sign (standardised
+data), when no column keeps its sign, under `units=` (typed population) and in
+extrapolation mode: the fit is then that of C5x. Motivation, from campaign 2's
+C1: I.12.2 (q1·q2/(4π·ε·r²)), I.32.5 and III.19.51, products of powers of the
+variables, were recovered in 1, 2 and 0 runs out of 5; the other runs returned
+formulas of 50 to 70 nodes. Expected: gains on those three equations and on
+II.38.3, no loss elsewhere.
+
+**Problems.** Budget T. F41 (seeds 0 to 4) and R7raw (5 folds and the
+out-of-domain split, seeds 0 to 4): C6's 275 fits, two at a time; C5x's are
+those of campaign 5b. R6, standardised, is not run: its targets are centred
+and change sign, so the change cannot act there (`_make_power_law_seeds`
+returns nothing, tested). Reported without deciding:
+`benchmarks/small_data_check.py` for C6.
+
+**H8, the seeds find more exact laws without losing on real data.** On F41,
+C6 recovers at least 6 more exact laws than C5x and is ahead on more equations
+than it is behind. On R7raw (70 paired fits), the median of the paired
+differences of test R² is at least -0.005 and C6 has no more collapses than
+C5x. Refuted if C6 recovers no more exact laws than C5x, or if the median
+R7raw difference is below -0.01; the seeds are then left out.

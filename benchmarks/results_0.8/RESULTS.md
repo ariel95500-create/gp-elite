@@ -214,3 +214,33 @@ change, and the printed formula is still checked against predict().
 `verbose=False` and asking to launch Python with PYTHONHASHSEED=0, is gone:
 `seed=` alone reproduces a fit since the tree hashes stopped depending on
 Python's string hashing (tested with PYTHONHASHSEED 0, 1, 12345 and unset).
+
+## Campaign 5b — the polish, restricted to exact laws (C5x) against C5a
+
+Records: `campaign5b_T.jsonl` (C5x's 335 fits, 29 September 2026, 12:25 to
+13:48; C5a's are those of campaign 5). While it ran, measurements of
+another kind were made on the same machine for about ten minutes; the 37 fits
+whose 30 seconds overlapped them were run again once the campaign had ended,
+and their first records are kept apart (`campaign5b_T_perturbed_replaced.jsonl`,
+not used). Summary: `campaign5b_T_summary.txt`.
+
+| | C5a | C5x |
+|---|---|---|
+| Feynman, exact laws (205 runs) | 64 | 75 |
+| runs exact for one arm only | 0 | 11 (sign test p = 0.001) |
+| ahead / behind on equations | | 4 / 0 |
+| real data, R6 and R7raw (130 fits): paired difference, median (better / worse) | | +0.000 (5 / 7) |
+| collapses (test R² < 0), R6 and R7raw | 11 | 11 |
+| polished variants admitted into the selection, real data | | 0 (in 130 fits) |
+| polished variants admitted, Feynman | | 221 (in 42 fits) |
+| inexact formulas, 335 fits | 21 | 21 |
+| time beyond the 30 s budget, median | 0.4 s | 1.1 s |
+
+**H7b holds** on each of its criteria: 11 more exact laws (I.8.14 from 0 to 5
+of 5, II.2.42 from 0 to 4, I.32.5 from 0 to 1, I.6.20a from 3 to 4), none
+lost, a median real-data difference of +0.000 and as many collapses. On real
+data no polished variant reached the exact floor, so the delivered models are
+those C5a delivers; the few differences come from the search itself, whose
+number of generations in 30 seconds varies with the load of the machine. The
+restricted polish is kept. Its cost is the time of the final selection: about
+0.7 s more per fit at these sizes (140 to 500 rows).
