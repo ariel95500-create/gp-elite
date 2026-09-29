@@ -823,3 +823,50 @@ def test_rounding_noise_constant_is_not_printed():
     assert f.exact and f.text() == "b * c / d"
     t2 = N("+", N(0.5), N("*", X(0), X(1)))
     assert F.raw_formula(t2, None, Xr, ["a", "b", "c", "d"]).text() == "0.5 + a * b"
+
+
+# ── 18. The scale of the data does not decide whether the law is found ──────
+# Measured on 0.7 and on the 0.8 branch before this fix: y = s·x0²/x1 came
+# back as a constant or a wrong line, with a negative R² and no warning, for
+# s = 1e-9, 1e-19, 1e-30, 1e20, 1e30; and a column whose values were of the
+# order of 1e-19 (a charge in coulombs) was left unscaled.
+
+def test_target_scale_is_a_power_of_ten_outside_ordinary_sizes():
+    y = np.linspace(1.0, 5.0, 50)
+    assert core._target_scale(y) == 1.0
+    u = y / np.std(y)                                  # standard deviation 1
+    assert core._target_scale(1.1e-3 * u) == 1.0 and core._target_scale(900 * u) == 1.0
+    assert core._target_scale(1e-9 * y) == 1e-9
+    assert core._target_scale(1e20 * y) == 1e20
+    assert core._target_scale(np.full(10, 3e-12)) == 1e-12   # constant target
+
+
+def test_tiny_column_is_normalised():
+    X = np.c_[np.linspace(1e-19, 5e-19, 20), np.linspace(1.0, 2.0, 20),
+              np.zeros(20)]
+    sc, _ = core._choose_scaler(X, "auto", (-2.0, 2.0))
+    Xs = sc.fit_transform(X)
+    assert np.isclose(np.max(np.abs(Xs[:, 0])), 1.0)
+    assert np.all(Xs[:, 2] == 0.0)                     # a null column stays null
+
+
+@pytest.mark.parametrize("s", [1e-19, 1e20])
+def test_law_found_whatever_the_scale_of_y(s):
+    rng = np.random.RandomState(0)
+    X = np.c_[rng.uniform(1, 5, 120), rng.uniform(1, 3, 120)]
+    y = s * X[:, 0] ** 2 / X[:, 1]
+    r = symbolic_regression(X, y, generations=15, seed=0, parallel=False)
+    p = r.predict(X)
+    assert np.max(np.abs(p - y)) <= 1e-9 * np.max(np.abs(y))
+    assert r.formula_exact
+    assert r.mse_train <= 1e-18 * np.var(y)
+
+
+def test_unknown_constant_keeps_its_units_and_value_at_any_scale():
+    rng = np.random.RandomState(0)
+    x = rng.uniform(0.01, 0.10, (150, 1))
+    est = GPEliteRegressor(units=["m"], target_units="N", unknown_constant=True,
+                           generations=10, random_state=0)
+    est.fit(x, 2.5e-9 * x[:, 0])
+    assert est.constant_units_string() == "[kg / s^2]"
+    assert abs(est.constant_value_ / 2.5e-9 - 1.0) < 1e-6

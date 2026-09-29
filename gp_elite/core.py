@@ -4344,6 +4344,46 @@ def _pure_mse(node, xs, ys) -> float:
         return 1e6
 
 
+def _target_scale(y):
+    """[v0.8] Power of ten by which the target is divided during the search
+    when its spread is far from 1 (standard deviation outside [1e-3, 1e3],
+    or the largest |y| when y is constant). The engine has absolute
+    thresholds tuned for targets of ordinary size: up to 0.7, a law whose
+    values were of order 1e-9 (a capacitance in farads, an energy in joules
+    of one molecule) or 1e20 came back as a constant or a wrong line, with a
+    negative R², and no warning. The delivered model, its formula and its
+    MSEs are in the units of y; within [1e-3, 1e3] nothing changes."""
+    sd = float(np.std(y))
+    ref = sd if sd > 0 else float(np.max(np.abs(y))) if len(y) else 0.0
+    if not (ref > 0.0 and np.isfinite(ref)) or 1e-3 <= ref <= 1e3:
+        return 1.0
+    return 10.0 ** round(math.log10(ref))
+
+
+def _scale_tree(tree, s: float):
+    """[v0.8] L'arbre multiplié par s, en repliant s dans les constantes de
+    tête quand l'arbre porte déjà sa mise à l'échelle (a + b·f, ou b·f sous
+    units=), pour que la constante de tête reste lisible (et que la
+    constante déduite par unknown_constant reste la bonne)."""
+    if tree is None or s == 1.0:
+        return tree
+    const = lambda n: (n is not None and n.left is None and n.right is None
+                       and not isinstance(n.value, str))
+    t = tree.copy()
+    if t.value == "*" and const(t.left):
+        t.left = Node(float(s) * float(t.left.value))
+        return t
+    if t.value == "+" and const(t.left) and t.right is not None \
+            and t.right.value == "*" and const(t.right.left):
+        t.left = Node(float(s) * float(t.left.value))
+        t.right.left = Node(float(s) * float(t.right.left.value))
+        t.right._hash = t.right._chash = t.right._ehash = None
+        return t
+    if const(t):
+        return Node(float(s) * float(t.value))
+    return Node("*", Node(float(s)), t)
+
+
 def wrap_linear_scaling(node, xs, ys):
     """
     [v18-LS] Matérialise le scaling optimal dans l'arbre :  a + b·f(x).
@@ -8540,7 +8580,10 @@ class _ShiftFreeScaler:
 
     def fit_transform(self, X):
         m = np.max(np.abs(X), axis=0).astype(np.float64)
-        m[m < 1e-12] = 1.0
+        # [v0.8] Seule une colonne nulle garde le facteur 1. Le seuil était
+        # 1e-12 : une colonne en unités SI de l'ordre de 1e-19 (une charge
+        # en coulombs) restait alors à 1e-19 et la recherche n'en tirait rien.
+        m[~(m > 0.0)] = 1.0
         ratio = getattr(self, "group_ratio", None)
         if ratio is not None and ratio > 1.0 and m.size > 1:
             order = np.argsort(m, kind="stable")
@@ -10156,10 +10199,18 @@ def _interactive_menu():
         print()
 
         _gen_func = lambda Xm: np.zeros(Xm.shape[0])  # placeholder (override)
+        # [v0.8] Cible d'échelle extrême : la recherche voit y / 10^k, la loi
+        # affichée dans les colonnes de l'utilisateur est remise dans ses
+        # unités (voir _target_scale).
+        _y_scale = _target_scale(np.asarray(y, dtype=float))
+        if _y_scale != 1.0:
+            print(f"  Target divided by {_y_scale:g} during the search "
+                  f"(its values are far from 1); the formula below is in "
+                  f"its own units.")
         try:
             best, X_data, y_data = evolve(
                 _gen_func, cfg, problem_key="GENERIC_CSV",
-                X_override=X, y_override=y)
+                X_override=X, y_override=(y / _y_scale if _y_scale != 1.0 else y))
         except Exception as _e:
             import traceback as _tbx
             print(f"[ERROR] Evolution interrupted: {_e}")
@@ -10192,8 +10243,12 @@ def _interactive_menu():
                 except ImportError:
                     import formula as _fm
                 _Xraw = _scaler.inverse_transform(np.asarray(X_data, dtype=float))
-                _rf = _fm.raw_formula(best.node if hasattr(best, "node") else best,
-                                      _scaler, _Xraw, list(feat_names))
+                _bn = best.node if hasattr(best, "node") else best
+                _rf = _fm.raw_formula(
+                    _scale_tree(_bn, _y_scale), _scaler, _Xraw, list(feat_names),
+                    predictions=None if _y_scale == 1.0 else
+                    np.asarray(evaluate_vector(_bn, np.asarray(X_data, dtype=float)),
+                               dtype=float) * _y_scale)
                 print("\n  Formula in YOUR columns (checked on your data):")
                 print(f"    {target_name} = {_rf.text()}")
                 if not _rf.exact:
@@ -10207,7 +10262,8 @@ def _interactive_menu():
                       "was\n  dimensionally consistent by construction.")
                 if unknown_const_cli:
                     _u, _v = _deduce_console_constant(
-                        best.node if hasattr(best, "node") else best,
+                        _scale_tree(best.node if hasattr(best, "node") else best,
+                                    _y_scale),
                         feat_dims_cli, target_dim_cli, _scaler, n_feat)
                     if _u is not None:
                         from .dimensions import _fmt as _fmtdim

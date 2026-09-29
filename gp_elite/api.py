@@ -9,6 +9,7 @@ via la CLI `gp-elite` ou `python -m gp_elite`.
 from __future__ import annotations
 
 import io
+import math
 import random
 import contextlib
 from dataclasses import dataclass
@@ -41,7 +42,7 @@ except ImportError:
     import formula as _formula
 
 
-def _build_raw_formula(node, scaler, X_raw, names):
+def _build_raw_formula(node, scaler, X_raw, names, predictions=None):
     """[v0.7] Formula of `node` in the RAW variables, checked against predict.
 
     Returns (RawFormula or None, display string). None only if the scaler is
@@ -50,7 +51,8 @@ def _build_raw_formula(node, scaler, X_raw, names):
     explicitly instead of silently showing a scaled-space formula.
     """
     try:
-        rf = _formula.raw_formula(node, scaler, X_raw, names)
+        rf = _formula.raw_formula(node, scaler, X_raw, names,
+                                  predictions=predictions)
         return rf, rf.text()
     except Exception:
         with contextlib.redirect_stdout(io.StringIO()):
@@ -198,6 +200,9 @@ def _prepare_fit_data(X, y, feature_names):
     return Xa, ya, feature_names
 
 
+_target_scale = core._target_scale    # [v0.8] défini dans core (aussi pour la console)
+
+
 def _predict_inputs(X, n_features):
     """X for predict(): 2-D, with the number of columns of the fit."""
     Xn = _to_float_matrix(X, "X")
@@ -219,13 +224,18 @@ def _predict_inputs(X, n_features):
     return Xn
 
 
-def _predict_raw(node, scaler, X, n_features):
+def _predict_raw(node, scaler, X, n_features, y_scale=1.0, eval_node=None):
     """Predictions on raw inputs. A row with a missing or infinite input gets
-    NaN (it used to get 0, a plausible-looking wrong value)."""
+    NaN (it used to get 0, a plausible-looking wrong value). With a target of
+    extreme scale, the search model `eval_node` is evaluated and multiplied
+    by `y_scale` [v0.8]."""
     Xn = _predict_inputs(X, n_features)
     bad = ~np.isfinite(Xn).all(axis=1)
     Xs = scaler.transform(Xn) if scaler is not None else Xn
-    out = core.evaluate_vector(node, Xs)
+    if eval_node is not None and y_scale != 1.0:
+        out = np.asarray(core.evaluate_vector(eval_node, Xs), dtype=float) * y_scale
+    else:
+        out = core.evaluate_vector(node, Xs)
     if bad.any():
         out = np.array(out, dtype=float)
         out[bad] = np.nan
@@ -249,6 +259,12 @@ class ParetoEntry:
     scaler: object = None
     formula: object = None          # [v0.7] formula.RawFormula (variables brutes)
     n_features: Optional[int] = None   # [v0.8] colonnes attendues par predict
+    # [v0.8] cible d'échelle extrême (voir _target_scale) : `node` porte le
+    # facteur 10^k dans ses constantes ; predict évalue `eval_node` (le
+    # modèle de la recherche) puis multiplie par y_scale, hors des bornes de
+    # sécurité du moteur (qui écrêtent ses sorties à 1e12).
+    y_scale: float = 1.0
+    eval_node: object = None
 
     @property
     def formula_exact(self) -> Optional[bool]:
@@ -265,7 +281,8 @@ class ParetoEntry:
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predictions on RAW inputs (same units as the fit). A row with a
         missing or infinite input gets NaN."""
-        return _predict_raw(self.node, self.scaler, X, self.n_features)
+        return _predict_raw(self.node, self.scaler, X, self.n_features,
+                            self.y_scale, self.eval_node)
 
     def __str__(self):
         r2 = f"{self.r2_validation:.6f}" if self.r2_validation is not None else "n/a"
@@ -324,6 +341,8 @@ class SRResult:
     time_limit_reached: bool = False
     restarts_completed: int = 1
     formula: object = None          # [v0.7] formula.RawFormula (variables brutes)
+    y_scale: float = 1.0            # [v0.8] voir ParetoEntry.y_scale
+    eval_node: object = None
 
     @property
     def formula_exact(self) -> Optional[bool]:
@@ -355,7 +374,8 @@ class SRResult:
         l'utilisateur fournit des données dans leurs unités d'origine.
         """
         return _predict_raw(self.node, self.scaler, X,
-                            len(self.feature_names) if self.feature_names else None)
+                            len(self.feature_names) if self.feature_names else None,
+                            self.y_scale, self.eval_node)
 
     def diagnostics(self, X: np.ndarray, y: np.ndarray, verbose: bool = True,
                     ordered: bool = False):
@@ -550,6 +570,12 @@ def symbolic_regression(
     # repris comme noms de variables.
     X, y, feature_names = _prepare_fit_data(X, y, feature_names)
     n_feat = X.shape[1]
+    # [v0.8] Cible d'échelle extrême : la recherche voit y / 10^k (voir
+    # _target_scale) ; le modèle livré est remis dans les unités de y à la
+    # fin. Pas avec une loss personnalisée, qui reçoit y tel quel.
+    _y_scale = _target_scale(y) if loss_fn is None else 1.0
+    if _y_scale != 1.0:
+        y = y / _y_scale
 
     if seed is not None:
         random.seed(seed)
@@ -869,12 +895,29 @@ def symbolic_regression(
         var = float(np.var(val_ys))
         r2_val = (1.0 - mse_val / var) if var > 1e-15 else float("nan")
 
+    # [v0.8] Retour aux unités de y (cible d'échelle extrême, voir plus haut).
+    _best_eval = None
+    if _y_scale != 1.0:
+        _best_eval = best
+        best = core._scale_tree(best, _y_scale)
+        mse_tr = float(mse_tr) * _y_scale ** 2
+        if mse_val is not None:
+            mse_val = mse_val * _y_scale ** 2
+        for e in pareto_entries:
+            e.eval_node, e.y_scale = e.node, _y_scale
+            e.node = core._scale_tree(e.node, _y_scale)
+            e.mse_validation = float(e.mse_validation) * _y_scale ** 2
+        y = y * _y_scale
+
     # ── [v0.7] La formule LIVRÉE, en variables brutes, vérifiée ──
     # L'arbre vit dans l'espace normalisé du moteur ; l'afficher avec les noms
     # bruts donnait une formule fausse sur les données brutes (revue externe,
     # bloquant n°1). On la réécrit en variables brutes et on vérifie qu'elle
     # reproduit predict() sur les données d'entraînement.
-    raw_formula, expression = _build_raw_formula(best, scaler, X, feature_names)
+    raw_formula, expression = _build_raw_formula(
+        best, scaler, X, feature_names,
+        predictions=None if _best_eval is None else
+        _predict_raw(best, scaler, X, n_feat, _y_scale, _best_eval))
     if raw_formula is not None and not raw_formula.exact:
         # [v0.7] Jamais en silence : la formule affichee est la fonction
         # mathematique sans les garde-fous numeriques du moteur ; la ou l'un
@@ -890,7 +933,10 @@ def symbolic_regression(
             % (raw_formula.rows_off, len(y), raw_formula.max_error),
             RuntimeWarning, stacklevel=2)
     for e in pareto_entries:
-        e.formula, e.expression = _build_raw_formula(e.node, scaler, X, feature_names)
+        e.formula, e.expression = _build_raw_formula(
+            e.node, scaler, X, feature_names,
+            predictions=None if e.eval_node is None else
+            _predict_raw(e.node, scaler, X, n_feat, e.y_scale, e.eval_node))
 
     return SRResult(
         expression=expression,
@@ -906,4 +952,6 @@ def symbolic_regression(
         time_limit_reached=bool(_time_hit),
         restarts_completed=int(_restarts_done),
         formula=raw_formula,
+        y_scale=float(_y_scale),
+        eval_node=_best_eval,
     )
