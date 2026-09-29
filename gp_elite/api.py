@@ -898,13 +898,13 @@ def symbolic_regression(
     if _y_scale != 1.0:
         _best_eval = best
         best = core._scale_tree(best, _y_scale)
-        mse_tr = float(mse_tr) * _y_scale ** 2
+        mse_tr = float(mse_tr) * _y_scale * _y_scale
         if mse_val is not None:
-            mse_val = mse_val * _y_scale ** 2
+            mse_val = mse_val * _y_scale * _y_scale
         for e in pareto_entries:
             e.eval_node, e.y_scale = e.node, _y_scale
             e.node = core._scale_tree(e.node, _y_scale)
-            e.mse_validation = float(e.mse_validation) * _y_scale ** 2
+            e.mse_validation = float(e.mse_validation) * _y_scale * _y_scale
         y = y * _y_scale
 
     # ── [v0.7] La formule LIVRÉE, en variables brutes, vérifiée ──

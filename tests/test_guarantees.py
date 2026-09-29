@@ -1132,3 +1132,11 @@ def test_target_scale_does_not_overflow():
     y = np.linspace(1.0, 5.0, 50)
     assert core._target_scale(1e200 * y) == 1e200      # std(y) overflows naively
     assert core._target_scale(1e-200 * y) == 1e-200
+
+
+def test_fit_on_a_target_of_order_1e200():
+    rng = np.random.RandomState(0)
+    x = rng.uniform(1, 5, (60, 1))
+    r = symbolic_regression(x, 1e200 * x[:, 0], generations=5, seed=0, parallel=False)
+    p = r.predict(x)
+    assert np.max(np.abs(p / 1e200 - x[:, 0])) < 1e-9 and r.formula_exact

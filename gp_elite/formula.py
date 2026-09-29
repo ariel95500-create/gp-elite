@@ -772,11 +772,14 @@ def raw_formula(node, scaler, X_raw, feature_names=None, predictions=None):
     p = np.asarray(predictions, dtype=float)
     a, b = affine_maps(scaler, X_raw)
 
+    # [v0.8] échelle calculée sans débordement (prédictions de l'ordre de 1e200)
+    _pm = float(np.max(np.abs(p))) if p.size else 0.0
+    _sd = _pm * float(np.std(p / _pm)) if (_pm > 0.0 and np.isfinite(_pm)) else 0.0
+
     def _check(tree):
         pos = {}
         v = evaluate(tree, X_raw, pos)
-        scale = max(float(np.max(np.abs(p))) if p.size else 0.0,
-                    float(np.std(p)) if p.size else 0.0, 1e-300)
+        scale = max(_pm, _sd, 1e-300)
         with np.errstate(all="ignore"):
             gap = np.abs(v - p)
         off = ~np.isfinite(gap) | (gap > 1e-7 * scale)
