@@ -870,3 +870,143 @@ def test_unknown_constant_keeps_its_units_and_value_at_any_scale():
     est.fit(x, 2.5e-9 * x[:, 0])
     assert est.constant_units_string() == "[kg / s^2]"
     assert abs(est.constant_value_ / 2.5e-9 - 1.0) < 1e-6
+
+
+# ── 19. A right structure is not delivered with unfinished constants ────────
+# In the 0.8 decision bench, Feynman I.8.14 came back 5 times out of 5 as
+# sqrt((x2' - x3')² + (x1' - x0')²) on the normalised columns: the right
+# structure, but each column has its own factor 1/max|x|, so a difference of
+# two columns needs a coefficient on each term (1 - R² = 1.8e-4). The final
+# polish adds, for each finalist, a variant whose sums carry weights.
+
+def _ls_residual(tree, Xs, y):
+    p = core.evaluate_vector(tree, Xs)
+    a, b, ok = core._linear_scale_params(p, y)
+    assert ok
+    return float(np.mean((y - (a + b * p)) ** 2) / np.var(y))
+
+
+def test_weighted_sums_turn_a_right_structure_exact():
+    rng = np.random.RandomState(1006)
+    Xr = rng.uniform(1, 5, (140, 4))
+    y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2)
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    t = N("sqrt", N("+", N("sq", N("-", X(2), X(3))),
+                    N("sq", N("-", X(1), X(0)))))
+    assert _ls_residual(t, Xs, y) > 1e-6          # structure alone: not exact
+    cfg = core.Config()
+    for inner in (True, False):
+        w = core._lm_to_convergence(core._weight_sums(t, innermost_only=inner),
+                                    Xs, y, cfg)
+        assert _ls_residual(w, Xs, y) < 1e-20
+    # nothing to weight in a product, and a term with a coefficient keeps it
+    assert core._weight_sums(N("*", X(0), X(1))) is None
+    w = core._weight_sums(N("+", N("*", N(2.0), X(0)), X(1)))
+    assert core.to_string(w).count("1.0") == 1
+
+
+def test_final_polish_offers_the_exact_variant(monkeypatch):
+    rng = np.random.RandomState(1006)
+    Xr = rng.uniform(1, 5, (200, 4))
+    y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2)
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    tr, va = slice(0, 140), slice(140, 200)
+    monkeypatch.setattr(core, "_VAL_XS", Xs[va])
+    monkeypatch.setattr(core, "_VAL_YS", y[va])
+    monkeypatch.setattr(core, "_VAL_TRAIN_XS", Xs[tr])
+    monkeypatch.setattr(core, "_VAL_TRAIN_YS", y[tr])
+    monkeypatch.setattr(core, "_EXTRAP_PROBE_XS", None)
+    monkeypatch.setattr(core, "_DIM_GATE_DIMS", None)
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
+    t = N("sqrt", N("+", N("sq", N("-", X(2), X(3))),
+                    N("sq", N("-", X(1), X(0)))))
+    t = core.wrap_linear_scaling(t, Xs[tr], y[tr])     # finalists carry a + b·f
+    core._track_val_candidate(t)
+    cfg = core.Config()
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    best = min(core._VAL_CANDS, key=lambda c: c[0])
+    assert best[0] < 1e-20 * np.var(y)
+    cfg.FINAL_POLISH = False                           # no weighted variant
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    core._track_val_candidate(t)
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    assert min(c[0] for c in core._VAL_CANDS) > 1e-8 * np.var(y)
+
+
+def test_polished_model_keeps_its_own_scale_and_offset(monkeypatch):
+    """Levenberg-Marquardt in variable projection fits a' + b'·tree. On a
+    tree that already carries its scaling a + b·f, the fitted constants
+    used to come back with the old a and b: on y = 3 sin(2x) + 1 the raw
+    MSE went from 0.39 to 271 (the scaled form: 2e-31). The scale and
+    offset are now refitted into the tree's own constants."""
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
+    x = np.linspace(0.1, 3, 80).reshape(-1, 1)
+    y = 3 * np.sin(2.0 * x[:, 0]) + 1
+    w = core.wrap_linear_scaling(N("sin", N("*", N(1.8), X(0))), x, y)
+    p = core._refit_scaling(core.optimize_constants_adam(w.copy(), x, y,
+                                                         core.Config()), x, y)
+    assert np.mean((core.evaluate_vector(p, x) - y) ** 2) < 1e-20
+    assert core.tree_size(p) == core.tree_size(w)
+
+
+def test_small_data_model_is_its_own_best_rescaling():
+    """Under 30 points there is no hold-out, and the champion polished at
+    the end of the fit was delivered as is: its prediction has to be its own
+    best linear rescaling, or its scale and offset are stale."""
+    rng = np.random.RandomState(3)
+    x = rng.uniform(0.1, 3, (25, 1))
+    y = 3 * np.sin(2.0 * x[:, 0]) + 1
+    r = symbolic_regression(x, y, operators="trig", generations=15, seed=0,
+                            parallel=False)
+    p = r.predict(x)
+    a, b, ok = core._linear_scale_params(p, y)
+    assert ok and abs(b - 1.0) < 1e-6 and abs(a) < 1e-6 * np.std(y)
+
+
+def test_polish_reaches_the_small_candidates_the_selection_will_choose(monkeypatch):
+    """The eight best candidates on the hold-out can all be large trees; the
+    parsimony rule then delivers a smaller one of the tolerance band, which
+    must be among the polished finalists (I.8.14: 14 nodes, never polished)."""
+    y = np.linspace(0.0, 1.0, 30)
+    monkeypatch.setattr(core, "_VAL_YS", y)
+    big = [(1e-5 + 1e-7 * i, 1e-6, 50 + i, N("+", X(0), N(float(i)))) for i in range(10)]
+    small = (1e-4, 1e-5, 7, N("*", X(0), X(1)))
+    monkeypatch.setattr(core, "_VAL_CANDS", big + [small])
+    cfg = core.Config()
+    assert any(t[3] is small[3] for t in core._finalists(cfg))
+    cfg.FINAL_POLISH = False
+    assert not any(t[3] is small[3] for t in core._finalists(cfg))
+
+
+def test_polish_never_replaces_an_approximation_by_another(monkeypatch):
+    """A polished variant enters the final selection only if it reproduces the
+    hold-out to numerical precision: on data that no law fits exactly, the
+    polish leaves the candidate pool as it was."""
+    rng = np.random.RandomState(7)
+    Xr = rng.uniform(1, 5, (200, 4))
+    y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2) \
+        + 0.05 * rng.randn(200)                        # measured: noisy
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    tr, va = slice(0, 140), slice(140, 200)
+    monkeypatch.setattr(core, "_VAL_XS", Xs[va])
+    monkeypatch.setattr(core, "_VAL_YS", y[va])
+    monkeypatch.setattr(core, "_VAL_TRAIN_XS", Xs[tr])
+    monkeypatch.setattr(core, "_VAL_TRAIN_YS", y[tr])
+    monkeypatch.setattr(core, "_EXTRAP_PROBE_XS", None)
+    monkeypatch.setattr(core, "_DIM_GATE_DIMS", None)
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
+    t = N("sqrt", N("+", N("sq", N("-", X(2), X(3))),
+                    N("sq", N("-", X(1), X(0)))))
+    t = core.wrap_linear_scaling(t, Xs[tr], y[tr])
+    core._track_val_candidate(t)
+    cfg = core.Config()
+    cfg.FINAL_POLISH = False
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    without = sorted(round(c[0], 12) for c in core._VAL_CANDS)
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    core._track_val_candidate(t)
+    cfg.FINAL_POLISH = True
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    assert sorted(round(c[0], 12) for c in core._VAL_CANDS) == without

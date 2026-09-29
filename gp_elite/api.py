@@ -778,9 +778,7 @@ def symbolic_regression(
             pool = sorted(merged.values(), key=lambda t: (t[0], t[2]))[:core._VAL_CANDS_MAX]
             core._VAL_CANDS[:] = [t for t in pool]
             with sink:
-                for (_m, _se, _sz, _nd) in pool[:8]:
-                    _pol = core.optimize_constants_adam(_nd.copy(), X_full, y_full, cfg)
-                    core._track_val_candidate(_pol)
+                core._polish_finalists(core._finalists(cfg), X_full, y_full, cfg)   # [v0.8]
                 _sel, _sel_val = core._select_one_se(best, champ_val)
                 if _sel is not None:
                     if (core._EXTRAP_PROBE_XS is not None
