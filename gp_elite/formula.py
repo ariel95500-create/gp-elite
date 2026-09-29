@@ -384,12 +384,20 @@ _NOISE_REL = 1e-12
 
 
 def drop_noise_constants(tree, X):
-    """Remove from every sum a constant term that is only rounding noise, at
-    most 1e-12 of the largest value the sum takes on the data: an exact law
-    printed ``8.88178e-16 + v1 * v2 / v3`` reads ``v1 * v2 / v3``.  [v0.8]
-    The function changes by less than 1e-12 of its own scale; raw_formula
-    keeps the result only if it still passes the fit-time check."""
+    """Remove from every sum a term that is only rounding noise: at most
+    1e-12 of the largest value the sum takes on the data. An exact law
+    printed ``8.88178e-16 + v1 * v2 / v3``, or with a term
+    ``1.50921e-16 * a`` beside ``3 * sqrt(a)``, reads without it.  [v0.8]
+    The function changes by less than 1e-12 of its own scale per term;
+    raw_formula keeps the result only if it still passes the fit-time check."""
     X = np.asarray(X, dtype=float)
+
+    def term_size(c, t):
+        if t is None:
+            return abs(c)
+        with np.errstate(all="ignore"):
+            v = evaluate(t, X)
+        return abs(c) * float(np.max(np.abs(v))) if v.size else 0.0
 
     def rec(nd, in_sum=False):
         if nd is None:
@@ -399,19 +407,62 @@ def drop_noise_constants(tree, X):
         is_sum = nd.value in ("+", "-") and nd.right is not None
         if is_sum and not in_sum:
             terms = _flatten_sum(nd, 1.0, [])
-            consts = [c for c, t in terms if t is None]
-            rest = [(c, t) for c, t in terms if t is not None]
-            if consts and rest:
+            if len(terms) > 1:
                 with np.errstate(all="ignore"):
                     vals = evaluate(nd, X)
                 if vals.size and np.all(np.isfinite(vals)):
                     m = float(np.max(np.abs(vals)))
-                    if m > 0.0 and abs(sum(consts)) <= _NOISE_REL * m:
-                        return _rebuild_sum([(c, rec(t)) for c, t in rest])
+                    keep = [(c, t) for c, t in terms
+                            if not (m > 0.0 and term_size(c, t) <= _NOISE_REL * m)]
+                    if keep and len(keep) < len(terms):
+                        return _rebuild_sum([(c, rec(t)) for c, t in keep])
         return Node(nd.value, rec(nd.left, is_sum),
                     rec(nd.right, is_sum) if nd.right is not None else None)
 
     return rec(tree)
+
+
+def unit_powers(tree, X):
+    """u^1 -> u, and u^0 -> 1 where u > 0 on every row (the engine's u^0 is
+    sign(u)).  [v0.8] The search can leave such factors (``sqrt(a)^0``);
+    raw_formula folds the constants again afterwards and keeps the result
+    only if it passes the fit-time check."""
+    X = np.asarray(X, dtype=float)
+
+    def rec(nd):
+        if nd is None:
+            return None
+        if nd.left is None and nd.right is None:
+            return Node(nd.value)
+        l = rec(nd.left)
+        r = rec(nd.right) if nd.right is not None else None
+        if nd.value == "pow" and r is not None and r.left is None \
+                and r.right is None and _is_num(r.value):
+            p = float(r.value)
+            if p == 1.0:
+                return l
+            if p == 0.0:
+                with np.errstate(all="ignore"):
+                    u = evaluate(l, X)
+                if u.size and np.all(u > 0):
+                    return Node(1.0)
+        return Node(nd.value, l, r)
+
+    return rec(tree)
+
+
+def tidy_on_data(tree, X):
+    """[v0.8] unit_powers, constant folding again, then drop_noise_constants."""
+    t = unit_powers(tree, X)
+    n = np.asarray(X).shape[1] if np.asarray(X).ndim == 2 else 1
+    one, zero = np.ones(n), np.zeros(n)
+    for _ in range(3):
+        c, f = _fold(t, one, zero)
+        again = _tidy(_mat(c, f))
+        if to_sympy_string(again) == to_sympy_string(t):
+            break
+        t = again
+    return drop_noise_constants(t, X)
 
 
 def substitute_only(node, a, b):
@@ -794,7 +845,7 @@ def raw_formula(node, scaler, X_raw, feature_names=None, predictions=None):
         tree = to_raw_tree(node, a, b)
         pos, ok, err, n_off = _check(tree)
         if ok:                                       # [v0.8] rounding-noise terms
-            clean = drop_noise_constants(tree, X_raw)
+            clean = tidy_on_data(tree, X_raw)
             pos_c, ok_c, err_c, n_off_c = _check(clean)
             if ok_c:
                 tree, pos, err, n_off = clean, pos_c, err_c, n_off_c

@@ -7379,6 +7379,12 @@ def _track_val_candidate(cand):
 
 _FINAL_LM_ITER = 100          # itérations de LM pour les finalistes
 _WEIGHTED_SUMS_MAX = 6        # au-delà de 6 sommes, pas de variante pondérée
+# [v0.8] Avec time_limit=, les variantes du polissage (convergence, sommes
+# pondérées) cessent une seconde après l'échéance : sur 3 000 lignes elles
+# prenaient près de deux secondes, que time_limit_check.py voyait dépasser
+# l'échéance (18,5 s pour 15 s). La correction d'échelle, elle, est toujours
+# faite. Sans échéance, rien ne change.
+_POLISH_GRACE_S = 1.0
 
 
 def _has_scale(t) -> bool:
@@ -7554,12 +7560,16 @@ def _polish_finalists(top, xs, ys, cfg) -> None:
     Le premier candidat de chaque finaliste est celui de la 0.7 (constantes
     ajustées par optimize_constants_adam, donc LM à 20 itérations), recalé
     par _refit_scaling."""
+    _dl = getattr(cfg, "DEADLINE", None)
+    _stop = None if _dl is None else max(time.time(), float(_dl)) + _POLISH_GRACE_S
     for _m, _se, _sz, nd in top:
         pol = _refit_scaling(optimize_constants_adam(nd.copy(), xs, ys, cfg),
                              xs, ys)
         _track_val_candidate(pol)
         if not bool(getattr(cfg, "FINAL_POLISH", True)) or _CUSTOM_LOSS_FN is not None:
             continue
+        if _stop is not None and time.time() > _stop:
+            continue                            # budget de temps épuisé
         try:
             conv = _lm_to_convergence(pol, xs, ys, cfg)
             if conv is not None:

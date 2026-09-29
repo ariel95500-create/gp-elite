@@ -1140,3 +1140,51 @@ def test_fit_on_a_target_of_order_1e200():
     r = symbolic_regression(x, 1e200 * x[:, 0], generations=5, seed=0, parallel=False)
     p = r.predict(x)
     assert np.max(np.abs(p / 1e200 - x[:, 0])) < 1e-9 and r.formula_exact
+
+
+def test_printed_formula_drops_unit_powers_and_noise_terms():
+    """The README usage example came back as the exact law written
+    -6.84895 + 6.68223 * (0.448952 * sqrt(a) - (1.50921e-16 * a - 1.32425
+    + 0.0748253 * b) * sqrt(a)^0): u^0 with u > 0 is 1, and a term of 1e-16
+    relative size is rounding noise. It now prints 2 + 3 * sqrt(a) - 0.5 * b."""
+    from gp_elite import formula as F
+    rng = np.random.RandomState(0)
+    Xr = rng.uniform(1, 5, (60, 2))
+    inner = N("-", N("*", N(0.448952), N("sqrt", X(0))),
+              N("*", N("+", N("-", N("*", N(1.50921e-16), X(0)), N(1.32425)),
+                       N("*", N(0.0748253), X(1))),
+                N("pow", N("sqrt", X(0)), N(0.0))))
+    t = N("+", N(-6.84895), N("*", N(6.68223), inner))
+    f = F.raw_formula(t, None, Xr, ["a", "b"])
+    assert f.exact
+    assert "^0" not in f.text() and "e-16" not in f.text()
+    assert f.text().count("sqrt(a)") == 1
+
+
+def test_polish_extras_stop_after_the_time_budget(monkeypatch):
+    rng = np.random.RandomState(1006)
+    Xr = rng.uniform(1, 5, (200, 4))
+    y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2)
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    tr, va = slice(0, 140), slice(140, 200)
+    for name, val in (("_VAL_XS", Xs[va]), ("_VAL_YS", y[va]),
+                      ("_VAL_TRAIN_XS", Xs[tr]), ("_VAL_TRAIN_YS", y[tr]),
+                      ("_EXTRAP_PROBE_XS", None), ("_DIM_GATE_DIMS", None),
+                      ("_LS_SCALE_ONLY", False), ("_CUSTOM_LOSS_FN", None),
+                      ("_USE_LINEAR_SCALING", True)):
+        monkeypatch.setattr(core, name, val)
+    t = core.wrap_linear_scaling(N("sqrt", N("+", N("sq", N("-", X(2), X(3))),
+                                             N("sq", N("-", X(1), X(0))))),
+                                 Xs[tr], y[tr])
+    cfg = core.Config()
+    cfg.DEADLINE = time.time() - 100.0          # the budget is long gone
+    monkeypatch.setattr(core, "_POLISH_GRACE_S", -1e9)
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    core._track_val_candidate(t)
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    assert min(c[0] for c in core._VAL_CANDS) > 1e-8 * np.var(y)   # no extra
+    cfg.DEADLINE = None                         # no budget: the polish runs
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    core._track_val_candidate(t)
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    assert min(c[0] for c in core._VAL_CANDS) < 1e-20 * np.var(y)
