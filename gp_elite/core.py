@@ -2939,6 +2939,213 @@ _PARAMETRIC_CACHE: Dict[int, Any] = {}
 _PARAMETRIC_CACHE_MAX = 2048
 
 
+# ============================================================
+# [v0.8] ÉVALUATION INCRÉMENTALE POUR LEVENBERG-MARQUARDT
+# ============================================================
+# La jacobienne par différences avant réévaluait l'arbre ENTIER pour chaque
+# constante perturbée, alors qu'une constante ne change que les nœuds situés
+# sur le chemin de sa feuille à la racine. On compile donc, par forme d'arbre,
+# une évaluation « en ligne droite » qui garde la valeur de chaque nœud, et
+# pour chaque constante la liste des opérations du chemin feuille -> racine.
+# Chaque colonne ne recalcule que ce chemin, les autres nœuds reprenant leur
+# valeur au point courant. Les opérations et leurs opérandes sont exactement
+# ceux de l'expression compilée (_to_np_code_parametric) : le résultat est le
+# même bit pour bit (vérifié par tests/test_speed_equivalence.py), pour 3 à
+# 5 fois moins de calcul sur la jacobienne.
+
+_LM_UNARY_FN = {
+    "sin":  np.sin, "cos": np.cos, "tan": _np_safe_tan, "tanh": np.tanh,
+    "exp":  _np_safe_exp, "log": _np_safe_log, "sqrt": _np_safe_sqrt,
+    "abs":  np.abs, "is_even": _np_is_even, "step": _np_step,
+}
+_LM_UNARY_SRC = {
+    "sin": "np.sin", "cos": "np.cos", "tan": "_safe_tan", "tanh": "np.tanh",
+    "exp": "_safe_exp", "log": "_safe_log", "sqrt": "_safe_sqrt",
+    "abs": "np.abs", "is_even": "_is_even", "step": "_step",
+}
+_LM_BINARY_SRC = {"/": "_safe_div", "max2": "_max2", "min2": "_min2"}
+_LM_BINARY_FN = {"/": _np_safe_div, "max2": _np_max2, "min2": _np_min2}
+
+
+def _lm_apply(op, a, b):
+    """Une opération binaire telle que l'écrit _to_np_code_parametric."""
+    if op == "+":
+        return a + b
+    if op == "-":
+        return a - b
+    if op == "*":
+        return a * b
+    return op(a, b)          # fonction protégée (_safe_div, _safe_pow, ...)
+
+
+class _LMPlan:
+    """Plan d'évaluation d'une FORME d'arbre (constantes -> _c[j])."""
+    __slots__ = ("full", "cols", "n_consts", "n_values")
+
+
+_LM_PLAN_CACHE: Dict[Any, _LMPlan] = {}
+_LM_PLAN_CACHE_MAX = 2048
+
+
+def _lm_build_plan(node, consts) -> Optional[_LMPlan]:
+    """Construit le plan d'une forme d'arbre, ou None si elle n'est pas
+    compilable (on retombe alors sur l'évaluation complète)."""
+    const_idx = {id(c): i for i, c in enumerate(consts)}
+    lines = []          # code source en ligne droite
+    info = []           # par indice de valeur : (op, [indices enfants], pow_fn)
+    leaf_of_const = {}  # indice de constante -> indice de valeur de sa feuille
+    parent = {}         # indice de valeur -> (indice parent, côté)
+
+    # Parcours post-ordre ITÉRATIF qui reproduit _code() de
+    # _to_np_code_parametric : mêmes enfants visités, mêmes expressions.
+    stack = [(node, False)]
+    out_idx = []        # pile des indices produits
+    while stack:
+        n, done = stack.pop()
+        if not done:
+            if n is None:
+                k = len(info); info.append(("lit", [], None))
+                lines.append(f"    v{k} = 0.0")
+                out_idx.append(k)
+                continue
+            v = n.value
+            if v == "x":
+                k = len(info); info.append(("leaf", [], None))
+                lines.append(f"    v{k} = _x")
+                out_idx.append(k)
+                continue
+            if isinstance(v, str) and v.startswith("X[") and v.endswith("]"):
+                k = len(info)
+                try:
+                    lines.append(f"    v{k} = _x[:, {int(v[2:-1])}]")
+                    info.append(("leaf", [], None))
+                except ValueError:
+                    lines.append(f"    v{k} = 0.0")
+                    info.append(("lit", [], None))
+                out_idx.append(k)
+                continue
+            if isinstance(v, float):
+                j = const_idx.get(id(n))
+                if j is None:
+                    return None
+                k = len(info); info.append(("const", [], None))
+                lines.append(f"    v{k} = _c[{j}]")
+                leaf_of_const[j] = k
+                out_idx.append(k)
+                continue
+            if v in ("+", "-", "*", "/", "pow", "max2", "min2"):
+                stack.append((n, True))
+                stack.append((n.right, False))
+                stack.append((n.left, False))
+                continue
+            if v in _LM_UNARY_SRC or v in ("neg", "sq", "cube"):
+                stack.append((n, True))
+                stack.append((n.left, False))
+                continue
+            # opérateur inconnu : l'expression compilée écrit 0.0 sans
+            # évaluer les enfants
+            k = len(info); info.append(("lit", [], None))
+            lines.append(f"    v{k} = 0.0")
+            out_idx.append(k)
+            continue
+        v = n.value
+        k = len(info)
+        if v in ("+", "-", "*", "/", "pow", "max2", "min2"):
+            b = out_idx.pop(); a = out_idx.pop()
+            if v in ("+", "-", "*"):
+                lines.append(f"    v{k} = (v{a} {v} v{b})")
+                info.append((v, [a, b], None))
+            elif v == "pow":
+                fname = "_safe_pow" if _is_const_subtree(n.right) else "_safe_powv"
+                lines.append(f"    v{k} = {fname}(v{a}, v{b})")
+                info.append((_NP_GLOBALS[fname], [a, b], None))
+            else:
+                lines.append(f"    v{k} = {_LM_BINARY_SRC[v]}(v{a}, v{b})")
+                info.append((_LM_BINARY_FN[v], [a, b], None))
+            parent[a] = (k, 0)
+            parent[b] = (k, 1)
+        else:
+            a = out_idx.pop()
+            if v == "neg":
+                lines.append(f"    v{k} = (-v{a})")
+            elif v == "sq":
+                lines.append(f"    v{k} = (v{a} ** 2)")
+            elif v == "cube":
+                lines.append(f"    v{k} = (v{a} ** 3)")
+            else:
+                lines.append(f"    v{k} = {_LM_UNARY_SRC[v]}(v{a})")
+            info.append((v, [a], None))
+            parent[a] = (k, 0)
+        out_idx.append(k)
+
+    root = out_idx.pop()
+    names = ", ".join(f"v{k}" for k in range(len(info)))
+    src = ("def _full(_x, _c):\n" + "\n".join(lines) +
+           f"\n    return v{root}, ({names},)\n")
+    globs = dict(_NP_GLOBALS)
+    try:
+        exec(src, globs)
+    except Exception:
+        return None
+
+    cols = []
+    for j in range(len(consts)):
+        k = leaf_of_const.get(j)
+        if k is None:
+            cols.append(None)            # constante sans effet sur la sortie
+            continue
+        steps = []
+        while k in parent:
+            pk, side = parent[k]
+            op, ch, _ = info[pk]
+            if len(ch) == 2:
+                steps.append((op, side, ch[1 - side]))
+            else:
+                steps.append((op, -1, -1))
+            k = pk
+        cols.append((leaf_of_const[j], tuple(steps)))
+    plan = _LMPlan()
+    plan.full = globs["_full"]
+    plan.cols = cols
+    plan.n_consts = len(consts)
+    plan.n_values = len(info)
+    return plan
+
+
+def _lm_plan(node, consts) -> Optional[_LMPlan]:
+    key = (node.canonical_hash(), len(consts))
+    plan = _LM_PLAN_CACHE.get(key)
+    if plan is None and key not in _LM_PLAN_CACHE:
+        plan = _lm_build_plan(node, consts)
+        _LM_PLAN_CACHE[key] = plan
+        if len(_LM_PLAN_CACHE) > _LM_PLAN_CACHE_MAX:
+            for old_key in list(_LM_PLAN_CACHE.keys())[:256]:
+                del _LM_PLAN_CACHE[old_key]
+    return plan
+
+
+def _lm_column(plan, j, cv, values):
+    """Valeur de la racine quand seule la constante j vaut cv[j] (les
+    autres nœuds gardent `values`, calculées au point courant)."""
+    col = plan.cols[j]
+    t = cv[j]
+    for op, side, sib in col[1]:
+        if side < 0:                         # unaire
+            if op == "neg":
+                t = -t
+            elif op == "sq":
+                t = t ** 2
+            elif op == "cube":
+                t = t ** 3
+            else:
+                t = _LM_UNARY_FN[op](t)
+        elif side == 0:
+            t = _lm_apply(op, t, values[sib])
+        else:
+            t = _lm_apply(op, values[sib], t)
+    return t
+
+
 def compile_parametric(node) -> Tuple[Any, list]:
     """
     Compile f(_x, _c) où _c est un array numpy des constantes.
@@ -4403,24 +4610,16 @@ def optimize_constants_lm(node: Node,
     Coût/itération : (n_consts+1) évaluations vectorisées (Jacobienne par
     différences avant) + résolution d'un système n_consts×n_consts.
     Déterministe (aucun redémarrage bruité) → runs reproductibles.
+    [v0.8] Jacobienne incrémentale (_lm_plan) : chaque colonne ne recalcule
+    que le chemin de la constante à la racine. Mêmes valeurs bit pour bit.
     """
     child = node.copy()
-    fn, consts = compile_parametric(child)
-    if not consts or fn is None:
-        return child
-
-    nC = len(consts)
     y  = np.asarray(ys, dtype=float)
-    c  = np.array([cn.value for cn in consts], dtype=float)
-    lo_b = float(cfg.ERC_MIN) * 3.0
-    hi_b = float(cfg.ERC_MAX) * 3.0
     _LM_NUM_CLIP = 1e150   # [v0.4] borne anti-overflow : au-dela, r@r ou J.T@J
                            # depassent float64. sq/cube/* ne sont pas bornes par
                            # _SAFE_LIMIT et peuvent sortir ~1e217.
 
-    def _resid(cv):
-        with np.errstate(all='ignore'):
-            p = fn(xs, cv)
+    def _resid_p(p):
         p = np.asarray(p, dtype=float)
         if p.ndim == 0:
             p = np.full_like(y, float(p))
@@ -4429,10 +4628,48 @@ def optimize_constants_lm(node: Node,
             p = np.where(bad, 0.0, p)
             r = p - y
             r[bad] = 1e6          # zone invalide : fortement pénalisée
-            return np.clip(r, -_LM_NUM_CLIP, _LM_NUM_CLIP)
-        return np.clip(p - y, -_LM_NUM_CLIP, _LM_NUM_CLIP)
+            return _np_minimum(_np_maximum(r, -_LM_NUM_CLIP), _LM_NUM_CLIP)
+        return _np_minimum(_np_maximum(p - y, -_LM_NUM_CLIP), _LM_NUM_CLIP)
 
-    r = _resid(c)
+    # [v0.8] plan incrémental quand il est disponible ; sinon, évaluation
+    # complète comme en 0.7 (arbres très profonds, très gros volumes).
+    consts = _collect_constants_ordered(child)
+    plan = None
+    if consts and tree_depth(child) <= 90:
+        plan = _lm_plan(child, consts)
+        if plan is not None and plan.n_values * max(len(y), 1) > 20_000_000:
+            plan = None
+    if plan is not None:
+        def _eval(cv):
+            with np.errstate(all='ignore'):
+                p, vals = plan.full(xs, cv)
+            return _resid_p(p), vals
+
+        def _column(i, cv, r0, vals):
+            if plan.cols[i] is None:          # constante sans effet
+                return r0
+            with np.errstate(all='ignore'):
+                p = _lm_column(plan, i, cv, vals)
+            return _resid_p(p)
+    else:
+        fn, consts = compile_parametric(child)
+        if not consts or fn is None:
+            return child
+
+        def _eval(cv):
+            with np.errstate(all='ignore'):
+                p = fn(xs, cv)
+            return _resid_p(p), None
+
+        def _column(i, cv, r0, vals):
+            return _eval(cv)[0]
+
+    nC = len(consts)
+    c  = np.array([cn.value for cn in consts], dtype=float)
+    lo_b = float(cfg.ERC_MIN) * 3.0
+    hi_b = float(cfg.ERC_MAX) * 3.0
+
+    r, vals = _eval(c)
     sse_best = float(r @ r)
     c_best = c.copy()
     lam = 1e-3
@@ -4443,7 +4680,7 @@ def optimize_constants_lm(node: Node,
         for i in range(nC):
             h = 1e-6 * (1.0 + abs(c[i]))
             cp = c.copy(); cp[i] += h
-            J[:, i] = (_resid(cp) - r) / h
+            J[:, i] = (_column(i, cp, r, vals) - r) / h
         # [v0.4] jacobienne assainie : sans cela J.T @ J deborde float64
         J = np.nan_to_num(J, nan=0.0,
                           posinf=_LM_NUM_CLIP, neginf=-_LM_NUM_CLIP)
@@ -4460,11 +4697,12 @@ def optimize_constants_lm(node: Node,
             except np.linalg.LinAlgError:
                 lam *= 10.0; continue
             c_new = np.clip(c + delta, lo_b, hi_b)
-            r_new = _resid(c_new)
+            r_new, vals_new = _eval(c_new)
             sse_new = float(r_new @ r_new)
             if np.isfinite(sse_new) and sse_new < sse_best:
                 rel = (sse_best - sse_new) / max(sse_best, 1e-300)
                 c, r, sse_best = c_new, r_new, sse_new
+                vals = vals_new
                 c_best = c.copy()
                 lam = max(lam / 3.0, 1e-12)
                 stepped = True

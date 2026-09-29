@@ -268,3 +268,73 @@ def test_memories_never_carry_a_sampling_table_across_processes():
     lib.evaporate()
     cog.evaporate()
     assert lib._sampling is None and cog._sampling is None
+
+
+# ------------------------------------------------ incremental LM jacobian
+
+_BIN = ["+", "-", "*", "/", "pow", "max2", "min2"]
+_UN = ["sin", "cos", "tan", "tanh", "exp", "log", "sqrt", "abs", "neg", "sq",
+       "cube", "step"]
+
+
+def _rand_tree(rng, d, nvar):
+    if d == 0 or rng.random() < 0.3:
+        u = rng.random()
+        if u < 0.45:
+            return core.Node(rng.uniform(-3, 3))
+        if u < 0.5:
+            return core.Node(float(rng.choice([0.0, 1.0, -1.0, 2.0, -0.5, 1e-9])))
+        return core.Node("X[%d]" % rng.randrange(nvar))
+    if rng.random() < 0.6:
+        return core.Node(rng.choice(_BIN), _rand_tree(rng, d - 1, nvar),
+                         _rand_tree(rng, d - 1, nvar))
+    return core.Node(rng.choice(_UN), _rand_tree(rng, d - 1, nvar))
+
+
+def test_incremental_lm_plan_matches_compiled_function():
+    """Full evaluation and every jacobian column of the incremental plan
+    equal the compiled parametric function evaluated at the perturbed
+    constants, bit for bit, on every operator."""
+    import random as pyrandom
+    rng = pyrandom.Random(0)
+    X = np.random.RandomState(0).uniform(-3, 3, (40, 3))
+    X[5] = 0.0
+    n_cols = 0
+    for _ in range(700):
+        tree = _rand_tree(rng, rng.randint(1, 6), 3)
+        consts = core._collect_constants_ordered(tree)
+        if not consts:
+            continue
+        fn, _ = core.compile_parametric(tree)
+        plan = core._lm_build_plan(tree, consts)
+        assert fn is not None and plan is not None
+        c = np.array([cn.value for cn in consts])
+        with np.errstate(all="ignore"):
+            base, vals = plan.full(X, c)
+            assert _same(base, fn(X, c))
+            for j in range(len(consts)):
+                cp = c.copy()
+                cp[j] += 1e-6 * (1 + abs(c[j]))
+                got = base if plan.cols[j] is None else core._lm_column(plan, j, cp, vals)
+                assert _same(got, fn(X, cp)), (core.to_string(tree), j)
+                n_cols += 1
+    assert n_cols > 800
+
+
+def test_levenberg_marquardt_returns_the_same_constants(monkeypatch):
+    """optimize_constants_lm with the incremental jacobian and with the 0.7
+    full re-evaluation return the same tree, constant for constant."""
+    import random as pyrandom
+    rng = pyrandom.Random(1)
+    nr = np.random.RandomState(1)
+    X = nr.uniform(0.5, 3, (50, 3))
+    y = X[:, 0] * np.sin(X[:, 1]) + 0.3 * X[:, 2] ** 2
+    cfg = core.Config()
+    trees = [_rand_tree(rng, rng.randint(2, 5), 3) for _ in range(60)]
+    fast = [core.optimize_constants_lm(t, X, y, cfg) for t in trees]
+    monkeypatch.setattr(core, "_lm_plan", lambda node, consts: None)
+    slow = [core.optimize_constants_lm(t, X, y, cfg) for t in trees]
+    for a, b in zip(fast, slow):
+        assert core.to_string(a) == core.to_string(b)
+        assert [float(n.value).hex() for n in core._collect_constants_ordered(a)] == \
+               [float(n.value).hex() for n in core._collect_constants_ordered(b)]
