@@ -7256,6 +7256,43 @@ def _refit_scaling(tree, xs, ys):
         return tree
 
 
+def _finalists(cfg, k: int = 8) -> list:
+    """Les candidats à polir : les k meilleurs sur le hold-out (0.7), et,
+    avec le polissage, les k plus petits de la bande de tolérance où la
+    sélection finale choisira. [v0.8] Sans ces derniers, la structure juste
+    de I.8.14 (14 nœuds, 1 - R² = 1,8e-4) n'était jamais polie : les huit
+    meilleurs sur le hold-out étaient des arbres de 48 à 68 nœuds, et la
+    règle de parcimonie livrait ensuite le 14 nœuds tel quel."""
+    ranked = sorted(_VAL_CANDS, key=lambda t: (t[0], t[2]))
+    top = ranked[:k]
+    if not ranked or not bool(getattr(cfg, "FINAL_POLISH", True)):
+        return top
+    var_val = float(np.var(_VAL_YS)) if (_VAL_YS is not None and len(_VAL_YS) > 1) else 0.0
+    tol_r2 = float(globals().get("VAL_R2_TOLERANCE", 0.003))
+    best_mse, best_se = ranked[0][0], ranked[0][1]
+    band = tol_r2 * var_val if var_val > 1e-15 else best_mse * 0.20
+    thr = best_mse + max(best_se, band)
+    seen = set()
+    for t in top:
+        try:
+            seen.add(t[3].exact_hash())
+        except Exception:
+            pass
+    small = []
+    for t in sorted((t for t in ranked if t[0] <= thr), key=lambda t: (t[2], t[0])):
+        try:
+            h = t[3].exact_hash()
+        except Exception:
+            continue
+        if h in seen:
+            continue
+        seen.add(h)
+        small.append(t)
+        if len(small) >= k:
+            break
+    return top + small
+
+
 def _polish_finalists(top, xs, ys, cfg) -> None:
     """Polissage des finalistes avant la sélection finale (voir plus haut).
     Le premier candidat de chaque finaliste est celui de la 0.7 (constantes
@@ -8189,8 +8226,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # forme simple et EXACTE peut perdre contre un gros arbre simplement
         # parce que ses constantes n'étaient pas encore ajustées. Coût : ~ms.
         try:
-            _top = sorted(_VAL_CANDS, key=lambda t: (t[0], t[2]))[:8]
-            _polish_finalists(_top, xs, ys, cfg)     # [v0.8] voir sa définition
+            _polish_finalists(_finalists(cfg), xs, ys, cfg)   # [v0.8] voir leurs définitions
         except Exception:
             pass
         _champ_val = _holdout_mse(global_best, xs, ys)

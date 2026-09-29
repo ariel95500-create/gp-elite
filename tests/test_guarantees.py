@@ -837,3 +837,18 @@ def test_small_data_model_is_its_own_best_rescaling():
     p = r.predict(x)
     a, b, ok = core._linear_scale_params(p, y)
     assert ok and abs(b - 1.0) < 1e-6 and abs(a) < 1e-6 * np.std(y)
+
+
+def test_polish_reaches_the_small_candidates_the_selection_will_choose(monkeypatch):
+    """The eight best candidates on the hold-out can all be large trees; the
+    parsimony rule then delivers a smaller one of the tolerance band, which
+    must be among the polished finalists (I.8.14: 14 nodes, never polished)."""
+    y = np.linspace(0.0, 1.0, 30)
+    monkeypatch.setattr(core, "_VAL_YS", y)
+    big = [(1e-5 + 1e-7 * i, 1e-6, 50 + i, N("+", X(0), N(float(i)))) for i in range(10)]
+    small = (1e-4, 1e-5, 7, N("*", X(0), X(1)))
+    monkeypatch.setattr(core, "_VAL_CANDS", big + [small])
+    cfg = core.Config()
+    assert any(t[3] is small[3] for t in core._finalists(cfg))
+    cfg.FINAL_POLISH = False
+    assert not any(t[3] is small[3] for t in core._finalists(cfg))
