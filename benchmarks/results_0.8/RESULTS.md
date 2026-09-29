@@ -184,3 +184,32 @@ against 13): variants of the polish win the final selection on the hold-out
 and extrapolate worse (547_no2, out of domain, seed 1: R² 0.362 with C5a,
 -0.359 with C5). The polish as measured is not kept; campaign 5b tests a
 restriction of it that removes this mechanism.
+
+## Corrections made outside the campaigns
+
+These change what a fit returns only on data that none of the campaign
+problems contain, where the engine failed; they are measured on that data.
+
+**The scale of the data.** On 0.7.0 and on the 0.8 branch until this
+correction, y = s·x0²/x1 came back as a constant or a wrong straight line,
+with a negative R² on the training points and no warning, for target scales
+s = 1e-9, 1e-19, 1e-30, 1e20 and 1e30; a column whose values were of the order
+of 1e-19 (a charge in coulombs) was left unscaled by the normalisation, and
+predictions above 1e12 were clipped by the engine's safety bounds. The search
+now works on y divided by a power of ten when the standard deviation of y lies
+outside [1e-3, 1e3] (every campaign target lies inside, so nothing changed
+there), the model is returned in the units of y, and only a null column keeps
+the factor 1 in the division by max|x|. `benchmarks/scale_check.py`, eleven
+input and target scales from 1e-34 to 1e30: before, 5 correct laws out of 11
+(R² from -1.99 to 1.000); after, 11 out of 11 (R² ≥ 0.9999, formula exact).
+Output: `scale_check.txt`.
+
+**The rounding noise of constants in the printed formula.** An exact law was
+printed 8.88178e-16 + v1 * v2 / v3; a constant term that is at most 1e-12 of
+the sum it belongs to is no longer printed. The model and predict() do not
+change, and the printed formula is still checked against predict().
+
+**The note about PYTHONHASHSEED**, printed once per process even with
+`verbose=False` and asking to launch Python with PYTHONHASHSEED=0, is gone:
+`seed=` alone reproduces a fit since the tree hashes stopped depending on
+Python's string hashing (tested with PYTHONHASHSEED 0, 1, 12345 and unset).
