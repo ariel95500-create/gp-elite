@@ -529,11 +529,13 @@ def symbolic_regression(
                   rendu abordable par l'accélération LM (v26).
     seed : graine de reproductibilité
 
-    Reproductibilité [v29] : à seed égal, les répétitions AU SEIN d'un même
-    processus sont identiques (workers parallèles inclus). Pour une
-    reproductibilité ENTRE invocations de Python, lancez l'interpréteur avec
-    PYTHONHASHSEED=0 (le hachage aléatoire des str, propre à CPython, modifie
-    sinon l'ordre d'itération des `set` et donc certains tirages).
+    Reproductibilité [v0.8] : à seed égal, deux ajustements sur les mêmes
+    données rendent le même modèle, dans un même processus comme d'un
+    lancement de Python à l'autre (PYTHONHASHSEED n'intervient plus). Le
+    mode parallèle suit un autre chemin que le mode séquentiel : pour
+    retrouver un résultat sur une autre machine, fixez aussi `parallel`
+    (None l'active dès 4 cœurs). Les calculs flottants de NumPy peuvent
+    différer d'une version ou d'un processeur à l'autre.
     verbose : True affiche les logs détaillés du moteur
 
     Retourne
