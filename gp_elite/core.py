@@ -1883,6 +1883,8 @@ class Config:
     # structures à tremplin que l'évolution n'assemble pas seule.
     MOTIF_SEEDS: bool      = True
     MOTIF_SEEDS_N: int     = 32
+    # [v0.8] Polissage des finalistes (voir _polish_finalists).
+    FINAL_POLISH: bool     = True
     ADAM_LR: float         = 0.05
     ADAM_BETA1: float      = 0.9
     ADAM_BETA2: float      = 0.999
@@ -7125,6 +7127,165 @@ def _track_val_candidate(cand):
     except Exception:
         pass
 
+
+# ════════════════════════════════════════════════════════════════
+# [v0.8] POLISSAGE DES FINALISTES : convergence, et sommes pondérées
+# ════════════════════════════════════════════════════════════════
+# Constat (campagne 2, 205 ajustements Feynman à 30 s) : des structures
+# justes sortaient avec des constantes inexactes. Feynman I.8.14,
+# sqrt((x2-x1)² + (y2-y1)²), revenait 5 fois sur 5 sous la forme
+# sqrt((x2' - x3')² + (x1' - x0')²) sur les colonnes normalisées : la
+# structure est la bonne, mais x/max|x| donne à chaque colonne son propre
+# facteur (4,97 ; 4,99...), si bien qu'une différence de deux colonnes
+# demande un coefficient sur chaque terme, que l'arbre n'avait pas
+# (1 - R² = 1,8e-4). Même cas pour II.2.42, k·(T2-T1)·A/d. Et II.15.4
+# rendait -μ·B·sin(-10,985 - 1,00432·θ) : la bonne forme, des constantes
+# que 20 itérations de Levenberg-Marquardt n'avaient pas fini d'ajuster.
+# Le polissage final ajoute donc deux candidats par finaliste : le même
+# arbre, ses constantes ajustées jusqu'à convergence (100 itérations), et
+# l'arbre dont chaque terme de somme ou de différence reçoit son propre
+# coefficient (A ± B devient a·A ± b·B), ajusté de même. Ces candidats ne
+# changent pas la recherche : ils passent par la même sélection finale que
+# les autres (hold-out, règle de parcimonie), où un arbre plus grand n'est
+# retenu que s'il fait nettement mieux qu'un plus petit.
+
+_FINAL_LM_ITER = 100          # itérations de LM pour les finalistes
+_WEIGHTED_SUMS_MAX = 6        # au-delà de 6 sommes, pas de variante pondérée
+
+
+def _has_scale(t) -> bool:
+    """Vrai si le terme porte déjà un coefficient (constante, ou produit
+    dont un facteur est une constante)."""
+    if t.left is None and t.right is None:
+        return not isinstance(t.value, str)
+    if t.value == "*":
+        for c in (t.left, t.right):
+            if c is not None and c.left is None and c.right is None \
+                    and not isinstance(c.value, str):
+                return True
+    return False
+
+
+def _weight_sums(node, innermost_only: bool = False) -> Optional["Node"]:
+    """Copie de l'arbre où chaque terme d'une somme ou d'une différence
+    reçoit un coefficient 1 (A ± B devient 1·A ± 1·B), sauf un terme qui
+    en porte déjà un. Avec innermost_only, seules les sommes dont les
+    termes ne contiennent aucune autre somme sont pondérées : c'est assez
+    pour sqrt((x2-x1)² + (y2-y1)²), avec deux coefficients de moins.
+    None s'il n'y a rien à pondérer, ou plus de _WEIGHTED_SUMS_MAX sommes."""
+    n_sums = [0]
+    n_new = [0]
+
+    def rebuild(n):
+        """Rend (copie, contient une somme)."""
+        if n.left is None and n.right is None:
+            return Node(n.value), False
+        l, hl = rebuild(n.left) if n.left is not None else (None, False)
+        r, hr = rebuild(n.right) if n.right is not None else (None, False)
+        is_sum = n.value in ("+", "-") and l is not None and r is not None
+        if is_sum:
+            n_sums[0] += 1
+            if not (innermost_only and (hl or hr)):
+                if not _has_scale(l):
+                    l = Node("*", Node(1.0), l); n_new[0] += 1
+                if not _has_scale(r):
+                    r = Node("*", Node(1.0), r); n_new[0] += 1
+        return Node(n.value, l, r), (is_sum or hl or hr)
+
+    try:
+        out, _ = rebuild(node)
+    except RecursionError:
+        return None
+    if n_new[0] == 0 or n_sums[0] > _WEIGHTED_SUMS_MAX:
+        return None
+    return out
+
+
+def _lm_to_convergence(node, xs, ys, cfg) -> Optional["Node"]:
+    """LM avec _FINAL_LM_ITER itérations ; None si l'ajustement n'a rien
+    amélioré (optimize_constants_lm rend alors l'arbre d'entrée)."""
+    old = getattr(cfg, "CONST_OPT_ITER", 20)
+    try:
+        cfg.CONST_OPT_ITER = max(int(old), _FINAL_LM_ITER)
+        out = optimize_constants_lm(node, xs, ys, cfg)
+    except Exception:
+        return None
+    finally:
+        cfg.CONST_OPT_ITER = old
+    if out is None or out.exact_hash() == node.exact_hash():
+        return None
+    return out
+
+
+def _refit_scaling(tree, xs, ys):
+    """[v0.8] Recale l'échelle et le décalage matérialisés d'un arbre après
+    un ajustement de LM en projection variable. LM ajuste les constantes de
+    la forme a' + b'·arbre ; un arbre qui porte déjà sa mise à l'échelle
+    (a + b·f, rendue par wrap_linear_scaling) gardait donc l'ancien a et
+    l'ancien b, et ses prédictions brutes n'étaient plus celles de la forme
+    ajustée (sur y = 3 sin(2x) + 1 : MSE 0,39 avant LM, 271 après, 2e-31
+    pour la forme mise à l'échelle). Les nouveaux a, b sont replacés dans
+    les constantes existantes, sinon l'arbre est enveloppé."""
+    if tree is None or not (_USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None):
+        return tree
+    try:
+        xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
+        ys_np = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+        with np.errstate(all="ignore"):
+            p = evaluate_vector(tree, xs_np)
+            if float(np.std(p)) < 1e-6:
+                return tree
+            a2, b2, ok = _linear_scale_params(p, ys_np)
+        if not ok or (abs(b2 - 1.0) < 1e-12 and abs(a2) < 1e-12):
+            return tree
+        const = lambda n: (n is not None and n.left is None and n.right is None
+                           and not isinstance(n.value, str))
+        t = tree.copy()
+        if _LS_SCALE_ONLY:
+            if t.value == "*" and const(t.left):
+                t.left = Node(float(b2) * float(t.left.value))
+                return t
+        elif t.value == "+" and const(t.left) and t.right is not None \
+                and t.right.value == "*" and const(t.right.left):
+            t.left = Node(float(a2) + float(b2) * float(t.left.value))
+            t.right.left = Node(float(b2) * float(t.right.left.value))
+            t.right._hash = t.right._chash = t.right._ehash = None
+            return t
+        return wrap_linear_scaling(tree, xs_np, ys_np)
+    except Exception:
+        return tree
+
+
+def _polish_finalists(top, xs, ys, cfg) -> None:
+    """Polissage des finalistes avant la sélection finale (voir plus haut).
+    Le premier candidat de chaque finaliste est celui de la 0.7 (constantes
+    ajustées par optimize_constants_adam, donc LM à 20 itérations), recalé
+    par _refit_scaling."""
+    for _m, _se, _sz, nd in top:
+        pol = _refit_scaling(optimize_constants_adam(nd.copy(), xs, ys, cfg),
+                             xs, ys)
+        _track_val_candidate(pol)
+        if not bool(getattr(cfg, "FINAL_POLISH", True)) or _CUSTOM_LOSS_FN is not None:
+            continue
+        try:
+            conv = _lm_to_convergence(pol, xs, ys, cfg)
+            if conv is not None:
+                _track_val_candidate(_refit_scaling(conv, xs, ys))
+            seen = set()
+            for inner in (True, False):
+                wt = _weight_sums(pol, innermost_only=inner)
+                if wt is None or wt.exact_hash() in seen:
+                    continue
+                seen.add(wt.exact_hash())
+                wt = _lm_to_convergence(wt, xs, ys, cfg)
+                if wt is not None:
+                    ws = simplify(wt)
+                    if _pure_mse(ws, xs, ys) <= _pure_mse(wt, xs, ys):
+                        wt = ws
+                    _track_val_candidate(_refit_scaling(wt, xs, ys))
+        except Exception:
+            pass
+
 def _build_near_probes(xs_np, ys_np, n=400):
     """[v0.7-NEAR] Sondes par paires de points reels. Generateur DEDIE : ne
     consomme pas l'etat aleatoire global du moteur (sinon tous les resultats
@@ -8006,6 +8167,12 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         import copy as _copy
         optimized = optimize_constants_adam(global_best.copy(), xs, ys, cfg)  # [v19-OPT]
         optimized = simplify(optimized)
+        # [v0.8] Le champion porte sa mise à l'échelle a + b·f ; LM en
+        # projection variable ajuste la forme a' + b'·(champion) : sans
+        # recalage, l'arbre rendu gardait l'ancien a et l'ancien b (raw_mse,
+        # invariant d'échelle, ne le voit pas). Sans hold-out (moins de 30
+        # points, ou validation_split=0), ce modèle était livré tel quel.
+        optimized = _refit_scaling(optimized, xs, ys)
         if raw_mse(optimized, xs, ys) < raw_mse(global_best, xs, ys):
             global_best = optimized
         # Si Adam a dégradé, global_best reste intact (deepcopy garantit l'isolation)
@@ -8023,9 +8190,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # parce que ses constantes n'étaient pas encore ajustées. Coût : ~ms.
         try:
             _top = sorted(_VAL_CANDS, key=lambda t: (t[0], t[2]))[:8]
-            for _mse_i, _se_i, _sz_i, _nd_i in _top:
-                _pol = optimize_constants_adam(_nd_i.copy(), xs, ys, cfg)
-                _track_val_candidate(_pol)
+            _polish_finalists(_top, xs, ys, cfg)     # [v0.8] voir sa définition
         except Exception:
             pass
         _champ_val = _holdout_mse(global_best, xs, ys)
