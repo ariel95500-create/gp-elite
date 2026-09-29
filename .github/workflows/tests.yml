@@ -29,9 +29,6 @@ jobs:
           - os: windows-latest
             python-version: "3.14"
 
-    env:
-      PYTHONHASHSEED: "0"        # reproducible results across interpreters
-
     steps:
       - uses: actions/checkout@v4
 

@@ -15,12 +15,22 @@ python -m pip install -e ".[test]"
 ## Running the tests
 
 ```bash
-PYTHONHASHSEED=0 python -m pytest tests/ -q          # Linux / macOS
-set "PYTHONHASHSEED=0" && python -m pytest tests/ -q   # Windows
+python -m pytest tests/ -q
 ```
 
-`PYTHONHASHSEED=0` makes results identical across interpreter runs. The same
-suite runs on every push (Linux, Python 3.9–3.14, and Windows).
+Since 0.8 a fit with a given `seed` returns the same model from one launch of
+Python to the next without `PYTHONHASHSEED` (a test checks it with several
+values and unset). The benchmark scripts still set `PYTHONHASHSEED=0`, which
+does no harm. The suite runs on every push (Linux, Python 3.9–3.14, and
+Windows).
+
+## Changing the search
+
+A change that alters which model a fit returns (not only how fast) is judged
+before it ships: write the hypothesis and the decision criteria in
+`benchmarks/results_0.8/PLAN.md` first, then compare the engine with and
+without the change with `benchmarks/decision_bench.py` (see its docstring),
+and report the outcome in `RESULTS.md`, whether or not the change passes.
 
 `tests/test_guarantees.py` pins down defects that once existed unnoticed
 (wrong exported formula, dimensional gate disagreeing with the auditor,
