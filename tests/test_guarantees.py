@@ -885,3 +885,78 @@ def test_polish_never_replaces_an_approximation_by_another(monkeypatch):
     cfg.FINAL_POLISH = True
     core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
     assert sorted(round(c[0], 12) for c in core._VAL_CANDS) == without
+
+
+# ── 19. A pure power law is seeded, not left to chance ──────────────────────
+# In the 0.8 decision bench, laws that are a mere product of powers of the
+# variables (Feynman I.12.2, I.32.5, III.19.51) came back exact in 1, 2 and
+# 0 runs out of 5 at 30 s; the other runs returned formulas of 50 to 70
+# nodes. A power law is a straight line in log scale: the exponents fitted
+# there seed the initial population.
+
+def _set_pool(monkeypatch, pool):
+    b_ops, _bw, u_ops, _uw = core._GENCSV_POOLS[pool]
+    monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
+    monkeypatch.setattr(core, "_GENERIC_BINARY_OPS", list(b_ops))
+    monkeypatch.setattr(core, "_GENERIC_UNARY_OPS", list(u_ops))
+
+
+def _scaled_residual(tree, Xs, y):
+    p = core.evaluate_vector(tree, Xs)
+    a, b, ok = core._linear_scale_params(p, y)
+    assert ok
+    return float(np.mean((y - (a + b * p)) ** 2) / np.var(y))
+
+
+def test_power_law_seed_is_the_monomial(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 120), rng.uniform(1, 5, 120),
+               rng.uniform(1, 3, 120), rng.uniform(1, 3, 120)]
+    y = Xr[:, 0] * Xr[:, 1] / (4 * np.pi * Xr[:, 2] * Xr[:, 3] ** 2)
+    Xs = Xr / np.abs(Xr).max(axis=0)          # normalize="auto"
+    cfg = core.Config()
+    cfg.TERMINALS = ["X[%d]" % i for i in range(4)]
+    seeds = core._make_power_law_seeds(Xs, y, cfg)
+    assert len(seeds) == 1                     # half-integer exponents: no pow seed
+    assert _scaled_residual(seeds[0], Xs, y) < 1e-20
+    assert core.tree_size(seeds[0]) <= 9
+    # an empirical power law gets its fitted exponents through pow
+    y2 = 2.3 * Xr[:, 0] ** 1.27 * Xr[:, 1] ** -0.41
+    seeds2 = core._make_power_law_seeds(Xs, y2, cfg)
+    assert len(seeds2) == 2 and "pow" in _ops_in(seeds2[1], set())
+    assert _scaled_residual(seeds2[1], Xs, y2) < 1e-12
+
+
+def test_power_law_seed_only_where_it_applies(monkeypatch):
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 80), rng.uniform(1, 5, 80)]
+    cfg = core.Config()
+    cfg.TERMINALS = ["X[0]", "X[1]"]
+    _set_pool(monkeypatch, "physical")
+    # a target that changes sign (standardised data): nothing is injected
+    assert core._make_power_law_seeds(Xr, Xr[:, 0] * Xr[:, 1] - 10.0, cfg) == []
+    # columns that all change sign: nothing either
+    Xc = Xr - 3.0
+    assert core._make_power_law_seeds(Xc, np.exp(Xc[:, 0]) + 5.0, cfg) == []
+    # the operator pool is respected: 'conserve' has neither '/' nor sqrt
+    _set_pool(monkeypatch, "conserve")
+    assert core._make_power_law_seeds(Xr, Xr[:, 0] / Xr[:, 1] ** 2, cfg) == []
+    s = core._make_power_law_seeds(Xr, Xr[:, 0] * Xr[:, 1] ** 2, cfg)
+    assert len(s) == 1 and _ops_in(s[0], set()) <= {"*", "sq"}
+    # under units= the typed population is left alone
+    _set_pool(monkeypatch, "physical")
+    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}}
+    assert core._make_power_law_seeds(Xr, Xr[:, 0] * Xr[:, 1], cfg) == []
+
+
+def test_power_law_recovered_in_a_short_fit():
+    rng = np.random.RandomState(2)
+    Xr = np.c_[rng.uniform(1, 5, 200), rng.uniform(1, 5, 200),
+               rng.uniform(1, 3, 200), rng.uniform(1, 3, 200)]
+    y = Xr[:, 0] * Xr[:, 1] / (4 * np.pi * Xr[:, 2] * Xr[:, 3] ** 2)
+    r = symbolic_regression(Xr[:140], y[:140], generations=5, seed=0,
+                            parallel=False)
+    pred = r.predict(Xr[140:])
+    assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
+    assert r.size <= 11 and r.formula_exact
