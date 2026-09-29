@@ -104,9 +104,10 @@ def one(name):
             caught = [str(m.message)[:200] for m in w]
         p = np.asarray(r.predict(X), dtype=float)
         finite = bool(np.all(np.isfinite(p)))
-        v = float(np.var(y))
+        m = float(np.max(np.abs(y))) or 1.0          # scale-safe R² (|y| ~ 1e200)
+        v = float(np.var(y / m))
         with np.errstate(all="ignore"):
-            r2 = (1.0 - float(np.mean((p - y) ** 2)) / v) if v > 0 else None
+            r2 = (1.0 - float(np.mean(((p - y) / m) ** 2)) / v) if v > 0 else None
         rec.update(outcome="model", expression=r.expression[:200],
                    size=int(r.size), formula_exact=bool(r.formula_exact),
                    finite=finite, r2_train=r2)

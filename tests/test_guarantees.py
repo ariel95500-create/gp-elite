@@ -1126,3 +1126,9 @@ def test_power_law_seed_only_for_data_that_follow_one(monkeypatch):
     assert len(core._make_power_law_seeds(Xr, near, cfg)) >= 1
     other = np.exp(-Xr[:, 0]) + 0.3 * Xr[:, 1]        # not a power law
     assert core._make_power_law_seeds(Xr, other, cfg) == []
+
+
+def test_target_scale_does_not_overflow():
+    y = np.linspace(1.0, 5.0, 50)
+    assert core._target_scale(1e200 * y) == 1e200      # std(y) overflows naively
+    assert core._target_scale(1e-200 * y) == 1e-200

@@ -4520,8 +4520,12 @@ def _target_scale(y):
     of one molecule) or 1e20 came back as a constant or a wrong line, with a
     negative R², and no warning. The delivered model, its formula and its
     MSEs are in the units of y; within [1e-3, 1e3] nothing changes."""
-    sd = float(np.std(y))
-    ref = sd if sd > 0 else float(np.max(np.abs(y))) if len(y) else 0.0
+    y = np.asarray(y, dtype=float)
+    m = float(np.max(np.abs(y))) if y.size else 0.0
+    if not (m > 0.0 and np.isfinite(m)):
+        return 1.0
+    sd = m * float(np.std(y / m))       # sans débordement pour |y| ~ 1e200
+    ref = sd if sd > 0 else m
     if not (ref > 0.0 and np.isfinite(ref)) or 1e-3 <= ref <= 1e3:
         return 1.0
     return 10.0 ** round(math.log10(ref))
