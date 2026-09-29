@@ -960,3 +960,21 @@ def test_power_law_recovered_in_a_short_fit():
     pred = r.predict(Xr[140:])
     assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
     assert r.size <= 11 and r.formula_exact
+
+
+def test_power_law_seed_only_for_data_that_follow_one(monkeypatch):
+    """Campaign 6: a monomial fitted to data that are not a power law
+    (228_elusage, X0^-3.38 with a log-log R² of 0.81) won the selection and
+    collapsed out of domain. The seed now requires the monomial to explain
+    99.9 % of the variance of log|y|."""
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(4)
+    Xr = np.c_[rng.uniform(1, 5, 120), rng.uniform(1, 5, 120)]
+    cfg = core.Config()
+    cfg.TERMINALS = ["X[0]", "X[1]"]
+    exact = Xr[:, 0] ** 2 / Xr[:, 1]
+    assert len(core._make_power_law_seeds(Xr, exact, cfg)) == 1
+    near = exact * (1 + 0.005 * rng.randn(120))       # 0.5 % noise: still one
+    assert len(core._make_power_law_seeds(Xr, near, cfg)) >= 1
+    other = np.exp(-Xr[:, 0]) + 0.3 * Xr[:, 1]        # not a power law
+    assert core._make_power_law_seeds(Xr, other, cfg) == []

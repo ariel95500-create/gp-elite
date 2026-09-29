@@ -4145,18 +4145,30 @@ def _make_motif_seeds(cfg, n_max: int = 32) -> list:
 # la population initiale le monôme aux exposants arrondis au demi-entier
 # (la forme d'une loi physique usuelle) et, si le pool contient `pow`, le
 # monôme aux exposants ajustés (loi empirique : Levenberg-Marquardt affine
-# ensuite ces exposants). Ce ne sont que deux individus par île, parmi une
-# centaine, jugés comme les autres. Aucun tirage aléatoire : sans colonne de signe
+# ensuite ces exposants), et seulement si les données sont bien celles d'une
+# loi de puissance : le monôme doit expliquer au moins 99,9 % de la variance
+# de log|y| (_POWER_LAW_MIN_R2). Ce ne sont que deux individus par île, parmi
+# une centaine, jugés comme les autres. Aucun tirage aléatoire : sans colonne de signe
 # constant ou avec une cible qui change de signe (données centrées), rien
 # n'est injecté et l'ajustement est celui d'avant. Hors du mode CSV
 # générique, sous `units=` (population typée) et en mode extrapolation
 # (où les motifs sont déjà coupés), rien n'est injecté non plus.
 
+_POWER_LAW_MIN_R2 = 0.999    # part de la variance de log|y| que le monôme doit expliquer
+
+
 def _power_law_exponents(X, y):
     """Exposants (a_j) de |y| ≈ c·Π |x_j|^a_j par moindres carrés sur les
     logarithmes, pour les colonnes de signe constant. Rend (cols, a) ou
-    None si la cible change de signe, si aucune colonne ne convient ou si
-    le système est dégénéré."""
+    None si la cible change de signe, si aucune colonne ne convient, si le
+    système est dégénéré, ou si le monôme n'explique pas au moins 99,9 % de
+    la variance de log|y|.
+
+    [v0.8] Ce dernier seuil vient de la campagne 6 : sans lui, sur données
+    réelles, un monôme ajusté à des données qui n'en sont pas un (228_elusage :
+    X0^-3,38, R² log-log 0,81) gagnait la sélection et s'effondrait hors du
+    domaine (R² -12). Les lois de Feynman qui sont des monômes ont un R²
+    log-log de 1 ; les six jeux réels et nikuradse_1, 0,93 au plus."""
     n = y.shape[0]
     with np.errstate(all="ignore"):
         if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
@@ -4174,6 +4186,14 @@ def _power_law_exponents(X, y):
         except Exception:
             return None
     if rank < A.shape[1] or not np.all(np.isfinite(coef)):
+        return None
+    ly = np.log(np.abs(y))
+    v = float(np.var(ly))
+    if not v > 0.0:
+        return None
+    with np.errstate(all="ignore"):
+        r2 = 1.0 - float(np.var(ly - A @ coef)) / v
+    if not r2 >= _POWER_LAW_MIN_R2:
         return None
     return cols, coef[1:]
 
