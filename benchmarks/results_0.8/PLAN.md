@@ -114,3 +114,37 @@ case both changes are left out of the release unless a separate campaign
 supports one of them on its own. The early stop can only make fits longer:
 the median time of the Feynman fits is reported, and the out-of-domain
 error of the models that are not exact is reported for both arms.
+
+---
+
+# Campaign 3 — grouped normalisation, written before its first run
+
+Written on 29 September 2026, before any run of campaign 3 and before the
+results of campaign 2. Only one fit of the change had been run, the one
+quoted below (it motivated the change, so it is not evidence).
+
+| Arm | Engine |
+|---|---|
+| C1 | commit `580aabf` (campaign 2's C1) |
+| C8 | commit `a16deab`: C1 plus the change below |
+
+**The change.** `normalize="auto"` divided every column by its own max|x|.
+That keeps products as products but not sums and differences of variables of
+the same kind: on Feynman I.8.14, sqrt((x2-x1)² + (y2-y1)²) with column
+maxima 4.97 and 4.99 becomes another function of the normalised variables,
+which the search only approached to 1e-4 (0 exact laws out of 5 seeds in
+campaign 1, arm B). C8 gives one common factor, the largest max|x|, to the
+columns whose max|x| lie within a factor 10 of each other; columns of very
+different magnitudes keep their own. One fit of C8 on I.8.14 (seed 0) returned
+sqrt((v2 - v3)² + (v1 - v0)²) in 1.2 s.
+
+Same problems, budget T, protocol as campaigns 1 and 2.
+
+**H5, grouped normalisation finds more exact laws without losing on real
+data.** On F41, exact recoveries of C8 exceed those of C1 by at least 6 of the
+205 runs, and C8 is ahead on more equations than it is behind. On R6 (folds
+and out of domain together), the median of the paired differences of test R²
+(C8 - C1) is at least -0.005, and C8 has no more collapses than C1. Refuted if
+C8 recovers no more exact laws than C1, or if the median real-data difference
+is below -0.01. Reported without deciding: the equations gained and lost,
+model sizes, the out-of-domain error of the models that are not exact.
