@@ -1885,6 +1885,8 @@ class Config:
     MOTIF_SEEDS_N: int     = 32
     # [v0.8] Polissage des finalistes (voir _polish_finalists).
     FINAL_POLISH: bool     = True
+    # [v0.8] Monômes ajustés en échelle log (voir _make_power_law_seeds).
+    POWER_LAW_SEEDS: bool  = True
     ADAM_LR: float         = 0.05
     ADAM_BETA1: float      = 0.9
     ADAM_BETA2: float      = 0.999
@@ -4127,6 +4129,169 @@ def _make_motif_seeds(cfg, n_max: int = 32) -> list:
         add(builders[k % len(builders)])
         k += 1
     return out[:n_max]
+
+
+# ════════════════════════════════════════════════════════════════
+# [v0.8] GRAINES DE LOI DE PUISSANCE
+# ════════════════════════════════════════════════════════════════
+# Constat (campagne 2 du banc de décision, 205 ajustements Feynman à 30 s) :
+# des lois qui ne sont qu'un produit de puissances des variables, comme
+# I.12.2 q1·q2/(4π·ε·r²), I.32.5 ou III.19.51, étaient retrouvées 1, 2 et 0
+# fois sur 5 ; les autres ajustements rendaient des formules de 50 à 70
+# nœuds. Or une loi y = c·Π x_j^a_j est une droite en échelle log :
+# log|y| = log|c| + Σ a_j·log|x_j|. Quand la cible et des colonnes gardent
+# un signe constant, les moindres carrés sur les logarithmes donnent les
+# exposants, et la normalisation par max|x| ne les change pas. On place dans
+# la population initiale le monôme aux exposants arrondis au demi-entier
+# (la forme d'une loi physique usuelle) et, si le pool contient `pow`, le
+# monôme aux exposants ajustés (loi empirique : Levenberg-Marquardt affine
+# ensuite ces exposants), et seulement si les données sont bien celles d'une
+# loi de puissance : le monôme doit expliquer au moins 99,9 % de la variance
+# de log|y| (_POWER_LAW_MIN_R2). Ce ne sont que deux individus par île, parmi
+# une centaine, jugés comme les autres. Aucun tirage aléatoire : sans colonne de signe
+# constant ou avec une cible qui change de signe (données centrées), rien
+# n'est injecté et l'ajustement est celui d'avant. Hors du mode CSV
+# générique, sous `units=` (population typée) et en mode extrapolation
+# (où les motifs sont déjà coupés), rien n'est injecté non plus.
+
+_POWER_LAW_MIN_R2 = 0.999    # part de la variance de log|y| que le monôme doit expliquer
+
+
+def _power_law_exponents(X, y):
+    """Exposants (a_j) de |y| ≈ c·Π |x_j|^a_j par moindres carrés sur les
+    logarithmes, pour les colonnes de signe constant. Rend (cols, a) ou
+    None si la cible change de signe, si aucune colonne ne convient, si le
+    système est dégénéré, ou si le monôme n'explique pas au moins 99,9 % de
+    la variance de log|y|.
+
+    [v0.8] Ce dernier seuil vient de la campagne 6 : sans lui, sur données
+    réelles, un monôme ajusté à des données qui n'en sont pas un (228_elusage :
+    X0^-3,38, R² log-log 0,81) gagnait la sélection et s'effondrait hors du
+    domaine (R² -12). Les lois de Feynman qui sont des monômes ont un R²
+    log-log de 1 ; les six jeux réels et nikuradse_1, 0,93 au plus."""
+    n = y.shape[0]
+    with np.errstate(all="ignore"):
+        if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
+            return None
+        if not (np.all(y > 0) or np.all(y < 0)):
+            return None
+        cols = [j for j in range(X.shape[1])
+                if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
+        if not cols or n < len(cols) + 3:
+            return None
+        A = np.column_stack([np.ones(n), np.log(np.abs(X[:, cols]))])
+        try:
+            coef, _res, rank, _sv = np.linalg.lstsq(A, np.log(np.abs(y)),
+                                                    rcond=None)
+        except Exception:
+            return None
+    if rank < A.shape[1] or not np.all(np.isfinite(coef)):
+        return None
+    ly = np.log(np.abs(y))
+    v = float(np.var(ly))
+    if not v > 0.0:
+        return None
+    with np.errstate(all="ignore"):
+        r2 = 1.0 - float(np.var(ly - A @ coef)) / v
+    if not r2 >= _POWER_LAW_MIN_R2:
+        return None
+    return cols, coef[1:]
+
+
+def _half_integer_power(term: str, e2: int, uops) -> Optional["Node"]:
+    """x^(e2/2) pour e2 > 0, avec les seuls opérateurs du pool (sq, cube,
+    sqrt, *). None si une racine est nécessaire et que sqrt manque."""
+    n_int, half = divmod(e2, 2)
+
+    def ipow(k: int) -> "Node":
+        if k == 1:
+            return Node(term)
+        if k == 3 and "cube" in uops:
+            return Node("cube", Node(term))
+        if k % 2 == 0:
+            h = ipow(k // 2)
+            return Node("sq", h) if "sq" in uops else Node("*", h, ipow(k // 2))
+        return Node("*", Node(term), ipow(k - 1))
+
+    factors = []
+    if n_int:
+        factors.append(ipow(n_int))
+    if half:
+        if "sqrt" not in uops:
+            return None
+        factors.append(Node("sqrt", Node(term)))
+    out = factors[0]
+    for f in factors[1:]:
+        out = Node("*", out, f)
+    return out
+
+
+def _product(nodes: list) -> Optional["Node"]:
+    if not nodes:
+        return None
+    out = nodes[0]
+    for f in nodes[1:]:
+        out = Node("*", out, f)
+    return out
+
+
+def _make_power_law_seeds(xs, ys, cfg) -> list:
+    """[v0.8] Voir le commentaire ci-dessus. Rend 0, 1 ou 2 arbres."""
+    if not _GENERIC_CSV_MODE or _dim_active(cfg) \
+            or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) \
+            or not bool(getattr(cfg, "POWER_LAW_SEEDS", True)):
+        return []
+    terms = list(getattr(cfg, "TERMINALS", []) or [])
+    try:
+        X = np.asarray(xs, dtype=float)
+        y = np.asarray(ys, dtype=float)
+    except Exception:
+        return []
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+    if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
+            or X.shape[1] != len(terms):
+        return []
+    fit = _power_law_exponents(X, y)
+    if fit is None:
+        return []
+    cols, expo = fit
+    bops = set(_GENERIC_BINARY_OPS)
+    uops = set(_GENERIC_UNARY_OPS)
+    seeds = []
+
+    # 1) exposants arrondis au demi-entier le plus proche
+    e2s = [int(round(2.0 * float(a))) for a in expo]
+    if all(abs(e2) <= 12 for e2 in e2s) and any(e2s):
+        num, den, ok = [], [], True
+        for j, e2 in zip(cols, e2s):
+            if e2 == 0:
+                continue
+            f = _half_integer_power(terms[j], abs(e2), uops)
+            if f is None:
+                ok = False
+                break
+            (num if e2 > 0 else den).append(f)
+        if ok and (not den or "/" in bops):
+            top, bot = _product(num), _product(den)
+            if bot is None:
+                seeds.append(top)
+            else:
+                seeds.append(Node("/", top if top is not None else Node(1.0), bot))
+
+    # 2) exposants ajustés, si le pool a pow et qu'ils ne sont pas déjà
+    #    des demi-entiers (sinon la graine 1 les contient)
+    if "pow" in bops and float(np.max(np.abs(2.0 * expo - np.round(2.0 * expo)))) > 0.04:
+        facs = [Node("pow", Node(terms[j]), Node(round(float(a), 4)))
+                for j, a in zip(cols, expo) if abs(float(a)) >= 0.02]
+        if facs:
+            seeds.append(_product(facs))
+
+    if seeds:
+        TRACE.set("power_law_seed", "exposants %s ; %d graine(s) : %s" % (
+            ", ".join("%s^%.3g" % (terms[j], float(a)) for j, a in zip(cols, expo)),
+            len(seeds), " | ".join(to_string(s) for s in seeds)))
+    return seeds
 
 
 # [CUSTOM-LOSS PARSIMONY] Poids de la pénalité de taille pour la loss custom
@@ -8145,6 +8310,21 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             slot          = (_base2 + j) // cfg.N_ISLANDS
             if slot < len(target_island.population):
                 target_island.population[slot] = mnd
+    else:
+        _motifs = []
+    # [v0.8] Graines de loi de puissance (voir _make_power_law_seeds) : une
+    # copie dans chaque île, au slot qui suit les motifs. Rien n'est injecté
+    # (et rien ne change) quand la cible ou toutes les colonnes changent de
+    # signe.
+    _plaw = _make_power_law_seeds(xs, ys, cfg)
+    if _plaw:
+        _base3 = (len(seeds) + (len(_cseeds) if _cseeds else 0)
+                  + len(_motifs)) // cfg.N_ISLANDS + 1
+        for target_island in islands:
+            for j, pnd in enumerate(_plaw):
+                slot = _base3 + j
+                if slot < len(target_island.population):
+                    target_island.population[slot] = pnd.copy()
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.
