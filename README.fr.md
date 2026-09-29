@@ -150,6 +150,21 @@ exacte, sans garantie.
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 
+**Vos données.** `X` peut être un tableau NumPy, une liste de lignes ou un
+DataFrame pandas, dont les noms de colonnes deviennent alors les noms de
+variables ; `y` un tableau 1-D ou une seule colonne. Une valeur manquante ou
+infinie est refusée avec la ligne et la colonne en cause (retirez-la ou
+complétez-la d'abord), et une colonne non numérique est nommée dans l'erreur :
+jusqu'à la 0.7, de telles données passaient et l'ajustement rendait une formule
+sans rapport, sans avertissement.
+
+**Reproductibilité.** Avec le même `seed`, les mêmes données et les mêmes
+réglages, un ajustement rend le même modèle d'un lancement à l'autre, sans fixer
+`PYTHONHASHSEED` (nécessaire jusqu'à la 0.7). Les îles parallèles suivent un
+autre chemin que la recherche séquentielle, et `parallel=None` les active dès
+quatre cœurs : fixez aussi `parallel=` pour retrouver le même modèle sur une
+autre machine.
+
 **Scripts et îles parallèles.** Sur une machine à quatre cœurs ou plus, les îles
 tournent dans des processus parallèles. Ces processus sont démarrés en mode
 `spawn` sur tous les systèmes (Linux compris) et ré-importent votre script :
@@ -164,8 +179,12 @@ Rien à faire dans un notebook.
   colonnes remises à l'échelle en interne ; la formule rendue replie cette mise à
   l'échelle dans ses constantes, et l'ajustement vérifie qu'elle reproduit
   `predict()` sur vos données (`resultat.formula_exact`). `resultat.sympy()` donne
-  la même formule sous forme de chaîne lisible par `sympy.sympify`. (Avant la 0.7,
-  les constantes affichées étaient celles de l'espace normalisé interne.) La
+  la même formule sous forme de chaîne lisible par `sympy.sympify`, et
+  `resultat.sympy_expr()` l'expression sympy elle-même, avec un symbole par
+  colonne : à utiliser quand un nom de colonne est aussi une constante ou une
+  fonction de sympy (`sympify` lit `E` comme 2,718..., `I` comme √-1) ou n'est
+  pas un identifiant ; `sympy()` le signale dans ce cas. (Avant la 0.7, les
+  constantes affichées étaient celles de l'espace normalisé interne.) La
   formule est la fonction mathématique pure : là où l'un des garde-fous
   numériques du moteur agit sur vos données (une puissance bornée parce que sa
   base dépasse 100 ou son exposant 6 en valeur absolue, ou sa valeur un million ;
@@ -180,6 +199,9 @@ Rien à faire dans un notebook.
   données de test hors de l'ajustement.
 - **`resultat.pareto`** liste les autres candidats non dominés, du plus simple au
   plus complexe, chacun avec son `expression`, son `r2_validation` et son `predict`.
+- **`predict()` vérifie ce qu'on lui donne.** Il attend autant de colonnes qu'à
+  l'ajustement (un seul échantillon s'écrit `X.reshape(1, -1)`), et rend NaN pour
+  une ligne dont une entrée manque ou est infinie, là où la 0.7 rendait 0.
 
 ---
 

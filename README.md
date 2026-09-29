@@ -143,6 +143,19 @@ guarantee.
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
 
+**Your data.** `X` can be a NumPy array, a list of rows or a pandas DataFrame,
+whose column names then become the variable names; `y` a 1-D array or a single
+column. A missing or infinite value is refused with the row and the column
+concerned (remove or impute it first), and a non-numeric column is named in the
+error: up to 0.7 such data went through and the fit returned an unrelated formula
+without a warning.
+
+**Reproducibility.** With the same `seed`, the same data and the same settings, a
+fit returns the same model, run after run, without setting `PYTHONHASHSEED`
+(required up to 0.7). Parallel islands follow another path than the sequential
+search, and `parallel=None` turns them on from four cores: set `parallel=` too
+to get the same model on another machine.
+
 **Scripts and parallel islands.** On machines with four cores or more, islands run
 in parallel worker processes. Those workers are started with `spawn` on every
 system (Linux included) and re-import your script, so keep the top-level code
@@ -156,8 +169,11 @@ same result, and says so once. Notebooks need nothing.
   columns internally; the formula it returns has the rescaling folded back into its
   constants, and the fit checks that the formula reproduces `predict()` on your
   data (`result.formula_exact`). `result.sympy()` gives the same formula as a
-  string `sympy.sympify` can parse. (Before 0.7, the displayed constants were
-  those of the internal scaled space.) The formula is the plain mathematical
+  string `sympy.sympify` can parse, and `result.sympy_expr()` the sympy
+  expression itself, with one symbol per column: use it when a column name is
+  also a sympy constant or function (`sympify` reads `E` as 2.718..., `I` as
+  √-1) or is not an identifier; `sympy()` warns in that case. (Before 0.7, the
+  displayed constants were those of the internal scaled space.) The formula is the plain mathematical
   function: where one of the engine's numerical safety nets acts on your data
   (a power clipped because its base exceeds 100 or its exponent 6 in absolute
   value, or its value a million; a division by a denominator within 1e-8 of
@@ -171,6 +187,9 @@ same result, and says so once. Notebooks need nothing.
   fit.
 - **`result.pareto`** lists the other non-dominated candidates, simplest first,
   each with its own `expression`, `r2_validation` and `predict`.
+- **`predict()` checks what it is given.** It expects as many columns as the fit
+  had (a single sample is `X.reshape(1, -1)`), and returns NaN for a row with a
+  missing or infinite input, where 0.7 returned 0.
 
 ---
 
