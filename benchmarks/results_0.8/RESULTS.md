@@ -103,8 +103,8 @@ not used).
 
 ## Campaign 4 — formula-faithful tie-break and companion lookup (C4) against C1
 
-Records: `campaign4_T.jsonl` (C4's 265 fits, 29 September 2026, 08:06 to
-09:16; C1's are those of campaign 2). Eight Feynman fits (I.11.19 seeds 1 to
+Records: `campaign4_T.jsonl` (C4's 265 fits, 29 September 2026, 08:17 to
+09:15; C1's are those of campaign 2). Eight Feynman fits (I.11.19 seeds 1 to
 4, I.15.10 seeds 0 to 3) ran while a micro-benchmark was also using the
 machine; they were run again after the campaign, and their first records are
 kept apart (`campaign4_T_perturbed_replaced.jsonl`, not used; no exact

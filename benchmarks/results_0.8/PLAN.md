@@ -231,7 +231,7 @@ are dropped.
 
 # Decision on campaign 4, and campaign 5 — written before campaign 5 runs
 
-Written on 29 September 2026 at 09:55. Campaign 4 has ended and H6 holds
+Written on 29 September 2026 at 09:24. Campaign 4 has ended and H6 holds
 (`RESULTS.md`): C4 (`ff32450`) is merged into the 0.8 branch. Its analysis
 found a fault introduced by campaign 2's variable projection (the scale and
 offset carried by a finalist or by the final champion are left stale by
@@ -288,8 +288,8 @@ polish is then left out (`FINAL_POLISH` off) and only the correction ships.
 Reported without deciding: runtime of the final selection (fit time beyond
 the budget), sizes, equations gained and lost, out-of-domain errors.
 
-**Amendment, 29 September 2026 at 10:25, before the campaign was run
-again.** Campaign 5 was first started at 10:02 with arms `f250f5d` and
+**Amendment, 29 September 2026 at 09:33, before the campaign was run
+again.** Campaign 5 was first started at 09:24 with arms `f250f5d` and
 `106f616`, in which the polish acted on the eight best candidates on the
 hold-out only. After seven equations, I.8.14 was still returned inexact by
 C5; a single diagnostic run showed why: its right structure (14 nodes,
