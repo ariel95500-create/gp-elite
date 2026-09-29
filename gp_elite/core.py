@@ -4813,6 +4813,7 @@ def optimize_constants_lm(node: Node,
     """
     child = node.copy()
     y  = np.asarray(ys, dtype=float)
+    _varpro = _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
     _LM_NUM_CLIP = 1e150   # [v0.4] borne anti-overflow : au-dela, r@r ou J.T@J
                            # depassent float64. sq/cube/* ne sont pas bornes par
                            # _SAFE_LIMIT et peuvent sortir ~1e217.
@@ -4827,6 +4828,15 @@ def optimize_constants_lm(node: Node,
             r = p - y
             r[bad] = 1e6          # zone invalide : fortement pénalisée
             return _np_minimum(_np_maximum(r, -_LM_NUM_CLIP), _LM_NUM_CLIP)
+        if _varpro:
+            # [v0.8] Projection variable : le résidu est celui de la forme
+            # MISE À L'ÉCHELLE a + b·f (a, b par moindres carrés à chaque
+            # évaluation), celle que juge la fitness. Sans cela, LM ajustait
+            # les constantes pour que f seule colle à y, et déformait la
+            # forme dès que l'arbre n'avait pas de constante d'échelle libre.
+            a_ls, b_ls, ok = _linear_scale_params(p, y)
+            if ok:
+                p = a_ls + b_ls * p
         return _np_minimum(_np_maximum(p - y, -_LM_NUM_CLIP), _LM_NUM_CLIP)
 
     # [v0.8] plan incrémental quand il est disponible ; sinon, évaluation
@@ -6867,10 +6877,11 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 if global_best:
                     # [v21-VAL] early-stop jugé sur le HOLD-OUT (anti-surapprentissage)
                     _es_mse = _holdout_mse(global_best, xs, ys)
-                    if _es_mse <= cfg.EARLY_STOPPING_MSE:
+                    _es_thr = _early_stop_threshold(cfg, ys)
+                    if _es_mse <= _es_thr:
                         print(f"\n{'═'*60}")
                         print(f"  [SUCCESS] Precision target reached at GEN {gen:04d}!")
-                        print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {cfg.EARLY_STOPPING_MSE:.2e}")
+                        print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {_es_thr:.2e}")
                         print(f"  Early stop — remaining generations saved.")
                         print(f"{'═'*60}\n")
                         break
@@ -6950,6 +6961,32 @@ _EXTRAP_PROBE_XS = None
 _EXTRAP_BAND = None     # (y_lo, y_hi) plausibles
 _VAL_CANDS: list = []   # [(val_mse, val_se, size, node)] candidats-champions
 _VAL_CANDS_MAX = 64
+
+def _early_stop_threshold(cfg, ys_train) -> float:
+    """[v0.8] Seuil d'arrêt anticipé, RELATIF à la variance de la cible pour
+    les ajustements de l'API.
+
+    Le seuil était un MSE absolu de 1e-6 : il dépendait donc de l'unité de y.
+    Sur une cible de variance 0,02 (loi gaussienne de Feynman I.6.20a), un
+    modèle à 1 - R² = 6e-5 l'atteignait : la recherche s'arrêtait à la 6e
+    génération, puis la sélection parcimonieuse rendait une approximation
+    plus courte à 1 - R² = 2e-3, alors que la loi exacte était à portée. En
+    unités plus grandes, la même loi n'aurait jamais déclenché l'arrêt. On
+    ne s'arrête plus que sur une loi exacte à la précision numérique
+    (1 - R² <= _EXACT_REL sur le hold-out), le seul cas où chercher encore
+    ne peut rien apporter. Les modes démonstration (Syracuse, batterie)
+    gardent leur seuil absolu."""
+    if not _GENERIC_CSV_MODE:
+        return cfg.EARLY_STOPPING_MSE
+    ref = _VAL_YS if (_VAL_YS is not None and len(_VAL_YS) > 1) else ys_train
+    try:
+        v = float(np.var(np.asarray(ref, dtype=float)))
+    except Exception:
+        return cfg.EARLY_STOPPING_MSE
+    if not math.isfinite(v) or v <= 1e-300:
+        return cfg.EARLY_STOPPING_MSE
+    return _EXACT_REL * v
+
 
 def _holdout_mse(node, xs_train, ys_train) -> float:
     """MSE sur le hold-out si disponible, sinon sur le train (fallback)."""
@@ -7876,10 +7913,11 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         if global_best:
             # [v21-VAL] early-stop jugé sur le HOLD-OUT (anti-surapprentissage)
             _es_mse = _holdout_mse(global_best, xs, ys)
-            if _es_mse <= cfg.EARLY_STOPPING_MSE:
+            _es_thr = _early_stop_threshold(cfg, ys)
+            if _es_mse <= _es_thr:
                 print(f"\n{'═'*60}")
                 print(f"  [SUCCESS] Precision target reached at GEN {gen:04d}!")
-                print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {cfg.EARLY_STOPPING_MSE:.2e}")
+                print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {_es_thr:.2e}")
                 print(f"  Early stop — remaining generations saved.")
                 print(f"{'═'*60}\n")
                 break
