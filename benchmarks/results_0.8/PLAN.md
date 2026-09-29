@@ -242,8 +242,8 @@ points, quoted below because they show the fault, not as evidence of a gain.
 | Arm | Engine |
 |---|---|
 | C4 | commit `ff32450` (campaign 4) |
-| C5a | commit `f250f5d`: C4 plus the correction alone |
-| C5 | commit `106f616`: C4 plus the correction and the polish |
+| C5a | commit `788d09d`: C4 plus the correction alone |
+| C5 | commit `b2f78c0`: C4 plus the correction and the polish |
 
 **The correction** (`_refit_scaling`). After Levenberg-Marquardt, the scale
 and offset materialised in the final champion and in each polished finalist
@@ -287,3 +287,16 @@ laws than C5a, or if the median real-data difference is below -0.01; the
 polish is then left out (`FINAL_POLISH` off) and only the correction ships.
 Reported without deciding: runtime of the final selection (fit time beyond
 the budget), sizes, equations gained and lost, out-of-domain errors.
+
+**Amendment, 29 September 2026 at 10:25, before the campaign was run
+again.** Campaign 5 was first started at 10:02 with arms `f250f5d` and
+`106f616`, in which the polish acted on the eight best candidates on the
+hold-out only. After seven equations, I.8.14 was still returned inexact by
+C5; a single diagnostic run showed why: its right structure (14 nodes,
+1 - R² = 1.8e-4) was not among those eight (all 48 to 68 nodes), so it was
+never weighted, and the parsimony rule then delivered it unpolished. The
+campaign was stopped (72 records, kept apart and not used), and the polish now
+also takes the eight smallest candidates of the tolerance band in which the
+final selection chooses (`_finalists`); with the correction alone (C5a) the
+finalists are unchanged. Arms, problems and criteria are otherwise those
+written above, and the campaign is run again from the start.
