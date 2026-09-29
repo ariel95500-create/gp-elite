@@ -379,6 +379,7 @@ from __future__ import annotations
 import bisect
 import math
 import operator
+import weakref
 import random
 import numpy as np
 import copy
@@ -3940,12 +3941,18 @@ def _predict_cached(node, xs_np):
     # Sans cela, une prédiction calculée sur le TRAIN (134 pts) était renvoyée
     # pour une requête sur le dataset COMPLET (168 pts) → mismatch de forme →
     # exception silencieuse → MSE rapporté à 1e6 alors que le modèle est bon.
+    # [v0.8] id() n'identifie un tableau que tant qu'il existe : une fois
+    # libéré, son adresse peut être réattribuée à un AUTRE tableau de même
+    # taille, qui recevrait alors les prédictions du premier. Les appels du
+    # moteur passent des tableaux qui vivent tout l'ajustement, mais rien ne
+    # l'imposait : l'entrée garde désormais une référence faible au tableau
+    # et n'est servie que pour lui.
     h = (node.exact_hash(), id(xs_np), xs_np.shape[0])   # [v0.7] exact
-    r = _PRED_CACHE.get(h)
-    if r is not None:
-        return r
+    e = _PRED_CACHE.get(h)
+    if e is not None and e[0]() is xs_np:
+        return e[1]
     preds = evaluate_vector(node, xs_np)
-    _PRED_CACHE[h] = preds
+    _PRED_CACHE[h] = (weakref.ref(xs_np), preds)
     if len(_PRED_CACHE) > _PRED_CACHE_MAX:
         for _ in range(1024):
             if _PRED_CACHE:
@@ -4586,79 +4593,98 @@ def simplify(node: Node) -> Node:
 def _simplify_tree(root: Node) -> Node:
     """Post-ordre itératif : reconstruit une copie simplifiée de bas en haut.
     Ne mute jamais l'entrée ; chaque nœud produit est neuf ou appartient
-    exclusivement au sous-arbre en construction (zéro partage)."""
+    exclusivement au sous-arbre en construction (zéro partage).
+    [v0.8] Une feuille est recopiée directement : aucune règle ne s'applique
+    à un nœud sans enfant (_simplify_node rendait Node(v)), et sa forme en
+    cache ne peut être qu'elle-même. Mêmes arbres, deux fois moins d'appels."""
     if root is None:
         return None
     out: dict = {}                      # id(noeud original) -> Node simplifié neuf
     stack = [(root, False)]
+    pop = stack.pop
+    push = stack.append
+    cache_get = _SIMPLIFY_CACHE.get
     while stack:
-        nd, processed = stack.pop()
+        nd, processed = pop()
         if processed:
             l = out.pop(id(nd.left))  if nd.left  is not None else None
             r = out.pop(id(nd.right)) if nd.right is not None else None
             out[id(nd)] = _simplify_node(nd.value, l, r)
-        else:
-            # Cache structurel au niveau du sous-arbre (lecture seule, copie)
-            h = nd._ehash
-            c = _SIMPLIFY_CACHE.get(h if h is not None else nd.exact_hash())
-            if c is not None:
-                out[id(nd)] = c.copy()
-                continue
-            stack.append((nd, True))
-            if nd.left  is not None: stack.append((nd.left,  False))
-            if nd.right is not None: stack.append((nd.right, False))
+            continue
+        left = nd.left
+        right = nd.right
+        if left is None and right is None:
+            out[id(nd)] = Node(nd.value)
+            continue
+        # Cache structurel au niveau du sous-arbre (lecture seule, copie)
+        h = nd._ehash
+        c = cache_get(h if h is not None else nd.exact_hash())
+        if c is not None:
+            out[id(nd)] = c.copy()
+            continue
+        push((nd, True))
+        if left  is not None: push((left,  False))
+        if right is not None: push((right, False))
     return out[id(root)]
+
+
+_UNARY_FOLD = frozenset(("sin", "cos", "tan", "tanh", "exp", "log", "sqrt",
+                         "abs", "neg", "sq", "cube"))
 
 
 def _simplify_node(v, left, right) -> Node:
     """Applique les règles algébriques à UN nœud dont les enfants sont déjà
     simplifiés. left/right appartiennent exclusivement à l'appelant : les
-    réutiliser dans le résultat est sûr (aucun partage inter-arbres)."""
+    réutiliser dans le résultat est sûr (aucun partage inter-arbres).
+    [v0.8] Mêmes règles, dans le même ordre ; tests d'appartenance par
+    ensemble et prédicats _is_float/_is_const calculés une fois."""
+    lf = left is not None and isinstance(left.value, float)
+    rf = right is not None and isinstance(right.value, float)
     # Repliage des constantes unaires (inclut tanh)
-    if v in ("sin", "cos", "tan", "tanh", "exp", "log", "sqrt", "abs", "neg", "sq", "cube"):
-        if _is_float(left):
-            try:
-                c = left.value
-                if v == "sin":   return Node(float(math.sin(c)))
-                if v == "cos":   return Node(float(math.cos(c)))
-                if v == "tan":   return Node(float(safe_tan(c)))
-                if v == "tanh":  return Node(float(math.tanh(c)))
-                if v == "exp":   return Node(float(safe_exp(c)))
-                if v == "log":   return Node(float(safe_log(c)))
-                if v == "sqrt":  return Node(float(safe_sqrt(c)))
-                if v == "abs":   return Node(float(abs(c)))
-                if v == "neg":   return Node(float(-c))
-                if v == "sq":    return Node(float(c * c))
-                if v == "cube":  return Node(float(c * c * c))
-            except Exception:
-                pass
+    if lf and v in _UNARY_FOLD:
+        try:
+            c = left.value
+            if v == "sin":   return Node(float(math.sin(c)))
+            if v == "cos":   return Node(float(math.cos(c)))
+            if v == "tan":   return Node(float(safe_tan(c)))
+            if v == "tanh":  return Node(float(math.tanh(c)))
+            if v == "exp":   return Node(float(safe_exp(c)))
+            if v == "log":   return Node(float(safe_log(c)))
+            if v == "sqrt":  return Node(float(safe_sqrt(c)))
+            if v == "abs":   return Node(float(abs(c)))
+            if v == "neg":   return Node(float(-c))
+            if v == "sq":    return Node(float(c * c))
+            if v == "cube":  return Node(float(c * c * c))
+        except Exception:
+            pass
 
-    # Règles binaires identitaires
+    # Règles binaires identitaires (_is_const(n, k) = n flottant et
+    # |n.value - k| < 1e-9)
     if v == "+":
-        if _is_const(right, 0):  return left
-        if _is_const(left,  0):  return right
+        if rf and abs(right.value - 0) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return right
         # expr + expr -> 2.0 * expr
         if (left is not None and right is not None
-                and not _is_float(left) and not _is_float(right)
+                and not lf and not rf
                 and left.exact_hash() == right.exact_hash()):
             return Node("*", Node(2.0), left)
-    if v == "-":
-        if _is_const(right, 0):  return left
-        if _is_const(left,  0):  return Node("neg", right)
+    elif v == "-":
+        if rf and abs(right.value - 0) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return Node("neg", right)
         if left and right and left.exact_hash() == right.exact_hash():
             return Node(0.0)
-    if v == "*":
-        if _is_const(right, 1):  return left
-        if _is_const(left,  1):  return right
-        if _is_const(right, 0):  return Node(0.0)
-        if _is_const(left,  0):  return Node(0.0)
-        if _is_const(right, -1): return Node("neg", left)
-        if _is_const(left,  -1): return Node("neg", right)
-        if _is_float(right) and abs(right.value) < 1e-6: return Node(0.0)
-        if _is_float(left)  and abs(left.value)  < 1e-6: return Node(0.0)
-    if v == "/":
-        if _is_const(right, 1):  return left
-        if _is_const(left,  0):  return Node(0.0)
+    elif v == "*":
+        if rf and abs(right.value - 1) < 1e-9:  return left
+        if lf and abs(left.value - 1) < 1e-9:   return right
+        if rf and abs(right.value - 0) < 1e-9:  return Node(0.0)
+        if lf and abs(left.value - 0) < 1e-9:   return Node(0.0)
+        if rf and abs(right.value - -1) < 1e-9: return Node("neg", left)
+        if lf and abs(left.value - -1) < 1e-9:  return Node("neg", right)
+        if rf and abs(right.value) < 1e-6: return Node(0.0)
+        if lf and abs(left.value)  < 1e-6: return Node(0.0)
+    elif v == "/":
+        if rf and abs(right.value - 1) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return Node(0.0)
         if left and right and left.exact_hash() == right.exact_hash():
             return Node(1.0)
         # (a * b) / a = b  et  (a * b) / b = a
@@ -4668,14 +4694,14 @@ def _simplify_node(v, left, right) -> Node:
             dh = right.exact_hash()      if right      else None
             if lh and lh == dh: return left.right
             if rh and rh == dh: return left.left
-    if v == "pow":
-        if _is_const(right, 0):  return Node(1.0)
-        if _is_const(right, 1):  return left
-        if _is_const(left,  0):  return Node(0.0)
-        if _is_const(left,  1):  return Node(1.0)
+    elif v == "pow":
+        if rf and abs(right.value - 0) < 1e-9:  return Node(1.0)
+        if rf and abs(right.value - 1) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return Node(0.0)
+        if lf and abs(left.value - 1) < 1e-9:   return Node(1.0)
 
     # Repliage des constantes binaires
-    if v in BINARY_OPS and _is_float(left) and _is_float(right):
+    if lf and rf and v in BINARY_OPS:
         a, b = left.value, right.value
         try:
             if v == "+":   return Node(float(a + b))

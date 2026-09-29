@@ -593,3 +593,26 @@ def test_square_of_a_negative_constant_is_positive_in_every_evaluator():
     assert [core.evaluate(t, row) for row in xs] == list(expected)
     fn, consts = core.compile_parametric(t)
     assert np.array_equal(fn(xs, np.array([c.value for c in consts])), expected)
+
+
+def test_prediction_cache_never_serves_another_arrays_predictions():
+    """The prediction cache is keyed by id(array). Once an array is freed its
+    id can be given to another array of the same size: the cache must not
+    serve the old predictions for it."""
+    import weakref
+    t = N("*", N(2.0), X(0))
+    a = np.array([[1.0], [2.0], [3.0]])
+    b = np.array([[10.0], [20.0], [30.0]])
+
+    class Dead:
+        pass
+    ghost = Dead()
+    dead_ref = weakref.ref(ghost)
+    del ghost                                  # an array that no longer exists
+    key = (t.exact_hash(), id(b), b.shape[0])
+    core._PRED_CACHE[key] = (dead_ref, np.array([2.0, 4.0, 6.0]))
+    try:
+        assert np.array_equal(core._predict_cached(t, b), [20.0, 40.0, 60.0])
+        assert np.array_equal(core._predict_cached(t, a), [2.0, 4.0, 6.0])
+    finally:
+        core._PRED_CACHE.pop(key, None)

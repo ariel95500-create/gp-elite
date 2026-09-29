@@ -396,3 +396,203 @@ def test_interpreter_matches_compiled_code():
     core._EVAL_COUNTS.clear()
     assert _same(core.evaluate_vector(deep, X2), compiled(deep, X2))
     assert n == 3000
+
+
+# ------------------------------------------------------------ simplification
+# The 0.7 simplifier (gp_elite/core.py), with its own cache.
+
+from gp_elite.core import (Node, _is_float, _is_const, safe_tan, safe_exp,
+                           safe_log, safe_sqrt, safe_div, safe_pow, BINARY_OPS)
+import math
+
+_REF_CACHE = {}
+
+def _ref_simplify(node: Node) -> Node:
+    if node is None:
+        return node
+    h = node.exact_hash()
+    cached = _REF_CACHE.get(h)
+    if cached is not None:
+        return cached.copy()
+    result = _ref_simplify_tree(_ref_simplify_tree(node))
+    _REF_CACHE[h] = result
+    return result.copy()
+
+def _ref_simplify_tree(root: Node) -> Node:
+    if root is None:
+        return None
+    out: dict = {}
+    stack = [(root, False)]
+    while stack:
+        nd, processed = stack.pop()
+        if processed:
+            l = out.pop(id(nd.left)) if nd.left is not None else None
+            r = out.pop(id(nd.right)) if nd.right is not None else None
+            out[id(nd)] = _ref_simplify_node(nd.value, l, r)
+        else:
+            c = _REF_CACHE.get(nd.exact_hash())
+            if c is not None:
+                out[id(nd)] = c.copy()
+                continue
+            stack.append((nd, True))
+            if nd.left is not None:
+                stack.append((nd.left, False))
+            if nd.right is not None:
+                stack.append((nd.right, False))
+    return out[id(root)]
+
+def _ref_simplify_node(v, left, right) -> Node:
+    if v in ('sin', 'cos', 'tan', 'tanh', 'exp', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube'):
+        if _is_float(left):
+            try:
+                c = left.value
+                if v == 'sin':
+                    return Node(float(math.sin(c)))
+                if v == 'cos':
+                    return Node(float(math.cos(c)))
+                if v == 'tan':
+                    return Node(float(safe_tan(c)))
+                if v == 'tanh':
+                    return Node(float(math.tanh(c)))
+                if v == 'exp':
+                    return Node(float(safe_exp(c)))
+                if v == 'log':
+                    return Node(float(safe_log(c)))
+                if v == 'sqrt':
+                    return Node(float(safe_sqrt(c)))
+                if v == 'abs':
+                    return Node(float(abs(c)))
+                if v == 'neg':
+                    return Node(float(-c))
+                if v == 'sq':
+                    return Node(float(c * c))
+                if v == 'cube':
+                    return Node(float(c * c * c))
+            except Exception:
+                pass
+    if v == '+':
+        if _is_const(right, 0):
+            return left
+        if _is_const(left, 0):
+            return right
+        if left is not None and right is not None and (not _is_float(left)) and (not _is_float(right)) and (left.exact_hash() == right.exact_hash()):
+            return Node('*', Node(2.0), left)
+    if v == '-':
+        if _is_const(right, 0):
+            return left
+        if _is_const(left, 0):
+            return Node('neg', right)
+        if left and right and (left.exact_hash() == right.exact_hash()):
+            return Node(0.0)
+    if v == '*':
+        if _is_const(right, 1):
+            return left
+        if _is_const(left, 1):
+            return right
+        if _is_const(right, 0):
+            return Node(0.0)
+        if _is_const(left, 0):
+            return Node(0.0)
+        if _is_const(right, -1):
+            return Node('neg', left)
+        if _is_const(left, -1):
+            return Node('neg', right)
+        if _is_float(right) and abs(right.value) < 1e-06:
+            return Node(0.0)
+        if _is_float(left) and abs(left.value) < 1e-06:
+            return Node(0.0)
+    if v == '/':
+        if _is_const(right, 1):
+            return left
+        if _is_const(left, 0):
+            return Node(0.0)
+        if left and right and (left.exact_hash() == right.exact_hash()):
+            return Node(1.0)
+        if left is not None and left.value == '*':
+            lh = left.left.exact_hash() if left.left else None
+            rh = left.right.exact_hash() if left.right else None
+            dh = right.exact_hash() if right else None
+            if lh and lh == dh:
+                return left.right
+            if rh and rh == dh:
+                return left.left
+    if v == 'pow':
+        if _is_const(right, 0):
+            return Node(1.0)
+        if _is_const(right, 1):
+            return left
+        if _is_const(left, 0):
+            return Node(0.0)
+        if _is_const(left, 1):
+            return Node(1.0)
+    if v in BINARY_OPS and _is_float(left) and _is_float(right):
+        a, b = (left.value, right.value)
+        try:
+            if v == '+':
+                return Node(float(a + b))
+            if v == '-':
+                return Node(float(a - b))
+            if v == '*':
+                return Node(float(a * b))
+            if v == '/':
+                return Node(float(safe_div(a, b)))
+            if v == 'pow':
+                return Node(float(safe_pow(a, b)))
+        except Exception:
+            pass
+    if v == 'neg' and left is not None and (left.value == 'neg'):
+        return left.left
+    return Node(v, left, right)
+
+
+def test_simplify_matches_the_0_7_simplifier():
+    """Same outputs, tree after tree, from the same empty cache: the cache
+    contents then evolve identically, so a whole search simplifies alike."""
+    import random as pyrandom
+    rng = pyrandom.Random(5)
+    specials = [0.0, -0.0, 1.0, -1.0, 2.0, 1e-7, float("inf"), float("nan")]
+    ops_b = ["+", "-", "*", "/", "pow", "max2"]
+    ops_u = ["sin", "cos", "tan", "tanh", "exp", "log", "sqrt", "abs", "neg",
+             "sq", "cube", "step"]
+
+    def tree(d):
+        if d == 0 or rng.random() < 0.3:
+            u = rng.random()
+            if u < 0.35:
+                return Node(rng.uniform(-3, 3))
+            if u < 0.55:
+                return Node(float(rng.choice(specials)))
+            return Node("X[%d]" % rng.randrange(2))
+        if rng.random() < 0.6:
+            a = tree(d - 1)
+            b = a.copy() if rng.random() < 0.15 else tree(d - 1)   # x+x, x-x...
+            if rng.random() < 0.1:
+                a = Node("*", b.copy(), tree(d - 2) if d > 1 else Node(2.0))
+            return Node(rng.choice(ops_b), a, b)
+        return Node(rng.choice(ops_u), tree(d - 1))
+
+    def key(t):
+        out, st = [], [t]
+        while st:
+            n = st.pop()
+            if n is None:
+                out.append("_")
+                continue
+            out.append(float(n.value).hex() if isinstance(n.value, float) else str(n.value))
+            if n.left is not None or n.right is not None:
+                st.append(n.right)
+                st.append(n.left)
+        return " ".join(out)
+
+    trees = [tree(rng.randint(1, 6)) for _ in range(1500)]
+    trees += [t.copy() for t in trees[:300]]          # repeats hit the cache
+    saved = dict(core._SIMPLIFY_CACHE)
+    try:
+        core._SIMPLIFY_CACHE.clear()
+        _REF_CACHE.clear()
+        with np.errstate(all="ignore"):
+            for t in trees:
+                assert key(core.simplify(t)) == key(_ref_simplify(t)), key(t)
+    finally:
+        core._SIMPLIFY_CACHE.clear()
+        core._SIMPLIFY_CACHE.update(saved)
