@@ -200,6 +200,19 @@ def run_one(job):
         if Xo is not None and len(yo) >= 20:
             rec["err_ood"] = one_minus_r2(yo, r.predict(Xo))
             rec["n_ood"] = int(len(yo))
+    # Growth of the model outside the training box (diagnostic studied in
+    # campaign 2 onward; computed after the timing, never fed to the fit).
+    try:
+        lo, hi = Xtr.min(axis=0), Xtr.max(axis=0)
+        w = np.where(hi > lo, hi - lo, 1.0)
+        rng = np.random.RandomState(12345)
+        Xb = rng.uniform(lo - 0.25 * w, hi + 0.25 * w, (2000, Xtr.shape[1]))
+        p_tr = np.asarray(r.predict(Xtr), dtype=float)
+        p_b = np.asarray(r.predict(Xb), dtype=float)
+        s_tr = float(np.ptp(p_tr)) or 1e-30
+        rec["growth_box25"] = float(np.ptp(p_b)) / s_tr
+    except Exception:
+        pass
     rec["date"] = time.strftime("%Y-%m-%dT%H:%M:%S")
     rec["pythonhashseed"] = os.environ.get("PYTHONHASHSEED")
     return rec
