@@ -300,3 +300,44 @@ also takes the eight smallest candidates of the tolerance band in which the
 final selection chooses (`_finalists`); with the correction alone (C5a) the
 finalists are unchanged. Arms, problems and criteria are otherwise those
 written above, and the campaign is run again from the start.
+
+---
+
+# Decision on campaign 5, and campaign 5b — written before campaign 5b runs
+
+Written on 29 September 2026 at 12:15, after the runs of C5a and C5 (the
+R7raw runs of C4, which only serve the report on the correction, were still
+going) and before any run of campaign 5b.
+
+**H7 fails** on its collapse criterion. On F41, C5 recovers 75 exact laws
+against 64 for C5a (+11; runs exact for one arm only: 11 against 0), ahead on
+4 equations and behind on none; on real data (R6 and R7raw, 130 paired fits)
+the median paired difference is +0.000, but C5 has 12 collapses against 11.
+The polish is not kept as it was measured. The extra collapse, and more real
+fits worse than better (17 against 13), come from polished variants that win
+the final selection on the hold-out and extrapolate worse (547_no2, out of
+domain, seed 1: R² 0.362 with C5a, -0.359 with C5).
+
+**Campaign 5b** tests a restriction of the polish that removes that
+mechanism: a polished variant (converged constants, weighted sums) enters the
+final selection only if it reproduces the hold-out to numerical precision,
+under the floor below which the selection keeps only exact laws (1e-12 times
+the variance of the hold-out). The polish can then turn a right structure into
+an exact law, and never replaces an approximate model by another one. On
+measured data no variant reaches that floor, and the fit is the one of C5a.
+
+| Arm | Engine |
+|---|---|
+| C5a | commit `788d09d` (campaign 5: the correction alone) |
+| C5x | commit `0b23fed`: C5 with the restriction |
+
+**Problems.** Budget T. F41, R6 (folds and out of domain) and R7raw: C5x's
+335 fits, two at a time; C5a's are those of campaign 5. Reported without
+deciding: the number of polished variants admitted on real data (expected:
+none; recorded as `polish_admitted`), and `small_data_check.py`.
+
+**H7b.** The restricted polish is kept if, on F41, C5x recovers at least 6
+more exact laws than C5a and is ahead on more equations than it is behind,
+and, on real data (R6 and R7raw together, 130 paired fits), the median paired
+difference of test R² is at least -0.005 and C5x has no more collapses than
+C5a (11). Otherwise only the correction ships.
