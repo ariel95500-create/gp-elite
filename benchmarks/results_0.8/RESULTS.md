@@ -318,9 +318,9 @@ side. F gains I.12.2, I.8.14 and II.3.24 and loses one run of I.6.20a. On the
 real folds, F is worse on more folds than it is better (14 against 9, mean
 difference -0.008); within the criterion, and reported.
 
-At equal work the speed-up measured on the engine alone (2.2 to 3.6 times on
-13 reference configurations, identical models) is partly spent by what the
-quality changes add: the final polish, and the search itself when it no
-longer stops at an absolute MSE of 1e-6. On the Feynman equations the median
-fit takes 0.5 s instead of 12.3 s mostly because the exact laws are found at
-the first generations.
+The speed-up measured on the engine alone (2.2 to 3.6 times on 13 reference
+configurations, same models) is not all found on the real data here: the
+changes that alter the search and the final selection also change its cost
+(the final polish alone adds about 0.7 s per fit). On the Feynman equations
+the median fit takes 0.5 s instead of 12.3 s mostly because half of them find
+the exact law at the first generation (median: 1 generation, against 18).
