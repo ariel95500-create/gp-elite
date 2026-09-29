@@ -191,3 +191,38 @@ seeds 5 to 9 alone C8 recovers more exact laws than C1, (ii) over seeds 0 to 9
 (410 paired runs) the two-sided sign test on the runs exact for one arm only
 gives p < 0.10 in favour of C8, and (iii) the real-data criteria of H5 hold in
 campaign 3. Otherwise `normalize="auto"` keeps one factor per column.
+
+---
+
+# Decision on campaign 3, and campaign 4 — written before campaign 4 runs
+
+Written on 29 September 2026 at 09:35. Campaign 3 has ended: on real data,
+C8 has 6 collapses against 4 for C1, so H5 fails on its own criteria (iii of
+3b) whatever the Feynman confirmation would have given. The grouped
+normalisation does not become the default, and campaign 3b, whose outcome
+could no longer change that decision, was stopped after 47 fits (its records
+are kept, and used for nothing).
+
+**Campaign 4.** Arms C1 (`580aabf`) and C4 (`ff32450`): C1 plus two changes.
+
+- **Formula-faithful tie-break.** Among the candidates the final selection
+  cannot tell apart, the smallest was returned even when a numerical safety
+  net of the engine acted on the data, so that the delivered formula departs
+  from `predict()` (`formula_exact` False: 22 of C1's 205 Feynman fits and 6
+  of its 60 real-data fits in campaign 2). C4 prefers the smallest candidate
+  whose formula reproduces the model.
+- **Companion lookup.** The co-occurrence graph is indexed by canonical hash
+  but was queried with the structural hash: a fragment containing a constant
+  was never found (3,281 companions found out of 6,650 lookups on a 25
+  generation run of I.12.2, 6,798 out of 6,798 after the fix).
+
+C1's fits are those of campaign 2; C4 runs its 265 fits two at a time.
+
+**H6.** Both changes are kept if: C4 returns at most half as many inexact
+formulas as C1 over the 265 fits (at most 14 against 28); its exact laws on
+F41 are at least those of C1 minus 6 (the scatter measured between
+equivalent arms); on R6 the median paired difference of test R² is at least
+-0.005 and C4 has no more collapses than C1 (4). If only the inexact-formula
+criterion fails, the tie-break is dropped and the companion fix is kept if
+the other criteria hold; if the exact-law or real-data criteria fail, both
+are dropped.
