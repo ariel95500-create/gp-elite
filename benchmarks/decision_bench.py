@@ -14,6 +14,10 @@ Problems
   R6   the six frozen PMLB datasets of pmlb_frozen.py, standardised on the
        training part like SRBench: 5 folds, and one out-of-domain split
        (train on the 80 % of rows closest to the centre, test on the rest).
+  R7raw  the same six plus nikuradse_1, in their own units (not
+       standardised), same folds and out-of-domain split: the data a user
+       measures, where a change that needs positive values can act
+       (--raw-real).
 
 Budgets
   T    time_limit=30 s, generations=1000 (the clock stops the search)
@@ -48,15 +52,28 @@ BUDGETS = {
 SEEDS = [0, 1, 2, 3, 4]
 REAL = ["210_cloud", "228_elusage", "712_chscase_geyser1", "561_cpu",
         "690_visualizing_galaxy", "547_no2"]
+REAL_RAW = REAL + ["nikuradse_1"]
 
 
 # ─────────────────────────────────────────────────────────────── jobs ──
 
-def jobs_for(budget, seeds=None, feynman_only=False):
+def jobs_for(budget, seeds=None, feynman_only=False, raw_real=False):
     import feynman_bench as F
     n_feyn = len(F.PROBS) if budget == "T" else 15
     seeds = SEEDS if seeds is None else seeds
     out = []
+    if raw_real:                    # R7raw only: folds, then out of domain
+        for name in REAL_RAW:
+            for k in range(5):
+                out.append(dict(kind="realraw", problem=name,
+                                split="fold%d" % k, seed=0))
+        for name in REAL_RAW:
+            for s in seeds:
+                out.append(dict(kind="realraw", problem=name, split="ood",
+                                seed=s))
+        for j in out:
+            j["budget"] = budget
+        return out
     for i in range(n_feyn):
         for s in seeds:
             out.append(dict(kind="feyn", problem=F.PROBS[i][0], index=i,
@@ -127,7 +144,7 @@ def feyn_data(i):
     return X[tr], y[tr], X[te], y[te], Xo, yo, names, pool
 
 
-def real_data(name, split):
+def real_data(name, split, raw=False):
     import pmlb_frozen
     from sklearn.model_selection import KFold
     X, y = pmlb_frozen.load(name)
@@ -143,6 +160,8 @@ def real_data(name, split):
         order = np.argsort(d, kind="stable")
         n_te = int(round(0.2 * len(X)))
         tr, te = np.sort(order[:-n_te]), np.sort(order[-n_te:])
+    if raw:                                 # the data in its own units
+        return X[tr], y[tr], X[te], y[te]
     mx, sx = X[tr].mean(axis=0), X[tr].std(axis=0)
     sx[sx == 0] = 1.0
     my, sy = y[tr].mean(), y[tr].std() or 1.0
@@ -184,7 +203,8 @@ def run_one(job):
         Xtr, ytr, Xte, yte, Xo, yo, names, pool = feyn_data(job["index"])
         kw.update(feature_names=names, operators=pool)
     else:
-        Xtr, ytr, Xte, yte = real_data(job["problem"], job["split"])
+        Xtr, ytr, Xte, yte = real_data(job["problem"], job["split"],
+                                       raw=job["kind"] == "realraw")
         Xo = yo = None
         kw.update(operators="physical")
     import warnings
@@ -238,7 +258,8 @@ def _git_commit(path):
         return None
 
 
-def drive(arms, budget, out, workers, seeds=None, feynman_only=False):
+def drive(arms, budget, out, workers, seeds=None, feynman_only=False,
+          raw_real=False):
     done = set()
     if os.path.exists(out):
         for line in open(out):
@@ -246,7 +267,7 @@ def drive(arms, budget, out, workers, seeds=None, feynman_only=False):
                 done.add(job_key(json.loads(line)))
     commits = {a: _git_commit(p) for a, p in arms.items()}
     todo = []
-    for j in jobs_for(budget, seeds, feynman_only):
+    for j in jobs_for(budget, seeds, feynman_only, raw_real):
         group = []
         for a in arms:
             jj = dict(j, arm=a, commit=commits[a])
@@ -369,14 +390,20 @@ def summary(paths, budget, keep_arms=None):
                       % (arm, len(ood), np.median(ood),
                          sum(1 for o in ood if o > 1.0)))
 
-    for label, pred in (("folds", lambda sp: sp.startswith("fold")),
-                        ("out of domain", lambda sp: sp == "ood"),
-                        ("folds + out of domain", lambda sp: True)):
-        re_ = pairs("real", pred)
+    for kind, label, pred in (
+            ("real", "folds", lambda sp: sp.startswith("fold")),
+            ("real", "out of domain", lambda sp: sp == "ood"),
+            ("real", "folds + out of domain", lambda sp: True),
+            ("realraw", "folds", lambda sp: sp.startswith("fold")),
+            ("realraw", "out of domain", lambda sp: sp == "ood"),
+            ("realraw", "folds + out of domain", lambda sp: True)):
+        re_ = pairs(kind, pred)
         if not re_:
             continue
         d = [rb["r2"] - ra["r2"] for ra, rb in re_]
-        print("\nReal data, %s: %d paired fits" % (label, len(re_)))
+        print("\n%s, %s: %d paired fits"
+              % ("Real data" if kind == "real" else "Real data in raw units",
+                 label, len(re_)))
         for arm, idx in ((A, 0), (B, 1)):
             r2 = [p[idx]["r2"] for p in re_]
             print("  %s  R2 median %.4f  mean %.4f  worst %.4f  collapses %d"
@@ -405,6 +432,8 @@ def main():
     r.add_argument("--seeds", default=None,
                    help="comma-separated engine seeds (default 0,1,2,3,4)")
     r.add_argument("--feynman-only", action="store_true")
+    r.add_argument("--raw-real", action="store_true",
+                   help="run R7raw only (real data in its own units)")
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
@@ -422,7 +451,7 @@ def main():
         drive({k: os.path.abspath(v) for k, v in arms.items()}, a.budget,
               os.path.abspath(a.out), a.workers,
               [int(x) for x in a.seeds.split(",")] if a.seeds else None,
-              a.feynman_only)
+              a.feynman_only, a.raw_real)
     elif a.cmd == "summary":
         summary(a.paths, a.budget,
                 a.arms.split(",") if a.arms else None)
