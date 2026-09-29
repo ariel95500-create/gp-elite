@@ -725,3 +725,23 @@ def test_same_seed_same_model_across_python_launches():
         assert p.returncode == 0, p.stderr[-2000:]
         outs.append([l for l in p.stdout.splitlines() if l.startswith("EXPR")][-1])
     assert outs[0] == outs[1] == outs[2]
+
+
+def test_grouped_normalisation_shares_one_factor_between_comparable_columns():
+    """normalize='grouped' gives columns of comparable magnitude one common
+    factor (sums and differences of them keep their form), and keeps the
+    formula in the raw variables exact."""
+    Xd = np.c_[np.linspace(1, 4.97, 20), np.linspace(1, 4.99, 20),
+               np.linspace(100, 700, 20)]
+    sc, _ = core._choose_scaler(Xd, "grouped", (-2.0, 2.0))
+    sc.fit_transform(Xd)
+    assert sc.scale_[0] == sc.scale_[1] == 4.99 and sc.scale_[2] == 700.0
+    sc2, _ = core._choose_scaler(Xd, "auto", (-2.0, 2.0))
+    sc2.fit_transform(Xd)
+    assert sc2.scale_[0] == 4.97              # the default is unchanged
+    r = np.random.RandomState(3)
+    X4 = r.uniform(1, 5, (120, 4))
+    y = np.sqrt((X4[:, 1] - X4[:, 0]) ** 2 + (X4[:, 3] - X4[:, 2]) ** 2)
+    res = symbolic_regression(X4, y, normalize="grouped", generations=5,
+                              parallel=False, seed=0)
+    assert res.formula_exact

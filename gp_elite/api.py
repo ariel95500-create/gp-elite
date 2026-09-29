@@ -485,7 +485,10 @@ def symbolic_regression(
     y : ndarray (n_samples,)             — cible
     feature_names : noms des colonnes (sinon X0, X1, …) — apparaissent dans la formule
     operators : 'physical' | 'trig' | 'full' | 'poly'  — pool d'opérateurs
-    normalize : 'auto' | 'divmax' | 'minmax' | 'standard' | 'none'
+    normalize : 'auto' | 'divmax' | 'grouped' | 'minmax' | 'standard' | 'none'
+                'grouped' [v0.8] : un facteur commun aux colonnes d'échelles
+                comparables, pour les lois qui additionnent ou soustraient
+                des variables de même nature (voir le README).
                 'auto' = 'divmax' : chaque colonne divisée par son max|x|,
                 sans décalage (préserve x*y, x/y, x^n). [v0.7] Aussi pour les
                 colonnes signées, qui passaient auparavant en min-max.
@@ -570,10 +573,12 @@ def symbolic_regression(
         raise ValueError("speed=%r is not one of ['ultrafast', 'fast', "
                          "'normal', 'thorough']" % (speed,))
     _norms = ("auto", "divmax", "shiftfree", "div", "minmax", "standard",
-              "zscore", "std", "none", "off", "raw", "identity", "smart")
+              "zscore", "std", "none", "off", "raw", "identity", "smart",
+              "grouped")
     if (normalize or "auto").lower() not in _norms:
         raise ValueError("normalize=%r is not one of ['auto', 'divmax', "
-                         "'minmax', 'standard', 'none', 'smart']" % (normalize,))
+                         "'grouped', 'minmax', 'standard', 'none', 'smart']"
+                         % (normalize,))
     scaler, _desc = core._choose_scaler(X, normalize, (-2.0, 2.0))
     X_scaled = scaler.fit_transform(X)
 

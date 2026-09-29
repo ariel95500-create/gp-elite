@@ -8437,15 +8437,45 @@ class _ShiftFreeScaler:
     (x+β1)(y+β2) = x·y + β1·y + β2·x + β1β2 (termes croisés → arbres gonflés).
     Le benchmark Feynman a montré 4-9× moins de nœuds et R² parfait sur les
     lois multiplicatives avec cette normalisation."""
-    def __init__(self):
+    # [v0.8] Option normalize="grouped" : UN facteur commun aux colonnes
+    # d'échelles comparables (max|x| à moins d'un facteur GROUP_RATIO les uns
+    # des autres). Diviser chaque colonne par son propre max|x| préserve les
+    # produits mais pas les sommes et différences de variables de même
+    # nature : sur Feynman I.8.14, sqrt((x2-x1)^2 + (y2-y1)^2) avec des
+    # maxima de 4,97 et 4,99 devient une autre fonction des variables
+    # normalisées. Mesuré (benchmarks/results_0.8, campagne 3) : 75 lois
+    # exactes contre 69 sur 205 (I.8.14 : 5/5 contre 0/5), R² réel médian
+    # 0,769 contre 0,735, mais 6 effondrements hors domaine contre 4 : pas le
+    # défaut, une option.
+    GROUP_RATIO = 10.0
+
+    def __init__(self, group_ratio=None):
         self.scale_ = None
+        self.group_ratio = group_ratio
+
     def fit_transform(self, X):
         m = np.max(np.abs(X), axis=0).astype(np.float64)
         m[m < 1e-12] = 1.0
+        ratio = getattr(self, "group_ratio", None)
+        if ratio is not None and ratio > 1.0 and m.size > 1:
+            order = np.argsort(m, kind="stable")
+            scale = m.copy()
+            start = 0
+            while start < len(order):
+                end = start
+                while (end + 1 < len(order)
+                       and m[order[end + 1]] <= ratio * m[order[start]]):
+                    end += 1
+                grp = order[start:end + 1]
+                scale[grp] = m[grp].max()
+                start = end + 1
+            m = scale
         self.scale_ = m
         return X / m
+
     def transform(self, X):
         return X / self.scale_
+
     def inverse_transform(self, Xs):
         return Xs * self.scale_
 
@@ -8538,6 +8568,9 @@ def _choose_scaler(X_raw, normalize, x_range):
         mode = "divmax"
     if mode in ("divmax", "shiftfree", "div"):
         return _ShiftFreeScaler(), "divmax (shift-free, preserves products)"
+    if mode == "grouped":                              # [v0.8] option
+        return (_ShiftFreeScaler(group_ratio=_ShiftFreeScaler.GROUP_RATIO),
+                "divmax, one factor per group of comparable columns")
     if mode in ("standard", "zscore", "std"):
         from sklearn.preprocessing import StandardScaler as _SS
         return _SS(), "standard (z-score)"
