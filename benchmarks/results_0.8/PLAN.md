@@ -148,3 +148,6 @@ and out of domain together), the median of the paired differences of test R²
 C8 recovers no more exact laws than C1, or if the median real-data difference
 is below -0.01. Reported without deciding: the equations gained and lost,
 model sizes, the out-of-domain error of the models that are not exact.
+
+To halve the cost, C1's fits are those of campaign 2; C8's fits run two at a
+time, as every fit of these campaigns does (two processes on the two cores).
