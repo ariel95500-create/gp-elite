@@ -616,3 +616,112 @@ def test_prediction_cache_never_serves_another_arrays_predictions():
         assert np.array_equal(core._predict_cached(t, a), [2.0, 4.0, 6.0])
     finally:
         core._PRED_CACHE.pop(key, None)
+
+
+# ── 14. Bad inputs are refused with a clear message, never fitted silently ──
+# Measured on 0.7: a NaN in X or an infinity in y went through, and the fit
+# returned an unrelated formula without any warning; predict() took one
+# sample given as a 1-D array for a column, accepted a wrong number of
+# columns, and returned 0 for a row containing NaN.
+
+def _xy():
+    r = np.random.RandomState(0)
+    X = r.uniform(1, 5, (40, 2))
+    return X, X[:, 0] * X[:, 1] + 1.0
+
+
+@pytest.mark.parametrize("where", ["X", "y"])
+def test_missing_or_infinite_values_are_refused(where):
+    X, y = _xy()
+    X, y = X.copy(), y.copy()
+    if where == "X":
+        X[3, 1] = np.nan
+    else:
+        y[5] = np.inf
+    with pytest.raises(ValueError, match="missing or infinite"):
+        symbolic_regression(X, y, generations=2, parallel=False, seed=0)
+
+
+def test_non_numeric_column_is_named():
+    pd = pytest.importorskip("pandas")
+    X, y = _xy()
+    df = pd.DataFrame({"mass": X[:, 0], "label": ["a"] * 40})
+    with pytest.raises(ValueError, match="'label' is not numeric"):
+        symbolic_regression(df, y, generations=2, parallel=False, seed=0)
+
+
+def test_dataframe_column_names_become_the_variables():
+    pd = pytest.importorskip("pandas")
+    X, y = _xy()
+    df = pd.DataFrame({"mass": X[:, 0], "speed": X[:, 1]})
+    res = symbolic_regression(df, y, generations=5, parallel=False, seed=0)
+    assert res.feature_names == ["mass", "speed"]
+    assert "mass" in res.expression and "speed" in res.expression
+
+
+def test_target_as_a_column_and_single_variable_as_1d_are_accepted():
+    X, y = _xy()
+    res = symbolic_regression(X, y.reshape(-1, 1), generations=2,
+                              parallel=False, seed=0)
+    assert res.predict(X).shape == (40,)
+    res1 = symbolic_regression(X[:, 0], 3.0 * X[:, 0], generations=2,
+                               parallel=False, seed=0)
+    assert res1.predict(X[:, :1]).shape == (40,)
+
+
+def test_predict_checks_the_shape_and_propagates_missing_values():
+    X, y = _xy()
+    res = symbolic_regression(X, y, generations=5, parallel=False, seed=0)
+    one = X[:1]
+    with pytest.raises(ValueError, match="reshape\\(1, -1\\)"):
+        res.predict(one.ravel())                  # one sample given as 1-D
+    with pytest.raises(ValueError, match="fitted on 2"):
+        res.predict(np.ones((4, 3)))
+    with pytest.raises(ValueError, match="fitted on 2"):
+        res.predict(np.ones((4, 1)))
+    Xm = X[:3].copy()
+    Xm[1, 0] = np.nan
+    p = res.predict(Xm)
+    assert np.isnan(p[1]) and np.isfinite(p[[0, 2]]).all()
+    assert np.array_equal(p[[0, 2]], res.predict(X[[0, 2]]))
+    for entry in res.pareto or []:
+        assert np.isnan(entry.predict(Xm)[1])
+
+
+def test_sympy_expr_is_right_for_any_column_name():
+    sympy = pytest.importorskip("sympy")
+    X, y = _xy()
+    res = symbolic_regression(X, y, feature_names=["E", "mass (kg)"],
+                              generations=5, parallel=False, seed=0)
+    with pytest.warns(UserWarning, match="misread"):
+        res.sympy()
+    e = res.sympy_expr()
+    assert {str(s) for s in e.free_symbols} <= {"E", "mass (kg)"}
+    f = sympy.lambdify([sympy.Symbol("E"), sympy.Symbol("mass (kg)")], e, "numpy")
+    assert np.allclose(f(X[:, 0], X[:, 1]), res.predict(X), rtol=1e-9, atol=1e-9)
+
+
+# ── 15. seed= alone reproduces a fit, whatever PYTHONHASHSEED is ────────────
+# Measured on 0.7: two launches of the same script with seed=0 returned
+# different models unless PYTHONHASHSEED was set before starting Python
+# (tree hashes carried strings, and their values oriented some draws).
+
+def test_same_seed_same_model_across_python_launches():
+    import subprocess
+    import sys
+    code = (
+        "import numpy as np\n"
+        "from gp_elite import symbolic_regression\n"
+        "r = np.random.RandomState(9)\n"
+        "X = r.uniform(-3, 3, (150, 2)); y = X[:, 0] * X[:, 1] ** 2 - 0.5 * X[:, 0]\n"
+        "res = symbolic_regression(X, y, generations=6, speed='ultrafast',\n"
+        "                          restarts=2, parallel=False, seed=5)\n"
+        "print('EXPR', res.expression)\n")
+    outs = []
+    for hs in ("0", "1", "12345"):
+        env = dict(os.environ, PYTHONHASHSEED=hs)
+        p = subprocess.run([sys.executable, "-c", code], env=env,
+                           capture_output=True, text=True, timeout=600)
+        assert p.returncode == 0, p.stderr[-2000:]
+        outs.append([l for l in p.stdout.splitlines() if l.startswith("EXPR")][-1])
+    assert outs[0] == outs[1] == outs[2]

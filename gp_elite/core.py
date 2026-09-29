@@ -378,6 +378,8 @@ GP_ELITE.py  —  Genetic Programming symbolique haute performance
 from __future__ import annotations
 import bisect
 import math
+import struct
+import hashlib
 import operator
 import weakref
 import random
@@ -2190,6 +2192,91 @@ def _active_pools():
     return b_ops, b_w, u_ops, u_w, all_ops, all_w
 
 
+# [v0.8] HACHAGE DES ARBRES INDÉPENDANT DE PYTHONHASHSEED.
+# Jusqu'en 0.7, les hash d'arbres portaient des chaînes (noms d'opérateurs et
+# de variables, constantes écrites en hexadécimal) dont le hash change d'un
+# lancement de Python à l'autre. Leur VALEUR orientait certains tirages (le
+# graphe de co-occurrences range chaque paire de fragments par hash
+# croissant) : deux lancements du même script avec seed=0 rendaient des
+# modèles différents, sauf à fixer PYTHONHASHSEED=0 avant de lancer Python.
+# Les chaînes sont maintenant codées par un entier stable (blake2b, 64 bits)
+# et les constantes par leurs bits IEEE ; hash() d'un tuple d'entiers ne
+# dépend pas de PYTHONHASHSEED. seed= suffit à reproduire un ajustement.
+
+_STR_CODES: Dict[str, int] = {}
+_PACK_D = struct.Struct("<d").pack
+_UNPACK_Q = struct.Struct("<q").unpack
+_TAG_FLOAT, _TAG_OTHER, _TAG_UNARY, _TAG_BINARY = 1, 2, 3, 4
+_CANON_CONST = hash((_TAG_FLOAT, 0x7FF0DEADC0DE))
+
+
+def _str_code(s) -> int:
+    c = _STR_CODES.get(s)
+    if c is None:
+        c = int.from_bytes(hashlib.blake2b(str(s).encode("utf-8", "surrogatepass"),
+                                           digest_size=8).digest(), "little")
+        _STR_CODES[s] = c
+    return c
+
+
+def _value_code(v) -> int:
+    """Code stable d'une valeur de nœud non flottante (opérateur, variable)."""
+    if isinstance(v, str):
+        return _str_code(v)
+    if isinstance(v, int):
+        return v
+    return _str_code(repr(v))
+
+
+def _leaf_code_exact(v) -> int:
+    if isinstance(v, float):
+        return hash((_TAG_FLOAT, _UNPACK_Q(_PACK_D(v))[0]))
+    return hash((_TAG_OTHER, _value_code(v)))
+
+
+def _leaf_code_rounded(v) -> int:
+    if isinstance(v, float):
+        # + 0.0 : -0.0 et 0.0 restent le même individu, comme avant
+        return hash((_TAG_FLOAT, _UNPACK_Q(_PACK_D(round(v, 4) + 0.0))[0]))
+    return hash((_TAG_OTHER, _value_code(v)))
+
+
+def _leaf_code_canonical(v) -> int:
+    if isinstance(v, float):
+        return _CANON_CONST
+    return hash((_TAG_OTHER, _value_code(v)))
+
+
+def _node_hashes(root, attr, leaf_code):
+    """Calcule et mémorise `attr` sur tous les nœuds de root qui ne l'ont
+    pas encore (pré-ordre, puis enfants avant parents)."""
+    stack = [root]
+    order = []
+    pop = stack.pop
+    push = stack.append
+    add = order.append
+    while stack:
+        nd = pop()
+        add(nd)
+        l = nd.left
+        if l is not None and getattr(l, attr) is None:
+            push(l)
+        r = nd.right
+        if r is not None and getattr(r, attr) is None:
+            push(r)
+    for nd in reversed(order):
+        l = nd.left
+        r = nd.right
+        if l is None and r is None:
+            setattr(nd, attr, leaf_code(nd.value))
+        elif r is None:
+            setattr(nd, attr, hash((_TAG_UNARY, _value_code(nd.value),
+                                    getattr(l, attr))))
+        else:
+            setattr(nd, attr, hash((_TAG_BINARY, _value_code(nd.value),
+                                    getattr(l, attr), getattr(r, attr))))
+
+
 class Node:
     __slots__ = ("value", "left", "right", "_hash", "_chash", "_ehash")
 
@@ -2230,30 +2317,12 @@ class Node:
         return root
 
     def structural_hash(self) -> int:
-        """Hash structurel, mémoïsé, calcul ITÉRATIF post-ordre.
-        [OPT v18] Plus de str(round(v)) par feuille ni de récursion Python."""
-        if self._hash is not None:
-            return self._hash
-        stack = [(self, False)]
-        while stack:
-            nd, processed = stack.pop()
-            if nd._hash is not None:
-                continue
-            if processed:
-                if nd.left is None and nd.right is None:
-                    nd._hash = hash(("leaf", round(nd.value, 4)
-                                     if isinstance(nd.value, float) else nd.value))
-                elif nd.right is None:
-                    nd._hash = hash(("unary", nd.value, nd.left._hash))
-                else:
-                    nd._hash = hash(("binary", nd.value,
-                                     nd.left._hash, nd.right._hash))
-            else:
-                stack.append((nd, True))
-                if nd.left  is not None and nd.left._hash  is None:
-                    stack.append((nd.left,  False))
-                if nd.right is not None and nd.right._hash is None:
-                    stack.append((nd.right, False))
+        """Hash structurel (constantes arrondies à 4 décimales), mémoïsé.
+        [v0.8] Indépendant de PYTHONHASHSEED : voir _node_hashes."""
+        h = self._hash
+        if h is not None:
+            return h
+        _node_hashes(self, "_hash", _leaf_code_rounded)
         return self._hash
 
     def exact_hash(self) -> int:
@@ -2272,8 +2341,8 @@ class Node:
         h = self._ehash
         if h is not None:
             return h
-        # [v0.8] pré-ordre puis parcours inverse (enfants avant parents) :
-        # mêmes valeurs de hash, moins d'allocations que la pile à drapeaux.
+        # Même calcul que _node_hashes(self, "_ehash", _leaf_code_exact),
+        # écrit avec des accès directs : c'est le hash le plus sollicité.
         stack = [self]
         order = []
         pop = stack.pop
@@ -2288,45 +2357,35 @@ class Node:
             r = nd.right
             if r is not None and r._ehash is None:
                 push(r)
+        codes = _STR_CODES
         for nd in reversed(order):
             l = nd.left
             r = nd.right
+            v = nd.value
             if l is None and r is None:
-                v = nd.value
-                nd._ehash = hash(("leaf", v.hex()
-                                  if isinstance(v, float) else v))
-            elif r is None:
-                nd._ehash = hash(("unary", nd.value, l._ehash))
+                if isinstance(v, float):
+                    nd._ehash = hash((1, _UNPACK_Q(_PACK_D(v))[0]))
+                else:
+                    c = codes.get(v) if isinstance(v, str) else None
+                    nd._ehash = hash((2, c if c is not None else _value_code(v)))
+                continue
+            c = codes.get(v) if isinstance(v, str) else None
+            if c is None:
+                c = _value_code(v)
+            if r is None:
+                nd._ehash = hash((3, c, l._ehash))
             else:
-                nd._ehash = hash(("binary", nd.value, l._ehash, r._ehash))
+                nd._ehash = hash((4, c, l._ehash, r._ehash))
         return self._ehash
 
     def canonical_hash(self) -> int:
-        """Hash canonique (constantes -> 'C'), MÉMOÏSÉ et itératif.
+        """Hash canonique (toute constante vaut 'C'), mémoïsé.
         [OPT v18] L'ancienne version recalculait récursivement à chaque appel
         -> O(n²) par individu dans _is_banned et le scan de dominance."""
-        if self._chash is not None:
-            return self._chash
-        stack = [(self, False)]
-        while stack:
-            nd, processed = stack.pop()
-            if nd._chash is not None:
-                continue
-            if processed:
-                if nd.left is None and nd.right is None:
-                    key = "C" if isinstance(nd.value, float) else nd.value
-                    nd._chash = hash(("leaf", key))
-                elif nd.right is None:
-                    nd._chash = hash(("unary", nd.value, nd.left._chash))
-                else:
-                    nd._chash = hash(("binary", nd.value,
-                                      nd.left._chash, nd.right._chash))
-            else:
-                stack.append((nd, True))
-                if nd.left  is not None and nd.left._chash  is None:
-                    stack.append((nd.left,  False))
-                if nd.right is not None and nd.right._chash is None:
-                    stack.append((nd.right, False))
+        h = self._chash
+        if h is not None:
+            return h
+        _node_hashes(self, "_chash", _leaf_code_canonical)
         return self._chash
 
     def invalidate_hash(self):
