@@ -4814,6 +4814,9 @@ def optimize_constants_lm(node: Node,
     child = node.copy()
     y  = np.asarray(ys, dtype=float)
     _varpro = _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
+    _ls_scale_only = _LS_SCALE_ONLY
+    _ym = float(y.mean())
+    _yc = y - _ym
     _LM_NUM_CLIP = 1e150   # [v0.4] borne anti-overflow : au-dela, r@r ou J.T@J
                            # depassent float64. sq/cube/* ne sont pas bornes par
                            # _SAFE_LIMIT et peuvent sortir ~1e217.
@@ -4834,9 +4837,23 @@ def optimize_constants_lm(node: Node,
             # évaluation), celle que juge la fitness. Sans cela, LM ajustait
             # les constantes pour que f seule colle à y, et déformait la
             # forme dès que l'arbre n'avait pas de constante d'échelle libre.
-            a_ls, b_ls, ok = _linear_scale_params(p, y)
-            if ok:
-                p = a_ls + b_ls * p
+            # Mêmes opérations que _linear_scale_params (moyenne et écart de
+            # y calculés une fois ; p est fini ici, ce qui rend son test de
+            # finitude redondant avec celui de l'amplitude).
+            if _ls_scale_only:
+                a_ls, b_ls, ok = _linear_scale_params(p, y)
+                if ok:
+                    p = a_ls + b_ls * p
+            else:
+                pm = float(p.mean())
+                pc = p - pm
+                if not float(np.max(np.abs(pc))) > 1e15:
+                    var_p = float(np.dot(pc, pc))
+                    if not var_p < 1e-12:
+                        b_ls = float(np.dot(pc, _yc)) / var_p
+                        a_ls = _ym - b_ls * pm
+                        if math.isfinite(a_ls) and math.isfinite(b_ls):
+                            p = a_ls + b_ls * p
         return _np_minimum(_np_maximum(p - y, -_LM_NUM_CLIP), _LM_NUM_CLIP)
 
     # [v0.8] plan incrémental quand il est disponible ; sinon, évaluation
