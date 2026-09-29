@@ -148,7 +148,7 @@ correction of an evaluation.
 ## Campaign 5 — correction of the scale after Levenberg-Marquardt (C5a), and polish of the finalists (C5)
 
 Records: `campaign5_T.jsonl` (C5a and C5 side by side on F41, R6 and R7raw,
-740 fits with the R7raw runs of C4, 29 September 2026, 09:36 to 12:21; C4's
+740 fits with the R7raw runs of C4, 29 September 2026, 09:36 to 12:24; C4's
 F41 and R6 fits are those of campaign 4). The first start of the campaign,
 stopped after 72 fits and amended before the restart (`PLAN.md`), is kept in
 `campaign5_T_stopped.jsonl` and not used. Small data: `small_data_C5.jsonl`
