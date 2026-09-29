@@ -5641,7 +5641,11 @@ def build_stigmergic_tree_v2(lib: FragmentLibrary,
         tree = root_frag   # repli conservatif
 
     # ---- Étape 3 : greffages supplémentaires ----
-    h_root = root_frag.structural_hash()
+    # [v0.8] Le graphe de co-occurrences est indexé par canonical_hash
+    # (FragmentCoGraph.deposit_individual) : le chercher par structural_hash
+    # ne trouvait le fragment que s'il ne contenait aucune constante, et le
+    # tirage d'un compagnon retombait sinon sur la bibliothèque seule.
+    h_root = root_frag.canonical_hash()
     for _ in range(8):
         remaining = target_size - tree_size(tree)
         if remaining < 2:
@@ -5815,7 +5819,11 @@ def build_stigmergic_tree_v3(lib: FragmentLibrary,
                     else Node(bin_op, companion, top_down))
 
     # Fragments supplémentaires via co-graph
-    h_root = root_frag.structural_hash()
+    # [v0.8] Le graphe de co-occurrences est indexé par canonical_hash
+    # (FragmentCoGraph.deposit_individual) : le chercher par structural_hash
+    # ne trouvait le fragment que s'il ne contenait aucune constante, et le
+    # tirage d'un compagnon retombait sinon sur la bibliothèque seule.
+    h_root = root_frag.canonical_hash()
     for _ in range(4):
         remaining = (cfg.MAX_TREE_SIZE // 2) - tree_size(top_down)
         if remaining < 2:
