@@ -7145,9 +7145,11 @@ def _track_val_candidate(cand):
 # arbre, ses constantes ajustées jusqu'à convergence (100 itérations), et
 # l'arbre dont chaque terme de somme ou de différence reçoit son propre
 # coefficient (A ± B devient a·A ± b·B), ajusté de même. Ces candidats ne
-# changent pas la recherche : ils passent par la même sélection finale que
-# les autres (hold-out, règle de parcimonie), où un arbre plus grand n'est
-# retenu que s'il fait nettement mieux qu'un plus petit.
+# changent pas la recherche, et n'entrent dans la sélection finale que s'ils
+# reproduisent le hold-out à la précision numérique (_track_if_exact) : le
+# polissage rend exacte une structure juste, il ne remplace jamais un modèle
+# approché par un autre (campagne 5 : sans cette règle, des variantes plus
+# ajustées gagnaient la sélection et extrapolaient moins bien).
 
 _FINAL_LM_ITER = 100          # itérations de LM pour les finalistes
 _WEIGHTED_SUMS_MAX = 6        # au-delà de 6 sommes, pas de variante pondérée
@@ -7293,6 +7295,34 @@ def _finalists(cfg, k: int = 8) -> list:
     return top + small
 
 
+_POLISH_ADMITTED = 0          # variantes polies admises (diagnostic, bancs)
+
+
+def _track_if_exact(cand) -> None:
+    """[v0.8] Un candidat du polissage n'entre dans la sélection finale que
+    s'il reproduit le hold-out à la précision numérique (le plancher sous
+    lequel la sélection ne garde que des lois exactes, _EXACT_REL). Le
+    polissage peut ainsi rendre exacte une structure juste, mais il ne
+    remplace jamais un modèle approché par un autre modèle approché : sur des
+    données mesurées, aucune variante n'atteint ce plancher, et le résultat
+    est celui qu'on aurait eu sans lui. (Mesuré dans la campagne 5 : sans
+    cette règle, des variantes plus ajustées gagnaient la sélection sur le
+    hold-out et extrapolaient moins bien.)"""
+    if cand is None or _VAL_XS is None or _VAL_YS is None or len(_VAL_YS) < 2:
+        return
+    var_val = float(np.var(_VAL_YS))
+    if not var_val > 1e-15:
+        return
+    try:
+        with np.errstate(all="ignore"):
+            m = float(np.mean((evaluate_vector(cand, _VAL_XS) - _VAL_YS) ** 2))
+    except Exception:
+        return
+    if math.isfinite(m) and m <= _EXACT_REL * var_val:
+        globals()["_POLISH_ADMITTED"] = _POLISH_ADMITTED + 1
+        _track_val_candidate(cand)
+
+
 def _polish_finalists(top, xs, ys, cfg) -> None:
     """Polissage des finalistes avant la sélection finale (voir plus haut).
     Le premier candidat de chaque finaliste est celui de la 0.7 (constantes
@@ -7307,7 +7337,7 @@ def _polish_finalists(top, xs, ys, cfg) -> None:
         try:
             conv = _lm_to_convergence(pol, xs, ys, cfg)
             if conv is not None:
-                _track_val_candidate(_refit_scaling(conv, xs, ys))
+                _track_if_exact(_refit_scaling(conv, xs, ys))
             seen = set()
             for inner in (True, False):
                 wt = _weight_sums(pol, innermost_only=inner)
@@ -7319,7 +7349,7 @@ def _polish_finalists(top, xs, ys, cfg) -> None:
                     ws = simplify(wt)
                     if _pure_mse(ws, xs, ys) <= _pure_mse(wt, xs, ys):
                         wt = ws
-                    _track_val_candidate(_refit_scaling(wt, xs, ys))
+                    _track_if_exact(_refit_scaling(wt, xs, ys))
         except Exception:
             pass
 

@@ -852,3 +852,36 @@ def test_polish_reaches_the_small_candidates_the_selection_will_choose(monkeypat
     assert any(t[3] is small[3] for t in core._finalists(cfg))
     cfg.FINAL_POLISH = False
     assert not any(t[3] is small[3] for t in core._finalists(cfg))
+
+
+def test_polish_never_replaces_an_approximation_by_another(monkeypatch):
+    """A polished variant enters the final selection only if it reproduces the
+    hold-out to numerical precision: on data that no law fits exactly, the
+    polish leaves the candidate pool as it was."""
+    rng = np.random.RandomState(7)
+    Xr = rng.uniform(1, 5, (200, 4))
+    y = np.sqrt((Xr[:, 1] - Xr[:, 0]) ** 2 + (Xr[:, 3] - Xr[:, 2]) ** 2) \
+        + 0.05 * rng.randn(200)                        # measured: noisy
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    tr, va = slice(0, 140), slice(140, 200)
+    monkeypatch.setattr(core, "_VAL_XS", Xs[va])
+    monkeypatch.setattr(core, "_VAL_YS", y[va])
+    monkeypatch.setattr(core, "_VAL_TRAIN_XS", Xs[tr])
+    monkeypatch.setattr(core, "_VAL_TRAIN_YS", y[tr])
+    monkeypatch.setattr(core, "_EXTRAP_PROBE_XS", None)
+    monkeypatch.setattr(core, "_DIM_GATE_DIMS", None)
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
+    t = N("sqrt", N("+", N("sq", N("-", X(2), X(3))),
+                    N("sq", N("-", X(1), X(0)))))
+    t = core.wrap_linear_scaling(t, Xs[tr], y[tr])
+    core._track_val_candidate(t)
+    cfg = core.Config()
+    cfg.FINAL_POLISH = False
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    without = sorted(round(c[0], 12) for c in core._VAL_CANDS)
+    monkeypatch.setattr(core, "_VAL_CANDS", [])
+    core._track_val_candidate(t)
+    cfg.FINAL_POLISH = True
+    core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
+    assert sorted(round(c[0], 12) for c in core._VAL_CANDS) == without
