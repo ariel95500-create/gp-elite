@@ -20,6 +20,9 @@ Critères, inchangés :
 Usage : python feynman_bench.py <i_debut> <i_fin>   (fin exclue, 41 au total)
         python feynman_bench.py 0 41                (tout, plusieurs heures)
         python feynman_bench.py --bilan             (agrégat par famille)
+        python feynman_bench.py 12 15 --normalize none
+                                (même banc avec normalize='none' ; résultats
+                                 dans feyn_results_normalize-none.jsonl)
 
 Reprise possible : les résultats s'ajoutent à feyn_results.jsonl.
 Lancer avec PYTHONHASHSEED=0.
@@ -178,7 +181,7 @@ def bilan(out="feyn_results.jsonl"):
         print(f"\nÉchecs : {', '.join(sorted(manques))}")
 
 
-def run_range(i0, i1, out="feyn_results.jsonl"):
+def run_range(i0, i1, out="feyn_results.jsonl", normalize=None):
     for i in range(i0, min(i1, len(PROBS))):
         p = PROBS[i]
         name, formula, nv, sampler, f, pool = p[:6]
@@ -189,10 +192,12 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
         t0 = time.time()
         import gp_elite.core as _C
         _ex0 = getattr(_C, "_EXACT_PRIORITY_SWAPS", 0)
+        extra = {} if normalize is None else dict(normalize=normalize)
         with contextlib.redirect_stdout(io.StringIO()):
             r = symbolic_regression(X[tr], y[tr], feature_names=names,
                                     operators=pool, generations=30, speed="fast",
-                                    validation_split=0.15, seed=0, restarts=4)
+                                    validation_split=0.15, seed=0, restarts=4,
+                                    **extra)
         dt = time.time()-t0
         pred = r.predict(X[te]); v = np.var(y[te])
         one_minus_r2 = float(np.mean((pred-y[te])**2)/v)
@@ -216,6 +221,8 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
                    one_minus_r2=one_minus_r2, pareto_best=pb, pb_size=pb_size,
                    time=round(dt,1), size=r.size, expr=r.expression[:90],
                    exact_priority=getattr(_C, "_EXACT_PRIORITY_SWAPS", 0) > _ex0)
+        if normalize is not None:
+            rec["normalize"] = normalize
         rec.update(provenance.fields())
         with open(out, "a") as fh: fh.write(json.dumps(rec)+"\n")
         print(f"  {name:<10} {status:<6} champ={one_minus_r2:.1e} front={pb:.1e}"
@@ -223,12 +230,21 @@ def run_range(i0, i1, out="feyn_results.jsonl"):
         sys.stdout.flush()
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] in ("--bilan", "--summary"):
-        bilan()
+    args = sys.argv[1:]
+    norm = None
+    if "--normalize" in args:
+        k = args.index("--normalize")
+        norm = args[k + 1]
+        del args[k:k + 2]
+    out = ("feyn_results.jsonl" if norm is None
+           else f"feyn_results_normalize-{norm}.jsonl")
+    if args and args[0] in ("--bilan", "--summary"):
+        bilan(out)
     else:
-        a = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-        b = int(sys.argv[2]) if len(sys.argv) > 2 else len(PROBS)
+        a = int(args[0]) if len(args) > 0 else 0
+        b = int(args[1]) if len(args) > 1 else len(PROBS)
         print(f"=== BANC FEYNMAN — équations {a}..{b-1} sur {len(PROBS)} "
-              f"(restarts=4, fast/30) ===")
-        run_range(a, b)
-        bilan()
+              f"(restarts=4, fast/30"
+              + ("" if norm is None else f", normalize={norm!r}") + ") ===")
+        run_range(a, b, out=out, normalize=norm)
+        bilan(out)

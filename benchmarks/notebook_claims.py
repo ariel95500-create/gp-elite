@@ -4,7 +4,8 @@ figures in the notebooks' text come from.
     PYTHONHASHSEED=0 python benchmarks/notebook_claims.py <snippet>
 
 snippet: kepler30 hooke coulomb torque optionB tp nikuradse (one process
-each). Output of the 0.7.0 run: benchmarks/results_0.7/notebook_snippets.txt.
+each). Output of the 0.8.0 run: benchmarks/results_0.8/notebook_snippets.txt
+(0.7.0: benchmarks/results_0.7/notebook_snippets.txt).
 Times depend on the machine; the rest does not.
 """
 import os, sys, time, numpy as np

@@ -308,18 +308,21 @@ if mask_out.sum() > 0:
     if bmin is not None:
         bp = level(pvk(Xout))
         print(f"\n    --- lecture de la généralisation ---")
-        print(f"    meilleur biais GP_ELITE : {bmin:+.3f} sigma")
-        print(f"    biais de la théorie     : {bp:+.3f} sigma")
+        print(f"    meilleur biais GP_ELITE : {bmin:+.3f} sigma   (la meilleure des "
+              f"{len(biases)} formes, choisie APRÈS avoir vu la courbe retirée)")
+        print(f"    biais de la théorie     : {bp:+.3f} sigma   (aucun choix)")
         if abs(bmin) < abs(bp):
-            print("    -> GP_ELITE prédit le niveau d'une rugosité jamais vue")
-            print("       AUSSI BIEN OU MIEUX que la loi classique.")
+            print("    -> au moins une forme proposée prédit le niveau de la rugosité")
+            print("       jamais vue mieux que la loi classique ; rien ne dit d'avance")
+            print("       laquelle choisir, et ce meilleur chiffre est donc optimiste.")
         else:
             print("    -> la loi classique prédit mieux le niveau. Écart : "
                   f"{abs(bmin) - abs(bp):+.3f} sigma.")
     if best2 and best2[1] > r2_log_out:
-        print(f"\n    -> BAT la loi log de référence sur une rugosité jamais vue "
-              f"({best2[1]:.4f} > {r2_log_out:.4f}).")
-        print("       C'est un résultat publiable.")
+        print(f"\n    -> la meilleure forme, choisie après coup, bat la loi log ajustée "
+              f"sur la rugosité jamais vue ({best2[1]:.4f} > {r2_log_out:.4f}).")
+        print("       Choisie en regardant le test : un plafond optimiste, pas une")
+        print("       prédiction que l'on aurait pu faire d'avance.")
     elif best2 and best2[1] > 0:
         print(f"\n    -> généralise ({best2[1]:.4f} > 0) mais ne bat pas la loi log "
               f"({r2_log_out:.4f}).")
