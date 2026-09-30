@@ -1,9 +1,211 @@
 # Changelog
 
+## 0.8.0 — "Swift"
+
+This release makes the engine faster (the speed-ups alone return the same
+models), recovers more laws, and fixes failures a user could meet without
+being told: data whose values are far from 1, and unusable inputs. Every
+change meant to improve the search or the final selection was decided by a
+comparison whose hypothesis and criteria were written before it ran
+(`benchmarks/decision_bench.py`: the 41 equations of
+`benchmarks/feynman_bench.py` with five seeds, six real PMLB datasets
+standardised as SRBench does, and seven, those six and nikuradse_1, in their
+own units, at 30 seconds per fit; plans in `benchmarks/results_0.8/PLAN.md`,
+results and raw records in `benchmarks/results_0.8/RESULTS.md`). Changes that
+did not meet their criteria are listed there too, with their numbers. The
+corrections listed under Fixed were not subject to such a decision;
+`RESULTS.md` and the other files of `benchmarks/results_0.8/` show what they
+change.
+
+At 30 seconds per fit, on the 41 equations with five seeds (205 runs), the
+release returns the exact law (1 - R² < 1e-9 on held-out points) 88 times,
+measured last (campaign R); 0.7.0 did 64 times, in the first campaign, on the
+same machine (each change's own effect is given below, measured against the
+engine without it). On the six real datasets, standardised, the engine of
+campaign 5b (the later changes do not act there) keeps the median test R² of
+the folds (0.809 against 0.808 for 0.7.0); out of their domain it has fewer
+collapses (R² < 0: 5 against 7 in 30 fits), but the worst is deeper (-224 on
+228_elusage, against -43 on 210_cloud). Side by side at equal work (100
+generations, 0.8.0 as of commit `b0e12cf`, whose later changes act neither
+without a time limit nor on these data), 0.8.0 takes 0.44 of the time of
+0.7.0 on the 15 equations of the README (0.58 per generation, less per fit
+because it finds the exact law at the first generation more often: 40 fits of
+75 against 9) and finds 54 exact laws against 46; on the real datasets it
+takes 0.58 of the time (medians of per-fit ratios), with a slightly lower
+test R² (median 0.809 against 0.815; worse on 14 folds, better on 9).
+
+### Faster, same models
+At equal seed and equal work, the changes below return the same model as
+before, bit for bit (checked on 13 reference configurations by
+`benchmarks/speed_equivalence.py`, and by `tests/test_speed_equivalence.py`).
+`import gp_elite` takes 0.08 s instead of 0.92 s (median of seven fresh
+processes; pandas and scikit-learn are imported only where needed).
+- ε-lexicase selection processes cases by blocks: when a block of cases
+  eliminates no candidate, it is passed in one NumPy operation. Same draws,
+  same parents.
+- Levenberg-Marquardt computes each column of its Jacobian by re-evaluating
+  only the path from the constant to the root.
+- A tree is interpreted until it has been evaluated three times, and only
+  then compiled.
+- Stigmergic sampling tables are frozen while a generation is produced;
+  protected operators, tree copies and the simplifier are cheaper; the
+  prediction cache can no longer be fooled by a reused array identifier.
+
+### Fixed
+- **Data far from 1.** A target of order 1e-9 or 1e20 (SI units make this
+  common: farads, joules per molecule, pascals of a star) came back as a
+  constant or a wrong straight line, with a negative R² and no warning that
+  the fit had failed; a column of order 1e-19 was not normalised, and
+  predictions above 1e12 were clipped. The search now works on y divided by a
+  power of ten when its standard deviation lies outside [1e-3, 1e3], and the
+  model, its formula and its MSEs come back in the units of y; the division by
+  max|x| leaves only null columns at 1. `benchmarks/scale_check.py`, eleven
+  scales from 1e-34 to 1e30: the law is recovered at all eleven on the
+  release, against 2 with 0.7.0.
+- **The square of a negative constant** was evaluated negative during the
+  search.
+- **`seed=` alone reproduces a fit**, whatever `PYTHONHASHSEED` is: tree
+  hashes no longer depend on Python's string hashing. The note asking for
+  `PYTHONHASHSEED=0`, printed once per process even with `verbose=False`, is
+  gone.
+- **Unusable inputs are refused** instead of fitted: a missing or infinite
+  value is named with its row and column, a non-numeric column is named. With
+  0.7.0, a missing value in y or in a column the law uses went through, and
+  the fit returned an unrelated formula without a warning; a non-numeric
+  column stopped the fit on a conversion error that did not name it
+  (`benchmarks/bad_input_check.py`). `predict()` checks the number of columns
+  and returns NaN for a row with a missing or infinite input (0.7.0 returned
+  0).
+- **`time_limit=` is kept more closely.** The variants of the final polish
+  stop one second after the deadline, or one second after they start if that
+  is later. At 30 s per fit on the 41 Feynman equations, the time spent
+  beyond the budget falls from 1.26 s (median; 6.3 s at most) to 1.03 s
+  (1.85 s at most), with the same 88 exact laws (campaign R); a 15 s budget
+  on 3,000 rows ends at 16.7 s (`benchmarks/time_limit_check.py`).
+- An exact law was printed with the rounding noise of its offset
+  (`8.88178e-16 + v1 * v2 / v3`), or with a power 0 of a positive
+  sub-expression; such a term is no longer printed (the model does not
+  change, and the printed formula is still checked against it).
+
+### Changed — the search and the final selection
+Each item below met the criteria written before its campaign (numbers at 30 s
+per fit, 205 Feynman runs, against the engine without the change, whose fits
+come from the campaign that measured it).
+- **Early stop relative to the scale of y, and constants fitted for the form
+  that is judged.** The search stopped at a hold-out MSE of 1e-6 whatever the
+  unit of y; it now stops only on a law exact to numerical precision, so a
+  search that finds only an approximation uses its whole budget. And
+  Levenberg-Marquardt fitted the tree alone, while the search judges it after
+  the linear scaling a + b·f: it now fits the constants of the scaled form
+  (variable projection). Together: 69 exact laws against 58 (sign test on the
+  runs exact for one engine only, p = 0.019); on real data, a median paired
+  difference of +0.000 and as many collapses.
+- **A formula that reproduces the model is preferred** among candidates the
+  data cannot tell apart: fits whose printed formula departs from `predict()`
+  (`formula_exact` False) fall from 28 to 11 out of 265, and from 6 to 0 out of
+  60 on real data, at the cost of 6 exact laws (63 against 69, the tolerance
+  written in the plan). The stigmergic co-occurrence graph, queried with the
+  wrong key, now finds fragments that contain constants.
+- **Right structures are finished into exact laws.** For each finalist of the
+  final selection, the constants are fitted to convergence, and variants
+  give each term of a sum its own coefficient (sqrt((x2-x1)² + (y2-y1)²) on
+  columns divided by different maxima needs one); a variant enters the
+  selection only if it reproduces the hold-out to numerical precision, so it
+  never replaces an approximate model by another. 75 exact laws against 64
+  (I.8.14 from 0 to 5 of 5); on real data no variant was ever admitted. About
+  0.7 s more per fit at the sizes measured (140 to 500 rows).
+- **Power laws are seeded.** When the data follow a power law (a monomial
+  fitted on the logarithms explains 99.9 % of the variance of log|y|), that
+  monomial, with its exponents rounded to halves, and with its fitted
+  exponents if the pool has `pow`, starts in the initial population. 88 exact
+  laws against 75: q1·q2/(4π·ε·r²) from 2 to 5 of 5, III.19.51 from 0 to 5;
+  none lost; never triggered on the real datasets, where that fit explains at
+  most 96 % of the variance of log|y| on the training rows.
+- A champion or finalist polished by Levenberg-Marquardt keeps a scale and
+  an offset that match it (a defect of the development version of variable
+  projection, found in campaign 4 and never released; as a correction, it was
+  kept whatever campaign 5 showed: 64 exact laws against 63).
+
+The polish and the seeds were first measured without their restriction, and
+failed on collapses on real data; the restricted versions were designed after
+seeing those failures and measured on the same equations, seeds and splits,
+and the 99.9 % threshold of the seeds was set knowing that the real datasets
+stay well below it. On these real datasets the restricted mechanisms never
+act, by construction: their real-data criteria show that they do no harm
+there, not that they would help on data closer to a power law.
+
+### Added
+- `normalize="grouped"`: one scale factor for the columns whose magnitudes
+  are within a factor 10 of each other, so that sums and differences of
+  same-kind variables keep their form. Measured and left as an option: +6
+  exact laws out of 205 (within the scatter between equivalent engines) and 2
+  more collapses on real data out of domain.
+- `SRResult.sympy_expr()` and `ParetoEntry.sympy_expr()`: the sympy expression
+  with one symbol per column, right for column names sympy would misread
+  (`E`, `I`, names with spaces).
+- `benchmarks/decision_bench.py` (A/B comparison of two engines at equal time
+  or equal work, one process per fit), `benchmarks/small_data_check.py`,
+  `benchmarks/scale_check.py`, `benchmarks/robustness_check.py`,
+  `benchmarks/bad_input_check.py`, `benchmarks/typed_generations_check.py`,
+  `benchmarks/speed_equivalence.py`; `benchmarks/feynman_bench.py --normalize
+  none`.
+
+### Measured and not kept
+- The speed-up (with the fix of the negative square) does not find more laws
+  in the same time: twice the generations in 30 s, 64 exact laws against 64.
+- A warning based on how much the predictions grow just outside the training
+  box does not predict out-of-domain failure (3 of 8 collapses caught, 5 false
+  alarms): not shipped.
+- The polish of finalists without the exact-only rule, and power-law seeds
+  without the power-law test: as many or more exact laws (+11 and +15, against
+  +11 and +13 for the versions kept), and one and two more collapses on real
+  data.
+
+### Measured on this release
+Every figure of the README and the notebooks was re-measured on the release
+(commit `cdddaf0`) or comes from `RESULTS.md`; raw results and logs are in
+`benchmarks/results_0.8/`, with the commands in its README. Each method is
+judged on the model it returns:
+- Feynman benchmark, 15 equations, one seed: 12/15 exact and 13/15 within
+  1e-3, as with 0.7.0, but not the same laws: I.8.14 now comes back exact and
+  III.15.12 within 1e-3, while I.18.12 (r·F·sin θ) is missed. Without the
+  column normalisation (`normalize="none"`), the three laws with a sine or a
+  cosine all come back exact. With `units=` declared, 14/15 exact, each in its
+  textbook form. Against gplearn on the same data: 12/15 against 6/15 exact,
+  ahead on 8 equations, behind on one (I.18.12).
+- `units=` on Feynman II.11.3, 5 seeds: 5/5 dimensionally valid against 0/5,
+  median size 27 against 59 nodes, and two runs in five recover the exact law.
+  The typed search takes longer than with 0.7.0: 149 s per run (median)
+  against 57 s. 0.7.0 stopped a search once its hold-out MSE fell below 1e-6,
+  0.8.0 only on an exact law, so the typed runs that end on an approximation
+  now use all their generations; per generation, the typed search takes
+  about a fifth less time than with 0.7.0 (two seeds, run side by side;
+  diagnostic D2 in `RESULTS.md`). `time_limit=` bounds it.
+- Robust mode: the error is divided by six at 10 % outliers, with no gain at
+  20 %, on the bundled example.
+- Data size (`normalize="none"`, 5 equations): the four equations other than
+  I.16.6 recovered exactly at every size from 25 to 10,000 points, in every
+  run; I.16.6 is not recovered exactly at any size. The five fits take 108 s
+  in total at 1,000 points and 284 s at 10,000.
+- Unusual inputs (`benchmarks/robustness_check.py`, 16 cases: constant,
+  null or duplicated columns, three rows, inputs and targets of order 1e±150
+  and 1e±200...): each returns a model with finite predictions, and 15 of the
+  16 formulas reproduce `predict()`.
+- Printed formulas (`benchmarks/formula_fuzz.py`, 1,500 random trees): 1,461
+  exact, each matching `predict()` through sympy (0.7.0: 1,448); 38 inexact
+  because a safety net acts, 1 because of the rewriting.
+- `operators=` respected in 48 fits out of 48; `time_limit=15` ends at 16.7 s,
+  sequential or parallel (single runs; 0.7.0: 17.3 s and 16.5 s).
+- The simulated battery example (`examples/battery_soh.py`) extrapolates
+  worse than with 0.7.0: R² -0.314 on the forward split, against +0.594,
+  still ahead of the two tree ensembles (-2.5 and -2.3).
+
 ## 0.7.0 — "Sound"
 
+Not published on its own: these changes reach users with 0.8.0.
+
 This release fixes what an external review of 0.6.1 found, and re-measures
-every number the README quotes on the released code. Defaults that change:
+every number the README quotes on its final code. Defaults that change:
 `normalize="auto"` (measured below), the population of the default `fast`
 preset (300 → 400), and the number of generations of `speed="thorough"` and,
 in `GPEliteRegressor`, of each preset (below). The final selection gains two

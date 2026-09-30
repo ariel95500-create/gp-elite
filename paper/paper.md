@@ -14,7 +14,7 @@ authors:
 affiliations:
   - index: 1
     name: Independent Researcher, France
-date: 28 September 2026
+date: 30 September 2026
 bibliography: paper.bib
 ---
 
@@ -104,7 +104,7 @@ baseline (2000 programs over 30 generations, against 400 over 30 generations
 and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
 before any measurement,
 and each method judged on the model it returns, it recovers 12/15 exactly
-($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.7.0,
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.8.0,
 `benchmarks/duel.py`). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
@@ -142,8 +142,12 @@ arithmetic, which it is not.
 proved unsatisfying: on the tested problem it reported that none of the returned
 models were physically meaningful, without offering a remedy. v0.4 moves the
 check inside the search, reusing the same algebra so that auditor and engine
-cannot diverge. The cost is a slowdown of between two and three times on the
-problem measured below; the benefit is that every returned model is valid by
+cannot diverge. The cost, on the problem measured below, is a run about seven
+times longer at equal generations (median 149 s against 21 s for 40
+generations), because a typed generation costs more; with version 0.7 the
+ratio was smaller (57 s against 22 s) mainly because a search then stopped as
+soon as its hold-out error fell below a fixed threshold, even on an
+approximation. The benefit is that every returned model is valid by
 construction.
 
 *Deducing rather than requiring.* Under `unknown_constant=True` the validity
@@ -169,25 +173,26 @@ documentation.
 
 The dimensional mode has been evaluated in a controlled A/B experiment on
 Feynman equation II.11.3, five seeds, identical budget for the unconstrained
-and constrained arms (`benchmarks/ab_ood.py`, version 0.7.0). Unconstrained,
+and constrained arms (`benchmarks/ab_ood.py`, version 0.8.0). Unconstrained,
 0/5 returned models are dimensionally valid; with `units=`, 5/5 are valid and
-more than twice as small (median 17 versus 41 nodes) at a better test $R^2$
-(0.99957 versus 0.98661). A third arm grants the unconstrained search four
-times the generations, more wall-clock time than the constrained arm: still
-0/5 valid. The same experiment bounds the claim. On a test set drawn *outside*
-the training domain, approximations collapse (median $R^2$ 0.10 for the
-unconstrained runs at equal budget, 0.45 with four times the generations,
-0.34 to 0.65 for the three constrained approximations);
-the two other constrained runs recovered the exact law, which holds there. The constraint mostly buys physically coherent
-and compact approximations; it finds the law itself only in some runs at these
-budgets.
+more than twice as small (median 27 versus 59 nodes) at a better test $R^2$
+(0.99957 versus 0.99157). A third arm grants the unconstrained search four
+times the generations: still 0/5 valid. The same experiment bounds the claim.
+On a test set drawn *outside* the training domain, approximations degrade
+(median $R^2$ 0.34 for the unconstrained runs at equal budget, 0.42 with four
+times the generations, 0.32 to 0.65 for the three constrained
+approximations); the two other constrained runs recovered the exact law, which
+holds there. The constraint mostly buys physically coherent and compact
+approximations; it finds the law itself only in some runs at these budgets,
+and it is the slowest arm (median 149 s per run, against 21 s unconstrained
+and 84 s with four times the generations).
 
 The mystery-constant mode is validated on three reference laws whose answer is
 known in advance (`benchmarks/test_constante_mystere.py`, 25 generations, two
 restarts). Hooke's law returns `kg·s⁻²` and 250.0 for a true 250; gravitation
 returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
-`kg·m²·s⁻²·mol⁻¹·K⁻¹` and 8.31446 for a true 8.314463. Structure is exact and
-$R^2 = 1.000000$ in all three.
+`kg·m²·s⁻²·mol⁻¹·K⁻¹` and 8.314462618, the value used to generate the data.
+Structure is exact and $R^2 = 1.000000$ in all three.
 
 An integration for the SRBench living benchmark [@lacava2021srbench] has been
 merged into that project ahead of its next evaluation round.
@@ -219,9 +224,14 @@ defects, including a float64 overflow in the Levenberg–Marquardt optimizer,
 two defects in the dimensional mode, an exported formula left in the internal
 scaled space, and a cache that could evaluate a model with the constants of
 another;
-packaging and release engineering; the benchmark and non-regression scripts
-distributed in the repository; and the drafting of the documentation and of
-this paper.
+packaging and release engineering; for version 0.8, the speed-ups of the
+engine, the fit of constants by variable projection, the final polish of the
+finalists, the power-law seeds, the handling of data far from unit scale, and
+the protocol of comparisons with criteria written before each measurement,
+under which the changes to the search and the final selection were accepted
+or rejected; the benchmark and
+non-regression scripts distributed in the repository; and the drafting of the
+documentation and of this paper.
 
 All AI-assisted output was reviewed and validated by the author before
 inclusion, and the direction of the work — which mechanisms to pursue, which
@@ -231,7 +241,7 @@ reproduced before being fixed and re-tested afterwards, and the absence of
 regression was verified by comparing fits before and after each change on a
 fixed set of seeds. The benchmark figures quoted in this paper were produced
 with the scripts in the repository, whose raw results, machine and dates are
-recorded in `benchmarks/results_0.7/`, and the project's test suite passes on
+recorded in `benchmarks/results_0.8/`, and the project's test suite passes on
 the released version. The scientific claims and
 their stated limits are the author's own, as is responsibility for the whole.
 
