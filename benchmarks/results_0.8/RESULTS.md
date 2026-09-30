@@ -6,7 +6,7 @@ Each campaign is judged against the criteria written before it ran, in
 
 ## Campaign 1 — 0.7.0 (A) against the faster engine (B), 30 s per fit
 
-Records: `campaign1_T.jsonl` (530 fits, 29 September 2026, 03:36 to 05:42,
+Records: `campaign1_T.jsonl` (530 fits, 29 September 2026, 03:36 to 05:31,
 two fits at a time on a 2-core Linux container). Summary:
 `campaign1_T_summary.txt`.
 
@@ -17,7 +17,7 @@ against 42 on Feynman, 100 against 55 on real data).
 |---|---|---|
 | Feynman, exact laws (205 runs) | 64 | 64 |
 | ahead / behind on equations | | 5 / 5 |
-| Real data, 5 folds: test R² median (mean, worst) | 0.808 (0.782, 0.406) | 0.812 (0.727, -0.527) |
+| Real data, 5 folds: test R² median (mean, worst) | 0.808 (0.781, 0.406) | 0.812 (0.727, -0.527) |
 | paired folds, B better / worse | | 7 / 16 |
 | Real data, out of domain: test R² median | 0.640 | 0.409 |
 | collapses (test R² < 0), folds + out of domain | 7 | 9 |
@@ -39,7 +39,7 @@ data and exploding beyond it (210_cloud: R² -42.9 for A, -9.4 for B;
 
 ## Campaign 2 — relative early stop and variable projection (C1) against B1
 
-Records: `campaign2_T.jsonl` (530 fits, 29 September 2026, 05:47 to 08:03).
+Records: `campaign2_T.jsonl` (530 fits, 29 September 2026, 05:33 to 07:24).
 Summary: `campaign2_T_summary.txt`.
 
 | | B1 | C1 |
@@ -203,7 +203,9 @@ the factor 1 in the division by max|x|. `benchmarks/scale_check.py`, eleven
 input and target scales from 1e-34 to 1e30: before, the law was recovered at
 2 scales out of 11 (training R² from -1.99 to 1.000); after, at 10 out of 11,
 the eleventh returning an approximation at R² = 0.99991, and every formula
-reproduces predict(). Output: `scale_check.txt`.
+reproduces predict(). Output: `scale_check.txt`. On the release (commit
+`cdddaf0`, with the changes of campaigns 5b and 6b) the same check recovers
+the law at all eleven scales (`scale_check_release.txt`).
 
 **The rounding noise of constants in the printed formula.** An exact law was
 printed 8.88178e-16 + v1 * v2 / v3; a constant term that is at most 1e-12 of
@@ -324,3 +326,24 @@ changes that alter the search and the final selection also change its cost
 (the final polish alone adds about 0.7 s per fit). On the Feynman equations
 the median fit takes 0.5 s instead of 12.3 s mostly because half of them find
 the exact law at the first generation (median: 1 generation, against 18).
+
+## Documentation check D1 — angle columns and normalisation
+
+Records: `feynman_angles_normalize_none.jsonl` and its transcript
+`feynman_angles_normalize_none.txt` (30 September 2026, 01:22 to 01:23,
+commit `cdddaf0`, one process). Command:
+`python benchmarks/feynman_bench.py 12 15 --normalize none`. The default
+normalisation figures are those of the release's Feynman 15 run
+(`feynman15.jsonl`).
+
+| Equation | default (`normalize='auto'`) | `normalize='none'` |
+|---|---|---|
+| II.15.4, -mu*B*cos(th) | exact | exact |
+| I.18.12, r*F*sin(th) | missed (1-R² 2.2e-3) | exact |
+| III.15.12, 2*U*(1-cos(k*d)) | within 1e-3 (1.7e-4) | exact |
+
+The expectation written in `PLAN.md` holds: without normalisation the three
+laws with an angle column come back exact, against one with the default. The
+quickstart notebooks keep their advice to try `normalize='none'` when a column
+is an angle, now with these figures; one run per equation, a check of what
+the notebooks say and not a decision on the engine.

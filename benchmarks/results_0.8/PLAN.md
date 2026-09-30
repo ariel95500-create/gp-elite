@@ -156,7 +156,7 @@ time, as every fit of these campaigns does (two processes on the two cores).
 
 # Amendment to budget G, written before any run of it
 
-Written on 29 September 2026 at 08:15, before budget G was run. Campaign 1
+Written on 29 September 2026 and committed at 07:26, before budget G was run. Campaign 1
 compared A and B at equal time; since then, campaign 2 changed the engine
 (C1 kept), so an equal-work comparison of A with B (`c7b5934`) would describe
 an engine that will not be released. Budget G will compare A (0.7.0) with F,
@@ -174,7 +174,7 @@ at least -0.005 and F has no more collapses than A.
 
 # Campaign 3b — confirmation on new seeds, written before it runs
 
-Written on 29 September 2026 at 09:05, after the Feynman part of campaign 3
+Written on 29 September 2026 and committed at 08:06, after the Feynman part of campaign 3
 (C8 75 exact laws, C1 69: +6, exactly the threshold of H5; 6 equations ahead,
 4 behind; runs exact for one arm only: 14 for C8, 8 for C1, two-sided sign
 test p = 0.29) and before its real-data part and before any run of 3b.
@@ -196,7 +196,7 @@ campaign 3. Otherwise `normalize="auto"` keeps one factor per column.
 
 # Decision on campaign 3, and campaign 4 — written before campaign 4 runs
 
-Written on 29 September 2026 at 09:35. Campaign 3 has ended: on real data,
+Written on 29 September 2026 and committed at 08:17. Campaign 3 has ended: on real data,
 C8 has 6 collapses against 4 for C1, so H5 fails on its own criteria (iii of
 3b) whatever the Feynman confirmation would have given. The grouped
 normalisation does not become the default, and campaign 3b, whose outcome
@@ -418,3 +418,89 @@ more exact laws than C5x and is ahead on more equations than it is behind,
 and, on R7raw (70 paired fits), the median paired difference of test R² is at
 least -0.005 and C6x has no more collapses than C5x (6). Otherwise the seeds
 are left out.
+
+---
+
+# Documentation check D1 — angle columns and normalisation, written before it runs
+
+Written on 30 September 2026 at 01:21. The quickstart notebooks advise trying
+`normalize='none'` when a column is an angle, and support the advice with the
+0.7 Feynman benchmark: with the default normalisation the two laws with an
+angle column came back exact, and III.15.12 (a cosine of a product of two
+columns) only without normalisation. On the release (commit `cdddaf0`,
+`python benchmarks/feynman_bench.py 0 15`), the default normalisation returns
+II.15.4 exact, misses I.18.12 and returns III.15.12 within 1e-3 only. The
+advice is kept only if the release supports it.
+
+**Measurement.** The three equations with an angle column (II.15.4, I.18.12,
+III.15.12), same data, split and budget as `feynman_bench.py` (seed 0,
+`restarts=4`, 30 generations, `speed='fast'`), with `normalize='none'`, one
+process, `PYTHONHASHSEED=0`: `python benchmarks/feynman_bench.py 12 15
+--normalize none`. This is one seed per equation, a check of what the
+notebooks say, not a decision on the engine; the notebooks will say so.
+
+**Expectation.** With `normalize='none'` the three returned models are exact.
+If they are, the note says that on the release the default returns one of the
+three exactly and `normalize='none'` all three. If not, the note gives what
+each setting returns, and the advice to compare both settings stays only as a
+suggestion, without a claim that one of them is better.
+
+---
+
+# Diagnostic D2 — why the typed search takes longer, written before it runs
+
+Written on 30 September 2026 at 01:55. On Feynman II.11.3 (`ab_ood.py`, 5
+seeds, 40 generations, one restart), the typed search (`units=`) takes a
+median 149 s per run on the release against 57 s with 0.7.0, while the
+untyped arm takes 21 s against 22 s. Two seeds (0 and 2) return the same model
+with both versions, in 134 s and 57 s with 0.7.0 and in 169 s and 175 s with
+0.8.0. The documentation must say that the typed search got slower and, if it
+can be measured, why.
+
+**Hypothesis.** 0.7.0 stopped a search whose hold-out MSE fell below 1e-6
+whatever the scale of y, while 0.8.0 stops only on a law exact to numerical
+precision (campaign 2, C1). The typed runs that return an approximation
+therefore run all 40 generations with 0.8.0 and fewer with 0.7.0. Expected:
+on seed 2, 0.7.0 stops well before generation 40 and 0.8.0 reaches it; on
+seed 0, both reach it. The time per generation is expected within 30 % of
+each other on both seeds; if 0.8.0 is more than 30 % slower per generation,
+that is a second cause and is reported as such.
+
+**Measurement.** Seeds 0 and 2 of the typed arm, run as `ab_ood.py` runs them,
+with the generation counter of `decision_bench.py` (the last generation index
+passed to `evolve_island`), on 0.7.0 (commit `e847605`) and on the release
+(commit `cdddaf0`); one process per fit, the two engines side by side on the
+two cores, seed 2 first, then seed 0. A diagnostic, not a decision: nothing in
+the engine changes with its result.
+
+---
+
+# Campaign R — the release itself on F41, written before it runs
+
+Written on 30 September 2026 at 01:56. The headline figure of the 0.8.0
+entry of the CHANGELOG (88 exact laws in 205 runs at 30 s per fit, against 64
+for 0.7.0) was measured on C6x (commit `f34b3d9`, campaign 6b). The release
+(commit `cdddaf0`) differs from C6x by the correction of data far from unit
+scale, which leaves every campaign target unchanged (their standard
+deviations lie inside [1e-3, 1e3]), by the printing of formulas, which does
+not change the model, and by a time bound on the polish of the finalists:
+with `time_limit=`, the polished variants stop one second after the deadline,
+or after the start of the polish if it starts later. At 30 s per fit that
+bound can act (an independent review of the records finds C6x fits ending
+more than 1.5 s after the deadline, two of them among the fits whose exact
+law came from the polish). A published figure must be the release's.
+
+**Measurement.** F41, five seeds, budget T (30 s per fit), two fits at a time,
+one process per fit, the release engine as arm R:
+`python benchmarks/decision_bench.py run --budget T --feynman-only
+--arm R=<worktree at cdddaf0> --out <file>`. Nothing else runs on the machine
+meanwhile. The real datasets are not re-run: on them no polished variant was
+ever admitted (campaigns 5b and 6b), so the bound cannot change their models.
+
+**What is published.** The release's count, whatever it is, in place of C6x's
+88, with C6x's figure kept in `RESULTS.md`. Expectation: within 6 exact laws
+of 88, the spread seen between equivalent engines (campaign 1: B and A, same
+models at equal work, 64 and 64 at equal time; campaign 3: +6 within the
+scatter). A release more than 6 laws below C6x means the time bound costs
+laws: the bound is then examined before the release, and the figures
+published say so.
