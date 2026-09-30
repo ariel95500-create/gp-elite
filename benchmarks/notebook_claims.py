@@ -88,8 +88,12 @@ def nikuradse():
                             normalize="none", generations=30, speed="fast", restarts=2, seed=0)
     print(f"searched for {time.time()-t0:.0f} s")
     r2 = lambda e: 1 - np.mean((e.predict(Xn) - yn)**2) / np.var(yn)
+    print("size  R2      formula_exact  expression")
     for e in sorted(list(m.pareto or []) + [m], key=lambda e: e.size):
-        print(f"{e.size:>4}  {r2(e):>6.4f}  {e.expression[:90]}")
+        print(f"{e.size:>4}  {r2(e):>6.4f}  {str(e.formula_exact):<13}  {e.expression[:90]}")
+    with np.errstate(over="ignore"):
+        big = int(np.sum(Xn[:, 0] ** Xn[:, 1] > 1e6))
+    print(f"rows where r_k ** log_Re exceeds 1e6: {big} of {len(yn)}")
 
 if __name__ == "__main__":
     globals()[sys.argv[1]]()

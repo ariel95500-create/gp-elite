@@ -8,6 +8,8 @@ reached, time per generation, size, test and out-of-domain R².
 
 Usage (PYTHONPATH selects the engine; one process per fit):
     PYTHONHASHSEED=0 PYTHONPATH=<engine> python benchmarks/typed_generations_check.py <seed>
+With --verbose, the engine prints its progress, and why it stopped, before the
+record.
 """
 import io, json, os, sys, time, warnings
 from contextlib import redirect_stdout
@@ -18,7 +20,12 @@ import gp_elite
 import gp_elite.core as C
 from gp_elite import GPEliteRegressor
 
-seed = int(sys.argv[1])
+VERBOSE = "--verbose" in sys.argv
+if VERBOSE:                       # the estimator has no verbose option of its own
+    import functools
+    import gp_elite.sklearn_api as SK
+    SK.symbolic_regression = functools.partial(SK.symbolic_regression, verbose=True)
+seed = int([a for a in sys.argv[1:] if a != "--verbose"][0])
 gens = [0]; calls = [0]
 orig = C.evolve_island
 def counted(*args, **kwargs):
@@ -33,9 +40,14 @@ Xod, yod = ab_ood.make_data_ood(200, seed + 9000)
 kw = dict(operators="physical", generations=40, speed="fast", restarts=1,
           random_state=seed, units=ab_ood.UNITS, target_units=ab_ood.TARGET)
 t0 = time.time()
-with redirect_stdout(io.StringIO()), warnings.catch_warnings():
+with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    est = GPEliteRegressor(**kw); est.fit(Xtr, ytr)
+    est = GPEliteRegressor(**kw)
+    if VERBOSE:
+        est.fit(Xtr, ytr)
+    else:
+        with redirect_stdout(io.StringIO()):
+            est.fit(Xtr, ytr)
 dt = time.time() - t0
 with np.errstate(all="ignore"):
     r2t = ab_ood._r2(yte, est.predict(Xte)); r2o = ab_ood._r2(yod, est.predict(Xod))

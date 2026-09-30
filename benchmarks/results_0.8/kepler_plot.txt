@@ -1,0 +1,3 @@
+# python examples/kepler_plot.py, PYTHONHASHSEED=0, commit cdddaf0 engine, 2026-09-30 04:47:34, nothing else running
+T = 0.00279171 + 0.999396 * a * sqrt(a)   R2 = 1.000000   10.8 s
+written: /home/claude/repo/kepler_plot.png

@@ -1,0 +1,16 @@
+# PYTHONHASHSEED=0 PYTHONPATH=<engine> python benchmarks/bad_input_check.py
+== 0.7.0 (commit e847605) 2026-09-30 02:04:49
+{"case": "nan_in_X", "engine": "/tmp/claude-0/arms/gp07", "warnings": [], "outcome": "model", "expression": "(1.0 + (9.906991 * X[0]))   [scaled inputs: variables are internally rescaled]", "r2_true_law": 1.0}
+{"case": "nan_in_used_column", "engine": "/tmp/claude-0/arms/gp07", "warnings": [], "outcome": "model", "expression": "(7.302741 + (-0.039915 * X[1]))   [scaled inputs: variables are internally rescaled]", "r2_true_law": -0.0019960762679214206}
+{"case": "inf_in_X", "engine": "/tmp/claude-0/arms/gp07", "warnings": ["invalid value encountered in divide", "invalid value encountered in divide", "invalid value encountered in divide"], "outcome": "model", "expression": "(1.0 + (9.906991 * X[0]))   [scaled inputs: variables are internally rescaled]", "r2_true_law": 1.0}
+{"case": "nan_in_y", "engine": "/tmp/claude-0/arms/gp07", "warnings": [], "outcome": "model", "expression": "0.206239 * X1", "r2_true_law": -8.748515175417422}
+{"case": "text_column", "engine": "/tmp/claude-0/arms/gp07", "outcome": "error", "error": "ValueError: could not convert string to float: 'a'"}
+{"case": "predict_nan_row", "engine": "/tmp/claude-0/arms/gp07", "warnings": [], "outcome": "model", "expression": "1 + 2 * X0", "r2_true_law": 1.0, "predict_nan_row": [7.390508031418599, 0.0, 6.389238394711238]}
+== release (commit cdddaf0) 2026-09-30 02:05:03
+{"case": "nan_in_X", "engine": "/tmp/claude-0/arms/gpR", "outcome": "error", "error": "ValueError: X contains 1 missing or infinite value in 1 row (first: row 7, column 'X1'). gp-elite needs complete numeric data: remove or impute these rows."}
+{"case": "nan_in_used_column", "engine": "/tmp/claude-0/arms/gpR", "outcome": "error", "error": "ValueError: X contains 1 missing or infinite value in 1 row (first: row 7, column 'X0'). gp-elite needs complete numeric data: remove or impute these rows."}
+{"case": "inf_in_X", "engine": "/tmp/claude-0/arms/gpR", "outcome": "error", "error": "ValueError: X contains 1 missing or infinite value in 1 row (first: row 7, column 'X1'). gp-elite needs complete numeric data: remove or impute these rows."}
+{"case": "nan_in_y", "engine": "/tmp/claude-0/arms/gpR", "outcome": "error", "error": "ValueError: y contains 1 missing or infinite value in 1 row (first: row 7). gp-elite needs complete numeric data: remove or impute these rows."}
+{"case": "text_column", "engine": "/tmp/claude-0/arms/gpR", "outcome": "error", "error": "ValueError: X column 'label' is not numeric (row 0 holds 'a'). Convert it to numbers or leave it out."}
+{"case": "predict_nan_row", "engine": "/tmp/claude-0/arms/gpR", "warnings": [], "outcome": "model", "expression": "1 + 2 * X0", "r2_true_law": 1.0, "predict_nan_row": [7.390508031418598, null, 6.389238394711237]}
+== done 2026-09-30 02:05:05

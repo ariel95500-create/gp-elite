@@ -2,6 +2,8 @@
 
 Written on 29 September 2026, before the first run of the campaign. The
 criteria below decide; they are not adjusted after the results are seen.
+[Note added on 30 September: this plan was committed at 03:42, six minutes
+after the first fit of campaign 1 had started, at 03:36.]
 
 ## What is compared
 
@@ -178,6 +180,9 @@ Written on 29 September 2026 and committed at 08:06, after the Feynman part of c
 (C8 75 exact laws, C1 69: +6, exactly the threshold of H5; 6 equations ahead,
 4 behind; runs exact for one arm only: 14 for C8, 8 for C1, two-sided sign
 test p = 0.29) and before its real-data part and before any run of 3b.
+[Erratum, 30 September: by the records, the real-data part of campaign 3 had
+started at 08:00, and 24 of its 60 fits, all on folds, were recorded when this
+plan was committed; the criteria below do not use them.]
 Campaigns 1 and 2 showed that two arms that should be equivalent differ by
 about six exact laws on 205 runs: a +6 is within that scatter, so H5 is not
 decided on seeds 0 to 4 alone (protocol rule 7: an ambiguous cell is run
@@ -289,7 +294,7 @@ Reported without deciding: runtime of the final selection (fit time beyond
 the budget), sizes, equations gained and lost, out-of-domain errors.
 
 **Amendment, 29 September 2026 at 09:33, before the campaign was run
-again.** Campaign 5 was first started at 09:24 with arms `f250f5d` and
+again.** Campaign 5 was first started at 09:24 (09:26 by the records) with arms `f250f5d` and
 `106f616`, in which the polish acted on the eight best candidates on the
 hold-out only. After seven equations, I.8.14 was still returned inexact by
 C5; a single diagnostic run showed why: its right structure (14 nodes,
@@ -433,7 +438,9 @@ II.15.4 exact, misses I.18.12 and returns III.15.12 within 1e-3 only. The
 advice is kept only if the release supports it.
 
 **Measurement.** The three equations with an angle column (II.15.4, I.18.12,
-III.15.12), same data, split and budget as `feynman_bench.py` (seed 0,
+III.15.12) [erratum, 30 September: III.15.12 has no angle column, its cosine
+takes the product of two columns, k·d; the measurement and its expectation are
+unchanged], same data, split and budget as `feynman_bench.py` (seed 0,
 `restarts=4`, 30 generations, `speed='fast'`), with `normalize='none'`, one
 process, `PYTHONHASHSEED=0`: `python benchmarks/feynman_bench.py 12 15
 --normalize none`. This is one seed per equation, a check of what the

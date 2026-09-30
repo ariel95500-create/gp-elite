@@ -47,7 +47,7 @@ Summary: `campaign2_T_summary.txt`.
 | Feynman, exact laws (205 runs) | 58 | 69 |
 | runs exact for one arm only | 4 | 15 (two-sided sign test p = 0.019) |
 | ahead / behind on equations | | 7 / 2 |
-| Real data, 5 folds: test R² median (mean) | 0.807 (0.759) | 0.810 (0.750) |
+| Real data, 5 folds: test R² median (mean) | 0.807 (0.759) | 0.809 (0.750) |
 | Real data, out of domain: test R² median | 0.548 | 0.630 |
 | paired difference, folds + out of domain: median | | +0.000 |
 | collapses (test R² < 0), folds + out of domain | 4 | 4 |
@@ -85,7 +85,7 @@ Summary: `campaign3_T_summary.txt`.
 | Feynman, exact laws (205 runs) | 69 | 75 |
 | runs exact for one arm only | 8 | 14 (sign test p = 0.29) |
 | ahead / behind on equations | | 6 / 4 |
-| Real data, 5 folds: test R² median (mean, worst) | 0.810 (0.750, 0.016) | 0.813 (0.786, 0.262) |
+| Real data, 5 folds: test R² median (mean, worst) | 0.809 (0.750, 0.016) | 0.813 (0.786, 0.262) |
 | Real data, out of domain: test R² median | 0.630 | 0.695 |
 | collapses (test R² < 0), folds + out of domain | 4 | 6 |
 
@@ -117,7 +117,7 @@ outcome differs between the two). Summary: `campaign4_T_summary.txt`.
 | Feynman, exact laws (205 runs) | 69 | 63 |
 | runs exact for one arm only | 11 | 5 (sign test p = 0.21) |
 | ahead / behind on equations | | 3 / 6 |
-| Real data, 5 folds: test R² median (mean, worst) | 0.810 (0.750, 0.016) | 0.810 (0.771, 0.372) |
+| Real data, 5 folds: test R² median (mean, worst) | 0.809 (0.750, 0.016) | 0.809 (0.771, 0.372) |
 | Real data, out of domain: test R² median (worst) | 0.630 (-64.1) | 0.630 (-224.1) |
 | paired difference, folds + out of domain: median | | +0.000 |
 | collapses (test R² < 0), folds + out of domain | 4 | 4 |
@@ -306,7 +306,7 @@ generations, no time limit, two fits at a time. A is 0.7.0 (`e847605`), F the
 | ahead / behind on equations | | 3 / 1 |
 | median time per fit, Feynman 15 | 12.3 s | 0.5 s |
 | per-fit time ratio F/A, median (quartiles), Feynman 15 | | 0.44 (0.14, 0.58) |
-| Real data, 5 folds: test R² median (mean, worst) | 0.815 (0.785, 0.406) | 0.810 (0.777, 0.372) |
+| Real data, 5 folds: test R² median (mean, worst) | 0.815 (0.785, 0.406) | 0.809 (0.777, 0.372) |
 | paired folds, F better / worse (median difference) | | 9 / 14 (-0.000) |
 | collapses (test R² < 0) | 0 | 0 |
 | per-fit time ratio F/A, median (quartiles), real data | | 0.58 (0.52, 0.61) |
@@ -331,7 +331,8 @@ the exact law at the first generation (median: 1 generation, against 18).
 
 Records: `feynman_angles_normalize_none.jsonl` and its transcript
 `feynman_angles_normalize_none.txt` (30 September 2026, 01:22 to 01:23,
-commit `cdddaf0`, one process). Command:
+commit `cdddaf0`, one process). Its plan was written at 01:21, before the run,
+and committed after it, at 02:05, with those of D2 and campaign R. Command:
 `python benchmarks/feynman_bench.py 12 15 --normalize none`. The default
 normalisation figures are those of the release's Feynman 15 run
 (`feynman15.jsonl`).
@@ -343,7 +344,65 @@ normalisation figures are those of the release's Feynman 15 run
 | III.15.12, 2*U*(1-cos(k*d)) | within 1e-3 (1.7e-4) | exact |
 
 The expectation written in `PLAN.md` holds: without normalisation the three
-laws with an angle column come back exact, against one with the default. The
-quickstart notebooks keep their advice to try `normalize='none'` when a column
-is an angle, now with these figures; one run per equation, a check of what
-the notebooks say and not a decision on the engine.
+laws with a sine or a cosine come back exact, against one with the default.
+(The plan calls all three "equations with an angle column"; III.15.12 has none,
+its cosine takes the product of two columns, k·d.) The quickstart notebooks keep
+their advice to try `normalize='none'` when a column is an angle, now with these
+figures; one run per equation, a check of what the notebooks say and not a
+decision on the engine.
+
+## Diagnostic D2 — why the typed search takes longer
+
+Records: `typed_generations.jsonl`, with the times of the runs in
+`typed_generations.txt` (30 September 2026, 01:55 to 02:02, the two engines
+side by side on the two cores, one process per fit). Its plan was written at
+01:55, before the first run, and committed after the runs, at 02:05. Command:
+`python benchmarks/typed_generations_check.py <seed>` with `PYTHONPATH` on
+each engine. The machine restarted during the first run of seed 0, which left
+no record; seed 0 was run again from the start on both engines. The `version`
+field of the records reads 0.8.0 for both engines because it comes from the
+installed package metadata; the `engine` field gives the engine actually run.
+
+| Seed | 0.7.0: generations, time | 0.8.0: generations, time | time per generation |
+|---|---|---|---|
+| 2 | 14 of 40, 71.4 s | 40 of 40, 163.0 s | 5.1 s against 4.1 s |
+| 0 | 34 of 40, 153.1 s | 40 of 40, 143.5 s | 4.5 s against 3.6 s |
+
+Both engines return the same model on each seed. The hypothesis holds on
+both seeds: 0.7.0 stops before the last generation, 0.8.0 runs all 40. The
+expectation written for seed 0 did not: 0.7.0 stopped early there too, at
+generation 34. A run of 0.7.0 with its progress printed
+(`typed_generations_stop_0.7.txt`, `--verbose`, 04:38 to 04:41) shows why, on
+both seeds: "Precision target reached", the hold-out MSE having fallen below the
+fixed threshold of 1e-6 (5.0e-7 at generation 13 on seed 2, 4.9e-8 at
+generation 33 on seed 0), while the model finally returned is an approximation
+(test R² 0.9996 and 0.9975). Per generation, the typed search of 0.8.0 takes
+about a fifth less time than 0.7.0 on these two seeds (the time per generation
+here is the fit time divided by the generations, final selection included).
+The documentation says that the typed search takes longer than with 0.7.0 on
+this problem, and why.
+
+## Campaign R — the release itself on F41
+
+Records: `campaignR_T.jsonl` (205 fits, 30 September 2026, 02:05 to 02:16,
+then, after the machine went down, 03:58 to 04:21; the fits cut by the
+interruption left no record and were run in full at the resumption), commit
+`cdddaf0`, two fits at a time; its plan was committed at 02:05:30, before the
+first fit. Summary against C6x: `campaignR_T_summary.txt`.
+
+| | C6x (campaign 6b) | R (release) |
+|---|---|---|
+| Feynman, exact laws (205 runs) | 88 | 88 |
+| runs exact for one arm only | 0 | 0 |
+| ahead / behind on equations | | 0 / 0 |
+| fits stopped by the time limit | 125 | 125 |
+| time beyond the 30 s budget: median (90th percentile, maximum) | 1.26 s (2.72 s, 6.31 s) | 1.03 s (1.51 s, 1.85 s) |
+| inexact formulas (`formula_exact` False), 205 fits | 7 | 6 |
+
+The expectation written in `PLAN.md` holds: the release returns the exact law
+in the same 88 runs as C6x. The one-second bound on the polish shortens the
+time spent after the deadline without costing any exact law; five runs go from
+a miss to within 1e-3, as the number of generations run in 30 seconds varies
+with the load of the machine (median 76 against 66). The 88 of the CHANGELOG is
+the release's.
+

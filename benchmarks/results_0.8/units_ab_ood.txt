@@ -1,0 +1,47 @@
+Feynman II.11.3  x = q*Ef/(m*(w0^2-w^2))   5 variables
+5 seeds x 40 generations x 1 restart(s), speed=fast
+bras : untyped, typed, untyped_fair  (untyped_fair : x4 generations)
+sortie : /tmp/claude-0/claims080/units_ab_ood.jsonl
+Test hors domaine : w/w0 dans [0.70, 0.90] (entrainement : [0.20, 0.67])
+
+  [untyped     ] seed 0 ... [invalide] R2=0.99896 hors_dom=0.28162 (24s)
+  [untyped     ] seed 1 ... /home/claude/repo/gp_elite/sklearn_api.py:117: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 200 of 200 training rows (largest gap 0.0347), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  self.model_ = symbolic_regression(
+[invalide] R2=0.98934 hors_dom=0.33251 (19s)
+  [untyped     ] seed 2 ... [invalide] R2=0.98893 hors_dom=0.41722 (18s)
+  [untyped     ] seed 3 ... [invalide] R2=0.99220 hors_dom=0.33918 (21s)
+  [untyped     ] seed 4 ... [invalide] R2=0.99157 hors_dom=0.57647 (22s)
+  [typed       ] seed 0 ... [valide  ] R2=0.99753 hors_dom=0.40827 (169s)
+  [typed       ] seed 1 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (31s)
+  [typed       ] seed 2 ... [valide  ] R2=0.99957 hors_dom=0.65087 (175s)
+  [typed       ] seed 3 ... [valide  ] R2=0.99780 hors_dom=0.31874 (149s)
+  [typed       ] seed 4 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (107s)
+  [untyped_fair] seed 0 ... [invalide] R2=0.99893 hors_dom=0.28034 (97s)
+  [untyped_fair] seed 1 ... /home/claude/repo/gp_elite/sklearn_api.py:117: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 2 of 200 training rows (largest gap 0.000269), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  self.model_ = symbolic_regression(
+[invalide] R2=0.99782 hors_dom=0.18415 (80s)
+  [untyped_fair] seed 2 ... [invalide] R2=0.99555 hors_dom=0.45185 (84s)
+  [untyped_fair] seed 3 ... [invalide] R2=0.99874 hors_dom=0.41730 (77s)
+  [untyped_fair] seed 4 ... [invalide] R2=0.99863 hors_dom=0.54744 (91s)
+
+============================================================================
+                             sans units=       avec units=    sans units= x4
+----------------------------------------------------------------------------
+modeles valides                      0/5               5/5               0/5
+colle en domaine                     0/5               2/5               0/5
+RECUPERE (hors dom.)                 0/5               2/5               0/5
+R2 test median                   0.99157           0.99957           0.99863
+R2 HORS DOM. median              0.33918           0.65087           0.41730
+taille mediane                        59                27                60
+secondes / run                        21               149                84
+============================================================================
+
+Lecture : 'colle en domaine' est l'ancien critere (R2 sur un test tire
+dans le meme domaine). 'RECUPERE' exige en plus que le modele tienne
+HORS du domaine d'entrainement — c'est ce qui separe la loi de
+l'approximation. Un ecart entre les deux lignes = surajustement au domaine.
+
+Exemple de modele ayant reellement recupere la loi :
+  [typed] (15.042870079290655*((((X0*X1)/((X4*((3.832785170367139/X3) - (3.832785170367137*Abs((1.0/X4)))))*((X4*(((-3.9
+
+Resultats dans /tmp/claude-0/claims080/units_ab_ood.jsonl — envoie ce fichier pour analyse.

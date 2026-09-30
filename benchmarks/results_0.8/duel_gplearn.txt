@@ -1,0 +1,19 @@
+  I.12.1     GPE:EXACT 1.1e-31 (  2s) | gplearn:EXACT 0.0e+00 (  1s)
+  I.12.5     GPE:EXACT 6.0e-32 (  2s) | gplearn:EXACT 0.0e+00 (  1s)
+  I.14.4     GPE:EXACT 4.8e-32 (  2s) | gplearn:MISS  4.2e-03 ( 28s)
+  I.39.1     GPE:EXACT 6.3e-32 (  2s) | gplearn:NEAR  5.6e-04 ( 33s)
+  II.3.24    GPE:EXACT 4.8e-31 (  1s) | gplearn:MISS  2.7e-02 ( 25s)
+  I.6.20a    GPE:EXACT 2.3e-31 ( 26s) | gplearn:MISS  9.3e-02 ( 25s)
+  I.8.14     GPE:EXACT 9.4e-32 ( 36s) | gplearn:MISS  4.9e-01 ( 25s)
+  I.16.6     GPE:MISS  6.9e-03 ( 53s) | gplearn:MISS  6.5e-02 ( 27s)
+  I.27.6     GPE:EXACT 6.4e-31 ( 37s) | gplearn:MISS  1.4e-01 ( 26s)
+  I.34.8     GPE:EXACT 3.4e-31 (  2s) | gplearn:EXACT 1.1e-32 ( 25s)
+  I.43.16    GPE:EXACT 7.4e-32 (  2s) | gplearn:EXACT 2.1e-32 ( 24s)
+  I.12.2     GPE:EXACT 1.3e-31 (  2s) | gplearn:MISS  1.2e-01 ( 28s)
+  II.15.4    GPE:EXACT 5.9e-32 ( 50s) | gplearn:EXACT 1.1e-32 ( 25s)
+  I.18.12    GPE:MISS  2.2e-03 ( 52s) | gplearn:EXACT 2.2e-32 ( 27s)
+  III.15.12  GPE:NEAR  1.7e-04 ( 53s) | gplearn:MISS  9.6e-03 ( 29s)
+15 equations, chaque methode jugee sur le modele qu'elle rend :
+  GP_ELITE : 12/15 exacts, 13/15 a moins de 1e-3
+  gplearn  : 6/15 exacts, 7/15 a moins de 1e-3
+  par statut : GP_ELITE devant sur 8, derriere sur 1, egalite sur 6

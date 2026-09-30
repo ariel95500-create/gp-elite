@@ -2,8 +2,8 @@
 
 Each optimised routine is compared here, value for value and bit for bit, with
 the 0.7.0 code it replaces (copied below as the reference). The whole engine
-is also checked end to end by benchmarks/speed_check.py, which compares the
-models returned by two versions at equal seed.
+is also checked end to end by benchmarks/speed_equivalence.py, which compares
+the models returned by two versions at equal seed on thirteen configurations.
 """
 import itertools
 import warnings

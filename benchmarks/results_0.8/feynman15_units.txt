@@ -1,0 +1,42 @@
+gp_elite 0.8.0  <-  /home/claude/repo/gp_elite/__init__.py
+résultats : /tmp/claude-0/claims080/feynman15_units.jsonl
+bras UNITS (recherche typée), normalize=none, seed=0, restarts=4, fast/30
+=== BANC FEYNMAN, BRAS UNITS — équations 0..14 ===
+  I.12.1     EXACT  champ=0.0e+00 pareto=0.0e+00  (2s)
+  I.12.5     EXACT  champ=0.0e+00 pareto=0.0e+00  (2s)
+  I.14.4     EXACT  champ=3.5e-32 pareto=3.5e-32  (2s)
+  I.39.1     EXACT  champ=3.4e-32 pareto=3.4e-32  (2s)
+  II.3.24    EXACT  champ=3.4e-32 pareto=3.4e-32  (3s)
+  I.6.20a    EXACT  champ=3.2e-32 pareto=3.2e-32  (3s)
+  I.8.14     EXACT  champ=0.0e+00 pareto=0.0e+00  (19s)
+  I.16.6     NEAR   champ=8.9e-04 pareto=3.1e-04  (76s)  !ops:sqrt
+  I.27.6     EXACT  champ=0.0e+00 pareto=0.0e+00  (7s)
+  I.34.8     EXACT  champ=0.0e+00 pareto=0.0e+00  (10s)
+  I.43.16    EXACT  champ=0.0e+00 pareto=0.0e+00  (10s)
+  I.12.2     EXACT  champ=3.0e-32 pareto=3.0e-32  (28s)
+  II.15.4    EXACT  champ=7.5e-33 pareto=0.0e+00  (7s)
+  I.18.12    EXACT  champ=0.0e+00 pareto=0.0e+00  (3s)
+  III.15.12  EXACT  champ=0.0e+00 pareto=0.0e+00  (32s)
+
+=== BILAN BRAS UNITS — 14/15 EXACT (moteur 0.8.0) ===
+équation   none   units  pareto_best  taille  drapeaux
+I.12.1     EXACT  EXACT  0.0e+00      3       
+I.12.5     EXACT  EXACT  0.0e+00      3       
+I.14.4     EXACT  EXACT  3.5e-32      7       
+I.39.1     EXACT  EXACT  3.4e-32      5       
+II.3.24    EXACT  EXACT  3.4e-32      7       
+I.6.20a    EXACT  EXACT  3.2e-32      7       
+I.8.14     EXACT  EXACT  0.0e+00      10      
+I.16.6     MISS   NEAR   3.1e-04      53      sqrt
+I.27.6     EXACT  EXACT  0.0e+00      9       
+I.34.8     EXACT  EXACT  0.0e+00      7       
+I.43.16    EXACT  EXACT  0.0e+00      7       
+I.12.2     EXACT  EXACT  3.0e-32      11      
+II.15.4    EXACT  EXACT  0.0e+00      8       
+I.18.12    EXACT  EXACT  0.0e+00      6       
+III.15.12  EXACT  EXACT  0.0e+00      10      
+
+Aucune régression vs le bras none.
+
+Rappel : I.16.6 sous units n'est pas seed-robuste (1 seed/4 en session d'étude) — un MISS ici resterait un résultat, pas un bug.
+Ce bras se rapporte À CÔTÉ des bras auto (gelé) et none — il ne remplace rien.

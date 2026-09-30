@@ -1,0 +1,124 @@
+gp_elite 0.8.0  <-  /home/claude/repo/gp_elite/__init__.py
+résultats : /tmp/claude-0/claims080/scaling.jsonl
+=== BANC DE SCALING — bras 'none', tailles [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000] ===
+    plage annoncée par le README : 25-10000 points
+
+--- I.12.1   mu*Nn
+  N=25     rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=25     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.3s  propre
+  N=25     rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.6s  propre
+  N=50     rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=50     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=50     rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=100    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.5s  propre
+  N=100    rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=200    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=200    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.4s  propre
+  N=200    rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.7s  propre
+  N=500    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.5s  propre
+  N=1000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.5s  propre
+  N=2000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       1.9s  propre
+  N=5000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       2.7s  propre
+  N=10000  rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=3       3.7s  propre
+
+--- I.8.14   sqrt((x2-x1)^2+(y2-y1)^2)
+  N=25     rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      4.1s  propre
+  N=25     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     27.4s  propre
+  N=25     rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10     26.5s  propre
+  N=50     rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     19.4s  propre
+  N=50     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     14.1s  propre
+  N=50     rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10     15.1s  propre
+  N=100    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      6.0s  propre
+  N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     13.1s  propre
+  N=100    rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10      5.3s  propre
+  N=200    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      3.8s  propre
+  N=200    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10      6.5s  propre
+  N=200    rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10      3.5s  propre
+  N=500    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      4.6s  propre
+  N=1000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      8.3s  propre
+  N=2000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      9.8s  propre
+  N=5000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     14.9s  propre
+  N=10000  rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      8.7s  propre
+
+--- III.15.12   2*U*(1-cos(k*d))
+  N=25     rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     21.2s  propre
+  N=25     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     12.0s  propre
+  N=25     rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10     21.9s  propre
+  N=50     rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     22.1s  propre
+  N=50     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     13.2s  propre
+  N=50     rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10     26.5s  propre
+  N=100    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     26.5s  propre
+  N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     12.6s  propre
+  N=100    rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10     23.9s  propre
+  N=200    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     24.9s  propre
+  N=200    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     11.6s  propre
+  N=200    rep=2  EXACT  champ=0.0e+00 front=0.0e+00 size=10     25.0s  propre
+  N=500    rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     16.1s  propre
+  N=1000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     27.1s  propre
+  N=2000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     34.1s  propre
+  N=5000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     35.4s  propre
+  N=10000  rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     87.4s  propre
+
+--- I.12.2   q1*q2/(4*pi*eps*r^2)
+  N=25     rep=0  EXACT  champ=1.2e-31 front=1.2e-31 size=10      1.2s  propre
+  N=25     rep=1  EXACT  champ=4.0e-32 front=4.0e-32 size=10      1.4s  propre
+  N=25     rep=2  EXACT  champ=8.1e-30 front=8.1e-30 size=10      1.5s  propre
+  N=50     rep=0  EXACT  champ=1.2e-31 front=1.2e-31 size=10      1.4s  propre
+  N=50     rep=1  EXACT  champ=7.6e-32 front=7.6e-32 size=10      1.4s  propre
+  N=50     rep=2  EXACT  champ=1.0e-31 front=1.0e-31 size=10      1.6s  propre
+  N=100    rep=0  EXACT  champ=3.8e-31 front=3.8e-31 size=10      1.3s  propre
+  N=100    rep=1  EXACT  champ=5.0e-32 front=5.0e-32 size=10      1.3s  propre
+  N=100    rep=2  EXACT  champ=1.2e-31 front=1.2e-31 size=10      1.6s  propre
+  N=200    rep=0  EXACT  champ=2.7e-32 front=2.7e-32 size=10      1.5s  propre
+  N=200    rep=1  EXACT  champ=1.4e-32 front=1.4e-32 size=10      1.5s  propre
+  N=200    rep=2  EXACT  champ=2.1e-32 front=2.1e-32 size=10      1.4s  propre
+  N=500    rep=0  EXACT  champ=1.1e-31 front=1.1e-31 size=10      1.4s  propre
+  N=1000   rep=0  EXACT  champ=2.3e-31 front=2.3e-31 size=10      1.5s  propre
+  N=2000   rep=0  EXACT  champ=1.2e-31 front=1.2e-31 size=10      1.5s  propre
+  N=5000   rep=0  EXACT  champ=9.3e-32 front=9.3e-32 size=10      2.0s  propre
+  N=10000  rep=0  EXACT  champ=3.1e-31 front=3.1e-31 size=10      3.1s  propre
+
+--- I.16.6   (u+v)/(1+u*v/c^2)
+  N=25     rep=0  MISS   champ=1.8e-02 front=1.8e-02 size=14     44.2s  
+  N=25     rep=1  MISS   champ=2.4e-03 front=2.4e-03 size=12     39.0s  
+  N=25     rep=2  MISS   champ=7.0e-03 front=7.0e-03 size=11     46.7s  
+  N=50     rep=0  MISS   champ=5.4e-03 front=8.3e-04 size=30     46.6s  
+  N=50     rep=1  MISS   champ=1.6e-02 front=1.6e-02 size=37     42.1s  
+  N=50     rep=2  MISS   champ=2.0e-03 front=2.0e-03 size=29     42.3s  
+  N=100    rep=0  MISS   champ=2.2e-03 front=7.1e-04 size=16     51.0s  
+  N=100    rep=1  MISS   champ=1.4e-03 front=3.8e-04 size=30     47.5s  
+  N=100    rep=2  MISS   champ=1.6e-02 front=4.3e-03 size=37     47.9s  
+  N=200    rep=0  MISS   champ=1.2e-03 front=1.1e-03 size=29     50.0s  
+  N=200    rep=1  MISS   champ=1.3e-02 front=6.1e-03 size=64     48.1s  
+  N=200    rep=2  MISS   champ=2.1e-02 front=3.4e-03 size=19     45.3s  
+  N=500    rep=0  MISS   champ=1.9e-03 front=8.4e-04 size=29     52.5s  
+  N=1000   rep=0  MISS   champ=2.0e-03 front=7.1e-04 size=48     69.5s  
+  N=2000   rep=0  MISS   champ=1.8e-03 front=6.2e-04 size=40     75.8s  
+  N=5000   rep=0  MISS   champ=1.5e-03 front=3.9e-04 size=48    114.8s  
+  N=10000  rep=0  NEAR   champ=9.1e-04 front=5.7e-04 size=22    181.5s  
+
+=== SCALING — statut par équation et par taille (moteur 0.8.0) ===
+    (E=EXACT propre, e=EXACT non-canonique, N=NEAR, M=MISS ; | = plage citée par le README)
+équation   |    25     50    100    200    500   1000   2000   5000  10000|
+I.12.1     |   EEE    EEE    EEE    EEE      E      E      E      E      E|
+I.8.14     |   EEE    EEE    EEE    EEE      E      E      E      E      E|
+III.15.12  |   EEE    EEE    EEE    EEE      E      E      E      E      E|
+I.12.2     |   EEE    EEE    EEE    EEE      E      E      E      E      E|
+I.16.6     |   MMM    MMM    MMM    MMM      M      M      M      M      N|
+
+=== taux de récupération et coût par taille (modèle rendu) ===
+      N    exactes      <1e-3  front ex.   temps méd.  README
+     25    12/15      12/15      12/15         12.0s  dans la plage
+     50    12/15      12/15      12/15         14.1s  dans la plage
+    100    12/15      12/15      12/15          6.0s  dans la plage
+    200    12/15      12/15      12/15          3.8s  dans la plage
+    500     4/5        4/5        4/5           4.6s  dans la plage
+   1000     4/5        4/5        4/5           8.3s  dans la plage
+   2000     4/5        4/5        4/5           9.8s  dans la plage
+   5000     4/5        4/5        4/5          14.9s  dans la plage
+  10000     4/5        5/5        4/5           8.7s  dans la plage
+
+--- lecture pour le README ---
+
+Ce banc mesure l'effet de la TAILLE seule (bras 'none'). Il ne remplace ni le banc gelé ni les bras none/units.

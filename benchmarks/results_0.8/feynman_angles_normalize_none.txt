@@ -1,0 +1,16 @@
+=== BANC FEYNMAN — équations 12..14 sur 41 (restarts=4, fast/30, normalize='none') ===
+  II.15.4    EXACT  champ=0.0e+00 front=0.0e+00  (11s)  -mu*B*cos(th)
+  I.18.12    EXACT  champ=0.0e+00 front=0.0e+00  (7s)  r*F*sin(th)
+  III.15.12  EXACT  champ=0.0e+00 front=0.0e+00  (23s)  2*U*(1-cos(k*d))
+
+famille                EXACT    NEAR    MISS   total  taille méd.
+-----------------------------------------------------------------
+historique                 3       0       0       3            7
+-----------------------------------------------------------------
+TOTAL                      3       0       0       3
+
+Modele rendu (champion)      : 3/3 exacts, 3/3 a moins de 1e-3
+Loi presente dans le front   : 3/3 exacts (meilleur point du front, choisi sur le test : metrique secondaire)
+
+Exact = récupération symbolique (1−R² < 1e-9). Une famille où
+MISS domine est un point dur identifié, donc une piste de travail.
