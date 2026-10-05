@@ -216,7 +216,10 @@ def run_one(job):
 
 # ───────────────────────────────────────────────────────────── driver ──
 
-def drive(python, out, workers, kinds=None):
+def drive(python, out, workers, kinds=None, max_seconds=None):
+    """Runs the jobs not yet in `out`. With max_seconds, stops launching new
+    fits after that time and returns once the running ones are recorded (the
+    next call resumes)."""
     done = set()
     if os.path.exists(out):
         with open(out) as fh:
@@ -234,6 +237,11 @@ def drive(python, out, workers, kinds=None):
     t_start = time.time()
     n_done = 0
     while todo or running:
+        if max_seconds is not None and time.time() - t_start > max_seconds \
+                and todo:
+            print("time slice over: %d jobs left for the next call"
+                  % len(todo), flush=True)
+            todo = []
         while todo and len(running) < workers:
             j = todo.pop(0)
             p = subprocess.Popen(
@@ -313,6 +321,7 @@ def main():
     r.add_argument("--out", required=True)
     r.add_argument("--workers", type=int, default=3)
     r.add_argument("--kinds", default=None)
+    r.add_argument("--max-seconds", type=float, default=None)
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
@@ -320,7 +329,7 @@ def main():
     a = ap.parse_args()
     if a.cmd == "run":
         drive(a.python, a.out, a.workers,
-              a.kinds.split(",") if a.kinds else None)
+              a.kinds.split(",") if a.kinds else None, a.max_seconds)
     elif a.cmd == "one":
         print(json.dumps(run_one(json.loads(a.job))))
     else:
