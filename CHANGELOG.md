@@ -13,6 +13,9 @@
   passed, and the engine flagged that formula inexact as documented. The test
   now checks the flag: a formula flagged exact reproduces `predict()`, and an
   inexact returned model warns.
+- `CITATION.cff`: `date-released` is 5 October 2026, the day 0.8.0 was
+  published on PyPI (it said 30 September 2026, the date the release was
+  prepared).
 
 ## 0.8.0 — "Swift"
 
