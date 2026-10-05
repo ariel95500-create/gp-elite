@@ -1,0 +1,1694 @@
+{
+ "built": "by benchmarks/test_set.py build",
+ "datasets": {
+  "1027_ESL": {
+   "columns": [
+    "in1",
+    "in2",
+    "in3",
+    "in4"
+   ],
+   "features": 4,
+   "group": "TR25",
+   "rows": 488,
+   "sha256": "7a5041b2294a4daf15200c430ecf7369b6f7f5d5e610d15f9ede9ef020ca989c"
+  },
+  "1028_SWD": {
+   "columns": [
+    "In1",
+    "In2",
+    "In3",
+    "In4",
+    "In5",
+    "In6",
+    "In7",
+    "In8",
+    "In9",
+    "In10"
+   ],
+   "features": 10,
+   "group": "TR25",
+   "rows": 1000,
+   "sha256": "c90b93ec29cee0a1442855b50daec25dcd08616560149247a5d6a23bdb58b940"
+  },
+  "1029_LEV": {
+   "columns": [
+    "In1",
+    "In2",
+    "In3",
+    "In4"
+   ],
+   "features": 4,
+   "group": "TR25",
+   "rows": 1000,
+   "sha256": "a0984a3c7a9f9c8f904ef9b740c42c3a008e06d389ffba0694f3efb7111ef875"
+  },
+  "1030_ERA": {
+   "columns": [
+    "in1",
+    "in2",
+    "in3",
+    "in4"
+   ],
+   "features": 4,
+   "group": "TR25",
+   "rows": 1000,
+   "sha256": "14cc652961873b6f31d1793c6b2c7b08d6aa4a0bd071657cdee17d4e8d1cb371"
+  },
+  "1096_FacultySalaries": {
+   "columns": [
+    "CIC.institutions",
+    "average.salary",
+    "full.prof.salary",
+    "assoc.prof.salary"
+   ],
+   "features": 4,
+   "group": "TR25",
+   "rows": 50,
+   "sha256": "d74bdccb6b94a4e39876620d6f2ed591cc75a1200c94471a50c26e72bb5eaae6"
+  },
+  "192_vineyard": {
+   "columns": [
+    "lugs_1989",
+    "lugs_1990"
+   ],
+   "features": 2,
+   "group": "TR25",
+   "rows": 52,
+   "sha256": "69119f237af60c41a5cebd5115486da534df6d7c3a24964a9770f7debf8605c8"
+  },
+  "229_pwLinear": {
+   "columns": [
+    "a1",
+    "a2",
+    "a3",
+    "a4",
+    "a5",
+    "a6",
+    "a7",
+    "a8",
+    "a9",
+    "a10"
+   ],
+   "features": 10,
+   "group": "TR25",
+   "rows": 200,
+   "sha256": "e03974524078cc1f3376dab41dcfbd8f7ca8fe7a26ab3d4d463e91d90b50bccd"
+  },
+  "230_machine_cpu": {
+   "columns": [
+    "MYCT",
+    "MMIN",
+    "MMAX",
+    "CACH",
+    "CHMIN",
+    "CHMAX"
+   ],
+   "features": 6,
+   "group": "TR25",
+   "rows": 209,
+   "sha256": "7aa3d85bd6cf5eaed08b939f8db32a144a16f994d40e691cc984019e7e300471"
+  },
+  "519_vinnie": {
+   "columns": [
+    "year",
+    "field_goal_attempts"
+   ],
+   "features": 2,
+   "group": "TR25",
+   "rows": 380,
+   "sha256": "e73fed546a8277207716a2ff2e09e1008773b3f7a18d48695ce975711be10a0b"
+  },
+  "522_pm10": {
+   "columns": [
+    "cars_per_hour",
+    "temperature_at_2m",
+    "wind_speed",
+    "temperature_diff_2m_25m",
+    "wind_direction",
+    "hour_of_day",
+    "day"
+   ],
+   "features": 7,
+   "group": "TR25",
+   "rows": 500,
+   "sha256": "d9edbbc828db6855b03abf662cfc92f123f8480da22d047f03efcc00d94acd74"
+  },
+  "523_analcatdata_neavote": {
+   "columns": [
+    "Party",
+    "Bills"
+   ],
+   "features": 2,
+   "group": "TR25",
+   "rows": 100,
+   "sha256": "5a747bdfb7fbd2b0a08908988caf78f781fbe2f5f9eb275b25b4eb1e567097d2"
+  },
+  "529_pollen": {
+   "columns": [
+    "RIDGE",
+    "NUB",
+    "CRACK",
+    "WEIGHT"
+   ],
+   "features": 4,
+   "group": "TR25",
+   "rows": 3848,
+   "sha256": "bb7fef82369e1fbed0be0d928ab71ab8d94b8d670ede92f5889d03056cb637a5"
+  },
+  "556_analcatdata_apnea2": {
+   "columns": [
+    "Automatic",
+    "Scorer_1",
+    "Subject"
+   ],
+   "features": 3,
+   "group": "TR25",
+   "rows": 475,
+   "sha256": "41a22fefa027944fb2513796920702b64ba659d1795cccd0b1fed1810ac5a17b"
+  },
+  "557_analcatdata_apnea1": {
+   "columns": [
+    "Scorer_1",
+    "Scorer_2",
+    "Subject"
+   ],
+   "features": 3,
+   "group": "TR25",
+   "rows": 475,
+   "sha256": "e6a28cf30424f6e641cca3553bb05b2c814f12c53b9cf8c978da578ac31c203b"
+  },
+  "663_rabe_266": {
+   "columns": [
+    "col_1",
+    "col_2"
+   ],
+   "features": 2,
+   "group": "TR25",
+   "rows": 120,
+   "sha256": "5c1fd1a8d06f88fdc75f4fbe9967fc2ad6858676a652ae443154b593e14ae120"
+  },
+  "665_sleuth_case2002": {
+   "columns": [
+    "FM",
+    "LC",
+    "BK",
+    "SS",
+    "AG",
+    "YR"
+   ],
+   "features": 6,
+   "group": "TR25",
+   "rows": 147,
+   "sha256": "3050d9047263f350d5aa20879a6fc2516f0a0f6a205a4271ca2e3b9c3cff0d09"
+  },
+  "666_rmftsa_ladata": {
+   "columns": [
+    "Total_Mortality",
+    "Cardiovascular_Mortality",
+    "Temperature",
+    "Relative_Humidity",
+    "Carbon_Monoxide",
+    "Sulfur_Dioxideglm.LAshumway",
+    "Nitrogen_Dioxide",
+    "Hydrocarbons",
+    "Ozone",
+    "Particulates"
+   ],
+   "features": 10,
+   "group": "TR25",
+   "rows": 508,
+   "sha256": "7133338518674e3dcd63ca1518c0835f6ae782c4085367da9d668b1a32814ea9"
+  },
+  "678_visualizing_environmental": {
+   "columns": [
+    "ozone",
+    "radiation",
+    "temperature"
+   ],
+   "features": 3,
+   "group": "TR25",
+   "rows": 111,
+   "sha256": "d38749b6dd3d61543d43ef48d5a9a7af1ad10653af764f964eb5f40cd99d2dec"
+  },
+  "687_sleuth_ex1605": {
+   "columns": [
+    "FMED",
+    "TMIQ",
+    "Age2IQ",
+    "Age4IQ",
+    "Age8IQ"
+   ],
+   "features": 5,
+   "group": "TR25",
+   "rows": 62,
+   "sha256": "a0039382a010e3dc9f35451fe9406d913c0f9c0251a8dac9bcbd5c57d8dd4695"
+  },
+  "706_sleuth_case1202": {
+   "columns": [
+    "bsal",
+    "sal77",
+    "fsex",
+    "senior",
+    "age",
+    "educ"
+   ],
+   "features": 6,
+   "group": "TR25",
+   "rows": 93,
+   "sha256": "cfca3c636dedef52e9609f98a9db1a70e3806fbc2370fce23bf184b71d40f83e"
+  },
+  "feynman_III_12_43": {
+   "columns": [
+    "n",
+    "h"
+   ],
+   "family": "main",
+   "features": 2,
+   "formula": "L = n*(h/(2*pi))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "de19bb01498695cdee3c0953e1ef0a99504975ed83c1e5daea25091c01e5c649"
+  },
+  "feynman_III_13_18": {
+   "columns": [
+    "E_n",
+    "d",
+    "k",
+    "h"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "v = 2*E_n*d**2*k/(h/(2*pi))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "432f54c70aac5e497b9a59893a85e87a80decbcf59af3aef725969f3c163c700"
+  },
+  "feynman_III_14_14": {
+   "columns": [
+    "I_0",
+    "q",
+    "Volt",
+    "kb",
+    "T"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "I = I_0*(exp(q*Volt/(kb*T))-1)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "dd15125c9a8dc21ea6463de316ae17601b52947ff4cbdb08880d7fb4738c0e5f"
+  },
+  "feynman_III_15_14": {
+   "columns": [
+    "h",
+    "E_n",
+    "d"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "m = (h/(2*pi))**2/(2*E_n*d**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "cd8bd44206b36deb9210d32a1ad4d15ca0a793f17557cbe7ca13c2d9f4db5f41"
+  },
+  "feynman_III_15_27": {
+   "columns": [
+    "alpha",
+    "n",
+    "d"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "k = 2*pi*alpha/(n*d)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "8389b317f4bc5a177a1c53033b5f3a0541170b06c191a0ee5f049328de4ded4b"
+  },
+  "feynman_III_21_20": {
+   "columns": [
+    "rho_c_0",
+    "q",
+    "A_vec",
+    "m"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "j = -rho_c_0*q*A_vec/m",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "8538186ac37737203707e61ec858a77c9ee17b0d8d2aaa0792be9e634852cb70"
+  },
+  "feynman_III_4_32": {
+   "columns": [
+    "h",
+    "omega",
+    "kb",
+    "T"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "n = 1/(exp((h/(2*pi))*omega/(kb*T))-1)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "13d4ff74522fa391a51a285728fe0287bc9de3e202b5cb6daf17ecfa6986b634"
+  },
+  "feynman_III_4_33": {
+   "columns": [
+    "h",
+    "omega",
+    "kb",
+    "T"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "E_n = (h/(2*pi))*omega/(exp((h/(2*pi))*omega/(kb*T))-1)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "c8e306b13a8dd69806255d3173fa81c5ccf19bca77370174133188718b90f619"
+  },
+  "feynman_III_7_38": {
+   "columns": [
+    "mom",
+    "B",
+    "h"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "omega = 2*mom*B/(h/(2*pi))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "60e64c904e6f283decdc0fec6fb05cec4275699e62a2469235944cc80d7d1268"
+  },
+  "feynman_III_8_54": {
+   "columns": [
+    "E_n",
+    "t",
+    "h"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "prob = sin(E_n*t/(h/(2*pi)))**2",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "7ea3ed239a04651b111539b8b871e32baae1a32946dff56796e28278a1a856eb"
+  },
+  "feynman_II_10_9": {
+   "columns": [
+    "sigma_den",
+    "epsilon",
+    "chi"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "Ef = sigma_den/epsilon*1/(1+chi)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "8b496ed28d24e63d4d7a149f5c7a6aeb8f3d670f3fab556822eaa504c3f52bb9"
+  },
+  "feynman_II_11_20": {
+   "columns": [
+    "n_rho",
+    "p_d",
+    "Ef",
+    "kb",
+    "T"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "Pol = n_rho*p_d**2*Ef/(3*kb*T)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "497a5f8c1b629fb99ed94e2e0372c116e57f389d7142be58fe7ac9e7e6c94fad"
+  },
+  "feynman_II_11_28": {
+   "columns": [
+    "n",
+    "alpha"
+   ],
+   "family": "main",
+   "features": 2,
+   "formula": "theta = 1+n*alpha/(1-(n*alpha/3))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "6cc3960daada616748c470f969363377da27cf965502b6045ff7ac2ee69f4f65"
+  },
+  "feynman_II_13_17": {
+   "columns": [
+    "epsilon",
+    "c",
+    "I",
+    "r"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "B = 1/(4*pi*epsilon*c**2)*2*I/r",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "9eecc4a33eee17d1407cc1322dcb5e4cbd0d9896b31372b0c29a5d4d47f1ad83"
+  },
+  "feynman_II_13_34": {
+   "columns": [
+    "rho_c_0",
+    "v",
+    "c"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "j = rho_c_0*v/sqrt(1-v**2/c**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "b49f7f0c707d0c13071769020e7dfa751024cbb39505d7a63a698cc964dc3896"
+  },
+  "feynman_II_15_5": {
+   "columns": [
+    "p_d",
+    "Ef",
+    "theta"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "E_n = -p_d*Ef*cos(theta)",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "f28d32c148698e770b4358421d605dd07be0c71701ea5c72bd124c2db2ad87f6"
+  },
+  "feynman_II_21_32": {
+   "columns": [
+    "q",
+    "epsilon",
+    "r",
+    "v",
+    "c"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "Volt = q/(4*pi*epsilon*r*(1-v/c))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "c16b02479930071ccda1ee9dab31bdb2b6a87cb9524a7416f195c5ef3e1ff924"
+  },
+  "feynman_II_27_16": {
+   "columns": [
+    "epsilon",
+    "c",
+    "Ef"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "flux = epsilon*c*Ef**2",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "a006a8526eb710e97b3d35997914e1a4cce6f72b619a1f75c1344c27813160ca"
+  },
+  "feynman_II_27_18": {
+   "columns": [
+    "epsilon",
+    "Ef"
+   ],
+   "family": "main",
+   "features": 2,
+   "formula": "E_den = epsilon*Ef**2",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "cce562c9f66cbc2fcc247f4088ddcdca1a3f87bd012301ffd7193079e3aba9ee"
+  },
+  "feynman_II_34_11": {
+   "columns": [
+    "g_",
+    "q",
+    "B",
+    "m"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "omega = g_*q*B/(2*m)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "0eeab8e8335d6f764fc425ca4813ff0f3ed8bcc2b6b02f240f516e81c9ba3f6a"
+  },
+  "feynman_II_34_29a": {
+   "columns": [
+    "q",
+    "h",
+    "m"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "mom = q*h/(4*pi*m)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "f95db66c0b2cbb58617e9832e148b901707ab21f1a4f09df91ae4814b06800f6"
+  },
+  "feynman_II_34_29b": {
+   "columns": [
+    "g_",
+    "h",
+    "Jz",
+    "mom",
+    "B"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "E_n = g_*mom*B*Jz/(h/(2*pi))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "36b9b89793755c1967ca09f23bed32acad90897e366b94f0cea548f93cf08d9d"
+  },
+  "feynman_II_34_2a": {
+   "columns": [
+    "q",
+    "v",
+    "r"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "I = q*v/(2*pi*r)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "db0b9d801c367e62921e3f789b1495144eabc747009a2540af0b6b5625643129"
+  },
+  "feynman_II_35_21": {
+   "columns": [
+    "n_rho",
+    "mom",
+    "B",
+    "kb",
+    "T"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "M = n_rho*mom*tanh(mom*B/(kb*T))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "8977b58636f4ab93652cd72bc9470b26b162b5164c0defeeb4259e9b1be68c18"
+  },
+  "feynman_II_36_38": {
+   "columns": [
+    "mom",
+    "H",
+    "kb",
+    "T",
+    "alpha",
+    "epsilon",
+    "c",
+    "M"
+   ],
+   "family": "main",
+   "features": 8,
+   "formula": "f = mom*H/(kb*T)+(mom*alpha)/(epsilon*c**2*kb*T)*M",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "595470f9a3fddd19b01f87ebd196fe6116dd9a916eb15c5116796ffa031cbf35"
+  },
+  "feynman_II_37_1": {
+   "columns": [
+    "mom",
+    "B",
+    "chi"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "E_n = mom*(1+chi)*B",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "1bf039fd63a87e777189294a2c149d7c4c266cbbc3a578413070272f2649c30e"
+  },
+  "feynman_II_38_14": {
+   "columns": [
+    "Y",
+    "sigma"
+   ],
+   "family": "main",
+   "features": 2,
+   "formula": "mu_S = Y/(2*(1+sigma))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "e298b176393f3f0d95f726b962a48d00183117c0b98f60c4326dc2d3ada7add7"
+  },
+  "feynman_II_4_23": {
+   "columns": [
+    "q",
+    "epsilon",
+    "r"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "Volt = q/(4*pi*epsilon*r)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "c572f83ac238d7b6b3388f1f4718fed8484d64650e42b594bfb9a35f1977f14b"
+  },
+  "feynman_II_6_11": {
+   "columns": [
+    "epsilon",
+    "p_d",
+    "theta",
+    "r"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "Volt = 1/(4*pi*epsilon)*p_d*cos(theta)/r**2",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "922102bb67694201011ec70b43ac43f247f292589fbb31b23fcb8196f336f2b2"
+  },
+  "feynman_II_6_15a": {
+   "columns": [
+    "epsilon",
+    "p_d",
+    "r",
+    "x",
+    "y",
+    "z"
+   ],
+   "family": "main",
+   "features": 6,
+   "formula": "Ef = p_d/(4*pi*epsilon)*3*z/r**5*sqrt(x**2+y**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "8607911c4e5129bdfd880b64b1832888e1fded14fc4705a692218e257bf84638"
+  },
+  "feynman_II_8_31": {
+   "columns": [
+    "epsilon",
+    "Ef"
+   ],
+   "family": "main",
+   "features": 2,
+   "formula": "E_den = epsilon*Ef**2/2",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "50858cfdd7e1d1745b762219b4f49e1c29a9f563edcadb0df0062c1c514407bf"
+  },
+  "feynman_II_8_7": {
+   "columns": [
+    "q",
+    "epsilon",
+    "d"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "E_n = 3/5*q**2/(4*pi*epsilon*d)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "89372a6c7a74e79d20fac0f1400d05ed6b7a5b704a00f5a0bfd1e89f8b37442e"
+  },
+  "feynman_I_12_11": {
+   "columns": [
+    "q",
+    "Ef",
+    "B",
+    "v",
+    "theta"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "F = q*(Ef+B*v*sin(theta))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "b60e0a36a502a1a39defeb41ecf62678cb950d4919a35852c10a0fe4ed8c2f6e"
+  },
+  "feynman_I_12_4": {
+   "columns": [
+    "q1",
+    "epsilon",
+    "r"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "Ef = q1*r/(4*pi*epsilon*r**3)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "34bbaf358da713e38131bb1e7ee30c96c1c231df66b8160114debb65129dbb33"
+  },
+  "feynman_I_13_12": {
+   "columns": [
+    "m1",
+    "m2",
+    "r1",
+    "r2",
+    "G"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "U = G*m1*m2*(1/r2-1/r1)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "0bc0851b5c873efa5f4811529d1deb8c33d8988ce362a941ad20717c8b7c0ada"
+  },
+  "feynman_I_13_4": {
+   "columns": [
+    "m",
+    "v",
+    "u",
+    "w"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "K = 1/2*m*(v**2+u**2+w**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "9667b3a070da38c54933322db0f606e7e3244a7c932146988cd190a2822ed8ab"
+  },
+  "feynman_I_14_3": {
+   "columns": [
+    "m",
+    "g",
+    "z"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "U = m*g*z",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "8d3d55e6e18e7069609d23ee5440a7fedb638964c6a3b840185789dd2fa5d83c"
+  },
+  "feynman_I_15_3t": {
+   "columns": [
+    "x",
+    "c",
+    "u",
+    "t"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "t1 = (t-u*x/c**2)/sqrt(1-u**2/c**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "fc5ddbfbe3cc36b1905e680b09920fb82b0c5ab18fb56998482a24d0d19da734"
+  },
+  "feynman_I_15_3x": {
+   "columns": [
+    "x",
+    "u",
+    "c",
+    "t"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "x1 = (x-u*t)/sqrt(1-u**2/c**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "4fe38bd151c9e385d2740cb07c76a437de2df230a19207a30042328fe9c02580"
+  },
+  "feynman_I_18_14": {
+   "columns": [
+    "m",
+    "r",
+    "v",
+    "theta"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "L = m*r*v*sin(theta)",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "b1da36a5d394c150a88a76bea27d3d108705e40c69360e6c762ce2fa0b8cf136"
+  },
+  "feynman_I_18_4": {
+   "columns": [
+    "m1",
+    "m2",
+    "r1",
+    "r2"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "r = (m1*r1+m2*r2)/(m1+m2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "37e43e9cfdbefac4b32156fcc982d6c545a5eef2e4f14d1b352778b8f2110b01"
+  },
+  "feynman_I_24_6": {
+   "columns": [
+    "m",
+    "omega",
+    "omega_0",
+    "x"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "E_n = 1/2*m*(omega**2+omega_0**2)*1/2*x**2",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "a165e97242a38fc129e00c07ed7ed563e0d23c1efcc9a2302964cc24df4aeca1"
+  },
+  "feynman_I_29_16": {
+   "columns": [
+    "x1",
+    "x2",
+    "theta1",
+    "theta2"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "x = sqrt(x1**2+x2**2-2*x1*x2*cos(theta1-theta2))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "931fb63ceb3060f3fef68dcf16b21db9cdca0441ae55bbd9229dc64450fc8359"
+  },
+  "feynman_I_30_3": {
+   "columns": [
+    "Int_0",
+    "theta",
+    "n"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "Int = Int_0*sin(n*theta/2)**2/sin(theta/2)**2",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "a4ae6d7b6b3c43612d6b4df2a686551bdd178f82b79f821c30825b97716f4f5e"
+  },
+  "feynman_I_32_17": {
+   "columns": [
+    "epsilon",
+    "c",
+    "Ef",
+    "r",
+    "omega",
+    "omega_0"
+   ],
+   "family": "main",
+   "features": 6,
+   "formula": "Pwr = (1/2*epsilon*c*Ef**2)*(8*pi*r**2/3)*(omega**4/(omega**2-omega_0**2)**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "43a1e55543483b2a8b5e2f9af19932c4a9ef1fd6cdb578f1911a10f44ca66ad7"
+  },
+  "feynman_I_34_14": {
+   "columns": [
+    "c",
+    "v",
+    "omega_0"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "omega = (1+v/c)/sqrt(1-v**2/c**2)*omega_0",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "8014fc1befcc85cc9e1c8d580f616d44af996285372ed7ccb765e6ff4974ab50"
+  },
+  "feynman_I_34_27": {
+   "columns": [
+    "omega",
+    "h"
+   ],
+   "family": "main",
+   "features": 2,
+   "formula": "E_n = (h/(2*pi))*omega",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "6ac2dbe6a9bf3b2a78843b42b1a9e87e40bd8dc94d64529651937987276572a2"
+  },
+  "feynman_I_38_12": {
+   "columns": [
+    "m",
+    "q",
+    "h",
+    "epsilon"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "r = 4*pi*epsilon*(h/(2*pi))**2/(m*q**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "96ebabb9b928a05a9b76d5429883036df8ecf4dab03d63a574724aadaf2f6bed"
+  },
+  "feynman_I_39_11": {
+   "columns": [
+    "gamma",
+    "pr",
+    "V"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "E_n = 1/(gamma-1)*pr*V",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "e3c6021b55a953e88be1afd6acf8bf141e40369494ddca3448ae060a01930de8"
+  },
+  "feynman_I_39_22": {
+   "columns": [
+    "n",
+    "T",
+    "V",
+    "kb"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "pr = n*kb*T/V",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "860f6d75c3cad8365d579007be7eec9181a80214b61ee66abcfae324bef02a62"
+  },
+  "feynman_I_41_16": {
+   "columns": [
+    "omega",
+    "T",
+    "h",
+    "kb",
+    "c"
+   ],
+   "family": "main",
+   "features": 5,
+   "formula": "L_rad = h/(2*pi)*omega**3/(pi**2*c**2*(exp((h/(2*pi))*omega/(kb*T))-1))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "6bd8a091e31c41e09f3312ef91fb71125c2989556f556dd0e655b0ee14f00882"
+  },
+  "feynman_I_43_31": {
+   "columns": [
+    "mob",
+    "T",
+    "kb"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "D = mob*kb*T",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "ff3ffc40110eda66cc395da079d23fd96b438f4e7baba4601512173380d9e6b7"
+  },
+  "feynman_I_43_43": {
+   "columns": [
+    "gamma",
+    "kb",
+    "A",
+    "v"
+   ],
+   "family": "main",
+   "features": 4,
+   "formula": "kappa = 1/(gamma-1)*kb*v/A",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "745db20578ebca54c29645631e04388beb01b28588d77614a061f2ad1d3dbebc"
+  },
+  "feynman_I_47_23": {
+   "columns": [
+    "gamma",
+    "pr",
+    "rho"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "c = sqrt(gamma*pr/rho)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "a079a819cb746626bd94ec986a11b38cb9f8172b5fdc720facfbaee23fad9f39"
+  },
+  "feynman_I_48_2": {
+   "columns": [
+    "m",
+    "v",
+    "c"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "E_n = m*c**2/sqrt(1-v**2/c**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "6d63ea8e442cf0704cea4f9a162127ebdb1a36155c498d66599854bea3f824c5"
+  },
+  "feynman_I_6_2": {
+   "columns": [
+    "sigma",
+    "theta"
+   ],
+   "family": "main",
+   "features": 2,
+   "formula": "f = exp(-(theta/sigma)**2/2)/(sqrt(2*pi)*sigma)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "9f9e055195a014e952a3e01ac571d9b6678914e5ee56553ebd24be61aa31ee89"
+  },
+  "feynman_I_6_2b": {
+   "columns": [
+    "sigma",
+    "theta",
+    "theta1"
+   ],
+   "family": "main",
+   "features": 3,
+   "formula": "f = exp(-((theta-theta1)/sigma)**2/2)/(sqrt(2*pi)*sigma)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "d640a0ca56c70b15fa8b5b252dba269acb18513560cc62aca953120bf1fb231a"
+  },
+  "feynman_I_9_18": {
+   "columns": [
+    "m1",
+    "m2",
+    "G",
+    "x1",
+    "x2",
+    "y1",
+    "y2",
+    "z1",
+    "z2"
+   ],
+   "family": "main",
+   "features": 9,
+   "formula": "F = G*m1*m2/((x2-x1)**2+(y2-y1)**2+(z2-z1)**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "5b21ac7ce0965297e6e1e20b0278d25f76b7467bc43922f7c817d8e8d0550cfa"
+  },
+  "feynman_test_1": {
+   "columns": [
+    "Z_1",
+    "Z_2",
+    "alpha",
+    "hbar",
+    "c",
+    "E_n",
+    "theta"
+   ],
+   "family": "bonus",
+   "features": 7,
+   "formula": "A = (Z_1*Z_2*alpha*hbar*c/(4*E_n*sin(theta/2)**2))**2",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "cd6732f81884d2eec03ae31d84ccddcaca0b4304c1e588f1e801b2f31056b0f6"
+  },
+  "feynman_test_10": {
+   "columns": [
+    "c",
+    "v",
+    "theta2"
+   ],
+   "family": "bonus",
+   "features": 3,
+   "formula": "theta1 = arccos((cos(theta2)-v/c)/(1-v/c*cos(theta2)))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "eb0d47f127e8bfbc771a469412883683611868dfb22c59e30e8e35926fafeb73"
+  },
+  "feynman_test_11": {
+   "columns": [
+    "I_0",
+    "alpha",
+    "delta",
+    "n"
+   ],
+   "family": "bonus",
+   "features": 4,
+   "formula": "I = I_0*(sin(alpha/2)*sin(n*delta/2)/(alpha/2*sin(delta/2)))**2",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "ac3bbaa860dce0a0e3e62fd1949681da128bfeac1381bbb846c2e4e9171e5e6b"
+  },
+  "feynman_test_12": {
+   "columns": [
+    "q",
+    "y",
+    "Volt",
+    "d",
+    "epsilon"
+   ],
+   "family": "bonus",
+   "features": 5,
+   "formula": "F = q/(4*pi*epsilon*y**2)*(4*pi*epsilon*Volt*d-q*d*y**3/(y**2-d**2)**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "499d6bab97fa9df143ab4fc75726a32db9a8f4a2135fdcd4f8c82d9be6788b95"
+  },
+  "feynman_test_13": {
+   "columns": [
+    "q",
+    "r",
+    "d",
+    "alpha",
+    "epsilon"
+   ],
+   "family": "bonus",
+   "features": 5,
+   "formula": "Volt = 1/(4*pi*epsilon)*q/sqrt(r**2+d**2-2*r*d*cos(alpha))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "b73199a629260ba8a717f4b1197f1e09bdd74f903b7b526c122305ca1212fcb6"
+  },
+  "feynman_test_14": {
+   "columns": [
+    "Ef",
+    "theta",
+    "r",
+    "d",
+    "alpha"
+   ],
+   "family": "bonus",
+   "features": 5,
+   "formula": "Volt = Ef*cos(theta)*(-r+d**3/r**2*(alpha-1)/(alpha+2))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "29fab748c7ead859b3837c5825c4ebbc7ce6435dde5eccc0a0cc1c5d943a3f91"
+  },
+  "feynman_test_15": {
+   "columns": [
+    "c",
+    "v",
+    "omega",
+    "theta"
+   ],
+   "family": "bonus",
+   "features": 4,
+   "formula": "omega_0 = sqrt(1-v**2/c**2)*omega/(1+v/c*cos(theta))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "a2d3da2c805aacdac703d63c456656dc9d292465583d996726935a865c80ac43"
+  },
+  "feynman_test_16": {
+   "columns": [
+    "m",
+    "c",
+    "p",
+    "q",
+    "A_vec",
+    "Volt"
+   ],
+   "family": "bonus",
+   "features": 6,
+   "formula": "E_n = sqrt((p-q*A_vec)**2*c**2+m**2*c**4)+q*Volt",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "047ab79f64ced4dda59ce398c640897657fa09191f73bcc7e68aa04e1d596fbc"
+  },
+  "feynman_test_17": {
+   "columns": [
+    "m",
+    "omega",
+    "p",
+    "y",
+    "x",
+    "alpha"
+   ],
+   "family": "bonus",
+   "features": 6,
+   "formula": "E_n = 1/(2*m)*(p**2+m**2*omega**2*x**2*(1+alpha*x/y))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "f38b8a0056fb1c8721bf3119b2d94e6ab1c4eb6faccd1e1bf47bf0611fec3d95"
+  },
+  "feynman_test_18": {
+   "columns": [
+    "G",
+    "k_f",
+    "r",
+    "H_G",
+    "c"
+   ],
+   "family": "bonus",
+   "features": 5,
+   "formula": "rho_0 = 3/(8*pi*G)*(c**2*k_f/r**2+H_G**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "b911d2ab0f7cd67b894ebb8f630bf024b26a90f5a4cbee70a973f8e3590119da"
+  },
+  "feynman_test_19": {
+   "columns": [
+    "G",
+    "k_f",
+    "r",
+    "H_G",
+    "alpha",
+    "c"
+   ],
+   "family": "bonus",
+   "features": 6,
+   "formula": "pr = -1/(8*pi*G)*(c**4*k_f/r**2+H_G**2*c**2*(1-2*alpha))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "740274685d56f3667828ff72def0c6e8ec2274c3315ef9c9074a5b8799377231"
+  },
+  "feynman_test_2": {
+   "columns": [
+    "m",
+    "k_G",
+    "L",
+    "E_n",
+    "theta1",
+    "theta2"
+   ],
+   "family": "bonus",
+   "features": 6,
+   "formula": "k = m*k_G/L**2*(1+sqrt(1+2*E_n*L**2/(m*k_G**2))*cos(theta1-theta2))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "fc0136e4bf16f0304f06f0a0b7ede82a65f1f43ebeaf4235a2aa939520b77540"
+  },
+  "feynman_test_20": {
+   "columns": [
+    "omega",
+    "omega_0",
+    "alpha",
+    "h",
+    "m",
+    "c",
+    "beta"
+   ],
+   "family": "bonus",
+   "features": 7,
+   "formula": "A = 1/(4*pi)*alpha**2*h**2/(m**2*c**2)*(omega_0/omega)**2*(omega_0/omega+omega/omega_0-sin(beta)**2)",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "c97b2f726a06be716722e1ffef60a70473e1ac153a9974dc55c6aa0c9f491ccb"
+  },
+  "feynman_test_3": {
+   "columns": [
+    "d",
+    "alpha",
+    "theta1",
+    "theta2"
+   ],
+   "family": "bonus",
+   "features": 4,
+   "formula": "r = d*(1-alpha**2)/(1+alpha*cos(theta1-theta2))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "67f18d181971222bd8b13de5157a5ceed029bf566204a11e2e72bb2f8f484fab"
+  },
+  "feynman_test_4": {
+   "columns": [
+    "m",
+    "E_n",
+    "U",
+    "L",
+    "r"
+   ],
+   "family": "bonus",
+   "features": 5,
+   "formula": "v = sqrt(2/m*(E_n-U-L**2/(2*m*r**2)))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "1390591a5cd47d78403bbb7b37af7bafca7a642d07fc983634e12f4726e4723e"
+  },
+  "feynman_test_5": {
+   "columns": [
+    "d",
+    "G",
+    "m1",
+    "m2"
+   ],
+   "family": "bonus",
+   "features": 4,
+   "formula": "t = 2*pi*d**(3/2)/sqrt(G*(m1+m2))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "1fcc05c796450fd229f7b96ac5ed646cf304de3c1031b6c29c4597188740a9e8"
+  },
+  "feynman_test_6": {
+   "columns": [
+    "epsilon",
+    "L",
+    "m",
+    "Z_1",
+    "Z_2",
+    "q",
+    "E_n"
+   ],
+   "family": "bonus",
+   "features": 7,
+   "formula": "alpha = sqrt(1+2*epsilon**2*E_n*L**2/(m*(Z_1*Z_2*q**2)**2))",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "1569b2cedcbd086be21fb9d6167e665e34eb78c4d2595909f20423b3150d6cbd"
+  },
+  "feynman_test_7": {
+   "columns": [
+    "G",
+    "rho",
+    "alpha",
+    "c",
+    "d"
+   ],
+   "family": "bonus",
+   "features": 5,
+   "formula": "H_G = sqrt(8*pi*G*rho/3-alpha*c**2/d**2)",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "e4c5b49608ad2a7ebf34a94e6be2a375e28fe70391776fc114e54b38a7e50087"
+  },
+  "feynman_test_8": {
+   "columns": [
+    "E_n",
+    "m",
+    "c",
+    "theta"
+   ],
+   "family": "bonus",
+   "features": 4,
+   "formula": "K = E_n/(1+E_n/(m*c**2)*(1-cos(theta)))",
+   "group": "TF78",
+   "pool": "trig",
+   "rows": 100000,
+   "sha256": "3d0a25fa170861a878cecee1b0705f38d956f76de69eddb6ebbf30a3e9a642dc"
+  },
+  "feynman_test_9": {
+   "columns": [
+    "G",
+    "c",
+    "m1",
+    "m2",
+    "r"
+   ],
+   "family": "bonus",
+   "features": 5,
+   "formula": "Pwr = -32/5*G**4/c**5*(m1*m2)**2*(m1+m2)/r**5",
+   "group": "TF78",
+   "pool": "physical",
+   "rows": 100000,
+   "sha256": "5b8e415ea92cef6f28b5b305c0b8ddd77b3469e9bcd0286e7d3a411d9613020d"
+  },
+  "first_principles_planck": {
+   "columns": [
+    "nu",
+    "T"
+   ],
+   "features": 2,
+   "group": "TR25",
+   "rows": 100,
+   "sha256": "3d6da20062b2e45124b3642be37d4d8ce55338defb288e6f1f16805c3749fb18"
+  },
+  "first_principles_rydberg": {
+   "columns": [
+    "n_1",
+    "n_2"
+   ],
+   "features": 2,
+   "group": "TR25",
+   "rows": 50,
+   "sha256": "1795eb6b277f77d3332c1fc5102c39522b0d831da86504497c3a8b5d38950fc9"
+  },
+  "first_principles_supernovae_zg": {
+   "columns": [
+    "Xaxis0"
+   ],
+   "features": 1,
+   "group": "TR25",
+   "rows": 243,
+   "sha256": "3d3726316ea0738c7087b2bb0240194f780bd7d9536ce2d6d14eab51c8f15a7d"
+  },
+  "first_principles_supernovae_zr": {
+   "columns": [
+    "Xaxis0"
+   ],
+   "features": 1,
+   "group": "TR25",
+   "rows": 236,
+   "sha256": "60d430262139ca54b0348a7907630fe405d06e0256377eae0cd1709ce3b5f671"
+  },
+  "solar_flare": {
+   "columns": [
+    "sunspot_group_configuration",
+    "sunspot_largest_spot",
+    "sunspot_distribution",
+    "sunspot_activity",
+    "sunspot_evolution",
+    "recent_flare_activity",
+    "historically_complex_region",
+    "historically_complex_region_recent",
+    "region_area",
+    "largest_spot_area"
+   ],
+   "features": 10,
+   "group": "TR25",
+   "rows": 1066,
+   "sha256": "9ed158002637ad41073501000b53e10acd06aca296a27d566fe1230ae49ecfec"
+  },
+  "strogatz_bacres1": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "x' = 20 - x - (x * y)/(1+0.5 * x**2)",
+   "formula_gap": 4.516826020140887e-15,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "bd51ab1c50bf4e5137004d5cff24f488036db02e0b320511c0063c240e44a4c9"
+  },
+  "strogatz_bacres2": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "y' = 10 - (x * y)/(1+0.5 * x**2)",
+   "formula_gap": 5.914197770850001e-15,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "9db929297f072b54d9b38771078c2df18b1af9de525edbc50aefb2eb8ae988db"
+  },
+  "strogatz_barmag1": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "x' = 0.5 * sin(x - y) - sin(x)",
+   "formula_gap": 4.75165285817466e-15,
+   "group": "TS14",
+   "pool": "trig",
+   "rows": 400,
+   "sha256": "d64985fffe0472437ae92ca3b2e15b9aa8039d708ef0c949eae7785132c78599"
+  },
+  "strogatz_barmag2": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "y' = 0.5 * sin(y - x) - sin(y)",
+   "formula_gap": 4.624764437537791e-15,
+   "group": "TS14",
+   "pool": "trig",
+   "rows": 400,
+   "sha256": "81d6a7353393c2bf3526b5488d1f505392265ec4061d9f72b6840d9501ed77d5"
+  },
+  "strogatz_glider1": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "x' = -0.05 * x**2 - sin(y)",
+   "formula_gap": 1.9968951048773142e-14,
+   "group": "TS14",
+   "pool": "trig",
+   "rows": 400,
+   "sha256": "442e064b27a6359bb097c8514985d359f16b0a8bf55a48e2d2bb23ddc67836ec"
+  },
+  "strogatz_glider2": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "y' = x - cos(y)/x",
+   "formula_gap": 3.212192424672293e-14,
+   "group": "TS14",
+   "pool": "trig",
+   "rows": 400,
+   "sha256": "c7daf5c7323846957bad4d698709499c141a92e0d35c414b63ae5b0dd6052cf9"
+  },
+  "strogatz_lv1": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "x' = 3  * x - 2  * x * y - x**2",
+   "formula_gap": 2.268632812471891e-16,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "a49e69c7312aa035d96737c89b9b57709966101d9e1407458eeeb313a18f1f13"
+  },
+  "strogatz_lv2": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "y' = 2 * y - x * y - y**2",
+   "formula_gap": 7.778066385411009e-16,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "4a5819a00a0d906662f69c173fb7ef433ee9ff1be222107a84aa8c46715a39e3"
+  },
+  "strogatz_predprey1": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "x' = x  * ( 4 - x - (y)/(1+x) )",
+   "formula_gap": 1.947280350575929e-15,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "0543909f3146daa4a9e48ae457e3970fe77113ebf8c508096edb374673ed4672"
+  },
+  "strogatz_predprey2": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "y' = y * ( (x)/(1+x) - 0.075 * y )",
+   "formula_gap": 1.3724856856223041e-14,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "e228d7b7d163cc2b5e76e5aeff623961d47ca0b1407afd1255f4d3721ff168ff"
+  },
+  "strogatz_shearflow1": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "x' = cot(y) * cos(x)",
+   "formula_gap": 4.454617083360918e-15,
+   "group": "TS14",
+   "pool": "trig",
+   "rows": 400,
+   "sha256": "1a1c46e6394eaf948ef78c97728c61a874a4ebaf41e1c5bb5a8cd24b1d531350"
+  },
+  "strogatz_shearflow2": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "y' = (cos(y)**2 + 0.1 *  sin(y)**2) * sin(x)",
+   "formula_gap": 5.22107668514393e-15,
+   "group": "TS14",
+   "pool": "trig",
+   "rows": 400,
+   "sha256": "3c7d37ef43c6350fa23d0a81e5503096f478c4faa1487f329284e92fae89165c"
+  },
+  "strogatz_vdp1": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "x' = 10 *  (y - (1)/(3) * (x**3-x))",
+   "formula_gap": 9.829408143723517e-15,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "c5035a4188c656149b0b0e7499359ccfc20f7b04c966fecde8c297af785a3c9e"
+  },
+  "strogatz_vdp2": {
+   "columns": [
+    "x",
+    "y"
+   ],
+   "exact_scorable": true,
+   "features": 2,
+   "formula": "y' = -(1)/(10) * x",
+   "formula_gap": 5.157499400618421e-15,
+   "group": "TS14",
+   "pool": "physical",
+   "rows": 400,
+   "sha256": "70f38f8fbebd8ecc8d70fa16cd80b177e4042def3df36c6611f61c44856ac637"
+  }
+ },
+ "rules": "benchmarks/results_0.9/PLAN.md",
+ "summary_sha256": "d658820a844a555776273a2c1b6766eba983bb078e3bcc539141b1ac2cc33960"
+}
