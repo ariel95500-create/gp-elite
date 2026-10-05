@@ -169,8 +169,10 @@ un R² négatif, et aucun avertissement que l'ajustement avait échoué).
 réglages, un ajustement rend le même modèle d'un lancement à l'autre, sans fixer
 `PYTHONHASHSEED` (nécessaire jusqu'à la 0.7). Les îles parallèles suivent un
 autre chemin que la recherche séquentielle, et `parallel=None` les active dès
-quatre cœurs : fixez aussi `parallel=` pour retrouver le même modèle sur une
-autre machine.
+quatre cœurs : fixez aussi `parallel=`. Sur une autre machine, le modèle peut
+encore différer : NumPy calcule des fonctions comme `exp` et `tanh` avec les
+instructions qu'offre le processeur, ce qui peut changer le dernier chiffre
+d'une valeur, et la recherche peut alors prendre un autre chemin.
 
 **Scripts et îles parallèles.** Sur une machine à quatre cœurs ou plus, les îles
 tournent dans des processus parallèles. Ces processus sont démarrés en mode

@@ -159,8 +159,10 @@ a wrong line, with a negative R², and no warning that the fit had failed).
 **Reproducibility.** With the same `seed`, the same data and the same settings, a
 fit returns the same model, run after run, without setting `PYTHONHASHSEED`
 (required up to 0.7). Parallel islands follow another path than the sequential
-search, and `parallel=None` turns them on from four cores: set `parallel=` too
-to get the same model on another machine.
+search, and `parallel=None` turns them on from four cores: set `parallel=` too.
+On another machine the model can still differ: NumPy computes functions such as
+`exp` and `tanh` with the instructions the processor offers, which can change
+the last digit of a value, and the search can then take another path.
 
 **Scripts and parallel islands.** On machines with four cores or more, islands run
 in parallel worker processes. Those workers are started with `spawn` on every
