@@ -19,6 +19,12 @@ N=3200 qu'à N=200 ; I.16.6 passe de 4.1e-3 (MISS) à 3.8e-4 (NEAR) entre
 N=200 et N=1000, en 93 s contre 116 s. => hypothèse B favorisée, à
 confirmer sur machine de référence.
 
+[0.7] Le README n'annonce plus de plage de tailles : il cite l'enveloppe
+mesurée par ce banc (moteur 0.7.0 : les quatre équations autres que I.16.6
+retrouvées exactement à chaque taille de 25 à 10 000 points, à chaque tirage ;
+I.16.6 manquée partout ; temps médian ×2 de 1 000 à 10 000 points).
+CLAIM_LO/CLAIM_HI bornent désormais cette plage citée (champ in_readme_claim).
+
 PROTOCOLE — identique au banc Feynman SAUF la taille :
   normalize="none", operators=pool d'origine, generations=30, speed="fast",
   validation_split=0.15, seed=0, restarts=4, split 70/30.
@@ -33,13 +39,15 @@ Sortie : feyn_scaling.jsonl — télémétrie v2 (même esprit que le bras units
 Reprise : relancer reprend là où le script s'est arrêté.
 
 Lancement :
-  Windows :  set PYTHONHASHSEED=0 && python benchmarks\\feynman_scaling.py
+  Windows :  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_scaling.py
   Linux   :  PYTHONHASHSEED=0 python3 benchmarks/feynman_scaling.py
 Options :
   --arm none|auto      bras de normalisation (défaut : none)
   --sizes 25,100,1000  grille de tailles personnalisée
   --eq I.16.6,I.12.1   sous-ensemble d'équations
   --bilan              bilan seul depuis le jsonl
+  --out fichier.jsonl  fichier de résultats (défaut : benchmarks/feyn_scaling.jsonl,
+                       mesures de la 0.6.0 ; une autre version doit écrire ailleurs)
 """
 import os, sys, json, time, io, re, contextlib, hashlib, datetime
 
@@ -48,7 +56,6 @@ try:
 except Exception:
     pass
 
-EXPECTED_ENGINE = "0.6.0"
 
 # La racine du dépôt passe AVANT tout : sinon un gp_elite installé par pip
 # (potentiellement plus ancien) masque la copie du dépôt.
@@ -71,7 +78,7 @@ def U(rng, lo, hi, n): return rng.uniform(lo, hi, n)
 # 100..5000 : la plage annoncée par le README
 # 10000     : AU-DELÀ de la borne haute annoncée
 SIZES = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
-CLAIM_LO, CLAIM_HI = 100, 5000
+CLAIM_LO, CLAIM_HI = 25, 10000      # [0.7] plage citée par le README (100-5000 avant)
 REPEATS_SMALL, SMALL_N = 3, 200      # 3 tirages si N <= 200, sinon 1
 
 # ── sous-ensemble représentatif (indices = ceux du banc Feynman) ────────────
@@ -109,9 +116,9 @@ _SUSPECT = {"sin","cos","tanh","tan","exp","log","sqrt"}
 def _census(expr):
     c = {}
     for op in _OPS:
+        # \btan\s*\( ne reconnait pas « tanh( » : aucune soustraction a faire
+        # (l'ancienne soustrayait tanh une seconde fois : tan = -1).
         k = len(re.findall(r"\b%s\s*\(" % op, expr))
-        if op == "tan":
-            k -= len(re.findall(r"\btanh\s*\(", expr))
         if k: c[op] = k
     sq = expr.count("\u00b2")
     if sq: c["square"] = sq
@@ -120,8 +127,38 @@ def _census(expr):
 def _expected(formula):
     return set(re.findall(r"\b(sin|cos|tanh|tan|exp|log|sqrt|abs)\b", formula))
 
+def _st(err):
+    return "EXACT" if err < 1e-9 else ("NEAR" if err < 1e-3 else "MISS")
+
 def _err(e, X, y, var):
     return float(np.mean((e.predict(X) - y) ** 2) / var)
+
+def _score(rec):
+    """Champs dérivés, recalculés depuis les champs bruts d'un
+    enregistrement : statut du modèle RENDU (one_minus_r2), statut du
+    meilleur point du front (pareto_best, métrique secondaire), opérateurs
+    suspects et propreté jugés sur l'expression RENDUE (expr_full).
+    Sert au run comme au bilan, pour que les enregistrements écrits par une
+    version antérieure du script (statut et opérateurs lus sur le front)
+    soient jugés comme les nouveaux."""
+    size = rec.get("size")
+    if size is None:                 # enregistrements antérieurs : taille du
+        for d in rec.get("front", []):  # rendu retrouvée dans le front
+            if d.get("expr") == rec.get("expr_full") or d["err_test"] == rec["one_minus_r2"]:
+                size = d["size"]
+                break
+    status = _st(rec["one_minus_r2"])
+    census = _census(rec.get("expr_full", ""))
+    suspects = sorted((set(census) & _SUSPECT) - _expected(rec.get("formula", "")))
+    clean = bool(status == "EXACT" and not suspects and size is not None
+                 and int(size) <= CANON_SIZE.get(rec["name"], 99) + 4)
+    rec.update(status=status, status_front=_st(rec["pareto_best"]),
+               clean_recovery=clean, ops_census=census, suspect_ops=suspects,
+               ops_suspects=bool(suspects),
+               in_readme_claim=bool(CLAIM_LO <= rec["n_total"] <= CLAIM_HI))
+    if size is not None:
+        rec["size"] = int(size)
+    return rec
 
 def _done():
     if not os.path.exists(OUT): return set()
@@ -137,13 +174,25 @@ def _done():
     return keys
 
 def _check_engine():
+    """[v0.7] Un fichier de résultats = une version du moteur. On refuse
+    d'ajouter des mesures d'une version à un fichier qui en contient d'une
+    autre (les comparaisons n'auraient aucune valeur) ; --out permet de
+    mesurer une nouvelle version dans un fichier neuf."""
     print(f"gp_elite {ENGINE}  <-  {os.path.abspath(gp_elite.__file__)}")
-    if ENGINE != EXPECTED_ENGINE:
-        print(f"\n!! ARRÊT : moteur {ENGINE}, attendu {EXPECTED_ENGINE}.")
-        print("   Le scaling doit tourner sur la MÊME version que les autres")
-        print("   bancs, sinon les comparaisons n'ont aucune valeur.")
-        print("   Le chemin ci-dessus pointe-t-il vers ton dépôt ou vers")
-        print("   site-packages ? Passer outre volontairement : --force")
+    print(f"résultats : {OUT}")
+    versions = set()
+    if os.path.exists(OUT):
+        with open(OUT, encoding="utf-8") as fh:
+            for line in fh:
+                try:
+                    versions.add(json.loads(line).get("engine_version"))
+                except Exception:
+                    pass
+    autres = sorted(v for v in versions if v and v != ENGINE)
+    if autres:
+        print(f"\n!! ARRÊT : {OUT} contient des mesures du moteur {autres},")
+        print(f"   et le moteur chargé est {ENGINE}. Mesurez dans un fichier")
+        print("   neuf : --out <fichier>.  Passer outre volontairement : --force")
         if "--force" not in sys.argv:
             sys.exit(1)
         print("   (--force : on continue malgré tout)\n")
@@ -206,19 +255,13 @@ def run(sizes, eq_filter, arm):
                 front.sort(key=lambda d: d["size"])
                 pbe = min(front, key=lambda d: d["err_test"])
                 pb, pb_size = pbe["err_test"], pbe["size"]
-                status = ("EXACT" if pb < 1e-9 else
-                          "NEAR" if pb < 1e-3 else "MISS")
-                census = _census(pbe["expr"])
-                suspects = sorted((set(census) & _SUSPECT) - _expected(formula))
-                clean = bool(status == "EXACT" and not suspects
-                             and pb_size <= CANON_SIZE.get(name, 99) + 4)
-
+                # [v0.7] Le STATUT juge le modele RENDU (le champion). Le
+                # meilleur point du front, choisi en regardant le test, n'est
+                # qu'une metrique secondaire (status_front). Voir _score.
                 rec = dict(
                     name=name, formula=formula, n_total=N, rep=rep, arm=arm,
-                    status=status, clean_recovery=clean,
                     one_minus_r2=champ_te, pareto_best=pb, pb_size=pb_size,
-                    time=round(dt, 1),
-                    in_readme_claim=bool(CLAIM_LO <= N <= CLAIM_HI),
+                    size=int(r.size), time=round(dt, 1),
                     n_train=ntr, n_test=N - ntr, n_vars=nv, pool=pool,
                     engine_version=ENGINE,
                     pythonhashseed=os.environ.get("PYTHONHASHSEED"),
@@ -227,14 +270,14 @@ def run(sizes, eq_filter, arm):
                     validation_split=0.15, normalize=arm,
                     X_hash=dhash, y_hash=yhash,
                     expr_full=r.expression, front=front,
-                    ops_census=census, suspect_ops=suspects,
-                    ops_suspects=bool(suspects),
                 )
+                _score(rec)
+                status, clean = rec["status"], rec["clean_recovery"]
                 with open(OUT, "a", encoding="utf-8") as fh:
                     fh.write(json.dumps(rec) + "\n")
                 mark = "propre" if clean else ("" if status != "EXACT" else "non-canonique")
-                print(f"  N={N:<6} rep={rep}  {status:<6} pb={pb:.1e} "
-                      f"size={pb_size:<4} {dt:6.1f}s  {mark}")
+                print(f"  N={N:<6} rep={rep}  {status:<6} champ={champ_te:.1e} "
+                      f"front={pb:.1e} size={int(r.size):<4} {dt:6.1f}s  {mark}")
                 sys.stdout.flush()
 
 # ── bilan ───────────────────────────────────────────────────────────────────
@@ -245,13 +288,18 @@ def bilan():
     rows = [r for r in rows if r.get("status") != "ERROR"]
     if not rows:
         print("(aucun résultat exploitable)"); return
+    # [v0.7] champs derives recalcules (voir _score), meme pour les
+    # enregistrements anterieurs dont le statut venait du front ; le front
+    # reste affiche a part, comme metrique secondaire.
+    for r in rows:
+        _score(r)
     sizes = sorted({r["n_total"] for r in rows})
     names = [p[1] for p in PROBS if any(r["name"] == p[1] for r in rows)]
 
     print(f"\n=== SCALING — statut par équation et par taille "
           f"(moteur {ENGINE}) ===")
     print("    (E=EXACT propre, e=EXACT non-canonique, N=NEAR, M=MISS ; "
-          "| = bornes annoncées du README)")
+          "| = plage citée par le README)")
     hdr = "équation   "
     for N in sizes:
         hdr += ("|" if N == CLAIM_LO else " ") + f"{N:>6}"
@@ -274,17 +322,18 @@ def bilan():
             if N == CLAIM_HI: line += "|"
         print(line)
 
-    print(f"\n=== taux de récupération et coût par taille ===")
-    print(f"{'N':>7}  {'exactes':>9}  {'propres':>9}  {'temps méd.':>11}  README")
+    print(f"\n=== taux de récupération et coût par taille (modèle rendu) ===")
+    print(f"{'N':>7}  {'exactes':>9}  {'<1e-3':>9}  {'front ex.':>9}  {'temps méd.':>11}  README")
     for N in sizes:
         sub = [r for r in rows if r["n_total"] == N]
         if not sub: continue
         ex = sum(1 for r in sub if r["status"] == "EXACT")
-        cl = sum(1 for r in sub if r.get("clean_recovery"))
+        nr = sum(1 for r in sub if r["status"] in ("EXACT", "NEAR"))
+        fr = sum(1 for r in sub if r["status_front"] == "EXACT")
         ts = sorted(r["time"] for r in sub)
         med = ts[len(ts)//2]
         inside = "dans la plage" if CLAIM_LO <= N <= CLAIM_HI else "HORS plage"
-        print(f"{N:>7}  {ex:>4}/{len(sub):<4}  {cl:>4}/{len(sub):<4}  "
+        print(f"{N:>7}  {ex:>4}/{len(sub):<4}  {nr:>4}/{len(sub):<4}  {fr:>4}/{len(sub):<4}  "
               f"{med:>9.1f}s  {inside}")
 
     lo = [r for r in rows if r["n_total"] < CLAIM_LO]
@@ -310,6 +359,7 @@ if __name__ == "__main__":
     if "--arm" in argv:   arm = argv[argv.index("--arm") + 1]
     if "--sizes" in argv: sizes = [int(x) for x in argv[argv.index("--sizes") + 1].split(",")]
     if "--eq" in argv:    eqs = set(argv[argv.index("--eq") + 1].split(","))
+    if "--out" in argv:   OUT = os.path.abspath(argv[argv.index("--out") + 1])
     if os.environ.get("PYTHONHASHSEED") != "0":
         print("!! ATTENTION : PYTHONHASHSEED != 0 — relancer avec "
               "PYTHONHASHSEED=0 pour la reproductibilité.")

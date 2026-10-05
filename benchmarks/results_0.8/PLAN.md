@@ -1,0 +1,513 @@
+# Decision bench for 0.8 — plan written before any measurement
+
+Written on 29 September 2026, before the first run of the campaign. The
+criteria below decide; they are not adjusted after the results are seen.
+[Note added on 30 September: this plan was committed at 03:42, six minutes
+after the first fit of campaign 1 had started, at 03:36.]
+
+## What is compared
+
+| Arm | Engine |
+|---|---|
+| A | gp-elite 0.7.0 (commit `e847605`) |
+| B | 0.8 development branch at commit `c7b5934` |
+
+Between A and B, every change but one returns the same model at equal seed
+(checked bit for bit on 13 reference configurations and by
+`tests/test_speed_equivalence.py`): they only make the engine faster. The
+exception is the fix of commit `aaa5f79`: the square of a negative constant
+was evaluated negative during the search (0.8 % of the trees evaluated). At
+equal work, any difference of quality between A and B comes from that fix;
+at equal time, it also comes from the extra generations B runs.
+
+## Problems
+
+**F41.** The 41 equations of `benchmarks/feynman_bench.py` (the 15 of the
+README and the 26 added to cover rational forms, roots, exponentials...).
+As in that bench: 200 points per equation drawn with the data seed
+`1000 + i`, 140 for training and 60 for the test, operator pool of the
+equation. Out of domain: 200 more points where each variable is drawn from
+its range extended by 30 % of its width above the maximum, kept when at
+least one variable exceeds its training range and the law is finite there.
+
+**R6.** The six real PMLB datasets of `benchmarks/pmlb_frozen.py`, frozen by
+content hash. Five folds (`KFold(5, shuffle=True, random_state=0)`), inputs
+and target standardised on the training part as SRBench's `evaluate_model`
+does. Out of domain: one split per dataset, training on the 80 % of rows
+closest to the centre (Euclidean norm of the standardised inputs), testing on
+the 20 % farthest.
+
+Every fit: `symbolic_regression` defaults otherwise (`speed="fast"`, one
+restart, 20 % internal hold-out), `parallel=False`, one process per fit,
+`PYTHONHASHSEED=0`, two fits at a time on the two cores of the machine.
+Engine seeds 0 to 4 (Feynman and the out-of-domain real splits); seed 0 for
+the real folds, the five folds providing the replication.
+
+## Budgets
+
+**T, equal time (the headline).** `time_limit=30` seconds per fit,
+`generations=1000` so that the clock stops the search. F41 x 5 seeds, R6 x 5
+folds, R6 out of domain x 5 seeds.
+
+**G, equal work.** `generations=100`, the default of `speed="fast"`. The 15
+equations of the README x 5 seeds, and R6 x 5 folds.
+
+## Hypotheses and decision criteria
+
+**H1, speed (budget G).** B is faster at equal work: the median of the
+per-fit time ratios B/A is at most 0.6 on F15 and on R6. Refuted above 0.8.
+
+**H2, the negative-square fix does not cost quality (budget G).** On F15,
+exact recoveries of B are at least those of A minus 4 (out of 75 runs). On R6,
+the median of the paired per-fold differences of test R² (B - A) is at least
+-0.01 and B has at most one more collapse (test R² < 0) than A. A violation
+does not remove the fix (it corrects a wrong evaluation) but is investigated
+and reported.
+
+**H3, more is found in the same time (budget T).** On F41, B recovers at least
+8 more exact laws than A over the 205 runs, and is ahead on more equations
+than it is behind. On R6 (folds and out of domain together), the median of
+the paired differences of test R² is at least 0 and B has no more collapses
+than A. Refuted if B recovers no more exact laws than A.
+
+Exact law: 1 - R² < 1e-9 on the held-out test points, judged on the model
+the fit returns. Also reported, without deciding anything: close
+(1 - R² < 1e-3), out-of-domain error of the models that are not exact,
+model size, generations completed in the time budget, and the count of
+out-of-domain collapses.
+
+---
+
+# Campaign 2 — two quality changes, written before its first run
+
+Written on 29 September 2026, while campaign 1 was running and before any
+run of campaign 2. None of its results had been seen.
+
+| Arm | Engine |
+|---|---|
+| B1 | 0.8 branch at commit `cf7a7d3`: campaign 1's B, plus the input checks and the tree hashes made independent of PYTHONHASHSEED |
+| C1 | commit `580aabf`: B1 plus two changes that alter the search |
+
+The two changes of C1:
+
+- **Relative early stop.** The search stopped as soon as the hold-out MSE
+  fell under 1e-6, an absolute value that depends on the unit of y. On a
+  target of variance 0.02 (Feynman I.6.20a), a model at 1 - R² = 6e-5
+  reached it at the sixth generation, and the final selection returned an
+  approximation at 1 - R² = 2e-3 while the exact law was within reach. C1
+  stops early only on a law exact to numerical precision (1 - R² <= 1e-12
+  on the hold-out).
+- **Levenberg-Marquardt in variable projection.** The constants were fitted
+  so that the tree alone matches y, while the search judges the tree after
+  the implicit linear scaling a + b·f. On y = 3 sin(2x) + 1, the tree
+  sin(c·x) converged to c = 1.878 (MSE 0.16); fitting a and b by least
+  squares inside the residual gives c = 2 exactly.
+
+Same problems, budget T (30 s per fit), seeds and protocol as campaign 1.
+
+**H4, C1 finds more exact laws in the same time without losing elsewhere.**
+Decision criteria: on F41, exact recoveries of C1 exceed those of B1 by at
+least 6 over the 205 runs, and C1 is ahead on more equations than it is
+behind. On R6 (folds and out of domain together), the median of the paired
+differences of test R² (C1 - B1) is at least -0.005, and C1 has no more
+collapses (test R² < 0) than B1. Refuted if C1 recovers no more exact laws
+than B1, or if the median real-data difference is below -0.01; in either
+case both changes are left out of the release unless a separate campaign
+supports one of them on its own. The early stop can only make fits longer:
+the median time of the Feynman fits is reported, and the out-of-domain
+error of the models that are not exact is reported for both arms.
+
+---
+
+# Campaign 3 — grouped normalisation, written before its first run
+
+Written on 29 September 2026, before any run of campaign 3 and before the
+results of campaign 2. Only one fit of the change had been run, the one
+quoted below (it motivated the change, so it is not evidence).
+
+| Arm | Engine |
+|---|---|
+| C1 | commit `580aabf` (campaign 2's C1) |
+| C8 | commit `a16deab`: C1 plus the change below |
+
+**The change.** `normalize="auto"` divided every column by its own max|x|.
+That keeps products as products but not sums and differences of variables of
+the same kind: on Feynman I.8.14, sqrt((x2-x1)² + (y2-y1)²) with column
+maxima 4.97 and 4.99 becomes another function of the normalised variables,
+which the search only approached to 1e-4 (0 exact laws out of 5 seeds in
+campaign 1, arm B). C8 gives one common factor, the largest max|x|, to the
+columns whose max|x| lie within a factor 10 of each other; columns of very
+different magnitudes keep their own. One fit of C8 on I.8.14 (seed 0) returned
+sqrt((v2 - v3)² + (v1 - v0)²) in 1.2 s.
+
+Same problems, budget T, protocol as campaigns 1 and 2.
+
+**H5, grouped normalisation finds more exact laws without losing on real
+data.** On F41, exact recoveries of C8 exceed those of C1 by at least 6 of the
+205 runs, and C8 is ahead on more equations than it is behind. On R6 (folds
+and out of domain together), the median of the paired differences of test R²
+(C8 - C1) is at least -0.005, and C8 has no more collapses than C1. Refuted if
+C8 recovers no more exact laws than C1, or if the median real-data difference
+is below -0.01. Reported without deciding: the equations gained and lost,
+model sizes, the out-of-domain error of the models that are not exact.
+
+To halve the cost, C1's fits are those of campaign 2; C8's fits run two at a
+time, as every fit of these campaigns does (two processes on the two cores).
+
+---
+
+# Amendment to budget G, written before any run of it
+
+Written on 29 September 2026 and committed at 07:26, before budget G was run. Campaign 1
+compared A and B at equal time; since then, campaign 2 changed the engine
+(C1 kept), so an equal-work comparison of A with B (`c7b5934`) would describe
+an engine that will not be released. Budget G will compare A (0.7.0) with F,
+the release candidate at the end of the quality campaigns, on the same
+problems (F15 x 5 seeds, R6 x 5 folds, 100 generations, no time limit).
+
+**H1', speed at equal work.** The median of the per-fit time ratios F/A is at
+most 0.6 on F15 and on R6. Refuted above 0.8.
+
+**H2', quality at equal work.** On F15, exact recoveries of F are at least
+those of A. On R6, the median of the paired differences of test R² (F - A) is
+at least -0.005 and F has no more collapses than A.
+
+---
+
+# Campaign 3b — confirmation on new seeds, written before it runs
+
+Written on 29 September 2026 and committed at 08:06, after the Feynman part of campaign 3
+(C8 75 exact laws, C1 69: +6, exactly the threshold of H5; 6 equations ahead,
+4 behind; runs exact for one arm only: 14 for C8, 8 for C1, two-sided sign
+test p = 0.29) and before its real-data part and before any run of 3b.
+[Erratum, 30 September: by the records, the real-data part of campaign 3 had
+started at 08:00, and 24 of its 60 fits, all on folds, were recorded when this
+plan was committed; the criteria below do not use them.]
+Campaigns 1 and 2 showed that two arms that should be equivalent differ by
+about six exact laws on 205 runs: a +6 is within that scatter, so H5 is not
+decided on seeds 0 to 4 alone (protocol rule 7: an ambiguous cell is run
+again with more seeds before anything is said about it).
+
+Arms C1 (`580aabf`) and C8 (`a16deab`), F41 with engine seeds 5 to 9 (205
+runs per arm, side by side), budget T.
+
+**Decision.** The grouped normalisation becomes the default only if (i) on
+seeds 5 to 9 alone C8 recovers more exact laws than C1, (ii) over seeds 0 to 9
+(410 paired runs) the two-sided sign test on the runs exact for one arm only
+gives p < 0.10 in favour of C8, and (iii) the real-data criteria of H5 hold in
+campaign 3. Otherwise `normalize="auto"` keeps one factor per column.
+
+---
+
+# Decision on campaign 3, and campaign 4 — written before campaign 4 runs
+
+Written on 29 September 2026 and committed at 08:17. Campaign 3 has ended: on real data,
+C8 has 6 collapses against 4 for C1, so H5 fails on its own criteria (iii of
+3b) whatever the Feynman confirmation would have given. The grouped
+normalisation does not become the default, and campaign 3b, whose outcome
+could no longer change that decision, was stopped after 47 fits (its records
+are kept, and used for nothing).
+
+**Campaign 4.** Arms C1 (`580aabf`) and C4 (`ff32450`): C1 plus two changes.
+
+- **Formula-faithful tie-break.** Among the candidates the final selection
+  cannot tell apart, the smallest was returned even when a numerical safety
+  net of the engine acted on the data, so that the delivered formula departs
+  from `predict()` (`formula_exact` False: 22 of C1's 205 Feynman fits and 6
+  of its 60 real-data fits in campaign 2). C4 prefers the smallest candidate
+  whose formula reproduces the model.
+- **Companion lookup.** The co-occurrence graph is indexed by canonical hash
+  but was queried with the structural hash: a fragment containing a constant
+  was never found (3,281 companions found out of 6,650 lookups on a 25
+  generation run of I.12.2, 6,798 out of 6,798 after the fix).
+
+C1's fits are those of campaign 2; C4 runs its 265 fits two at a time.
+
+**H6.** Both changes are kept if: C4 returns at most half as many inexact
+formulas as C1 over the 265 fits (at most 14 against 28); its exact laws on
+F41 are at least those of C1 minus 6 (the scatter measured between
+equivalent arms); on R6 the median paired difference of test R² is at least
+-0.005 and C4 has no more collapses than C1 (4). If only the inexact-formula
+criterion fails, the tie-break is dropped and the companion fix is kept if
+the other criteria hold; if the exact-law or real-data criteria fail, both
+are dropped.
+
+---
+
+# Decision on campaign 4, and campaign 5 — written before campaign 5 runs
+
+Written on 29 September 2026 at 09:24. Campaign 4 has ended and H6 holds
+(`RESULTS.md`): C4 (`ff32450`) is merged into the 0.8 branch. Its analysis
+found a fault introduced by campaign 2's variable projection (the scale and
+offset carried by a finalist or by the final champion are left stale by
+Levenberg-Marquardt). No Feynman or PMLB fit of the change below has been
+run; it was checked on constructed cases (tests) and on four fits of 25
+points, quoted below because they show the fault, not as evidence of a gain.
+
+| Arm | Engine |
+|---|---|
+| C4 | commit `ff32450` (campaign 4) |
+| C5a | commit `788d09d`: C4 plus the correction alone |
+| C5 | commit `b2f78c0`: C4 plus the correction and the polish |
+
+**The correction** (`_refit_scaling`). After Levenberg-Marquardt, the scale
+and offset materialised in the final champion and in each polished finalist
+are refitted into the tree's own constants. On y = 3 sin(2x) + 1 with 25
+points (no hold-out), seeds 0 to 3: training R² -48.8, 1.000, 1.000, -234.8
+before, 0.961, 1.000, 1.000, 0.892 after. It is kept whatever the outcome of
+this campaign (it corrects an evaluation); its effect is reported (C5a
+against C4) and investigated if it costs more than 6 exact laws, more than
+0.01 of median paired R², or more than one collapse.
+
+**The polish** (what this campaign decides; `FINAL_POLISH`). For each of the
+eight finalists of the final selection, two more kinds of candidates: the
+same tree with its constants fitted by Levenberg-Marquardt for up to 100
+iterations instead of 20, and variants in which each term of a sum or a
+difference carries its own coefficient (A ± B becomes a·A ± b·B; one variant
+for the innermost sums only, one for all sums), fitted the same way. They go
+through the same final selection as every other candidate. Motivation, from
+campaign 2's C1: I.8.14, sqrt((x2-x1)² + (y2-y1)²), came back 5 times out of
+5 as sqrt((x2' - x3')² + (x1' - x0')²) on the normalised columns (1 - R² =
+1.8e-4), where each column's own factor 1/max|x| calls for a coefficient on
+each term of the differences; II.2.42 likewise; II.15.4 as
+-μB·sin(-10.985 - 1.00432 θ), the right form with unfinished constants.
+Expected: gains on I.8.14, II.2.42 and II.15.4, no loss elsewhere.
+
+**Problems.** Budget T, as in campaigns 1 to 4. F41 (seeds 0 to 4) and R6
+(5 folds and the out-of-domain split, seeds 0 to 4) for C5a and C5, side by
+side (530 fits); C4's are those of campaign 4. R7raw, new (`--raw-real` of
+`decision_bench.py`): the six PMLB datasets and nikuradse_1 in their own
+units, not standardised, 5 folds and the out-of-domain split (seeds 0 to 4),
+C5a and C5 side by side, then C4 alone two fits at a time (210 fits).
+Reported without deciding: `benchmarks/small_data_check.py` (five laws, 25
+points, four seeds, no hold-out) for the three arms.
+
+**H7, the polish finds more exact laws without losing on real data (C5
+against C5a).** On F41, C5 recovers at least 6 more exact laws than C5a (the
+scatter measured between equivalent arms) and is ahead on more equations
+than it is behind. On real data (R6 and R7raw together, 130 paired fits), the
+median of the paired differences of test R² is at least -0.005 and C5 has no
+more collapses (test R² < 0) than C5a. Refuted if C5 recovers no more exact
+laws than C5a, or if the median real-data difference is below -0.01; the
+polish is then left out (`FINAL_POLISH` off) and only the correction ships.
+Reported without deciding: runtime of the final selection (fit time beyond
+the budget), sizes, equations gained and lost, out-of-domain errors.
+
+**Amendment, 29 September 2026 at 09:33, before the campaign was run
+again.** Campaign 5 was first started at 09:24 (09:26 by the records) with arms `f250f5d` and
+`106f616`, in which the polish acted on the eight best candidates on the
+hold-out only. After seven equations, I.8.14 was still returned inexact by
+C5; a single diagnostic run showed why: its right structure (14 nodes,
+1 - R² = 1.8e-4) was not among those eight (all 48 to 68 nodes), so it was
+never weighted, and the parsimony rule then delivered it unpolished. The
+campaign was stopped (72 records, kept apart and not used), and the polish now
+also takes the eight smallest candidates of the tolerance band in which the
+final selection chooses (`_finalists`); with the correction alone (C5a) the
+finalists are unchanged. Arms, problems and criteria are otherwise those
+written above, and the campaign is run again from the start.
+
+---
+
+# Decision on campaign 5, and campaign 5b — written before campaign 5b runs
+
+Written on 29 September 2026 at 12:15, after the runs of C5a and C5 (the
+R7raw runs of C4, which only serve the report on the correction, were still
+going) and before any run of campaign 5b.
+
+**H7 fails** on its collapse criterion. On F41, C5 recovers 75 exact laws
+against 64 for C5a (+11; runs exact for one arm only: 11 against 0), ahead on
+4 equations and behind on none; on real data (R6 and R7raw, 130 paired fits)
+the median paired difference is +0.000, but C5 has 12 collapses against 11.
+The polish is not kept as it was measured. The extra collapse, and more real
+fits worse than better (17 against 13), come from polished variants that win
+the final selection on the hold-out and extrapolate worse (547_no2, out of
+domain, seed 1: R² 0.362 with C5a, -0.359 with C5).
+
+**Campaign 5b** tests a restriction of the polish that removes that
+mechanism: a polished variant (converged constants, weighted sums) enters the
+final selection only if it reproduces the hold-out to numerical precision,
+under the floor below which the selection keeps only exact laws (1e-12 times
+the variance of the hold-out). The polish can then turn a right structure into
+an exact law, and never replaces an approximate model by another one. On
+measured data no variant reaches that floor, and the fit is the one of C5a.
+
+| Arm | Engine |
+|---|---|
+| C5a | commit `788d09d` (campaign 5: the correction alone) |
+| C5x | commit `0b23fed`: C5 with the restriction |
+
+**Problems.** Budget T. F41, R6 (folds and out of domain) and R7raw: C5x's
+335 fits, two at a time; C5a's are those of campaign 5. Reported without
+deciding: the number of polished variants admitted on real data (expected:
+none; recorded as `polish_admitted`), and `small_data_check.py`.
+
+**H7b.** The restricted polish is kept if, on F41, C5x recovers at least 6
+more exact laws than C5a and is ahead on more equations than it is behind,
+and, on real data (R6 and R7raw together, 130 paired fits), the median paired
+difference of test R² is at least -0.005 and C5x has no more collapses than
+C5a (11). Otherwise only the correction ships.
+
+---
+
+# Decision on campaign 5b, and campaign 6 — written before campaign 6 runs
+
+Written on 29 September 2026 at 13:48. Campaign 5b has ended and H7b holds
+(`RESULTS.md`): the correction and the restricted polish (C5x, `0b23fed`) go
+into the release. No Feynman or PMLB fit of the change below has been run; it
+was checked on constructed data (tests) only, including one fit of 5
+generations on data of the form of I.12.2 (a test, not evidence).
+
+| Arm | Engine |
+|---|---|
+| C5x | commit `0b23fed` (campaign 5b) |
+| C6 | commit `fe8bbcd`: C5x plus the change below |
+
+**The change: power-law seeds.** When the target and some input columns keep
+a constant sign, the exponents of |y| ≈ c·Π|x_j|^a_j are fitted by least
+squares on the logarithms (the normalisation by max|x| leaves them unchanged),
+and two individuals are placed in the initial population of each island: the
+monomial whose exponents are rounded to the nearest half-integer, built with
+the pool's `*`, `/`, `sq`, `cube` and `sqrt`, and, when the pool has `pow` and
+the exponents are not half-integers, the monomial with the fitted exponents,
+which Levenberg-Marquardt then refines. They are judged like any other
+individual. Nothing is injected when the target changes sign (standardised
+data), when no column keeps its sign, under `units=` (typed population) and in
+extrapolation mode: the fit is then that of C5x. Motivation, from campaign 2's
+C1: I.12.2 (q1·q2/(4π·ε·r²)), I.32.5 and III.19.51, products of powers of the
+variables, were recovered in 1, 2 and 0 runs out of 5; the other runs returned
+formulas of 50 to 70 nodes. Expected: gains on those three equations and on
+II.38.3, no loss elsewhere.
+
+**Problems.** Budget T. F41 (seeds 0 to 4) and R7raw (5 folds and the
+out-of-domain split, seeds 0 to 4): C6's 275 fits, two at a time; C5x's are
+those of campaign 5b. R6, standardised, is not run: its targets are centred
+and change sign, so the change cannot act there (`_make_power_law_seeds`
+returns nothing, tested). Reported without deciding:
+`benchmarks/small_data_check.py` for C6.
+
+**H8, the seeds find more exact laws without losing on real data.** On F41,
+C6 recovers at least 6 more exact laws than C5x and is ahead on more equations
+than it is behind. On R7raw (70 paired fits), the median of the paired
+differences of test R² is at least -0.005 and C6 has no more collapses than
+C5x. Refuted if C6 recovers no more exact laws than C5x, or if the median
+R7raw difference is below -0.01; the seeds are then left out.
+
+---
+
+# Decision on campaign 6, and campaign 6b — written before campaign 6b runs
+
+Written on 29 September 2026 at 14:46. Campaign 6 has ended: H8 fails on its
+collapse criterion (8 against 6 on R7raw, out of domain), although C6
+recovers 90 exact laws on F41 against 75 (`RESULTS.md`). The collapses come
+from monomials fitted to data that are not power laws. On the training data
+of F41, the log-log regression explains all of the variance of log|y| for the
+fourteen laws that are monomials (R² = 1.000000), and at most 99.99 % for the
+others; on the seven real datasets in their units, at most 93 % (nikuradse_1;
+228_elusage 81 %).
+
+**Campaign 6b** tests the seeds restricted to data that follow a power law:
+the seeds are placed only if the log-log regression explains at least 99.9 %
+of the variance of log|y| on the training rows. Everything else is as in
+campaign 6.
+
+| Arm | Engine |
+|---|---|
+| C5x | commit `0b23fed` (campaign 5b) |
+| C6x | commit `f34b3d9`: C6 with the restriction |
+
+**Problems.** As in campaign 6: F41 and R7raw, C6x's 275 fits, two at a time;
+C5x's are those of campaign 5b.
+
+**H8b.** The restricted seeds are kept if, on F41, C6x recovers at least 6
+more exact laws than C5x and is ahead on more equations than it is behind,
+and, on R7raw (70 paired fits), the median paired difference of test R² is at
+least -0.005 and C6x has no more collapses than C5x (6). Otherwise the seeds
+are left out.
+
+---
+
+# Documentation check D1 — angle columns and normalisation, written before it runs
+
+Written on 30 September 2026 at 01:21. The quickstart notebooks advise trying
+`normalize='none'` when a column is an angle, and support the advice with the
+0.7 Feynman benchmark: with the default normalisation the two laws with an
+angle column came back exact, and III.15.12 (a cosine of a product of two
+columns) only without normalisation. On the release (commit `cdddaf0`,
+`python benchmarks/feynman_bench.py 0 15`), the default normalisation returns
+II.15.4 exact, misses I.18.12 and returns III.15.12 within 1e-3 only. The
+advice is kept only if the release supports it.
+
+**Measurement.** The three equations with an angle column (II.15.4, I.18.12,
+III.15.12) [erratum, 30 September: III.15.12 has no angle column, its cosine
+takes the product of two columns, k·d; the measurement and its expectation are
+unchanged], same data, split and budget as `feynman_bench.py` (seed 0,
+`restarts=4`, 30 generations, `speed='fast'`), with `normalize='none'`, one
+process, `PYTHONHASHSEED=0`: `python benchmarks/feynman_bench.py 12 15
+--normalize none`. This is one seed per equation, a check of what the
+notebooks say, not a decision on the engine; the notebooks will say so.
+
+**Expectation.** With `normalize='none'` the three returned models are exact.
+If they are, the note says that on the release the default returns one of the
+three exactly and `normalize='none'` all three. If not, the note gives what
+each setting returns, and the advice to compare both settings stays only as a
+suggestion, without a claim that one of them is better.
+
+---
+
+# Diagnostic D2 — why the typed search takes longer, written before it runs
+
+Written on 30 September 2026 at 01:55. On Feynman II.11.3 (`ab_ood.py`, 5
+seeds, 40 generations, one restart), the typed search (`units=`) takes a
+median 149 s per run on the release against 57 s with 0.7.0, while the
+untyped arm takes 21 s against 22 s. Two seeds (0 and 2) return the same model
+with both versions, in 134 s and 57 s with 0.7.0 and in 169 s and 175 s with
+0.8.0. The documentation must say that the typed search got slower and, if it
+can be measured, why.
+
+**Hypothesis.** 0.7.0 stopped a search whose hold-out MSE fell below 1e-6
+whatever the scale of y, while 0.8.0 stops only on a law exact to numerical
+precision (campaign 2, C1). The typed runs that return an approximation
+therefore run all 40 generations with 0.8.0 and fewer with 0.7.0. Expected:
+on seed 2, 0.7.0 stops well before generation 40 and 0.8.0 reaches it; on
+seed 0, both reach it. The time per generation is expected within 30 % of
+each other on both seeds; if 0.8.0 is more than 30 % slower per generation,
+that is a second cause and is reported as such.
+
+**Measurement.** Seeds 0 and 2 of the typed arm, run as `ab_ood.py` runs them,
+with the generation counter of `decision_bench.py` (the last generation index
+passed to `evolve_island`), on 0.7.0 (commit `e847605`) and on the release
+(commit `cdddaf0`); one process per fit, the two engines side by side on the
+two cores, seed 2 first, then seed 0. A diagnostic, not a decision: nothing in
+the engine changes with its result.
+
+---
+
+# Campaign R — the release itself on F41, written before it runs
+
+Written on 30 September 2026 at 01:56. The headline figure of the 0.8.0
+entry of the CHANGELOG (88 exact laws in 205 runs at 30 s per fit, against 64
+for 0.7.0) was measured on C6x (commit `f34b3d9`, campaign 6b). The release
+(commit `cdddaf0`) differs from C6x by the correction of data far from unit
+scale, which leaves every campaign target unchanged (their standard
+deviations lie inside [1e-3, 1e3]), by the printing of formulas, which does
+not change the model, and by a time bound on the polish of the finalists:
+with `time_limit=`, the polished variants stop one second after the deadline,
+or after the start of the polish if it starts later. At 30 s per fit that
+bound can act (an independent review of the records finds C6x fits ending
+more than 1.5 s after the deadline, two of them among the fits whose exact
+law came from the polish). A published figure must be the release's.
+
+**Measurement.** F41, five seeds, budget T (30 s per fit), two fits at a time,
+one process per fit, the release engine as arm R:
+`python benchmarks/decision_bench.py run --budget T --feynman-only
+--arm R=<worktree at cdddaf0> --out <file>`. Nothing else runs on the machine
+meanwhile. The real datasets are not re-run: on them no polished variant was
+ever admitted (campaigns 5b and 6b), so the bound cannot change their models.
+
+**What is published.** The release's count, whatever it is, in place of C6x's
+88, with C6x's figure kept in `RESULTS.md`. Expectation: within 6 exact laws
+of 88, the spread seen between equivalent engines (campaign 1: B and A, same
+models at equal work, 64 and 64 at equal time; campaign 3: +6 within the
+scatter). A release more than 6 laws below C6x means the time bound costs
+laws: the bound is then examined before the release, and the figures
+published say so.

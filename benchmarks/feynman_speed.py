@@ -38,7 +38,7 @@ PROTOCOLE — identique aux autres bancs SAUF le paramètre étudié :
 Sortie : feyn_speed.jsonl   |   Reprise automatique.
 
 Lancement :
-  set PYTHONHASHSEED=0 && python benchmarks\\feynman_speed.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_speed.py
 Options :
   --axe 1|2|both     (défaut : both)
   --modes fast,normal

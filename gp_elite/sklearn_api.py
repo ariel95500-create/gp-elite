@@ -6,7 +6,7 @@ SRBench, whose harness expects a scikit-learn regressor exposing the discovered
 equation.
 
     from gp_elite import GPEliteRegressor
-    est = GPEliteRegressor(operators="physical", generations=40).fit(X, y)
+    est = GPEliteRegressor(operators="physical").fit(X, y)
     est.predict(X_new)
     est.sympy()          # the equation as a string
 
@@ -43,12 +43,14 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
     """
 
     def __init__(self, operators="physical", normalize="auto",
-                 generations=40, speed="fast", validation_split=0.20,
+                 generations=None, speed="fast", validation_split=0.20,
                  restarts=1, robust=False, parallel=None, random_state=0,
-                 units=None, target_units=None, unknown_constant=False):
+                 units=None, target_units=None, unknown_constant=False,
+                 time_limit=None):
         # store-only: no logic here (sklearn requirement)
         self.operators = operators
         self.normalize = normalize
+        # None = choisi selon `speed` au moment du fit (voir _resolve_generations).
         self.generations = generations
         self.speed = speed
         self.validation_split = validation_split
@@ -62,6 +64,10 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         # [v0.5] La constante multiplicative de tete peut porter une dimension,
         # deduite par homogeneite. Requiert units= et target_units=.
         self.unknown_constant = unknown_constant
+        # [v0.7] Budget de temps total en secondes (None = illimite). A
+        # l'echeance, la recherche s'arrete proprement et rend le meilleur
+        # modele trouve au lieu d'etre tuee sans resultat.
+        self.time_limit = time_limit
 
     # sklearn tags. The API changed in 1.6: new versions call __sklearn_tags__,
     # older ones call _more_tags. Support both so SRBench works on any version.
@@ -77,6 +83,19 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         except Exception:
             pass
         return tags
+
+    _GENS_BY_SPEED = {"ultrafast": 30, "fast": 40, "normal": 60, "thorough": 200}
+
+    def _resolve_generations(self):
+        """generations=None -> valeur adaptee au preset `speed`.
+
+        'thorough' vise la DECOUVERTE de lois : 200 generations contre 40 en
+        mode rapide (et population 400 sur 4 iles). Un entier explicite
+        l'emporte toujours.
+        """
+        if self.generations is not None:
+            return int(self.generations)
+        return self._GENS_BY_SPEED.get(self.speed, 40)
 
     def fit(self, X, y):
         if validate_data is not None:
@@ -98,11 +117,12 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         self.model_ = symbolic_regression(
             X, y, feature_names=names,
             operators=self.operators, normalize=self.normalize,
-            generations=self.generations, speed=self.speed,
+            generations=self._resolve_generations(), speed=self.speed,
             validation_split=self.validation_split, restarts=self.restarts,
             robust=self.robust, parallel=self.parallel,
             units=self.units, target_units=self.target_units,
             unknown_constant=self.unknown_constant,
+            time_limit=self.time_limit,
             seed=self.random_state)
         self.equation_ = self.model_.expression
         self.is_fitted_ = True
@@ -160,6 +180,14 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         if sc is None:
             self.constant_value_ = float(b)
             return
+        # [v0.7] Le repliage ci-dessous suppose une normalisation SANS
+        # decalage (x_s = x / s). Avec min-max ou z-score (colonnes signees
+        # sous normalize='auto'), chaque variable devient a*(x - x0) : la
+        # formule brute n'est plus un monome et aucune constante brute unique
+        # n'existe. On rend None plutot qu'un nombre faux (scale_ d'un
+        # MinMaxScaler est un MULTIPLICATEUR, pas un diviseur).
+        if type(scaler).__name__ not in ("_ShiftFreeScaler", "_IdentityScaler"):
+            return
         pseudo = {i: {f"__s{i}": 1} for i in range(self.n_features_in_)}
         expo = DS.infer_dim(inner, pseudo)
         if expo is None:
@@ -206,14 +234,14 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         The string can be read back with ``sympy.sympify(...)`` and, evaluated
         on the raw features, reproduces ``predict`` exactly.
 
-        The engine searches on internally rescaled inputs (``x_i / s_i``, a
-        purely multiplicative, shift-free normalisation). The expression tree
-        therefore lives in scaled space. Returning it with raw variable names
-        would be WRONG: on ``y = 3x`` with ``x`` in [1, 5] it yields
-        ``14.86 * X0`` instead of ``3 * X0`` — a formula that predicts
-        correctly nowhere outside the engine. The scaling is consequently
-        folded into the expression here, so that what is delivered is what the
-        model computes.
+        The engine searches on internally rescaled inputs (each column goes
+        through an affine map: ``x / max|x|`` by default, min-max or z-score
+        on request), so the evolved tree lives in scaled space. Returning it
+        with raw variable names would be WRONG: on
+        ``y = 3x`` with ``x`` in [1, 5] it yields ``14.86 * X0`` instead of
+        ``3 * X0``. Since 0.7 the formula is rewritten in the raw variables for
+        EVERY normalisation, and checked against ``predict`` on the training
+        data at fit time (``model_.formula_exact``).
 
         Parameters
         ----------
@@ -224,10 +252,11 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
             ``False`` -> expression in the internally scaled variables, useful
             only for inspecting the search space.
 
-        Operators are mapped explicitly (``sq`` -> ``**2``, ``max2`` -> ``Max``,
-        ``step`` -> ``Heaviside``, ...) so none comes out as an undefined
-        sympy function. For the human-readable form (with the ² and ³ symbols),
-        use :meth:`pretty`.
+        Protected operators are written as the engine computes them where it
+        matters: ``sqrt(Abs(u))`` / ``log(Abs(u))`` unless ``u`` is positive
+        on all training rows, ``sign(u)*Abs(u)**2`` for an even power of a
+        base that changes sign. For the human-readable form, use
+        :meth:`pretty`.
         """
         check_is_fitted(self, "model_") if _HAS_SKLEARN else None
         from .core import node_to_sympy
@@ -239,11 +268,7 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         names = list(feature_names) if feature_names else \
             ["X%d" % i for i in range(n)]
         if raw:
-            scaler = getattr(self.model_, "scaler", None)
-            scale = getattr(scaler, "scale_", None)
-            if scale is not None:
-                names = ["((%s) / %.17g)" % (nm, float(sv))
-                         for nm, sv in zip(names, scale)]
+            return self.model_.sympy(names)
         return node_to_sympy(node, names or None)
 
     def pretty(self):

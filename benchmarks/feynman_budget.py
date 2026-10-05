@@ -47,7 +47,7 @@ PROTOCOLE — tout le reste est gelé et identique aux autres bancs :
 Sortie : feyn_budget.jsonl   |   Reprise automatique.
 
 Lancement :
-  set PYTHONHASHSEED=0 && python benchmarks\\feynman_budget.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_budget.py
 Options :
   --alloc default,bench     sous-ensemble d'allocations
   --eq I.16.6,I.12.2        sous-ensemble d'équations

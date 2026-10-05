@@ -1,0 +1,42 @@
+# python benchmarks/notebook_claims.py <snippet>, PYTHONHASHSEED=0, commit cdddaf0 engine, one process per snippet, nothing else running
+### kepler30 (2026-09-30 04:47:55)
+0.00279171 + 0.999396 * distance * sqrt(distance)  (7s)
+### hooke (2026-09-30 04:48:03)
+deduced units : [kg / s^2]
+deduced value : 250.0
+equation      : 250 * X0
+### coulomb (2026-09-30 04:48:05)
+found in 1 s
+equation : 0.0795775 * q1 * q2 / (eps * r²)
+1/(4*pi) = 0.079577
+### torque (2026-09-30 04:48:07)
+without units             17 s   error=0.0e+00   size=7
+                       |F * r * sin(theta)|
+with units                 2 s   error=0.0e+00   size=6
+                       sin(theta) * F * r
+### optionB (2026-09-30 04:48:27)
+equation: 1.5 * pressure * volume
+### tp (2026-09-30 04:48:29)
+TP loi : -0.00141869 - 1.73061 * sin(0.999339 * x * x) / ((6.12752 + 0.136482 * x) / (-3.81258 * x + 14.1956 * tanh(0.00139088 * sign(x) * |x|^6)) + 0.0423522 - 0.334104 * x)
+ 10 generations : MSE = 9.706e-03   taille = 34  (3 s)
+ 30 generations : MSE = 1.784e-04   taille = 41  (11 s)
+ 60 generations : MSE = 1.784e-04   taille = 41  (25 s)
+### nikuradse (2026-09-30 04:49:24)
+PvK R2 = 0.9434
+/home/claude/repo/benchmarks/notebook_claims.py:87: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 304 of 362 training rows (largest gap 0.563), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  m = symbolic_regression(Xn, yn, feature_names=["r_k", "log_Re"], operators="physical",
+searched for 25 s
+size  R2      formula_exact  expression
+   6  0.9344  True           1.10292 - 0.133487 * log(r_k)
+   7  0.9491  True           1.32655 - 0.561493 * log(log(r_k))
+   9  0.9488  True           1.57047 - 0.659128 * log(log(r_k) + 0.693147)
+  28  0.9583  True           1.04156 - 0.153023 * log(-5.44792 + r_k)^(0.158102 * log_Re) / ((-0.572184 * sqrt(r_k) + l
+  31  0.9629  False          0.793065 - 0.0149172 * log(-12.7713 + r_k)^(0.182952 * log_Re) / ((-6.8757 * sqrt((r_k^(-0
+  32  0.9632  True           0.657532 - 0.0315319 * (log(|log(log(|log(log_Re) + 15 - r_k|)) + 18.3539 - r_k|) - sqrt(l
+  38  0.9712  False          2.89486 - 0.814142 * (sqrt(log(r_k)) + sqrt(sqrt(log(|(-0.295993 * log_Re + 4.4482) * log(
+  44  0.9815  True           0.953453 + 0.0397481 * (68.5085 * sqrt((log_Re - 3.3348) / log_Re * r_k) / (14.9937 * (r_k
+  51  0.9880  False          1.00415 - 0.267216 * (log(||0.0128264 * log_Re - 0.551877| / (((-2.839 - log_Re) / r_k^log
+  53  0.9915  False          0.976077 - 0.210922 * (log(||0.135158 * log_Re - 0.709718| / (((-2.80496 - log_Re) / r_k^l
+  53  0.9915  False          0.976077 - 0.210922 * (log(||0.135158 * log_Re - 0.709718| / (((-2.80496 - log_Re) / r_k^l
+rows where r_k ** log_Re exceeds 1e6: 304 of 362
+### done (2026-09-30 04:49:50)

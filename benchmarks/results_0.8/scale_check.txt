@@ -1,0 +1,27 @@
+# benchmarks/scale_check.py, 29 September 2026, PYTHONHASHSEED=0
+## 0.7.0 (commit e847605)
+engine: /tmp/claude-0/arms/gp07/gp_elite/__init__.py
+x scale 1       y scale 1        R2   1.000000  formula_exact True   (sqrt(X1) * X0 / |X1|)²
+x scale 1e-09   y scale 1        R2   1.000000  formula_exact True   1e+18 * (sqrt(X1) * X0 / |X1|)²
+x scale 1e-19   y scale 1        R2   0.863356  formula_exact True   -473499 + 473473 * |-25.9708 * sqrt(X1)^(-1)|^sqrt(sqrt(X0))
+x scale 1e-34   y scale 1        R2   0.058365  formula_exact True   9.04936 - 1.94828 * X1
+x scale 1       y scale 1e-09    R2  -0.895018  formula_exact True   9.04936e-09
+x scale 1       y scale 1e-19    R2  -0.003193  formula_exact True   5.19737e-19
+x scale 1       y scale 1e-30    R2  -0.895018  formula_exact True   9.04936e-30
+x scale 1       y scale 1e+20    R2  -1.985897  formula_exact False  -3.60718e+20 + 3.02482e+20 * X0
+x scale 1       y scale 1e+30    R2  -1.985897  formula_exact False  -3.60718e+30 + 3.02482e+30 * X0
+x scale 1e-09   y scale 1e-09    R2  -0.895018  formula_exact True   9.04936e-09
+x scale 1e+09   y scale 1e+30    R2  -1.985897  formula_exact False  -3.60718e+30 + 3.02482e+21 * X0
+## 0.8 branch with the fixes (v08-work, working tree)
+engine: /home/claude/repo/gp_elite/__init__.py
+x scale 1       y scale 1        R2   1.000000  formula_exact True   X0² / X1
+x scale 1e-09   y scale 1        R2   1.000000  formula_exact True   1e+18 * X0² / X1
+x scale 1e-19   y scale 1        R2   1.000000  formula_exact True   1e+38 * X0 * X0 / X1
+x scale 1e-34   y scale 1        R2   1.000000  formula_exact True   1e+68 * X0 * X1 * X0 * X1 / X1 / X1 * X1 / X1 / X1
+x scale 1       y scale 1e-09    R2   0.999909  formula_exact True   -7.92194e-13 + 2.94039e-12 * X0 * (0.33359 * X1 + 15) * (-1.
+x scale 1       y scale 1e-19    R2   1.000000  formula_exact True   1e-19 * X0 * X0 / X1
+x scale 1       y scale 1e-30    R2   1.000000  formula_exact True   1e-30 * X0 * X0 / X1
+x scale 1       y scale 1e+20    R2   1.000000  formula_exact True   1e+20 * X0 * X0 / X1
+x scale 1       y scale 1e+30    R2   1.000000  formula_exact True   1e+30 * X0 * X0 / X1
+x scale 1e-09   y scale 1e-09    R2   1.000000  formula_exact True   1e+09 * X0 * X0 / X1
+x scale 1e+09   y scale 1e+30    R2   1.000000  formula_exact True   1e+12 * X0 * X0 / X1

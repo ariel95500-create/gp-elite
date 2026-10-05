@@ -1,0 +1,18 @@
+  [FAIL] sequentiel : arret a l'echeance              T=15s duree=17.3s (1 gen = 0.9s)
+  [PASS] sequentiel : modele valide rendu             R2=1.0000
+  [PASS] sequentiel : time_limit_reached = True       
+  [PASS] parallele : arret a l'echeance               T=15s duree=16.5s (1 gen = 2.3s)
+  [PASS] parallele : modele valide rendu              R2=0.9940
+  [PASS] parallele : time_limit_reached = True        
+  [PASS] budget genereux : non atteint                
+  [PASS] budget genereux : resultat identique         
+  [PASS] 3 redemarrages dans 24 s                     duree=25.1s, lances=3
+  [PASS] 3 redemarrages : tous lances                 
+  [PASS] drapeau non transmis au fit suivant          
+  [PASS] time_limit=0 rejete                          
+  [PASS] time_limit=-5 rejete                         
+  [PASS] time_limit=nan rejete                        
+  [PASS] time_limit=inf rejete                        
+  [PASS] GPEliteRegressor : diagnostic expose         
+
+BILAN : 15/16

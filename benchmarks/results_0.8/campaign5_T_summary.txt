@@ -1,0 +1,95 @@
+Budget T, arms ['C5', 'C5a'], 670 fits
+
+Feynman: 205 paired fits (41 equations)
+  C5  exact  75  near  37  miss  93   time median 30.7 s   generations median 70
+  C5a  exact  64  near  35  miss 106   time median 30.3 s   generations median 70
+  C5a ahead on 0 equations, behind on 4
+    ahead : 
+    behind: I.32.5 (1->0), I.6.20a (4->3), I.8.14 (5->0), II.2.42 (4->0)
+  time ratio C5a/C5: median 0.96
+  C5 out of domain, models not exact: n=130, median 1-R2 0.033, collapses (R2<0) 11
+  C5a out of domain, models not exact: n=141, median 1-R2 0.0297, collapses (R2<0) 13
+
+Real data, folds: 30 paired fits
+  C5  R2 median 0.8021  mean 0.7764  worst 0.3715  collapses 0   time median 30.9 s   generations median 79
+  C5a  R2 median 0.8095  mean 0.7710  worst 0.3715  collapses 0   time median 30.4 s   generations median 79
+  paired difference C5a - C5: median +0.0000  mean -0.0054   C5a better on 4, worse on 5
+  time ratio C5a/C5: median 0.99
+
+Real data, out of domain: 30 paired fits
+  C5  R2 median 0.6298  mean -7.0176  worst -223.2330  collapses 6   time median 31.0 s   generations median 83
+  C5a  R2 median 0.6298  mean -7.0263  worst -224.2241  collapses 5   time median 30.4 s   generations median 83
+  paired difference C5a - C5: median +0.0000  mean -0.0087   C5a better on 3, worse on 4
+  time ratio C5a/C5: median 0.98
+
+Real data, folds + out of domain: 60 paired fits
+  C5  R2 median 0.7548  mean -3.1206  worst -223.2330  collapses 6   time median 31.0 s   generations median 81
+  C5a  R2 median 0.7548  mean -3.1277  worst -224.2241  collapses 5   time median 30.4 s   generations median 81
+  paired difference C5a - C5: median +0.0000  mean -0.0071   C5a better on 7, worse on 9
+  time ratio C5a/C5: median 0.98
+
+Real data in raw units, folds: 35 paired fits
+  C5  R2 median 0.8787  mean 0.7928  worst 0.0163  collapses 0   time median 30.9 s   generations median 76
+  C5a  R2 median 0.8787  mean 0.7960  worst 0.0163  collapses 0   time median 30.3 s   generations median 75
+  paired difference C5a - C5: median +0.0000  mean +0.0031   C5a better on 3, worse on 3
+  time ratio C5a/C5: median 0.98
+
+Real data in raw units, out of domain: 35 paired fits
+  C5  R2 median 0.6850  mean -12.5116  worst -232.5370  collapses 6   time median 31.1 s   generations median 73
+  C5a  R2 median 0.6850  mean -12.4958  worst -232.5370  collapses 6   time median 30.4 s   generations median 74
+  paired difference C5a - C5: median +0.0000  mean +0.0157   C5a better on 7, worse on 1
+  time ratio C5a/C5: median 0.98
+
+Real data in raw units, folds + out of domain: 70 paired fits
+  C5  R2 median 0.7879  mean -5.8594  worst -232.5370  collapses 6   time median 31.0 s   generations median 74
+  C5a  R2 median 0.7885  mean -5.8499  worst -232.5370  collapses 6   time median 30.4 s   generations median 74
+  paired difference C5a - C5: median +0.0000  mean +0.0094   C5a better on 10, worse on 4
+  time ratio C5a/C5: median 0.98
+---- correction: C4 against C5a (C4's F41 and R6 from campaign 4)
+Budget T, arms ['C4', 'C5a'], 670 fits
+
+Feynman: 205 paired fits (41 equations)
+  C4  exact  63  near  36  miss 106   time median 30.3 s   generations median 69
+  C5a  exact  64  near  35  miss 106   time median 30.3 s   generations median 70
+  C5a ahead on 1 equations, behind on 0
+    ahead : I.18.12 (0->1)
+    behind: 
+  time ratio C5a/C4: median 1.00
+  C4 out of domain, models not exact: n=142, median 1-R2 0.0305, collapses (R2<0) 15
+  C5a out of domain, models not exact: n=141, median 1-R2 0.0297, collapses (R2<0) 13
+
+Real data, folds: 30 paired fits
+  C4  R2 median 0.8095  mean 0.7709  worst 0.3715  collapses 0   time median 30.3 s   generations median 81
+  C5a  R2 median 0.8095  mean 0.7710  worst 0.3715  collapses 0   time median 30.4 s   generations median 79
+  paired difference C5a - C4: median +0.0000  mean +0.0000   C5a better on 2, worse on 2
+  time ratio C5a/C4: median 1.00
+
+Real data, out of domain: 30 paired fits
+  C4  R2 median 0.6298  mean -7.0168  worst -224.1165  collapses 4   time median 30.3 s   generations median 83
+  C5a  R2 median 0.6298  mean -7.0263  worst -224.2241  collapses 5   time median 30.4 s   generations median 83
+  paired difference C5a - C4: median +0.0000  mean -0.0095   C5a better on 0, worse on 4
+  time ratio C5a/C4: median 1.00
+
+Real data, folds + out of domain: 60 paired fits
+  C4  R2 median 0.7548  mean -3.1229  worst -224.1165  collapses 4   time median 30.3 s   generations median 82
+  C5a  R2 median 0.7548  mean -3.1277  worst -224.2241  collapses 5   time median 30.4 s   generations median 81
+  paired difference C5a - C4: median +0.0000  mean -0.0048   C5a better on 2, worse on 6
+  time ratio C5a/C4: median 1.00
+
+Real data in raw units, folds: 35 paired fits
+  C4  R2 median 0.8787  mean 0.7959  worst 0.0163  collapses 0   time median 30.4 s   generations median 73
+  C5a  R2 median 0.8787  mean 0.7960  worst 0.0163  collapses 0   time median 30.3 s   generations median 75
+  paired difference C5a - C4: median +0.0000  mean +0.0000   C5a better on 2, worse on 3
+  time ratio C5a/C4: median 1.00
+
+Real data in raw units, out of domain: 35 paired fits
+  C4  R2 median 0.7346  mean -12.5297  worst -232.5370  collapses 7   time median 30.4 s   generations median 71
+  C5a  R2 median 0.6850  mean -12.4958  worst -232.5370  collapses 6   time median 30.4 s   generations median 74
+  paired difference C5a - C4: median +0.0000  mean +0.0338   C5a better on 6, worse on 4
+  time ratio C5a/C4: median 1.00
+
+Real data in raw units, folds + out of domain: 70 paired fits
+  C4  R2 median 0.7888  mean -5.8669  worst -232.5370  collapses 7   time median 30.4 s   generations median 71
+  C5a  R2 median 0.7885  mean -5.8499  worst -232.5370  collapses 6   time median 30.4 s   generations median 74
+  paired difference C5a - C4: median +0.0000  mean +0.0169   C5a better on 8, worse on 7
+  time ratio C5a/C4: median 1.00

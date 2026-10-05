@@ -6,6 +6,7 @@ import numpy as np, time, json, sys, io, contextlib, warnings
 warnings.filterwarnings("ignore")
 from feynman_bench import PROBS
 from gp_elite import symbolic_regression
+import provenance
 from gplearn.genetic import SymbolicRegressor
 from gplearn.functions import make_function
 
@@ -29,9 +30,14 @@ def run_range(i0, i1, out="duel_results.jsonl"):
                     operators=pool, generations=30, speed="fast",
                     validation_split=0.15, seed=0, restarts=4)
         tg = time.time() - t0
+        # [v0.7] EQUITE : chaque methode est jugee sur le modele qu'elle REND.
+        # L'ancienne version prenait pour GP_ELITE le meilleur point de son
+        # front de Pareto CHOISI SUR LE TEST, alors que gplearn n'etait juge
+        # que sur son programme final : un oracle au profit d'un seul camp.
         eg = float(np.mean((r.predict(X[te]) - y[te])**2) / vte)
+        eg_front = eg                        # information seulement, non comparee
         for pe in (r.pareto or []):
-            eg = min(eg, float(np.mean((pe.predict(X[te]) - y[te])**2) / vte))
+            eg_front = min(eg_front, float(np.mean((pe.predict(X[te]) - y[te])**2) / vte))
         # ── gplearn (pop 2000 × 30 gens, pool équivalent) ──
         fs = BASE + (('sin','cos') if pool == "trig" else ())
         t0 = time.time()
@@ -43,11 +49,40 @@ def run_range(i0, i1, out="duel_results.jsonl"):
         pl = gp.predict(X[te])
         el = float(np.mean((pl - y[te])**2) / vte) if np.all(np.isfinite(pl)) else float("inf")
         rec = dict(name=name, gpe=status(eg), gpe_err=eg, gpe_t=round(tg,1),
+                   gpe_front=status(eg_front), gpe_front_err=eg_front,
                    gpl=status(el), gpl_err=el, gpl_t=round(tl,1))
+        rec.update(provenance.fields())
         with open(out, "a") as fh: fh.write(json.dumps(rec) + "\n")
         print(f"  {name:<10} GPE:{status(eg):<6}{eg:.1e} ({tg:>3.0f}s) | "
               f"gplearn:{status(el):<6}{el:.1e} ({tl:>3.0f}s)")
         sys.stdout.flush()
 
+def summary(out="duel_results.jsonl"):
+    import collections, os
+    if not os.path.exists(out):
+        print("Aucun resultat."); return
+    rows = list({json.loads(l)["name"]: json.loads(l) for l in open(out) if l.strip()}.values())
+    n = len(rows)
+    a = collections.Counter(r["gpe"] for r in rows); b = collections.Counter(r["gpl"] for r in rows)
+    # [v0.7] Comparaison par STATUT (EXACT > NEAR > MISS). Comparer les
+    # erreurs brutes departageait deux recuperations exactes sur du bruit
+    # d'arrondi (1e-32 contre 0) et comptait des « defaites » fictives.
+    rank = {"EXACT": 2, "NEAR": 1, "MISS": 0}
+    win = sum(1 for r in rows if rank[r["gpe"]] > rank[r["gpl"]])
+    lose = sum(1 for r in rows if rank[r["gpe"]] < rank[r["gpl"]])
+    print(f"{n} equations, chaque methode jugee sur le modele qu'elle rend :")
+    print(f"  GP_ELITE : {a['EXACT']}/{n} exacts, {a['EXACT'] + a['NEAR']}/{n} a moins de 1e-3")
+    print(f"  gplearn  : {b['EXACT']}/{n} exacts, {b['EXACT'] + b['NEAR']}/{n} a moins de 1e-3")
+    print(f"  par statut : GP_ELITE devant sur {win}, derriere sur {lose}, "
+          f"egalite sur {n - win - lose}")
+
+
 if __name__ == "__main__":
-    run_range(int(sys.argv[1]), int(sys.argv[2]))
+    # Sans argument : les 15 equations d'origine (celles du chiffre publie).
+    if len(sys.argv) > 1 and sys.argv[1] in ("--summary", "--bilan"):
+        summary()
+    else:
+        a = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+        b = int(sys.argv[2]) if len(sys.argv) > 2 else 15
+        run_range(a, b)
+        summary()

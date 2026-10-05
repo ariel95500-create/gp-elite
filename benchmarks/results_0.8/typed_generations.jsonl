@@ -1,0 +1,4 @@
+{"engine": "/tmp/claude-0/arms/gp07/gp_elite/__init__.py", "version": "0.8.0", "seed": 2, "seconds": 71.4, "generations_reached": 14, "island_calls": 42, "sec_per_gen": 5.1, "size": 17, "r2_test": 0.999568, "r2_ood": 0.650874}
+{"engine": "/home/claude/repo/gp_elite/__init__.py", "version": "0.8.0", "seed": 2, "seconds": 163.0, "generations_reached": 40, "island_calls": 120, "sec_per_gen": 4.07, "size": 17, "r2_test": 0.999568, "r2_ood": 0.650874}
+{"engine": "/tmp/claude-0/arms/gp07/gp_elite/__init__.py", "version": "0.8.0", "seed": 0, "seconds": 153.1, "generations_reached": 34, "island_calls": 102, "sec_per_gen": 4.5, "size": 17, "r2_test": 0.997526, "r2_ood": 0.408267}
+{"engine": "/home/claude/repo/gp_elite/__init__.py", "version": "0.8.0", "seed": 0, "seconds": 143.5, "generations_reached": 40, "island_calls": 120, "sec_per_gen": 3.59, "size": 17, "r2_test": 0.997526, "r2_ood": 0.408267}

@@ -376,7 +376,12 @@ GP_ELITE.py  —  Genetic Programming symbolique haute performance
 """
 
 from __future__ import annotations
+import bisect
 import math
+import struct
+import hashlib
+import operator
+import weakref
 import random
 import numpy as np
 import copy
@@ -391,12 +396,28 @@ from collections import deque
 from typing import Optional, List, Tuple, Dict, Any
 
 # [v16-BATTERY] Dépendances pour la lecture de données réelles (CSV NASA)
-try:
-    import pandas as _pd
-    from sklearn.preprocessing import MinMaxScaler as _MinMaxScaler
-    _CSV_DEPS_OK = True
-except ImportError:
-    _CSV_DEPS_OK = False
+# [v0.8] Importées à la demande : pandas et scikit-learn représentaient les
+# trois quarts du temps d'`import gp_elite` (près d'une seconde), payés aussi
+# par chaque processus parallèle au démarrage, alors que la recherche n'en
+# utilise aucun. Seuls les chargeurs CSV et normalize="minmax" en ont besoin.
+def _csv_deps():
+    """(pandas, MinMaxScaler), ou ImportError si l'un manque."""
+    import pandas as pd
+    from sklearn.preprocessing import MinMaxScaler
+    return pd, MinMaxScaler
+
+
+def _csv_deps_ok() -> bool:
+    try:
+        _csv_deps()
+        return True
+    except ImportError:
+        return False
+
+
+def _MinMaxScaler(*args, **kwargs):
+    from sklearn.preprocessing import MinMaxScaler
+    return MinMaxScaler(*args, **kwargs)
 
 # ============================================================
 # BIBLIOTHÈQUE DE FRAGMENTS — SUBSTRAT STIGMERGIQUE
@@ -418,6 +439,18 @@ class FragmentEntry:
     # Vecteur numpy de shape (N_PROBE,) — sortie du fragment sur PROBE_X.
     # None tant que non calculée (fragments déposés avant initialisation du probe).
     semantic_signature: Optional[np.ndarray] = None
+
+
+# [v0.8] Sonde de _is_semantically_trivial (construite une fois) et verdicts
+# mémorisés, vidés en même temps que le cache de simplification.
+_TRIVIAL_PROBE_X = np.array([
+    [-2.0, -1.5,  0.3,  1.0],
+    [-1.0, -0.5,  0.7,  2.0],
+    [ 0.5,  0.1,  1.1, -0.5],
+    [ 1.5,  1.0, -0.3, -1.5],
+    [ 2.5,  2.0, -1.0, -2.5],
+])
+_TRIVIAL_CACHE: dict = {}
 
 
 class FragmentLibrary:
@@ -442,6 +475,20 @@ class FragmentLibrary:
     def __init__(self):
         self.fragments: Dict[int, FragmentEntry] = {}
         self.generation = 0
+        self._sampling = None   # [v0.8] tables de tirage (voir begin_sampling)
+
+    # [v0.8] Tables de tirage figées. sample() reconstruisait à CHAQUE appel la
+    # liste des candidats et leurs poids sémantiques en parcourant toute la
+    # bibliothèque, alors qu'elle ne change qu'aux dépôts et évaporations.
+    # Entre begin_sampling() et end_sampling(), fenêtre pendant laquelle
+    # l'appelant garantit que la bibliothèque n'est pas modifiée (la
+    # reproduction d'une île), chaque table est calculée une fois, à
+    # l'identique, puis réutilisée : mêmes tirages, bit pour bit.
+    def begin_sampling(self):
+        self._sampling = {}
+
+    def end_sampling(self):
+        self._sampling = None
 
     def _structural_quality(self, node: "Node") -> float:
         """
@@ -468,25 +515,38 @@ class FragmentLibrary:
         Détecte les fragments sémantiquement nuls ou triviaux.
         [v16-NDIM] Génère une mini-matrice X de test (5 lignes) compatible
         avec le mode N-D ; en mode 1-D le vecteur xs reste un 1-D array.
+        [v0.8] Verdict mémorisé par arbre exact jusqu'au prochain vidage du
+        cache de simplification (_clear_simplify_caches) : dans cet
+        intervalle, simplify(node) rendrait de toute façon la forme déjà
+        calculée, donc le verdict est le même. Les dépôts testaient les mêmes
+        sous-arbres à chaque génération (5 % du temps total).
         """
+        h = node.exact_hash()
+        v = _TRIVIAL_CACHE.get(h)
+        if v is not None:
+            return v
+        v = self._is_semantically_trivial_uncached(node)
+        _TRIVIAL_CACHE[h] = v
+        return v
+
+    def _is_semantically_trivial_uncached(self, node: "Node") -> bool:
         simplified = simplify(node)  # [v19-OPT] simplify ne mute plus l'entrée
         if simplified.left is None and simplified.right is None:
             return True
         # Sonde N-D générique : matrice 5×4 couvrant les features 0–3
-        test_X = np.array([
-            [-2.0, -1.5,  0.3,  1.0],
-            [-1.0, -0.5,  0.7,  2.0],
-            [ 0.5,  0.1,  1.1, -0.5],
-            [ 1.5,  1.0, -0.3, -1.5],
-            [ 2.5,  2.0, -1.0, -2.5],
-        ])
         try:
-            vals = evaluate_vector(simplified, test_X)
+            vals = evaluate_vector(simplified, _TRIVIAL_PROBE_X)
             if np.std(vals) < 1e-6:
                 return True
         except Exception:
             pass
         return False
+
+    def __getstate__(self):
+        # [v0.8] une table de tirage ne traverse jamais un processus
+        st = dict(self.__dict__)
+        st["_sampling"] = None
+        return st
 
     def merge_from(self, other: "FragmentLibrary"):
         """[v20-PAR] Fusionne la bibliothèque d'un worker dans celle du maître.
@@ -494,6 +554,7 @@ class FragmentLibrary:
         on fusionne par MAX de phéromone (signal le plus fort conservé, pas
         de double comptage de l'instantané commun), freq/last_gen par max,
         best_fitness par min."""
+        self._sampling = None
         for h, e in other.fragments.items():
             mine = self.fragments.get(h)
             if mine is None:
@@ -515,6 +576,7 @@ class FragmentLibrary:
 
     def deposit(self, individual: Node, rank: int, fitness: float, gen: int):
         """Dépose τ = quality/rank sur tous les sous-arbres valides d'un individu."""
+        self._sampling = None
         delta_base = 1.0 / rank
         nodes = get_all_nodes(individual)
         seen  = set()
@@ -618,6 +680,7 @@ class FragmentLibrary:
         40 % du τ total. Avec 11 opérateurs, on garantit une diversité
         minimale équivalente à ~2.5 opérateurs toujours représentés.
         """
+        self._sampling = None
         rate  = evap_rate if evap_rate is not None else self.EVAP_RATE
         t_max = tau_max   if tau_max   is not None else 1e9
 
@@ -682,16 +745,39 @@ class FragmentLibrary:
         [OPT] Calcul sémantique vectorisé en batch — toutes les signatures
         sont empilées en une matrice et le calcul de corrélation est fait
         en une seule passe matricielle plutôt que N appels séquentiels.
+        [v0.8] Table de tirage réutilisée dans une fenêtre begin_sampling().
         """
+        res_sig = CURRENT_RESIDUAL_SIG
+        cache = getattr(self, "_sampling", None)
+        if cache is not None:
+            key = (min_size, max_size, root_op)
+            ent = cache.get(key)
+            if ent is None or ent[0] is not res_sig:
+                ent = (res_sig,) + self._sample_table(min_size, max_size,
+                                                      root_op, res_sig)
+                cache[key] = ent
+            _, candidates, cumsum, total = ent
+        else:
+            candidates, cumsum, total = self._sample_table(min_size, max_size,
+                                                           root_op, res_sig)
+        if candidates is None or total <= 0:
+            return None
+        # Tirage pondéré via cumsum (plus rapide que boucle cumul)
+        r = random.random() * total
+        idx = int(np.searchsorted(cumsum, r))
+        idx = min(idx, len(candidates) - 1)
+        return candidates[idx][1].node.copy()  # [v19-OPT] copy itératif (≈50× vs deepcopy)
+
+    def _sample_table(self, min_size, max_size, root_op, res_sig):
+        """(candidats, poids cumulés, total) du tirage de sample()."""
         candidates = [
             (h, e) for h, e in self.fragments.items()
             if min_size <= e.size <= max_size
             and (root_op is None or e.root_op == root_op)
         ]
         if not candidates:
-            return None
+            return None, None, None
 
-        res_sig = CURRENT_RESIDUAL_SIG
         taus    = np.array([e.tau for _, e in candidates], dtype=np.float64)
 
         if res_sig is not None:
@@ -735,14 +821,7 @@ class FragmentLibrary:
             weights = taus * 0.5
 
         total = float(weights.sum())
-        if total <= 0:
-            return None
-        # Tirage pondéré via cumsum (plus rapide que boucle cumul)
-        r = random.random() * total
-        cumsum = np.cumsum(weights)
-        idx = int(np.searchsorted(cumsum, r))
-        idx = min(idx, len(candidates) - 1)
-        return candidates[idx][1].node.copy()  # [v19-OPT] copy itératif (≈50× vs deepcopy)
+        return candidates, np.cumsum(weights), total
 
     def top_fragments(self, n: int = 5) -> List[FragmentEntry]:
         return sorted(self.fragments.values(), key=lambda e: -e.tau)[:n]
@@ -932,13 +1011,44 @@ class FragmentCoGraph:
     def __init__(self):
         # co[(h_i, h_j)] = poids, avec h_i < h_j (non-orienté)
         self.co: Dict[Tuple[int, int], float] = {}
+        self._sampling = None   # [v0.8] tables de tirage (voir begin_sampling)
+
+    # [v0.8] Même principe que FragmentLibrary.begin_sampling : sample_pair et
+    # sample_companion parcouraient toutes les arêtes (jusqu'à 2 000) à chaque
+    # appel. Dans la fenêtre, où ni le graphe ni la bibliothèque ne changent,
+    # les tables sont construites une fois dans l'ordre exact du parcours
+    # d'origine, et le tirage « premier cumul >= r » se fait par bisection :
+    # même résultat que la boucle, les poids étant positifs.
+    def begin_sampling(self, lib: "FragmentLibrary"):
+        self._sampling = {"lib": lib, "pair": None, "adj": None, "comp": {}}
+
+    def end_sampling(self):
+        self._sampling = None
+
+    @staticmethod
+    def _cumulate(ws):
+        """Cumuls dans l'ordre (mêmes additions que la boucle d'origine),
+        ou None si un poids négatif ou non fini interdit la bisection."""
+        cum, acc = [], 0.0
+        for w in ws:
+            if not (w >= 0.0) or w == float("inf"):
+                return None
+            acc += w
+            cum.append(acc)
+        return cum
 
     @staticmethod
     def _key(h1: int, h2: int) -> Tuple[int, int]:
         return (h1, h2) if h1 < h2 else (h2, h1)
 
+    def __getstate__(self):
+        st = dict(self.__dict__)
+        st["_sampling"] = None
+        return st
+
     def merge_from(self, other: "FragmentCoGraph"):
         """[v20-PAR] Fusion par MAX d'arête (même logique que FragmentLibrary)."""
+        self._sampling = None
         co = self.co
         for k, w in other.co.items():
             if w > co.get(k, 0.0):
@@ -956,6 +1066,7 @@ class FragmentCoGraph:
         MAX_LOCAL_PAIRS premières paires (les fragments sont déjà triés par τ).
         """
         MAX_LOCAL = 12   # max de fragments par individu pris en compte
+        self._sampling = None
         hs = hashes[:MAX_LOCAL]
         delta = 1.0 / (rank * rank)
         for i in range(len(hs)):
@@ -987,6 +1098,7 @@ class FragmentCoGraph:
 
     def evaporate(self):
         """Évaporation + élagage des arêtes faibles + limite MAX_EDGES."""
+        self._sampling = None
         to_del = [k for k, v in self.co.items() if v * self.EVAP_RATE < self.MIN_CO]
         for k in to_del:
             del self.co[k]
@@ -1005,6 +1117,32 @@ class FragmentCoGraph:
         au poids de co-occurrence.
         Ne retourne que des fragments encore présents dans `lib`.
         """
+        cache = getattr(self, "_sampling", None)
+        if cache is not None and cache["lib"] is lib:
+            ent = cache["comp"].get(h_root)
+            if ent is None:
+                adj = cache["adj"]
+                if adj is None:
+                    adj = cache["adj"] = self._adjacency(lib)
+                cands = adj.get(h_root, [])
+                ent = (cands, sum(w for _, w in cands),
+                       self._cumulate(w for _, w in cands))
+                cache["comp"][h_root] = ent
+            candidates, total, cum = ent
+            if not candidates or total <= 0:
+                return None
+            r = random.random() * total
+            if cum is not None:
+                i = bisect.bisect_left(cum, r)
+                h_other = candidates[i][0] if i < len(candidates) else candidates[-1][0]
+                return lib.fragments[h_other].node.copy()
+            cumul = 0.0
+            for h_other, w in candidates:
+                cumul += w
+                if r <= cumul:
+                    return lib.fragments[h_other].node.copy()
+            return lib.fragments[candidates[-1][0]].node.copy()
+
         candidates: List[Tuple[Tuple[int, int], float]] = []
         for (h1, h2), w in self.co.items():
             other = h2 if h1 == h_root else (h1 if h2 == h_root else None)
@@ -1020,7 +1158,6 @@ class FragmentCoGraph:
         if total <= 0:
             return None
 
-        import copy as _copy
         r = random.random() * total
         cumul = 0.0
         for h_other, w in candidates:
@@ -1028,6 +1165,22 @@ class FragmentCoGraph:
             if r <= cumul:
                 return lib.fragments[h_other].node.copy()  # [v19-OPT]
         return lib.fragments[candidates[-1][0]].node.copy()  # [v19-OPT]
+
+    def _adjacency(self, lib: "FragmentLibrary") -> dict:
+        """h -> [(voisin, poids)] dans l'ordre de parcours de self.co, voisins
+        limités aux fragments présents dans lib (filtre de sample_companion)."""
+        adj: dict = {}
+        frags = lib.fragments
+        for (h1, h2), w in self.co.items():
+            if h1 == h2:
+                if h2 in frags:
+                    adj.setdefault(h1, []).append((h2, w))
+                continue
+            if h2 in frags:
+                adj.setdefault(h1, []).append((h2, w))
+            if h1 in frags:
+                adj.setdefault(h2, []).append((h1, w))
+        return adj
 
     def sample_pair(self, lib: "FragmentLibrary"
                     ) -> Tuple[Optional[Any], Optional[Any]]:
@@ -1039,22 +1192,34 @@ class FragmentCoGraph:
         if not self.co or not lib.fragments:
             return None, None
 
-        # Construire la distribution sur les arêtes valides
-        valid: List[Tuple[Tuple[int, int], float]] = []
-        for (h1, h2), w in self.co.items():
-            if h1 in lib.fragments and h2 in lib.fragments:
-                tau_prod = lib.fragments[h1].tau * lib.fragments[h2].tau
-                valid.append(((h1, h2), w * tau_prod))
+        cache = getattr(self, "_sampling", None)
+        if cache is not None and cache["lib"] is lib:
+            ent = cache["pair"]
+            if ent is None:
+                valid = self._pair_table(lib)
+                ent = cache["pair"] = (valid, sum(w for _, w in valid),
+                                       self._cumulate(w for _, w in valid))
+            valid, total, cum = ent
+        else:
+            valid, total, cum = self._pair_table(lib), None, None
+            if valid:
+                total = sum(w for _, w in valid)
 
         if not valid:
             return None, None
-
-        total = sum(w for _, w in valid)
         if total <= 0:
             return None, None
 
-        import copy as _copy
         r = random.random() * total
+        if cum is not None:
+            i = bisect.bisect_left(cum, r)
+            if i < len(valid):
+                (h1, h2), _ = valid[i]
+                if random.random() < 0.5:
+                    h1, h2 = h2, h1
+                return lib.fragments[h1].node.copy(), lib.fragments[h2].node.copy()
+            (h1, h2), _ = valid[-1]
+            return (lib.fragments[h1].node.copy(), lib.fragments[h2].node.copy())
         cumul = 0.0
         for (h1, h2), w in valid:
             cumul += w
@@ -1068,6 +1233,16 @@ class FragmentCoGraph:
         (h1, h2), _ = valid[-1]
         return (lib.fragments[h1].node.copy(),  # [v19-OPT]
                 lib.fragments[h2].node.copy())
+
+    def _pair_table(self, lib: "FragmentLibrary") -> list:
+        """Distribution de sample_pair sur les arêtes valides (ordre de self.co)."""
+        valid: List[Tuple[Tuple[int, int], float]] = []
+        frags = lib.fragments
+        for (h1, h2), w in self.co.items():
+            if h1 in frags and h2 in frags:
+                tau_prod = frags[h1].tau * frags[h2].tau
+                valid.append(((h1, h2), w * tau_prod))
+        return valid
 
     def top_pairs(self, n: int = 5, lib: "FragmentLibrary" = None
                   ) -> List[Tuple[float, str, str]]:
@@ -1708,6 +1883,10 @@ class Config:
     # structures à tremplin que l'évolution n'assemble pas seule.
     MOTIF_SEEDS: bool      = True
     MOTIF_SEEDS_N: int     = 32
+    # [v0.8] Polissage des finalistes (voir _polish_finalists).
+    FINAL_POLISH: bool     = True
+    # [v0.8] Monômes ajustés en échelle log (voir _make_power_law_seeds).
+    POWER_LAW_SEEDS: bool  = True
     ADAM_LR: float         = 0.05
     ADAM_BETA1: float      = 0.9
     ADAM_BETA2: float      = 0.999
@@ -1832,6 +2011,13 @@ class Config:
     # Toute erreur du pool => repli séquentiel automatique et silencieux.
     PARALLEL_ISLANDS: Optional[bool] = None
     PARALLEL_ROUND: int = 0          # 0 = auto : min(10, MIGRATION_INTERVAL)
+    # [v0.7-TIME] Echeance ABSOLUE (time.time()) au-dela de laquelle l'evolution
+    # s'arrete proprement et rend le meilleur modele trouve. None = pas de
+    # limite. Posee par symbolic_regression(time_limit=...) ; verifiee avant
+    # chaque generation (sequentiel), avant chaque ronde (maitre parallele) et
+    # avant chaque generation DANS les processus fils. La premiere generation
+    # s'execute toujours, pour garantir un modele.
+    DEADLINE: Optional[float] = None
 
     # [v19] Déduplication sémantique de population (cf. Operon / PySR)
     USE_SEMANTIC_DEDUP: bool = False # écarte les clones comportementaux ; OFF par default :
@@ -1842,6 +2028,10 @@ class Config:
 
     # Sorties
     LOG_CSV: str           = "gp_elite_log.csv"
+    # [v0.7] Une bibliotheque n'ecrit pas de fichier en silence. L'API met ce
+    # drapeau a False ; le mode console le garde (journal dans le DOSSIER
+    # COURANT, plus dans le dossier d'installation du paquet).
+    WRITE_LOG_CSV: bool    = True
     SAVE_BEST: str         = "gp_elite_best.txt"
 
 
@@ -2006,8 +2196,93 @@ def _active_pools():
     return b_ops, b_w, u_ops, u_w, all_ops, all_w
 
 
+# [v0.8] HACHAGE DES ARBRES INDÉPENDANT DE PYTHONHASHSEED.
+# Jusqu'en 0.7, les hash d'arbres portaient des chaînes (noms d'opérateurs et
+# de variables, constantes écrites en hexadécimal) dont le hash change d'un
+# lancement de Python à l'autre. Leur VALEUR orientait certains tirages (le
+# graphe de co-occurrences range chaque paire de fragments par hash
+# croissant) : deux lancements du même script avec seed=0 rendaient des
+# modèles différents, sauf à fixer PYTHONHASHSEED=0 avant de lancer Python.
+# Les chaînes sont maintenant codées par un entier stable (blake2b, 64 bits)
+# et les constantes par leurs bits IEEE ; hash() d'un tuple d'entiers ne
+# dépend pas de PYTHONHASHSEED. seed= suffit à reproduire un ajustement.
+
+_STR_CODES: Dict[str, int] = {}
+_PACK_D = struct.Struct("<d").pack
+_UNPACK_Q = struct.Struct("<q").unpack
+_TAG_FLOAT, _TAG_OTHER, _TAG_UNARY, _TAG_BINARY = 1, 2, 3, 4
+_CANON_CONST = hash((_TAG_FLOAT, 0x7FF0DEADC0DE))
+
+
+def _str_code(s) -> int:
+    c = _STR_CODES.get(s)
+    if c is None:
+        c = int.from_bytes(hashlib.blake2b(str(s).encode("utf-8", "surrogatepass"),
+                                           digest_size=8).digest(), "little")
+        _STR_CODES[s] = c
+    return c
+
+
+def _value_code(v) -> int:
+    """Code stable d'une valeur de nœud non flottante (opérateur, variable)."""
+    if isinstance(v, str):
+        return _str_code(v)
+    if isinstance(v, int):
+        return v
+    return _str_code(repr(v))
+
+
+def _leaf_code_exact(v) -> int:
+    if isinstance(v, float):
+        return hash((_TAG_FLOAT, _UNPACK_Q(_PACK_D(v))[0]))
+    return hash((_TAG_OTHER, _value_code(v)))
+
+
+def _leaf_code_rounded(v) -> int:
+    if isinstance(v, float):
+        # + 0.0 : -0.0 et 0.0 restent le même individu, comme avant
+        return hash((_TAG_FLOAT, _UNPACK_Q(_PACK_D(round(v, 4) + 0.0))[0]))
+    return hash((_TAG_OTHER, _value_code(v)))
+
+
+def _leaf_code_canonical(v) -> int:
+    if isinstance(v, float):
+        return _CANON_CONST
+    return hash((_TAG_OTHER, _value_code(v)))
+
+
+def _node_hashes(root, attr, leaf_code):
+    """Calcule et mémorise `attr` sur tous les nœuds de root qui ne l'ont
+    pas encore (pré-ordre, puis enfants avant parents)."""
+    stack = [root]
+    order = []
+    pop = stack.pop
+    push = stack.append
+    add = order.append
+    while stack:
+        nd = pop()
+        add(nd)
+        l = nd.left
+        if l is not None and getattr(l, attr) is None:
+            push(l)
+        r = nd.right
+        if r is not None and getattr(r, attr) is None:
+            push(r)
+    for nd in reversed(order):
+        l = nd.left
+        r = nd.right
+        if l is None and r is None:
+            setattr(nd, attr, leaf_code(nd.value))
+        elif r is None:
+            setattr(nd, attr, hash((_TAG_UNARY, _value_code(nd.value),
+                                    getattr(l, attr))))
+        else:
+            setattr(nd, attr, hash((_TAG_BINARY, _value_code(nd.value),
+                                    getattr(l, attr), getattr(r, attr))))
+
+
 class Node:
-    __slots__ = ("value", "left", "right", "_hash", "_chash")
+    __slots__ = ("value", "left", "right", "_hash", "_chash", "_ehash")
 
     def __init__(self, value, left=None, right=None):
         self.value = value
@@ -2015,86 +2290,112 @@ class Node:
         self.right = right
         self._hash  = None
         self._chash = None   # [v18] canonical_hash mémoïsé
+        self._ehash = None   # [v0.7] exact_hash mémoïsé
 
     def copy(self):
-        """Copie profonde ITÉRATIVE (post-ordre) — aucune limite de profondeur.
+        """Copie profonde ITÉRATIVE — aucune limite de profondeur.
         [FIX-REC v18] L'ancienne version récursive levait RecursionError sur
-        les arbres profonds produits par les constructeurs stigmergiques."""
-        out = {}
-        stack = [(self, False)]
+        les arbres profonds produits par les constructeurs stigmergiques.
+        [v0.8] Chaque nœud neuf est créé une fois puis relié à son parent
+        (plus de dictionnaire id -> copie ni de double passage par la pile) :
+        2,3 fois plus rapide, même arbre.
+        NB : ne PAS propager _hash/_chash/_ehash — les mutations in-place
+        (point_mutation) n'invalident que le nœud touché ; des hashes hérités
+        sur les ancêtres seraient périmés -> faux hits de cache."""
+        root = Node(self.value)
+        stack = [(self, root)]
+        pop = stack.pop
+        push = stack.append
         while stack:
-            nd, processed = stack.pop()
-            if processed:
-                # NB : ne PAS propager _hash/_chash — les mutations in-place
-                # (point_mutation) n'invalident que le nœud touché ; des hashes
-                # hérités sur les ancêtres seraient périmés -> faux hits de cache.
-                out[id(nd)] = Node(nd.value,
-                          out.pop(id(nd.left))  if nd.left  is not None else None,
-                          out.pop(id(nd.right)) if nd.right is not None else None)
-            else:
-                stack.append((nd, True))
-                if nd.left  is not None: stack.append((nd.left,  False))
-                if nd.right is not None: stack.append((nd.right, False))
-        return out[id(self)]
+            src, dst = pop()
+            l = src.left
+            if l is not None:
+                nl = dst.left = Node(l.value)
+                if l.left is not None or l.right is not None:
+                    push((l, nl))
+            r = src.right
+            if r is not None:
+                nr = dst.right = Node(r.value)
+                if r.left is not None or r.right is not None:
+                    push((r, nr))
+        return root
 
     def structural_hash(self) -> int:
-        """Hash structurel, mémoïsé, calcul ITÉRATIF post-ordre.
-        [OPT v18] Plus de str(round(v)) par feuille ni de récursion Python."""
-        if self._hash is not None:
-            return self._hash
-        stack = [(self, False)]
-        while stack:
-            nd, processed = stack.pop()
-            if nd._hash is not None:
-                continue
-            if processed:
-                if nd.left is None and nd.right is None:
-                    nd._hash = hash(("leaf", round(nd.value, 4)
-                                     if isinstance(nd.value, float) else nd.value))
-                elif nd.right is None:
-                    nd._hash = hash(("unary", nd.value, nd.left._hash))
-                else:
-                    nd._hash = hash(("binary", nd.value,
-                                     nd.left._hash, nd.right._hash))
-            else:
-                stack.append((nd, True))
-                if nd.left  is not None and nd.left._hash  is None:
-                    stack.append((nd.left,  False))
-                if nd.right is not None and nd.right._hash is None:
-                    stack.append((nd.right, False))
+        """Hash structurel (constantes arrondies à 4 décimales), mémoïsé.
+        [v0.8] Indépendant de PYTHONHASHSEED : voir _node_hashes."""
+        h = self._hash
+        if h is not None:
+            return h
+        _node_hashes(self, "_hash", _leaf_code_rounded)
         return self._hash
 
+    def exact_hash(self) -> int:
+        """[v0.7] Hash avec les valeurs EXACTES des constantes.
+
+        structural_hash() arrondit les constantes a 4 decimales : c'est voulu
+        pour la deduplication de population (1.00001 et 1.00002 y sont le
+        meme individu). Mais tout cache qui stocke une VALEUR calculee a
+        partir d'un arbre (fonction compilee dont les constantes sont en dur,
+        predictions, fitness, forme simplifiee) doit etre indexe sur l'arbre
+        EXACT. Jusqu'en 0.6, evaluate_vector(1.00002*x) rendait 1.00001*x si
+        ce dernier avait ete compile avant -- y compris lors d'un ajustement
+        precedent du meme processus : predict() pouvait calculer avec les
+        constantes d'un autre modele, et deux ajustements identiques
+        successifs pouvaient diverger."""
+        h = self._ehash
+        if h is not None:
+            return h
+        # Même calcul que _node_hashes(self, "_ehash", _leaf_code_exact),
+        # écrit avec des accès directs : c'est le hash le plus sollicité.
+        stack = [self]
+        order = []
+        pop = stack.pop
+        push = stack.append
+        add = order.append
+        while stack:
+            nd = pop()
+            add(nd)
+            l = nd.left
+            if l is not None and l._ehash is None:
+                push(l)
+            r = nd.right
+            if r is not None and r._ehash is None:
+                push(r)
+        codes = _STR_CODES
+        for nd in reversed(order):
+            l = nd.left
+            r = nd.right
+            v = nd.value
+            if l is None and r is None:
+                if isinstance(v, float):
+                    nd._ehash = hash((1, _UNPACK_Q(_PACK_D(v))[0]))
+                else:
+                    c = codes.get(v) if isinstance(v, str) else None
+                    nd._ehash = hash((2, c if c is not None else _value_code(v)))
+                continue
+            c = codes.get(v) if isinstance(v, str) else None
+            if c is None:
+                c = _value_code(v)
+            if r is None:
+                nd._ehash = hash((3, c, l._ehash))
+            else:
+                nd._ehash = hash((4, c, l._ehash, r._ehash))
+        return self._ehash
+
     def canonical_hash(self) -> int:
-        """Hash canonique (constantes -> 'C'), MÉMOÏSÉ et itératif.
+        """Hash canonique (toute constante vaut 'C'), mémoïsé.
         [OPT v18] L'ancienne version recalculait récursivement à chaque appel
         -> O(n²) par individu dans _is_banned et le scan de dominance."""
-        if self._chash is not None:
-            return self._chash
-        stack = [(self, False)]
-        while stack:
-            nd, processed = stack.pop()
-            if nd._chash is not None:
-                continue
-            if processed:
-                if nd.left is None and nd.right is None:
-                    key = "C" if isinstance(nd.value, float) else nd.value
-                    nd._chash = hash(("leaf", key))
-                elif nd.right is None:
-                    nd._chash = hash(("unary", nd.value, nd.left._chash))
-                else:
-                    nd._chash = hash(("binary", nd.value,
-                                      nd.left._chash, nd.right._chash))
-            else:
-                stack.append((nd, True))
-                if nd.left  is not None and nd.left._chash  is None:
-                    stack.append((nd.left,  False))
-                if nd.right is not None and nd.right._chash is None:
-                    stack.append((nd.right, False))
+        h = self._chash
+        if h is not None:
+            return h
+        _node_hashes(self, "_chash", _leaf_code_canonical)
         return self._chash
 
     def invalidate_hash(self):
         self._hash  = None
         self._chash = None
+        self._ehash = None
 
 # ============================================================
 # AFFICHAGE
@@ -2397,18 +2698,37 @@ def safe_sqrt(x: float) -> float:
 # OPÉRATIONS SÉCURISÉES — vectorisées NumPy
 # ============================================================
 
+# [v0.8] ufuncs appelés directement : np.clip passe par plusieurs couches
+# Python (~3 µs par appel), ce qui dominait le coût des opérations protégées
+# sur les petits jeux de données. min(max(a, lo), hi) donne exactement
+# np.clip(a, lo, hi), NaN compris (propagé par np.maximum comme par np.clip).
+_np_minimum = np.minimum
+_np_maximum = np.maximum
+_np_abs = np.abs
+_np_isfinite = np.isfinite
+
 def _np_safe_div(a, b):
     """
     Division protégée NumPy.
     [v16-FIX] np.where évalue les DEUX branches avant de choisir : si a/b déborde
     en float64 même quand |b|>1e-8, le RuntimeWarning est levé.
     Solution : clipper a en amont et remplacer b~0 par 1.0 avant la division.
+    [v0.8] Mêmes valeurs, bit pour bit, que la version 0.7 (vérifié par
+    tests/test_speed_equivalence.py) : bornes par np.minimum/np.maximum au
+    lieu de np.clip (dont l'enveloppe Python coûtait plus que le calcul sur
+    les petits jeux de données), masque calculé une fois, et division directe
+    quand aucun dénominateur n'est proche de zéro (le cas courant). Sans
+    dénominateur minuscule, |a| <= 1e6 et |b| >= 1e-8 : la division ne peut
+    ni déborder ni lever d'avertissement.
     """
-    a = np.clip(a, -_SAFE_LIMIT, _SAFE_LIMIT)
-    b_safe = np.where(np.abs(b) < 1e-8, 1.0, b)
-    with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
-        r = np.where(np.abs(b) < 1e-8, a, a / b_safe)
-    return np.where(np.isfinite(r), r, 0.0)
+    a = _np_minimum(_np_maximum(a, -_SAFE_LIMIT), _SAFE_LIMIT)
+    small = _np_abs(b) < 1e-8
+    if small.any():
+        with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
+            r = np.where(small, a, a / np.where(small, 1.0, b))
+    else:
+        r = a / b
+    return np.where(_np_isfinite(r), r, 0.0)
 
 def _np_safe_pow(a, b):
     """
@@ -2418,17 +2738,61 @@ def _np_safe_pow(a, b):
     Les features de trajectoire X[6]-X[9] peuvent atteindre ~7 (log1p de grandes
     valeurs), et sq(X[7]) ≈ 49 — pow(49, 8) = 1.9e13 qui déborde float32 dans
     certains contextes. On clippe la base à [-100, 100] avant la puissance.
+    [v0.8] Exposant scalaire (le cas de la compilation : _safe_pow ne reçoit
+    que des exposants constants) : une seule des deux branches est calculée,
+    au lieu des deux puis d'un choix. Mêmes valeurs bit pour bit.
     """
-    b = np.clip(b, -6.0, 6.0)   # exposant limité : base^6 suffisant pour GP
-    a = np.clip(a, -100.0, 100.0)  # base clippée : évite pow(large, large)
+    b = _np_minimum(_np_maximum(b, -6.0), 6.0)   # exposant limité : base^6 suffisant pour GP
+    a = _np_minimum(_np_maximum(a, -100.0), 100.0)  # base clippée : évite pow(large, large)
     with np.errstate(all='ignore'):
-        b_int = np.round(b)
-        is_int = np.abs(b - b_int) < 1e-6
-        r_int  = np.sign(a) * np.power(np.abs(a) + 1e-12, np.abs(b_int))
-        r_int  = np.where(b_int >= 0, r_int, 1.0 / (np.abs(r_int) + 1e-12) * np.sign(r_int))
-        r_real = np.power(np.abs(a) + 1e-12, b)
-        r = np.where(is_int, r_int, r_real)
-    return np.where(np.isfinite(r) & (np.abs(r) < _SAFE_LIMIT), r, 1.0)
+        if np.ndim(b) == 0:
+            b_int = np.round(b)
+            if abs(b - b_int) < 1e-6:
+                r = np.sign(a) * np.power(_np_abs(a) + 1e-12, _np_abs(b_int))
+                if not b_int >= 0:
+                    r = 1.0 / (_np_abs(r) + 1e-12) * np.sign(r)
+            else:
+                r = np.power(_np_abs(a) + 1e-12, b)
+        else:
+            b_int = np.round(b)
+            is_int = np.abs(b - b_int) < 1e-6
+            r_int  = np.sign(a) * np.power(np.abs(a) + 1e-12, np.abs(b_int))
+            r_int  = np.where(b_int >= 0, r_int, 1.0 / (np.abs(r_int) + 1e-12) * np.sign(r_int))
+            r_real = np.power(np.abs(a) + 1e-12, b)
+            r = np.where(is_int, r_int, r_real)
+    return np.where(_np_isfinite(r) & (_np_abs(r) < _SAFE_LIMIT), r, 1.0)
+
+def _np_safe_pow_var(a, b):
+    """[v0.7] Puissance a exposant VARIABLE : |a|^b sur toutes les lignes.
+
+    La branche entiere de _np_safe_pow (sign(a)*|a|^n) sert aux exposants
+    CONSTANTS (pow(u, 3) garde le signe de u). Appliquee ligne par ligne a un
+    exposant variable, elle rendait la fonction discontinue : la ou
+    l'exposant tombait exactement sur un entier, le resultat changeait de
+    signe. Avec la division par max|x|, une colonne vaut exactement ±1 sur
+    sa ligne extreme, donc le cas se produisait a coup sur ; la recherche
+    pouvait s'en servir comme d'un indicateur de ligne, et aucune formule
+    lisible ne reproduisait le modele (561_cpu standardise : formule et
+    predict() en desaccord de 0.97 sur 2 lignes). Memes garde-fous que
+    _np_safe_pow (exposant et base bornes, resultat non fini ou enorme -> 1).
+    """
+    b = _np_minimum(_np_maximum(b, -6.0), 6.0)
+    a = _np_minimum(_np_maximum(a, -100.0), 100.0)
+    with np.errstate(all='ignore'):
+        r = np.power(_np_abs(a) + 1e-12, b)
+    return np.where(_np_isfinite(r) & (_np_abs(r) < _SAFE_LIMIT), r, 1.0)
+
+def _is_const_subtree(node) -> bool:
+    """[v0.7] Vrai si le sous-arbre ne contient aucune variable (x, X[i]) :
+    c'est lui qui decide de la semantique de pow (exposant constant :
+    branche entiere signee ; exposant variable : |a|^b), a la compilation
+    comme dans la formule livree (gp_elite/formula.py)."""
+    if node is None:
+        return True
+    v = node.value
+    if node.left is None and node.right is None:
+        return not (v == "x" or (isinstance(v, str) and v.startswith("X[")))
+    return _is_const_subtree(node.left) and _is_const_subtree(node.right)
 
 def _np_safe_tan(a):
     with np.errstate(all='ignore'):
@@ -2442,8 +2806,8 @@ def _np_safe_exp(a):
     comme exp(-X[:,0]²) sur des valeurs négatives légitimement grandes.
     """
     with np.errstate(over='ignore', invalid='ignore'):
-        r = np.exp(np.clip(a, -88.0, 88.0))
-    return np.where(np.isfinite(r), r, 0.0)
+        r = np.exp(_np_minimum(_np_maximum(a, -88.0), 88.0))
+    return np.where(_np_isfinite(r), r, 0.0)
 
 def _np_safe_log(a):
     return np.log(np.abs(a) + 1e-12)
@@ -2499,6 +2863,7 @@ _NP_GLOBALS = {
     "np":          np,
     "_safe_div":   _np_safe_div,
     "_safe_pow":   _np_safe_pow,
+    "_safe_powv":  _np_safe_pow_var,   # [v0.7] exposant variable
     "_safe_tan":   _np_safe_tan,
     "_safe_exp":   _np_safe_exp,
     "_safe_log":   _np_safe_log,
@@ -2508,6 +2873,28 @@ _NP_GLOBALS = {
     "_max2":       _np_max2,      # [V42] max(a, b) — sélection de branche
     "_min2":       _np_min2,      # [V42] min(a, b) — sélection de branche
 }
+
+def _float_literal(v) -> str:
+    """[v0.8] Littéral Python d'une constante, sûr dans toute expression.
+
+    Jusqu'en 0.7 le compilateur écrivait repr(v) tel quel : sq(-0.5) donnait
+    le code « (-0.5 ** 2) », que Python lit -(0.5 ** 2) = -0.25, puisque **
+    lie plus fort que le moins unaire. evaluate_vector rendait donc -0.25 là
+    où l'arbre, la formule livrée, l'évaluation scalaire et l'optimisation
+    des constantes valent +0.25 (0,8 % des arbres évalués pendant une
+    recherche contenaient ce motif). Les constantes négatives sont désormais
+    parenthésées, et les non-finies écrites float('inf') / float('nan')
+    (leur nom nu levait NameError à l'appel)."""
+    v = float(v)
+    if v != v:
+        return "float('nan')"
+    if v == float("inf"):
+        return "float('inf')"
+    if v == float("-inf"):
+        return "(-float('inf'))"
+    r = repr(v)
+    return "(" + r + ")" if r.startswith("-") else r
+
 
 def _to_np_code(node) -> str:
     """Traduit récursivement un arbre en expression Python/NumPy (string).
@@ -2527,7 +2914,7 @@ def _to_np_code(node) -> str:
         except ValueError:
             return "0.0"
     if isinstance(v, float):
-        return repr(v)
+        return _float_literal(v)             # [v0.8] voir _float_literal
     if v == "+":
         return f"({_to_np_code(node.left)} + {_to_np_code(node.right)})"
     if v == "-":
@@ -2537,7 +2924,8 @@ def _to_np_code(node) -> str:
     if v == "/":
         return f"_safe_div({_to_np_code(node.left)}, {_to_np_code(node.right)})"
     if v == "pow":
-        return f"_safe_pow({_to_np_code(node.left)}, {_to_np_code(node.right)})"
+        fn = "_safe_pow" if _is_const_subtree(node.right) else "_safe_powv"
+        return f"{fn}({_to_np_code(node.left)}, {_to_np_code(node.right)})"
     if v == "sin":
         return f"np.sin({_to_np_code(node.left)})"
     if v == "cos":
@@ -2606,12 +2994,14 @@ def _to_np_code_parametric(node, const_list: list) -> str:
                 return "0.0"
         if isinstance(v, float):
             idx = const_idx.get(id(n))
-            return f"_c[{idx}]" if idx is not None else repr(v)
+            return f"_c[{idx}]" if idx is not None else _float_literal(v)
         if v == "+":   return f"({_code(n.left)} + {_code(n.right)})"
         if v == "-":   return f"({_code(n.left)} - {_code(n.right)})"
         if v == "*":   return f"({_code(n.left)} * {_code(n.right)})"
         if v == "/":   return f"_safe_div({_code(n.left)}, {_code(n.right)})"
-        if v == "pow": return f"_safe_pow({_code(n.left)}, {_code(n.right)})"
+        if v == "pow":
+            fn = "_safe_pow" if _is_const_subtree(n.right) else "_safe_powv"
+            return f"{fn}({_code(n.left)}, {_code(n.right)})"
         if v == "sin":  return f"np.sin({_code(n.left)})"
         if v == "cos":  return f"np.cos({_code(n.left)})"
         if v == "tan":  return f"_safe_tan({_code(n.left)})"
@@ -2634,6 +3024,213 @@ def _to_np_code_parametric(node, const_list: list) -> str:
 
 _PARAMETRIC_CACHE: Dict[int, Any] = {}
 _PARAMETRIC_CACHE_MAX = 2048
+
+
+# ============================================================
+# [v0.8] ÉVALUATION INCRÉMENTALE POUR LEVENBERG-MARQUARDT
+# ============================================================
+# La jacobienne par différences avant réévaluait l'arbre ENTIER pour chaque
+# constante perturbée, alors qu'une constante ne change que les nœuds situés
+# sur le chemin de sa feuille à la racine. On compile donc, par forme d'arbre,
+# une évaluation « en ligne droite » qui garde la valeur de chaque nœud, et
+# pour chaque constante la liste des opérations du chemin feuille -> racine.
+# Chaque colonne ne recalcule que ce chemin, les autres nœuds reprenant leur
+# valeur au point courant. Les opérations et leurs opérandes sont exactement
+# ceux de l'expression compilée (_to_np_code_parametric) : le résultat est le
+# même bit pour bit (vérifié par tests/test_speed_equivalence.py), pour 3 à
+# 5 fois moins de calcul sur la jacobienne.
+
+_LM_UNARY_FN = {
+    "sin":  np.sin, "cos": np.cos, "tan": _np_safe_tan, "tanh": np.tanh,
+    "exp":  _np_safe_exp, "log": _np_safe_log, "sqrt": _np_safe_sqrt,
+    "abs":  np.abs, "is_even": _np_is_even, "step": _np_step,
+}
+_LM_UNARY_SRC = {
+    "sin": "np.sin", "cos": "np.cos", "tan": "_safe_tan", "tanh": "np.tanh",
+    "exp": "_safe_exp", "log": "_safe_log", "sqrt": "_safe_sqrt",
+    "abs": "np.abs", "is_even": "_is_even", "step": "_step",
+}
+_LM_BINARY_SRC = {"/": "_safe_div", "max2": "_max2", "min2": "_min2"}
+_LM_BINARY_FN = {"/": _np_safe_div, "max2": _np_max2, "min2": _np_min2}
+
+
+def _lm_apply(op, a, b):
+    """Une opération binaire telle que l'écrit _to_np_code_parametric."""
+    if op == "+":
+        return a + b
+    if op == "-":
+        return a - b
+    if op == "*":
+        return a * b
+    return op(a, b)          # fonction protégée (_safe_div, _safe_pow, ...)
+
+
+class _LMPlan:
+    """Plan d'évaluation d'une FORME d'arbre (constantes -> _c[j])."""
+    __slots__ = ("full", "cols", "n_consts", "n_values")
+
+
+_LM_PLAN_CACHE: Dict[Any, _LMPlan] = {}
+_LM_PLAN_CACHE_MAX = 2048
+
+
+def _lm_build_plan(node, consts) -> Optional[_LMPlan]:
+    """Construit le plan d'une forme d'arbre, ou None si elle n'est pas
+    compilable (on retombe alors sur l'évaluation complète)."""
+    const_idx = {id(c): i for i, c in enumerate(consts)}
+    lines = []          # code source en ligne droite
+    info = []           # par indice de valeur : (op, [indices enfants], pow_fn)
+    leaf_of_const = {}  # indice de constante -> indice de valeur de sa feuille
+    parent = {}         # indice de valeur -> (indice parent, côté)
+
+    # Parcours post-ordre ITÉRATIF qui reproduit _code() de
+    # _to_np_code_parametric : mêmes enfants visités, mêmes expressions.
+    stack = [(node, False)]
+    out_idx = []        # pile des indices produits
+    while stack:
+        n, done = stack.pop()
+        if not done:
+            if n is None:
+                k = len(info); info.append(("lit", [], None))
+                lines.append(f"    v{k} = 0.0")
+                out_idx.append(k)
+                continue
+            v = n.value
+            if v == "x":
+                k = len(info); info.append(("leaf", [], None))
+                lines.append(f"    v{k} = _x")
+                out_idx.append(k)
+                continue
+            if isinstance(v, str) and v.startswith("X[") and v.endswith("]"):
+                k = len(info)
+                try:
+                    lines.append(f"    v{k} = _x[:, {int(v[2:-1])}]")
+                    info.append(("leaf", [], None))
+                except ValueError:
+                    lines.append(f"    v{k} = 0.0")
+                    info.append(("lit", [], None))
+                out_idx.append(k)
+                continue
+            if isinstance(v, float):
+                j = const_idx.get(id(n))
+                if j is None:
+                    return None
+                k = len(info); info.append(("const", [], None))
+                lines.append(f"    v{k} = _c[{j}]")
+                leaf_of_const[j] = k
+                out_idx.append(k)
+                continue
+            if v in ("+", "-", "*", "/", "pow", "max2", "min2"):
+                stack.append((n, True))
+                stack.append((n.right, False))
+                stack.append((n.left, False))
+                continue
+            if v in _LM_UNARY_SRC or v in ("neg", "sq", "cube"):
+                stack.append((n, True))
+                stack.append((n.left, False))
+                continue
+            # opérateur inconnu : l'expression compilée écrit 0.0 sans
+            # évaluer les enfants
+            k = len(info); info.append(("lit", [], None))
+            lines.append(f"    v{k} = 0.0")
+            out_idx.append(k)
+            continue
+        v = n.value
+        k = len(info)
+        if v in ("+", "-", "*", "/", "pow", "max2", "min2"):
+            b = out_idx.pop(); a = out_idx.pop()
+            if v in ("+", "-", "*"):
+                lines.append(f"    v{k} = (v{a} {v} v{b})")
+                info.append((v, [a, b], None))
+            elif v == "pow":
+                fname = "_safe_pow" if _is_const_subtree(n.right) else "_safe_powv"
+                lines.append(f"    v{k} = {fname}(v{a}, v{b})")
+                info.append((_NP_GLOBALS[fname], [a, b], None))
+            else:
+                lines.append(f"    v{k} = {_LM_BINARY_SRC[v]}(v{a}, v{b})")
+                info.append((_LM_BINARY_FN[v], [a, b], None))
+            parent[a] = (k, 0)
+            parent[b] = (k, 1)
+        else:
+            a = out_idx.pop()
+            if v == "neg":
+                lines.append(f"    v{k} = (-v{a})")
+            elif v == "sq":
+                lines.append(f"    v{k} = (v{a} ** 2)")
+            elif v == "cube":
+                lines.append(f"    v{k} = (v{a} ** 3)")
+            else:
+                lines.append(f"    v{k} = {_LM_UNARY_SRC[v]}(v{a})")
+            info.append((v, [a], None))
+            parent[a] = (k, 0)
+        out_idx.append(k)
+
+    root = out_idx.pop()
+    names = ", ".join(f"v{k}" for k in range(len(info)))
+    src = ("def _full(_x, _c):\n" + "\n".join(lines) +
+           f"\n    return v{root}, ({names},)\n")
+    globs = dict(_NP_GLOBALS)
+    try:
+        exec(src, globs)
+    except Exception:
+        return None
+
+    cols = []
+    for j in range(len(consts)):
+        k = leaf_of_const.get(j)
+        if k is None:
+            cols.append(None)            # constante sans effet sur la sortie
+            continue
+        steps = []
+        while k in parent:
+            pk, side = parent[k]
+            op, ch, _ = info[pk]
+            if len(ch) == 2:
+                steps.append((op, side, ch[1 - side]))
+            else:
+                steps.append((op, -1, -1))
+            k = pk
+        cols.append((leaf_of_const[j], tuple(steps)))
+    plan = _LMPlan()
+    plan.full = globs["_full"]
+    plan.cols = cols
+    plan.n_consts = len(consts)
+    plan.n_values = len(info)
+    return plan
+
+
+def _lm_plan(node, consts) -> Optional[_LMPlan]:
+    key = (node.canonical_hash(), len(consts))
+    plan = _LM_PLAN_CACHE.get(key)
+    if plan is None and key not in _LM_PLAN_CACHE:
+        plan = _lm_build_plan(node, consts)
+        _LM_PLAN_CACHE[key] = plan
+        if len(_LM_PLAN_CACHE) > _LM_PLAN_CACHE_MAX:
+            for old_key in list(_LM_PLAN_CACHE.keys())[:256]:
+                del _LM_PLAN_CACHE[old_key]
+    return plan
+
+
+def _lm_column(plan, j, cv, values):
+    """Valeur de la racine quand seule la constante j vaut cv[j] (les
+    autres nœuds gardent `values`, calculées au point courant)."""
+    col = plan.cols[j]
+    t = cv[j]
+    for op, side, sib in col[1]:
+        if side < 0:                         # unaire
+            if op == "neg":
+                t = -t
+            elif op == "sq":
+                t = t ** 2
+            elif op == "cube":
+                t = t ** 3
+            else:
+                t = _LM_UNARY_FN[op](t)
+        elif side == 0:
+            t = _lm_apply(op, t, values[sib])
+        else:
+            t = _lm_apply(op, values[sib], t)
+    return t
 
 
 def compile_parametric(node) -> Tuple[Any, list]:
@@ -2674,8 +3271,11 @@ def compile_to_numpy(node):
     """
     Compile l'arbre en f(x_array) -> np.ndarray, mis en cache par hash structural.
     Utilisé par evaluate_vector et raw_mse.
+    [v0.7] Indexé par exact_hash : les constantes sont écrites en dur dans le
+    code compilé, deux arbres qui ne diffèrent qu'au-delà de la 4e décimale
+    ne peuvent pas partager une fonction.
     """
-    h = node.structural_hash()
+    h = node.exact_hash()
     if h in _COMPILE_CACHE:
         return _COMPILE_CACHE[h]
     code = _to_np_code(node)
@@ -2755,6 +3355,76 @@ def evaluate(node, x) -> float:
         return 0.0
     return 0.0
 
+# [v0.8] INTERPRÉTEUR — même calcul que le code compilé, sans le compiler.
+# Compiler un arbre (génération du source, compile(), exec) coûte ~5 µs par
+# nœud, et la grande majorité des arbres de la recherche ne sont évalués
+# qu'une ou deux fois : 11 % du temps total y passait. L'interpréteur applique
+# nœud par nœud EXACTEMENT les opérations qu'écrit _to_np_code (mêmes
+# fonctions, mêmes opérandes, mêmes littéraux) ; le code compilé n'est plus
+# produit que pour un arbre évalué au moins _COMPILE_AFTER fois. Mêmes
+# valeurs bit pour bit (tests/test_speed_equivalence.py). Les arbres de plus
+# de _INTERP_MAX_DEPTH niveaux passent toujours par le compilateur, pour en
+# garder le comportement exact (y compris ses replis).
+
+_INTERP_MAX_DEPTH = 100
+_COMPILE_AFTER = 3
+_EVAL_COUNTS: Dict[int, int] = {}
+_NAN = float("nan")
+
+
+class _InterpTooDeep(Exception):
+    pass
+
+
+def _sq(a):
+    return a ** 2
+
+
+def _cube(a):
+    return a ** 3
+
+
+_INTERP_BINARY = {"+": operator.add, "-": operator.sub, "*": operator.mul,
+                  "/": _np_safe_div, "max2": _np_max2, "min2": _np_min2}
+_INTERP_UNARY = {"sin": np.sin, "cos": np.cos, "tan": _np_safe_tan,
+                 "tanh": np.tanh, "exp": _np_safe_exp, "log": _np_safe_log,
+                 "sqrt": _np_safe_sqrt, "abs": np.abs, "neg": operator.neg,
+                 "sq": _sq, "cube": _cube, "is_even": _np_is_even,
+                 "step": _np_step}
+
+
+def _interp(n, x, d):
+    """Valeur de l'arbre n sur x, selon les règles de _to_np_code."""
+    if n is None:
+        return 0.0
+    v = n.value
+    if v == "x":
+        return x
+    if isinstance(v, str) and v.startswith("X[") and v.endswith("]"):
+        try:
+            idx = int(v[2:-1])
+        except ValueError:
+            return 0.0
+        return x[:, idx]
+    if isinstance(v, float):
+        v = float(v)                       # le littéral de _float_literal
+        return _NAN if v != v else v
+    if not isinstance(v, str):             # _to_np_code : aucun opérateur
+        return 0.0
+    if d >= _INTERP_MAX_DEPTH:
+        raise _InterpTooDeep()
+    f = _INTERP_BINARY.get(v)
+    if f is not None:
+        return f(_interp(n.left, x, d + 1), _interp(n.right, x, d + 1))
+    f = _INTERP_UNARY.get(v)
+    if f is not None:
+        return f(_interp(n.left, x, d + 1))
+    if v == "pow":
+        f = _np_safe_pow if _is_const_subtree(n.right) else _np_safe_pow_var
+        return f(_interp(n.left, x, d + 1), _interp(n.right, x, d + 1))
+    return 0.0
+
+
 def evaluate_vector(node, xs) -> np.ndarray:
     """Évalue sur un vecteur (1-D) ou une matrice (N-D) via le compilateur NumPy.
     [v16-NDIM]
@@ -2762,13 +3432,38 @@ def evaluate_vector(node, xs) -> np.ndarray:
       · xs 2-D (n_samples, n_features) → mode N-D, _x[:, i] accès par feature
     La fonction compilée reçoit _x tel quel ; _to_np_code génère le bon indexage.
     """
-    fn = compile_to_numpy(node)
+    h = node.exact_hash()
+    fn = _COMPILE_CACHE.get(h)
+    if fn is None:
+        k = _EVAL_COUNTS.get(h, 0) + 1
+        if k >= _COMPILE_AFTER:
+            fn = compile_to_numpy(node)
+            _EVAL_COUNTS.pop(h, None)
+        else:
+            _EVAL_COUNTS[h] = k
+            if len(_EVAL_COUNTS) > 65536:
+                _EVAL_COUNTS.clear()
     if isinstance(xs, np.ndarray):
         x_in = xs
     else:
         x_in = np.asarray(xs, dtype=float)
+    if fn is None:
+        try:
+            with np.errstate(all="ignore"):
+                r = _interp(node, x_in, 0)
+        except _InterpTooDeep:
+            fn = compile_to_numpy(node)
+        except Exception:
+            n_rows = xs.shape[0] if isinstance(xs, np.ndarray) else len(xs)
+            return np.zeros(n_rows)
     try:
-        r = fn(x_in)
+        # [v0.7] sq/cube/* ne sont pas proteges : un debordement donne inf,
+        # remplace juste apres. Sans errstate, NumPy imprimait des
+        # « RuntimeWarning: overflow » chez l'utilisateur (sans effet sur le
+        # resultat, qui est identique).
+        if fn is not None:
+            with np.errstate(all="ignore"):
+                r = fn(x_in)
         n_rows = x_in.shape[0]
         r = np.asarray(r, dtype=float)
         if r.shape == ():          # scalaire → broadcast
@@ -2778,7 +3473,7 @@ def evaluate_vector(node, xs) -> np.ndarray:
         # éviter tout overflow en aval (R², carré). Borne large (1e12) qui ne
         # change rien aux prédictions normales mais neutralise les explosions.
         r = np.where(np.isfinite(r), r, 0.0)
-        return np.clip(r, -1e12, 1e12)
+        return _np_minimum(_np_maximum(r, -1e12), 1e12)
     except Exception:
         n_rows = xs.shape[0] if isinstance(xs, np.ndarray) else len(xs)
         return np.zeros(n_rows)
@@ -3309,12 +4004,18 @@ def _predict_cached(node, xs_np):
     # Sans cela, une prédiction calculée sur le TRAIN (134 pts) était renvoyée
     # pour une requête sur le dataset COMPLET (168 pts) → mismatch de forme →
     # exception silencieuse → MSE rapporté à 1e6 alors que le modèle est bon.
-    h = (node.structural_hash(), id(xs_np), xs_np.shape[0])
-    r = _PRED_CACHE.get(h)
-    if r is not None:
-        return r
+    # [v0.8] id() n'identifie un tableau que tant qu'il existe : une fois
+    # libéré, son adresse peut être réattribuée à un AUTRE tableau de même
+    # taille, qui recevrait alors les prédictions du premier. Les appels du
+    # moteur passent des tableaux qui vivent tout l'ajustement, mais rien ne
+    # l'imposait : l'entrée garde désormais une référence faible au tableau
+    # et n'est servie que pour lui.
+    h = (node.exact_hash(), id(xs_np), xs_np.shape[0])   # [v0.7] exact
+    e = _PRED_CACHE.get(h)
+    if e is not None and e[0]() is xs_np:
+        return e[1]
     preds = evaluate_vector(node, xs_np)
-    _PRED_CACHE[h] = preds
+    _PRED_CACHE[h] = (weakref.ref(xs_np), preds)
     if len(_PRED_CACHE) > _PRED_CACHE_MAX:
         for _ in range(1024):
             if _PRED_CACHE:
@@ -3428,6 +4129,169 @@ def _make_motif_seeds(cfg, n_max: int = 32) -> list:
         add(builders[k % len(builders)])
         k += 1
     return out[:n_max]
+
+
+# ════════════════════════════════════════════════════════════════
+# [v0.8] GRAINES DE LOI DE PUISSANCE
+# ════════════════════════════════════════════════════════════════
+# Constat (campagne 2 du banc de décision, 205 ajustements Feynman à 30 s) :
+# des lois qui ne sont qu'un produit de puissances des variables, comme
+# I.12.2 q1·q2/(4π·ε·r²), I.32.5 ou III.19.51, étaient retrouvées 1, 2 et 0
+# fois sur 5 ; les autres ajustements rendaient des formules de 50 à 70
+# nœuds. Or une loi y = c·Π x_j^a_j est une droite en échelle log :
+# log|y| = log|c| + Σ a_j·log|x_j|. Quand la cible et des colonnes gardent
+# un signe constant, les moindres carrés sur les logarithmes donnent les
+# exposants, et la normalisation par max|x| ne les change pas. On place dans
+# la population initiale le monôme aux exposants arrondis au demi-entier
+# (la forme d'une loi physique usuelle) et, si le pool contient `pow`, le
+# monôme aux exposants ajustés (loi empirique : Levenberg-Marquardt affine
+# ensuite ces exposants), et seulement si les données sont bien celles d'une
+# loi de puissance : le monôme doit expliquer au moins 99,9 % de la variance
+# de log|y| (_POWER_LAW_MIN_R2). Ce ne sont que deux individus par île, parmi
+# une centaine, jugés comme les autres. Aucun tirage aléatoire : sans colonne de signe
+# constant ou avec une cible qui change de signe (données centrées), rien
+# n'est injecté et l'ajustement est celui d'avant. Hors du mode CSV
+# générique, sous `units=` (population typée) et en mode extrapolation
+# (où les motifs sont déjà coupés), rien n'est injecté non plus.
+
+_POWER_LAW_MIN_R2 = 0.999    # part de la variance de log|y| que le monôme doit expliquer
+
+
+def _power_law_exponents(X, y):
+    """Exposants (a_j) de |y| ≈ c·Π |x_j|^a_j par moindres carrés sur les
+    logarithmes, pour les colonnes de signe constant. Rend (cols, a) ou
+    None si la cible change de signe, si aucune colonne ne convient, si le
+    système est dégénéré, ou si le monôme n'explique pas au moins 99,9 % de
+    la variance de log|y|.
+
+    [v0.8] Ce dernier seuil vient de la campagne 6 : sans lui, sur données
+    réelles, un monôme ajusté à des données qui n'en sont pas un (228_elusage :
+    X0^-3,38, R² log-log 0,81) gagnait la sélection et s'effondrait hors du
+    domaine (R² -12). Les lois de Feynman qui sont des monômes ont un R²
+    log-log de 1 ; les six jeux réels et nikuradse_1, 0,93 au plus."""
+    n = y.shape[0]
+    with np.errstate(all="ignore"):
+        if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
+            return None
+        if not (np.all(y > 0) or np.all(y < 0)):
+            return None
+        cols = [j for j in range(X.shape[1])
+                if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
+        if not cols or n < len(cols) + 3:
+            return None
+        A = np.column_stack([np.ones(n), np.log(np.abs(X[:, cols]))])
+        try:
+            coef, _res, rank, _sv = np.linalg.lstsq(A, np.log(np.abs(y)),
+                                                    rcond=None)
+        except Exception:
+            return None
+    if rank < A.shape[1] or not np.all(np.isfinite(coef)):
+        return None
+    ly = np.log(np.abs(y))
+    v = float(np.var(ly))
+    if not v > 0.0:
+        return None
+    with np.errstate(all="ignore"):
+        r2 = 1.0 - float(np.var(ly - A @ coef)) / v
+    if not r2 >= _POWER_LAW_MIN_R2:
+        return None
+    return cols, coef[1:]
+
+
+def _half_integer_power(term: str, e2: int, uops) -> Optional["Node"]:
+    """x^(e2/2) pour e2 > 0, avec les seuls opérateurs du pool (sq, cube,
+    sqrt, *). None si une racine est nécessaire et que sqrt manque."""
+    n_int, half = divmod(e2, 2)
+
+    def ipow(k: int) -> "Node":
+        if k == 1:
+            return Node(term)
+        if k == 3 and "cube" in uops:
+            return Node("cube", Node(term))
+        if k % 2 == 0:
+            h = ipow(k // 2)
+            return Node("sq", h) if "sq" in uops else Node("*", h, ipow(k // 2))
+        return Node("*", Node(term), ipow(k - 1))
+
+    factors = []
+    if n_int:
+        factors.append(ipow(n_int))
+    if half:
+        if "sqrt" not in uops:
+            return None
+        factors.append(Node("sqrt", Node(term)))
+    out = factors[0]
+    for f in factors[1:]:
+        out = Node("*", out, f)
+    return out
+
+
+def _product(nodes: list) -> Optional["Node"]:
+    if not nodes:
+        return None
+    out = nodes[0]
+    for f in nodes[1:]:
+        out = Node("*", out, f)
+    return out
+
+
+def _make_power_law_seeds(xs, ys, cfg) -> list:
+    """[v0.8] Voir le commentaire ci-dessus. Rend 0, 1 ou 2 arbres."""
+    if not _GENERIC_CSV_MODE or _dim_active(cfg) \
+            or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) \
+            or not bool(getattr(cfg, "POWER_LAW_SEEDS", True)):
+        return []
+    terms = list(getattr(cfg, "TERMINALS", []) or [])
+    try:
+        X = np.asarray(xs, dtype=float)
+        y = np.asarray(ys, dtype=float)
+    except Exception:
+        return []
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+    if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
+            or X.shape[1] != len(terms):
+        return []
+    fit = _power_law_exponents(X, y)
+    if fit is None:
+        return []
+    cols, expo = fit
+    bops = set(_GENERIC_BINARY_OPS)
+    uops = set(_GENERIC_UNARY_OPS)
+    seeds = []
+
+    # 1) exposants arrondis au demi-entier le plus proche
+    e2s = [int(round(2.0 * float(a))) for a in expo]
+    if all(abs(e2) <= 12 for e2 in e2s) and any(e2s):
+        num, den, ok = [], [], True
+        for j, e2 in zip(cols, e2s):
+            if e2 == 0:
+                continue
+            f = _half_integer_power(terms[j], abs(e2), uops)
+            if f is None:
+                ok = False
+                break
+            (num if e2 > 0 else den).append(f)
+        if ok and (not den or "/" in bops):
+            top, bot = _product(num), _product(den)
+            if bot is None:
+                seeds.append(top)
+            else:
+                seeds.append(Node("/", top if top is not None else Node(1.0), bot))
+
+    # 2) exposants ajustés, si le pool a pow et qu'ils ne sont pas déjà
+    #    des demi-entiers (sinon la graine 1 les contient)
+    if "pow" in bops and float(np.max(np.abs(2.0 * expo - np.round(2.0 * expo)))) > 0.04:
+        facs = [Node("pow", Node(terms[j]), Node(round(float(a), 4)))
+                for j, a in zip(cols, expo) if abs(float(a)) >= 0.02]
+        if facs:
+            seeds.append(_product(facs))
+
+    if seeds:
+        TRACE.set("power_law_seed", "exposants %s ; %d graine(s) : %s" % (
+            ", ".join("%s^%.3g" % (terms[j], float(a)) for j, a in zip(cols, expo)),
+            len(seeds), " | ".join(to_string(s) for s in seeds)))
+    return seeds
 
 
 # [CUSTOM-LOSS PARSIMONY] Poids de la pénalité de taille pour la loss custom
@@ -3647,6 +4511,50 @@ def _pure_mse(node, xs, ys) -> float:
         return 1e6
 
 
+def _target_scale(y):
+    """[v0.8] Power of ten by which the target is divided during the search
+    when its spread is far from 1 (standard deviation outside [1e-3, 1e3],
+    or the largest |y| when y is constant). The engine has absolute
+    thresholds tuned for targets of ordinary size: up to 0.7, a law whose
+    values were of order 1e-9 (a capacitance in farads, an energy in joules
+    of one molecule) or 1e20 came back as a constant or a wrong line, with a
+    negative R², and no warning. The delivered model, its formula and its
+    MSEs are in the units of y; within [1e-3, 1e3] nothing changes."""
+    y = np.asarray(y, dtype=float)
+    m = float(np.max(np.abs(y))) if y.size else 0.0
+    if not (m > 0.0 and np.isfinite(m)):
+        return 1.0
+    sd = m * float(np.std(y / m))       # sans débordement pour |y| ~ 1e200
+    ref = sd if sd > 0 else m
+    if not (ref > 0.0 and np.isfinite(ref)) or 1e-3 <= ref <= 1e3:
+        return 1.0
+    return 10.0 ** round(math.log10(ref))
+
+
+def _scale_tree(tree, s: float):
+    """[v0.8] L'arbre multiplié par s, en repliant s dans les constantes de
+    tête quand l'arbre porte déjà sa mise à l'échelle (a + b·f, ou b·f sous
+    units=), pour que la constante de tête reste lisible (et que la
+    constante déduite par unknown_constant reste la bonne)."""
+    if tree is None or s == 1.0:
+        return tree
+    const = lambda n: (n is not None and n.left is None and n.right is None
+                       and not isinstance(n.value, str))
+    t = tree.copy()
+    if t.value == "*" and const(t.left):
+        t.left = Node(float(s) * float(t.left.value))
+        return t
+    if t.value == "+" and const(t.left) and t.right is not None \
+            and t.right.value == "*" and const(t.right.left):
+        t.left = Node(float(s) * float(t.left.value))
+        t.right.left = Node(float(s) * float(t.right.left.value))
+        t.right._hash = t.right._chash = t.right._ehash = None
+        return t
+    if const(t):
+        return Node(float(s) * float(t.value))
+    return Node("*", Node(float(s)), t)
+
+
 def wrap_linear_scaling(node, xs, ys):
     """
     [v18-LS] Matérialise le scaling optimal dans l'arbre :  a + b·f(x).
@@ -3773,60 +4681,6 @@ def count_distinct_features(node: "Node", terminals: List[str]) -> int:
 def fitness(node, xs: List[float], ys: List[float], cfg: Config,
             role: str = "explorer") -> float:
     """
-    [v14.4 — Asymétrie des Îles] Fitness conditionnelle selon le rôle de l'île.
-
-    Chaque île évalue les individus avec sa propre métrique, ce qui crée une
-    pression sélective spécialisée sans pour autant contraindre toutes les îles
-    au même régime. La migration fait ensuite circuler les bons individus entre
-    les îles, permettant à l'exploratrice de fournir des sous-structures
-    complexes que la nettoyeuse simplifiera ensuite.
-
-    ── role == "cleaner" (Île Nettoyeuse) ──────────────────────────────────────
-    Métrique BIC stricte (v14.x) :
-        fitness = n·ln(max(MSE_pur, 1e-15)) + k·ln(n) + γ·n_adj²·ln(n)
-    Rasoir d'Ockham forcé : les constantes ajustées et les introns coûtent cher.
-    But : détruire le bloat, promouvoir l'élégance symbolique.
-
-    ── role == "explorer" ou "stigmergic" (Îles Exploratrices) ────────────────
-    Métrique v13.12 : MSE hybride (Pearson+MSE) + pénalité linéaire plafonnée.
-        base      = raw_mse(node, xs, ys)          # fitness hybride Pearson+MSE
-        size_pen  = tree_size(node) * cfg.PARSIMONY
-        depth_pen = tree_depth(node) * cfg.DEPTH_PENALTY
-        penalty   = min(size_pen + depth_pen, 0.05 * base + 1e-8)
-        fitness   = base + penalty
-    Liberté de construire des sous-structures complexes comme sin(1/x) sans
-    être massacrée par le BIC lors de la phase d'assemblage transitoire.
-
-    Cache : clé (hash, role) — un même arbre peut avoir deux scores différents
-    selon le rôle. Invalidation via _fitness_cache.clear() à chaque génération.
-    """
-    h   = node.structural_hash()
-    key = (h, role)
-    if key in _fitness_cache:
-        return _fitness_cache[key]
-
-    if role == "cleaner":
-        # ── BIC strict (v14.2) ───────────────────────────────────────────────
-        mse_pur      = _pure_mse(node, xs, ys)
-        n            = len(ys)
-        k, n_adj     = tree_complexity(node)
-        ln_n         = math.log(n)
-        mse_safe     = max(mse_pur, 1e-15)
-        score        = (n * math.log(mse_safe)
-                        + k * ln_n
-                        + _FLOAT_GAMMA * (n_adj ** 2) * ln_n)
-    else:
-        # ── Explorer / Stigmergic : MSE hybride + pénalité linéaire (v13.12) ─
-        base      = raw_mse(node, xs, ys)
-        size_pen  = tree_size(node)  * cfg.PARSIMONY
-        depth_pen = tree_depth(node) * cfg.DEPTH_PENALTY
-        max_pen   = 0.05 * base + 1e-8
-        penalty   = min(size_pen + depth_pen, max_pen)
-        score     = base + penalty
-
-def fitness(node, xs: List[float], ys: List[float], cfg: Config,
-            role: str = "explorer") -> float:
-    """
     [v14.4] Fitness conditionnelle par rôle d'île.
     [FIX-A v17] Pénalité mono-feature : force l'exploration multi-variable
     en mode Syracuse — corrige le blocage sur X[2] seul.
@@ -3845,7 +4699,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
         TRACE.bump("candidats_rejetes_dim")     # [v0.7]
         return float("inf")
 
-    h   = node.structural_hash()
+    h   = node.exact_hash()          # [v0.7] exact : voir Node.exact_hash
     # [OPT] Bucket générationnel : même individu → même fitness pendant 10 gens
     gen_bucket = getattr(cfg, '_gen_bucket', 0)
     key = (h, role, gen_bucket)
@@ -3977,6 +4831,12 @@ def _is_const(n, v: float) -> bool:
 
 _SIMPLIFY_CACHE: dict = {}   # hash → simplified Node (resets each generation)
 
+
+def _clear_simplify_caches():
+    """Vide le cache de simplification et ceux qui en dépendent."""
+    _SIMPLIFY_CACHE.clear()
+    _TRIVIAL_CACHE.clear()
+
 def simplify(node: Node) -> Node:
     """Simplification algébrique avec cache structurel.
 
@@ -3991,7 +4851,7 @@ def simplify(node: Node) -> Node:
     """
     if node is None:
         return node
-    h = node.structural_hash()
+    h = node.exact_hash()                    # [v0.7] exact : voir Node.exact_hash
     cached = _SIMPLIFY_CACHE.get(h)
     if cached is not None:
         return cached.copy()                 # jamais d'objet partagé
@@ -4003,95 +4863,115 @@ def simplify(node: Node) -> Node:
 def _simplify_tree(root: Node) -> Node:
     """Post-ordre itératif : reconstruit une copie simplifiée de bas en haut.
     Ne mute jamais l'entrée ; chaque nœud produit est neuf ou appartient
-    exclusivement au sous-arbre en construction (zéro partage)."""
+    exclusivement au sous-arbre en construction (zéro partage).
+    [v0.8] Une feuille est recopiée directement : aucune règle ne s'applique
+    à un nœud sans enfant (_simplify_node rendait Node(v)), et sa forme en
+    cache ne peut être qu'elle-même. Mêmes arbres, deux fois moins d'appels."""
     if root is None:
         return None
     out: dict = {}                      # id(noeud original) -> Node simplifié neuf
     stack = [(root, False)]
+    pop = stack.pop
+    push = stack.append
+    cache_get = _SIMPLIFY_CACHE.get
     while stack:
-        nd, processed = stack.pop()
+        nd, processed = pop()
         if processed:
             l = out.pop(id(nd.left))  if nd.left  is not None else None
             r = out.pop(id(nd.right)) if nd.right is not None else None
             out[id(nd)] = _simplify_node(nd.value, l, r)
-        else:
-            # Cache structurel au niveau du sous-arbre (lecture seule, copie)
-            c = _SIMPLIFY_CACHE.get(nd.structural_hash())
-            if c is not None:
-                out[id(nd)] = c.copy()
-                continue
-            stack.append((nd, True))
-            if nd.left  is not None: stack.append((nd.left,  False))
-            if nd.right is not None: stack.append((nd.right, False))
+            continue
+        left = nd.left
+        right = nd.right
+        if left is None and right is None:
+            out[id(nd)] = Node(nd.value)
+            continue
+        # Cache structurel au niveau du sous-arbre (lecture seule, copie)
+        h = nd._ehash
+        c = cache_get(h if h is not None else nd.exact_hash())
+        if c is not None:
+            out[id(nd)] = c.copy()
+            continue
+        push((nd, True))
+        if left  is not None: push((left,  False))
+        if right is not None: push((right, False))
     return out[id(root)]
+
+
+_UNARY_FOLD = frozenset(("sin", "cos", "tan", "tanh", "exp", "log", "sqrt",
+                         "abs", "neg", "sq", "cube"))
 
 
 def _simplify_node(v, left, right) -> Node:
     """Applique les règles algébriques à UN nœud dont les enfants sont déjà
     simplifiés. left/right appartiennent exclusivement à l'appelant : les
-    réutiliser dans le résultat est sûr (aucun partage inter-arbres)."""
+    réutiliser dans le résultat est sûr (aucun partage inter-arbres).
+    [v0.8] Mêmes règles, dans le même ordre ; tests d'appartenance par
+    ensemble et prédicats _is_float/_is_const calculés une fois."""
+    lf = left is not None and isinstance(left.value, float)
+    rf = right is not None and isinstance(right.value, float)
     # Repliage des constantes unaires (inclut tanh)
-    if v in ("sin", "cos", "tan", "tanh", "exp", "log", "sqrt", "abs", "neg", "sq", "cube"):
-        if _is_float(left):
-            try:
-                c = left.value
-                if v == "sin":   return Node(float(math.sin(c)))
-                if v == "cos":   return Node(float(math.cos(c)))
-                if v == "tan":   return Node(float(safe_tan(c)))
-                if v == "tanh":  return Node(float(math.tanh(c)))
-                if v == "exp":   return Node(float(safe_exp(c)))
-                if v == "log":   return Node(float(safe_log(c)))
-                if v == "sqrt":  return Node(float(safe_sqrt(c)))
-                if v == "abs":   return Node(float(abs(c)))
-                if v == "neg":   return Node(float(-c))
-                if v == "sq":    return Node(float(c * c))
-                if v == "cube":  return Node(float(c * c * c))
-            except Exception:
-                pass
+    if lf and v in _UNARY_FOLD:
+        try:
+            c = left.value
+            if v == "sin":   return Node(float(math.sin(c)))
+            if v == "cos":   return Node(float(math.cos(c)))
+            if v == "tan":   return Node(float(safe_tan(c)))
+            if v == "tanh":  return Node(float(math.tanh(c)))
+            if v == "exp":   return Node(float(safe_exp(c)))
+            if v == "log":   return Node(float(safe_log(c)))
+            if v == "sqrt":  return Node(float(safe_sqrt(c)))
+            if v == "abs":   return Node(float(abs(c)))
+            if v == "neg":   return Node(float(-c))
+            if v == "sq":    return Node(float(c * c))
+            if v == "cube":  return Node(float(c * c * c))
+        except Exception:
+            pass
 
-    # Règles binaires identitaires
+    # Règles binaires identitaires (_is_const(n, k) = n flottant et
+    # |n.value - k| < 1e-9)
     if v == "+":
-        if _is_const(right, 0):  return left
-        if _is_const(left,  0):  return right
+        if rf and abs(right.value - 0) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return right
         # expr + expr -> 2.0 * expr
         if (left is not None and right is not None
-                and not _is_float(left) and not _is_float(right)
-                and left.structural_hash() == right.structural_hash()):
+                and not lf and not rf
+                and left.exact_hash() == right.exact_hash()):
             return Node("*", Node(2.0), left)
-    if v == "-":
-        if _is_const(right, 0):  return left
-        if _is_const(left,  0):  return Node("neg", right)
-        if left and right and left.structural_hash() == right.structural_hash():
+    elif v == "-":
+        if rf and abs(right.value - 0) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return Node("neg", right)
+        if left and right and left.exact_hash() == right.exact_hash():
             return Node(0.0)
-    if v == "*":
-        if _is_const(right, 1):  return left
-        if _is_const(left,  1):  return right
-        if _is_const(right, 0):  return Node(0.0)
-        if _is_const(left,  0):  return Node(0.0)
-        if _is_const(right, -1): return Node("neg", left)
-        if _is_const(left,  -1): return Node("neg", right)
-        if _is_float(right) and abs(right.value) < 1e-6: return Node(0.0)
-        if _is_float(left)  and abs(left.value)  < 1e-6: return Node(0.0)
-    if v == "/":
-        if _is_const(right, 1):  return left
-        if _is_const(left,  0):  return Node(0.0)
-        if left and right and left.structural_hash() == right.structural_hash():
+    elif v == "*":
+        if rf and abs(right.value - 1) < 1e-9:  return left
+        if lf and abs(left.value - 1) < 1e-9:   return right
+        if rf and abs(right.value - 0) < 1e-9:  return Node(0.0)
+        if lf and abs(left.value - 0) < 1e-9:   return Node(0.0)
+        if rf and abs(right.value - -1) < 1e-9: return Node("neg", left)
+        if lf and abs(left.value - -1) < 1e-9:  return Node("neg", right)
+        if rf and abs(right.value) < 1e-6: return Node(0.0)
+        if lf and abs(left.value)  < 1e-6: return Node(0.0)
+    elif v == "/":
+        if rf and abs(right.value - 1) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return Node(0.0)
+        if left and right and left.exact_hash() == right.exact_hash():
             return Node(1.0)
         # (a * b) / a = b  et  (a * b) / b = a
         if left is not None and left.value == "*":
-            lh = left.left.structural_hash()  if left.left  else None
-            rh = left.right.structural_hash() if left.right else None
-            dh = right.structural_hash()      if right      else None
+            lh = left.left.exact_hash()  if left.left  else None
+            rh = left.right.exact_hash() if left.right else None
+            dh = right.exact_hash()      if right      else None
             if lh and lh == dh: return left.right
             if rh and rh == dh: return left.left
-    if v == "pow":
-        if _is_const(right, 0):  return Node(1.0)
-        if _is_const(right, 1):  return left
-        if _is_const(left,  0):  return Node(0.0)
-        if _is_const(left,  1):  return Node(1.0)
+    elif v == "pow":
+        if rf and abs(right.value - 0) < 1e-9:  return Node(1.0)
+        if rf and abs(right.value - 1) < 1e-9:  return left
+        if lf and abs(left.value - 0) < 1e-9:   return Node(0.0)
+        if lf and abs(left.value - 1) < 1e-9:   return Node(1.0)
 
     # Repliage des constantes binaires
-    if v in BINARY_OPS and _is_float(left) and _is_float(right):
+    if lf and rf and v in BINARY_OPS:
         a, b = left.value, right.value
         try:
             if v == "+":   return Node(float(a + b))
@@ -4119,6 +4999,7 @@ def _invalidate_all_hashes(node: Node):
         n = stack.pop()
         n._hash  = None
         n._chash = None
+        n._ehash = None
         if n.left:  stack.append(n.left)
         if n.right: stack.append(n.right)
 
@@ -4138,24 +5019,20 @@ def optimize_constants_lm(node: Node,
     Coût/itération : (n_consts+1) évaluations vectorisées (Jacobienne par
     différences avant) + résolution d'un système n_consts×n_consts.
     Déterministe (aucun redémarrage bruité) → runs reproductibles.
+    [v0.8] Jacobienne incrémentale (_lm_plan) : chaque colonne ne recalcule
+    que le chemin de la constante à la racine. Mêmes valeurs bit pour bit.
     """
     child = node.copy()
-    fn, consts = compile_parametric(child)
-    if not consts or fn is None:
-        return child
-
-    nC = len(consts)
     y  = np.asarray(ys, dtype=float)
-    c  = np.array([cn.value for cn in consts], dtype=float)
-    lo_b = float(cfg.ERC_MIN) * 3.0
-    hi_b = float(cfg.ERC_MAX) * 3.0
+    _varpro = _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
+    _ls_scale_only = _LS_SCALE_ONLY
+    _ym = float(y.mean())
+    _yc = y - _ym
     _LM_NUM_CLIP = 1e150   # [v0.4] borne anti-overflow : au-dela, r@r ou J.T@J
                            # depassent float64. sq/cube/* ne sont pas bornes par
                            # _SAFE_LIMIT et peuvent sortir ~1e217.
 
-    def _resid(cv):
-        with np.errstate(all='ignore'):
-            p = fn(xs, cv)
+    def _resid_p(p):
         p = np.asarray(p, dtype=float)
         if p.ndim == 0:
             p = np.full_like(y, float(p))
@@ -4164,10 +5041,71 @@ def optimize_constants_lm(node: Node,
             p = np.where(bad, 0.0, p)
             r = p - y
             r[bad] = 1e6          # zone invalide : fortement pénalisée
-            return np.clip(r, -_LM_NUM_CLIP, _LM_NUM_CLIP)
-        return np.clip(p - y, -_LM_NUM_CLIP, _LM_NUM_CLIP)
+            return _np_minimum(_np_maximum(r, -_LM_NUM_CLIP), _LM_NUM_CLIP)
+        if _varpro:
+            # [v0.8] Projection variable : le résidu est celui de la forme
+            # MISE À L'ÉCHELLE a + b·f (a, b par moindres carrés à chaque
+            # évaluation), celle que juge la fitness. Sans cela, LM ajustait
+            # les constantes pour que f seule colle à y, et déformait la
+            # forme dès que l'arbre n'avait pas de constante d'échelle libre.
+            # Mêmes opérations que _linear_scale_params (moyenne et écart de
+            # y calculés une fois ; p est fini ici, ce qui rend son test de
+            # finitude redondant avec celui de l'amplitude).
+            if _ls_scale_only:
+                a_ls, b_ls, ok = _linear_scale_params(p, y)
+                if ok:
+                    p = a_ls + b_ls * p
+            else:
+                pm = float(p.mean())
+                pc = p - pm
+                if not float(np.max(np.abs(pc))) > 1e15:
+                    var_p = float(np.dot(pc, pc))
+                    if not var_p < 1e-12:
+                        b_ls = float(np.dot(pc, _yc)) / var_p
+                        a_ls = _ym - b_ls * pm
+                        if math.isfinite(a_ls) and math.isfinite(b_ls):
+                            p = a_ls + b_ls * p
+        return _np_minimum(_np_maximum(p - y, -_LM_NUM_CLIP), _LM_NUM_CLIP)
 
-    r = _resid(c)
+    # [v0.8] plan incrémental quand il est disponible ; sinon, évaluation
+    # complète comme en 0.7 (arbres très profonds, très gros volumes).
+    consts = _collect_constants_ordered(child)
+    plan = None
+    if consts and tree_depth(child) <= 90:
+        plan = _lm_plan(child, consts)
+        if plan is not None and plan.n_values * max(len(y), 1) > 20_000_000:
+            plan = None
+    if plan is not None:
+        def _eval(cv):
+            with np.errstate(all='ignore'):
+                p, vals = plan.full(xs, cv)
+            return _resid_p(p), vals
+
+        def _column(i, cv, r0, vals):
+            if plan.cols[i] is None:          # constante sans effet
+                return r0
+            with np.errstate(all='ignore'):
+                p = _lm_column(plan, i, cv, vals)
+            return _resid_p(p)
+    else:
+        fn, consts = compile_parametric(child)
+        if not consts or fn is None:
+            return child
+
+        def _eval(cv):
+            with np.errstate(all='ignore'):
+                p = fn(xs, cv)
+            return _resid_p(p), None
+
+        def _column(i, cv, r0, vals):
+            return _eval(cv)[0]
+
+    nC = len(consts)
+    c  = np.array([cn.value for cn in consts], dtype=float)
+    lo_b = float(cfg.ERC_MIN) * 3.0
+    hi_b = float(cfg.ERC_MAX) * 3.0
+
+    r, vals = _eval(c)
     sse_best = float(r @ r)
     c_best = c.copy()
     lam = 1e-3
@@ -4178,7 +5116,7 @@ def optimize_constants_lm(node: Node,
         for i in range(nC):
             h = 1e-6 * (1.0 + abs(c[i]))
             cp = c.copy(); cp[i] += h
-            J[:, i] = (_resid(cp) - r) / h
+            J[:, i] = (_column(i, cp, r, vals) - r) / h
         # [v0.4] jacobienne assainie : sans cela J.T @ J deborde float64
         J = np.nan_to_num(J, nan=0.0,
                           posinf=_LM_NUM_CLIP, neginf=-_LM_NUM_CLIP)
@@ -4195,11 +5133,12 @@ def optimize_constants_lm(node: Node,
             except np.linalg.LinAlgError:
                 lam *= 10.0; continue
             c_new = np.clip(c + delta, lo_b, hi_b)
-            r_new = _resid(c_new)
+            r_new, vals_new = _eval(c_new)
             sse_new = float(r_new @ r_new)
             if np.isfinite(sse_new) and sse_new < sse_best:
                 rel = (sse_best - sse_new) / max(sse_best, 1e-300)
                 c, r, sse_best = c_new, r_new, sse_new
+                vals = vals_new
                 c_best = c.copy()
                 lam = max(lam / 3.0, 1e-12)
                 stepped = True
@@ -4414,7 +5353,7 @@ def semantic_dedup(population, xs, ys, cfg, protected=0):
 
 
 class EpsilonLexicaseSelector:
-    __slots__ = ("pop", "E", "eps", "n_cases", "_case_buf")
+    __slots__ = ("pop", "E", "eps", "n_cases", "_case_buf", "_ET")
 
     def __init__(self, population: List["Node"], xs, ys):
         xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
@@ -4439,11 +5378,55 @@ class EpsilonLexicaseSelector:
         # [v19-OPT] buffer d'ordre des cas réutilisé (shuffle in-place) :
         # évite une allocation np.random.permutation par sélection.
         self._case_buf = np.arange(self.n_cases)
+        # [v0.8] erreurs rangées par cas (C, P) : une ligne = un cas.
+        self._ET = np.ascontiguousarray(self.E.T)
 
     def select(self) -> "Node":
-        # [v19-OPT] Filtrage incrémental sur des INDICES Python (cand est une
-        # liste d'ints), ce qui évite le fancy-indexing NumPy self.E[cand, c]
-        # (qui alloue un tableau à chaque cas). On indexe colonne par colonne.
+        """Sélection ε-lexicase, par BLOCS de cas.
+
+        [v0.8] Même résultat, tirage pour tirage, que le filtrage cas par cas
+        (_select_reference, gardée pour les tests) : les cas sont parcourus
+        dans le même ordre aléatoire, et le hasard n'est consommé qu'aux mêmes
+        endroits. Ce qui change : quand les candidats restants passent tous
+        les cas d'un bloc (fréquent, car la mise à l'échelle linéaire rend
+        beaucoup d'individus équivalents), le bloc entier est franchi en une
+        opération NumPy au lieu d'une boucle Python par cas. Sur 5 000
+        lignes, la sélection parcourait ainsi les 5 000 cas à chaque parent
+        et prenait près de la moitié du temps de calcul.
+
+        Pourquoi c'est exact : tant que personne n'est éliminé, l'ensemble des
+        candidats ne change pas, donc les seuils (min + ε) calculés d'un coup
+        sur le bloc sont ceux que le parcours cas par cas aurait calculés. Au
+        premier cas du bloc qui élimine quelqu'un, on applique ce cas seul et
+        on repart du cas suivant."""
+        np.random.shuffle(self._case_buf)
+        order = self._case_buf
+        ET = self._ET
+        eps = self.eps
+        n = order.shape[0]
+        c = order[0]
+        col = ET[c]
+        cand = np.flatnonzero(col <= col.min() + eps[c])
+        pos, B = 1, 8
+        while cand.shape[0] > 1 and pos < n:
+            blk = order[pos:pos + B]
+            sub = ET[blk[:, None], cand]                 # (b, k)
+            ok = sub <= (sub.min(axis=1) + eps[blk])[:, None]
+            rows_ok = ok.all(axis=1)
+            if rows_ok.all():                            # bloc sans élimination
+                pos += blk.shape[0]
+                B = min(2 * B, 1024)
+                continue
+            j = int(rows_ok.argmin())                    # premier cas qui élimine
+            cand = cand[ok[j]]
+            pos += j + 1
+            B = 8
+        idx = int(cand[0]) if cand.shape[0] == 1 else int(cand[np.random.randint(cand.shape[0])])
+        return self.pop[idx].copy()
+
+    def _select_reference(self) -> "Node":
+        """Filtrage cas par cas (version 0.7), gardé comme référence : les
+        tests vérifient que select() rend le même individu à chaque tirage."""
         np.random.shuffle(self._case_buf)
         E = self.E
         eps = self.eps
@@ -4803,13 +5786,13 @@ def build_stigmergic_tree(lib: FragmentLibrary,
         r = random.random()
         if r < 0.45:
             # Wrapper binaire : op(tree, frag)
-            op = random.choices(["+", "-", "*"], weights=[3, 2, 3])[0]
+            op = _pool_choice(["+", "-", "*"], [3, 2, 3], fallback="+") or "+"
             tree = Node(op, tree, frag) if random.random() < 0.5 else Node(op, frag, tree)
         elif r < 0.65:
             # Wrapper unaire autour de l'arbre
-            op = random.choices(["sin", "cos", "neg", "sq"],
-                                weights=[2, 2, 1, 2])[0]
-            tree = Node(op, tree)
+            op = _pool_choice(["sin", "cos", "neg", "sq"], [2, 2, 1, 2])
+            if op is not None:
+                tree = Node(op, tree)
         else:
             # Insertion profonde : remplacer un terminal par le fragment
             terminals = [(n, p, s) for n, p, s in get_all_nodes(tree)
@@ -4886,7 +5869,11 @@ def build_stigmergic_tree_v2(lib: FragmentLibrary,
         tree = root_frag   # repli conservatif
 
     # ---- Étape 3 : greffages supplémentaires ----
-    h_root = root_frag.structural_hash()
+    # [v0.8] Le graphe de co-occurrences est indexé par canonical_hash
+    # (FragmentCoGraph.deposit_individual) : le chercher par structural_hash
+    # ne trouvait le fragment que s'il ne contenait aucune constante, et le
+    # tirage d'un compagnon retombait sinon sur la bibliothèque seule.
+    h_root = root_frag.canonical_hash()
     for _ in range(8):
         remaining = target_size - tree_size(tree)
         if remaining < 2:
@@ -4903,11 +5890,12 @@ def build_stigmergic_tree_v2(lib: FragmentLibrary,
 
         r = random.random()
         if r < 0.45:
-            op = random.choices(["+", "-", "*"], weights=[3, 2, 3])[0]
+            op = _pool_choice(["+", "-", "*"], [3, 2, 3], fallback="+") or "+"
             tree = Node(op, tree, frag) if random.random() < 0.5 else Node(op, frag, tree)
         elif r < 0.65:
-            op = random.choices(["sin", "cos", "neg", "sq"], weights=[2, 2, 1, 2])[0]
-            tree = Node(op, tree)
+            op = _pool_choice(["sin", "cos", "neg", "sq"], [2, 2, 1, 2])
+            if op is not None:
+                tree = Node(op, tree)
         else:
             terminals = [(n, p, s) for n, p, s in get_all_nodes(tree)
                          if n.left is None and n.right is None and p is not None]
@@ -4943,6 +5931,8 @@ def warm_transfer(decay_lib: float = 0.4,
     decay_co  : taux de rétention pour FragmentCoGraph (co)
     decay_seq : taux de rétention pour FragmentSequenceMemory
     """
+    FRAGMENT_LIB.end_sampling()
+    COGRAPH.end_sampling()
     # Fragment library : décote τ
     for e in FRAGMENT_LIB.fragments.values():
         e.tau *= decay_lib
@@ -5057,7 +6047,11 @@ def build_stigmergic_tree_v3(lib: FragmentLibrary,
                     else Node(bin_op, companion, top_down))
 
     # Fragments supplémentaires via co-graph
-    h_root = root_frag.structural_hash()
+    # [v0.8] Le graphe de co-occurrences est indexé par canonical_hash
+    # (FragmentCoGraph.deposit_individual) : le chercher par structural_hash
+    # ne trouvait le fragment que s'il ne contenait aucune constante, et le
+    # tirage d'un compagnon retombait sinon sur la bibliothèque seule.
+    h_root = root_frag.canonical_hash()
     for _ in range(4):
         remaining = (cfg.MAX_TREE_SIZE // 2) - tree_size(top_down)
         if remaining < 2:
@@ -5145,7 +6139,8 @@ class Island:
                     self.cfg.TARGET_DIM, self.cfg.MAX_INIT_DEPTH,
                     self.cfg.FEAT_DIMS, random,
                     unknown_constant=bool(getattr(self.cfg,
-                                                  "UNKNOWN_CONST", False)))
+                                                  "UNKNOWN_CONST", False)),
+                    ops=_active_pool_ops())
                 if t is None:
                     fails += 1
                     continue
@@ -5251,6 +6246,7 @@ def migrate(islands: List[Island]):
     # d'un run précédent) reçoivent ici leur signature à jour.
     # On limite à 40 fragments max par migration pour ne pas ralentir les échanges.
     _refreshed = 0
+    FRAGMENT_LIB.end_sampling()
     for h, e in FRAGMENT_LIB.fragments.items():
         if e.semantic_signature is None and _refreshed < 40:
             e.semantic_signature = compute_semantic_sig(e.node, PROBE_X)
@@ -5469,6 +6465,12 @@ def evolve_island(island: Island,
 
     found_better = False
 
+    # [v0.8] Fenêtre de tirage figé (voir FragmentLibrary.begin_sampling) :
+    # d'ici à la fin de la reproduction, les mémoires stigmergiques ne sont
+    # que lues. Tout dépôt ou évaporation referme de toute façon la fenêtre.
+    FRAGMENT_LIB.begin_sampling()
+    COGRAPH.begin_sampling(FRAGMENT_LIB)
+
     if best_fit < island.best_score:
         island.best_score = best_fit
         island.best       = best.copy()
@@ -5604,7 +6606,10 @@ def evolve_island(island: Island,
             # [v14.5] Adam uniquement si l'enfant est prometteur ET élitiste (top 25%)
             if random.random() < cfg.CONST_OPT_PROB:
                 child_mse = raw_mse(child, xs, ys)
-                _elite_threshold = sorted(raw_mse(ind, xs, ys) for ind in pop[:max(4, len(pop)//4)])[-1]
+                # [v0.8] _elite_threshold n'est plus recalculé ici pour chaque
+                # enfant : `pop` ne change pas pendant la reproduction, la
+                # valeur est celle calculée une fois avant la boucle (le
+                # recalcul coûtait ~6 % du temps total).
                 if child_mse < _elite_threshold:
                     child = optimize_constants_adam(child, xs, ys, cfg)
             child = simplify(child)
@@ -5628,7 +6633,8 @@ def evolve_island(island: Island,
                 # sous-arbre remplacé -> validité préservée.
                 if _dim_active(cfg):
                     child = _ds().typed_mutate(child, cfg.FEAT_DIMS,
-                                               cfg.MAX_MUTATION_DEPTH, random)
+                                               cfg.MAX_MUTATION_DEPTH, random,
+                                               ops=_active_pool_ops())
                 else:
                     child = mutate(child, xs, ys, cfg, role=island.role)  # [v14.5] rôle transmis
 
@@ -5664,6 +6670,9 @@ def evolve_island(island: Island,
 
         new_pop.append(child)
 
+    FRAGMENT_LIB.end_sampling()
+    COGRAPH.end_sampling()
+
     # [v19] Déduplication sémantique : on retire les clones comportementaux
     # (hors élite, déjà en tête de new_pop), puis on REMPLIT les slots libérés
     # par de nouveaux arbres -> taille de population constante, mais la fraction
@@ -5686,7 +6695,8 @@ def evolve_island(island: Island,
                 parent = new_pop[random.randrange(_n_keep)]
                 if _dim_active(cfg):          # [v0.4] refill typé
                     child = _ds().typed_mutate(parent, cfg.FEAT_DIMS,
-                                               cfg.MAX_MUTATION_DEPTH, random)
+                                               cfg.MAX_MUTATION_DEPTH, random,
+                                               ops=_active_pool_ops())
                 else:
                     child  = mutate(parent, xs, ys, cfg, role=island.role)
                 if (tree_size(child) <= cfg.MAX_TREE_SIZE
@@ -5730,11 +6740,22 @@ def evolve_island(island: Island,
 
 _PW: dict = {}    # état du worker (initialisé une fois par processus)
 
-def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
-                          syracuse_y_raw, syracuse_x_raw,
+def _pool_probe():
+    """[v0.7-PAR] Tache vide : prouve qu'un worker a fini de demarrer."""
+    return True
+
+
+def _parallel_worker_init(data_path, use_ls, syracuse_mode,
                           gencsv=None, battery_mode=False,
-                          ls_scale_only=False, dim_unknown_const=False):
+                          ls_scale_only=False, dim_unknown_const=False,
+                          quiet=False):
     """Initializer du pool : reçoit les données constantes UNE fois par worker.
+    [v0.7-PAR] Les tableaux (xs, ys, sondes, series Syracuse) arrivent par un
+    fichier temporaire, pas par initargs : les initargs sont ecrits dans le
+    tube de demarrage du fils, et au-dela de sa capacite (64 Ko sous Linux)
+    le parent y reste bloque si le fils meurt pendant son amorcage -- ce que
+    fait justement un fils qui re-execute un script sans garde __main__. Le
+    repli sequentiel promis devenait un blocage definitif des ~3000 lignes.
     [FIX-WIN v20] Sous Windows (spawn), le worker ré-importe le module depuis
     __file__ et l'enregistre sous son nom canonique dans sys.modules, ce qui
     évite le ModuleNotFoundError quand le fichier s'appelle GP_ELITE_v20_PARALLEL
@@ -5753,6 +6774,15 @@ def _parallel_worker_init(xs, ys, probe_x, use_ls, syracuse_mode,
     _LS_SCALE_ONLY = bool(ls_scale_only)
     global _DIM_UNKNOWN_CONST                 # [v0.5]
     _DIM_UNKNOWN_CONST = bool(dim_unknown_const)
+    import pickle as _pickle
+    if quiet:
+        # [v0.7-PAR] Le parent est silencieux (symbolic_regression(verbose=
+        # False) redirige sa sortie) : ses workers le sont aussi. Sans cela,
+        # sur une machine a 4 coeurs ou plus, leurs messages de progression
+        # s'affichaient chez l'utilisateur malgre verbose=False.
+        _sys.stdout = open(_os.devnull, "w")
+    with open(data_path, "rb") as _fh:
+        xs, ys, probe_x, syracuse_y_raw, syracuse_x_raw = _pickle.load(_fh)
     _PW["xs"] = xs
     _PW["ys"] = ys
     PROBE_X             = probe_x
@@ -5791,10 +6821,15 @@ def _island_round_task(payload):
     xs, ys = _PW["xs"], _PW["ys"]
     cfg = island.cfg
     best_local = None
+    _deadline = getattr(cfg, "DEADLINE", None)
     for gen in range(gen_start, gen_start + n_gens):
+        # [v0.7-TIME] Echeance atteinte : on rend l'ile en l'etat. Jamais a la
+        # generation 0, pour qu'au moins une generation produise un modele.
+        if _deadline is not None and gen > 0 and time.time() >= _deadline:
+            break
         if gen % 10 == 0:
             _fitness_cache.clear()
-        _SIMPLIFY_CACHE.clear()
+        _clear_simplify_caches()
         if _SYRACUSE_MODE:
             _t = gen / max(cfg.GENERATIONS - 1, 1)
             cfg._mono_pen_cache = 0.10 - _t * 0.07
@@ -5804,10 +6839,108 @@ def _island_round_task(payload):
             best_local = nb
     return (island, best_local, FRAGMENT_LIB, COGRAPH, SEQ_MEM)
 
+def _active_pool_ops():
+    """[v0.7] Operateurs autorises pour le generateur TYPE (units=). Le pool
+    `operators=` vit dans _GENERIC_BINARY_OPS / _GENERIC_UNARY_OPS, restaures
+    aussi dans les processus paralleles. None = pas de filtrage (hors mode
+    CSV generique, comportement historique)."""
+    if not _GENERIC_CSV_MODE:
+        return None
+    return frozenset(_GENERIC_BINARY_OPS) | frozenset(_GENERIC_UNARY_OPS)
+
+
+def _pool_choice(ops, weights, fallback="neg"):
+    """[v0.7] Tire un operateur de `ops`, RESTREINT au pool `operators=`.
+
+    Les constructeurs stigmergiques enveloppaient leurs arbres avec un unaire
+    tire de ["sin", "cos", "neg", "sq"] code en dur : du cos apparaissait
+    dans le front de Pareto avec le pool 'physical', qui n'en contient pas.
+    Un seul tirage aleatoire comme avant : pour un pool qui contient deja ces
+    operateurs, le comportement est strictement inchange."""
+    pool = _active_pool_ops()
+    if pool is not None:
+        pairs = [(o, w) for o, w in zip(ops, weights) if o in pool]
+        if not pairs:
+            return fallback if fallback in pool else None
+        ops, weights = [p[0] for p in pairs], [p[1] for p in pairs]
+    return random.choices(ops, weights=weights)[0]
+
+
+# ── [v0.7-PAR] Parallelisme sur pour les scripts sans garde __main__ ──────
+# Les iles paralleles utilisent le demarrage « spawn » (identique sur tous les
+# systemes). Un processus fils spawn RE-EXECUTE le script principal de
+# l'utilisateur. Sans `if __name__ == "__main__":`, chaque fils refait donc
+# tout le calcul avant de servir : mesure sur 800 points, le script est
+# execute 3 fois et le mode parallele met 9,0 s contre 4,6 s en sequentiel.
+# Les exemples du README n'ont pas cette garde : c'est le cas par defaut d'un
+# nouvel utilisateur sur une machine a 4 coeurs ou plus.
+#
+# Detection : pendant la creation du pool, le parent pose GP_ELITE_POOL_CHILD
+# dans l'environnement, que les fils heritent. Un fils qui atteint evolve()
+# pendant son demarrage est forcement en train de re-executer le script : il
+# se termine SANS bruit, le pool du parent se brise, le parent bascule en
+# sequentiel, previent une seule fois, et ne retente plus le parallele.
+_POOL_CHILD_ENV = "GP_ELITE_POOL_CHILD"
+_PARALLEL_BROKEN = False     # vrai apres un pool brise : plus de tentative
+_PARALLEL_WARNED = False
+
+
+class _SkipLogExport(Exception):
+    """Export du journal desactive (API) : sortie propre du bloc d'ecriture."""
+
+
+def _exit_if_reimported_by_worker():
+    """Termine un fils gp-elite qui est en train de RE-EXECUTER le script.
+
+    Attention : pendant cette phase, multiprocessing.parent_process() n'est
+    PAS encore renseigne (il ne l'est qu'au demarrage du travailleur, apres
+    la re-execution). Les indicateurs fiables sont ceux qu'utilise
+    multiprocessing lui-meme pour detecter la phase d'amorcage :
+    l'attribut `_inheriting` du processus courant, et le nom `__mp_main__`
+    donne au module principal re-importe. La variable d'environnement
+    restreint la detection aux fils crees par gp-elite.
+    """
+    if os.environ.get(_POOL_CHILD_ENV) != "1":
+        return
+    try:
+        import multiprocessing as _mp
+        bootstrapping = bool(getattr(_mp.current_process(), "_inheriting", False))
+    except Exception:
+        bootstrapping = False
+    main_mod = sys.modules.get("__main__")
+    if bootstrapping or getattr(main_mod, "__name__", "") == "__mp_main__":
+        sys.exit(0)          # silencieux : le parent gere le repli
+
+
+def _warn_unguarded_main(err):
+    """Avertissement unique, sur stderr (non capture par le mode silencieux)."""
+    global _PARALLEL_WARNED
+    if _PARALLEL_WARNED:
+        return
+    _PARALLEL_WARNED = True
+    import warnings
+    main_file = getattr(sys.modules.get("__main__"), "__file__", None)
+    if main_file:
+        msg = ("gp-elite: parallel islands could not start, most likely "
+               "because the script %r is not protected by "
+               "`if __name__ == \"__main__\":` (required by multiprocessing). "
+               "Continuing SEQUENTIALLY: results are identical, only slower. "
+               "Wrap your top-level code in that guard to use several cores, "
+               "or pass parallel=False to silence this message."
+               % os.path.basename(main_file))
+    else:
+        msg = ("gp-elite: parallel islands could not start (%s); continuing "
+               "sequentially. Pass parallel=False to silence this message."
+               % type(err).__name__)
+    warnings.warn(msg, RuntimeWarning, stacklevel=3)
+
+
 def _parallel_enabled(cfg) -> bool:
     """AUTO : parallèle si ≥4 cœurs et ≥2 îles ; True force ; False bloque."""
     flag = getattr(cfg, "PARALLEL_ISLANDS", None)
     if flag is False or cfg.N_ISLANDS < 2:
+        return False
+    if _PARALLEL_BROKEN:          # [v0.7-PAR] deja echoue dans ce processus
         return False
     if flag is True:
         return True
@@ -5864,18 +6997,48 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
     # déjà démarré). Combiné aux seeds par (île, round) déjà deterministics et
     # à la collecte ORDONNÉE des résultats, le mode parallèle devient
     # reproductible : même seed → même champion.
+    _prev_hash = _os.environ.get("PYTHONHASHSEED")
+    _prev_child = _os.environ.get(_POOL_CHILD_ENV)
     _os.environ["PYTHONHASHSEED"] = "0"
+    _os.environ[_POOL_CHILD_ENV] = "1"      # [v0.7-PAR] herite par les fils
 
+    # [v0.7-PAR] Donnees des workers par fichier temporaire (voir
+    # _parallel_worker_init) : le message de demarrage reste petit.
+    import pickle as _pickle, tempfile as _tempfile
+    _data_path = None
     try:
+        with _tempfile.NamedTemporaryFile(prefix="gp_elite_pool_", suffix=".pkl",
+                                          delete=False) as _fh:
+            _data_path = _fh.name
+            _pickle.dump((xs, ys, PROBE_X, _syr_y, _syr_x), _fh,
+                         protocol=_pickle.HIGHEST_PROTOCOL)
         with _cf.ProcessPoolExecutor(
                 max_workers=n_workers, mp_context=ctx,
                 initializer=_parallel_worker_init,
-                initargs=(xs, ys, PROBE_X, _USE_LINEAR_SCALING,
-                          _SYRACUSE_MODE, _syr_y, _syr_x,
+                initargs=(_data_path, _USE_LINEAR_SCALING,
+                          _SYRACUSE_MODE,
                           _gencsv, _BATTERY_CSV_MODE,
-                          _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST)) as ex:
+                          _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST,
+                          sys.stdout is not sys.__stdout__)) as ex:
+            # [v0.7-PAR] Sonde : des taches vides d'abord. Un script sans
+            # garde __main__ fait terminer chaque worker pendant son demarrage
+            # (_exit_if_reimported_by_worker) ; la sonde echoue alors en
+            # BrokenProcessPool et on bascule en sequentiel. Sans elle, la
+            # premiere ronde (iles entieres, plus que la capacite d'un tube)
+            # restait coincee dans la file d'envoi : Python 3.9 attend ce fil
+            # d'envoi pour fermer le pool, et le repli promis ne venait jamais.
+            for _f in [ex.submit(_pool_probe) for _ in range(n_workers)]:
+                _f.result()
             gen = 0
+            _deadline = getattr(cfg, "DEADLINE", None)
             while gen < cfg.GENERATIONS:
+                # [v0.7-TIME] Echeance atteinte : pas de nouvelle ronde.
+                if _deadline is not None and gen > 0 and time.time() >= _deadline:
+                    TRACE.set("time_limit", "atteint (parallele, gen %d)" % gen)
+                    globals()["_TIME_LIMIT_HIT"] = True
+                    print(f"[TIME] Time limit reached at generation {gen} — "
+                          f"returning the best model so far.")
+                    break
                 # Round aligné sur les frontières de migration
                 nxt_mig = ((gen // cfg.MIGRATION_INTERVAL) + 1) * cfg.MIGRATION_INTERVAL
                 n_gens  = min(round_len, cfg.GENERATIONS - gen, max(1, nxt_mig - gen))
@@ -5950,10 +7113,11 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 if global_best:
                     # [v21-VAL] early-stop jugé sur le HOLD-OUT (anti-surapprentissage)
                     _es_mse = _holdout_mse(global_best, xs, ys)
-                    if _es_mse <= cfg.EARLY_STOPPING_MSE:
+                    _es_thr = _early_stop_threshold(cfg, ys)
+                    if _es_mse <= _es_thr:
                         print(f"\n{'═'*60}")
                         print(f"  [SUCCESS] Precision target reached at GEN {gen:04d}!")
-                        print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {cfg.EARLY_STOPPING_MSE:.2e}")
+                        print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {_es_thr:.2e}")
                         print(f"  Early stop — remaining generations saved.")
                         print(f"{'═'*60}\n")
                         break
@@ -5966,7 +7130,26 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
     except Exception as _par_err:
         print(f"[v20-PAR] ⚠ Parallel unavailable ({type(_par_err).__name__}: "
               f"{_par_err}) — automatic sequential fallback.")
+        # [v0.7-PAR] Un pool BRISE (fils termines) ne se reparera pas au
+        # prochain appel : on cesse d'essayer dans ce processus, et on dit
+        # pourquoi, une fois, sur stderr.
+        if type(_par_err).__name__ == "BrokenProcessPool":
+            globals()["_PARALLEL_BROKEN"] = True
+            _warn_unguarded_main(_par_err)
         return global_best, global_score, False
+    finally:
+        if _data_path is not None:
+            try:
+                _os.remove(_data_path)
+            except OSError:
+                pass
+        # [v0.7-PAR] Ne laisser aucune trace dans l'environnement de
+        # l'utilisateur (ses propres sous-processus en heriteraient).
+        for _k, _v in (("PYTHONHASHSEED", _prev_hash), (_POOL_CHILD_ENV, _prev_child)):
+            if _v is None:
+                _os.environ.pop(_k, None)
+            else:
+                _os.environ[_k] = _v
 
 
 # ════════════════════════════════════════════════════════════════
@@ -5979,9 +7162,74 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
 # suivi séparé du meilleur individu EN VALIDATION, early-stopping et
 # sélection finale sur la validation, rapport de généralisation.
 
+_TIME_LIMIT_HIT = False  # [v0.7-TIME] vrai si le dernier evolve() a ete
+                         # interrompu par l'echeance cfg.DEADLINE
 _VAL_XS = None          # hold-out features  (None = validation désactivée)
 _VAL_YS = None          # hold-out cible
 _VAL_TRAIN_XS = None    # [v23.1] train features (test de stabilité numérique)
+# [v0.7-NEAR] GARDE DE STABILITE PRES DU DOMAINE (mode par defaut).
+# Constat : sur donnees reelles (210_cloud, validation croisee), un modele a
+# donne R2 = -1.7e10 sur des points jamais vus, alors qu'il etait sain sur
+# l'entrainement et la validation. La garde hors-plage existante n'agit qu'en
+# mode extrapolate=True. Principe retenu : sonder par combinaisons de PAIRES
+# de points reels, x = l*xi + (1-l)*xj avec l dans [-0.1, 1.1] -- l'interieur
+# de l'enveloppe des donnees plus un leger debordement le long des directions
+# ou elles s'etendent vraiment. Une vraie loi ne peut pas diverger la ou des
+# mesures existent en continu. Mesure sur les 41 lois du banc Feynman : 0 vraie
+# loi jugee instable jusqu'a 10 % de debordement (pire ecart 2.8 etendues de y,
+# seuil 50) ; a 20 %, 5/41 le seraient (lois relativistes : la sonde traverse
+# v = c). Usage : DEPARTAGE seulement, entre candidats statistiquement
+# indiscernables -- jamais un rejet d'un candidat qui se detache.
+_NEAR_PROBE_XS = None
+_NEAR_BAND = None          # (centre, demi-largeur) en unites de y
+_NEAR_CACHE = {}
+_NEAR_GUARD_SWAPS = 0      # nombre de departages effectifs (diagnostic, tests)
+_EXACT_REL = 1e-12           # [v0.7-EXACT] plancher « exact » relatif a var(y_val)
+_EXACT_PRIORITY_SWAPS = 0   # [v0.7-EXACT] nombre de fois ou la regle a change le choix
+
+_FAITHFUL_SWAPS = 0          # [v0.8] departages par la fidelite de la formule
+_FAITHFUL_CACHE: Dict[int, bool] = {}
+
+
+def _formula_faithful(node) -> bool:
+    """[v0.8] Vrai si la fonction mathématique de l'arbre (sans garde-fou
+    numérique) reproduit l'évaluation du moteur sur les données de
+    l'ajustement (entraînement et hold-out, espace normalisé), avec la
+    tolérance du contrôle de gp_elite.formula (1e-7 relatif)."""
+    xs = [x for x in (_VAL_TRAIN_XS, _VAL_XS) if x is not None]
+    if node is None or not xs:
+        return True
+    try:
+        key = node.exact_hash()
+    except Exception:
+        key = None
+    if key is not None and key in _FAITHFUL_CACHE:
+        return _FAITHFUL_CACHE[key]
+    ok = True
+    try:
+        try:
+            from . import formula as _F
+        except ImportError:                  # core.py lancé comme script
+            import formula as _F
+        for X in xs:
+            p = np.asarray(evaluate_vector(node, X), dtype=float)
+            with np.errstate(all="ignore"):
+                v = np.asarray(_F.evaluate(node, X), dtype=float)
+                if v.ndim == 0:
+                    v = np.full(p.shape, float(v))
+                scale = max(float(np.max(np.abs(p))) if p.size else 0.0,
+                            float(np.std(p)) if p.size else 0.0, 1e-300)
+                gap = np.abs(v - p)
+            if not np.all(np.isfinite(gap)) or float(np.max(gap)) > 1e-7 * scale:
+                ok = False
+                break
+    except Exception:
+        ok = False
+    if key is not None:
+        _FAITHFUL_CACHE[key] = ok
+    return ok
+_NEAR_EXT = 0.10
+_NEAR_K = 50.0
 _VAL_TRAIN_YS = None    # [v23.1] train cible
 # [v25-EXTRAP] Garde-fou anti-divergence : points-sondes AU-DELÀ de la plage
 # d'entraînement (axe d'extrapolation prolongé) + bande de plausibilité dérivée
@@ -5991,6 +7239,32 @@ _EXTRAP_PROBE_XS = None
 _EXTRAP_BAND = None     # (y_lo, y_hi) plausibles
 _VAL_CANDS: list = []   # [(val_mse, val_se, size, node)] candidats-champions
 _VAL_CANDS_MAX = 64
+
+def _early_stop_threshold(cfg, ys_train) -> float:
+    """[v0.8] Seuil d'arrêt anticipé, RELATIF à la variance de la cible pour
+    les ajustements de l'API.
+
+    Le seuil était un MSE absolu de 1e-6 : il dépendait donc de l'unité de y.
+    Sur une cible de variance 0,02 (loi gaussienne de Feynman I.6.20a), un
+    modèle à 1 - R² = 6e-5 l'atteignait : la recherche s'arrêtait à la 6e
+    génération, puis la sélection parcimonieuse rendait une approximation
+    plus courte à 1 - R² = 2e-3, alors que la loi exacte était à portée. En
+    unités plus grandes, la même loi n'aurait jamais déclenché l'arrêt. On
+    ne s'arrête plus que sur une loi exacte à la précision numérique
+    (1 - R² <= _EXACT_REL sur le hold-out), le seul cas où chercher encore
+    ne peut rien apporter. Les modes démonstration (Syracuse, batterie)
+    gardent leur seuil absolu."""
+    if not _GENERIC_CSV_MODE:
+        return cfg.EARLY_STOPPING_MSE
+    ref = _VAL_YS if (_VAL_YS is not None and len(_VAL_YS) > 1) else ys_train
+    try:
+        v = float(np.var(np.asarray(ref, dtype=float)))
+    except Exception:
+        return cfg.EARLY_STOPPING_MSE
+    if not math.isfinite(v) or v <= 1e-300:
+        return cfg.EARLY_STOPPING_MSE
+    return _EXACT_REL * v
+
 
 def _holdout_mse(node, xs_train, ys_train) -> float:
     """MSE sur le hold-out si disponible, sinon sur le train (fallback)."""
@@ -6079,6 +7353,284 @@ def _track_val_candidate(cand):
     except Exception:
         pass
 
+
+# ════════════════════════════════════════════════════════════════
+# [v0.8] POLISSAGE DES FINALISTES : convergence, et sommes pondérées
+# ════════════════════════════════════════════════════════════════
+# Constat (campagne 2, 205 ajustements Feynman à 30 s) : des structures
+# justes sortaient avec des constantes inexactes. Feynman I.8.14,
+# sqrt((x2-x1)² + (y2-y1)²), revenait 5 fois sur 5 sous la forme
+# sqrt((x2' - x3')² + (x1' - x0')²) sur les colonnes normalisées : la
+# structure est la bonne, mais x/max|x| donne à chaque colonne son propre
+# facteur (4,97 ; 4,99...), si bien qu'une différence de deux colonnes
+# demande un coefficient sur chaque terme, que l'arbre n'avait pas
+# (1 - R² = 1,8e-4). Même cas pour II.2.42, k·(T2-T1)·A/d. Et II.15.4
+# rendait -μ·B·sin(-10,985 - 1,00432·θ) : la bonne forme, des constantes
+# que 20 itérations de Levenberg-Marquardt n'avaient pas fini d'ajuster.
+# Le polissage final ajoute donc deux candidats par finaliste : le même
+# arbre, ses constantes ajustées jusqu'à convergence (100 itérations), et
+# l'arbre dont chaque terme de somme ou de différence reçoit son propre
+# coefficient (A ± B devient a·A ± b·B), ajusté de même. Ces candidats ne
+# changent pas la recherche, et n'entrent dans la sélection finale que s'ils
+# reproduisent le hold-out à la précision numérique (_track_if_exact) : le
+# polissage rend exacte une structure juste, il ne remplace jamais un modèle
+# approché par un autre (campagne 5 : sans cette règle, des variantes plus
+# ajustées gagnaient la sélection et extrapolaient moins bien).
+
+_FINAL_LM_ITER = 100          # itérations de LM pour les finalistes
+_WEIGHTED_SUMS_MAX = 6        # au-delà de 6 sommes, pas de variante pondérée
+# [v0.8] Avec time_limit=, les variantes du polissage (convergence, sommes
+# pondérées) cessent une seconde après l'échéance : sur 3 000 lignes elles
+# prenaient près de deux secondes, que time_limit_check.py voyait dépasser
+# l'échéance (18,5 s pour 15 s). La correction d'échelle, elle, est toujours
+# faite. Sans échéance, rien ne change.
+_POLISH_GRACE_S = 1.0
+
+
+def _has_scale(t) -> bool:
+    """Vrai si le terme porte déjà un coefficient (constante, ou produit
+    dont un facteur est une constante)."""
+    if t.left is None and t.right is None:
+        return not isinstance(t.value, str)
+    if t.value == "*":
+        for c in (t.left, t.right):
+            if c is not None and c.left is None and c.right is None \
+                    and not isinstance(c.value, str):
+                return True
+    return False
+
+
+def _weight_sums(node, innermost_only: bool = False) -> Optional["Node"]:
+    """Copie de l'arbre où chaque terme d'une somme ou d'une différence
+    reçoit un coefficient 1 (A ± B devient 1·A ± 1·B), sauf un terme qui
+    en porte déjà un. Avec innermost_only, seules les sommes dont les
+    termes ne contiennent aucune autre somme sont pondérées : c'est assez
+    pour sqrt((x2-x1)² + (y2-y1)²), avec deux coefficients de moins.
+    None s'il n'y a rien à pondérer, ou plus de _WEIGHTED_SUMS_MAX sommes."""
+    n_sums = [0]
+    n_new = [0]
+
+    def rebuild(n):
+        """Rend (copie, contient une somme)."""
+        if n.left is None and n.right is None:
+            return Node(n.value), False
+        l, hl = rebuild(n.left) if n.left is not None else (None, False)
+        r, hr = rebuild(n.right) if n.right is not None else (None, False)
+        is_sum = n.value in ("+", "-") and l is not None and r is not None
+        if is_sum:
+            n_sums[0] += 1
+            if not (innermost_only and (hl or hr)):
+                if not _has_scale(l):
+                    l = Node("*", Node(1.0), l); n_new[0] += 1
+                if not _has_scale(r):
+                    r = Node("*", Node(1.0), r); n_new[0] += 1
+        return Node(n.value, l, r), (is_sum or hl or hr)
+
+    try:
+        out, _ = rebuild(node)
+    except RecursionError:
+        return None
+    if n_new[0] == 0 or n_sums[0] > _WEIGHTED_SUMS_MAX:
+        return None
+    return out
+
+
+def _lm_to_convergence(node, xs, ys, cfg) -> Optional["Node"]:
+    """LM avec _FINAL_LM_ITER itérations ; None si l'ajustement n'a rien
+    amélioré (optimize_constants_lm rend alors l'arbre d'entrée)."""
+    old = getattr(cfg, "CONST_OPT_ITER", 20)
+    try:
+        cfg.CONST_OPT_ITER = max(int(old), _FINAL_LM_ITER)
+        out = optimize_constants_lm(node, xs, ys, cfg)
+    except Exception:
+        return None
+    finally:
+        cfg.CONST_OPT_ITER = old
+    if out is None or out.exact_hash() == node.exact_hash():
+        return None
+    return out
+
+
+def _refit_scaling(tree, xs, ys):
+    """[v0.8] Recale l'échelle et le décalage matérialisés d'un arbre après
+    un ajustement de LM en projection variable. LM ajuste les constantes de
+    la forme a' + b'·arbre ; un arbre qui porte déjà sa mise à l'échelle
+    (a + b·f, rendue par wrap_linear_scaling) gardait donc l'ancien a et
+    l'ancien b, et ses prédictions brutes n'étaient plus celles de la forme
+    ajustée (sur y = 3 sin(2x) + 1 : MSE 0,39 avant LM, 271 après, 2e-31
+    pour la forme mise à l'échelle). Les nouveaux a, b sont replacés dans
+    les constantes existantes, sinon l'arbre est enveloppé."""
+    if tree is None or not (_USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None):
+        return tree
+    try:
+        xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
+        ys_np = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+        with np.errstate(all="ignore"):
+            p = evaluate_vector(tree, xs_np)
+            if float(np.std(p)) < 1e-6:
+                return tree
+            a2, b2, ok = _linear_scale_params(p, ys_np)
+        if not ok or (abs(b2 - 1.0) < 1e-12 and abs(a2) < 1e-12):
+            return tree
+        const = lambda n: (n is not None and n.left is None and n.right is None
+                           and not isinstance(n.value, str))
+        t = tree.copy()
+        if _LS_SCALE_ONLY:
+            if t.value == "*" and const(t.left):
+                t.left = Node(float(b2) * float(t.left.value))
+                return t
+        elif t.value == "+" and const(t.left) and t.right is not None \
+                and t.right.value == "*" and const(t.right.left):
+            t.left = Node(float(a2) + float(b2) * float(t.left.value))
+            t.right.left = Node(float(b2) * float(t.right.left.value))
+            t.right._hash = t.right._chash = t.right._ehash = None
+            return t
+        return wrap_linear_scaling(tree, xs_np, ys_np)
+    except Exception:
+        return tree
+
+
+def _finalists(cfg, k: int = 8) -> list:
+    """Les candidats à polir : les k meilleurs sur le hold-out (0.7), et,
+    avec le polissage, les k plus petits de la bande de tolérance où la
+    sélection finale choisira. [v0.8] Sans ces derniers, la structure juste
+    de I.8.14 (14 nœuds, 1 - R² = 1,8e-4) n'était jamais polie : les huit
+    meilleurs sur le hold-out étaient des arbres de 48 à 68 nœuds, et la
+    règle de parcimonie livrait ensuite le 14 nœuds tel quel."""
+    ranked = sorted(_VAL_CANDS, key=lambda t: (t[0], t[2]))
+    top = ranked[:k]
+    if not ranked or not bool(getattr(cfg, "FINAL_POLISH", True)):
+        return top
+    var_val = float(np.var(_VAL_YS)) if (_VAL_YS is not None and len(_VAL_YS) > 1) else 0.0
+    tol_r2 = float(globals().get("VAL_R2_TOLERANCE", 0.003))
+    best_mse, best_se = ranked[0][0], ranked[0][1]
+    band = tol_r2 * var_val if var_val > 1e-15 else best_mse * 0.20
+    thr = best_mse + max(best_se, band)
+    seen = set()
+    for t in top:
+        try:
+            seen.add(t[3].exact_hash())
+        except Exception:
+            pass
+    small = []
+    for t in sorted((t for t in ranked if t[0] <= thr), key=lambda t: (t[2], t[0])):
+        try:
+            h = t[3].exact_hash()
+        except Exception:
+            continue
+        if h in seen:
+            continue
+        seen.add(h)
+        small.append(t)
+        if len(small) >= k:
+            break
+    return top + small
+
+
+_POLISH_ADMITTED = 0          # variantes polies admises (diagnostic, bancs)
+
+
+def _track_if_exact(cand) -> None:
+    """[v0.8] Un candidat du polissage n'entre dans la sélection finale que
+    s'il reproduit le hold-out à la précision numérique (le plancher sous
+    lequel la sélection ne garde que des lois exactes, _EXACT_REL). Le
+    polissage peut ainsi rendre exacte une structure juste, mais il ne
+    remplace jamais un modèle approché par un autre modèle approché : sur des
+    données mesurées, aucune variante n'atteint ce plancher, et le résultat
+    est celui qu'on aurait eu sans lui. (Mesuré dans la campagne 5 : sans
+    cette règle, des variantes plus ajustées gagnaient la sélection sur le
+    hold-out et extrapolaient moins bien.)"""
+    if cand is None or _VAL_XS is None or _VAL_YS is None or len(_VAL_YS) < 2:
+        return
+    var_val = float(np.var(_VAL_YS))
+    if not var_val > 1e-15:
+        return
+    try:
+        with np.errstate(all="ignore"):
+            m = float(np.mean((evaluate_vector(cand, _VAL_XS) - _VAL_YS) ** 2))
+    except Exception:
+        return
+    if math.isfinite(m) and m <= _EXACT_REL * var_val:
+        globals()["_POLISH_ADMITTED"] = _POLISH_ADMITTED + 1
+        _track_val_candidate(cand)
+
+
+def _polish_finalists(top, xs, ys, cfg) -> None:
+    """Polissage des finalistes avant la sélection finale (voir plus haut).
+    Le premier candidat de chaque finaliste est celui de la 0.7 (constantes
+    ajustées par optimize_constants_adam, donc LM à 20 itérations), recalé
+    par _refit_scaling."""
+    _dl = getattr(cfg, "DEADLINE", None)
+    _stop = None if _dl is None else max(time.time(), float(_dl)) + _POLISH_GRACE_S
+    for _m, _se, _sz, nd in top:
+        pol = _refit_scaling(optimize_constants_adam(nd.copy(), xs, ys, cfg),
+                             xs, ys)
+        _track_val_candidate(pol)
+        if not bool(getattr(cfg, "FINAL_POLISH", True)) or _CUSTOM_LOSS_FN is not None:
+            continue
+        if _stop is not None and time.time() > _stop:
+            continue                            # budget de temps épuisé
+        try:
+            conv = _lm_to_convergence(pol, xs, ys, cfg)
+            if conv is not None:
+                _track_if_exact(_refit_scaling(conv, xs, ys))
+            seen = set()
+            for inner in (True, False):
+                wt = _weight_sums(pol, innermost_only=inner)
+                if wt is None or wt.exact_hash() in seen:
+                    continue
+                seen.add(wt.exact_hash())
+                wt = _lm_to_convergence(wt, xs, ys, cfg)
+                if wt is not None:
+                    ws = simplify(wt)
+                    if _pure_mse(ws, xs, ys) <= _pure_mse(wt, xs, ys):
+                        wt = ws
+                    _track_if_exact(_refit_scaling(wt, xs, ys))
+        except Exception:
+            pass
+
+def _build_near_probes(xs_np, ys_np, n=400):
+    """[v0.7-NEAR] Sondes par paires de points reels. Generateur DEDIE : ne
+    consomme pas l'etat aleatoire global du moteur (sinon tous les resultats
+    changeraient, garde active ou non)."""
+    global _NEAR_PROBE_XS, _NEAR_BAND
+    Xm = xs_np if xs_np.ndim == 2 else xs_np.reshape(-1, 1)
+    if len(Xm) < 2:
+        return
+    rng = np.random.RandomState(20260924)
+    i = rng.randint(0, len(Xm), n); j = rng.randint(0, len(Xm), n)
+    lam = rng.uniform(-_NEAR_EXT, 1.0 + _NEAR_EXT, (n, 1))
+    _NEAR_PROBE_XS = lam * Xm[i] + (1.0 - lam) * Xm[j]
+    y = np.asarray(ys_np, dtype=float)
+    r = float(np.ptp(y)) if len(y) else 0.0
+    _NEAR_BAND = (float(np.median(y)), _NEAR_K * max(r, 1e-12))
+
+
+def _near_domain_stable(cand) -> bool:
+    """[v0.7-NEAR] Vrai si le candidat reste fini et dans la bande sur les
+    sondes pres du domaine. Resultat mis en cache par arbre EXACT."""
+    if _NEAR_PROBE_XS is None or _NEAR_BAND is None or cand is None:
+        return True
+    try:
+        key = cand.exact_hash()
+    except Exception:
+        key = None
+    if key is not None and key in _NEAR_CACHE:
+        return _NEAR_CACHE[key]
+    try:
+        with np.errstate(all="ignore"):
+            p = np.asarray(evaluate_vector(cand, _NEAR_PROBE_XS), dtype=float)
+        if p.ndim == 0:
+            p = np.full(len(_NEAR_PROBE_XS), float(p))
+        c, half = _NEAR_BAND
+        ok = bool(np.all(np.isfinite(p)) and float(np.max(np.abs(p - c))) <= half)
+    except Exception:
+        ok = False
+    if key is not None:
+        _NEAR_CACHE[key] = ok
+    return ok
+
+
 def _select_one_se(champion, champ_val):
     """[v23.2] Sélection parcimonieuse par TOLÉRANCE R².
 
@@ -6108,8 +7660,54 @@ def _select_one_se(champion, champ_val):
     # Seuil = best + max(barre statistique 1-SE, bande de tolérance R²)
     r2_band = tol_r2 * var_val if var_val > 1e-15 else best_mse * 0.20
     thr = best_mse + max(best_se, r2_band)
+    # [v0.7-EXACT] PRIORITÉ À L'EXACTITUDE. La tolérance R² existe pour ne
+    # pas surajuster le BRUIT. Quand le meilleur candidat reproduit le
+    # hold-out à la précision numérique (MSE <= 1e-12 x variance : aucune
+    # donnée mesurée n'y arrive, seule une loi exacte sur données non
+    # bruitées), il n'y a pas de bruit à éviter : on ne remplace pas la loi
+    # exacte par une approximation plus courte (vu sur Feynman I.18.12 :
+    # r*F*sin(th) exacte dans le front, rendu 0.0776 + 0.9967*r*F*sin(1.0106*th)).
+    # Seuls les candidats eux aussi exacts restent éligibles ; le plus petit
+    # gagne. Sans effet dès que le meilleur MSE dépasse ce plancher.
+    exact_floor = _EXACT_REL * var_val
+    if var_val > 1e-15 and best_mse <= exact_floor:
+        loose = min((t for t in pool if t[0] <= thr), key=lambda t: (t[2], t[0]))
+        thr = exact_floor
+        tight = min((t for t in pool if t[0] <= thr), key=lambda t: (t[2], t[0]))
+        if tight[3] is not loose[3]:
+            globals()["_EXACT_PRIORITY_SWAPS"] = _EXACT_PRIORITY_SWAPS + 1
+            TRACE.set("exact_priority", "loi exacte préférée à une "
+                      "approximation plus courte")
     eligible = [t for t in pool if t[0] <= thr]
     eligible.sort(key=lambda t: (t[2], t[0]))   # plus petit, puis meilleur MSE
+    # [v0.8] DEPARTAGE PAR LA FIDÉLITÉ DE LA FORMULE. Parmi les candidats que
+    # les données ne savent pas distinguer, on préfère le plus petit dont la
+    # formule imprimée reproduit le modèle, c'est-à-dire sur lequel aucun
+    # garde-fou numérique (division protégée, puissance bornée) n'agit sur
+    # les données : sinon la formule livrée s'écarte de predict() et
+    # l'utilisateur reçoit un avertissement (formula_exact False). Stable
+    # près du domaine d'abord, comme ci-dessous.
+    if not (_formula_faithful(eligible[0][3])
+            and _near_domain_stable(eligible[0][3])):
+        both = [t for t in eligible
+                if _formula_faithful(t[3]) and _near_domain_stable(t[3])]
+        if both:
+            globals()["_FAITHFUL_SWAPS"] = _FAITHFUL_SWAPS + 1
+            TRACE.set("faithful_formula", "candidat dont la formule reproduit "
+                      "le modèle préféré à un équivalent plus court")
+            m, _, _, node = both[0]
+            return node, m
+    # [v0.7-NEAR] DEPARTAGE : parmi les candidats que les donnees ne savent pas
+    # distinguer, le plus petit qui NE DIVERGE PAS pres du domaine. Si aucun
+    # n'est stable, comportement historique inchange.
+    if not _near_domain_stable(eligible[0][3]):
+        stable = [t for t in eligible if _near_domain_stable(t[3])]
+        if stable:
+            globals()["_NEAR_GUARD_SWAPS"] = _NEAR_GUARD_SWAPS + 1
+            TRACE.set("near_guard", "champion divergent pres du domaine "
+                      "remplace par un candidat equivalent stable")
+            m, _, _, node = stable[0]
+            return node, m
     m, _, _, node = eligible[0]
     return node, m
 
@@ -6118,9 +7716,12 @@ def _split_holdout(xs, ys, cfg):
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
     VALIDATION_SPLIT<=0 ou dataset trop petit (<30 points)."""
     global _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _EXTRAP_PROBE_XS, _EXTRAP_BAND
+    global _NEAR_PROBE_XS, _NEAR_BAND
     _VAL_XS = None; _VAL_YS = None
     _VAL_TRAIN_XS = None; _VAL_TRAIN_YS = None
     _EXTRAP_PROBE_XS = None; _EXTRAP_BAND = None
+    _NEAR_PROBE_XS = None; _NEAR_BAND = None; _NEAR_CACHE.clear()
+    _FAITHFUL_CACHE.clear()
     _VAL_CANDS.clear()
     frac = float(getattr(cfg, "VALIDATION_SPLIT", 0.0) or 0.0)
     n = len(ys)
@@ -6205,6 +7806,7 @@ def _split_holdout(xs, ys, cfg):
     ys_tr   = ys_np[tr_idx]
     _VAL_TRAIN_XS = xs_tr
     _VAL_TRAIN_YS = ys_tr
+    _build_near_probes(xs_np, ys_np)          # [v0.7-NEAR]
     print(f"[v21-VAL] Hold-out {_split_kind} : {len(tr_idx)} points train / "
           f"{len(val_idx)} points validation ({len(val_idx)/n:.0%}, {_seed_note})")
     print(f"          Evolution sees ONLY the train set; final champion "
@@ -6341,6 +7943,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     global _fitness_cache, _PARAMETRIC_CACHE
     global PROBE_X, CURRENT_RESIDUAL_SIG     # [v17]
     global _USE_LINEAR_SCALING               # [v18-LS]
+    _exit_if_reimported_by_worker()          # [v0.7-PAR]
     _USE_LINEAR_SCALING = bool(getattr(cfg, "USE_LINEAR_SCALING", True))
     # [v0.4.1] Les drapeaux dimensionnels sont des GLOBALES de module. Sans
     # remise a zero ici, un fit avec units= contaminait tous les fits suivants
@@ -6367,11 +7970,18 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         TRACE.set("dim_mode", "inactif (aucune unité déclarée)")
         TRACE.set("ls_mode", "affine (a + b·f) si linear scaling actif")
     globals()["VAL_R2_TOLERANCE"] = float(getattr(cfg, "VAL_R2_TOLERANCE", 0.003))
-    # FIX v13.10 : LOG_CSV relatif au répertoire du script
-    _script_dir = os.path.dirname(os.path.abspath(__file__))
+    # [v0.7] Journal relatif au DOSSIER COURANT de l'utilisateur. L'ancienne
+    # resolution (dossier du module) ecrivait dans site-packages a chaque
+    # ajustement -- y compris depuis l'API --, echouait en silence sur une
+    # installation en lecture seule et entrelacait les ecritures de processus
+    # concurrents.
     if not os.path.isabs(cfg.LOG_CSV):
         cfg = copy.copy(cfg)
-        cfg.LOG_CSV = os.path.join(_script_dir, cfg.LOG_CSV)
+        cfg.LOG_CSV = os.path.join(os.getcwd(), cfg.LOG_CSV)
+    # [v0.7-TIME] Le drapeau d'arret au temps est un etat GLOBAL : il doit
+    # etre remis a zero a chaque evolve(), sinon il fuit d'un ajustement au
+    # suivant dans un meme processus.
+    globals()["_TIME_LIMIT_HIT"] = False
     # FIX v13.7 : vider les caches entre runs pour éviter les biais
     # inter-problèmes (hash structurel identique, domaine différent).
     _fitness_cache    = {}
@@ -6714,6 +8324,21 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             slot          = (_base2 + j) // cfg.N_ISLANDS
             if slot < len(target_island.population):
                 target_island.population[slot] = mnd
+    else:
+        _motifs = []
+    # [v0.8] Graines de loi de puissance (voir _make_power_law_seeds) : une
+    # copie dans chaque île, au slot qui suit les motifs. Rien n'est injecté
+    # (et rien ne change) quand la cible ou toutes les colonnes changent de
+    # signe.
+    _plaw = _make_power_law_seeds(xs, ys, cfg)
+    if _plaw:
+        _base3 = (len(seeds) + (len(_cseeds) if _cseeds else 0)
+                  + len(_motifs)) // cfg.N_ISLANDS + 1
+        for target_island in islands:
+            for j, pnd in enumerate(_plaw):
+                slot = _base3 + j
+                if slot < len(target_island.population):
+                    target_island.population[slot] = pnd.copy()
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.
@@ -6743,7 +8368,15 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     _plateau_threshold = 40   # générations sans amélioration globale
     _last_global_raw   = float('inf')
 
+    _deadline = getattr(cfg, "DEADLINE", None)
     for gen in range(cfg.GENERATIONS if _seq_needed else 0):
+        # [v0.7-TIME] Echeance atteinte : arret propre, meilleur modele conserve.
+        if _deadline is not None and gen > 0 and time.time() >= _deadline:
+            TRACE.set("time_limit", "atteint (sequentiel, gen %d)" % gen)
+            globals()["_TIME_LIMIT_HIT"] = True
+            print(f"[TIME] Time limit reached at generation {gen} — "
+                  f"returning the best model so far.")
+            break
         # [OPT] Cache fitness vidé toutes les 10 générations (aligné sur gen//10).
         # Entre deux vidages, la clé (hash, role, gen//10) garantit la fraîcheur.
         # Évite de recalculer la fitness d'individus stables entre générations.
@@ -6751,7 +8384,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             _fitness_cache.clear()
         # [OPT] Vider le cache de simplification pour libérer la mémoire
         # et éviter des résultats périmés après mutations.
-        _SIMPLIFY_CACHE.clear()
+        _clear_simplify_caches()
         # [FIX-A] Mettre à jour la pénalité mono-feature progressive
         # 0.10 en gen=0 → 0.03 en fin de run (décroissance linéaire)
         if _SYRACUSE_MODE:
@@ -6827,10 +8460,11 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         if global_best:
             # [v21-VAL] early-stop jugé sur le HOLD-OUT (anti-surapprentissage)
             _es_mse = _holdout_mse(global_best, xs, ys)
-            if _es_mse <= cfg.EARLY_STOPPING_MSE:
+            _es_thr = _early_stop_threshold(cfg, ys)
+            if _es_mse <= _es_thr:
                 print(f"\n{'═'*60}")
                 print(f"  [SUCCESS] Precision target reached at GEN {gen:04d}!")
-                print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {cfg.EARLY_STOPPING_MSE:.2e}")
+                print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {_es_thr:.2e}")
                 print(f"  Early stop — remaining generations saved.")
                 print(f"{'═'*60}\n")
                 break
@@ -6839,6 +8473,8 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         if gen > 0 and gen % cfg.MIGRATION_INTERVAL == 0:
             migrate(islands)
 
+    if _deadline is not None and time.time() >= _deadline:
+        globals()["_TIME_LIMIT_HIT"] = True
     # Optimisation finale des constantes sur le meilleur
     # [v14.4] Correction du bug de référence : copy.deepcopy() avant Adam+simplify
     # pour garantir que global_best n'est jamais corrompu si des nœuds sont
@@ -6849,6 +8485,12 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         import copy as _copy
         optimized = optimize_constants_adam(global_best.copy(), xs, ys, cfg)  # [v19-OPT]
         optimized = simplify(optimized)
+        # [v0.8] Le champion porte sa mise à l'échelle a + b·f ; LM en
+        # projection variable ajuste la forme a' + b'·(champion) : sans
+        # recalage, l'arbre rendu gardait l'ancien a et l'ancien b (raw_mse,
+        # invariant d'échelle, ne le voit pas). Sans hold-out (moins de 30
+        # points, ou validation_split=0), ce modèle était livré tel quel.
+        optimized = _refit_scaling(optimized, xs, ys)
         if raw_mse(optimized, xs, ys) < raw_mse(global_best, xs, ys):
             global_best = optimized
         # Si Adam a dégradé, global_best reste intact (deepcopy garantit l'isolation)
@@ -6865,10 +8507,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # forme simple et EXACTE peut perdre contre un gros arbre simplement
         # parce que ses constantes n'étaient pas encore ajustées. Coût : ~ms.
         try:
-            _top = sorted(_VAL_CANDS, key=lambda t: (t[0], t[2]))[:8]
-            for _mse_i, _se_i, _sz_i, _nd_i in _top:
-                _pol = optimize_constants_adam(_nd_i.copy(), xs, ys, cfg)
-                _track_val_candidate(_pol)
+            _polish_finalists(_finalists(cfg), xs, ys, cfg)   # [v0.8] voir leurs définitions
         except Exception:
             pass
         _champ_val = _holdout_mse(global_best, xs, ys)
@@ -6930,6 +8569,8 @@ def evolve(func, cfg: Config, problem_key: str = '1',
 
     # Export CSV (optionnel — silencieux si filesystem en lecture seule)
     try:
+        if not getattr(cfg, "WRITE_LOG_CSV", True):
+            raise _SkipLogExport()
         with open(cfg.LOG_CSV, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(
                 f, fieldnames=["gen", "island", "fit", "raw",
@@ -7346,15 +8987,48 @@ class _ShiftFreeScaler:
     (x+β1)(y+β2) = x·y + β1·y + β2·x + β1β2 (termes croisés → arbres gonflés).
     Le benchmark Feynman a montré 4-9× moins de nœuds et R² parfait sur les
     lois multiplicatives avec cette normalisation."""
-    def __init__(self):
+    # [v0.8] Option normalize="grouped" : UN facteur commun aux colonnes
+    # d'échelles comparables (max|x| à moins d'un facteur GROUP_RATIO les uns
+    # des autres). Diviser chaque colonne par son propre max|x| préserve les
+    # produits mais pas les sommes et différences de variables de même
+    # nature : sur Feynman I.8.14, sqrt((x2-x1)^2 + (y2-y1)^2) avec des
+    # maxima de 4,97 et 4,99 devient une autre fonction des variables
+    # normalisées. Mesuré (benchmarks/results_0.8, campagne 3) : 75 lois
+    # exactes contre 69 sur 205 (I.8.14 : 5/5 contre 0/5), R² réel médian
+    # 0,769 contre 0,735, mais 6 effondrements hors domaine contre 4 : pas le
+    # défaut, une option.
+    GROUP_RATIO = 10.0
+
+    def __init__(self, group_ratio=None):
         self.scale_ = None
+        self.group_ratio = group_ratio
+
     def fit_transform(self, X):
         m = np.max(np.abs(X), axis=0).astype(np.float64)
-        m[m < 1e-12] = 1.0
+        # [v0.8] Seule une colonne nulle garde le facteur 1. Le seuil était
+        # 1e-12 : une colonne en unités SI de l'ordre de 1e-19 (une charge
+        # en coulombs) restait alors à 1e-19 et la recherche n'en tirait rien.
+        m[~(m > 0.0)] = 1.0
+        ratio = getattr(self, "group_ratio", None)
+        if ratio is not None and ratio > 1.0 and m.size > 1:
+            order = np.argsort(m, kind="stable")
+            scale = m.copy()
+            start = 0
+            while start < len(order):
+                end = start
+                while (end + 1 < len(order)
+                       and m[order[end + 1]] <= ratio * m[order[start]]):
+                    end += 1
+                grp = order[start:end + 1]
+                scale[grp] = m[grp].max()
+                start = end + 1
+            m = scale
         self.scale_ = m
         return X / m
+
     def transform(self, X):
         return X / self.scale_
+
     def inverse_transform(self, Xs):
         return Xs * self.scale_
 
@@ -7408,10 +9082,20 @@ def _scale_ratio(X_raw):
 def _choose_scaler(X_raw, normalize, x_range):
     """[v23] Sélectionne la normalisation.
 
-    'auto'  : shift-free si toutes les features sont strictement positives
-              (cas multiplicatif typique en sciences — masses, distances,
-              températures absolues), sinon MinMax. NE SE DEMANDE JAMAIS
-              s'il faut normaliser, seulement comment.
+    'auto'  : [v0.7] shift-free (division par max|x|) pour TOUTES les
+              données. Jusqu'en 0.6 : shift-free seulement si toutes les
+              features étaient strictement positives, sinon MinMax — qui
+              remplace chaque variable par a*(x - x0) et casse la structure
+              multiplicative. Mesuré sur la version publiée (critère fixé
+              avant ; 8 lois à entrées signées x 5 seeds, puis 6 jeux PMLB
+              standardisés comme dans SRBench x 5 plis ;
+              benchmarks/norm_signed.py) : récupérations exactes 20/40 contre
+              7/40 ; R² test médian sur données réelles 0.808 contre 0.808,
+              moyenne 0.781 contre 0.775, pire pli 0.406 contre 0.399,
+              meilleur sur 16 plis appariés sur 30, aucun effondrement de
+              part et d'autre ; formules livrées plus courtes (médiane 16
+              nœuds contre 20). NE SE DEMANDE
+              JAMAIS s'il faut normaliser, seulement comment.
     'smart' : [v0.7] teste d'abord la disparité d'échelle entre colonnes.
               En dessous de SCALE_RATIO_THRESHOLD, ne normalise pas (les
               features brutes préservent produits, différences et
@@ -7434,10 +9118,12 @@ def _choose_scaler(X_raw, normalize, x_range):
                 f"{SCALE_RATIO_THRESHOLD:g})")
         mode = "auto"
     if mode == "auto":
-        all_pos = bool(np.all(X_raw > 0))
-        mode = "divmax" if all_pos else "minmax"
+        mode = "divmax"
     if mode in ("divmax", "shiftfree", "div"):
         return _ShiftFreeScaler(), "divmax (shift-free, preserves products)"
+    if mode == "grouped":                              # [v0.8] option
+        return (_ShiftFreeScaler(group_ratio=_ShiftFreeScaler.GROUP_RATIO),
+                "divmax, one factor per group of comparable columns")
     if mode in ("standard", "zscore", "std"):
         from sklearn.preprocessing import StandardScaler as _SS
         return _SS(), "standard (z-score)"
@@ -7465,9 +9151,10 @@ def load_generic_csv(file_path: str,
     global _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS
     global CSV_FEATURE_NAMES, CSV_TARGET_NAME
 
-    if not _CSV_DEPS_OK:
+    if not _csv_deps_ok():
         raise ImportError("pandas et scikit-learn requis : "
                           "pip install pandas scikit-learn")
+    _pd = _csv_deps()[0]
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"Fichier introuvable : '{file_path}'  "
                                 f"(cwd : {os.getcwd()})")
@@ -7569,12 +9256,13 @@ def load_custom_csv(file_path: str):
     FileNotFoundError / KeyError si le fichier ou les colonnes manquent.
     ValueError  si le fichier contient moins de 10 lignes utiles.
     """
-    if not _CSV_DEPS_OK:
+    if not _csv_deps_ok():
         raise ImportError(
             "[BATTERY_SOH] pandas et scikit-learn sont requis pour charger "
             "des données CSV réelles.\n"
             "Installez-les avec : pip install pandas scikit-learn"
         )
+    _pd = _csv_deps()[0]
 
     # ── 1. Lecture & nettoyage des noms de colonnes ──────────────────────
     if not os.path.isfile(file_path):
@@ -8837,7 +10525,7 @@ def _interactive_menu():
                    "y": "poly", "": "physical"}[pool_rep]
 
         print("\n  Feature normalization:")
-        print("    a = auto      shift-free if features positive, else minmax (default)")
+        print("    a = auto      shift-free: each column / its max |value| (default)")
         print("    d = divmax    shift-free (preserves x·y, x/y — multiplicative laws)")
         print("    m = minmax    [-2,2] (bounds exp/pow, but inflates products)")
         print("    s = standard  z-score (centered & scaled)")
@@ -8936,10 +10624,18 @@ def _interactive_menu():
         print()
 
         _gen_func = lambda Xm: np.zeros(Xm.shape[0])  # placeholder (override)
+        # [v0.8] Cible d'échelle extrême : la recherche voit y / 10^k, la loi
+        # affichée dans les colonnes de l'utilisateur est remise dans ses
+        # unités (voir _target_scale).
+        _y_scale = _target_scale(np.asarray(y, dtype=float))
+        if _y_scale != 1.0:
+            print(f"  Target divided by {_y_scale:g} during the search "
+                  f"(its values are far from 1); the formula below is in "
+                  f"its own units.")
         try:
             best, X_data, y_data = evolve(
                 _gen_func, cfg, problem_key="GENERIC_CSV",
-                X_override=X, y_override=y)
+                X_override=X, y_override=(y / _y_scale if _y_scale != 1.0 else y))
         except Exception as _e:
             import traceback as _tbx
             print(f"[ERROR] Evolution interrupted: {_e}")
@@ -8947,20 +10643,52 @@ def _interactive_menu():
             _pause(); return
 
         if best:
-            print_result(f"CSV: {target_name} = f({', '.join(feat_names)})",
-                         best, X_data, y_data, cfg)
-            # Rappel du dictionnaire X[i] → nom de colonne
-            print("\n  Variable mapping:")
-            for i, nm in enumerate(feat_names):
-                print(f"    X[{i}] = {nm}")
-            print(f"\n  Note: features are normalized. "
-                  f"The formula is expressed on these normalized values.")
+            # [v0.7] L'expression brute du moteur vit dans l'espace NORMALISÉ.
+            # L'afficher avec les noms réels (« 24.97 * elongation » pour une
+            # loi 250 * elongation) induisait en erreur : pendant cet
+            # affichage, chaque colonne porte un prime (elongation′ = colonne
+            # remise à l'échelle), et la loi dans les colonnes réelles suit.
+            _names_real = list(globals().get("CSV_FEATURE_NAMES") or feat_names)
+            globals()["CSV_FEATURE_NAMES"] = [f"{nm}′" for nm in _names_real]
+            try:
+                print_result(f"CSV: {target_name} = f({', '.join(feat_names)})",
+                             best, X_data, y_data, cfg)
+            finally:
+                globals()["CSV_FEATURE_NAMES"] = _names_real
+            print("\n  Note: 'Expression' above is the engine's internal form, on")
+            print("  rescaled columns (a prime marks a rescaled column, e.g.")
+            print(f"  {feat_names[0]}′). Use the formula below.")
+            # [v0.7] La meme loi, ecrite dans les colonnes de l'utilisateur et
+            # verifiee sur ses donnees (formula.py). C'est elle qu'il faut
+            # recopier : l'expression normalisee n'est pas valable telle quelle
+            # sur les donnees brutes.
+            try:
+                try:
+                    from . import formula as _fm
+                except ImportError:
+                    import formula as _fm
+                _Xraw = _scaler.inverse_transform(np.asarray(X_data, dtype=float))
+                _bn = best.node if hasattr(best, "node") else best
+                _rf = _fm.raw_formula(
+                    _scale_tree(_bn, _y_scale), _scaler, _Xraw, list(feat_names),
+                    predictions=None if _y_scale == 1.0 else
+                    np.asarray(evaluate_vector(_bn, np.asarray(X_data, dtype=float)),
+                               dtype=float) * _y_scale)
+                print("\n  Formula in YOUR columns (checked on your data):")
+                print(f"    {target_name} = {_rf.text()}")
+                if not _rf.exact:
+                    print("    (!) differs from the engine's predictions on some rows:"
+                          " a numerical safety\n        net of the engine is active "
+                          "there (max gap %.3g)." % _rf.max_error)
+            except Exception as _fe:
+                print(f"\n  (formula in raw columns unavailable: {_fe})")
             if feat_dims_cli is not None:                  # [v0.6]
                 print("\n  Dimensional constraint was active: every candidate "
                       "was\n  dimensionally consistent by construction.")
                 if unknown_const_cli:
                     _u, _v = _deduce_console_constant(
-                        best.node if hasattr(best, "node") else best,
+                        _scale_tree(best.node if hasattr(best, "node") else best,
+                                    _y_scale),
                         feat_dims_cli, target_dim_cli, _scaler, n_feat)
                     if _u is not None:
                         from .dimensions import _fmt as _fmtdim

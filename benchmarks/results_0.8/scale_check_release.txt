@@ -1,0 +1,12 @@
+engine: /home/claude/repo/gp_elite/__init__.py
+x scale 1       y scale 1        R2   1.000000  formula_exact True   X0² / X1
+x scale 1e-09   y scale 1        R2   1.000000  formula_exact True   1e+18 * X0² / X1
+x scale 1e-19   y scale 1        R2   1.000000  formula_exact True   1e+38 * X0² / X1
+x scale 1e-34   y scale 1        R2   1.000000  formula_exact True   1e+68 * X0² / X1
+x scale 1       y scale 1e-09    R2   1.000000  formula_exact True   1e-09 * X0² / X1
+x scale 1       y scale 1e-19    R2   1.000000  formula_exact True   1e-19 * X0² / X1
+x scale 1       y scale 1e-30    R2   1.000000  formula_exact True   1e-30 * X0² / X1
+x scale 1       y scale 1e+20    R2   1.000000  formula_exact True   1e+20 * X0² / X1
+x scale 1       y scale 1e+30    R2   1.000000  formula_exact True   1e+30 * X0² / X1
+x scale 1e-09   y scale 1e-09    R2   1.000000  formula_exact True   1e+09 * X0² / X1
+x scale 1e+09   y scale 1e+30    R2   1.000000  formula_exact True   1e+12 * X0² / X1

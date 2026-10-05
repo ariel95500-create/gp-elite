@@ -62,7 +62,7 @@ split 70/30, 3 tirages indépendants par point de mesure.
 Sortie : feyn_noise.jsonl  |  Reprise automatique.
 
 Lancement :
-  set PYTHONHASHSEED=0 && python benchmarks\\feynman_noise.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_noise.py
 Options :
   --noise gauss|outlier   régime de bruit (défaut : gauss)
   --robust                bras robuste

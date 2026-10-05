@@ -1,0 +1,44 @@
+=== python benchmarks/notebook_claims.py kepler30
+0.00279171 + 0.999396 * distance * sqrt(distance)  (14s)
+
+=== python benchmarks/notebook_claims.py hooke
+deduced units : [kg / s^2]
+deduced value : 250.0
+equation      : 250 * X0
+
+=== python benchmarks/notebook_claims.py coulomb
+found in 35 s
+equation : 0.0795775 / (exp(log(r²)) / q2 * eps / q1)
+1/(4*pi) = 0.079577
+
+=== python benchmarks/notebook_claims.py torque
+without units              5 s   error=0.0e+00   size=6
+                       sin(theta) * r * F
+with units                 2 s   error=0.0e+00   size=6
+                       sin(theta) * F * r
+
+=== python benchmarks/notebook_claims.py optionB
+equation: 1.5 * volume * pressure
+
+=== python benchmarks/notebook_claims.py tp
+TP loi : -0.00467626 + 0.900389 * sin((0.334104 * x - 0.0980307) * (log(exp(x * (-3.59671 - 0.814163 / x) + exp(0.151393 - 5.1521 * sqrt(|x|) / x)^(-0.263267 * x))) + 4.31626 * x))
+ 10 generations : MSE = 2.976e-02   taille = 25  (4 s)
+ 30 generations : MSE = 1.851e-02   taille = 39  (14 s)
+ 60 generations : MSE = 2.031e-03   taille = 46  (32 s)
+
+=== python benchmarks/notebook_claims.py nikuradse
+PvK R2 = 0.9434
+searched for 43 s
+   6  0.9344  1.10292 - 0.133487 * log(r_k)
+   7  0.9491  1.32655 - 0.561493 * log(log(r_k))
+   9  0.9516  1.50664 - 0.485163 * sqrt(log(r_k - log_Re))
+  20  0.9516  2.3064 + 0.999997 * (0.00199095 * sqrt(sqrt(r_k)) - |-1.09273 - log(r_k - log_Re)|^0.35290
+  30  0.9617  0.525422 - 0.0986433 * log(log_Re + log_Re / |exp(|r_k|)|) * (log(|log(r_k + 11.7656 - log
+  34  0.9650  0.0911256 - 0.417894 * sqrt(1 / (r_k / sqrt(|log(|(r_k - 0.0124623)^(-r_k)|)|))) * log(sqr
+  38  0.9612  0.672221 + 0.999737 * (log(sqrt(r_k)^(-0.0661697)) + log(2 * r_k - log_Re) / (15 / log_Re 
+  52  0.9654  0.893226 + 1.00002 * (log(sqrt(|-15.2901 - 0.00747296 * r_k + log((1.36518^log_Re)^(log_Re
+  54  0.9677  1.07046 + 0.997179 * (log(sqrt(-12.4521 - 0.0114205 * r_k + log((1.34995^log_Re)^(log_Re²)
+  56  0.9713  0.850212 - 0.00711372 * (log(r_k - 2.70805) - sqrt(|(|exp(|r_k|)| - 0.915327)^(-0.595242) 
+  56  0.9713  0.850212 - 0.00711372 * (log(r_k - 2.70805) - sqrt(|(|exp(|r_k|)| - 0.915327)^(-0.595242) 
+  64  0.9714  0.883475 + 1.00097 * (log(sqrt(-14.7815 - 0.00738793 * r_k + log((1.39164^log_Re)^(log_Re²
+

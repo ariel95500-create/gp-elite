@@ -1,0 +1,30 @@
+# Claims queue 1 (one core): start time of each command
+== feynman_bench 0 15 Wed Sep 30 00:22:49 CEST 2026
+== duel 0 15 Wed Sep 30 00:28:00 CEST 2026
+== constante Wed Sep 30 00:39:09 CEST 2026
+== robust Wed Sep 30 00:39:16 CEST 2026
+== kepler demo Wed Sep 30 00:44:58 CEST 2026
+== battery Wed Sep 30 00:45:09 CEST 2026
+== readme kepler Wed Sep 30 00:46:01 CEST 2026
+== usage Wed Sep 30 00:46:13 CEST 2026
+== console Wed Sep 30 00:46:17 CEST 2026
+== fuzz Wed Sep 30 00:49:04 CEST 2026
+== pools Wed Sep 30 00:49:12 CEST 2026
+== snippet kepler30 Wed Sep 30 00:51:45 CEST 2026
+== snippet hooke Wed Sep 30 00:51:55 CEST 2026
+== snippet coulomb Wed Sep 30 00:51:56 CEST 2026
+== snippet torque Wed Sep 30 00:51:59 CEST 2026
+== snippet optionB Wed Sep 30 00:52:20 CEST 2026
+== snippet tp Wed Sep 30 00:52:23 CEST 2026
+== snippet nikuradse Wed Sep 30 00:53:22 CEST 2026
+== robustness Wed Sep 30 00:53:49 CEST 2026
+== scale Wed Sep 30 00:54:15 CEST 2026
+== small data Wed Sep 30 00:54:22 CEST 2026
+== done Wed Sep 30 00:55:13 CEST 2026
+
+# Claims queue 2 (the other core)
+== ab_ood Wed Sep 30 00:22:49 CEST 2026
+== units Wed Sep 30 00:42:14 CEST 2026
+== scaling Wed Sep 30 00:45:40 CEST 2026
+== time_limit Wed Sep 30 01:14:33 CEST 2026
+== done Wed Sep 30 01:16:07 CEST 2026

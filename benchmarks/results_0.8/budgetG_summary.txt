@@ -1,0 +1,23 @@
+Budget G, arms ['A', 'F'], 210 fits
+
+Feynman: 75 paired fits (15 equations)
+  A  exact  46  near   9  miss  20   time median 12.3 s   generations median 18
+  F  exact  54  near   7  miss  14   time median 0.5 s   generations median 1
+  F ahead on 3 equations, behind on 1
+    ahead : I.12.2 (3->5), I.8.14 (0->5), II.3.24 (3->5)
+    behind: I.6.20a (5->4)
+  time ratio F/A: median 0.44
+  A out of domain, models not exact: n=29, median 1-R2 0.0181, collapses (R2<0) 2
+  F out of domain, models not exact: n=21, median 1-R2 0.076, collapses (R2<0) 3
+
+Real data, folds: 30 paired fits
+  A  R2 median 0.8154  mean 0.7847  worst 0.4059  collapses 0   time median 66.7 s   generations median 100
+  F  R2 median 0.8095  mean 0.7767  worst 0.3715  collapses 0   time median 38.0 s   generations median 100
+  paired difference F - A: median -0.0000  mean -0.0080   F better on 9, worse on 14
+  time ratio F/A: median 0.58
+
+Real data, folds + out of domain: 30 paired fits
+  A  R2 median 0.8154  mean 0.7847  worst 0.4059  collapses 0   time median 66.7 s   generations median 100
+  F  R2 median 0.8095  mean 0.7767  worst 0.3715  collapses 0   time median 38.0 s   generations median 100
+  paired difference F - A: median -0.0000  mean -0.0080   F better on 9, worse on 14
+  time ratio F/A: median 0.58

@@ -1,14 +1,15 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "gp-elite"
-version = "0.6.1"
-description = "Régression symbolique par programmation génétique — lois interprétables sur données expérimentales (pur Python/NumPy)"
+version = "0.8.0"
+description = "Genetic-programming symbolic regression: interpretable laws from experimental data, with physical units (pure Python/NumPy)"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{name = "Sabri Hakou", email = "ariel95500@gmail.com"}]
 keywords = [
     "symbolic-regression", "genetic-programming", "machine-learning",
@@ -17,7 +18,6 @@ keywords = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -36,11 +36,13 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+test = ["pytest>=7.0", "sympy>=1.9"]
 
 [project.urls]
 Homepage = "https://github.com/ariel95500-create/gp-elite"
 Repository = "https://github.com/ariel95500-create/gp-elite"
 Issues = "https://github.com/ariel95500-create/gp-elite/issues"
+Changelog = "https://github.com/ariel95500-create/gp-elite/blob/main/CHANGELOG.md"
 
 [project.scripts]
 gp-elite = "gp_elite.cli:main"

@@ -122,9 +122,17 @@ def _infer(node, feat_dims):
         # only a constant exponent gives a clean power; approximate with the
         # right subtree's constant value if it is a leaf number
         rv = node.right.value
-        if isinstance(rv, (int, float)) and not _is_dimensionless(dl):
+        if isinstance(rv, (int, float)) and not isinstance(rv, bool):
             return _pow(dl, float(rv))
-        return dl if _is_dimensionless(dl) else dl
+        # [CORRECTIF] Exposant NON CONSTANT. `x ** z` n'a de dimension bien
+        # definie que si la base est adimensionnee : m^z n'est pas une
+        # dimension fixe quand z varie. L'ancienne version renvoyait `dl` dans
+        # les deux branches, donc acceptait x^z comme des metres.
+        if not _is_dimensionless(dl):
+            raise _DimError(
+                "pow with a non-constant exponent requires a dimensionless "
+                "base, got %s" % _fmt(dl))
+        return dict(DIMENSIONLESS)
     # unknown binary op: require dimensionless to be safe
     return _mul(dl, dr)
 

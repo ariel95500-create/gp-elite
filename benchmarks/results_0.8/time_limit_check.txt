@@ -1,0 +1,28 @@
+/home/claude/repo/benchmarks/time_limit_check.py:43: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 1 of 3000 training rows (largest gap inf), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  m = symbolic_regression(X, y, generations=500, parallel=par, seed=0, time_limit=T)
+  [PASS] sequentiel : arret a l'echeance              T=15s duree=16.7s (1 gen = 0.8s)
+  [PASS] sequentiel : modele valide rendu             R2=0.9997
+  [PASS] sequentiel : time_limit_reached = True       
+/home/claude/repo/benchmarks/time_limit_check.py:35: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 33 of 3000 training rows (largest gap 0.000139), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  symbolic_regression(X, y, generations=3, parallel=parallel, seed=0)
+  [PASS] parallele : arret a l'echeance               T=15s duree=16.7s (1 gen = 1.2s)
+  [PASS] parallele : modele valide rendu              R2=0.9992
+  [PASS] parallele : time_limit_reached = True        
+/home/claude/repo/benchmarks/time_limit_check.py:52: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 300 of 300 training rows (largest gap 50.9), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  a = symbolic_regression(X[:300], y[:300], generations=8, parallel=False, seed=5)
+/home/claude/repo/benchmarks/time_limit_check.py:53: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 300 of 300 training rows (largest gap 50.9), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  b = symbolic_regression(X[:300], y[:300], generations=8, parallel=False, seed=5, time_limit=3600)
+  [PASS] budget genereux : non atteint                
+  [PASS] budget genereux : resultat identique         
+  [PASS] 3 redemarrages dans 24 s                     duree=26.7s, lances=3
+  [PASS] 3 redemarrages : tous lances                 
+/home/claude/repo/benchmarks/time_limit_check.py:67: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 5 of 300 training rows (largest gap 0.459), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False.
+  c = symbolic_regression(X[:300], y[:300], generations=5, parallel=False, seed=1)
+  [PASS] drapeau non transmis au fit suivant          
+  [PASS] time_limit=0 rejete                          
+  [PASS] time_limit=-5 rejete                         
+  [PASS] time_limit=nan rejete                        
+  [PASS] time_limit=inf rejete                        
+  [PASS] GPEliteRegressor : diagnostic expose         
+
+BILAN : 16/16

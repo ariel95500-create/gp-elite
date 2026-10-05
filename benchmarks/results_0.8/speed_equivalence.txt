@@ -1,0 +1,57 @@
+# benchmarks/speed_equivalence.py, 30 September 2026, PYTHONHASHSEED=0, one process per configuration
+# pair 1: 0.7.0 (e847605) against the speed steps up to cef0be1 (before the fix of the negative square)
+A_feyn       same
+B_cpu        same
+C_big        same
+D_units      same
+E_minmax     same
+F_robust     same
+G_restarts   same
+H_parallel   same
+I_sklearn    same
+J_extrap     same
+K_thorough   same
+L_standard   same
+M_twice      same
+total time 76.5 s -> 45.3 s
+ALL IDENTICAL
+
+# pair 2: the fix of the negative square (aaa5f79) against the speed steps up to c7b5934 (engine B of campaign 1)
+A_feyn       same
+B_cpu        same
+C_big        same
+D_units      same
+E_minmax     same
+F_robust     same
+G_restarts   same
+H_parallel   same
+I_sklearn    same
+J_extrap     same
+K_thorough   same
+L_standard   same
+M_twice      same
+total time 44.3 s -> 38.0 s
+ALL IDENTICAL
+
+== pair 1 start 2026-09-30 04:32:21
+== pair 2 start 2026-09-30 04:33:43
+== done 2026-09-30 04:34:32
+
+# pair 3: before (98a165d) and after (4a4bf0a) the scaling of the Levenberg-Marquardt residual without recomputing the mean of y
+A_feyn       same
+B_cpu        same
+C_big        same
+D_units      same
+E_minmax     same
+F_robust     same
+G_restarts   same
+H_parallel   same
+I_sklearn    same
+J_extrap     same
+K_thorough   same
+L_standard   same
+M_twice      same
+total time 43.1 s -> 42.8 s
+ALL IDENTICAL
+== pair 3 start 2026-09-30 04:35:22
+== done 2026-09-30 04:36:10

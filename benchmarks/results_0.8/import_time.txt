@@ -1,0 +1,5 @@
+# import time of gp_elite, 7 fresh processes each, seconds (python -c 'import time; t = time.perf_counter(); import gp_elite; print("%.3f" % (time.perf_counter() - t))')
+== gp07 e847605 2026-09-30 02:05:10
+0.940 0.910 0.911 0.927 0.915 0.889 0.923 
+== gpR cdddaf0 2026-09-30 02:05:17
+0.161 0.073 0.077 0.079 0.075 0.073 0.073 

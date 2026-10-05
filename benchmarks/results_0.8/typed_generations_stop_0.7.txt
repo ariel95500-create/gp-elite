@@ -1,0 +1,159 @@
+# PYTHONHASHSEED=0 PYTHONPATH=<0.7.0, commit e847605> python benchmarks/typed_generations_check.py <seed> --verbose
+# 30 September 2026, 04:38 to 04:41, the two seeds side by side; why 0.7.0 stops early: the hold-out MSE falls below its fixed threshold of 1e-6
+
+=================== seed 2
+[v17-SEMANTIC] Probe set initialized: 30 points × 5 features  [-2.0, 2.0]
+======================================================================
+Generations : 40  |  Ops : ['+', '-', '*', '/', 'pow', 'sin', 'cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube']
+======================================================================
+
+[v21-VAL] Hold-out random : 160 points train / 40 points validation (20%, seed=1234)
+          Evolution sees ONLY the train set; final champion selected on the validation set.
+GP_ELITE  —  3 islands × 133 individuals  (island 0=explorer, island 1=cleaner, island 2=stigmergic)
+
+  [Stigmergy Blocked] Initial noise or insufficient quality (gen=0, r=0.816)
+[GEN 0000|I0] FIT=-807.32034548 RAW=0.92338762 SIZE=11 DEPTH=06 (1.1s)
+  EXPR = (0.121963 * ((((X0 * X1) / X2) / X3) / X4))
+
+  [Stigmergy Blocked] Initial noise or insufficient quality (gen=0, r=0.816)
+  [Stigmergy Blocked] Initial noise or insufficient quality (gen=0, r=0.816)
+[GEN 0001|I0] FIT=-1184.85757047 RAW=0.08545393 SIZE=11 DEPTH=06 (7.8s)
+  EXPR = (0.143742 * ((((X0 * X1) / X2) / X3) / X3))
+
+[GEN 0002|I0] FIT=-1334.60223802 RAW=0.02064442 SIZE=17 DEPTH=06 (14.0s)
+  EXPR = (0.293835 * ((((X0 * X1) / X2) / X3) / (X3 * ((X3 / X4) - -0.989698))))
+
+[GEN 0002|I1] FIT=-1690.56720893 RAW=0.00231695 SIZE=17 DEPTH=06 (17.5s)
+  EXPR = (0.368194 * ((((X0 * X1) / X2) / X3) / ((X3 * 2.5475) + (X3 - X4))))
+
+[GEN 0007|I1] FIT=-1719.87840384 RAW=0.00192527 SIZE=17 DEPTH=06 (41.7s)
+  EXPR = (0.344414 * ((((X0 * X1) / X2) / X3) / ((X3 * 2.385066) + (X3 - X4))))
+
+[GEN 0013|I0] FIT=-1796.67045202 RAW=0.00014916 SIZE=34 DEPTH=10 (64.8s)
+  EXPR = (0.999992 * (((sqrt((X3 * X4)) / X4) + 0.703094) * ((((X0 * (X1 / 1.471439)) / (((X4 / X3) - 3.795647) * (((X4 / X3) - 3.900688) * X2))) / X3) / X3)))
+
+
+════════════════════════════════════════════════════════════
+  [SUCCESS] Precision target reached at GEN 0013!
+  MSE (hold-out si actif) = 5.01e-07  ≤  seuil = 1.00e-06
+  Early stop — remaining generations saved.
+════════════════════════════════════════════════════════════
+
+[v21-VAL] Parsimonious selection: champion replaced — simpler (17 nodes vs 34, equivalent R²)
+
+──────────────────────────────────────────────────────────────────────
+[v21-VAL] GENERALIZATION REPORT (final champion)
+  MSE train      : 7.534677e-06
+  Validation MSE : 2.837113e-06   (never seen by evolution)
+  R² validation  : 0.9996
+  Ratio val/train: 0.38
+  ✓ Healthy generalization.
+──────────────────────────────────────────────────────────────────────
+[STIGM] Fragments accumulated: 136
+[STIGM] τ max : 6.0000  |  τ moyen : 0.4739
+[STIGM] Dominant operators: [('/', 54), ('*', 37), ('sq', 12), ('neg', 11), ('abs', 11)]
+[STIGM] Top 3 fragments :
+  τ=6.000  freq=109  (X3)²
+  τ=4.193  freq=288  (X0 * X1)
+  τ=4.090  freq=264  ((X0 * X1) / X2)
+
+[COGRAPH] Co-occurrence edges: 2000
+[COGRAPH] co max : 22.37572  |  co moyen : 0.73917
+[COGRAPH] Top 5 paires co-occurrentes :
+  co=22.3757  [(X0 * X1)]  ×  [((X0 * X1) / X2)]
+  co=11.8435  [(((X0 * X1) / X2) / X3)]  ×  [((X0 * X1) / X2)]
+  co=11.8435  [(X0 * X1)]  ×  [(((X0 * X1) / X2) / X3)]
+  co=10.9317  [(X1 / ((X1 * -5.471408) / (X3)²))]  ×  [((X1 * -5.471408) / (X3)²)]
+  co=9.9288  [(X1 * -5.471408)]  ×  [((X1 * -5.471408) / (X3)²)]
+
+[SEQ_MEM] Transitions apprises : 155  (poids total : 6350.41)
+[SEQ_MEM] Top 5 transitions :
+  root.root.unary           → *
+  *.root.unary              → *
+  *./.right                 → X[3]
+  *./.left                  → /
+  /./.right                 → X[2]
+{"engine": "/tmp/claude-0/arms/gp07/gp_elite/__init__.py", "version": "0.8.0", "seed": 2, "seconds": 68.4, "generations_reached": 14, "island_calls": 42, "sec_per_gen": 4.89, "size": 17, "r2_test": 0.999568, "r2_ood": 0.650874}
+
+=================== seed 0
+[v17-SEMANTIC] Probe set initialized: 30 points × 5 features  [-2.0, 2.0]
+======================================================================
+Generations : 40  |  Ops : ['+', '-', '*', '/', 'pow', 'sin', 'cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube']
+======================================================================
+
+[v21-VAL] Hold-out random : 160 points train / 40 points validation (20%, seed=1234)
+          Evolution sees ONLY the train set; final champion selected on the validation set.
+GP_ELITE  —  3 islands × 133 individuals  (island 0=explorer, island 1=cleaner, island 2=stigmergic)
+
+  [Stigmergy Blocked] Initial noise or insufficient quality (gen=0, r=-0.806)
+[GEN 0000|I0] FIT=-737.14123483 RAW=0.97348964 SIZE=11 DEPTH=06 (1.3s)
+  EXPR = (0.137884 * ((((X0 * X1) / X2) / X3) / X4))
+
+  [Stigmergy Blocked] Initial noise or insufficient quality (gen=0, r=0.806)
+  [Stigmergy Blocked] Initial noise or insufficient quality (gen=0, r=-0.806)
+[GEN 0001|I0] FIT=-1093.49313676 RAW=0.09637561 SIZE=11 DEPTH=06 (12.4s)
+  EXPR = (0.148985 * ((((X0 * X1) / X2) / X3) / X3))
+
+[GEN 0002|I0] FIT=-1326.66733284 RAW=0.00756547 SIZE=25 DEPTH=07 (18.1s)
+  EXPR = (0.092979 * (sqrt((((-X1) * (X4 / X1)) / (-0.744 / (1.8202 / X3)))) * ((((X0 * X1) / X2) / X3) / X3)))
+
+[GEN 0002|I1] FIT=-1397.71976626 RAW=0.00756547 SIZE=23 DEPTH=09 (21.3s)
+  EXPR = (0.243395 * ((((X0 * X1) / sqrt((X3 / (X4 / (X2)²)))) / X3) / ((1.6736 * X1) * (X3 / X1))))
+
+[GEN 0004|I1] FIT=-1458.62185204 RAW=0.00756547 SIZE=19 DEPTH=09 (31.9s)
+  EXPR = (0.145432 * ((((X0 * X1) / sqrt((X3 / (X4 / (X2)²)))) / X3) / sqrt((X3)²)))
+
+[GEN 0007|I1] FIT=-1468.77219967 RAW=0.00756547 SIZE=17 DEPTH=10 (45.4s)
+  EXPR = (0.145432 * ((X1 * (X0 / (sqrt((X3 / (X4 / (X2)²))) * X3))) / X3))
+
+[GEN 0010|I2] FIT=-1568.11227684 RAW=0.00105391 SIZE=40 DEPTH=12 (59.6s)
+  EXPR = (-0.713222 * ((((X2 * (X0 / (X0 * X2))) / (((X2 / ((X4 / (X3 / (-0.140193 * X1))) * X0)) - ((X2 * -1.155745) / (X1 * X0))) - ((-X2) / (X1 * X0)))) / X3) / X4))
+
+[GEN 0014|I2] FIT=-1568.11227684 RAW=0.00105391 SIZE=40 DEPTH=12 (74.0s)
+  EXPR = (-0.713223 * ((((X2 * (X0 / (X0 * X2))) / (((X2 / ((X4 / (X3 / (-0.140193 * X1))) * X0)) - ((X2 * -1.155746) / (X1 * X0))) - ((-X2) / (X1 * X0)))) / X3) / X4))
+
+[GEN 0033|I2] FIT=-2019.49163432 RAW=0.00001199 SIZE=56 DEPTH=13 (155.9s)
+  EXPR = (-0.533109 * ((((X2 * (((1.563931 * X1) / (X1 * X2)) - ((X4 / 2.1372) / (X3 * X2)))) / (((X2 / ((X4 / (X3 / (-0.135047 * X1))) * X0)) - ((X2 * -2.29756) / ((X4 / (sqrt((X4 / X1)))²) * X0))) - ((-X2) / (X1 * X0)))) / X3) / X4))
+
+
+════════════════════════════════════════════════════════════
+  [SUCCESS] Precision target reached at GEN 0033!
+  MSE (hold-out si actif) = 4.86e-08  ≤  seuil = 1.00e-06
+  Early stop — remaining generations saved.
+════════════════════════════════════════════════════════════
+
+[v21-VAL] Parsimonious selection: champion replaced — simpler (17 nodes vs 56, equivalent R²)
+
+──────────────────────────────────────────────────────────────────────
+[v21-VAL] GENERALIZATION REPORT (final champion)
+  MSE train      : 3.026600e-05
+  Validation MSE : 2.490327e-05   (never seen by evolution)
+  R² validation  : 0.9978
+  Ratio val/train: 0.82
+  ✓ Healthy generalization.
+──────────────────────────────────────────────────────────────────────
+[STIGM] Fragments accumulated: 37
+[STIGM] τ max : 1.0700  |  τ moyen : 0.3647
+[STIGM] Dominant operators: [('/', 13), ('*', 12), ('sqrt', 4), ('sq', 3), ('neg', 3)]
+[STIGM] Top 3 fragments :
+  τ=1.070  freq=3  sqrt((-0.4759 / X2))
+  τ=1.042  freq=168  (-X2)
+  τ=0.978  freq=3  (-sqrt((-0.4759 / X2)))
+
+[COGRAPH] Co-occurrence edges: 2000
+[COGRAPH] co max : 22.67834  |  co moyen : 1.23167
+[COGRAPH] Top 5 paires co-occurrentes :
+  co=22.6783  [(X2 * -2.6243)]  ×  [(X1 * X0)]
+  co=20.6581  [(X1 * X0)]  ×  [((X2 * 2.463243) / (X1 * X0))]
+  co=20.6564  [(X2 * -2.6243)]  ×  [((X2 * 2.463243) / (X1 * X0))]
+  co=20.1909  [(X0 / (X0 * X2))]  ×  [(X0 * X2)]
+  co=19.6232  [(X1 * X0)]  ×  [(X0 * X2)]
+
+[SEQ_MEM] Transitions apprises : 175  (poids total : 16892.96)
+[SEQ_MEM] Top 5 transitions :
+  *./.right                 → X[3]
+  *./.left                  → /
+  root.root.unary           → *
+  *.root.unary              → *
+  /./.right                 → /
+{"engine": "/tmp/claude-0/arms/gp07/gp_elite/__init__.py", "version": "0.8.0", "seed": 0, "seconds": 156.1, "generations_reached": 34, "island_calls": 102, "sec_per_gen": 4.59, "size": 17, "r2_test": 0.997526, "r2_ood": 0.408267}

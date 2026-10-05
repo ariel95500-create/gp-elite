@@ -1,0 +1,11 @@
+Budget T, arms ['C6x', 'R'], 410 fits
+
+Feynman: 205 paired fits (41 equations)
+  C6x  exact  88  near  27  miss  90   time median 30.6 s   generations median 66
+  R  exact  88  near  32  miss  85   time median 30.5 s   generations median 76
+  R ahead on 0 equations, behind on 0
+    ahead : 
+    behind: 
+  time ratio R/C6x: median 0.98
+  C6x out of domain, models not exact: n=117, median 1-R2 0.0326, collapses (R2<0) 10
+  R out of domain, models not exact: n=117, median 1-R2 0.0297, collapses (R2<0) 11

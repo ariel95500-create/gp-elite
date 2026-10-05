@@ -37,6 +37,14 @@ from .dimensions import (_infer, _mul, _inv, _pow, _eq, _is_dimensionless,
 _TRANSCENDENTAL = ("exp", "log", "sin", "cos", "tanh")
 
 
+def _ok(op, ops):
+    """[v0.7] Respect du pool `operators=`. ops=None : aucun filtrage
+    (comportement historique) ; sinon, seuls les operateurs du pool sont
+    produits. Sans ce filtre, le generateur type produisait sin/cos meme avec
+    le pool par defaut 'physical', qui n'en contient pas."""
+    return ops is None or op in ops
+
+
 # ── canonical hashable key for a dimension dict ─────────────────────────────
 
 def _key(d):
@@ -89,7 +97,7 @@ def _reachable(target, feats, _cache):
 
 # ── constructive generation ─────────────────────────────────────────────────
 
-def _build(target, depth, feats, rng, cache, budget):
+def _build(target, depth, feats, rng, cache, budget, ops=None):
     """Return a tree of dimension exactly `target`, or None."""
     budget[0] -= 1
     if budget[0] <= 0 or not _reachable(target, feats, cache):
@@ -109,54 +117,61 @@ def _build(target, depth, feats, rng, cache, budget):
     if dimless and rng.random() < 0.12:
         return Node(round(rng.uniform(-3, 3), 4))
 
-    prods = [("neg",), ("abs",), ("+",), ("-",), ("sqrt",), ("sq",)]
+    prods = [("neg",), ("abs",), ("+",), ("-",), ("sqrt",), ("sq",), ("cube",)]
     if dimless:
         prods += [(f,) for f in _TRANSCENDENTAL]
     factors = [d for _, d in feats] + [dict(DIMENSIONLESS)]
     for A in factors:
         prods.append(("*", A))
         prods.append(("/", A))
+    # cube n'etait pas produit historiquement : seulement si le pool le demande
+    prods = [p for p in prods if _ok(p[0], ops) and
+             (p[0] != "cube" or ops is not None)]
     rng.shuffle(prods)
 
     for p in prods:
         op = p[0]
         if op in ("neg", "abs"):
-            c = _build(target, depth - 1, feats, rng, cache, budget)
+            c = _build(target, depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node(op, c)
         elif op in ("+", "-"):
-            l = _build(target, depth - 1, feats, rng, cache, budget)
+            l = _build(target, depth - 1, feats, rng, cache, budget, ops)
             if l is None:
                 continue
-            r = _build(target, depth - 1, feats, rng, cache, budget)
+            r = _build(target, depth - 1, feats, rng, cache, budget, ops)
             if r is not None:
                 return Node(op, l, r)
         elif op == "sqrt":
-            c = _build(_pow(target, 2), depth - 1, feats, rng, cache, budget)
+            c = _build(_pow(target, 2), depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node("sqrt", c)
         elif op == "sq":
-            c = _build(_pow(target, 0.5), depth - 1, feats, rng, cache, budget)
+            c = _build(_pow(target, 0.5), depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node("sq", c)
+        elif op == "cube":
+            c = _build(_pow(target, 1.0 / 3.0), depth - 1, feats, rng, cache, budget, ops)
+            if c is not None:
+                return Node("cube", c)
         elif op in _TRANSCENDENTAL:
-            c = _build(dict(DIMENSIONLESS), depth - 1, feats, rng, cache, budget)
+            c = _build(dict(DIMENSIONLESS), depth - 1, feats, rng, cache, budget, ops)
             if c is not None:
                 return Node(op, c)
         elif op == "*":
             A = p[1]
-            l = _build(A, depth - 1, feats, rng, cache, budget)
+            l = _build(A, depth - 1, feats, rng, cache, budget, ops)
             if l is None:
                 continue
-            r = _build(_mul(target, _inv(A)), depth - 1, feats, rng, cache, budget)
+            r = _build(_mul(target, _inv(A)), depth - 1, feats, rng, cache, budget, ops)
             if r is not None:
                 return Node("*", l, r)
         elif op == "/":
             A = p[1]
-            l = _build(A, depth - 1, feats, rng, cache, budget)
+            l = _build(A, depth - 1, feats, rng, cache, budget, ops)
             if l is None:
                 continue
-            r = _build(_mul(A, _inv(target)), depth - 1, feats, rng, cache, budget)
+            r = _build(_mul(A, _inv(target)), depth - 1, feats, rng, cache, budget, ops)
             if r is not None:
                 return Node("/", l, r)
 
@@ -165,7 +180,7 @@ def _build(target, depth, feats, rng, cache, budget):
     return Node(round(rng.uniform(-3, 3), 4)) if dimless else None
 
 
-def _monomial_tree(target, feats, rng, max_terms=8):
+def _monomial_tree(target, feats, rng, max_terms=8, ops=None):
     """CHEMIN RAPIDE : resout directement les exposants entiers e_i tels que
     prod(dim_i ^ e_i) == target (moindres carres + arrondi + verification),
     puis construit l'arbre produit correspondant. Evite la recherche aveugle,
@@ -198,6 +213,8 @@ def _monomial_tree(target, feats, rng, max_terms=8):
             continue
         if np.abs(e).sum() > max_terms or np.abs(e).max() > 4:
             continue
+        if not _ok("/", ops) and np.any(e < 0):
+            continue                     # pool sans division : exposants >= 0
         node = None
         for i, k in enumerate(e):
             k = int(k)
@@ -259,7 +276,7 @@ def _surrogate_target(feats, rng, max_exp=2):
 
 
 def typed_random_tree(target_dim, max_depth, feat_dims, rng=None, tries=40,
-                      unknown_constant=False):
+                      unknown_constant=False, ops=None):
     """Random tree GUARANTEED to have dimension `target_dim`. None if impossible.
 
     [v0.5] Si unknown_constant, `target_dim` est ignore : on tire une cible de
@@ -274,23 +291,23 @@ def typed_random_tree(target_dim, max_depth, feat_dims, rng=None, tries=40,
         for _ in range(6):
             tgt = _surrogate_target(feats, rng)
             for _ in range(2):
-                t = _monomial_tree(tgt, feats, rng)
+                t = _monomial_tree(tgt, feats, rng, ops=ops)
                 if t is not None:
                     return t
             t = _build(tgt, rng.randint(2, max(2, max_depth)),
-                       feats, rng, cache, [4000])
+                       feats, rng, cache, [4000], ops)
             if t is not None:
                 return t
         return None
     tgt = dict(target_dim)
     # chemin rapide d'abord (majorite des cas, quasi instantane)
     for _ in range(3):
-        t = _monomial_tree(tgt, feats, rng)
+        t = _monomial_tree(tgt, feats, rng, ops=ops)
         if t is not None:
             return t
     for _ in range(tries):
         d = rng.randint(2, max(2, max_depth))
-        t = _build(tgt, d, feats, rng, cache, [4000])
+        t = _build(tgt, d, feats, rng, cache, [4000], ops)
         if t is not None:
             return t
     return None
@@ -320,7 +337,7 @@ def _graft(root, old, new):
     return Node(root.value, l, r)
 
 
-def typed_mutate(tree, feat_dims, max_depth, rng=None):
+def typed_mutate(tree, feat_dims, max_depth, rng=None, ops=None):
     """Replace a random subtree by a fresh one of the SAME dimension."""
     rng = rng or random
     fd = _norm_feat_dims(feat_dims)
@@ -335,7 +352,7 @@ def typed_mutate(tree, feat_dims, max_depth, rng=None):
             continue
         for _ in range(12):
             sub = _build(d, rng.randint(1, max(2, max_depth)), feats, rng,
-                         cache, [2000])
+                         cache, [2000], ops)
             if sub is not None:
                 return _graft(tree, pick, sub).copy()
     return tree
@@ -404,7 +421,15 @@ def _strip_linear_scaling(node):
 
 
 def is_typed_valid(tree, feat_dims, target_dim, unknown_constant=False):
-    """Cheap backstop gate: use in fitness() to reject trees from any path.
+    """Porte de validite. STRICTEMENT alignee sur dimensions.check_dimensions.
+
+    Une tolerance avait ete introduite ici pour accepter l'enrobage `a + b*f`
+    produit par wrap_linear_scaling. Elle creait une DIVERGENCE avec
+    l'auditeur : `1 + 2*x` avec x en metres etait REJETE par l'auditeur et
+    ACCEPTE par la porte, ce qui vidait de sa substance la promesse d'une
+    seule source de verite. Depuis que le scaling est multiplicatif seul sous
+    units= (_LS_SCALE_ONLY, v0.4.1), l'enrobage additif n'apparait plus : la
+    tolerance est retiree et les deux verdicts coincident a nouveau.
 
     [v0.5] Si unknown_constant, le critere devient la COHERENCE INTERNE seule :
     l'arbre doit avoir une dimension bien definie, pas necessairement egale a
@@ -415,33 +440,12 @@ def is_typed_valid(tree, feat_dims, target_dim, unknown_constant=False):
         try:
             _infer(tree, fd)
             return True
-        except _DimError:
-            pass
-        except Exception:
-            return False
-        inner = _strip_linear_scaling(tree)
-        if inner is tree:
-            return False
-        try:
-            _infer(inner, fd)
-            return True
         except Exception:
             return False
     try:
-        if _eq(_infer(tree, fd), target_dim):
-            return True
-    except _DimError:
-        pass
-    inner = _strip_linear_scaling(tree)
-    if inner is tree:
-        return False
-    try:
-        return _eq(_infer(inner, fd), target_dim)
+        return _eq(_infer(tree, fd), target_dim)
     except _DimError:
         return False
-
-
-# ── normalisation de l'argument utilisateur `units=` ────────────────────────
 
 def normalize_units_arg(units, target_units, n_features, feature_names=None):
     """Convertit l'argument utilisateur en (FEAT_DIMS, TARGET_DIM).
@@ -510,11 +514,17 @@ _DERIVED = {
 
 
 def parse_unit_string(s):
-    """'m/s' -> {'m':1,'s':-1} ; 'kg*m/s^2' -> {'kg':1,'m':1,'s':-2} ; 'J' -> ...
+    """'m/s' -> {'m':1,'s':-1} ; 'kg*m/s^2' -> ... ; 'J' -> {kg,m^2,s^-2}
 
-    Reconnait les unites de base SI, les unites derivees usuelles, et les
-    operateurs * / ^ ( ). Un jeton inconnu devient sa propre dimension de base
-    (comme dimensions.unit), donc 'widget' -> {'widget': 1}.
+    Reconnait les unites SI de base, les unites derivees usuelles, et les
+    operateurs * / ^ ( ).
+
+    [CORRECTIF] Validation STRICTE de la chaine. La version precedente
+    acceptait silencieusement des entrees mal formees : 'm garbage' -> {'m':1},
+    'm/(s' -> {'m':1,'s':-1}, 'kg**m' -> {'kg':1,'*':1}, '@@@' -> {}. Une unite
+    mal saisie produisait alors une contrainte dimensionnelle fausse SANS
+    aucun avertissement, ce qui est pire que pas de contrainte du tout.
+    Toute chaine invalide leve desormais ValueError.
     """
     import re
     from .dimensions import _mul, _inv, _pow, unit as _unit
@@ -522,7 +532,34 @@ def parse_unit_string(s):
     txt = str(s).strip()
     if txt in ("", "1", "-", "none", "dimensionless"):
         return {}
+
+    # 1) aucun caractere etranger
+    if re.search(r"[^A-Za-z0-9_.\*/^()+\-\s]", txt):
+        raise ValueError("unite invalide %r : caractere non autorise" % s)
     toks = re.findall(r"[A-Za-z_]+|-?\d+(?:\.\d+)?|[*/^()]", txt)
+    if "".join(toks) != re.sub(r"\s+", "", txt):
+        raise ValueError("unite invalide %r : jeton non reconnu" % s)
+    if toks.count("(") != toks.count(")"):
+        raise ValueError("unite invalide %r : parentheses desequilibrees" % s)
+
+    # 2) grammaire : deux unites accolees, ou deux operateurs de suite,
+    #    ou un operateur en fin de chaine, sont des erreurs
+    def kind(t):
+        if t in "*/^": return "op"
+        if t in "()":  return t
+        return "num" if re.fullmatch(r"-?\d+(?:\.\d+)?", t) else "sym"
+    prev = None
+    for t in toks:
+        k = kind(t)
+        if prev in ("sym", "num", ")") and k in ("sym", "num", "("):
+            raise ValueError("unite invalide %r : operateur manquant entre "
+                             "%r et %r" % (s, prev_tok, t))
+        if prev == "op" and k == "op":
+            raise ValueError("unite invalide %r : deux operateurs consecutifs" % s)
+        prev, prev_tok = k, t
+    if prev == "op":
+        raise ValueError("unite invalide %r : se termine par un operateur" % s)
+
     pos = [0]
 
     def peek():
@@ -544,7 +581,10 @@ def parse_unit_string(s):
             pos[0] += 1
             e = peek()
             pos[0] += 1
-            d = _pow(d, float(e))
+            try:
+                d = _pow(d, float(e))
+            except (TypeError, ValueError):
+                raise ValueError("unite invalide %r : exposant illisible" % s)
         return d
 
     def expr():
@@ -556,4 +596,8 @@ def parse_unit_string(s):
             d = _mul(d, r) if op == "*" else _mul(d, _inv(r))
         return d
 
-    return expr()
+    out = expr()
+    if pos[0] != len(toks):
+        raise ValueError("unite invalide %r : fin de chaine inattendue" % s)
+    return out
+

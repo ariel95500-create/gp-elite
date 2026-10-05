@@ -6,7 +6,7 @@ Rejoue les 5 cas de validation du dossier + le duel outlier, avec verdicts
 automatiques. Tout doit être VERT sauf le duel (jaune attendu tant que le
 bug n°2 — polissage LM en MSE — n'est pas traité).
 
-  set PYTHONHASHSEED=0 && python benchmarks\\validate_robust_fix.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\validate_robust_fix.py
 """
 import os, sys, io, contextlib
 import multiprocessing

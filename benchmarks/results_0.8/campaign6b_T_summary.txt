@@ -1,0 +1,29 @@
+Budget T, arms ['C5x', 'C6x'], 610 fits
+
+Feynman: 205 paired fits (41 equations)
+  C5x  exact  75  near  28  miss 102   time median 30.7 s   generations median 67
+  C6x  exact  88  near  27  miss  90   time median 30.6 s   generations median 66
+  C6x ahead on 4 equations, behind on 0
+    ahead : I.12.2 (2->5), I.32.5 (1->5), II.38.3 (4->5), III.19.51 (0->5)
+    behind: 
+  time ratio C6x/C5x: median 0.99
+  C5x out of domain, models not exact: n=130, median 1-R2 0.0334, collapses (R2<0) 11
+  C6x out of domain, models not exact: n=117, median 1-R2 0.0326, collapses (R2<0) 10
+
+Real data in raw units, folds: 35 paired fits
+  C5x  R2 median 0.8787  mean 0.7960  worst 0.0163  collapses 0   time median 30.9 s   generations median 75
+  C6x  R2 median 0.8787  mean 0.7960  worst 0.0163  collapses 0   time median 31.0 s   generations median 76
+  paired difference C6x - C5x: median +0.0000  mean +0.0000   C6x better on 0, worse on 0
+  time ratio C6x/C5x: median 1.00
+
+Real data in raw units, out of domain: 35 paired fits
+  C5x  R2 median 0.6850  mean -12.4968  worst -232.5370  collapses 6   time median 31.1 s   generations median 72
+  C6x  R2 median 0.6850  mean -12.4961  worst -232.5370  collapses 6   time median 31.2 s   generations median 73
+  paired difference C6x - C5x: median +0.0000  mean +0.0007   C6x better on 3, worse on 1
+  time ratio C6x/C5x: median 1.00
+
+Real data in raw units, folds + out of domain: 70 paired fits
+  C5x  R2 median 0.7885  mean -5.8504  worst -232.5370  collapses 6   time median 31.0 s   generations median 73
+  C6x  R2 median 0.7885  mean -5.8501  worst -232.5370  collapses 6   time median 31.1 s   generations median 74
+  paired difference C6x - C5x: median +0.0000  mean +0.0003   C6x better on 3, worse on 1
+  time ratio C6x/C5x: median 1.00

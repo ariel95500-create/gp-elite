@@ -47,7 +47,7 @@ défaut.
 Sortie : feyn_defaults.jsonl   |   Reprise automatique.
 
 Lancement :
-  set PYTHONHASHSEED=0 && python benchmarks\\feynman_defaults.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\feynman_defaults.py
 Options :
   --cand current,min_fix   sous-ensemble de candidats
   --seeds 0,1              graines moteur (défaut 0,1,2)

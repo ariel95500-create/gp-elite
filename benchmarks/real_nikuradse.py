@@ -22,13 +22,14 @@ qu'on n'a pas regardées.
 
 Lancement :
   python -m pip install pandas
-  set PYTHONHASHSEED=0 && python benchmarks\\real_nikuradse.py
+  set "PYTHONHASHSEED=0" && python benchmarks\\real_nikuradse.py
 Options :
   --explore-only   s'arrête après l'inspection des données
   --gens 40          budget de générations (défaut 30)
-  --normalize none   force le mode de normalisation. IMPORTANT : sous 'auto'
-                     les expressions sont en variables normalisées et leurs
-                     constantes ne sont pas physiquement lisibles.
+  --normalize none   force le mode de normalisation. Depuis la 0.7, les
+                     expressions sont rendues dans les variables brutes quel
+                     que soit ce mode (auparavant, sous 'auto', elles étaient
+                     écrites en variables normalisées).
 """
 import os, sys, io, json, time, contextlib
 
@@ -73,20 +74,18 @@ URL = (f"https://github.com/EpistasisLab/pmlb/raw/master/datasets/"
        f"{DATASET}/{DATASET}.tsv.gz")
 
 print(f"\n=== téléchargement de {DATASET} ===")
-df = None
+# [v0.7] Données figées par empreinte (pmlb_frozen.py) : le fichier est
+# téléchargé une fois, mis en cache dans benchmarks/_pmlb_cache/ et vérifié.
+# Hors ligne : déposer nikuradse_1.tsv.gz dans ce dossier de cache.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import pmlb_frozen
 try:
-    df = pd.read_csv(URL, sep="\t", compression="gzip")
-    print(f"  source : dépôt PMLB (master)")
+    df = pmlb_frozen.load_frame(DATASET)
+    print("  source : PMLB, contenu vérifié par SHA-256")
 except Exception as exc:
-    print(f"  téléchargement direct impossible ({type(exc).__name__}: {exc})")
-    try:
-        from pmlb import fetch_data
-        df = fetch_data(DATASET)
-        print("  source : paquet pmlb")
-    except Exception as exc2:
-        sys.exit(f"Impossible de récupérer les données : {exc2}\n"
-                 f"Solution de repli : ouvrir {URL} dans un navigateur,\n"
-                 f"enregistrer le fichier à côté du script, puis relancer.")
+    sys.exit(f"Impossible de récupérer les données : {exc}\n"
+             f"Solution de repli : ouvrir {URL} dans un navigateur et\n"
+             f"enregistrer le fichier dans {pmlb_frozen.CACHE}, puis relancer.")
 print(f"forme : {df.shape[0]} lignes x {df.shape[1]} colonnes")
 print(f"colonnes : {list(df.columns)}")
 
@@ -111,11 +110,8 @@ norm = "auto" if ratio > 20 else "none"
 if "--normalize" in sys.argv:
     norm = sys.argv[sys.argv.index("--normalize") + 1]
     print(f"  -> forcé par --normalize : '{norm}'")
-if norm == "auto":
-    print("  ATTENTION : sous normalize='auto', les expressions renvoyées sont")
-    print("  écrites en variables NORMALISÉES. Leurs constantes ne se lisent pas")
-    print("  physiquement. Pour une expression interprétable en unités réelles,")
-    print("  relancer avec  --normalize none  et comparer les deux.")
+# [v0.7] Plus d'avertissement : les expressions sont rendues en variables
+# brutes pour toute normalisation (gp_elite/formula.py).
 
 n_nan = int(np.isnan(X).sum() + np.isnan(y).sum())
 print(f"valeurs manquantes : {n_nan}")
@@ -312,18 +308,21 @@ if mask_out.sum() > 0:
     if bmin is not None:
         bp = level(pvk(Xout))
         print(f"\n    --- lecture de la généralisation ---")
-        print(f"    meilleur biais GP_ELITE : {bmin:+.3f} sigma")
-        print(f"    biais de la théorie     : {bp:+.3f} sigma")
+        print(f"    meilleur biais GP_ELITE : {bmin:+.3f} sigma   (la meilleure des "
+              f"{len(biases)} formes, choisie APRÈS avoir vu la courbe retirée)")
+        print(f"    biais de la théorie     : {bp:+.3f} sigma   (aucun choix)")
         if abs(bmin) < abs(bp):
-            print("    -> GP_ELITE prédit le niveau d'une rugosité jamais vue")
-            print("       AUSSI BIEN OU MIEUX que la loi classique.")
+            print("    -> au moins une forme proposée prédit le niveau de la rugosité")
+            print("       jamais vue mieux que la loi classique ; rien ne dit d'avance")
+            print("       laquelle choisir, et ce meilleur chiffre est donc optimiste.")
         else:
             print("    -> la loi classique prédit mieux le niveau. Écart : "
                   f"{abs(bmin) - abs(bp):+.3f} sigma.")
     if best2 and best2[1] > r2_log_out:
-        print(f"\n    -> BAT la loi log de référence sur une rugosité jamais vue "
-              f"({best2[1]:.4f} > {r2_log_out:.4f}).")
-        print("       C'est un résultat publiable.")
+        print(f"\n    -> la meilleure forme, choisie après coup, bat la loi log ajustée "
+              f"sur la rugosité jamais vue ({best2[1]:.4f} > {r2_log_out:.4f}).")
+        print("       Choisie en regardant le test : un plafond optimiste, pas une")
+        print("       prédiction que l'on aurait pu faire d'avance.")
     elif best2 and best2[1] > 0:
         print(f"\n    -> généralise ({best2[1]:.4f} > 0) mais ne bat pas la loi log "
               f"({r2_log_out:.4f}).")
