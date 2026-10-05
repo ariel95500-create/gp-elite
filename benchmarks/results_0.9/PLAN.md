@@ -141,3 +141,15 @@ seen as one.
 - TR25: some collapses out of domain, as on R6 and R7raw.
 - Reproducibility: at least one of the thirteen configurations returns a
   different model without AVX-512 (shown on one case on 5 October 2026).
+
+## Notes added after the measurement (5 October 2026)
+
+- The first targeted trial of phase 2 did not run alongside the baseline:
+  the change it tests (a candidate on which a numerical safety net acts is
+  invalid during the search) touches every evaluation path of the engine
+  (interpreter, compiled code, Levenberg-Marquardt, caches) and gets its own
+  written plan after gate 2. The fourth core stayed idle.
+- The reproducibility study ran after the baseline, not alongside it: one of
+  the thirteen configurations runs parallel islands, which would have taken
+  cores from the timed fits. Each setting was also run twice, to tell a
+  processor effect from a run-to-run difference.
