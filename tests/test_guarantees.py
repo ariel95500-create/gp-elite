@@ -14,6 +14,7 @@ import subprocess
 import sys
 import textwrap
 import time
+import warnings
 
 import numpy as np
 import pytest
@@ -149,24 +150,36 @@ def test_raw_formula_folding_is_exact(kind, signed):
 @pytest.mark.parametrize("data", ["positive_1var", "signed_2var"])
 def test_delivered_formula_is_the_model(normalize, data):
     """End to end: expression, sympy() and every Pareto entry are written in
-    the raw variables and reproduce predict() on the raw data."""
+    the raw variables, and every formula flagged exact reproduces predict() on
+    the raw data. A formula flagged inexact (a numerical safety net of the
+    engine acts on these data) is allowed, never in silence: the returned
+    model then warns. Which candidates the search meets depends on the last
+    bits of NumPy's floating-point functions, which can vary with the processor
+    (a test run on GitHub's Windows runners met such a candidate, with the
+    same code, seed and versions as runs that did not), so the test checks
+    the flag rather than assuming no safety net ever acts."""
     r = np.random.RandomState(1)
     if data == "positive_1var":
         Xd = r.uniform(1, 5, (80, 1)); y = 3.0 * Xd[:, 0] + 2.0; names = ["x"]
     else:
         Xd = r.uniform(-3, 3, (80, 2)); y = 2.0 * Xd[:, 0] * Xd[:, 1] + Xd[:, 0] ** 2
         names = ["u", "v"]
-    res = symbolic_regression(Xd, y, feature_names=names, normalize=normalize,
-                              generations=6, parallel=False, seed=0)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        res = symbolic_regression(Xd, y, feature_names=names, normalize=normalize,
+                                  generations=6, parallel=False, seed=0)
     cols = {nm: Xd[:, i] for i, nm in enumerate(names)}
-    tol = 1e-6 * max(np.max(np.abs(res.predict(Xd))), 1e-12)
-    assert res.formula_exact is True
-    assert np.max(np.abs(_eval_sympy_string(res.sympy(), cols)
-                         - res.predict(Xd))) <= tol
-    for e in res.pareto or []:
-        assert np.max(np.abs(_eval_sympy_string(e.sympy(), cols)
-                             - e.predict(Xd))) <= \
-            1e-6 * max(np.max(np.abs(e.predict(Xd))), 1e-12)
+    n_exact = 0
+    for e in [res] + list(res.pareto or []):
+        assert e.formula_exact in (True, False)
+        if e.formula_exact:
+            p = e.predict(Xd)
+            assert np.max(np.abs(_eval_sympy_string(e.sympy(), cols) - p)) <= \
+                1e-6 * max(np.max(np.abs(p)), 1e-12)
+            n_exact += 1
+    assert n_exact >= 1
+    if not res.formula_exact:
+        assert any("departs from predict()" in str(w.message) for w in caught)
     # the display names the raw columns, never the engine's X[i]
     assert "X[" not in res.expression
 

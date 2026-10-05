@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- The README said that setting `seed=` and `parallel=` returns the same model
+  on another machine. It does on the same machine; on another one, NumPy's
+  floating-point functions (`exp`, `tanh`...) can differ in the last digit
+  with the instructions the processor offers, and the search can then take
+  another path. The README now says so.
+- `test_delivered_formula_is_the_model` assumed that no numerical safety net
+  acts on the Pareto candidates of its data. On one of GitHub's Windows
+  runners one did, with the same code, seed and package versions as runs that
+  passed, and the engine flagged that formula inexact as documented. The test
+  now checks the flag: a formula flagged exact reproduces `predict()`, and an
+  inexact returned model warns.
+
 ## 0.8.0 — "Swift"
 
 This release makes the engine faster (the speed-ups alone return the same
