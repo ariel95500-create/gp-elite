@@ -54,7 +54,15 @@ def campaign_jobs():
             if j["kind"] in ("feyn", "real", "realraw")]
 
 
-JOBS = {"trial": trial_jobs, "campaign": campaign_jobs}
+def diag_jobs():
+    """After the trial (PLAN_PHASE2.md): the ten controls, F1 only, with the
+    time F1 needs to reach the generations A reaches in 30 s (61/45)."""
+    return [dict(j, time_limit=42.0) for j in trial_jobs()
+            if j["group"] == "control"]
+
+
+JOBS = {"trial": trial_jobs, "campaign": campaign_jobs, "diag": diag_jobs}
+ARMS_OF = {"diag": ("F1",)}
 
 
 def key(j):
@@ -65,6 +73,8 @@ def run_arm(job):
     import gp_elite.core as C
     import phase1_bench as P
     C._GUARD_STRICT = job["arm"] == "F1"
+    if "time_limit" in job:
+        P.TIME_LIMIT = float(job["time_limit"])
     rec = P.run_one(job)
     rec["guard_strict"] = bool(C._GUARD_STRICT)
     rec["rejected_by_guard"] = int(C.TRACE.count.get("candidats_rejetes_garde", 0))
@@ -79,7 +89,7 @@ def drive(which, python, out, pairs):
                 done.add(key(json.loads(line)))
     todo = []
     for j in JOBS[which]():
-        for arm in ARMS:
+        for arm in ARMS_OF.get(which, ARMS):
             jj = dict(j, arm=arm)
             if key(jj) not in done:
                 todo.append(jj)

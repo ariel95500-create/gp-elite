@@ -105,6 +105,59 @@ three lost controls F1 ran 53, 43 and 41 generations where A ran 72, 81 and
 candidates themselves is not known from this trial; it is examined before the
 next variant gets its written plan.
 
+## Diagnostic after the trial (9 October 2026, 21:12 to 21:16 UTC)
+
+The ten controls were run again, F1 only, with 42 s per fit (30 s × 61/45),
+so that F1 reaches the generations A reached in 30 s
+(`phase2_diag_F1_42s.jsonl`; `python benchmarks/phase2_bench.py run diag`).
+F1 then ran 58 to 83 generations (A: 61 to 87 in 30 s) and found the same 5
+exact laws as in 30 s; none of the three lost controls came back, although
+`I.8.14` seed 1 ran 75 generations against 72 in A. The losses do not come
+from the cost of the check alone: rejecting candidates during the search
+changes the path the search takes, and with it which laws it finds. A penalty
+(F2) also changes that path, by reordering the candidates, so the same kind of
+loss is to be expected from it; it is not the next variant.
+
+## Variant F3, plan written before any trial (9 October 2026)
+
+**The change.** F1's check, applied only where the delivered model is chosen,
+never in the search. A candidate whose formula does not reproduce the engine
+(the test of F1) does not enter the pool of the final selection (from which
+the Pareto front is also built), is not admitted as champion in that
+selection, and does not replace the champion after the final optimisation of
+the constants. The fitness, and therefore the whole search, stays that of
+0.8.0. The check runs on the candidates that enter the pool, not on every
+tree, and also with parallel islands, since the selection runs in the main
+process. Flags: `_GUARD_STRICT` on and a new `_GUARD_SEARCH` off (F1 is both
+on); both off by default.
+
+**Mechanics, checked before the trial.**
+
+1. Both flags off: the thirteen reference configurations of
+   `benchmarks/speed_equivalence.py` return the same models as gp-elite
+   0.8.0, bit for bit.
+2. F3 on, same thirteen configurations (fixed generations, no time limit):
+   every returned model has `formula_exact` True, and a configuration may
+   return a model different from (1) only if the check removed at least one
+   candidate there (counted by the engine's trace).
+3. The power example of F1's mechanics check: `formula_exact` True and no
+   inexact entry on the Pareto front.
+
+**Targeted trial F3.** The same 35 jobs as the trial of F1, arms A and F3
+side by side, A run again (generations within 30 s depend on the load). The
+trial is conclusive when all four hold:
+
+1. F3 delivers at most 2 inexact formulas in the 15 targeted fits;
+2. no control fit that is exact in A is not exact in F3;
+3. on the 20 real fits, the median paired difference of test R² (F3 − A) is
+   at least −0.01, and F3 has no collapse (R² < 0) that A does not have;
+4. on the 20 real fits, the worst test R² of F3 is no deeper than that of A
+   (added after what the trial of F1 showed, before any fit of F3).
+
+A conclusive trial opens campaign F3, decided by the four criteria of
+campaign F1 above, unchanged. A trial that is not conclusive is recorded with
+its numbers, and phase 2 goes back to the author before any further variant.
+
 ## The models that collapse out of domain
 
 The second half of phase 2, written separately after campaign F1: the
