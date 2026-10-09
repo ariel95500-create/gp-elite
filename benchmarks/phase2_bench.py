@@ -2,7 +2,8 @@
 
 F1: core._GUARD_STRICT and core._GUARD_SEARCH on (the check in the search and
 at the final selection). F3: _GUARD_STRICT on, _GUARD_SEARCH off (the check at
-the final selection only). See benchmarks/results_0.9/PLAN_PHASE2.md. Both
+the final selection only). F3R: F3 with _GUARD_CATCHUP on (the catch-up from
+the final populations). See benchmarks/results_0.9/PLAN_PHASE2.md. Both
 arms run the engine of this checkout (PYTHONPATH = repository root); the arm
 only sets the flags. Each fit runs in its own process (data, budget and
 records as benchmarks/phase1_bench.py); the two arms of a job run side by side
@@ -12,7 +13,8 @@ Usage, from the repository root:
   python benchmarks/phase2_bench.py run trial --python <python> \
          --out benchmarks/results_0.9/phase2_trial_F1.jsonl --pairs 2
   python benchmarks/phase2_bench.py summary trial benchmarks/results_0.9/phase2_trial_F1.jsonl
-  (trial3 and campaign3: the same with F3; campaign accepts --max-seconds)
+  (trial3/campaign3: the same with F3, trial3r/campaign3r with F3R;
+  run accepts --max-seconds)
 """
 import argparse
 import json
@@ -69,7 +71,9 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
         "diag": (diag_jobs, ("F1",)),
         "trial3": (trial_jobs, ("A", "F3")),
-        "campaign3": (campaign_jobs, ("A", "F3"))}
+        "campaign3": (campaign_jobs, ("A", "F3")),
+        "trial3r": (trial_jobs, ("A", "F3R")),
+        "campaign3r": (campaign_jobs, ("A", "F3R"))}
 
 
 def key(j):
@@ -79,8 +83,9 @@ def key(j):
 def run_arm(job):
     import gp_elite.core as C
     import phase1_bench as P
-    C._GUARD_STRICT = job["arm"] in ("F1", "F3")
-    C._GUARD_SEARCH = job["arm"] != "F3"
+    C._GUARD_STRICT = job["arm"] in ("F1", "F3", "F3R")
+    C._GUARD_SEARCH = job["arm"] not in ("F3", "F3R")
+    C._GUARD_CATCHUP = job["arm"] == "F3R"
     if "time_limit" in job:
         P.TIME_LIMIT = float(job["time_limit"])
     rec = P.run_one(job)
@@ -88,6 +93,9 @@ def run_arm(job):
     rec["guard_search"] = bool(C._GUARD_STRICT and C._GUARD_SEARCH)
     rec["rejected_by_guard"] = int(C.TRACE.count.get("candidats_rejetes_garde", 0))
     rec["rejected_from_pool"] = int(C.TRACE.count.get("pool_rejets_garde", 0))
+    rec["catchups"] = int(C.TRACE.count.get("rattrapages", 0))
+    rec["catchup_offered"] = int(C.TRACE.count.get("rattrapage_proposes", 0))
+    rec["catchup_s"] = C.TRACE.value.get("rattrapage_s")
     return rec
 
 
@@ -200,13 +208,19 @@ def summary_trial(path, arms):
               sum(1 for v in rl if v[B]["r2"] < 0), B, new_col,
               "PASS" if c3 else "FAIL"))
     ok = c1 and c2 and c3
-    if B == "F3":       # the fourth criterion of the F3 plan
+    if B in ("F3", "F3R"):       # the fourth criterion of the F3 plan
         wA, wB = min(v[A]["r2"] for v in rl), min(v[B]["r2"] for v in rl)
         c4 = wB >= wA
         print("4. real fits: worst R² %s %.4g, %s %.4g -> %s" % (
             A, wA, B, wB, "PASS" if c4 else "FAIL"))
         ok = ok and c4
     print("TRIAL %s" % ("CONCLUSIVE" if ok else "NOT CONCLUSIVE"))
+    cu = [v[B] for v in pairs.values() if v[B].get("catchups")]
+    if cu:
+        print("catch-up ran in %d fits: %s" % (len(cu), ", ".join(
+            "%s %s s%d (%d offered, %.2f s)" % (
+                r["problem"], r["split"], r["seed"], r["catchup_offered"],
+                r.get("catchup_s") or 0.0) for r in cu)))
     print("\nper fit (%s | %s): status or R², formula_exact" % (A, B))
     for k in sorted(pairs, key=lambda k: (pairs[k][A]["group"], k)):
         v = pairs[k]

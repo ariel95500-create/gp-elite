@@ -13,8 +13,9 @@ import gp_elite.core as C
 from gp_elite import symbolic_regression
 
 arm = sys.argv[1]
-C._GUARD_STRICT = arm in ("F1", "F3")
-C._GUARD_SEARCH = arm != "F3"
+C._GUARD_STRICT = arm in ("F1", "F3", "F3R")
+C._GUARD_SEARCH = arm not in ("F3", "F3R")
+C._GUARD_CATCHUP = arm == "F3R"
 warnings.simplefilter("ignore")
 r = np.random.RandomState(3)
 X = r.uniform(0.5, 3.0, (150, 2))
@@ -27,4 +28,5 @@ print(json.dumps(dict(
     pareto_inexact=sum(1 for e in (res.pareto or []) if e.formula_exact is False),
     removed_from_pool=int(C.TRACE.count.get("pool_rejets_garde", 0)),
     rejected_in_search=int(C.TRACE.count.get("candidats_rejetes_garde", 0)),
+    catchup=C.TRACE.value.get("rattrapage"),
     expression=res.expression[:120])))

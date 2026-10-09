@@ -1,6 +1,6 @@
 """Sets the phase 2 flags of gp_elite.core in every Python process started
 with this directory first on PYTHONPATH (benchmarks/speed_equivalence.py
-runs each configuration in its own process). GP_ELITE_ARM: A, F1 or F3.
+runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3 or F3R.
 With GP_ELITE_TRACE_LOG, each process appends its check counters there.
 
   GP_ELITE_ARM=F3 GP_ELITE_TRACE_LOG=<file> PYTHONHASHSEED=0 \
@@ -15,8 +15,9 @@ if _arm:
     import sys
 
     import gp_elite.core as _C
-    _C._GUARD_STRICT = _arm in ("F1", "F3")
-    _C._GUARD_SEARCH = _arm != "F3"
+    _C._GUARD_STRICT = _arm in ("F1", "F3", "F3R")
+    _C._GUARD_SEARCH = _arm not in ("F3", "F3R")
+    _C._GUARD_CATCHUP = _arm == "F3R"
 
     def _log():
         path = os.environ.get("GP_ELITE_TRACE_LOG")
@@ -26,5 +27,7 @@ if _arm:
                     arm=_arm, argv=sys.argv[1:3],
                     removed_from_pool=int(_C.TRACE.count.get("pool_rejets_garde", 0)),
                     rejected_in_search=int(_C.TRACE.count.get(
-                        "candidats_rejetes_garde", 0)))) + "\n")
+                        "candidats_rejetes_garde", 0)),
+                    catchups=int(_C.TRACE.count.get("rattrapages", 0)),
+                    catchup=_C.TRACE.value.get("rattrapage"))) + "\n")
     atexit.register(_log)
