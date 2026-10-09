@@ -158,6 +158,28 @@ A conclusive trial opens campaign F3, decided by the four criteria of
 campaign F1 above, unchanged. A trial that is not conclusive is recorded with
 its numbers, and phase 2 goes back to the author before any further variant.
 
+## Mechanics of F3, result (9 October 2026, 21:23 to 21:27 UTC)
+
+Files in `phase2_mechanics/` (the flags are set in each process by
+`benchmarks/phase2_flags/sitecustomize.py`).
+
+1. Both flags off against the 0.8.0 wheel (`repro/default`): 13 of 13
+   identical (`compare_0.8.0_vs_flags_off.txt`). **Holds.**
+2. F3 on: `formula_exact` True in 13 of 13 (`B_cpu` was False with the flags
+   off). Two configurations return another model, `B_cpu` (4 candidates
+   removed) and `I_sklearn` (Pareto front only, 1 removed); `C_big` had 1
+   removed and is unchanged; the ten others had none removed and are
+   identical (`compare_flags_off_vs_F3.txt`, `trace_F3.jsonl`). **Holds.**
+3. The power example: A `formula_exact` False with 2 inexact entries of 6 on
+   the Pareto front; F1 True with 0 of 5; **F3 False**, with a Pareto front of
+   one inexact entry (`power_example.txt`). In that fit the check removed all
+   27 candidates offered to the pool: the search never tracked a candidate
+   whose formula reproduces the engine, the pool was empty, and the selection
+   fell back on the champion, as 0.8.0 does. **Fails.**
+
+F3 does not pass its mechanics; its trial is not run, and phase 2 goes back to
+the author.
+
 ## The models that collapse out of domain
 
 The second half of phase 2, written separately after campaign F1: the

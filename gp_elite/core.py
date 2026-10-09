@@ -4698,7 +4698,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
             bool(getattr(cfg, "UNKNOWN_CONST", False))):
         TRACE.bump("candidats_rejetes_dim")     # [v0.7]
         return float("inf")
-    if _GUARD_STRICT and not _formula_faithful(node):   # [v0.9-F1]
+    if _GUARD_STRICT and _GUARD_SEARCH and not _formula_faithful(node):   # [v0.9-F1]
         TRACE.bump("candidats_rejetes_garde")
         return float("inf")
 
@@ -7199,6 +7199,11 @@ _FAITHFUL_CACHE: Dict[int, bool] = {}
 # Recherche sequentielle seulement : les iles paralleles ne le voient pas.
 # Plan et criteres : benchmarks/results_0.9/PLAN_PHASE2.md.
 _GUARD_STRICT = False
+# [v0.9-F3] Avec _GUARD_SEARCH coupe, le controle n'agit plus dans la
+# recherche (fitness inchangee, donc recherche de la 0.8.0) : seulement au
+# pool de la selection finale, au champion de cette selection et apres
+# l'optimisation finale des constantes. F1 = les deux drapeaux allumes.
+_GUARD_SEARCH = True
 
 
 def _formula_faithful(node) -> bool:
@@ -7349,6 +7354,7 @@ def _track_val_candidate(cand):
     if not _is_numerically_stable(cand):
         return
     if _GUARD_STRICT and not _formula_faithful(cand):    # [v0.9-F1]
+        TRACE.bump("pool_rejets_garde")                  # [v0.9-F3]
         return
     try:
         preds = evaluate_vector(cand, _VAL_XS)
@@ -7658,9 +7664,11 @@ def _select_one_se(champion, champ_val):
     meilleur (le plus large des deux). Cas batterie : le 10-nœuds (R²=0.9973)
     et le 29-nœuds (R²=0.9981) diffèrent de 0.08% → le 10-nœuds gagne."""
     pool = list(_VAL_CANDS)
-    if champion is not None and math.isfinite(champ_val) and _is_numerically_stable(champion) \
-            and not (_GUARD_STRICT and not _formula_faithful(champion)):   # [v0.9-F1]
-        pool.append((champ_val, 0.0, tree_size(champion), champion))
+    if champion is not None and math.isfinite(champ_val) and _is_numerically_stable(champion):
+        if not (_GUARD_STRICT and not _formula_faithful(champion)):   # [v0.9-F1]
+            pool.append((champ_val, 0.0, tree_size(champion), champion))
+        else:
+            TRACE.bump("pool_rejets_garde")                         # [v0.9-F3]
     if not pool:
         # [v25-EXTRAP] Tout a été rejeté par le garde anti-divergence (aucune
         # forme bornée trouvée) : on retombe sur le champion brut faute de mieux.
@@ -8504,9 +8512,11 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # invariant d'échelle, ne le voit pas). Sans hold-out (moins de 30
         # points, ou validation_split=0), ce modèle était livré tel quel.
         optimized = _refit_scaling(optimized, xs, ys)
-        if raw_mse(optimized, xs, ys) < raw_mse(global_best, xs, ys) \
-                and not (_GUARD_STRICT and not _formula_faithful(optimized)):   # [v0.9-F1]
-            global_best = optimized
+        if raw_mse(optimized, xs, ys) < raw_mse(global_best, xs, ys):
+            if not (_GUARD_STRICT and not _formula_faithful(optimized)):   # [v0.9-F1]
+                global_best = optimized
+            else:
+                TRACE.bump("pool_rejets_garde")                       # [v0.9-F3]
         # Si Adam a dégradé, global_best reste intact (deepcopy garantit l'isolation)
         _track_val_candidate(global_best)            # [v21-VAL] post-Adam
 

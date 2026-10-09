@@ -1,0 +1,13 @@
+A_feyn       ok
+B_cpu        ok
+C_big        ok
+D_units      ok
+E_minmax     ok
+F_robust     ok
+G_restarts   ok
+H_parallel   ok
+I_sklearn    ok
+J_extrap     ok
+K_thorough   ok
+L_standard   ok
+M_twice      ok
