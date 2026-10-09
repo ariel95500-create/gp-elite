@@ -429,3 +429,21 @@ G1 is adopted when all hold:
 
 Reported beside them: the fits where G1 changed the returned model, the
 number of candidates it failed, and the time beyond the budget.
+
+### Mechanics of G1, result (9 October 2026, 22:33 to 22:40 UTC)
+
+1. Flag off against the 0.8.0 wheel: 13 of 13 identical
+   (`phase2_mechanics/compare_0.8.0_vs_flags_off_G1_code.txt`); the test
+   suite passes (140 tests). **Holds.**
+2. Flag on: three configurations return another model or Pareto front,
+   `G_restarts` (3 candidates failed by the far test), `I_sklearn` (Pareto
+   front only, 4) and `M_twice` (Pareto front only, 2); `B_cpu` (3) and
+   `L_standard` (1) had candidates failed and are unchanged; the eight
+   others had none and are identical (`compare_flags_off_vs_G1.txt`,
+   `trace_G1.jsonl`). **Holds.**
+3. `228_elusage` in its own units, out of domain, seed 4: flag off, the
+   returned model (63 nodes, R² −232.5 out of domain) fails the far test;
+   flag on, the returned model (23 nodes) passes it, with R² −0.010 out of
+   domain; 20 candidates failed (`g1_deepest.txt`). **Holds.**
+
+The targeted trial of G1 is run.

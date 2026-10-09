@@ -1,0 +1,1 @@
+{"config": "D_units", "time_s": 46.98, "node": "* 0x1.2e8de46b7eb07p-4 / / / * X[0] X[1] X[2] X[3] X[3]", "expression": "0.0795775 * X0 * X1 / X2 / X3 / X3", "mse_validation": "0x1.bb24924924925p-110", "mse_train": "0x1.ea64924924925p-110", "size": 11, "formula_exact": true, "pareto": [[11, "* 0x1.2e8de46b7eb07p-4 / / / * X[0] X[1] X[2] X[3] X[3]", "0x1.bb24924924925p-110"]]}
