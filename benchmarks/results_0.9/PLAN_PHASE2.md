@@ -314,3 +314,43 @@ again.
 The second half of phase 2, written separately after campaign F1: the
 collapses of the decision bench (10 of 65 out of domain in the baseline) are
 examined one by one before any change is proposed for them.
+
+### Plan of the examination, written before it (9 October 2026)
+
+No campaign F1 was run (above); the examination comes now. It changes
+nothing in the engine and decides nothing: it describes, and any change it
+suggests gets its own written plan, trial and campaign, confirmed later on
+new seeds and on the frozen test set as the plan of 0.9 says.
+
+**What is looked at.** The decision bench only: the 65 out-of-domain fits of
+R6 and R7raw (seeds 0 to 4), never the frozen test set, whose collapses
+(37 of 125 on TR25) are not opened to design anything. In the baseline, 10 of
+the 65 collapse (R² < 0): `228_elusage` 6, `210_cloud` 3, `nikuradse_1` 1;
+four deeply (R² −233, −224, −203, −19.9), six mildly (−0.38 to −0.01).
+
+**How.** The baseline records keep only the first 160 characters of each
+formula, so the 65 fits are run again with the 0.8.0 wheel from PyPI as in
+phase 1 (30 s, three at a time, one process per fit, `PYTHONHASHSEED=0`),
+each also recording: the returned model's R² on the training, hold-out and
+out-of-domain rows; the number of out-of-domain rows and their target's
+variance and mean against the training ones; how far the out-of-domain rows
+lie beyond the training box (per row, the largest excess over the features in
+units of the feature's training width); how far the predictions go (largest
+distance of an out-of-domain prediction from the training mean, in units of
+the largest training one); the operators of the formula; the verdict of the
+engine's near-domain probe guard (`_near_domain_stable`) on it; and the same
+for every entry of the Pareto front. A time-budgeted fit run again can return
+another model; both runs are reported, and the collapses examined are those
+of either run.
+
+**What is written** (`COLLAPSES.md`): a table of every collapse with the
+facts above, then for each a reading of its cause, in one of three kinds
+decided case by case and stated with the fact that supports it: a term that
+explodes beyond the box (exponential, power, division) while the model is
+sound inside it; a smooth model (a line, a low-degree form) that is simply
+wrong out of the box; or an out-of-domain set so small or so flat that R²
+judges little. Then, descriptively and without choosing anything, how many
+collapses a few simple rules would have avoided and at what cost on the
+other fits (for instance: the near-domain guard as a filter rather than a
+tie-break, or the smallest Pareto entry within the hold-out tolerance), so
+that the next plan starts from facts.
