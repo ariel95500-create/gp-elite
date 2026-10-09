@@ -447,3 +447,35 @@ number of candidates it failed, and the time beyond the budget.
    domain; 20 candidates failed (`g1_deepest.txt`). **Holds.**
 
 The targeted trial of G1 is run.
+
+### Targeted trial G1, result (9 October 2026)
+
+Run from 22:39 to 22:48 UTC, 68 fits, 34 complete pairs, no crash
+(`phase2_trial_G1.jsonl`; `python benchmarks/phase2_bench.py summary trialg1
+benchmarks/results_0.9/phase2_trial_G1.jsonl`). The criteria are applied as
+written.
+
+1. Worst out-of-domain R² over the 11 collapses: −232.5 in A, **−1124 in
+   G1** (`561_cpu` standardised, seed 3: −2.57 in A). **Fails.**
+2. Controls: exact 7 of 10 in both arms, the same fits, the same models.
+   **Holds.**
+3. The 10 folds and the 3 far-reaching fits: median paired difference
+   +0.0000, worst −0.025 (`561_cpu` fold 4); no new collapse. **Holds.**
+4. Collapses over the 14 out-of-domain fits: 10 in A, 8 in G1. **Holds.**
+
+**The trial is not conclusive; campaign G1 is not run.**
+
+Reported beside the criteria. G1 did what it was built for on four of the
+five deep collapses: `228_elusage` standardised seed 0 (−224.2 to −0.38) and
+in its units seeds 2 and 4 (−202.9 to 0.37, −232.5 to −0.010), `210_cloud` in
+its units seed 3 (−19.9 to 0.22); the mild collapses and the controls are
+untouched, and it raised `561_cpu` standardised seed 0 from 0.56 to 0.89.
+The failure is the fifth: on `561_cpu` seed 3 the far test rejected the
+returned model and 44 other candidates, and chose a model of 59 nodes, with
+the same exponentials, that stays within the band up to one training width
+beyond the box but not up to three, where the out-of-domain rows of this
+dataset lie. A test on probes at a fixed distance moves the selection towards
+models that are tame up to that distance, and says nothing beyond it. The
+median generations are unchanged (67), as the search is.
+
+Phase 2 goes back to the author.
