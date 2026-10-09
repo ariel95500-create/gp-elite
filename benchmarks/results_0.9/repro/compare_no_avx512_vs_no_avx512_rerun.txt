@@ -1,0 +1,15 @@
+A_feyn       same
+B_cpu        same
+C_big        same
+D_units      same
+E_minmax     same
+F_robust     same
+G_restarts   same
+H_parallel   same
+I_sklearn    same
+J_extrap     same
+K_thorough   same
+L_standard   same
+M_twice      same
+total time 48.3 s -> 51.2 s
+ALL IDENTICAL
