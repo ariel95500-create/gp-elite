@@ -7237,25 +7237,6 @@ _VAL_TRAIN_YS = None    # [v23.1] train cible
 # rejeté de la sélection — ce que la validation-frontière (interne) ne peut voir.
 _EXTRAP_PROBE_XS = None
 _EXTRAP_BAND = None     # (y_lo, y_hi) plausibles
-# [v0.9-G1, a l'essai, desactive par defaut] Garde AU-DELA du domaine, dans
-# toutes les directions et sans extrapolate=True : sondes dans la boite
-# d'entrainement elargie d'une largeur de chaque cote ; un candidat dont une
-# prediction y sort de la bande (10 fois l'ecart maximal d'une cible a la
-# moyenne) est instable, sauf s'il reproduit le hold-out a la precision
-# numerique (une loi exacte n'est jamais ecartee). Plan et criteres :
-# benchmarks/results_0.9/PLAN_PHASE2.md (G1) ; constat :
-# benchmarks/results_0.9/COLLAPSES.md.
-_FAR_GUARD = False
-_FAR_EXT = 1.0          # largeurs d'entrainement ajoutees de chaque cote
-_FAR_K = 10.0           # bande : K fois l'ecart maximal d'une cible a la moyenne
-# [v0.9-G1b] Bande qui croit avec la distance : a une sonde dont le plus grand
-# depassement de la boite vaut d largeurs, K * (1 + d) fois cet ecart (une
-# croissance au plus lineaire passe, une explosion non). G1b = _FAR_EXT 3 et
-# _FAR_LINEAR allume ; G1 = _FAR_EXT 1, _FAR_LINEAR coupe.
-_FAR_LINEAR = False
-_FAR_PROBE_XS = None
-_FAR_BAND = None        # (centre, demi-largeur) en unites de y
-_FAR_CACHE: Dict[int, bool] = {}
 _VAL_CANDS: list = []   # [(val_mse, val_se, size, node)] candidats-champions
 _VAL_CANDS_MAX = 64
 
@@ -7333,8 +7314,6 @@ def _is_numerically_stable(cand) -> bool:
                 return False
         except Exception:
             return False
-    if _FAR_GUARD and not _far_stable(cand):          # [v0.9-G1]
-        return False
     return True
 
 def _track_val_candidate(cand):
@@ -7627,68 +7606,6 @@ def _build_near_probes(xs_np, ys_np, n=400):
     _NEAR_BAND = (float(np.median(y)), _NEAR_K * max(r, 1e-12))
 
 
-def _build_far_probes(xs_np, ys_np, n=400):
-    """[v0.9-G1] Sondes au-dela de la boite d'entrainement (voir _FAR_GUARD).
-    Generateur DEDIE, comme les sondes pres du domaine. Une colonne toute
-    positive garde ses sondes au-dessus de la moitie de son minimum (toute
-    negative : au-dessous de la moitie de son maximum)."""
-    global _FAR_PROBE_XS, _FAR_BAND
-    Xm = xs_np if xs_np.ndim == 2 else xs_np.reshape(-1, 1)
-    y = np.asarray(ys_np, dtype=float)
-    if len(Xm) < 2 or len(y) < 2:
-        return
-    lo, hi = Xm.min(axis=0), Xm.max(axis=0)
-    w = hi - lo
-    a, b = lo - _FAR_EXT * w, hi + _FAR_EXT * w
-    a = np.where(lo > 0, np.maximum(a, lo / 2.0), a)
-    b = np.where(hi < 0, np.minimum(b, hi / 2.0), b)
-    rng = np.random.RandomState(20261009)
-    _FAR_PROBE_XS = a + (b - a) * rng.uniform(0.0, 1.0, (n, Xm.shape[1]))
-    c = float(np.mean(y))
-    half = _FAR_K * max(float(np.max(np.abs(y - c))), 1e-12)
-    if _FAR_LINEAR:                                   # [v0.9-G1b]
-        ww = np.where(w > 0, w, 1.0)
-        d = np.max(np.maximum(np.maximum(_FAR_PROBE_XS - hi, lo - _FAR_PROBE_XS),
-                              0.0) / ww, axis=1)
-        half = half * (1.0 + d)
-    _FAR_BAND = (c, half)
-
-
-def _far_stable(cand) -> bool:
-    """[v0.9-G1] Vrai si le candidat reste fini et dans la bande sur les
-    sondes au-dela du domaine, ou s'il reproduit le hold-out a la precision
-    numerique. Resultat mis en cache par arbre EXACT."""
-    if _FAR_PROBE_XS is None or _FAR_BAND is None or cand is None:
-        return True
-    try:
-        key = cand.exact_hash()
-    except Exception:
-        key = None
-    if key is not None and key in _FAR_CACHE:
-        return _FAR_CACHE[key]
-    try:
-        with np.errstate(all="ignore"):
-            p = np.asarray(evaluate_vector(cand, _FAR_PROBE_XS), dtype=float)
-        if p.ndim == 0:
-            p = np.full(len(_FAR_PROBE_XS), float(p))
-        c, half = _FAR_BAND                  # half : nombre, ou un par sonde (G1b)
-        ok = bool(np.all(np.isfinite(p)) and np.all(np.abs(p - c) <= half))
-    except Exception:
-        ok = False
-    if not ok and _VAL_XS is not None and _VAL_YS is not None and len(_VAL_YS) > 1:
-        try:
-            with np.errstate(all="ignore"):
-                m = float(np.mean((evaluate_vector(cand, _VAL_XS) - _VAL_YS) ** 2))
-            ok = bool(math.isfinite(m) and m <= _EXACT_REL * float(np.var(_VAL_YS)))
-        except Exception:
-            pass
-    if not ok:
-        TRACE.bump("far_rejets")
-    if key is not None:
-        _FAR_CACHE[key] = ok
-    return ok
-
-
 def _near_domain_stable(cand) -> bool:
     """[v0.7-NEAR] Vrai si le candidat reste fini et dans la bande sur les
     sondes pres du domaine. Resultat mis en cache par arbre EXACT."""
@@ -7799,12 +7716,11 @@ def _split_holdout(xs, ys, cfg):
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
     VALIDATION_SPLIT<=0 ou dataset trop petit (<30 points)."""
     global _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _EXTRAP_PROBE_XS, _EXTRAP_BAND
-    global _NEAR_PROBE_XS, _NEAR_BAND, _FAR_PROBE_XS, _FAR_BAND
+    global _NEAR_PROBE_XS, _NEAR_BAND
     _VAL_XS = None; _VAL_YS = None
     _VAL_TRAIN_XS = None; _VAL_TRAIN_YS = None
     _EXTRAP_PROBE_XS = None; _EXTRAP_BAND = None
     _NEAR_PROBE_XS = None; _NEAR_BAND = None; _NEAR_CACHE.clear()
-    _FAR_PROBE_XS = None; _FAR_BAND = None; _FAR_CACHE.clear()   # [v0.9-G1]
     _FAITHFUL_CACHE.clear()
     _VAL_CANDS.clear()
     frac = float(getattr(cfg, "VALIDATION_SPLIT", 0.0) or 0.0)
@@ -7891,8 +7807,6 @@ def _split_holdout(xs, ys, cfg):
     _VAL_TRAIN_XS = xs_tr
     _VAL_TRAIN_YS = ys_tr
     _build_near_probes(xs_np, ys_np)          # [v0.7-NEAR]
-    if _FAR_GUARD:                            # [v0.9-G1]
-        _build_far_probes(xs_np, ys_np)
     print(f"[v21-VAL] Hold-out {_split_kind} : {len(tr_idx)} points train / "
           f"{len(val_idx)} points validation ({len(val_idx)/n:.0%}, {_seed_note})")
     print(f"          Evolution sees ONLY the train set; final champion "

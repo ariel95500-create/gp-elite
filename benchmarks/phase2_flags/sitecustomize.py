@@ -19,8 +19,9 @@ if _arm:
     if _arm in ("F1", "F3", "F3R") and not hasattr(_C, "_GUARD_STRICT"):
         raise SystemExit("the phase 2 flags are not in this engine: run from "
                          "commit 0038a29")
-    if _arm == "G1" and not hasattr(_C, "_FAR_GUARD"):
-        raise SystemExit("the flag of G1 is not in this engine")
+    if _arm in ("G1", "G1b") and not hasattr(_C, "_FAR_LINEAR"):
+        raise SystemExit("the flags of G1 and G1b are not in this engine: run "
+                         "from commit 8330827")
     if hasattr(_C, "_GUARD_STRICT"):
         _C._GUARD_STRICT = _arm in ("F1", "F3", "F3R")
         _C._GUARD_SEARCH = _arm not in ("F3", "F3R")

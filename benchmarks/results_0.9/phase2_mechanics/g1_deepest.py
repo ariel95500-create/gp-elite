@@ -3,6 +3,8 @@ own units, out of domain, seed 4 (the deepest collapse of COLLAPSES.md), the
 model returned with the flags on passes the far test.
 
   PYTHONHASHSEED=0 PYTHONPATH=. python benchmarks/results_0.9/phase2_mechanics/g1_deepest.py [G1|G1b]
+
+The flags exist in the engine up to commit 8330827 (PLAN_PHASE2.md).
 """
 import io
 import json
@@ -20,6 +22,8 @@ import decision_bench as D
 from gp_elite import symbolic_regression
 
 ARM = sys.argv[1] if len(sys.argv) > 1 else "G1"
+if not hasattr(C, "_FAR_LINEAR"):
+    sys.exit("the flags of G1 and G1b are not in this engine: run from commit 8330827")
 C._FAR_EXT = 3.0 if ARM == "G1b" else 1.0
 if hasattr(C, "_FAR_LINEAR"):
     C._FAR_LINEAR = ARM == "G1b"

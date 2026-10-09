@@ -4,8 +4,9 @@ F1: core._GUARD_STRICT and core._GUARD_SEARCH on (the check in the search and
 at the final selection). F3: _GUARD_STRICT on, _GUARD_SEARCH off (the check at
 the final selection only). F3R: F3 with _GUARD_CATCHUP on (the catch-up from
 the final populations). The flags were removed from the engine after the
-decision of 9 October 2026 (PLAN_PHASE2.md): run this script from commit
-0038a29, where they exist; it refuses to run without them. See
+decision of 9 October 2026 (PLAN_PHASE2.md): run the F arms from commit
+0038a29 and the G arms (G1, G1b) from commit 8330827, where they exist; the
+script refuses to run without them. See
 benchmarks/results_0.9/PLAN_PHASE2.md. Both
 arms run the engine of this checkout (PYTHONPATH = repository root); the arm
 only sets the flags. Each fit runs in its own process (data, budget and
@@ -133,10 +134,9 @@ def run_arm(job):
     if job["arm"] in ("F1", "F3", "F3R") and not hasattr(C, "_GUARD_STRICT"):
         sys.exit("the phase 2 flags are not in this engine: run from commit "
                  "0038a29 (benchmarks/results_0.9/PLAN_PHASE2.md)")
-    if job["arm"] == "G1" and not hasattr(C, "_FAR_GUARD"):
-        sys.exit("the flag of G1 is not in this engine")
-    if job["arm"] == "G1b" and not hasattr(C, "_FAR_LINEAR"):
-        sys.exit("the flags of G1b are not in this engine")
+    if job["arm"] in ("G1", "G1b") and not hasattr(C, "_FAR_LINEAR"):
+        sys.exit("the flags of G1 and G1b are not in this engine: run from "
+                 "commit 8330827 (benchmarks/results_0.9/PLAN_PHASE2.md)")
     if hasattr(C, "_GUARD_STRICT"):
         C._GUARD_STRICT = job["arm"] in ("F1", "F3", "F3R")
         C._GUARD_SEARCH = job["arm"] not in ("F3", "F3R")
