@@ -1,0 +1,1 @@
+{"config": "F_robust", "time_s": 4.389, "node": "+ 0x1.9372c77e05388p+2 * 0x1.5b1f521328adbp+1 X[0]", "expression": "6.30388 + 0.554606 * X0", "mse_validation": "0x1.9bb99818e5677p+5", "mse_train": "0x1.a505dcd8faf7bp+5", "size": 5, "formula_exact": true, "pareto": [[5, "+ 0x1.9372c77e05388p+2 * 0x1.5b1f521328adbp+1 X[0]", "0x1.9bb99818e5677p+5"]]}

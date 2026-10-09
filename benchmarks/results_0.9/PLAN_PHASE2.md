@@ -525,3 +525,20 @@ with seed 5, A against G1b, never run before. G1b is kept when all hold:
 3. the median paired difference of test R² over the folds at least −0.005.
 
 Otherwise G1b is not adopted and phase 2 goes back to the author.
+
+### Mechanics of G1b, result (9 October 2026, 22:53 to 22:58 UTC)
+
+1. Flags off against the 0.8.0 wheel: 13 of 13 identical
+   (`phase2_mechanics/compare_0.8.0_vs_flags_off_G1b_code.txt`); the test
+   suite passes (140 tests). **Holds.**
+2. Flags on: four configurations return another model or Pareto front, each
+   with candidates failed by the far test: `G_restarts` (3), `B_cpu` (Pareto
+   front only, 5), `I_sklearn` (Pareto front only, 4), `M_twice` (Pareto
+   front only, 2); `C_big` (2), `E_minmax` (1) and `L_standard` (1) had
+   candidates failed and are unchanged; the six others had none
+   (`compare_flags_off_vs_G1b.txt`, `trace_G1b.jsonl`). **Holds.**
+3. `228_elusage` in its units, out of domain, seed 4: flags on, the returned
+   model (23 nodes, R² −0.010 out of domain) passes the far test; 19
+   candidates failed (`g1b_deepest.txt`). **Holds.**
+
+The targeted trial of G1b is run.
