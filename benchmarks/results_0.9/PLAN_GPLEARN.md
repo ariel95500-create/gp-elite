@@ -29,7 +29,10 @@ measured.
   thread.
 - gplearn has no time limit: the fit runs one generation at a time
   (`warm_start=True`) until 30 s are spent, and the generation running at
-  that moment finishes, as in gp-elite; at most 1000 generations.
+  that moment finishes, as in gp-elite; at most 1000 generations. gplearn's
+  own stopping rule (a training fitness at its `stopping_criteria`, 0 by
+  default) still ends the run early (added before the first recorded fit:
+  a run one generation at a time would otherwise skip it).
 - Settings: gplearn's defaults (population 1000, tournament 20, parsimony
   coefficient 0.001, constants drawn in [−1, 1], mean squared error), with
   `random_state` = the seed, `n_jobs=1`, and the function set of all its

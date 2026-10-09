@@ -56,6 +56,10 @@ def run_one(job):
             g += 1
             m.set_params(generations=g)
             m.fit(Xtr, ytr)
+            # gplearn's own stopping rule (stopping_criteria, 0 by default),
+            # which a generation-by-generation run would otherwise skip
+            if m.run_details_["best_fitness"][-1] <= m.stopping_criteria:
+                break
             if time.time() - t0 >= BUDGET or g >= MAX_GEN:
                 break
     dt = time.time() - t0
@@ -65,7 +69,7 @@ def run_one(job):
                sklearn=sklearn.__version__, numpy=np.__version__,
                time=round(dt, 2), generations=g, err=e, r2=1.0 - e,
                size=int(m._program.length_), expr=str(m._program)[:300],
-               time_limit_reached=bool(g < MAX_GEN))
+               time_limit_reached=bool(dt >= BUDGET))
     if job["kind"] == "feyn":
         rec["status"] = "EXACT" if e < 1e-9 else "NEAR" if e < 1e-3 else "MISS"
         if Xo is not None and yo is not None and len(yo) >= 20:
@@ -85,9 +89,12 @@ def drive(python, out, workers):
                 done.add(key(json.loads(line)))
     todo = [j for j in jobs() if key(j) not in done]
     print("%d fits to run, %d done" % (len(todo), len(done)), flush=True)
+    # the repository root on PYTHONPATH: benchmarks/feynman_bench.py, which
+    # builds the F41 data, imports gp_elite at load time; nothing of it runs
+    # in a gplearn fit
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
-               OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
-    env.pop("PYTHONPATH", None)
+               OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1",
+               PYTHONPATH=os.path.dirname(HERE))
     running, n, t0 = [], 0, time.time()
     while todo or running:
         while todo and len(running) < workers:
