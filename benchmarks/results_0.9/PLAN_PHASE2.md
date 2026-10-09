@@ -479,3 +479,49 @@ models that are tame up to that distance, and says nothing beyond it. The
 median generations are unchanged (67), as the search is.
 
 Phase 2 goes back to the author.
+
+### Variant G1b, plan written before it is implemented (9 October 2026)
+
+Chosen by the author on 9 October 2026 between this variant, confirmed on
+new seeds, and stopping G1.
+
+**The change.** G1, with two differences. The probes reach three training
+widths beyond the box on each side instead of one (same generator, same rule
+for positive and negative features). And the band grows with the distance:
+a prediction at a probe whose largest excess beyond the box is d training
+widths may lie up to 10 × (1 + d) times the largest training distance from
+the training mean (10 times at the edge of the box, as in G1; 40 times at
+three widths). The principle is the one of the extrapolation guard of 0.8: a
+model may grow beyond the data at most about linearly with the distance; a
+line passes, an explosion does not. The exemption of exact laws, the cache
+and the fallback when every candidate fails are those of G1. Flags: G1's
+`_FAR_GUARD` on, with `_FAR_EXT` 3 and a new `_FAR_LINEAR` on; G1 remains
+`_FAR_EXT` 1 and `_FAR_LINEAR` off.
+
+Three widths come from `COLLAPSES.md` and from the trial of G1 (the
+out-of-domain rows of `561_cpu` lie up to 3.02 widths beyond the box): this
+variant is tuned on the decision bench, which is why it is adopted only if it
+is also confirmed on seeds it has never seen (below).
+
+**Mechanics, checked before the trial.** As for G1: (1) flags off, the
+thirteen reference configurations identical to 0.8.0 and the test suite
+passing; (2) flags on, a configuration may change only where the far test
+failed a candidate; (3) on `228_elusage` in its units, out of domain, seed 4,
+the returned model passes the far test.
+
+**Targeted trial G1b.** The 34 jobs and the 4 criteria of the trial of G1,
+unchanged, A against G1b.
+
+**Campaign G1b**, if the trial is conclusive: the decision bench, A against
+G1b, with the 5 criteria of campaign G1, unchanged.
+
+**Confirmation on new seeds**, if the campaign adopts G1b: the 65
+out-of-domain fits of R6 and R7raw with seeds 5 to 9, and their 65 folds
+with seed 5, A against G1b, never run before. G1b is kept when all hold:
+
+1. out of domain, no more collapses than A, and the worst R² no deeper than
+   A's;
+2. the median out-of-domain R² no lower than A's by more than 0.01;
+3. the median paired difference of test R² over the folds at least −0.005.
+
+Otherwise G1b is not adopted and phase 2 goes back to the author.
