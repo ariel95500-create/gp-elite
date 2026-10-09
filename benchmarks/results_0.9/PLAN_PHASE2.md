@@ -280,6 +280,35 @@ on real data whenever the model of 0.8.0 relies on a safety net.
 
 Phase 2 goes back to the author.
 
+## Decision after the trial of F3R (9 October 2026)
+
+Three ways on were put to the author (make F3R an option off by default,
+stop this work, or one more variant whose catch-up acts only where the
+delivered formula would be inexact); the author left the choice to the best
+technical option. Taken: **stop enforcing the equality of formula and
+model**, for these reasons.
+
+- Both ways of enforcing it, in the search (F1) and at the selection (F3R),
+  cost what the plan does not accept: exact laws for F1, accuracy and an out
+  of domain collapse on real data for F3R. The variant acting only where
+  needed would leave the fits of 0.8.0 with exact formulas untouched, but the
+  two `228_elusage` fits that fail criteria 3 and 4 are fits whose formula is
+  inexact, so it would fail the same way.
+- An option would have to be wired into every place where the delivered
+  model is chosen (the end of a run, the merge of restarts, the selection of
+  the extrapolation mode), for a benefit users mostly have already: every
+  entry of `result.pareto` carries its own `formula_exact`.
+
+What changes instead, without changing any model: when the returned formula
+departs from `predict()`, the warning also says how many entries of
+`result.pareto` have an exact formula, and names the most accurate of them on
+the hold-out. The target of gate 2 "formula equal to the model, 130 of 130"
+becomes "every formula that departs from the model is flagged and warned,
+with the exact alternatives named"; this goes to the author with the next
+point. The flags of F1, F3 and F3R are removed from the engine; they remain in
+the history (commits 72a3f32 to 0038a29), where the trials above can be run
+again.
+
 ## The models that collapse out of domain
 
 The second half of phase 2, written separately after campaign F1: the
