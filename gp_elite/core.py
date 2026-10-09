@@ -7248,6 +7248,11 @@ _EXTRAP_BAND = None     # (y_lo, y_hi) plausibles
 _FAR_GUARD = False
 _FAR_EXT = 1.0          # largeurs d'entrainement ajoutees de chaque cote
 _FAR_K = 10.0           # bande : K fois l'ecart maximal d'une cible a la moyenne
+# [v0.9-G1b] Bande qui croit avec la distance : a une sonde dont le plus grand
+# depassement de la boite vaut d largeurs, K * (1 + d) fois cet ecart (une
+# croissance au plus lineaire passe, une explosion non). G1b = _FAR_EXT 3 et
+# _FAR_LINEAR allume ; G1 = _FAR_EXT 1, _FAR_LINEAR coupe.
+_FAR_LINEAR = False
 _FAR_PROBE_XS = None
 _FAR_BAND = None        # (centre, demi-largeur) en unites de y
 _FAR_CACHE: Dict[int, bool] = {}
@@ -7640,7 +7645,13 @@ def _build_far_probes(xs_np, ys_np, n=400):
     rng = np.random.RandomState(20261009)
     _FAR_PROBE_XS = a + (b - a) * rng.uniform(0.0, 1.0, (n, Xm.shape[1]))
     c = float(np.mean(y))
-    _FAR_BAND = (c, _FAR_K * max(float(np.max(np.abs(y - c))), 1e-12))
+    half = _FAR_K * max(float(np.max(np.abs(y - c))), 1e-12)
+    if _FAR_LINEAR:                                   # [v0.9-G1b]
+        ww = np.where(w > 0, w, 1.0)
+        d = np.max(np.maximum(np.maximum(_FAR_PROBE_XS - hi, lo - _FAR_PROBE_XS),
+                              0.0) / ww, axis=1)
+        half = half * (1.0 + d)
+    _FAR_BAND = (c, half)
 
 
 def _far_stable(cand) -> bool:
@@ -7660,8 +7671,8 @@ def _far_stable(cand) -> bool:
             p = np.asarray(evaluate_vector(cand, _FAR_PROBE_XS), dtype=float)
         if p.ndim == 0:
             p = np.full(len(_FAR_PROBE_XS), float(p))
-        c, half = _FAR_BAND
-        ok = bool(np.all(np.isfinite(p)) and float(np.max(np.abs(p - c))) <= half)
+        c, half = _FAR_BAND                  # half : nombre, ou un par sonde (G1b)
+        ok = bool(np.all(np.isfinite(p)) and np.all(np.abs(p - c) <= half))
     except Exception:
         ok = False
     if not ok and _VAL_XS is not None and _VAL_YS is not None and len(_VAL_YS) > 1:

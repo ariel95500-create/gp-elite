@@ -90,6 +90,24 @@ def g1_trial_jobs():
     return out
 
 
+def confirm_jobs():
+    """Confirmation of G1b on seeds never run (PLAN_PHASE2.md): the 65
+    out-of-domain fits of R6 and R7raw with seeds 5 to 9, and their 65 folds
+    with seed 5."""
+    import decision_bench as D
+    out = []
+    for kind, names in (("real", D.REAL), ("realraw", D.REAL_RAW)):
+        for n in names:
+            for k in range(5):
+                out.append(dict(kind=kind, problem=n, split="fold%d" % k,
+                                seed=5, group=kind))
+        for n in names:
+            for s in range(5, 10):
+                out.append(dict(kind=kind, problem=n, split="ood", seed=s,
+                                group=kind))
+    return out
+
+
 # name: (jobs, arms)
 RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
@@ -99,7 +117,10 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "trial3r": (trial_jobs, ("A", "F3R")),
         "campaign3r": (campaign_jobs, ("A", "F3R")),
         "trialg1": (g1_trial_jobs, ("A", "G1")),
-        "campaigng1": (campaign_jobs, ("A", "G1"))}
+        "campaigng1": (campaign_jobs, ("A", "G1")),
+        "trialg1b": (g1_trial_jobs, ("A", "G1b")),
+        "campaigng1b": (campaign_jobs, ("A", "G1b")),
+        "confirmg1b": (confirm_jobs, ("A", "G1b"))}
 
 
 def key(j):
@@ -114,12 +135,17 @@ def run_arm(job):
                  "0038a29 (benchmarks/results_0.9/PLAN_PHASE2.md)")
     if job["arm"] == "G1" and not hasattr(C, "_FAR_GUARD"):
         sys.exit("the flag of G1 is not in this engine")
+    if job["arm"] == "G1b" and not hasattr(C, "_FAR_LINEAR"):
+        sys.exit("the flags of G1b are not in this engine")
     if hasattr(C, "_GUARD_STRICT"):
         C._GUARD_STRICT = job["arm"] in ("F1", "F3", "F3R")
         C._GUARD_SEARCH = job["arm"] not in ("F3", "F3R")
         C._GUARD_CATCHUP = job["arm"] == "F3R"
     if hasattr(C, "_FAR_GUARD"):
-        C._FAR_GUARD = job["arm"] == "G1"
+        C._FAR_GUARD = job["arm"] in ("G1", "G1b")
+        C._FAR_EXT = 3.0 if job["arm"] == "G1b" else 1.0
+    if hasattr(C, "_FAR_LINEAR"):
+        C._FAR_LINEAR = job["arm"] == "G1b"
     if "time_limit" in job:
         P.TIME_LIMIT = float(job["time_limit"])
     rec = P.run_one(job)
@@ -127,6 +153,8 @@ def run_arm(job):
     rec["guard_search"] = bool(getattr(C, "_GUARD_STRICT", False)
                                and getattr(C, "_GUARD_SEARCH", False))
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
+    rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
+    rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
     rec["far_rejected"] = int(C.TRACE.count.get("far_rejets", 0))
     rec["rejected_by_guard"] = int(C.TRACE.count.get("candidats_rejetes_garde", 0))
     rec["rejected_from_pool"] = int(C.TRACE.count.get("pool_rejets_garde", 0))
@@ -490,6 +518,44 @@ def summary_campaign_g1(path, arms):
                 A, v[A]["r2"], B, v[B]["r2"], dd))
 
 
+def summary_confirm(path, arms):
+    """The three criteria of the confirmation of G1b on new seeds."""
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    ood = [v for v in pairs.values() if v[A]["split"] == "ood"]
+    folds = [v for v in pairs.values() if v[A]["split"].startswith("fold")]
+    col = {a: int((_r2([v[a] for v in ood]) < 0).sum()) for a in arms}
+    worst = {a: float(_r2([v[a] for v in ood]).min()) for a in arms}
+    c1 = len(ood) == 65 and col[B] <= col[A] and worst[B] >= worst[A]
+    print("1. out of domain (%d): collapses %s %d, %s %d; worst R² %s %.4g, %s %.4g"
+          " -> %s" % (len(ood), A, col[A], B, col[B], A, worst[A], B, worst[B],
+                      "PASS" if c1 else "FAIL"))
+    mA = float(np.median(_r2([v[A] for v in ood])))
+    mB = float(np.median(_r2([v[B] for v in ood])))
+    c2 = mB >= mA - 0.01
+    print("2. median R² out of domain: %s %.4f, %s %.4f -> %s" % (
+        A, mA, B, mB, "PASS" if c2 else "FAIL"))
+    d = _r2([v[B] for v in folds]) - _r2([v[A] for v in folds])
+    c3 = len(folds) == 65 and np.median(d) >= -0.005
+    print("3. folds (%d): median paired difference %+.4f, mean %+.4g, worst %+.4g"
+          " -> %s" % (len(folds), np.median(d), np.mean(d), d.min(),
+                      "PASS" if c3 else "FAIL"))
+    print("%s %s" % (B, "CONFIRMED" if (c1 and c2 and c3) else "NOT CONFIRMED"))
+    print("\nmodels changed: out of domain %d of %d, folds %d of %d" % (
+        sum(1 for v in ood if _changed(v[A], v[B])), len(ood),
+        sum(1 for v in folds if _changed(v[A], v[B])), len(folds)))
+    print("fits where the two arms differ by more than 0.01 in R²")
+    for v in sorted(pairs.values(), key=lambda v: v[B]["r2"] - v[A]["r2"]):
+        dd = v[B]["r2"] - v[A]["r2"]
+        if abs(dd) > 0.01:
+            print("  %-8s %-24s %-6s s%d  %s %.4g  %s %.4g  (%+.4g)" % (
+                v[A]["kind"], v[A]["problem"], v[A]["split"], v[A]["seed"],
+                A, v[A]["r2"], B, v[B]["r2"], dd))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -509,10 +575,12 @@ def main():
         drive(a.which, a.python, a.out, a.pairs, a.max_seconds)
     elif a.cmd == "one":
         print(json.dumps(run_arm(json.loads(a.job))))
-    elif a.which == "trialg1":
+    elif a.which in ("trialg1", "trialg1b"):
         summary_trial_g1(a.path, RUNS[a.which][1])
-    elif a.which == "campaigng1":
+    elif a.which in ("campaigng1", "campaigng1b"):
         summary_campaign_g1(a.path, RUNS[a.which][1])
+    elif a.which == "confirmg1b":
+        summary_confirm(a.path, RUNS[a.which][1])
     elif a.which.startswith("trial"):
         summary_trial(a.path, RUNS[a.which][1])
     elif a.which.startswith("campaign"):

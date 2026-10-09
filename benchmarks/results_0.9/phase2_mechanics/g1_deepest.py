@@ -1,8 +1,8 @@
-"""Mechanics check 3 of G1 (PLAN_PHASE2.md): on 228_elusage in its own
-units, out of domain, seed 4 (the deepest collapse of COLLAPSES.md), the
-model returned with the flag on passes the far test.
+"""Mechanics check 3 of G1 and G1b (PLAN_PHASE2.md): on 228_elusage in its
+own units, out of domain, seed 4 (the deepest collapse of COLLAPSES.md), the
+model returned with the flags on passes the far test.
 
-  PYTHONHASHSEED=0 PYTHONPATH=. python benchmarks/results_0.9/phase2_mechanics/g1_deepest.py
+  PYTHONHASHSEED=0 PYTHONPATH=. python benchmarks/results_0.9/phase2_mechanics/g1_deepest.py [G1|G1b]
 """
 import io
 import json
@@ -19,6 +19,10 @@ import phase1_bench as P
 import decision_bench as D
 from gp_elite import symbolic_regression
 
+ARM = sys.argv[1] if len(sys.argv) > 1 else "G1"
+C._FAR_EXT = 3.0 if ARM == "G1b" else 1.0
+if hasattr(C, "_FAR_LINEAR"):
+    C._FAR_LINEAR = ARM == "G1b"
 out = []
 for flag in (False, True):
     C._FAR_GUARD = flag
@@ -35,7 +39,7 @@ for flag in (False, True):
         C._build_far_probes(np.vstack([C._VAL_TRAIN_XS, C._VAL_XS]),
                             np.concatenate([C._VAL_TRAIN_YS, C._VAL_YS]))
         C._FAR_CACHE.clear()
-    out.append(dict(flag=flag, passes_far_test=C._far_stable(node),
+    out.append(dict(arm=ARM, flag=flag, passes_far_test=C._far_stable(node),
                     r2_ood=1.0 - D.one_minus_r2(yo, r.predict(Xo)),
                     size=int(r.size), far_rejected=int(C.TRACE.count.get("far_rejets", 0)),
                     expr=r.expression[:120]))
