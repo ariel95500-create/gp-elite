@@ -548,3 +548,54 @@ The targeted trial of G1b is run.
 While the trial of G1b runs: if G1b is not adopted (trial, campaign or
 confirmation), phase 2 stops there, without a further variant, and the work
 goes on with the rest of the plan.
+
+### Targeted trial G1b, result (9 October 2026)
+
+Run from 22:59 to 23:08 UTC, 68 fits, 34 complete pairs, no crash
+(`phase2_trial_G1b.jsonl`; `python benchmarks/phase2_bench.py summary trialg1b
+benchmarks/results_0.9/phase2_trial_G1b.jsonl`). The criteria are applied as
+written.
+
+1. Worst out-of-domain R² over the 11 collapses: −232.5 in A, −3.81 in G1b.
+   **Holds.**
+2. Controls: exact 7 of 10 in A, 5 of 10 in G1b; `II.2.42` seeds 0, 3 and 4
+   are exact in A and not in G1b (`I.8.14` seed 3 is exact in G1b only).
+   **Fails.**
+3. The 10 folds and the 3 far-reaching fits: median paired difference
+   +0.0000, no new collapse. **Holds**, but the worst paired difference is
+   −0.49 (`561_cpu` fold 0: R² 0.981 in A, 0.491 in G1b).
+4. Collapses over the 14 out-of-domain fits: 10 in A, 8 in G1b. **Holds.**
+
+**The trial is not conclusive. Under the limit set by the author, G1b is not
+adopted and phase 2 stops here.**
+
+Why the controls were lost. The search is the same in both arms (the same
+83, 71 and 73 generations for the three lost fits). The law of `II.2.42`
+multiplies three variables, so beyond the box it grows like the cube of the
+distance, faster than the linear band of G1b allows three widths out; and a
+candidate of that structure enters the pool with constants not yet exact,
+so the exemption of exact laws does not apply at that moment, the
+candidate is turned away, and it is never polished into the exact law it
+becomes in A. G1, whose band does not grow and whose probes stop at one
+width, had kept the same three laws. A linear bound on growth beyond the
+data does not fit physical laws that are products of several quantities, and
+how far a model may be trusted beyond its data is not something a fixed
+probe distance settles: G1 was too short for `561_cpu`, G1b too strict for
+`II.2.42`.
+
+## Phase 2, outcome (9 October 2026)
+
+- **Formula and model.** The engine is unchanged; when the returned formula
+  departs from `predict()`, the warning now names the exact alternatives of
+  the Pareto front. The target of gate 2 was changed accordingly, with the
+  author's agreement.
+- **Collapses out of domain.** Examined (`COLLAPSES.md`): the deep ones are
+  models that explode beyond the training box, unseen by the engine's
+  near-domain guard. Two guards beyond the box were tried, G1 and G1b; each
+  rescued four or five of the five deep collapses of the decision bench and
+  each failed a criterion written in advance. Neither is adopted; the
+  targets of gate 2 on collapses stay as they are, unmet.
+- **Engine.** The flags of every variant are removed; the engine returns the
+  models of 0.8.0, bit for bit. The trials can be run again from the commits
+  where the flags exist (F1, F3 and F3R up to 0038a29; G1 and G1b up to
+  the commit that records this result).
