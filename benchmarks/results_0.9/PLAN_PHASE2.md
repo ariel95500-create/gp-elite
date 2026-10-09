@@ -180,6 +180,54 @@ Files in `phase2_mechanics/` (the flags are set in each process by
 F3 does not pass its mechanics; its trial is not run, and phase 2 goes back to
 the author.
 
+## Variant F3R (F3 with a catch-up), plan written before it is implemented (9 October 2026)
+
+Chosen by the author on 9 October 2026 among three options (F3 with a
+catch-up, the trial of F3 as it is, or stopping this work and keeping the
+warning of 0.8.0).
+
+**What was looked at before this plan.** One probe, on the power example only
+(F3 on, the final island populations read after the fit,
+`power_example.py`'s data and settings): 77 of the 375 distinct individuals
+of the final populations reproduce the engine, the best of them with training
+R² 0.99997, whereas none of the 27 candidates offered to the pool did. No fit
+of the decision bench or of the test set was made.
+
+**The change.** F3, plus a catch-up at the end of the search, before the
+polishing of the finalists, only in a run where the check removed at least
+one candidate (counter reset at each run): the individuals of the final island
+populations, with their linear scaling materialised as the search does for
+the candidates it tracks, are ranked by training MSE, and the first 8 whose
+formula reproduces the engine are offered to the pool of the final selection
+through the same door as every other candidate (dimensional gate, numerical
+stability, check). At most 200 distinct individuals are examined. Polishing
+and selection then run as in F3. A run in which nothing was removed is not
+touched, so it stays as in F3, whose search is that of 0.8.0. If no faithful
+candidate exists even then, the selection falls back on the champion as 0.8.0
+does, with its warning; this is counted. Flags: `_GUARD_STRICT` on,
+`_GUARD_SEARCH` off, a new `_GUARD_CATCHUP` on; all three off by default.
+
+**Mechanics, checked before the trial.**
+
+1. All flags off: the thirteen reference configurations return the same
+   models as gp-elite 0.8.0, bit for bit.
+2. F3R on, the same thirteen configurations: every returned model has
+   `formula_exact` True, and a configuration may return a model different
+   from (1) only if the check removed at least one candidate there.
+3. The power example: `formula_exact` True and no inexact entry on the Pareto
+   front. The time the catch-up takes there is reported.
+
+**Targeted trial F3R.** The same 35 jobs, arms A and F3R side by side, and
+the same four criteria as the trial of F3 above (at most 2 inexact formulas
+in the 15 targeted fits; no control exact in A lost; on the 20 real fits a
+median paired difference of test R² of at least −0.01 and no new collapse;
+on the same fits a worst test R² no deeper than A's). Reported beside them:
+the fits where the catch-up ran, and its time.
+
+A conclusive trial opens campaign F3R, decided by the four criteria of
+campaign F1 above, unchanged. Otherwise the trial is recorded with its
+numbers and phase 2 goes back to the author.
+
 ## The models that collapse out of domain
 
 The second half of phase 2, written separately after campaign F1: the
