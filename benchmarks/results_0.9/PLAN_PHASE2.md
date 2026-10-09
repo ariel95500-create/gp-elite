@@ -79,6 +79,32 @@ Reported as in phase 1: means, medians and worst cases, paired comparisons,
 time beyond the budget, and the cost of the check (median generations in
 30 s).
 
+## Targeted trial F1, result (9 October 2026)
+
+Run from 21:01 to 21:11 UTC, 70 fits, 35 complete pairs, no crash
+(`phase2_trial_F1.jsonl`; `python benchmarks/phase2_bench.py summary trial
+benchmarks/results_0.9/phase2_trial_F1.jsonl`). The criteria are applied as
+written above.
+
+1. Targeted fits: inexact formulas 8 of 15 in A, 0 of 15 in F1. **Holds.**
+2. Controls: exact 7 of 10 in A, 5 of 10 in F1. Three fits exact in A are
+   not exact in F1 (`I.8.14` seed 1, `II.2.42` seeds 0 and 3); one fit exact
+   in F1 is only near in A (`I.8.14` seed 3). **Fails.**
+3. Real fits: median paired difference of test R² +0.0018; collapses 3 in A,
+   2 in F1, none new in F1. **Holds.** The worst case, however, is far deeper
+   in F1: `228_elusage` out of domain, seed 4, R² −237,351 against −232.5 in A
+   (both arms collapse on that fit). Criterion 4 of the campaign would not
+   accept that.
+
+**The trial is not conclusive; campaign F1 is not run.**
+
+Cost of the check, reported as is: median generations in 30 s 61 in A and 45
+in F1 (−26 %), median candidates rejected by the check 5,585 per fit. In the
+three lost controls F1 ran 53, 43 and 41 generations where A ran 72, 81 and
+65. Whether the losses come from the fewer generations or from the rejected
+candidates themselves is not known from this trial; it is examined before the
+next variant gets its written plan.
+
 ## The models that collapse out of domain
 
 The second half of phase 2, written separately after campaign F1: the
