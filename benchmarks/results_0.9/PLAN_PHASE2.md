@@ -228,6 +228,24 @@ A conclusive trial opens campaign F3R, decided by the four criteria of
 campaign F1 above, unchanged. Otherwise the trial is recorded with its
 numbers and phase 2 goes back to the author.
 
+## Mechanics of F3R, result (9 October 2026, 21:36 to 21:38 UTC)
+
+1. All flags off, engine with F3R's code, against the 0.8.0 wheel: 13 of 13
+   identical (`compare_0.8.0_vs_flags_off_F3R_code.txt`). **Holds.** The test
+   suite passes with the flags off (139 tests, F3's code).
+2. F3R on: `formula_exact` True in 13 of 13. Three configurations return
+   another model or Pareto front, each with candidates removed and the
+   catch-up run: `B_cpu` (4 removed; 50 individuals checked, 8 offered),
+   `C_big` (1 removed; Pareto front only) and `I_sklearn` (1 removed; Pareto
+   front only); the ten others had none removed and are identical
+   (`compare_flags_off_vs_F3R.txt`, `trace_F3R.jsonl`). The catch-up took
+   0.25 to 0.36 s. **Holds.**
+3. The power example: `formula_exact` True, no inexact entry among the 4 of
+   the Pareto front; the catch-up checked 200 of 375 individuals, offered 6,
+   in 0.34 s (`power_example.txt`). **Holds.**
+
+The targeted trial of F3R is run.
+
 ## The models that collapse out of domain
 
 The second half of phase 2, written separately after campaign F1: the

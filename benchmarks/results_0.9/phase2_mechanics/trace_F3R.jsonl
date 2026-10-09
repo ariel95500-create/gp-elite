@@ -1,0 +1,67 @@
+{"arm": "F3R", "argv": ["one", "A_feyn"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "A_feyn"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "A_feyn"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "A_feyn"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "B_cpu"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "B_cpu"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "B_cpu"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "B_cpu"], "removed_from_pool": 4, "rejected_in_search": 0, "catchups": 1, "catchup": "372 individus, 50 controles, 8 proposes, 0.293 s"}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "C_big"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "C_big"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "C_big"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "C_big"], "removed_from_pool": 1, "rejected_in_search": 0, "catchups": 1, "catchup": "370 individus, 8 controles, 8 proposes, 0.358 s"}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "D_units"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "D_units"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "D_units"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "D_units"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "E_minmax"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "E_minmax"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "E_minmax"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "E_minmax"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "F_robust"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "G_restarts"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "G_restarts"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "G_restarts"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "G_restarts"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "G_restarts"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "H_parallel"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "H_parallel"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "H_parallel"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "H_parallel"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "I_sklearn"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "I_sklearn"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "I_sklearn"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "I_sklearn"], "removed_from_pool": 1, "rejected_in_search": 0, "catchups": 1, "catchup": "346 individus, 17 controles, 8 proposes, 0.254 s"}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "J_extrap"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "J_extrap"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "J_extrap"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "J_extrap"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "K_thorough"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "K_thorough"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "K_thorough"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "K_thorough"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "K_thorough"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "L_standard"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "L_standard"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "L_standard"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "L_standard"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "M_twice"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "M_twice"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "M_twice"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "M_twice"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "M_twice"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "M_twice"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["one", "M_twice"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": [], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
+{"arm": "F3R", "argv": ["run", "benchmarks/results_0.9/phase2_mechanics/F3R"], "removed_from_pool": 0, "rejected_in_search": 0, "catchups": 0, "catchup": null}
