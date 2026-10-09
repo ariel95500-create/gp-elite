@@ -153,3 +153,25 @@ seen as one.
   the thirteen configurations runs parallel islands, which would have taken
   cores from the timed fits. Each setting was also run twice, to tell a
   processor effect from a run-to-run difference.
+
+## Gate 2, validated on 9 October 2026
+
+The frozen test set (TF78, TS14, TR25) and the targets below were validated
+by the author after reading `BASELINE.md`. Starting values are those of
+gp-elite 0.8.0 measured in this phase.
+
+| Indicator | 0.8.0 | Target for 1.0 |
+|---|---|---|
+| F41 exact laws (205 fits, 30 s) | 88 | at least 110 |
+| the five families at zero (18 equations, 90 fits) | 0 | at least 20 |
+| TF78 exact laws (390 fits) | 145 | at least half of the relative gain on F41 |
+| structure retrieved, F41N1 / F41N10 (205 fits each) | 70 / 67 | at least 80 / 77 |
+| formula equal to the model, R6 + R7raw (130 fits) | 122 | 130 |
+| collapses out of domain, R6 + R7raw (65 fits) | 10, worst R² −233 | no more, worst no deeper |
+| median test R², R6 folds | 0.809 | at least 0.804 |
+| median test R², TR25 folds | 0.766 | at least 0.761 |
+| collapses, TR25 out of domain (125 fits) | 37 | fewer |
+| units mode, Feynman II.11.3 | 149 s in 0.8 (measured again in phase 3) | at most 60 s |
+
+The test-set indicators (TF78, TR25) are measured once per version and never
+used to decide a change.
