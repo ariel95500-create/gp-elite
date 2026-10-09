@@ -4698,6 +4698,9 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
             bool(getattr(cfg, "UNKNOWN_CONST", False))):
         TRACE.bump("candidats_rejetes_dim")     # [v0.7]
         return float("inf")
+    if _GUARD_STRICT and not _formula_faithful(node):   # [v0.9-F1]
+        TRACE.bump("candidats_rejetes_garde")
+        return float("inf")
 
     h   = node.exact_hash()          # [v0.7] exact : voir Node.exact_hash
     # [OPT] Bucket générationnel : même individu → même fitness pendant 10 gens
@@ -7189,6 +7192,13 @@ _EXACT_PRIORITY_SWAPS = 0   # [v0.7-EXACT] nombre de fois ou la regle a change l
 
 _FAITHFUL_SWAPS = 0          # [v0.8] departages par la fidelite de la formule
 _FAITHFUL_CACHE: Dict[int, bool] = {}
+# [v0.9-F1, a l'essai, desactive par defaut] Un candidat sur lequel un
+# garde-fou numerique agit sur les donnees (sa formule imprimee ne reproduit
+# pas le moteur, voir _formula_faithful) est INVALIDE pendant la recherche :
+# fitness infinie, et il n'entre pas dans le pool de la selection finale.
+# Recherche sequentielle seulement : les iles paralleles ne le voient pas.
+# Plan et criteres : benchmarks/results_0.9/PLAN_PHASE2.md.
+_GUARD_STRICT = False
 
 
 def _formula_faithful(node) -> bool:
@@ -7337,6 +7347,8 @@ def _track_val_candidate(cand):
         except Exception:
             return
     if not _is_numerically_stable(cand):
+        return
+    if _GUARD_STRICT and not _formula_faithful(cand):    # [v0.9-F1]
         return
     try:
         preds = evaluate_vector(cand, _VAL_XS)
@@ -7646,7 +7658,8 @@ def _select_one_se(champion, champ_val):
     meilleur (le plus large des deux). Cas batterie : le 10-nœuds (R²=0.9973)
     et le 29-nœuds (R²=0.9981) diffèrent de 0.08% → le 10-nœuds gagne."""
     pool = list(_VAL_CANDS)
-    if champion is not None and math.isfinite(champ_val) and _is_numerically_stable(champion):
+    if champion is not None and math.isfinite(champ_val) and _is_numerically_stable(champion) \
+            and not (_GUARD_STRICT and not _formula_faithful(champion)):   # [v0.9-F1]
         pool.append((champ_val, 0.0, tree_size(champion), champion))
     if not pool:
         # [v25-EXTRAP] Tout a été rejeté par le garde anti-divergence (aucune
@@ -8491,7 +8504,8 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # invariant d'échelle, ne le voit pas). Sans hold-out (moins de 30
         # points, ou validation_split=0), ce modèle était livré tel quel.
         optimized = _refit_scaling(optimized, xs, ys)
-        if raw_mse(optimized, xs, ys) < raw_mse(global_best, xs, ys):
+        if raw_mse(optimized, xs, ys) < raw_mse(global_best, xs, ys) \
+                and not (_GUARD_STRICT and not _formula_faithful(optimized)):   # [v0.9-F1]
             global_best = optimized
         # Si Adam a dégradé, global_best reste intact (deepcopy garantit l'isolation)
         _track_val_candidate(global_best)            # [v21-VAL] post-Adam
