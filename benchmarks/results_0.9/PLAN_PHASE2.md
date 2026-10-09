@@ -305,7 +305,7 @@ departs from `predict()`, the warning also says how many entries of
 the hold-out. The target of gate 2 "formula equal to the model, 130 of 130"
 becomes "every formula that departs from the model is flagged and warned,
 with the exact alternatives named"; this goes to the author with the next
-point. The flags of F1, F3 and F3R are removed from the engine; they remain in
+point. (Accepted by the author on 9 October 2026, the same evening.) The flags of F1, F3 and F3R are removed from the engine; they remain in
 the history (commits 72a3f32 to 0038a29), where the trials above can be run
 again.
 
@@ -542,3 +542,9 @@ Otherwise G1b is not adopted and phase 2 goes back to the author.
    candidates failed (`g1b_deepest.txt`). **Holds.**
 
 The targeted trial of G1b is run.
+
+### Limit set by the author (9 October 2026)
+
+While the trial of G1b runs: if G1b is not adopted (trial, campaign or
+confirmation), phase 2 stops there, without a further variant, and the work
+goes on with the rest of the plan.

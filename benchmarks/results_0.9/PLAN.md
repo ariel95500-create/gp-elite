@@ -175,3 +175,9 @@ gp-elite 0.8.0 measured in this phase.
 
 The test-set indicators (TF78, TR25) are measured once per version and never
 used to decide a change.
+
+Changed on 9 October 2026, accepted by the author: the target "formula
+equal to the model, 130 of 130" became "every formula that departs from the
+model is flagged and warned, with the exact alternatives of the Pareto front
+named", after two ways of enforcing the equality cost exact laws or accuracy
+(`PLAN_PHASE2.md`).
