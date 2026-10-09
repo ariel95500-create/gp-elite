@@ -354,3 +354,78 @@ collapses a few simple rules would have avoided and at what cost on the
 other fits (for instance: the near-domain guard as a filter rather than a
 tie-break, or the smallest Pareto entry within the hold-out tolerance), so
 that the next plan starts from facts.
+
+### Change G1 (a guard beyond the box), plan written before it is implemented (9 October 2026)
+
+From `COLLAPSES.md`: the deep collapses are models that explode beyond the
+training box, and the engine's guards look either within 10 % of the data
+(`_near_domain_stable`) or, with `extrapolate=True` only, along one feature.
+
+**The change.** `_is_numerically_stable`, the test that already keeps
+unstable candidates out of the final selection, of the Pareto front and of
+the merge of restarts (it is never called by the search), gains a test on
+probes beyond the training box, in default mode:
+
+- 400 probes from a dedicated generator (`RandomState(20261009)`, the
+  engine's own random state is not touched), each feature drawn uniformly
+  from its training range widened by one training width on each side, in the
+  engine's input space; a feature whose training values are all positive
+  keeps its probes above half its minimum (all negative: below half its
+  maximum), so that roots, logarithms and divisions of positive quantities
+  stay defined there;
+- a candidate fails when one of its predictions on the probes is not finite
+  or lies further from the training mean than 10 times the largest distance
+  of a training target from it;
+- a candidate that reproduces the hold-out at numerical precision (the floor
+  of the exact-law rule of 0.7, `_EXACT_REL`) never fails it, so an exact law
+  is never removed;
+- the verdict is cached per tree; if every candidate fails, the selection
+  behaves as in 0.8.0.
+
+The width (one training width) and the band (10) were chosen after reading
+`COLLAPSES.md`, which saw out-of-domain rows up to three widths beyond the box
+and legitimate predictions of `561_cpu` up to 10.7 times the span: they are
+fixed here, before any fit of G1, and the decision bench they were read on is
+the one that decides, so they are confirmed later on new seeds and on the
+frozen test set, as the plan of 0.9 says. Flag `_FAR_GUARD`, off by default.
+
+**Mechanics, checked before the trial.**
+
+1. Flag off: the thirteen reference configurations return the same models as
+   gp-elite 0.8.0, bit for bit, and the test suite passes.
+2. Flag on, the same thirteen: a configuration may return another model only
+   if the far test failed at least one candidate there (counted); reported
+   field by field.
+3. On `228_elusage` in its own units, out of domain, seed 4 (the deepest
+   collapse), the model returned with the flag on passes the far test.
+
+**Targeted trial G1** (sorts the idea, decides nothing). Arms A and G1 side
+by side, 30 s, as in the trials above. 34 jobs: the 11 collapses of
+`COLLAPSES.md` (either run); the three out-of-domain fits of `561_cpu` whose
+right predictions reach far (standardised seed 0, in its units seeds 0 and
+4); the controls `I.8.14` and `II.2.42`, seeds 0 to 4; and the folds of
+`210_cloud` and `561_cpu` (R6). Conclusive when all hold:
+
+1. the worst out-of-domain R² of G1 over the 11 collapses is −10 or better
+   (about −233 in A);
+2. no control exact in A is not exact in G1;
+3. on the 10 folds and the 3 far-reaching fits, the median paired difference
+   of test R² (G1 − A) is at least −0.01, and G1 has no collapse there that A
+   does not have;
+4. over the 14 out-of-domain fits, G1 has no more collapses than A.
+
+**Campaign G1** (decides). The whole decision bench, A against G1, budget T.
+G1 is adopted when all hold:
+
+1. out of domain, R6 and R7raw (65 fits): no more collapses than A, and the
+   worst R² −10 or better;
+2. F41: at least 82 exact laws of 205, and no more than 3 fits exact in A and
+   not in G1;
+3. R6 folds: median test R² at least 0.804, and the median paired difference
+   over the R6 and R7raw folds at least −0.005;
+4. the median out-of-domain R² over the 65 fits no lower than A's by more
+   than 0.01;
+5. no more formulas flagged inexact on the 130 real fits than in A.
+
+Reported beside them: the fits where G1 changed the returned model, the
+number of candidates it failed, and the time beyond the budget.
