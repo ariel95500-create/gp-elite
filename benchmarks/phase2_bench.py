@@ -69,6 +69,27 @@ def diag_jobs():
             if j["group"] == "control"]
 
 
+def g1_trial_jobs():
+    """The targeted trial of G1 (PLAN_PHASE2.md): the 11 collapses of
+    COLLAPSES.md, the 3 far-reaching fits of 561_cpu, the controls and the
+    R6 folds of 210_cloud and 561_cpu."""
+    out = []
+    for kind, name, seed in (
+            ("realraw", "228_elusage", 4), ("real", "228_elusage", 0),
+            ("realraw", "228_elusage", 2), ("realraw", "210_cloud", 3),
+            ("real", "561_cpu", 3), ("realraw", "228_elusage", 0),
+            ("realraw", "nikuradse_1", 3), ("real", "228_elusage", 1),
+            ("realraw", "210_cloud", 4), ("real", "210_cloud", 1),
+            ("real", "228_elusage", 3)):
+        out.append(dict(kind=kind, problem=name, split="ood", seed=seed,
+                        group="collapse"))
+    for kind, seed in (("real", 0), ("realraw", 0), ("realraw", 4)):
+        out.append(dict(kind=kind, problem="561_cpu", split="ood", seed=seed,
+                        group="far"))
+    out += [j for j in trial_jobs() if j["group"] in ("control", "real")]
+    return out
+
+
 # name: (jobs, arms)
 RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
@@ -76,7 +97,9 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "trial3": (trial_jobs, ("A", "F3")),
         "campaign3": (campaign_jobs, ("A", "F3")),
         "trial3r": (trial_jobs, ("A", "F3R")),
-        "campaign3r": (campaign_jobs, ("A", "F3R"))}
+        "campaign3r": (campaign_jobs, ("A", "F3R")),
+        "trialg1": (g1_trial_jobs, ("A", "G1")),
+        "campaigng1": (campaign_jobs, ("A", "G1"))}
 
 
 def key(j):
@@ -86,17 +109,25 @@ def key(j):
 def run_arm(job):
     import gp_elite.core as C
     import phase1_bench as P
-    if not hasattr(C, "_GUARD_STRICT"):
+    if job["arm"] in ("F1", "F3", "F3R") and not hasattr(C, "_GUARD_STRICT"):
         sys.exit("the phase 2 flags are not in this engine: run from commit "
                  "0038a29 (benchmarks/results_0.9/PLAN_PHASE2.md)")
-    C._GUARD_STRICT = job["arm"] in ("F1", "F3", "F3R")
-    C._GUARD_SEARCH = job["arm"] not in ("F3", "F3R")
-    C._GUARD_CATCHUP = job["arm"] == "F3R"
+    if job["arm"] == "G1" and not hasattr(C, "_FAR_GUARD"):
+        sys.exit("the flag of G1 is not in this engine")
+    if hasattr(C, "_GUARD_STRICT"):
+        C._GUARD_STRICT = job["arm"] in ("F1", "F3", "F3R")
+        C._GUARD_SEARCH = job["arm"] not in ("F3", "F3R")
+        C._GUARD_CATCHUP = job["arm"] == "F3R"
+    if hasattr(C, "_FAR_GUARD"):
+        C._FAR_GUARD = job["arm"] == "G1"
     if "time_limit" in job:
         P.TIME_LIMIT = float(job["time_limit"])
     rec = P.run_one(job)
-    rec["guard_strict"] = bool(C._GUARD_STRICT)
-    rec["guard_search"] = bool(C._GUARD_STRICT and C._GUARD_SEARCH)
+    rec["guard_strict"] = bool(getattr(C, "_GUARD_STRICT", False))
+    rec["guard_search"] = bool(getattr(C, "_GUARD_STRICT", False)
+                               and getattr(C, "_GUARD_SEARCH", False))
+    rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
+    rec["far_rejected"] = int(C.TRACE.count.get("far_rejets", 0))
     rec["rejected_by_guard"] = int(C.TRACE.count.get("candidats_rejetes_garde", 0))
     rec["rejected_from_pool"] = int(C.TRACE.count.get("pool_rejets_garde", 0))
     rec["catchups"] = int(C.TRACE.count.get("rattrapages", 0))
@@ -324,6 +355,141 @@ def summary_campaign(path, arms):
                 A, v[A]["r2"], B, v[B]["r2"], dd))
 
 
+def _changed(a, b):
+    return a.get("expr") != b.get("expr")
+
+
+def summary_trial_g1(path, arms):
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    for arm in arms:
+        rr = [v[arm] for v in pairs.values()]
+        print("%-3s median generations %.0f, median time %.1f s, candidates failed"
+              " by the far test (median) %.0f" % (
+                  arm, np.median([r.get("generations", 0) for r in rr]),
+                  np.median([r.get("time", 0) for r in rr]),
+                  np.median([r.get("far_rejected", 0) for r in rr])))
+    col = [v for v in pairs.values() if v[A]["group"] == "collapse"]
+    far = [v for v in pairs.values() if v[A]["group"] == "far"]
+    ct = [v for v in pairs.values() if v[A]["group"] == "control"]
+    fo = [v for v in pairs.values() if v[A]["group"] == "real"]
+    wA, wB = min(v[A]["r2"] for v in col), min(v[B]["r2"] for v in col)
+    c1 = wB >= -10
+    print("1. the %d collapses: worst R² out of domain %s %.4g, %s %.4g -> %s" % (
+        len(col), A, wA, B, wB, "PASS" if c1 else "FAIL"))
+    lost = [(v[A]["problem"], v[A]["seed"]) for v in ct
+            if v[A].get("status") == "EXACT" and v[B].get("status") != "EXACT"]
+    c2 = not lost
+    print("2. controls (%d): exact %s %d, %s %d, lost %s -> %s" % (
+        len(ct), A, sum(1 for v in ct if v[A].get("status") == "EXACT"), B,
+        sum(1 for v in ct if v[B].get("status") == "EXACT"), lost,
+        "PASS" if c2 else "FAIL"))
+    rl = fo + far
+    d = [v[B]["r2"] - v[A]["r2"] for v in rl]
+    new_col = [(v[A]["problem"], v[A]["split"], v[A]["seed"]) for v in rl
+               if v[B]["r2"] < 0 <= v[A]["r2"]]
+    c3 = np.median(d) >= -0.01 and not new_col
+    print("3. folds and far-reaching fits (%d): median paired R² difference %+.4f,"
+          " worst %+.4g, new collapses %s -> %s" % (
+              len(rl), np.median(d), min(d), new_col, "PASS" if c3 else "FAIL"))
+    od = col + far
+    cA = sum(1 for v in od if v[A]["r2"] < 0)
+    cB = sum(1 for v in od if v[B]["r2"] < 0)
+    c4 = cB <= cA
+    print("4. out of domain (%d): collapses %s %d, %s %d -> %s" % (
+        len(od), A, cA, B, cB, "PASS" if c4 else "FAIL"))
+    print("TRIAL %s" % ("CONCLUSIVE" if (c1 and c2 and c3 and c4) else "NOT CONCLUSIVE"))
+    print("\nper fit (%s | %s): status or R², size; * = another model" % (A, B))
+    for k in sorted(pairs, key=lambda k: (pairs[k][A]["group"], k)):
+        v = pairs[k]
+
+        def cell(r):
+            return "%s, %d nodes" % (r.get("status") or "R² %.4g" % r["r2"],
+                                     r.get("size", 0))
+        print("  %-8s %-8s %-12s %-6s s%d  %-26s | %-26s %s" % (
+            v[A]["group"], k[0], k[1], k[2], k[3], cell(v[A]), cell(v[B]),
+            "*" if _changed(v[A], v[B]) else ""))
+
+
+def summary_campaign_g1(path, arms):
+    """The five adoption criteria of G1 (PLAN_PHASE2.md)."""
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %s" % (
+        len(recs), len(pairs), {a: sum(1 for r in recs if r["arm"] == a and
+                                       r.get("status") == "CRASH")
+                                for a in arms}))
+    feyn = [v for v in pairs.values() if v[A]["kind"] == "feyn"]
+    real = [v for v in pairs.values() if v[A]["kind"] in ("real", "realraw")]
+    folds = [v for v in real if v[A]["split"].startswith("fold")]
+    ood = [v for v in real if v[A]["split"] == "ood"]
+    r6f = [v for v in folds if v[A]["kind"] == "real"]
+    col = {a: int((_r2([v[a] for v in ood]) < 0).sum()) for a in arms}
+    worst = {a: float(_r2([v[a] for v in ood]).min()) for a in arms}
+    c1 = len(ood) == 65 and col[B] <= col[A] and worst[B] >= -10
+    print("1. out of domain (%d): collapses %s %d, %s %d; worst R² %s %.4g, %s %.4g"
+          " -> %s" % (len(ood), A, col[A], B, col[B], A, worst[A], B, worst[B],
+                      "PASS" if c1 else "FAIL"))
+    ex = {a: sum(1 for v in feyn if v[a].get("status") == "EXACT") for a in arms}
+    lost = [(v[A]["problem"], v[A]["seed"]) for v in feyn
+            if v[A].get("status") == "EXACT" and v[B].get("status") != "EXACT"]
+    won = [(v[A]["problem"], v[A]["seed"]) for v in feyn
+           if v[B].get("status") == "EXACT" and v[A].get("status") != "EXACT"]
+    c2 = len(feyn) == 205 and ex[B] >= 82 and len(lost) <= 3
+    print("2. F41 exact: %s %d, %s %d of %d; exact in %s only %d %s; in %s only"
+          " %d %s -> %s" % (A, ex[A], B, ex[B], len(feyn), A, len(lost), lost,
+                            B, len(won), won, "PASS" if c2 else "FAIL"))
+    med6 = float(np.median(_r2([v[B] for v in r6f])))
+    d = _r2([v[B] for v in folds]) - _r2([v[A] for v in folds])
+    c3 = len(r6f) == 30 and len(folds) == 65 and med6 >= 0.804 \
+        and np.median(d) >= -0.005
+    print("3. R6 folds median R²: %s %.4f, %s %.4f; paired %s − %s over R6 and"
+          " R7raw folds (%d): median %+.4f, mean %+.4g, worst %+.4g -> %s" % (
+              A, float(np.median(_r2([v[A] for v in r6f]))), B, med6, B, A,
+              len(folds), np.median(d), np.mean(d), d.min(),
+              "PASS" if c3 else "FAIL"))
+    mA = float(np.median(_r2([v[A] for v in ood])))
+    mB = float(np.median(_r2([v[B] for v in ood])))
+    c4 = mB >= mA - 0.01
+    print("4. median R² out of domain: %s %.4f, %s %.4f -> %s" % (
+        A, mA, B, mB, "PASS" if c4 else "FAIL"))
+    ie = {a: sum(1 for v in real if v[a].get("formula_exact") is False) for a in arms}
+    c5 = ie[B] <= ie[A]
+    print("5. formulas flagged inexact on the %d real fits: %s %d, %s %d -> %s" % (
+        len(real), A, ie[A], B, ie[B], "PASS" if c5 else "FAIL"))
+    print("%s %s" % (B, "ADOPTED" if (c1 and c2 and c3 and c4 and c5) else "NOT ADOPTED"))
+    print("\nreported beside the criteria")
+    for name, rr in (("F41", feyn), ("R6 folds", r6f),
+                     ("R7raw folds", [v for v in folds if v[A]["kind"] == "realraw"]),
+                     ("R6 ood", [v for v in ood if v[A]["kind"] == "real"]),
+                     ("R7raw ood", [v for v in ood if v[A]["kind"] == "realraw"])):
+        ch = sum(1 for v in rr if _changed(v[A], v[B]))
+        print("  %s (%d): models changed %d" % (name, len(rr), ch))
+        for a in arms:
+            x = [v[a] for v in rr]
+            r2 = _r2(x)
+            over = [r["time"] - BUDGET for r in x if r.get("time_limit_reached")]
+            print("    %-3s R² median %.4g mean %.4g worst %.4g, collapses %d,"
+                  " generations median %.0f, beyond budget median %s max %s,"
+                  " candidates failed by the far test median %.0f" % (
+                      a, np.median(r2), np.mean(r2), r2.min(), int((r2 < 0).sum()),
+                      np.median([r.get("generations", 0) for r in x]),
+                      "%.2f" % np.median(over) if over else "n/a",
+                      "%.2f" % max(over) if over else "n/a",
+                      np.median([r.get("far_rejected", 0) for r in x])))
+    print("\nreal fits where the two arms differ by more than 0.01 in R²")
+    for v in sorted(real, key=lambda v: v[B]["r2"] - v[A]["r2"]):
+        dd = v[B]["r2"] - v[A]["r2"]
+        if abs(dd) > 0.01:
+            print("  %-8s %-24s %-6s s%d  %s %.4g  %s %.4g  (%+.4g)" % (
+                v[A]["kind"], v[A]["problem"], v[A]["split"], v[A]["seed"],
+                A, v[A]["r2"], B, v[B]["r2"], dd))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -343,6 +509,10 @@ def main():
         drive(a.which, a.python, a.out, a.pairs, a.max_seconds)
     elif a.cmd == "one":
         print(json.dumps(run_arm(json.loads(a.job))))
+    elif a.which == "trialg1":
+        summary_trial_g1(a.path, RUNS[a.which][1])
+    elif a.which == "campaigng1":
+        summary_campaign_g1(a.path, RUNS[a.which][1])
     elif a.which.startswith("trial"):
         summary_trial(a.path, RUNS[a.which][1])
     elif a.which.startswith("campaign"):
