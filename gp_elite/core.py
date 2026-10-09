@@ -4698,9 +4698,6 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
             bool(getattr(cfg, "UNKNOWN_CONST", False))):
         TRACE.bump("candidats_rejetes_dim")     # [v0.7]
         return float("inf")
-    if _GUARD_STRICT and _GUARD_SEARCH and not _formula_faithful(node):   # [v0.9-F1]
-        TRACE.bump("candidats_rejetes_garde")
-        return float("inf")
 
     h   = node.exact_hash()          # [v0.7] exact : voir Node.exact_hash
     # [OPT] Bucket générationnel : même individu → même fitness pendant 10 gens
@@ -7192,76 +7189,6 @@ _EXACT_PRIORITY_SWAPS = 0   # [v0.7-EXACT] nombre de fois ou la regle a change l
 
 _FAITHFUL_SWAPS = 0          # [v0.8] departages par la fidelite de la formule
 _FAITHFUL_CACHE: Dict[int, bool] = {}
-# [v0.9-F1, a l'essai, desactive par defaut] Un candidat sur lequel un
-# garde-fou numerique agit sur les donnees (sa formule imprimee ne reproduit
-# pas le moteur, voir _formula_faithful) est INVALIDE pendant la recherche :
-# fitness infinie, et il n'entre pas dans le pool de la selection finale.
-# Recherche sequentielle seulement : les iles paralleles ne le voient pas.
-# Plan et criteres : benchmarks/results_0.9/PLAN_PHASE2.md.
-_GUARD_STRICT = False
-# [v0.9-F3] Avec _GUARD_SEARCH coupe, le controle n'agit plus dans la
-# recherche (fitness inchangee, donc recherche de la 0.8.0) : seulement au
-# pool de la selection finale, au champion de cette selection et apres
-# l'optimisation finale des constantes. F1 = les deux drapeaux allumes.
-_GUARD_SEARCH = True
-# [v0.9-F3R] Rattrapage : dans un run ou le controle a ecarte au moins un
-# candidat du pool, les meilleurs individus des populations finales dont la
-# formule reproduit le moteur sont proposes au pool avant le polissage
-# (_catch_up_faithful). F3R = _GUARD_STRICT et _GUARD_CATCHUP allumes,
-# _GUARD_SEARCH coupe.
-_GUARD_CATCHUP = False
-_POOL_REMOVED = 0          # candidats ecartes par le controle dans ce run
-_CATCHUP_K = 8             # candidats fideles proposes au plus
-_CATCHUP_SCAN = 200        # individus distincts soumis au controle au plus
-
-
-def _guard_removed() -> None:
-    """[v0.9-F3] Un candidat ecarte par le controle : compte pour le run."""
-    globals()["_POOL_REMOVED"] = _POOL_REMOVED + 1
-    TRACE.bump("pool_rejets_garde")
-
-
-def _catch_up_faithful(islands, xs, ys) -> int:
-    """[v0.9-F3R] Les individus des populations finales, leur mise a
-    l'echelle materialisee comme pour les candidats suivis pendant la
-    recherche, classes par MSE d'entrainement ; les _CATCHUP_K premiers dont
-    la formule reproduit le moteur passent par la porte commune du pool
-    (_track_val_candidate). Au plus _CATCHUP_SCAN individus distincts sont
-    soumis au controle. Rend le nombre de candidats proposes. Plan :
-    benchmarks/results_0.9/PLAN_PHASE2.md."""
-    t0 = time.time()
-    seen, ranked = set(), []
-    for isl in islands:
-        for nd in list(getattr(isl, "population", None) or []) + [getattr(isl, "best", None)]:
-            if nd is None:
-                continue
-            try:
-                h = nd.exact_hash()
-                if h in seen:
-                    continue
-                seen.add(h)
-                with np.errstate(all="ignore"):
-                    cand = wrap_linear_scaling(nd, xs, ys)
-                    m = _pure_mse(cand, xs, ys)
-            except Exception:
-                continue
-            if math.isfinite(m):
-                ranked.append((m, tree_size(cand), len(ranked), cand))
-    ranked.sort(key=lambda t: t[:3])
-    n_checked = n_offered = 0
-    for _m, _sz, _i, cand in ranked:
-        if n_offered >= _CATCHUP_K or n_checked >= _CATCHUP_SCAN:
-            break
-        n_checked += 1
-        if _formula_faithful(cand):
-            _track_val_candidate(cand)
-            n_offered += 1
-    TRACE.bump("rattrapages")
-    TRACE.bump("rattrapage_proposes", n_offered)
-    TRACE.set("rattrapage", "%d individus, %d controles, %d proposes, %.3f s" % (
-        len(ranked), n_checked, n_offered, time.time() - t0))
-    TRACE.set("rattrapage_s", time.time() - t0)
-    return n_offered
 
 
 def _formula_faithful(node) -> bool:
@@ -7410,9 +7337,6 @@ def _track_val_candidate(cand):
         except Exception:
             return
     if not _is_numerically_stable(cand):
-        return
-    if _GUARD_STRICT and not _formula_faithful(cand):    # [v0.9-F1]
-        _guard_removed()                                 # [v0.9-F3]
         return
     try:
         preds = evaluate_vector(cand, _VAL_XS)
@@ -7723,10 +7647,7 @@ def _select_one_se(champion, champ_val):
     et le 29-nœuds (R²=0.9981) diffèrent de 0.08% → le 10-nœuds gagne."""
     pool = list(_VAL_CANDS)
     if champion is not None and math.isfinite(champ_val) and _is_numerically_stable(champion):
-        if not (_GUARD_STRICT and not _formula_faithful(champion)):   # [v0.9-F1]
-            pool.append((champ_val, 0.0, tree_size(champion), champion))
-        else:
-            _guard_removed()                                        # [v0.9-F3]
+        pool.append((champ_val, 0.0, tree_size(champion), champion))
     if not pool:
         # [v25-EXTRAP] Tout a été rejeté par le garde anti-divergence (aucune
         # forme bornée trouvée) : on retombe sur le champion brut faute de mieux.
@@ -7795,8 +7716,7 @@ def _split_holdout(xs, ys, cfg):
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
     VALIDATION_SPLIT<=0 ou dataset trop petit (<30 points)."""
     global _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _EXTRAP_PROBE_XS, _EXTRAP_BAND
-    global _NEAR_PROBE_XS, _NEAR_BAND, _POOL_REMOVED
-    _POOL_REMOVED = 0                                    # [v0.9-F3R]
+    global _NEAR_PROBE_XS, _NEAR_BAND
     _VAL_XS = None; _VAL_YS = None
     _VAL_TRAIN_XS = None; _VAL_TRAIN_YS = None
     _EXTRAP_PROBE_XS = None; _EXTRAP_BAND = None
@@ -8572,10 +8492,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # points, ou validation_split=0), ce modèle était livré tel quel.
         optimized = _refit_scaling(optimized, xs, ys)
         if raw_mse(optimized, xs, ys) < raw_mse(global_best, xs, ys):
-            if not (_GUARD_STRICT and not _formula_faithful(optimized)):   # [v0.9-F1]
-                global_best = optimized
-            else:
-                _guard_removed()                                      # [v0.9-F3]
+            global_best = optimized
         # Si Adam a dégradé, global_best reste intact (deepcopy garantit l'isolation)
         _track_val_candidate(global_best)            # [v21-VAL] post-Adam
 
@@ -8589,11 +8506,6 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # cela, la règle 1-SE compare des structures aux constantes brutes — une
         # forme simple et EXACTE peut perdre contre un gros arbre simplement
         # parce que ses constantes n'étaient pas encore ajustées. Coût : ~ms.
-        if _GUARD_STRICT and _GUARD_CATCHUP and _POOL_REMOVED > 0:   # [v0.9-F3R]
-            try:
-                _catch_up_faithful(islands, xs, ys)
-            except Exception:
-                pass
         try:
             _polish_finalists(_finalists(cfg), xs, ys, cfg)   # [v0.8] voir leurs définitions
         except Exception:

@@ -591,6 +591,41 @@ def test_inexact_formula_triggers_a_warning(monkeypatch):
     assert res.formula_exact is False
 
 
+def test_inexact_formula_warning_names_the_exact_alternatives(monkeypatch):
+    """[v0.9] Enforcing formula = model costs accuracy (phase 2 of 0.9), so the
+    model stays the most accurate one and the warning names the entries of
+    result.pareto whose formula is exact, the most accurate of them first."""
+    import gp_elite.api as API
+    real = API._formula.raw_formula
+    calls = []
+
+    def returned_model_inexact(node, scaler, X_raw, feature_names=None,
+                               predictions=None):
+        rf = real(node, scaler, X_raw, feature_names, predictions)
+        calls.append(1)
+        if len(calls) == 1:                 # the returned model is built first
+            rf.exact, rf.rows_off, rf.max_error = False, 2, 0.5
+        return rf
+
+    monkeypatch.setattr(API._formula, "raw_formula", returned_model_inexact)
+    Xd = np.random.RandomState(0).uniform(1, 3, (40, 1))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        res = symbolic_regression(Xd, 2 * Xd[:, 0] + 1, generations=2,
+                                  parallel=False, seed=0)
+    assert res.formula_exact is False and res.pareto
+    msg = [str(w.message) for w in caught if "departs from predict()" in str(w.message)]
+    assert len(msg) == 1
+    exact = [e for e in res.pareto if e.formula_exact]
+    if exact:
+        assert ("%d of the %d entries of result.pareto have an exact formula"
+                % (len(exact), len(res.pareto))) in msg[0]
+        best = min(exact, key=lambda e: (e.mse_validation, e.size))
+        assert best.expression[:100] in msg[0]
+    else:
+        assert "No entry of result.pareto" in msg[0]
+
+
 # ── 13. Every evaluator of the engine gives a tree the same value ───────────
 # Up to 0.7 the vectorised evaluator wrote a negative constant under a square
 # as "(-0.5 ** 2)", which Python reads -(0.5 ** 2): sq(-0.5) evaluated to

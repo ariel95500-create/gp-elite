@@ -61,6 +61,24 @@ def _build_raw_formula(node, scaler, X_raw, names, predictions=None):
             s, _formula.scaled_expression_note(scaler, X_raw, names))
 
 
+def _exact_alternatives(pareto_entries) -> str:
+    """[v0.9] The sentence of the inexact-formula warning that names the
+    entries of the Pareto front whose formula reproduces their model, and the
+    most accurate of them on the hold-out."""
+    entries = list(pareto_entries or [])
+    exact = [e for e in entries if e.formula_exact]
+    if not exact:
+        return ("No entry of result.pareto (%d) has an exact formula either."
+                % len(entries))
+    e = min(exact, key=lambda t: (t.mse_validation, t.size))
+    text = e.expression if len(e.expression) <= 160 else e.expression[:157] + "..."
+    r2 = ("validation R² %.6g, " % e.r2_validation
+          if e.r2_validation is not None else "")
+    return ("%d of the %d entries of result.pareto have an exact formula "
+            "(formula_exact True); the most accurate of them on the hold-out "
+            "(%ssize %d) is: %s" % (len(exact), len(entries), r2, e.size, text))
+
+
 def _sympy_or_raise(obj, feature_names):
     if obj.formula is None:
         raise RuntimeError("no raw-variable formula available for this model "
@@ -916,10 +934,19 @@ def symbolic_regression(
         best, scaler, X, feature_names,
         predictions=None if _best_eval is None else
         _predict_raw(best, scaler, X, n_feat, _y_scale, _best_eval))
+    for e in pareto_entries:
+        e.formula, e.expression = _build_raw_formula(
+            e.node, scaler, X, feature_names,
+            predictions=None if e.eval_node is None else
+            _predict_raw(e.node, scaler, X, n_feat, e.y_scale, e.eval_node))
     if raw_formula is not None and not raw_formula.exact:
         # [v0.7] Jamais en silence : la formule affichee est la fonction
         # mathematique sans les garde-fous numeriques du moteur ; la ou l'un
         # d'eux agit, elle s'ecarte de predict(), qui reste le modele.
+        # [v0.9] L'avertissement nomme les alternatives exactes du front de
+        # Pareto : imposer l'egalite formule = modele coute de la precision
+        # (phase 2, benchmarks/results_0.9/PLAN_PHASE2.md) ; le choix revient
+        # a l'utilisateur, qui a besoin de savoir qu'il existe.
         import warnings
         warnings.warn(
             "GP_ELITE: the formula printed for the returned model departs from "
@@ -927,14 +954,10 @@ def symbolic_regression(
             "often because a numerical safety net of the engine acts there (a "
             "power capped at 1e6 or clipped, a division by a near-zero "
             "denominator...). predict() is the model; result.formula_exact is "
-            "False."
-            % (raw_formula.rows_off, len(y), raw_formula.max_error),
+            "False. %s"
+            % (raw_formula.rows_off, len(y), raw_formula.max_error,
+               _exact_alternatives(pareto_entries)),
             RuntimeWarning, stacklevel=2)
-    for e in pareto_entries:
-        e.formula, e.expression = _build_raw_formula(
-            e.node, scaler, X, feature_names,
-            predictions=None if e.eval_node is None else
-            _predict_raw(e.node, scaler, X, n_feat, e.y_scale, e.eval_node))
 
     return SRResult(
         expression=expression,

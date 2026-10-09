@@ -2,6 +2,8 @@
 safety net (x0^7 is beyond the exponent clip of ±6), one fit per arm.
 
   PYTHONHASHSEED=0 PYTHONPATH=. python benchmarks/results_0.9/phase2_mechanics/power_example.py A
+
+The flags exist in the engine at commit 0038a29 only (PLAN_PHASE2.md).
 """
 import json
 import sys
@@ -13,6 +15,8 @@ import gp_elite.core as C
 from gp_elite import symbolic_regression
 
 arm = sys.argv[1]
+if not hasattr(C, "_GUARD_STRICT"):
+    sys.exit("the phase 2 flags are not in this engine: run from commit 0038a29")
 C._GUARD_STRICT = arm in ("F1", "F3", "F3R")
 C._GUARD_SEARCH = arm not in ("F3", "F3R")
 C._GUARD_CATCHUP = arm == "F3R"

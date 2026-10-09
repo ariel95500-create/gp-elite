@@ -192,7 +192,12 @@ same result, and says so once. Notebooks need nothing.
   that was the case for 6 of the 205 Feynman fits of the release at 30 s per fit,
   for none of 60 fits on standardised real data and 8 of 70 on real data in their
   own units (campaigns 5b and 6b), and for 1 of the 105 fits of the equal-work
-  comparison (100 generations).
+  comparison (100 generations). The warning also says how many entries of
+  `result.pareto` have an exact formula and names the most accurate of them:
+  forcing an exact formula on the returned model costs accuracy (measured for
+  0.9 in
+  [`benchmarks/results_0.9/PLAN_PHASE2.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_PHASE2.md)),
+  so the choice is left to you.
 - **`r2_validation` is a selection score.** The hold-out it is computed on is also
   used to choose the returned model among the candidates, so it is optimistic.
   To estimate how the formula generalises, keep a test set of your own out of the

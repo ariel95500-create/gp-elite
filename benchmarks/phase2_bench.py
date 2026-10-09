@@ -3,7 +3,10 @@
 F1: core._GUARD_STRICT and core._GUARD_SEARCH on (the check in the search and
 at the final selection). F3: _GUARD_STRICT on, _GUARD_SEARCH off (the check at
 the final selection only). F3R: F3 with _GUARD_CATCHUP on (the catch-up from
-the final populations). See benchmarks/results_0.9/PLAN_PHASE2.md. Both
+the final populations). The flags were removed from the engine after the
+decision of 9 October 2026 (PLAN_PHASE2.md): run this script from commit
+0038a29, where they exist; it refuses to run without them. See
+benchmarks/results_0.9/PLAN_PHASE2.md. Both
 arms run the engine of this checkout (PYTHONPATH = repository root); the arm
 only sets the flags. Each fit runs in its own process (data, budget and
 records as benchmarks/phase1_bench.py); the two arms of a job run side by side
@@ -83,6 +86,9 @@ def key(j):
 def run_arm(job):
     import gp_elite.core as C
     import phase1_bench as P
+    if not hasattr(C, "_GUARD_STRICT"):
+        sys.exit("the phase 2 flags are not in this engine: run from commit "
+                 "0038a29 (benchmarks/results_0.9/PLAN_PHASE2.md)")
     C._GUARD_STRICT = job["arm"] in ("F1", "F3", "F3R")
     C._GUARD_SEARCH = job["arm"] not in ("F3", "F3R")
     C._GUARD_CATCHUP = job["arm"] == "F3R"

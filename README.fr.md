@@ -206,7 +206,12 @@ Rien à faire dans un notebook.
   par ajustement, pour aucun des 60 ajustements sur données réelles
   standardisées et 8 des 70 sur données réelles dans leurs unités (campagnes 5b
   et 6b), et pour 1 des 105 ajustements de la comparaison à travail égal
-  (100 générations).
+  (100 générations). L'avertissement dit aussi combien d'entrées de
+  `resultat.pareto` ont une formule exacte et nomme la plus précise d'entre
+  elles : imposer une formule exacte au modèle rendu coûte de la précision
+  (mesuré pour la 0.9 dans
+  [`benchmarks/results_0.9/PLAN_PHASE2.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_PHASE2.md)),
+  le choix vous revient donc.
 - **`r2_validation` est un score de sélection.** Le hold-out sur lequel il est
   calculé sert aussi à choisir le modèle rendu parmi les candidats : il est donc
   optimiste. Pour estimer comment la formule généralise, gardez vos propres

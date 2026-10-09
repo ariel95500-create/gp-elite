@@ -16,6 +16,13 @@
 - `CITATION.cff`: `date-released` is 5 October 2026, the day 0.8.0 was
   published on PyPI (it said 30 September 2026, the date the release was
   prepared).
+- When the formula of the returned model departs from `predict()`, the
+  warning now says how many entries of `result.pareto` have an exact formula
+  and names the most accurate of them on the hold-out. No model changes. Two
+  ways of making the returned formula always exact were measured and not
+  adopted: rejecting such candidates during the search lost exact laws, and
+  removing them at the final selection lowered the test R² on real data
+  (`benchmarks/results_0.9/PLAN_PHASE2.md`).
 
 ## 0.8.0 — "Swift"
 
