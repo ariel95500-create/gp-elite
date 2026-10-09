@@ -246,6 +246,40 @@ numbers and phase 2 goes back to the author.
 
 The targeted trial of F3R is run.
 
+## Targeted trial F3R, result (9 October 2026)
+
+Run from 21:39 to 21:48 UTC, 70 fits, 35 complete pairs, no crash
+(`phase2_trial_F3R.jsonl`; `python benchmarks/phase2_bench.py summary trial3r
+benchmarks/results_0.9/phase2_trial_F3R.jsonl`). The criteria are applied as
+written.
+
+1. Targeted fits: inexact formulas 8 of 15 in A, 0 of 15 in F3R. **Holds.**
+2. Controls: exact 7 of 10 in both arms, the same fits. **Holds.**
+3. Real fits: median paired difference of test R² +0.0000; collapses 3 in A,
+   4 in F3R, one new: `228_elusage` out of domain, seed 1, R² 0.187 in A
+   (inexact formula) and −0.383 in F3R. **Fails.**
+4. Worst test R² over the real fits: −232.5 in A, −256.0 in F3R
+   (`228_elusage` out of domain, seed 2: −202.9 in A, inexact, and −256.0 in
+   F3R). **Fails.**
+
+**The trial is not conclusive; campaign F3R is not run.**
+
+Reported beside the criteria. The search is unchanged (median generations 61
+in both arms). The check removed candidates in every one of the 35 fits
+(median 12, at least 2), so the catch-up ran in all of them (8 candidates
+offered each time, 0.10 to 0.37 s), not only where the delivered formula
+would have been inexact; the plan expected most runs to be untouched. Of the
+20 real fits, 9 changed and all 9 lost test R²: four whose 0.8.0 formula was
+already exact (`210_cloud` folds 1 and 3, −0.020 and −0.015; `561_cpu`
+fold 4, −0.012; `nikuradse_1` fold 3, −0.014), where the candidates added by
+the catch-up changed the parsimonious choice, and five whose 0.8.0 formula
+was inexact (`nikuradse_1` folds 0, 1 and 4, −0.018, −0.008 and −0.047, and
+the two `228_elusage` fits above), where the best faithful replacement is
+worse. On this evidence, a formula that reproduces the model costs accuracy
+on real data whenever the model of 0.8.0 relies on a safety net.
+
+Phase 2 goes back to the author.
+
 ## The models that collapse out of domain
 
 The second half of phase 2, written separately after campaign F1: the
