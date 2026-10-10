@@ -34,7 +34,7 @@ several of the trigonometric laws that A misses (A found 2 of 50 in the
 baseline, gplearn 7); the controls show what `normalize="none"` costs
 elsewhere, which a change would have to avoid.
 
-## Result (10 October 2026, 01:51 to 02:05 UTC)
+## Result (10 October 2026, 01:47 to 02:01 UTC)
 
 120 fits, 60 complete pairs, no crash (`trig_diag.jsonl`; `python
 benchmarks/phase2_bench.py summary trig benchmarks/results_0.9/trig_diag.jsonl`).
@@ -64,3 +64,39 @@ the standard deviations of the columns are within a factor 10 of each other,
 unscaled, and four of the seven R7raw datasets (`561_cpu`, `547_no2` and
 `nikuradse_1` keep `divmax`, their columns differing in scale by 190 to
 1,660 times). The next step is the campaign of that default.
+
+## Change S1, plan written before its campaign (10 October 2026)
+
+**The change.** The default of `normalize` becomes `"smart"` instead of
+`"auto"` (`divmax`): the inputs are left as given when their columns have
+comparable scales (standard deviations within a factor 10), and divided by
+their largest absolute value otherwise, as today. No other change; the
+explicit options keep their meaning. Measured through the public argument
+(arm S: `normalize="smart"`; arm A: the default of 0.8.0), so the engine is
+not modified before the decision.
+
+The diagnostic above, whose numbers were read before this plan, stands for
+the targeted trial: S1 goes to the campaign.
+
+**Campaign S1** (decides). The decision bench, A against S side by side,
+budget T, four fits at a time: F41, R6 and R7raw, seeds 0 to 4 (335 jobs).
+S1 is adopted when all hold:
+
+1. **exact laws:** F41 exact in S at least 10 more than in A, and no equation
+   exact in A at three seeds or more falls to one seed or none in S (a
+   change of the search paths reshuffles single seeds; a law must not be
+   lost);
+2. **real data in the domain:** R6 folds median test R² at least 0.804, and
+   the median paired difference over R6 and R7raw folds at least −0.005;
+3. **out of domain:** on R6 and R7raw together, no more collapses than A, and
+   the median R² no lower than A's by more than 0.01;
+4. **formulas:** no more formulas flagged inexact on the 335 fits than in A.
+
+**Confirmation on new seeds**, if the campaign adopts S1: the same 335 jobs
+with seeds 5 to 9 (folds with seed 5), never run before. S1 is kept when F41
+exact in S is at least 5 more than in A, the median paired difference over
+the folds is at least −0.005, and out of domain S has no more collapses than
+A. Otherwise S1 is not adopted.
+
+The frozen test set is measured once, with the version, as the plan of 0.9
+says.
