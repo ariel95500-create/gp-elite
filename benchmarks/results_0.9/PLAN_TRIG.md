@@ -132,3 +132,42 @@ R7raw fits) without a gain in the domain and with losses out of domain. The
 benefit lies with laws of physical quantities of moderate size, and above
 all with angles inside trigonometric functions; the cost with real data
 whose raw values are large.
+
+## Change S2, plan written before it is implemented (10 October 2026)
+
+**The change.** With an operator pool that contains trigonometric functions
+(`"trig"` or `"full"`), `normalize="auto"` behaves as `"smart"`: inputs whose
+columns have comparable scales are left as given. With every other pool,
+including the default `"physical"`, nothing changes. The reason: scaling an
+input multiplies it by a constant, which a product, a quotient or a power
+absorbs into its own constant, but which changes the period of a sine or a
+cosine; that is where the diagnostic and campaign S1 found the gain. The
+rule is derived from S1, whose numbers were read before this plan, so it is
+confirmed on new seeds before adoption. Flag `_TRIG_SMART` in
+`gp_elite/core.py`, off by default, read by `symbolic_regression`.
+
+**Mechanics, before any fit.** With the flag on, the thirteen reference
+configurations return the same models as gp-elite 0.8.0 (none of them uses a
+trigonometric pool with `normalize="auto"`), and the test suite passes.
+
+**Campaign S2** (decides), A against S2 side by side, budget T, four fits at
+a time. The decision bench is unchanged by construction outside the ten F41
+laws of the `"trig"` pool, so the campaign runs:
+
+- part 1: those ten laws, seeds 0 to 4 (50 jobs);
+- part 2: R6 and R7raw, folds and out of domain, seeds 0 to 4, with
+  `operators="trig"` in both arms (130 jobs), for a user who asks for
+  trigonometric functions on real data.
+
+S2 is adopted when all hold:
+
+1. part 1: exact laws in S2 at least 5 more than in A, and no law exact in
+   A at three seeds or more falls to one or none;
+2. part 2, in the domain: the median paired difference of test R² over the
+   folds at least −0.005;
+3. part 2, out of domain: no more collapses than A, and the median R² no
+   lower than A's by more than 0.01;
+4. part 2: no more formulas flagged inexact than in A.
+
+**Confirmation on new seeds**, if the campaign adopts S2: part 1 with seeds
+5 to 9; S2 is kept when its exact laws are at least 5 more than A's.
