@@ -104,3 +104,26 @@ three criteria of four, with the gain the plan looked for on the
 trigonometric laws, fewer collapses out of domain on real data, and an
 unchanged median; it fails the fourth by one formula. Whether to test it
 again, on seeds never run, goes to the author.
+
+### Decisive test of T1 on new seeds, plan written before it (10 October 2026)
+
+Chosen by the author after campaign T1: one more test, on seeds never run,
+with the same four criteria. Campaign T1 stays recorded as not adopted; T1 is
+adopted only if this test holds all four, and both are reported.
+
+- Part 1: the ten "trig" laws with seeds 5 to 9 (50 jobs).
+- Part 2: R6 and R7raw with `operators="trig"` in both arms, out of domain
+  with seeds 5 to 9 and folds with seed 5 (130 jobs).
+- A against T1 side by side, budget T, four fits at a time, as the campaign.
+
+T1 is adopted when all hold, on these fits alone:
+
+1. part 1: at least 5 more exact laws than A, and no law exact in A at
+   three seeds or more falls to one or none;
+2. part 2, in the domain: the median paired difference of test R² over the
+   folds at least −0.005;
+3. part 2, out of domain: no more collapses than A, and the median R² no
+   lower than A's by more than 0.01;
+4. part 2: no more formulas flagged inexact than in A.
+
+If any fails, T1 is not adopted and 4a moves on without it.

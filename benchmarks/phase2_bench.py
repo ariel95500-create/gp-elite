@@ -153,6 +153,13 @@ def s2_confirm_jobs():
             if j["group"] == "trig"]
 
 
+def t1_retest_jobs():
+    """Decisive test of T1 on new seeds (PLAN_PHASE4.md): part 1 with seeds 5
+    to 9, part 2 with the real data of confirm_jobs() and operators="trig"."""
+    return s2_confirm_jobs() + [dict(j, group="real_trig", force_pool="trig")
+                                for j in confirm_jobs()]
+
+
 # name: (jobs, arms)
 RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
@@ -172,7 +179,8 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaigns2": (s2_jobs, ("A", "S2")),
         "confirms2": (s2_confirm_jobs, ("A", "S2")),
         "campaignt1": (s2_jobs, ("A", "T1")),
-        "confirmt1": (s2_confirm_jobs, ("A", "T1"))}
+        "confirmt1": (s2_confirm_jobs, ("A", "T1")),
+        "retestt1": (t1_retest_jobs, ("A", "T1"))}
 
 
 def key(j):
@@ -822,7 +830,8 @@ def main():
         summary_confirm(a.path, RUNS[a.which][1])
     elif a.which == "trig":
         summary_trig(a.path, RUNS[a.which][1])
-    elif a.which in ("campaigns2", "confirms2", "campaignt1", "confirmt1"):
+    elif a.which in ("campaigns2", "confirms2", "campaignt1", "confirmt1",
+                     "retestt1"):
         summary_s2(a.path, RUNS[a.which][1], confirm=a.which.startswith("confirm"))
     elif a.which in ("campaigns1", "confirms1"):
         summary_s1(a.path, RUNS[a.which][1], confirm=a.which == "confirms1")
