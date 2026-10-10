@@ -139,6 +139,20 @@ def confirm_s1_jobs():
     return out + confirm_jobs()
 
 
+def s2_jobs():
+    """Campaign S2 (PLAN_TRIG.md): part 1, the ten F41 laws of the "trig"
+    pool, seeds 0 to 4; part 2, R6 and R7raw with operators="trig"."""
+    out = [j for j in trig_jobs() if j["group"] == "trig"]
+    return out + [dict(j, group="real_trig", force_pool="trig")
+                  for j in campaign_jobs() if j["kind"] in ("real", "realraw")]
+
+
+def s2_confirm_jobs():
+    """Confirmation of S2: part 1 with seeds 5 to 9."""
+    return [dict(j, seed=j["seed"] + 5) for j in trig_jobs()
+            if j["group"] == "trig"]
+
+
 # name: (jobs, arms)
 RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
@@ -154,7 +168,9 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "confirmg1b": (confirm_jobs, ("A", "G1b")),
         "trig": (trig_jobs, ("A", "N")),
         "campaigns1": (campaign_jobs, ("A", "S")),
-        "confirms1": (confirm_s1_jobs, ("A", "S"))}
+        "confirms1": (confirm_s1_jobs, ("A", "S")),
+        "campaigns2": (s2_jobs, ("A", "S2")),
+        "confirms2": (s2_confirm_jobs, ("A", "S2"))}
 
 
 def key(j):
@@ -181,6 +197,16 @@ def run_arm(job):
         C._FAR_LINEAR = job["arm"] == "G1b"
     if "time_limit" in job:
         P.TIME_LIMIT = float(job["time_limit"])
+    if job["arm"] == "S2" and not hasattr(C, "_TRIG_SMART"):
+        sys.exit("the flag of S2 is not in this engine")
+    if hasattr(C, "_TRIG_SMART"):
+        C._TRIG_SMART = job["arm"] == "S2"
+    if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
+        import gp_elite
+        _sr0 = gp_elite.symbolic_regression
+        _pool = job["force_pool"]
+        gp_elite.symbolic_regression = (
+            lambda *a, **k: _sr0(*a, **dict(k, operators=_pool)))
     if job["arm"] in ("N", "S"):          # PLAN_TRIG.md: "none" or "smart"
         import gp_elite
         _sr = gp_elite.symbolic_regression
@@ -192,6 +218,7 @@ def run_arm(job):
     rec["guard_search"] = bool(getattr(C, "_GUARD_STRICT", False)
                                and getattr(C, "_GUARD_SEARCH", False))
     rec["normalize"] = {"N": "none", "S": "smart"}.get(job["arm"], "auto")
+    rec["trig_smart"] = bool(getattr(C, "_TRIG_SMART", False))
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -709,6 +736,58 @@ def summary_s1(path, arms, confirm=False):
                 A, v[A]["r2"], B, v[B]["r2"], dd))
 
 
+def summary_s2(path, arms, confirm=False):
+    """The criteria of campaign S2, or of its confirmation (PLAN_TRIG.md)."""
+    from collections import defaultdict
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    p1 = [v for v in pairs.values() if v[A]["group"] == "trig"]
+    ex = {a: sum(1 for v in p1 if v[a].get("status") == "EXACT") for a in arms}
+    per = defaultdict(lambda: {A: 0, B: 0})
+    for v in p1:
+        for a in arms:
+            per[v[A]["problem"]][a] += v[a].get("status") == "EXACT"
+    lost = sorted(n for n, c in per.items() if c[A] >= 3 and c[B] <= 1)
+    c1 = len(p1) == 50 and ex[B] >= ex[A] + 5 and (confirm or not lost)
+    print("1. part 1 (%d): exact %s %d, %s %d (at least +5); laws lost %s -> %s" % (
+        len(p1), A, ex[A], B, ex[B], lost, "PASS" if c1 else "FAIL"))
+    for n, c in sorted(per.items()):
+        print("     %-10s %d %d" % (n, c[A], c[B]))
+    if confirm:
+        print("S2 %s" % ("CONFIRMED" if c1 else "NOT CONFIRMED"))
+        return
+    p2 = [v for v in pairs.values() if v[A]["group"] == "real_trig"]
+    folds = [v for v in p2 if v[A]["split"].startswith("fold")]
+    ood = [v for v in p2 if v[A]["split"] == "ood"]
+    d = _r2([v[B] for v in folds]) - _r2([v[A] for v in folds])
+    c2 = len(folds) == 65 and np.median(d) >= -0.005
+    print("2. part 2 folds (%d): median paired difference %+.4f, mean %+.4g,"
+          " worst %+.4g -> %s" % (len(folds), np.median(d), np.mean(d), d.min(),
+                                  "PASS" if c2 else "FAIL"))
+    col = {a: int((_r2([v[a] for v in ood]) < 0).sum()) for a in arms}
+    mA = float(np.median(_r2([v[A] for v in ood])))
+    mB = float(np.median(_r2([v[B] for v in ood])))
+    c3 = len(ood) == 65 and col[B] <= col[A] and mB >= mA - 0.01
+    print("3. part 2 out of domain (%d): collapses %s %d, %s %d; median %s %.4f,"
+          " %s %.4f -> %s" % (len(ood), A, col[A], B, col[B], A, mA, B, mB,
+                              "PASS" if c3 else "FAIL"))
+    ie = {a: sum(1 for v in p2 if v[a].get("formula_exact") is False) for a in arms}
+    c4 = ie[B] <= ie[A]
+    print("4. part 2 formulas flagged inexact: %s %d, %s %d -> %s" % (
+        A, ie[A], B, ie[B], "PASS" if c4 else "FAIL"))
+    print("S2 %s" % ("ADOPTED" if (c1 and c2 and c3 and c4) else "NOT ADOPTED"))
+    print("part 2 fits where the arms differ by more than 0.05 in R²")
+    for v in sorted(p2, key=lambda v: v[B]["r2"] - v[A]["r2"]):
+        dd = v[B]["r2"] - v[A]["r2"]
+        if abs(dd) > 0.05:
+            print("  %-8s %-24s %-6s s%d  %s %.4g  %s %.4g  (%+.4g)" % (
+                v[A]["kind"], v[A]["problem"], v[A]["split"], v[A]["seed"],
+                A, v[A]["r2"], B, v[B]["r2"], dd))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -736,6 +815,8 @@ def main():
         summary_confirm(a.path, RUNS[a.which][1])
     elif a.which == "trig":
         summary_trig(a.path, RUNS[a.which][1])
+    elif a.which in ("campaigns2", "confirms2"):
+        summary_s2(a.path, RUNS[a.which][1], confirm=a.which == "confirms2")
     elif a.which in ("campaigns1", "confirms1"):
         summary_s1(a.path, RUNS[a.which][1], confirm=a.which == "confirms1")
     elif a.which.startswith("trial"):

@@ -622,7 +622,16 @@ def symbolic_regression(
         raise ValueError("normalize=%r is not one of ['auto', 'divmax', "
                          "'grouped', 'minmax', 'standard', 'none', 'smart']"
                          % (normalize,))
-    scaler, _desc = core._choose_scaler(X, normalize, (-2.0, 2.0))
+    _norm = normalize
+    if core._TRIG_SMART and (normalize or "auto").lower() == "auto" \
+            and pool in ("trig", "full"):
+        # [v0.9-S2, a l'essai] Avec des fonctions trigonometriques, diviser
+        # une variable par son max change la periode d'un sinus (une
+        # constante qu'un produit absorbe, pas sin) : entrees laissees telles
+        # quelles quand les colonnes ont des echelles comparables.
+        # benchmarks/results_0.9/PLAN_TRIG.md
+        _norm = "smart"
+    scaler, _desc = core._choose_scaler(X, _norm, (-2.0, 2.0))
     X_scaled = scaler.fit_transform(X)
 
     # ── Pool d'opérateurs + noms de colonnes (mode CSV générique) ──

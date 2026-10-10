@@ -171,3 +171,10 @@ S2 is adopted when all hold:
 
 **Confirmation on new seeds**, if the campaign adopts S2: part 1 with seeds
 5 to 9; S2 is kept when its exact laws are at least 5 more than A's.
+
+### Mechanics of S2, result (10 October 2026, 03:17 to 03:24 UTC)
+
+With the flag on, the thirteen reference configurations return the same
+models as the 0.8.0 wheel (`phase2_mechanics/compare_0.8.0_vs_S2_on.txt`);
+the test suite passes with the flag off (140 tests). **Holds.** The campaign
+is run.

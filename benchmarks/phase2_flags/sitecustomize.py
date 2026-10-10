@@ -1,6 +1,6 @@
 """Sets the phase 2 flags of gp_elite.core in every Python process started
 with this directory first on PYTHONPATH (benchmarks/speed_equivalence.py
-runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1 or G1b.
+runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b or S2.
 With GP_ELITE_TRACE_LOG, each process appends its check counters there. The
 flags exist in the engine at commit 0038a29 only (PLAN_PHASE2.md, decision).
 
@@ -31,6 +31,10 @@ if _arm:
         _C._FAR_EXT = 3.0 if _arm == "G1b" else 1.0
     if hasattr(_C, "_FAR_LINEAR"):
         _C._FAR_LINEAR = _arm == "G1b"
+    if _arm == "S2" and not hasattr(_C, "_TRIG_SMART"):
+        raise SystemExit("the flag of S2 is not in this engine")
+    if hasattr(_C, "_TRIG_SMART"):
+        _C._TRIG_SMART = _arm == "S2"
 
     def _log():
         path = os.environ.get("GP_ELITE_TRACE_LOG")
