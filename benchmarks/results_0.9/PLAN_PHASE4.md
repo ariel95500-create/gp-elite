@@ -218,3 +218,36 @@ formula, `C_big` now with an inexact one). **Holds.** Before it, outside any
 measurement, one fit of 30 generations on `I.18.12` came back exact with the
 flag on (1 − R² 1e-16, a sine of the angle in its own units) and one on
 `I.40.1` did not improve. The campaign is run.
+
+### Campaign A1, result (10 October 2026)
+
+Run from 08:46 to 09:58 UTC, 670 fits, 335 complete pairs, no crash
+(`campaign_A1.jsonl`; `python benchmarks/phase2_bench.py summary campaigna1
+benchmarks/results_0.9/campaign_A1.jsonl`). The criteria are applied as
+written.
+
+1. Exact laws: F41 86 in A, 91 in A1 (+5, at least +8 required); the five
+   zero families 0 in A, 1 in A1 (`III.15.12`; at least +4 required);
+   `II.2.42` falls from 3 seeds to 1. **Fails.** (`I.18.12` 1 to 5 seeds,
+   `II.15.4` 1 to 2, `I.6.20a` 4 to 5, `II.11.27` 0 to 1; `I.11.19` 1 to 0.)
+2. Real data in the domain: R6 folds median 0.810 in A, 0.804 in A1; median
+   paired difference over the folds +0.0000. **Holds**, at the edge.
+3. Out of domain: collapses 10 in A, **18 in A1**; median R² 0.647 in A,
+   0.482 in A1; worst −2.1e8 (R6). **Fails**, widely.
+4. Formulas flagged inexact: 15 in both. **Holds.**
+
+**A1 is not adopted**, and its flag is removed from the engine (the code
+stays in the history at commit 878fd47). The median generations fall from
+60 to 45 in 30 s (the fit of the constants after each such mutation). The
+adjustable argument helps the trigonometric laws, as the seeds of T1 did,
+but freer exponentials and logarithms fit the training rows of real data
+better and extrapolate much worse.
+
+### Where 4a stands
+
+Five measurements (`PLAN_TRIG.md`, T1 twice, A1) agree on one point: giving
+the sine and the cosine their argument in the variable's own units recovers
+trigonometric laws that 0.8.0 misses. Every way of doing it tried so far also
+touched something else (the scaling of all inputs, or exp and log) or moved
+a small count by one, and none was adopted. Users can already get the gain
+with `normalize="none"`, as the README now says.

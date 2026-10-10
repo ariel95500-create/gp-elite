@@ -5695,75 +5695,10 @@ def fragment_inject_mutation(node: Node, cfg: Config) -> Node:
     return simplify(tree)
 
 
-# ════════════════════════════════════════════════════════════════
-# [v0.9-A1, a l'essai, desactive par defaut] ARGUMENT AJUSTABLE (4a)
-# ════════════════════════════════════════════════════════════════
-# Une mutation remplace l'argument g d'un noeud sin, cos, exp, log ou sqrt
-# par a*g + b, puis Levenberg-Marquardt ajuste toutes les constantes de
-# l'arbre. Valeurs de depart : sin/cos d'une colonne seule -> la colonne
-# dans ses propres unites (x_j = (u_j - b_j)/a_j, voir PLAN_TRIG.md) ;
-# sinon a = 1.05, b = 0.05 (que simplify n'efface pas). Drapeau coupe : aucun
-# tirage aleatoire, moteur de la 0.8.0. Plan : benchmarks/results_0.9/
-# PLAN_PHASE4.md (A1).
-_ARG_MUT = False
-_ARG_MUT_RATE = 0.08
-_ARG_MUT_OPS = ("sin", "cos", "exp", "log", "sqrt")
-_RAW_AFFINE = None       # (a, b) de u_j = a_j*x_j + b_j, pose par symbolic_regression
-
-
-def _affine_wrapped(g) -> bool:
-    """Vrai si g est deja de la forme c*h + d ou c*h (constantes c, d)."""
-    num = lambda n: n is not None and n.left is None and n.right is None \
-        and not isinstance(n.value, str)
-    if g is None:
-        return False
-    if g.value == "+" and num(g.right) and g.left is not None and g.left.value == "*":
-        g = g.left
-    return g.value == "*" and (num(g.left) or num(g.right))
-
-
-def argument_mutation(node: Node, xs, ys, cfg: Config) -> Optional[Node]:
-    """[v0.9-A1] Voir le commentaire ci-dessus. None si l'arbre n'a aucun
-    noeud eligible (la mutation habituelle a alors lieu)."""
-    _b, _bw, u_ops, _uw, _a, _aw = _active_pools()
-    ops = set(_ARG_MUT_OPS) & set(u_ops)
-    if not ops:
-        return None
-    t = node.copy()
-    cands = [n for n, _p, _s in get_all_nodes(t)
-             if n.right is None and n.left is not None and n.value in ops
-             and not _affine_wrapped(n.left)]
-    if not cands:
-        return None
-    f = random.choice(cands)
-    g = f.left
-    a0, b0 = 1.05, 0.05
-    if f.value in ("sin", "cos") and _RAW_AFFINE is not None \
-            and g.left is None and g.right is None and isinstance(g.value, str) \
-            and g.value.startswith("X["):
-        try:
-            j = int(g.value[2:-1])
-            aj, bj = float(_RAW_AFFINE[0][j]), float(_RAW_AFFINE[1][j])
-            a0, b0 = 1.0 / aj, -bj / aj
-        except Exception:
-            pass
-    inner = Node("*", Node(a0), g)
-    f.left = Node("+", inner, Node(b0)) if b0 != 0.0 else inner
-    TRACE.bump("arg_mutations")
-    try:
-        return optimize_constants_adam(t, xs, ys, cfg)
-    except Exception:
-        return t
-
-
 def mutate(node: Node,
            xs: List[float], ys: List[float],
            cfg: Config,
            role: str = "explorer") -> Node:
-    if _ARG_MUT and random.random() < _ARG_MUT_RATE:      # [v0.9-A1]
-        out = argument_mutation(node, xs, ys, cfg)
-        if out is not None:
-            return out
     r = random.random()
     if r < cfg.HOIST_RATE:
         return hoist_mutation(node)
