@@ -155,3 +155,54 @@ collapses out of domain from 30 to 19 of 130 with a median R² out of domain
 no lower; but they add one formula flagged inexact in each run. The
 trigonometric laws themselves vary much from seed to seed in the engine of
 0.8.0 (2 of 50 on seeds 0 to 4, 7 of 50 on seeds 5 to 9).
+
+## Change A1 (the adjustable argument of 4a), plan written before it is implemented (10 October 2026)
+
+Chosen by the author after T1. A lesson of T1 is applied from here on, in
+advance: counts as small as the formulas flagged inexact (4 to 6 of 130) move
+by one or two from run to run, so criteria on such counts allow that much.
+
+**The change.** A new mutation, `argument_mutation`: in a tree that contains
+`sin`, `cos`, `exp`, `log` or `sqrt` (those of the active pool), one such
+node whose argument is not already of the form `a·g + b` gets its argument
+`g` replaced by `a·g + b`, and the constants of the whole tree are fitted at
+once by the engine's Levenberg-Marquardt step (`optimize_constants_adam`, as
+for the elite children). Starting values: for `sin` or `cos` of a lone
+column, `a` and `b` put the column back in its own units (the lesson of
+`PLAN_TRIG.md` and of T1: `sin(x_j)` with `x_j = (u_j − b_j)/a_j`);
+otherwise `a = 1.05`, `b = 0.05` (values that the simplifier does not erase,
+so that the step has something to move). It is drawn with probability 0.08
+at each mutation, before the usual ones; when the tree has no eligible node,
+the mutation proceeds as in 0.8.0. Not under `units=` (typed mutations) and
+not in the parallel islands (their workers do not receive the engine's
+flags, a known limit of this measurement, to be closed before any release).
+Flag `_ARG_MUT` in `gp_elite/core.py`, off by default; with it off, no random
+number is drawn, so the engine is that of 0.8.0.
+
+This acts with the default pool `"physical"` (which has `exp`, `log` and
+`sqrt`), so it changes most fits: it is measured on the whole decision bench.
+
+**Mechanics, before any fit.** Flag off: the thirteen reference
+configurations identical to gp-elite 0.8.0, the test suite passing. Flag on:
+reported field by field; `H_parallel` must stay identical (parallel islands)
+and `D_units` too (typed).
+
+**Campaign A1** (decides). The decision bench, A against A1 side by side,
+budget T, four fits at a time: F41, R6 and R7raw, seeds 0 to 4 (335 jobs).
+A1 is adopted when all hold:
+
+1. **exact laws:** F41 exact in A1 at least 8 more than in A, among which at
+   least 4 more in the five families at zero (roots, trigonometry, rational
+   forms, exponentials, logarithms: 18 equations, 90 fits); and no equation
+   exact in A at three seeds or more falls to one seed or none;
+2. **real data in the domain:** R6 folds median test R² at least 0.804, and
+   the median paired difference over R6 and R7raw folds at least −0.005;
+3. **out of domain:** on R6 and R7raw, no more than 2 collapses more than A,
+   and the median R² no lower than A's by more than 0.01;
+4. **formulas:** no more than 3 formulas flagged inexact more than A on the
+   335 fits.
+
+**Confirmation on new seeds**, if the campaign adopts A1: the same 335 jobs
+with seeds 5 to 9 (folds with seed 5). A1 is kept when F41 exact in A1 is at
+least 5 more than in A, the median paired difference over the folds is at
+least −0.005, and out of domain A1 has no more than 2 collapses more than A.
