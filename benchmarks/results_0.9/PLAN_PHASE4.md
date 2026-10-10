@@ -81,3 +81,26 @@ identical (`compare_0.8.0_vs_T1_on.txt`). **Holds.** Before it, one fit of
 20 generations per law, outside any measurement, showed the mechanism: with
 the flag on, `I.18.12` and `II.15.4` came back as `v0 * v1 * sin(v2)` and
 `-v0 * v1 * cos(v2)`. The campaign is run.
+
+### Campaign T1, result (10 October 2026)
+
+Run from 04:42 to 05:29 UTC, 360 fits, 180 complete pairs, no crash
+(`campaign_T1.jsonl`; `python benchmarks/phase2_bench.py summary campaignt1
+benchmarks/results_0.9/campaign_T1.jsonl`). The criteria are applied as
+written.
+
+1. Part 1, the ten "trig" laws: exact 2 in A, **12 in T1**, no law lost
+   (`I.18.12` and `II.15.4` 1 to 5 seeds, `III.17.37` 0 to 2). **Holds.**
+2. Part 2 (real data with `operators="trig"`), folds: median paired
+   difference +0.0000, mean +0.017, worst −0.100. **Holds.**
+3. Part 2, out of domain: collapses 13 in A, 9 in T1; median R² 0.700 in A,
+   0.699 in T1. **Holds.** (Not a criterion: the worst case is −78.0 in A,
+   −103.8 in T1, `228_elusage` standardised, seed 3.)
+4. Part 2, formulas flagged inexact: 4 in A, **5 in T1**. **Fails**, by one
+   formula of 130.
+
+**T1 is not adopted**, under the rule written before the campaign. It holds
+three criteria of four, with the gain the plan looked for on the
+trigonometric laws, fewer collapses out of domain on real data, and an
+unchanged median; it fails the fourth by one formula. Whether to test it
+again, on seeds never run, goes to the author.
