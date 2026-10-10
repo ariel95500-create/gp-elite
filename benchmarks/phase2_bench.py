@@ -109,6 +109,24 @@ def confirm_jobs():
     return out
 
 
+TRIG_LAWS = ("II.15.4", "I.18.12", "III.15.12", "I.26.2", "I.30.5", "I.37.4",
+             "I.50.26", "II.6.15b", "III.9.52", "III.17.37")
+
+
+def trig_jobs():
+    """The diagnostic of PLAN_TRIG.md: the ten F41 laws of the "trig" pool and
+    the two controls, seeds 0 to 4."""
+    import feynman_bench as F
+    out = []
+    for i, p in enumerate(F.PROBS):
+        if p[0] in TRIG_LAWS or p[0] in ("I.8.14", "II.2.42"):
+            for s in range(5):
+                out.append(dict(kind="feyn", problem=p[0], index=i, split="test",
+                                seed=s, group="trig" if p[0] in TRIG_LAWS
+                                else "control"))
+    return out
+
+
 # name: (jobs, arms)
 RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
@@ -121,7 +139,8 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaigng1": (campaign_jobs, ("A", "G1")),
         "trialg1b": (g1_trial_jobs, ("A", "G1b")),
         "campaigng1b": (campaign_jobs, ("A", "G1b")),
-        "confirmg1b": (confirm_jobs, ("A", "G1b"))}
+        "confirmg1b": (confirm_jobs, ("A", "G1b")),
+        "trig": (trig_jobs, ("A", "N"))}
 
 
 def key(j):
@@ -148,10 +167,16 @@ def run_arm(job):
         C._FAR_LINEAR = job["arm"] == "G1b"
     if "time_limit" in job:
         P.TIME_LIMIT = float(job["time_limit"])
+    if job["arm"] == "N":                 # PLAN_TRIG.md: the variables as given
+        import gp_elite
+        _sr = gp_elite.symbolic_regression
+        gp_elite.symbolic_regression = (
+            lambda *a, **k: _sr(*a, **dict(k, normalize="none")))
     rec = P.run_one(job)
     rec["guard_strict"] = bool(getattr(C, "_GUARD_STRICT", False))
     rec["guard_search"] = bool(getattr(C, "_GUARD_STRICT", False)
                                and getattr(C, "_GUARD_SEARCH", False))
+    rec["normalize"] = "none" if job["arm"] == "N" else "auto"
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -556,6 +581,38 @@ def summary_confirm(path, arms):
                 A, v[A]["r2"], B, v[B]["r2"], dd))
 
 
+def summary_trig(path, arms):
+    """PLAN_TRIG.md: exact, near and missed laws per arm, by equation."""
+    from collections import Counter, defaultdict
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    for g in ("trig", "control"):
+        vv = [v for v in pairs.values() if v[A]["group"] == g]
+        for a in arms:
+            st = Counter(v[a].get("status") for v in vv)
+            print("%-7s %-2s EXACT %2d NEAR %2d MISS %2d of %d, median generations %.0f" % (
+                g, a, st["EXACT"], st["NEAR"], st["MISS"] + st["CRASH"], len(vv),
+                np.median([v[a].get("generations", 0) for v in vv])))
+    by = defaultdict(list)
+    for k, v in sorted(pairs.items(), key=lambda kv: kv[0]):
+        by[(v[A]["group"], k[1])].append(v)
+    print("\nby equation (%s | %s), seeds 0 to 4" % (A, B))
+    for (g, name), vv in sorted(by.items()):
+        print("  %-7s %-10s %s | %s" % (g, name,
+              " ".join("%-5s" % v[A].get("status") for v in vv),
+              " ".join("%-5s" % v[B].get("status") for v in vv)))
+    print("\nexact in one arm only")
+    for k, v in sorted(pairs.items()):
+        if (v[A].get("status") == "EXACT") != (v[B].get("status") == "EXACT"):
+            print("  %-10s s%d  %s %-5s %s" % (k[1], k[3], A, v[A].get("status"),
+                                             v[A].get("expr", "")[:90]))
+            print("  %-10s     %s %-5s %s" % ("", B, v[B].get("status"),
+                                             v[B].get("expr", "")[:90]))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -581,6 +638,8 @@ def main():
         summary_campaign_g1(a.path, RUNS[a.which][1])
     elif a.which == "confirmg1b":
         summary_confirm(a.path, RUNS[a.which][1])
+    elif a.which == "trig":
+        summary_trig(a.path, RUNS[a.which][1])
     elif a.which.startswith("trial"):
         summary_trial(a.path, RUNS[a.which][1])
     elif a.which.startswith("campaign"):
