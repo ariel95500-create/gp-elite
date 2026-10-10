@@ -127,6 +127,18 @@ def trig_jobs():
     return out
 
 
+def confirm_s1_jobs():
+    """Confirmation of S1 on seeds never run (PLAN_TRIG.md): F41 with seeds
+    5 to 9, and the real data of confirm_jobs()."""
+    import feynman_bench as F
+    out = []
+    for i, p in enumerate(F.PROBS):
+        for s in range(5, 10):
+            out.append(dict(kind="feyn", problem=p[0], index=i, split="test",
+                            seed=s, group="feyn"))
+    return out + confirm_jobs()
+
+
 # name: (jobs, arms)
 RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
@@ -140,7 +152,9 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "trialg1b": (g1_trial_jobs, ("A", "G1b")),
         "campaigng1b": (campaign_jobs, ("A", "G1b")),
         "confirmg1b": (confirm_jobs, ("A", "G1b")),
-        "trig": (trig_jobs, ("A", "N"))}
+        "trig": (trig_jobs, ("A", "N")),
+        "campaigns1": (campaign_jobs, ("A", "S")),
+        "confirms1": (confirm_s1_jobs, ("A", "S"))}
 
 
 def key(j):
@@ -167,16 +181,17 @@ def run_arm(job):
         C._FAR_LINEAR = job["arm"] == "G1b"
     if "time_limit" in job:
         P.TIME_LIMIT = float(job["time_limit"])
-    if job["arm"] == "N":                 # PLAN_TRIG.md: the variables as given
+    if job["arm"] in ("N", "S"):          # PLAN_TRIG.md: "none" or "smart"
         import gp_elite
         _sr = gp_elite.symbolic_regression
+        _norm = "none" if job["arm"] == "N" else "smart"
         gp_elite.symbolic_regression = (
-            lambda *a, **k: _sr(*a, **dict(k, normalize="none")))
+            lambda *a, **k: _sr(*a, **dict(k, normalize=_norm)))
     rec = P.run_one(job)
     rec["guard_strict"] = bool(getattr(C, "_GUARD_STRICT", False))
     rec["guard_search"] = bool(getattr(C, "_GUARD_STRICT", False)
                                and getattr(C, "_GUARD_SEARCH", False))
-    rec["normalize"] = "none" if job["arm"] == "N" else "auto"
+    rec["normalize"] = {"N": "none", "S": "smart"}.get(job["arm"], "auto")
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -613,6 +628,87 @@ def summary_trig(path, arms):
                                              v[B].get("expr", "")[:90]))
 
 
+def summary_s1(path, arms, confirm=False):
+    """The criteria of campaign S1, or of its confirmation (PLAN_TRIG.md)."""
+    from collections import defaultdict
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    feyn = [v for v in pairs.values() if v[A]["kind"] == "feyn"]
+    real = [v for v in pairs.values() if v[A]["kind"] in ("real", "realraw")]
+    folds = [v for v in real if v[A]["split"].startswith("fold")]
+    ood = [v for v in real if v[A]["split"] == "ood"]
+    r6f = [v for v in folds if v[A]["kind"] == "real"]
+    ex = {a: sum(1 for v in feyn if v[a].get("status") == "EXACT") for a in arms}
+    per = defaultdict(lambda: {A: 0, B: 0})
+    for v in feyn:
+        for a in arms:
+            per[v[A]["problem"]][a] += v[a].get("status") == "EXACT"
+    lost_laws = sorted(n for n, c in per.items() if c[A] >= 3 and c[B] <= 1)
+    won_laws = sorted(n for n, c in per.items() if c[B] >= 3 and c[A] <= 1)
+    d = _r2([v[B] for v in folds]) - _r2([v[A] for v in folds])
+    col = {a: int((_r2([v[a] for v in ood]) < 0).sum()) for a in arms}
+    if confirm:
+        c1 = len(feyn) == 205 and ex[B] >= ex[A] + 5
+        c2 = len(folds) == 65 and np.median(d) >= -0.005
+        c3 = len(ood) == 65 and col[B] <= col[A]
+        print("1. F41 exact: %s %d, %s %d (at least +5) -> %s" % (
+            A, ex[A], B, ex[B], "PASS" if c1 else "FAIL"))
+        print("2. folds (%d): median paired difference %+.4f -> %s" % (
+            len(folds), np.median(d), "PASS" if c2 else "FAIL"))
+        print("3. out of domain (%d): collapses %s %d, %s %d -> %s" % (
+            len(ood), A, col[A], B, col[B], "PASS" if c3 else "FAIL"))
+        ok = c1 and c2 and c3
+        print("S1 %s" % ("CONFIRMED" if ok else "NOT CONFIRMED"))
+    else:
+        c1 = len(feyn) == 205 and ex[B] >= ex[A] + 10 and not lost_laws
+        med6 = float(np.median(_r2([v[B] for v in r6f])))
+        c2 = len(r6f) == 30 and len(folds) == 65 and med6 >= 0.804 \
+            and np.median(d) >= -0.005
+        mA = float(np.median(_r2([v[A] for v in ood])))
+        mB = float(np.median(_r2([v[B] for v in ood])))
+        c3 = len(ood) == 65 and col[B] <= col[A] and mB >= mA - 0.01
+        ie = {a: sum(1 for v in feyn + real if v[a].get("formula_exact") is False)
+              for a in arms}
+        c4 = ie[B] <= ie[A]
+        print("1. F41 exact: %s %d, %s %d (at least +10); laws lost %s -> %s" % (
+            A, ex[A], B, ex[B], lost_laws, "PASS" if c1 else "FAIL"))
+        print("2. R6 folds median R² %s %.4f, %s %.4f; paired over R6 and R7raw"
+              " folds (%d): median %+.4f, mean %+.4g, worst %+.4g -> %s" % (
+                  A, float(np.median(_r2([v[A] for v in r6f]))), B, med6,
+                  len(folds), np.median(d), np.mean(d), d.min(),
+                  "PASS" if c2 else "FAIL"))
+        print("3. out of domain (%d): collapses %s %d, %s %d; median R² %s %.4f,"
+              " %s %.4f -> %s" % (len(ood), A, col[A], B, col[B], A, mA, B, mB,
+                                  "PASS" if c3 else "FAIL"))
+        print("4. formulas flagged inexact: %s %d, %s %d -> %s" % (
+            A, ie[A], B, ie[B], "PASS" if c4 else "FAIL"))
+        ok = c1 and c2 and c3 and c4
+        print("S1 %s" % ("ADOPTED" if ok else "NOT ADOPTED"))
+    print("\nlaws exact at 3 seeds or more in %s and at most 1 in %s: %s" % (B, A, won_laws))
+    print("F41 by equation, exact seeds (%s, %s), where they differ:" % (A, B))
+    for n, c in sorted(per.items()):
+        if c[A] != c[B]:
+            print("  %-10s %d %d" % (n, c[A], c[B]))
+    for name, rr in (("R6 folds", r6f),
+                     ("R7raw folds", [v for v in folds if v[A]["kind"] == "realraw"]),
+                     ("R6 ood", [v for v in ood if v[A]["kind"] == "real"]),
+                     ("R7raw ood", [v for v in ood if v[A]["kind"] == "realraw"])):
+        print("  %s (%d): " % (name, len(rr)) + "; ".join(
+            "%s median %.4g worst %.4g collapses %d" % (
+                a, np.median(_r2([v[a] for v in rr])), _r2([v[a] for v in rr]).min(),
+                int((_r2([v[a] for v in rr]) < 0).sum())) for a in arms))
+    print("real fits where the arms differ by more than 0.05 in R²")
+    for v in sorted(real, key=lambda v: v[B]["r2"] - v[A]["r2"]):
+        dd = v[B]["r2"] - v[A]["r2"]
+        if abs(dd) > 0.05:
+            print("  %-8s %-24s %-6s s%d  %s %.4g  %s %.4g  (%+.4g)" % (
+                v[A]["kind"], v[A]["problem"], v[A]["split"], v[A]["seed"],
+                A, v[A]["r2"], B, v[B]["r2"], dd))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -640,6 +736,8 @@ def main():
         summary_confirm(a.path, RUNS[a.which][1])
     elif a.which == "trig":
         summary_trig(a.path, RUNS[a.which][1])
+    elif a.which in ("campaigns1", "confirms1"):
+        summary_s1(a.path, RUNS[a.which][1], confirm=a.which == "confirms1")
     elif a.which.startswith("trial"):
         summary_trial(a.path, RUNS[a.which][1])
     elif a.which.startswith("campaign"):
