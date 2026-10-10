@@ -100,3 +100,35 @@ A. Otherwise S1 is not adopted.
 
 The frozen test set is measured once, with the version, as the plan of 0.9
 says.
+
+## Campaign S1, result (10 October 2026)
+
+Run from 02:03 to 03:13 UTC, 670 fits, 335 complete pairs, no crash; the
+machine of the session restarted once, after 323 fits, and the run resumed
+(`campaign_S1.jsonl`; `python benchmarks/phase2_bench.py summary campaigns1
+benchmarks/results_0.9/campaign_S1.jsonl`). The criteria are applied as
+written.
+
+1. Exact laws: F41 87 in A, **103 in S** (+16); no law lost (`I.18.12` 1 to
+   5 seeds, `II.15.4` 1 to 5, `I.44.4` 0 to 4, `III.17.37` 0 to 2,
+   `III.15.12` 0 to 1, `I.6.20a` and `I.8.14` 4 to 5; `I.11.19` 1 to 0).
+   **Holds.**
+2. Real data in the domain: R6 folds median 0.810 in A, 0.831 in S; median
+   paired difference over the folds +0.0000 (worst −0.097). **Holds.**
+3. Out of domain: collapses 10 in A, 11 in S, and the median R² 0.647 in A,
+   0.574 in S. **Fails.** S removes the deep collapses of A on `228_elusage`
+   (−232.5 to −0.11, −224.2 to −1.37), `210_cloud` (−19.9 to 0.09) and
+   `561_cpu` (−2.57 to 0.97), and creates others, deepest `210_cloud` in its
+   units, seed 2 (0.685 to −183.8).
+4. Formulas flagged inexact: 15 in A, 25 in S. **Fails.** The new ones are
+   on real data left unscaled (`210_cloud`, `690_visualizing_galaxy`,
+   `228_elusage`), whose values reach 9 to 133: the engine's safety nets
+   (a power's base clipped at 100, a value capped at a million) were set for
+   inputs scaled to about 1, and act more often on raw values.
+
+**S1 is not adopted.** On F41 it is the largest gain measured on this bench
+since 0.8; on real data it changes most models (55 of 60 R6 fits, 31 of 70
+R7raw fits) without a gain in the domain and with losses out of domain. The
+benefit lies with laws of physical quantities of moderate size, and above
+all with angles inside trigonometric functions; the cost with real data
+whose raw values are large.
