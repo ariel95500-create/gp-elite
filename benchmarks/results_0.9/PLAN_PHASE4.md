@@ -206,3 +206,15 @@ A1 is adopted when all hold:
 with seeds 5 to 9 (folds with seed 5). A1 is kept when F41 exact in A1 is at
 least 5 more than in A, the median paired difference over the folds is at
 least −0.005, and out of domain A1 has no more than 2 collapses more than A.
+
+### Mechanics of A1, result (10 October 2026)
+
+Flag off: the thirteen reference configurations identical to the 0.8.0
+wheel (`phase2_mechanics/compare_0.8.0_vs_A1_off.txt`), the test suite
+passing (140 tests). Flag on (`compare_0.8.0_vs_A1_on.txt`): `H_parallel`
+and `D_units` identical, as required, and `A_feyn`, `F_robust`, `K_thorough`
+too; the eight others return another model (`B_cpu` now with an exact
+formula, `C_big` now with an inexact one). **Holds.** Before it, outside any
+measurement, one fit of 30 generations on `I.18.12` came back exact with the
+flag on (1 − R² 1e-16, a sine of the angle in its own units) and one on
+`I.40.1` did not improve. The campaign is run.

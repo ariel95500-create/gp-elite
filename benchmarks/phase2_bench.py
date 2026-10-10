@@ -180,7 +180,9 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "confirms2": (s2_confirm_jobs, ("A", "S2")),
         "campaignt1": (s2_jobs, ("A", "T1")),
         "confirmt1": (s2_confirm_jobs, ("A", "T1")),
-        "retestt1": (t1_retest_jobs, ("A", "T1"))}
+        "retestt1": (t1_retest_jobs, ("A", "T1")),
+        "campaigna1": (campaign_jobs, ("A", "A1")),
+        "confirma1": (confirm_s1_jobs, ("A", "A1"))}
 
 
 def key(j):
@@ -215,6 +217,10 @@ def run_arm(job):
         sys.exit("the flag of T1 is not in this engine: run from commit ec02331")
     if hasattr(C, "_TRIG_SEEDS"):                 # PLAN_PHASE4.md, change T1
         C._TRIG_SEEDS = job["arm"] == "T1"
+    if job["arm"] == "A1" and not hasattr(C, "_ARG_MUT"):
+        sys.exit("the flag of A1 is not in this engine")
+    if hasattr(C, "_ARG_MUT"):                    # PLAN_PHASE4.md, change A1
+        C._ARG_MUT = job["arm"] == "A1"
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
         import gp_elite
         _sr0 = gp_elite.symbolic_regression
@@ -234,6 +240,7 @@ def run_arm(job):
     rec["normalize"] = {"N": "none", "S": "smart"}.get(job["arm"], "auto")
     rec["trig_smart"] = bool(getattr(C, "_TRIG_SMART", False))
     rec["trig_seeds"] = C.TRACE.value.get("trig_seeds")
+    rec["arg_mutations"] = int(C.TRACE.count.get("arg_mutations", 0))
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -803,6 +810,87 @@ def summary_s2(path, arms, confirm=False):
                 A, v[A]["r2"], B, v[B]["r2"], dd))
 
 
+ZERO_FAMILIES = ("trig", "racine", "rationnelle", "exponentielle", "logarithme")
+
+
+def summary_a1(path, arms, confirm=False):
+    """The criteria of campaign A1, or of its confirmation (PLAN_PHASE4.md)."""
+    from collections import defaultdict
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    feyn = [v for v in pairs.values() if v[A]["kind"] == "feyn"]
+    real = [v for v in pairs.values() if v[A]["kind"] in ("real", "realraw")]
+    folds = [v for v in real if v[A]["split"].startswith("fold")]
+    ood = [v for v in real if v[A]["split"] == "ood"]
+    r6f = [v for v in folds if v[A]["kind"] == "real"]
+    ex = {a: sum(1 for v in feyn if v[a].get("status") == "EXACT") for a in arms}
+    zf = [v for v in feyn if v[A].get("family") in ZERO_FAMILIES]
+    exz = {a: sum(1 for v in zf if v[a].get("status") == "EXACT") for a in arms}
+    per = defaultdict(lambda: {A: 0, B: 0})
+    for v in feyn:
+        for a in arms:
+            per[v[A]["problem"]][a] += v[a].get("status") == "EXACT"
+    lost = sorted(n for n, c in per.items() if c[A] >= 3 and c[B] <= 1)
+    d = _r2([v[B] for v in folds]) - _r2([v[A] for v in folds])
+    col = {a: int((_r2([v[a] for v in ood]) < 0).sum()) for a in arms}
+    if confirm:
+        c1 = len(feyn) == 205 and ex[B] >= ex[A] + 5
+        c2 = len(folds) == 65 and np.median(d) >= -0.005
+        c3 = len(ood) == 65 and col[B] <= col[A] + 2
+        print("1. F41 exact: %s %d, %s %d (at least +5); zero families %s %d, %s %d"
+              " -> %s" % (A, ex[A], B, ex[B], A, exz[A], B, exz[B],
+                          "PASS" if c1 else "FAIL"))
+        print("2. folds (%d): median paired difference %+.4f -> %s" % (
+            len(folds), np.median(d), "PASS" if c2 else "FAIL"))
+        print("3. out of domain (%d): collapses %s %d, %s %d (at most +2) -> %s" % (
+            len(ood), A, col[A], B, col[B], "PASS" if c3 else "FAIL"))
+        print("%s %s" % (B, "CONFIRMED" if (c1 and c2 and c3) else "NOT CONFIRMED"))
+    else:
+        c1 = (len(feyn) == 205 and len(zf) == 90 and ex[B] >= ex[A] + 8
+              and exz[B] >= exz[A] + 4 and not lost)
+        med6 = float(np.median(_r2([v[B] for v in r6f])))
+        c2 = len(r6f) == 30 and len(folds) == 65 and med6 >= 0.804 \
+            and np.median(d) >= -0.005
+        mA = float(np.median(_r2([v[A] for v in ood])))
+        mB = float(np.median(_r2([v[B] for v in ood])))
+        c3 = len(ood) == 65 and col[B] <= col[A] + 2 and mB >= mA - 0.01
+        ie = {a: sum(1 for v in feyn + real if v[a].get("formula_exact") is False)
+              for a in arms}
+        c4 = ie[B] <= ie[A] + 3
+        print("1. F41 exact: %s %d, %s %d (at least +8); zero families (%d fits)"
+              " %s %d, %s %d (at least +4); laws lost %s -> %s" % (
+                  A, ex[A], B, ex[B], len(zf), A, exz[A], B, exz[B], lost,
+                  "PASS" if c1 else "FAIL"))
+        print("2. R6 folds median R² %s %.4f, %s %.4f; paired over R6 and R7raw"
+              " folds (%d): median %+.4f, mean %+.4g, worst %+.4g -> %s" % (
+                  A, float(np.median(_r2([v[A] for v in r6f]))), B, med6,
+                  len(folds), np.median(d), np.mean(d), d.min(),
+                  "PASS" if c2 else "FAIL"))
+        print("3. out of domain (%d): collapses %s %d, %s %d (at most +2); median"
+              " %s %.4f, %s %.4f -> %s" % (len(ood), A, col[A], B, col[B], A, mA,
+                                          B, mB, "PASS" if c3 else "FAIL"))
+        print("4. formulas flagged inexact: %s %d, %s %d (at most +3) -> %s" % (
+            A, ie[A], B, ie[B], "PASS" if c4 else "FAIL"))
+        print("%s %s" % (B, "ADOPTED" if (c1 and c2 and c3 and c4) else "NOT ADOPTED"))
+    print("\nF41 by equation, exact seeds (%s, %s), where they differ:" % (A, B))
+    for n, c in sorted(per.items()):
+        if c[A] != c[B]:
+            print("  %-10s %d %d" % (n, c[A], c[B]))
+    print("median generations: " + ", ".join("%s %.0f" % (
+        a, np.median([v[a].get("generations", 0) for v in feyn + real])) for a in arms))
+    for name, rr in (("R6 folds", r6f),
+                     ("R7raw folds", [v for v in folds if v[A]["kind"] == "realraw"]),
+                     ("R6 ood", [v for v in ood if v[A]["kind"] == "real"]),
+                     ("R7raw ood", [v for v in ood if v[A]["kind"] == "realraw"])):
+        print("  %s (%d): " % (name, len(rr)) + "; ".join(
+            "%s median %.4g worst %.4g collapses %d" % (
+                a, np.median(_r2([v[a] for v in rr])), _r2([v[a] for v in rr]).min(),
+                int((_r2([v[a] for v in rr]) < 0).sum())) for a in arms))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -830,6 +918,8 @@ def main():
         summary_confirm(a.path, RUNS[a.which][1])
     elif a.which == "trig":
         summary_trig(a.path, RUNS[a.which][1])
+    elif a.which in ("campaigna1", "confirma1"):
+        summary_a1(a.path, RUNS[a.which][1], confirm=a.which == "confirma1")
     elif a.which in ("campaigns2", "confirms2", "campaignt1", "confirmt1",
                      "retestt1"):
         summary_s2(a.path, RUNS[a.which][1], confirm=a.which.startswith("confirm"))
