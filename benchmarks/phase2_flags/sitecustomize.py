@@ -36,7 +36,7 @@ if _arm:
     if hasattr(_C, "_TRIG_SMART"):
         _C._TRIG_SMART = _arm == "S2"
     if _arm == "T1" and not hasattr(_C, "_TRIG_SEEDS"):
-        raise SystemExit("the flag of T1 is not in this engine")
+        raise SystemExit("the flag of T1 is not in this engine: run from commit ec02331")
     if hasattr(_C, "_TRIG_SEEDS"):
         _C._TRIG_SEEDS = _arm == "T1"
 

@@ -127,3 +127,31 @@ T1 is adopted when all hold, on these fits alone:
 4. part 2: no more formulas flagged inexact than in A.
 
 If any fails, T1 is not adopted and 4a moves on without it.
+
+### Decisive test of T1, result (10 October 2026)
+
+Run from 05:39 to 06:26 UTC, 360 fits, 180 complete pairs, no crash
+(`retest_T1.jsonl`; `python benchmarks/phase2_bench.py summary retestt1
+benchmarks/results_0.9/retest_T1.jsonl`). The criteria are applied as
+written.
+
+1. Part 1, the ten "trig" laws with seeds 5 to 9: exact 7 in A, 11 in T1
+   (+4; `I.18.12` 2 to 5, `II.15.4` 4 to 5, `III.17.37` 0 to 1, `I.50.26` 1
+   to 0); no law lost. **Fails**: at least +5 was required.
+2. Part 2, folds: median paired difference −0.0001 (worst −1.78,
+   `228_elusage` in its units, fold 2). **Holds.**
+3. Part 2, out of domain: collapses 17 in A, 10 in T1; median R² 0.440 in A,
+   0.735 in T1. **Holds.**
+4. Part 2, formulas flagged inexact: 5 in A, 6 in T1. **Fails**, again by
+   one formula of 130.
+
+**T1 is not adopted**, and its flag is removed from the engine (the code
+stays in the history at commit ec02331, where both runs can be repeated).
+
+What the two runs say together, for what it is worth outside the rule:
+over seeds 0 to 9 the seeds raise the trigonometric laws from 9 to 23 of
+100 fits, and on real data with trigonometric functions they cut the
+collapses out of domain from 30 to 19 of 130 with a median R² out of domain
+no lower; but they add one formula flagged inexact in each run. The
+trigonometric laws themselves vary much from seed to seed in the engine of
+0.8.0 (2 of 50 on seeds 0 to 4, 7 of 50 on seeds 5 to 9).

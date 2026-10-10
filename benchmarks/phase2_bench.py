@@ -212,7 +212,7 @@ def run_arm(job):
     if hasattr(C, "_TRIG_SMART"):
         C._TRIG_SMART = job["arm"] == "S2"
     if job["arm"] == "T1" and not hasattr(C, "_TRIG_SEEDS"):
-        sys.exit("the flag of T1 is not in this engine")
+        sys.exit("the flag of T1 is not in this engine: run from commit ec02331")
     if hasattr(C, "_TRIG_SEEDS"):                 # PLAN_PHASE4.md, change T1
         C._TRIG_SEEDS = job["arm"] == "T1"
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
