@@ -170,7 +170,9 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaigns1": (campaign_jobs, ("A", "S")),
         "confirms1": (confirm_s1_jobs, ("A", "S")),
         "campaigns2": (s2_jobs, ("A", "S2")),
-        "confirms2": (s2_confirm_jobs, ("A", "S2"))}
+        "confirms2": (s2_confirm_jobs, ("A", "S2")),
+        "campaignt1": (s2_jobs, ("A", "T1")),
+        "confirmt1": (s2_confirm_jobs, ("A", "T1"))}
 
 
 def key(j):
@@ -201,6 +203,10 @@ def run_arm(job):
         sys.exit("the flag of S2 is not in this engine: run from commit e009b27")
     if hasattr(C, "_TRIG_SMART"):
         C._TRIG_SMART = job["arm"] == "S2"
+    if job["arm"] == "T1" and not hasattr(C, "_TRIG_SEEDS"):
+        sys.exit("the flag of T1 is not in this engine")
+    if hasattr(C, "_TRIG_SEEDS"):                 # PLAN_PHASE4.md, change T1
+        C._TRIG_SEEDS = job["arm"] == "T1"
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
         import gp_elite
         _sr0 = gp_elite.symbolic_regression
@@ -219,6 +225,7 @@ def run_arm(job):
                                and getattr(C, "_GUARD_SEARCH", False))
     rec["normalize"] = {"N": "none", "S": "smart"}.get(job["arm"], "auto")
     rec["trig_smart"] = bool(getattr(C, "_TRIG_SMART", False))
+    rec["trig_seeds"] = C.TRACE.value.get("trig_seeds")
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -757,7 +764,7 @@ def summary_s2(path, arms, confirm=False):
     for n, c in sorted(per.items()):
         print("     %-10s %d %d" % (n, c[A], c[B]))
     if confirm:
-        print("S2 %s" % ("CONFIRMED" if c1 else "NOT CONFIRMED"))
+        print("%s %s" % (B, "CONFIRMED" if c1 else "NOT CONFIRMED"))
         return
     p2 = [v for v in pairs.values() if v[A]["group"] == "real_trig"]
     folds = [v for v in p2 if v[A]["split"].startswith("fold")]
@@ -778,7 +785,7 @@ def summary_s2(path, arms, confirm=False):
     c4 = ie[B] <= ie[A]
     print("4. part 2 formulas flagged inexact: %s %d, %s %d -> %s" % (
         A, ie[A], B, ie[B], "PASS" if c4 else "FAIL"))
-    print("S2 %s" % ("ADOPTED" if (c1 and c2 and c3 and c4) else "NOT ADOPTED"))
+    print("%s %s" % (B, "ADOPTED" if (c1 and c2 and c3 and c4) else "NOT ADOPTED"))
     print("part 2 fits where the arms differ by more than 0.05 in R²")
     for v in sorted(p2, key=lambda v: v[B]["r2"] - v[A]["r2"]):
         dd = v[B]["r2"] - v[A]["r2"]
@@ -815,8 +822,8 @@ def main():
         summary_confirm(a.path, RUNS[a.which][1])
     elif a.which == "trig":
         summary_trig(a.path, RUNS[a.which][1])
-    elif a.which in ("campaigns2", "confirms2"):
-        summary_s2(a.path, RUNS[a.which][1], confirm=a.which == "confirms2")
+    elif a.which in ("campaigns2", "confirms2", "campaignt1", "confirmt1"):
+        summary_s2(a.path, RUNS[a.which][1], confirm=a.which.startswith("confirm"))
     elif a.which in ("campaigns1", "confirms1"):
         summary_s1(a.path, RUNS[a.which][1], confirm=a.which == "confirms1")
     elif a.which.startswith("trial"):

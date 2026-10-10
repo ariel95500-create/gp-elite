@@ -70,3 +70,14 @@ both arms (130 jobs). T1 is adopted when all hold:
 
 **Confirmation on new seeds**, if the campaign adopts T1: part 1 with seeds
 5 to 9; T1 is kept when its exact laws are at least 5 more than A's.
+
+### Mechanics of T1, result (10 October 2026, 04:41 to 04:49 UTC)
+
+Flag off: the thirteen reference configurations are identical to the 0.8.0
+wheel (`phase2_mechanics/compare_0.8.0_vs_T1_off.txt`) and the test suite
+passes (140 tests). Flag on: only `E_minmax` (pool `"full"`) and
+`L_standard` (pool `"trig"`) return another model; the eleven others are
+identical (`compare_0.8.0_vs_T1_on.txt`). **Holds.** Before it, one fit of
+20 generations per law, outside any measurement, showed the mechanism: with
+the flag on, `I.18.12` and `II.15.4` came back as `v0 * v1 * sin(v2)` and
+`-v0 * v1 * cos(v2)`. The campaign is run.

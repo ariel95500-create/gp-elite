@@ -624,6 +624,12 @@ def symbolic_regression(
                          % (normalize,))
     scaler, _desc = core._choose_scaler(X, normalize, (-2.0, 2.0))
     X_scaled = scaler.fit_transform(X)
+    core._RAW_AFFINE = None
+    if core._TRIG_SEEDS:                     # [v0.9-T1] voir _make_trig_raw_seeds
+        try:
+            core._RAW_AFFINE = _formula.affine_maps(scaler, X)
+        except Exception:
+            core._RAW_AFFINE = None
 
     # ── Pool d'opérateurs + noms de colonnes (mode CSV générique) ──
     b_ops, b_w, u_ops, u_w = core._GENCSV_POOLS[pool]
@@ -889,6 +895,7 @@ def symbolic_regression(
                         mse_validation=float(m), r2_validation=_r2,
                         node=nd.copy(), scaler=scaler, n_features=n_feat))
     finally:
+        core._RAW_AFFINE = None              # [v0.9-T1]
         core._GENERIC_CSV_MODE = False
         core._CUSTOM_LOSS_FN = None   # [CUSTOM-LOSS] ne pas fuiter vers l'appel suivant
         core._CUSTOM_SEEDS = None         # idem : seeds custom non persistants

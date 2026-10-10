@@ -4294,6 +4294,68 @@ def _make_power_law_seeds(xs, ys, cfg) -> list:
     return seeds
 
 
+# ════════════════════════════════════════════════════════════════
+# [v0.9-T1, a l'essai, desactive par defaut] GRAINES TRIGONOMETRIQUES
+# DANS LES UNITES DE LA VARIABLE
+# ════════════════════════════════════════════════════════════════
+# Le moteur travaille sur des colonnes mises a l'echelle u_j = a_j*x_j + b_j ;
+# un sinus d'angle doit alors s'ecrire sin(k*u_j) avec une constante k
+# interieure que la recherche ne trouve pas (benchmarks/results_0.9/
+# PLAN_TRIG.md : 2 lois trigonometriques sur 50 avec la mise a l'echelle,
+# 13 sans). Avec sin ou cos dans le pool, la population initiale recoit des
+# graines ou la fonction trigonometrique prend la colonne dans ses propres
+# unites, x_j = (u_j - b_j)/a_j (la formule imprimee la replie en x_j) :
+# sin(x_j), cos(x_j), les memes multipliees par le produit des autres
+# colonnes, et sin/cos(x_j*x_k). Au plus _TRIG_SEEDS_MAX individus, juges
+# comme les autres. Plan et criteres : benchmarks/results_0.9/PLAN_PHASE4.md.
+_TRIG_SEEDS = False
+_TRIG_SEEDS_MAX = 32
+_RAW_AFFINE = None       # (a, b) de u_j = a_j*x_j + b_j, pose par symbolic_regression
+
+
+def _raw_column(term: str, j: int) -> "Node":
+    """[v0.9-T1] La colonne j dans ses propres unites, en variables du moteur."""
+    a, b = _RAW_AFFINE
+    aj, bj = float(a[j]), float(b[j])
+    nd = Node(term) if aj == 1.0 else Node("*", Node(1.0 / aj), Node(term))
+    if bj != 0.0:
+        nd = Node("-", nd, Node(bj / aj))
+    return nd
+
+
+def _make_trig_raw_seeds(cfg) -> list:
+    """[v0.9-T1] Voir le commentaire ci-dessus. Rend une liste, vide hors du
+    cas prevu (drapeau coupe, pas de sin ni cos dans le pool, units=, mode
+    extrapolation)."""
+    if not _TRIG_SEEDS or not _GENERIC_CSV_MODE or _RAW_AFFINE is None \
+            or _dim_active(cfg) or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
+        return []
+    uops, bops = set(_GENERIC_UNARY_OPS), set(_GENERIC_BINARY_OPS)
+    trig = [op for op in ("sin", "cos") if op in uops]
+    terms = list(getattr(cfg, "TERMINALS", []) or [])
+    if not trig or not terms or "*" not in bops \
+            or len(_RAW_AFFINE[0]) != len(terms):
+        return []
+    raw = [_raw_column(t, j) for j, t in enumerate(terms)]
+    out = []
+    for j in range(len(terms)):
+        for op in trig:
+            out.append(Node(op, raw[j].copy()))
+    if len(terms) > 1:
+        for j in range(len(terms)):
+            others = _product([Node(t) for k, t in enumerate(terms) if k != j])
+            for op in trig:
+                out.append(Node("*", others.copy(), Node(op, raw[j].copy())))
+        for j in range(len(terms)):
+            for k in range(j + 1, len(terms)):
+                for op in trig:
+                    out.append(Node(op, Node("*", raw[j].copy(), raw[k].copy())))
+    out = out[:_TRIG_SEEDS_MAX]
+    if out:
+        TRACE.set("trig_seeds", "%d graine(s)" % len(out))
+    return out
+
+
 # [CUSTOM-LOSS PARSIMONY] Poids de la pénalité de taille pour la loss custom
 # (0 = désactivé). Favorise les lois simples ; utile pour la découverte de
 # lois de conservation (sinon des arbres géants exploitent le bruit numérique).
@@ -8339,6 +8401,18 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                 slot = _base3 + j
                 if slot < len(target_island.population):
                     target_island.population[slot] = pnd.copy()
+    # [v0.9-T1] Graines trigonometriques dans les unites de la variable
+    # (voir _make_trig_raw_seeds), en tourniquet apres les precedentes. Rien
+    # quand le drapeau est coupe.
+    _tseeds = _make_trig_raw_seeds(cfg)
+    if _tseeds:
+        _base4 = ((len(seeds) + (len(_cseeds) if _cseeds else 0) + len(_motifs))
+                  // cfg.N_ISLANDS + 1 + len(_plaw))
+        for j, tnd in enumerate(_tseeds):
+            target_island = islands[j % cfg.N_ISLANDS]
+            slot = _base4 + j // cfg.N_ISLANDS
+            if slot < len(target_island.population):
+                target_island.population[slot] = tnd
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.
