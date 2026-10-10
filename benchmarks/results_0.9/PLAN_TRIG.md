@@ -178,3 +178,35 @@ With the flag on, the thirteen reference configurations return the same
 models as the 0.8.0 wheel (`phase2_mechanics/compare_0.8.0_vs_S2_on.txt`);
 the test suite passes with the flag off (140 tests). **Holds.** The campaign
 is run.
+
+## Campaign S2, result (10 October 2026)
+
+Run from 03:19 to 04:07 UTC, 360 fits, 180 complete pairs, no crash
+(`campaign_S2.jsonl`; `python benchmarks/phase2_bench.py summary campaigns2
+benchmarks/results_0.9/campaign_S2.jsonl`). The criteria are applied as
+written.
+
+1. Part 1, the ten "trig" laws: exact 2 in A, **13 in S2**, no law lost
+   (`I.18.12` and `II.15.4` 1 to 5 seeds, `III.17.37` 0 to 2, `III.15.12` 0
+   to 1). **Holds.**
+2. Part 2 (real data with `operators="trig"`), folds: median paired
+   difference +0.0000 (worst −0.18). **Holds.**
+3. Part 2, out of domain: collapses 13 in A, 12 in S2, but the median R²
+   falls from 0.700 to 0.629, and the worst case reaches −6.7e6 (`561_cpu`
+   standardised, seed 0: 0.563 in A). **Fails.**
+4. Part 2, formulas flagged inexact: 4 in A, 9 in S2. **Fails.**
+
+**S2 is not adopted**, and the flag is removed from the engine (it stays in
+the history at commit e009b27, where the campaign can be run again).
+
+What three measurements say together (the diagnostic, S1, S2): leaving the
+inputs as given recovers 11 more of the 50 fits of the ten trigonometric
+laws, every time, with plain formulas; on real data it harms the predictions
+out of domain and makes the safety nets act more often, with or without
+trigonometric functions. The engine cannot tell the two situations apart
+from the data alone. What it can do is let the sine find the scale itself:
+an adjustable argument `sin(a·u + b)` whose constants the
+Levenberg-Marquardt step fits would recover `sin(θ) = sin(m·u)` with the
+inputs still scaled. That is change 4a of the plan (phase 4), which these
+measurements now support with a gain of about 11 fits of 50 on this family.
+Meanwhile the README tells users with angles to pass `normalize="none"`.

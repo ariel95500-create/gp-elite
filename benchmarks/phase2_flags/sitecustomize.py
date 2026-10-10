@@ -32,7 +32,7 @@ if _arm:
     if hasattr(_C, "_FAR_LINEAR"):
         _C._FAR_LINEAR = _arm == "G1b"
     if _arm == "S2" and not hasattr(_C, "_TRIG_SMART"):
-        raise SystemExit("the flag of S2 is not in this engine")
+        raise SystemExit("the flag of S2 is not in this engine: run from commit e009b27")
     if hasattr(_C, "_TRIG_SMART"):
         _C._TRIG_SMART = _arm == "S2"
 

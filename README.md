@@ -421,7 +421,13 @@ its returned model: **12/15 against 6/15** exact, 13/15 against 7/15 within 1e-3
 GP_ELITE ahead on 8 equations, tied on 6, behind on one (I.18.12). Without the column
 normalisation (`normalize='none'`, same budget), the three laws with a sine or a
 cosine all come back exact, I.18.12 and III.15.12 included
-(`python benchmarks/feynman_bench.py 12 15 --normalize none`). With the physical
+(`python benchmarks/feynman_bench.py 12 15 --normalize none`). So when your law
+has an angle inside a sine or a cosine, pass `normalize='none'`: dividing an angle
+by its largest value changes the period the sine has to find. Measured for 0.9 on
+the ten trigonometric laws of the 41-equation bench with five seeds each: 13 of 50
+fits exact against 2 of 50 with the default; on real data, keep the default, which
+predicts better out of the training range
+([`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)). With the physical
 units declared (`units=`, same budget, no normalisation), 14/15 come back exact, each
 in its textbook form (`benchmarks/feynman_units.py`). One seed on fifteen equations is
 a showcase, not a statistical comparison:

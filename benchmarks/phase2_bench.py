@@ -198,7 +198,7 @@ def run_arm(job):
     if "time_limit" in job:
         P.TIME_LIMIT = float(job["time_limit"])
     if job["arm"] == "S2" and not hasattr(C, "_TRIG_SMART"):
-        sys.exit("the flag of S2 is not in this engine")
+        sys.exit("the flag of S2 is not in this engine: run from commit e009b27")
     if hasattr(C, "_TRIG_SMART"):
         C._TRIG_SMART = job["arm"] == "S2"
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2

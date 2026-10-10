@@ -445,7 +445,14 @@ sur des données tenues à l'écart) et **13/15 sous 1e-3** ; les échecs sont I
 égalité sur 6, derrière sur une (I.18.12). Sans la normalisation des colonnes
 (`normalize='none'`, même budget), les trois lois qui contiennent un sinus ou un
 cosinus reviennent toutes exactes, I.18.12 et III.15.12 compris
-(`python benchmarks/feynman_bench.py 12 15 --normalize none`). Avec les unités physiques déclarées
+(`python benchmarks/feynman_bench.py 12 15 --normalize none`). Donc, quand votre loi
+contient un angle dans un sinus ou un cosinus, passez `normalize='none'` : diviser un
+angle par sa plus grande valeur change la période que le sinus doit retrouver. Mesuré
+pour la 0.9 sur les dix lois trigonométriques du banc de 41 équations, cinq seeds
+chacune : 13 ajustements exacts sur 50, contre 2 sur 50 avec le réglage par défaut ;
+sur données réelles, gardez le réglage par défaut, qui prédit mieux hors de la plage
+d'apprentissage
+([`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)). Avec les unités physiques déclarées
 (`units=`, même budget, sans normalisation), 14/15 reviennent exactes, chacune sous sa
 forme de manuel (`benchmarks/feynman_units.py`). Une seed sur quinze équations est une
 vitrine, pas une comparaison statistique :

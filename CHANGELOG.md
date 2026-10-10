@@ -16,6 +16,12 @@
 - `CITATION.cff`: `date-released` is 5 October 2026, the day 0.8.0 was
   published on PyPI (it said 30 September 2026, the date the release was
   prepared).
+- The README now advises `normalize='none'` for laws with an angle inside a
+  sine or a cosine (13 of 50 fits exact against 2 of 50 on the ten
+  trigonometric laws of the bench), and the default for real data. Making it
+  the default, for every pool or only for the trigonometric ones, was
+  measured and not adopted: on real data it predicted worse out of the
+  training range (`benchmarks/results_0.9/PLAN_TRIG.md`).
 - When the formula of the returned model departs from `predict()`, the
   warning now says how many entries of `result.pareto` have an exact formula
   and names the most accurate of them on the hold-out. No model changes. Two

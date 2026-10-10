@@ -9061,10 +9061,6 @@ class _IdentityScaler:
 # normalisation est inutile. Les jeux bien échelonnés ont un ratio naturel
 # de 1.0 à 7.4 : le seuil de 10 laisse de la marge des deux côtés.
 SCALE_RATIO_THRESHOLD = 10.0
-# [v0.9-S2, a l'essai, desactive par defaut] normalize="auto" se comporte
-# comme "smart" avec un pool trigonometrique ("trig", "full") ; voir
-# symbolic_regression et benchmarks/results_0.9/PLAN_TRIG.md.
-_TRIG_SMART = False
 
 
 def _scale_ratio(X_raw):
