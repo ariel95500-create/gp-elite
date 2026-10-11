@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- The search with `units=` is more than five times faster and returns the
+  same models, bit for bit. Its typed operators computed again, millions of times
+  per fit, the same keys of dimensions and the same least-squares test of
+  whether a dimension can be built from the inputs; they now compute them
+  once per set of units, and the crossover infers the dimension of every
+  subtree in one pass. On Feynman II.11.3 (40 generations, seeds 0 to 9,
+  two fits at a time on one 4-core machine), the median run goes from 179 s
+  to 33.5 s, and a typed generation costs 1.44 times an untyped one instead
+  of 8.5. The thirteen reference configurations, the ten II.11.3 fits and
+  the three laws of the unknown-constant mode return the same models as
+  0.8.0, and two new tests compare the typed operators with the 0.8.0 code
+  (`benchmarks/results_0.9/PLAN_PHASE3.md`).
 - The README said that setting `seed=` and `parallel=` returns the same model
   on another machine. It does on the same machine; on another one, NumPy's
   floating-point functions (`exp`, `tanh`...) can differ in the last digit

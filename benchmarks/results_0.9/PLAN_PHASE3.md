@@ -163,3 +163,102 @@ The gate 2 indicator (median time, valid, exact on seeds 0 to 4) and the
 ratio typed to untyped are reported as measured, met or not. The README
 table and the CHANGELOG are updated only with numbers measured on the
 engine that is kept.
+
+## Results (11 October 2026)
+
+Records in `benchmarks/results_0.9/phase3/`. The container was replaced
+before this phase: the machine has four cores like the one of phases 1, 2
+and 4, but an Intel Xeon at 2.8 GHz with AVX-512 (that one ran at 2.1 GHz),
+with the same Python 3.11.15, NumPy 2.4.6 and scikit-learn 1.9.1. Before U0,
+gp-elite 0.8.0 installed from PyPI returned on it the same models as on that
+machine for the thirteen reference configurations.
+
+### U0, gp-elite 0.8.0 (`u0_0.8.0.jsonl`)
+
+| arm | median s | worst s | median s per generation | valid | exact | median out-of-domain R² |
+|---|---|---|---|---|---|---|
+| typed | 179.6 | 205.4 | 5.12 | 10 of 10 | 4 of 10 | 0.668 |
+| untyped | 24.2 | 34.5 | 0.605 | 0 of 10 | 0 of 10 | 0.336 |
+
+The four exact laws are seeds 1, 4, 7 and 9 (2 of 5 on seeds 0 to 4, as in
+the README); those runs stop on the law after 5, 22, 8 and 14 generations,
+the six others go through the 40. Per seed, a typed generation cost 8.47
+times an untyped one (median; worst 13.67). This machine is slower per fit
+than the 2-core container of 0.8: 0.605 s per untyped generation against
+about 0.5 s, hence 180 s for the 149 s of the README.
+
+### Profile (`profile_0.8.0_typed_seed0.txt`)
+
+Under the profiler, the typed fit of seed 0 took 519 s, of which 448 s in
+`typed_mutate`, almost all of it in `_build` (8.1 million calls for 8,745
+mutations): 244 s computing the keys of dimension dicts (55 million calls,
+most of them for the features, the same at every call) and 125 s testing
+reachability (552,000 least-squares solves), the rest building the trees.
+The crossover took 14 s, the validity gate 5 s, and the evaluation and the
+fitting of constants, which the untyped search shares, about 40 s. The
+expectation that 3a might gain little was wrong: the time went into the
+typed operators.
+
+### 3a, what changed (commit 118a42d)
+
+- `gp_elite/dim_search.py`: what `_build` computed again at each call is
+  computed once per set of units and pool of operators, and kept: the keys of
+  the feature dimensions and the features of each dimension, the
+  reachability of each target dimension, and the list of productions, copied
+  before each shuffle. A dimension travels through `_build` as its exact key
+  (the sorted items of its dict, floats untouched); the dimension of each
+  product, quotient and power is computed from the same floats as before,
+  then kept.
+- `typed_crossover` infers the dimension of every subtree in one pass from
+  the leaves instead of once per ancestor. `dimensions._infer` is split into
+  `_leaf_dim` and `_combine`, its own rules, which both use: the auditor and
+  the search keep one source of truth.
+- `tests/test_speed_equivalence.py`: two tests compare with the 0.8.0 code
+  copied verbatim. The builder and the typed mutation, on three sets of units
+  and three pools, build the same trees and leave the random generator in the
+  same state after every call; the inference of every subtree and the
+  crossover agree on 900 random trees, sound or not.
+
+### Equivalence: all four hold
+
+1. E1: the thirteen configurations return the same models
+   (`compare_E1_13_configurations.txt`).
+2. E2: on the ten seeds, the typed fits of 3a return the same equation, the
+   same size and the same predictions (same SHA-256) as U0, with the same log
+   of improvements generation by generation; so did both timed runs.
+3. E3: the three laws of the unknown-constant mode return the same models,
+   constant units and value included (`compare_E3_unknown_constant.txt`).
+4. E4: 142 tests pass (the 140 and the two above).
+
+### Timing
+
+0.8.0 and 3a side by side on the typed fits (`e2_timing_080_vs_3a.jsonl`):
+median 178.9 s to 33.5 s, worst 211.4 s to 42.8 s; per seed, 3a is 5.86
+times faster (median), 4.77 times at least. 3a typed and untyped side by
+side (`ratio_3a_typed_vs_untyped.jsonl`): typed 31.8 s (worst 42.4 s),
+untyped 22.7 s; a typed generation costs 1.44 times an untyped one per seed
+(median), 1.74 at worst. The profile of 3a (`profile_3a_typed_seed0.txt`):
+105 s under the profiler against 519 s, `_build` 39 s.
+
+**Decision: 3a adopted.** E1 to E4 hold and the median time falls by 81 %
+(178.9 s to 33.5 s), well beyond the 10 % asked.
+
+### 3b not run
+
+The plan runs 3b only if II.11.3 stays above 60 s after 3a; it takes 33.5 s.
+Campaign U1 is not needed, and the plateau stop stays an idea, not measured.
+
+### Exit of the phase
+
+| | 0.8.0 (this machine) | after 3a | target |
+|---|---|---|---|
+| II.11.3, median s per run | 179.6 | 33.5 | at most 60 |
+| worst s per run | 211.4 | 42.8 | — |
+| valid | 10 of 10 | 10 of 10 | 5 of 5 |
+| exact, seeds 0 to 4 | 2 of 5 | 2 of 5 | at least 2 of 5 |
+| typed / untyped s per generation | 8.47 | 1.44 (worst 1.74) | at most 3 |
+
+All met, with the same models as 0.8.0, so the same laws. The README table
+of 0.8 (149 s on a 2-core container) describes the published version and is
+measured again on the 0.9 release, like every public figure; the CHANGELOG
+has an entry.

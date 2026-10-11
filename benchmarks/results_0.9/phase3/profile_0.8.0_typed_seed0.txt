@@ -1,0 +1,36 @@
+cProfile of the typed fit of Feynman II.11.3, seed 0 (benchmarks/phase3_bench.py one typed 0), gp-elite 0.8.0.
+Times are inflated by the profiler.
+
+function calls (872896110 primitive calls) in 515.657 seconds
+
+   Ordered by: cumulative time
+   List reduced from 5568 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   2727/1    0.643    0.000  521.019  521.019 {built-in method builtins.exec}
+        1    0.000    0.000  521.019  521.019 phase3_bench.py:1(<module>)
+        1    0.000    0.000  520.875  520.875 phase3_bench.py:51(one)
+        1    0.001    0.001  519.020  519.020 sklearn_api.py:100(fit)
+        1    0.003    0.003  519.016  519.016 api.py:475(symbolic_regression)
+        1    0.003    0.003  518.970  518.970 core.py:7937(evolve)
+      120    0.090    0.001  516.602    4.305 phase3_bench.py:73(counted)
+      120    0.989    0.008  516.512    4.304 core.py:6259(evolve_island)
+     8745    0.175    0.000  447.891    0.051 dim_search.py:340(typed_mutate)
+8086121/15223   38.234    0.000  445.540    0.029 dim_search.py:100(_build)
+ 55564049   44.271    0.000  243.752    0.000 dim_search.py:50(_key)
+ 56186967   45.445    0.000  195.316    0.000 {built-in method builtins.sorted}
+  7952547   19.679    0.000  183.385    0.000 dim_search.py:107(<listcomp>)
+161448165   82.506    0.000  148.490    0.000 dim_search.py:51(<genexpr>)
+  7952547   20.905    0.000  125.431    0.000 dim_search.py:76(_reachable)
+106499549   56.568    0.000   56.568    0.000 {built-in method builtins.round}
+ 15971790   17.969    0.000   33.981    0.000 dimensions.py:43(_is_dimensionless)
+   552547   20.230    0.000   32.569    0.000 _linalg.py:2418(lstsq)
+      902    1.151    0.001   15.865    0.018 core.py:5007(optimize_constants_lm)
+  4585925   10.141    0.000   15.270    0.000 dimensions.py:27(_mul)
+     6674    0.533    0.000   14.387    0.002 dim_search.py:361(typed_crossover)
+      862    0.018    0.000   14.324    0.017 core.py:5169(optimize_constants_adam)
+4196624/575927    5.483    0.000   13.018    0.000 dimensions.py:73(_infer)
+ 16230760    4.834    0.000   12.680    0.000 {built-in method builtins.all}
+    13348    0.578    0.000   12.064    0.001 dim_search.py:366(annotated)
+
+

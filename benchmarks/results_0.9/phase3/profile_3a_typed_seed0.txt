@@ -1,0 +1,36 @@
+cProfile of the typed fit of Feynman II.11.3, seed 0 (benchmarks/phase3_bench.py one typed 0), phase 3a (commit 118a42d).
+Times are inflated by the profiler.
+
+function calls (159886315 primitive calls) in 104.940 seconds
+
+   Ordered by: cumulative time
+   List reduced from 5536 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   2725/1    0.605    0.000  105.698  105.698 {built-in method builtins.exec}
+        1    0.000    0.000  105.698  105.698 phase3_bench.py:1(<module>)
+        1    0.000    0.000  105.526  105.526 phase3_bench.py:54(one)
+        1    0.000    0.000  103.490  103.490 sklearn_api.py:100(fit)
+        1    0.003    0.003  103.485  103.485 api.py:493(symbolic_regression)
+        1    0.004    0.004  103.442  103.442 core.py:7937(evolve)
+      120    0.086    0.001  101.152    0.843 phase3_bench.py:76(counted)
+      120    0.591    0.005  101.066    0.842 core.py:6259(evolve_island)
+     8745    0.142    0.000   41.860    0.005 dim_search.py:438(typed_mutate)
+8086121/15223   14.200    0.000   39.387    0.003 dim_search.py:209(_build_ek)
+      902    1.048    0.001   14.978    0.017 core.py:5007(optimize_constants_lm)
+      862    0.016    0.000   13.514    0.016 core.py:5169(optimize_constants_adam)
+    26031    0.137    0.000   11.172    0.000 core.py:4840(simplify)
+   419496    3.281    0.000    8.896    0.000 random.py:376(shuffle)
+    41384    2.180    0.000    8.882    0.000 core.py:4863(_simplify_tree)
+    55106    0.275    0.000    8.814    0.000 core.py:4681(fitness)
+     6674    0.476    0.000    8.279    0.001 dim_search.py:489(typed_crossover)
+ 10135262    6.185    0.000    8.259    0.000 random.py:235(_randbelow_with_getrandbits)
+      147    0.007    0.000    7.788    0.053 __init__.py:1(<module>)
+   577204    5.702    0.000    7.605    0.000 core.py:2710(_np_safe_div)
+   847141    4.948    0.000    6.797    0.000 core.py:2332(exact_hash)
+  7952547    2.647    0.000    6.278    0.000 dim_search.py:159(_info)
+   513649    0.131    0.000    6.272    0.000 {method 'sort' of 'list' objects}
+    62530    0.257    0.000    6.052    0.000 core.py:5084(_column)
+    13348    0.447    0.000    5.713    0.000 dim_search.py:494(annotated)
+
+
