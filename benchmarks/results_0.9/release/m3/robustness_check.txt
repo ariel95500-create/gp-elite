@@ -1,0 +1,16 @@
+constant_column                model  R2 train 1.000000  exact formula True  finite True  1 + 2 * X0
+zero_column                    model  R2 train 1.000000  exact formula True  finite True  1 + 2 * X0
+constant_target                model  R2 train n/a  exact formula True  finite True  3
+duplicated_columns             model  R2 train 1.000000  exact formula True  finite True  X0²
+three_rows                     model  R2 train 1.000000  exact formula True  finite True  2 * X0
+ten_rows                       model  R2 train 1.000000  exact formula True  finite True  X0²
+huge_inputs                    model  R2 train 1.000000  exact formula True  finite True  1e-150 * X0
+tiny_inputs                    model  R2 train 1.000000  exact formula True  finite True  1e+150 * X0
+huge_target                    model  R2 train 1.000000  exact formula True  finite True  1e+200 * X0
+tiny_target                    model  R2 train 1.000000  exact formula True  finite True  1e-200 * X0
+wide_dynamic_range             model  R2 train 0.999367  exact formula False  finite True  -11.9104 - 3.32435 * (-1.77992 * X1 - (0.681933 - 0.201878 * X1) * (-0
+integer_and_boolean_columns    model  R2 train 1.000000  exact formula True  finite True  15 + 15 * (0.2 * X0 - 0.866667^X1)
+twenty_columns_two_used        model  R2 train 1.000000  exact formula True  finite True  X3 * X7
+negative_target_power_law      model  R2 train 1.000000  exact formula True  finite True  -X0 / X1²
+one_outlier                    model  R2 train 1.000000  exact formula True  finite True  0.634831 + 35.7292 * (|0.0407546 * X0 * X0 - 0.201878 * X0 - 0.523091|
+no_holdout_small_signed        model  R2 train 0.903075  exact formula True  finite True  2.9608 - 2.338 * |0.519959 * X0|^(0.519959 * X0)

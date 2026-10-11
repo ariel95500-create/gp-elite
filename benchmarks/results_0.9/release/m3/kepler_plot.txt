@@ -1,0 +1,2 @@
+T = 0.00279171 + 0.999396 * a * sqrt(a)   R2 = 1.000000   13.2 s
+written: /home/user/m3work/kepler_plot.png
