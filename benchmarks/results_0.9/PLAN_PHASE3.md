@@ -64,6 +64,15 @@ time, the per-seed ratio of typed to untyped seconds per generation, valid
 and exact counts. This is the "measured again in phase 3" of the gate 2
 table.
 
+Note added on 11 October 2026, before the first fit of U0: every fit of the
+phase passes `parallel=False`, as in phase 1. `ab_ood.py` leaves the
+default, which runs the islands in parallel processes from four cores up;
+the 0.8 figures came from a 2-core container, where the same default runs
+them in sequence. Without it, each fit would take three cores here and
+return other models than the published ones. One smoke fit of the bench
+(untyped, seed 0, not recorded in U0) showed it: its generation counter
+stayed at zero, the islands having run in other processes.
+
 ## 3a: profile, then speed-ups that change no model
 
 **Profile (diagnostic, decides nothing).** `cProfile` on the typed fit of
