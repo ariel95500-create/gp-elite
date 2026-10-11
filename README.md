@@ -10,7 +10,7 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, is not recovered exactly at any size. The five fits take 108 s in total at 1,000 points and 284 s at 10,000 (`benchmarks/feynman_scaling.py`, version 0.8.0).
+On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, is not recovered exactly at any size. The five fits take 139 s in total at 1,000 points and 380 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 0.9.0).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -139,8 +139,8 @@ guarantee.
   guaranteed to do better.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result; the final
-  selection that follows adds a little (under two seconds for a 15 s budget in
-  our measurement: 16.7 s on 3,000 rows).
+  selection that follows adds a little (two to three seconds for a 15 s budget in
+  our measurements: 17.0 to 17.6 s on 3,000 rows).
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
 
@@ -273,15 +273,15 @@ per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms. A malformed string
 | median test R² | 0.99157 | **0.99957** | 0.99863 |
 | median out-of-domain R² | 0.34 | **0.65** | 0.42 |
 | median model size | 59 nodes | **27 nodes** | 60 nodes |
-| median seconds / run | 21 | 149 | 84 |
+| median seconds / run | 29 | 34 | 114 |
 
 The third column gives the unconstrained arm four times the generations. It still
 yields **0/5** physically valid models: compute does not substitute for the
-constraint. (The constrained search is the slower one, and slower than with 0.7,
-which took 57 s: a search now stops early only on an exact law, so the constrained
-runs that end on an approximation go through all 40 generations, although each
-generation takes about a fifth less time than with 0.7 (two seeds, run side by
-side). `time_limit=` bounds it.)
+constraint. (Since 0.9 the constrained search takes about as long as the
+unconstrained one: a typed generation costs 1.4 times an untyped one, against 8.5
+times with 0.8, which took 180 s per run on the same machine, for the same models.
+A search stops early only on an exact law, so the constrained runs that end on an
+approximation go through all 40 generations; `time_limit=` bounds them.)
 The unconstrained failures are not marginal: across the ten unconstrained runs, the
 models take the logarithm of a frequency or of another quantity with units, add
 kilograms or hertz to pure numbers, or raise a quantity to an exponent in coulombs
@@ -290,8 +290,8 @@ or in hertz.
 **What it does *not* do.** On a test set drawn *outside* the training domain (w/w0
 pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), approximations degrade
 in every arm. Two constrained runs in five found the exact law, which holds there
-(R² = 1.00000); the other three are physically coherent approximations, not the law. Timings are from a 2-core Linux container, one run per core. Reproduce with
-`benchmarks/ab_ood.py`.
+(R² = 1.00000); the other three are physically coherent approximations, not the law. Timings are from a 4-core Linux machine, two runs at a time, with the
+islands in sequence (`parallel=False`). Reproduce with `benchmarks/ab_ood.py`.
 
 **When to use it.** For discovering physical laws when you know the units and the
 law is dimensionally homogeneous, and to guarantee that whatever the engine returns
@@ -355,7 +355,7 @@ PROTOCOL 1 — random split (INTERPOLATION, leaks info)
   XGBoost       R² = +0.997
 
 PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
-  RandomForest (300)      R² = -2.515
+  RandomForest (300)      R² = -2.521
   XGBoost (300 trees)     R² = -2.324
   GP_ELITE (one equation) R² = -0.314
 
@@ -470,7 +470,10 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**0.8 "Swift"** — faster (the speed-ups alone return the same models), more laws
+**0.9 "Steady"** — the search with `units=` more than five times faster, with the
+same models; a formula that departs from the model names the exact formulas of
+the Pareto front; a test set frozen before any decision, on which each version is
+measured once. **0.8 "Swift"** — faster (the speed-ups alone return the same models), more laws
 recovered (power laws seeded, right structures finished into exact laws), data of
 any scale, inputs checked; every change meant to improve the search decided by a
 comparison written before it ran. **0.7 "Sound"** — the formula you get is the model you got: written in your

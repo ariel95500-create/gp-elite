@@ -104,7 +104,7 @@ baseline (2000 programs over 30 generations, against 400 over 30 generations
 and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
 before any measurement,
 and each method judged on the model it returns, it recovers 12/15 exactly
-($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.8.0,
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.9.0,
 `benchmarks/duel.py`). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
@@ -142,12 +142,12 @@ arithmetic, which it is not.
 proved unsatisfying: on the tested problem it reported that none of the returned
 models were physically meaningful, without offering a remedy. v0.4 moves the
 check inside the search, reusing the same algebra so that auditor and engine
-cannot diverge. The cost, on the problem measured below, is a run about seven
-times longer at equal generations (median 149 s against 21 s for 40
-generations), because a typed generation costs more; with version 0.7 the
-ratio was smaller (57 s against 22 s) mainly because a search then stopped as
-soon as its hold-out error fell below a fixed threshold, even on an
-approximation. The benefit is that every returned model is valid by
+cannot diverge. The cost, on the problem measured below, is a run about 1.2
+times longer at equal generations (median 34 s against 29 s for 40
+generations): since version 0.9 a typed generation costs 1.4 times an untyped
+one, against 8.5 times in version 0.8, whose typed operators computed the same
+dimension keys and reachability tests again millions of times per fit; the
+returned models are the same. The benefit is that every returned model is valid by
 construction.
 
 *Deducing rather than requiring.* Under `unknown_constant=True` the validity
@@ -173,7 +173,7 @@ documentation.
 
 The dimensional mode has been evaluated in a controlled A/B experiment on
 Feynman equation II.11.3, five seeds, identical budget for the unconstrained
-and constrained arms (`benchmarks/ab_ood.py`, version 0.8.0). Unconstrained,
+and constrained arms (`benchmarks/ab_ood.py`, version 0.9.0). Unconstrained,
 0/5 returned models are dimensionally valid; with `units=`, 5/5 are valid and
 more than twice as small (median 27 versus 59 nodes) at a better test $R^2$
 (0.99957 versus 0.99157). A third arm grants the unconstrained search four

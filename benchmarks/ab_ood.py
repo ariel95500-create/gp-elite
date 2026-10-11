@@ -113,8 +113,11 @@ def run_one(mode, seed, gens, fair_factor, restarts=1, speed="fast"):
     Xod, yod = make_data_ood(200, seed + 9000)
 
     n_gens = gens * fair_factor if mode == "untyped_fair" else gens
+    # [0.9] parallel=False : les iles en sequence, comme sur la machine a deux
+    # coeurs des chiffres de 0.8 ; le defaut les lance en parallele des quatre
+    # coeurs, et rend d'autres modeles.
     kw = dict(operators="physical", generations=n_gens, speed=speed,
-              restarts=restarts, random_state=seed)
+              restarts=restarts, random_state=seed, parallel=False)
     if mode == "typed":
         kw["units"] = UNITS
         kw["target_units"] = TARGET

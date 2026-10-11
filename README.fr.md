@@ -13,7 +13,7 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, n'est retrouvée exactement à aucune taille. Les cinq ajustements prennent 108 s au total à 1 000 points et 284 s à 10 000 (`benchmarks/feynman_scaling.py`, version 0.8.0).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, n'est retrouvée exactement à aucune taille. Les cinq ajustements prennent 139 s au total à 1 000 points et 380 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 0.9.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -146,8 +146,8 @@ exacte, sans garantie.
   lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  sélection finale qui suit ajoute un peu (moins de deux secondes pour un budget
-  de 15 s dans notre mesure : 16,7 s sur 3 000 lignes).
+  sélection finale qui suit ajoute un peu (deux à trois secondes pour un budget
+  de 15 s dans nos mesures : 17,0 à 17,6 s sur 3 000 lignes).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 
@@ -290,15 +290,16 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 | R² test médian | 0.99157 | **0.99957** | 0.99863 |
 | R² hors domaine médian | 0.34 | **0.65** | 0.42 |
 | taille médiane du modèle | 59 nœuds | **27 nœuds** | 60 nœuds |
-| secondes / run (médiane) | 21 | 149 | 84 |
+| secondes / run (médiane) | 29 | 34 | 114 |
 
 La troisième colonne donne au bras non contraint quatre fois plus de générations. Il
 reste à **0/5** modèles physiquement valides : le calcul ne remplace pas la
-contrainte. (La recherche contrainte est la plus lente, et plus lente qu'avec la
-0.7, qui prenait 57 s : une recherche ne s'arrête plus tôt que sur une loi exacte,
-si bien que les runs contraints qui finissent sur une approximation parcourent les
-40 générations, même si chaque génération prend environ un cinquième de temps de
-moins qu'avec la 0.7 (deux seeds, lancées côte à côte). `time_limit=` la borne.) Les échecs sans contrainte ne sont pas
+contrainte. (Depuis la 0.9, la recherche contrainte prend à peu près autant de
+temps que la recherche libre : une génération typée coûte 1,4 fois une génération
+non typée, contre 8,5 fois avec la 0.8, qui prenait 180 s par run sur la même
+machine, pour les mêmes modèles. Une recherche ne s'arrête plus tôt que sur une loi
+exacte, si bien que les runs contraints qui finissent sur une approximation
+parcourent les 40 générations ; `time_limit=` les borne.) Les échecs sans contrainte ne sont pas
 marginaux : sur les dix runs non contraints, les modèles prennent le logarithme
 d'une fréquence ou d'une autre grandeur dotée d'unités, additionnent des
 kilogrammes ou des hertz à des nombres purs, ou élèvent une grandeur à un exposant
@@ -308,8 +309,9 @@ en coulombs ou en hertz.
 d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), les
 approximations se dégradent dans tous les bras. Deux runs contraints sur cinq ont
 trouvé la loi exacte, qui y tient (R² = 1.00000) ; les trois autres sont des
-approximations physiquement cohérentes, pas la loi. Temps mesurés sur un conteneur
-Linux à 2 cœurs, un run par cœur. Reproductible avec `benchmarks/ab_ood.py`.
+approximations physiquement cohérentes, pas la loi. Temps mesurés sur une machine
+Linux à 4 cœurs, deux runs à la fois, avec les îles en séquence (`parallel=False`).
+Reproductible avec `benchmarks/ab_ood.py`.
 
 **Quand s'en servir.** Pour découvrir une loi physique quand vous connaissez les
 unités et que la loi est dimensionnellement homogène, et pour garantir que ce que
@@ -377,7 +379,7 @@ PROTOCOL 1 — random split (INTERPOLATION, leaks info)
   XGBoost       R² = +0.997
 
 PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
-  RandomForest (300)      R² = -2.515
+  RandomForest (300)      R² = -2.521
   XGBoost (300 trees)     R² = -2.324
   GP_ELITE (one equation) R² = -0.314
 
@@ -496,7 +498,10 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**0.8 « Swift »** — plus rapide (les accélérations seules rendent les mêmes
+**0.9 « Steady »** — la recherche avec `units=` plus de cinq fois plus rapide,
+pour les mêmes modèles ; une formule qui s'écarte du modèle nomme les formules
+exactes du front de Pareto ; un jeu de test figé avant toute décision, sur lequel
+chaque version est mesurée une fois. **0.8 « Swift »** — plus rapide (les accélérations seules rendent les mêmes
 modèles), davantage de lois retrouvées (lois de puissance amorcées, structures
 justes menées jusqu'à la loi exacte), des données de toute échelle, des entrées
 vérifiées ; chaque changement destiné à améliorer la recherche décidé par une
