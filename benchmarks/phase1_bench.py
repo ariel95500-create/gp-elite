@@ -19,6 +19,11 @@ Usage, from the repository root:
   python benchmarks/phase1_bench.py run --python /path/to/venv/bin/python \
          --out benchmarks/results_0.9/baseline_0.8.0.jsonl --workers 3
   python benchmarks/phase1_bench.py summary benchmarks/results_0.9/baseline_0.8.0.jsonl
+
+Two engines side by side, each job started with both at the same time (the
+campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
+  python benchmarks/phase1_bench.py run-paired --python A/bin/python --out a.jsonl \\
+         --python B/bin/python --out b.jsonl --pairs 2
 """
 import argparse
 import io
@@ -272,6 +277,78 @@ def drive(python, out, workers, kinds=None, max_seconds=None):
         running = still
 
 
+def _record(j, p, out):
+    so, se = p.communicate()
+    lines = [l for l in so.splitlines() if l.startswith("{")]
+    if p.returncode == 0 and lines:
+        rec = json.loads(lines[-1])
+    else:                       # a crash is a recorded miss
+        rec = dict(j, status="CRASH", err=1e30, r2=-1e30,
+                   error=(se or so)[-400:])
+    with open(out, "a") as fh:
+        fh.write(json.dumps(rec) + "\n")
+
+
+def drive_paired(pythons, outs, pairs, kinds=None, max_seconds=None):
+    """Runs every job with each engine (one interpreter and one output file
+    each), the engines of one job started at the same time, so that they run
+    under the same load; `pairs` jobs at a time. Resumes like drive()."""
+    done = []
+    for out in outs:
+        d = set()
+        if os.path.exists(out):
+            with open(out) as fh:
+                for line in fh:
+                    if line.strip():
+                        d.add(key(json.loads(line)))
+        done.append(d)
+    todo = [j for j in all_jobs() if (kinds is None or j["kind"] in kinds)
+            and any(key(j) not in d for d in done)]
+    print("%d jobs to run with %d engines" % (len(todo), len(pythons)),
+          flush=True)
+    env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
+               OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
+    env.pop("PYTHONPATH", None)
+    running = []
+    t_start = time.time()
+    n_done = 0
+    while todo or running:
+        if max_seconds is not None and time.time() - t_start > max_seconds \
+                and todo:
+            print("time slice over: %d jobs left for the next call"
+                  % len(todo), flush=True)
+            todo = []
+        while todo and len(running) < pairs:
+            j = todo.pop(0)
+            procs = []
+            for i, python in enumerate(pythons):
+                if key(j) in done[i]:
+                    continue
+                procs.append((i, subprocess.Popen(
+                    [python, os.path.abspath(__file__), "one", json.dumps(j)],
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                    env=env, cwd=os.path.dirname(HERE))))
+            running.append((j, procs))
+        time.sleep(0.2)
+        still = []
+        for j, procs in running:
+            left = []
+            for i, p in procs:
+                if p.poll() is None:
+                    left.append((i, p))
+                else:
+                    _record(j, p, outs[i])
+            if left:
+                still.append((j, left))
+            else:
+                n_done += 1
+                if n_done % 25 == 0:
+                    print("%d jobs done, %.0f s elapsed, %d left" % (
+                        n_done, time.time() - t_start,
+                        len(todo) + len(still)), flush=True)
+        running = still
+
+
 def summary(path):
     recs = [json.loads(l) for l in open(path) if l.strip()]
     print("%d records" % len(recs))
@@ -322,6 +399,12 @@ def main():
     r.add_argument("--workers", type=int, default=3)
     r.add_argument("--kinds", default=None)
     r.add_argument("--max-seconds", type=float, default=None)
+    r2 = sub.add_parser("run-paired")
+    r2.add_argument("--python", action="append", required=True)
+    r2.add_argument("--out", action="append", required=True)
+    r2.add_argument("--pairs", type=int, default=2)
+    r2.add_argument("--kinds", default=None)
+    r2.add_argument("--max-seconds", type=float, default=None)
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
@@ -330,6 +413,11 @@ def main():
     if a.cmd == "run":
         drive(a.python, a.out, a.workers,
               a.kinds.split(",") if a.kinds else None, a.max_seconds)
+    elif a.cmd == "run-paired":
+        if len(a.python) != len(a.out):
+            raise SystemExit("one --out per --python")
+        drive_paired(a.python, a.out, a.pairs,
+                     a.kinds.split(",") if a.kinds else None, a.max_seconds)
     elif a.cmd == "one":
         print(json.dumps(run_one(json.loads(a.job))))
     else:
