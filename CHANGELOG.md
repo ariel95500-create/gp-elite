@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.0
 
 - The search with `units=` is more than five times faster and returns the
   same models, bit for bit. Its typed operators computed again, millions of times
