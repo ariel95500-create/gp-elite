@@ -596,3 +596,353 @@ def test_simplify_matches_the_0_7_simplifier():
     finally:
         core._SIMPLIFY_CACHE.clear()
         core._SIMPLIFY_CACHE.update(saved)
+
+
+# ------------------------------------------------- 0.9: the typed search
+# Verbatim from gp_elite 0.8.0 (gp_elite/dimensions.py, gp_elite/dim_search.py),
+# with the functions renamed _ref_*. The 0.9 builder keeps per set of units
+# what 0.8.0 computed again at every call; it must build the same trees and
+# leave the random generator in the same state.
+
+import random as _random
+
+from gp_elite import dim_search as DS
+from gp_elite.core import Node
+from gp_elite.dimensions import (_mul, _inv, _pow, _eq, _is_dimensionless,
+                                 _DimError, DIMENSIONLESS, _fmt)
+
+_TRANSCENDENTAL_DIM = {"exp", "log", "sin", "cos", "tan", "tanh", "sinh", "cosh"}
+_TRANSCENDENTAL = ("exp", "log", "sin", "cos", "tanh")
+_ok = DS._ok
+
+
+def _ref_key(d):
+    return tuple(sorted((k, round(float(v), 9))
+                        for k, v in d.items() if abs(v) > 1e-9))
+
+
+def _ref_infer(node, feat_dims):
+    """Return the dimension dict of `node`, or raise _DimError on a violation.
+    feat_dims maps 'X[i]' -> dimension dict."""
+    # leaf
+    if node.left is None and node.right is None:
+        v = node.value
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            return dict(DIMENSIONLESS)          # a fitted constant is dimensionless*
+        return dict(feat_dims.get(str(v), DIMENSIONLESS))
+
+    op = node.value
+
+    # unary
+    if node.right is None:
+        d = _ref_infer(node.left, feat_dims)
+        if op in _TRANSCENDENTAL_DIM:
+            if not _is_dimensionless(d):
+                raise _DimError(f"{op}(...) needs a dimensionless argument, "
+                                f"got {_fmt(d)}")
+            return dict(DIMENSIONLESS)
+        if op == "sqrt":
+            return _pow(d, 0.5)
+        if op == "sq":
+            return _pow(d, 2)
+        if op == "cube":
+            return _pow(d, 3)
+        if op in ("neg", "abs"):
+            return d
+        if op == "inv":
+            return _inv(d)
+        # unknown unary: pass through, but flag if it looks transcendental-ish
+        return d
+
+    # binary
+    dl = _ref_infer(node.left, feat_dims)
+    dr = _ref_infer(node.right, feat_dims)
+    if op in ("+", "-"):
+        if not _eq(dl, dr):
+            raise _DimError(f"cannot add/subtract {_fmt(dl)} and {_fmt(dr)}")
+        return dl
+    if op == "*":
+        return _mul(dl, dr)
+    if op == "/":
+        return _mul(dl, _inv(dr))
+    if op == "pow":
+        # exponent must be a dimensionless constant for the result to have
+        # a well-defined dimension
+        if not _is_dimensionless(dr):
+            raise _DimError(f"exponent must be dimensionless, got {_fmt(dr)}")
+        # only a constant exponent gives a clean power; approximate with the
+        # right subtree's constant value if it is a leaf number
+        rv = node.right.value
+        if isinstance(rv, (int, float)) and not isinstance(rv, bool):
+            return _pow(dl, float(rv))
+        # [CORRECTIF] Exposant NON CONSTANT. `x ** z` n'a de dimension bien
+        # definie que si la base est adimensionnee : m^z n'est pas une
+        # dimension fixe quand z varie. L'ancienne version renvoyait `dl` dans
+        # les deux branches, donc acceptait x^z comme des metres.
+        if not _is_dimensionless(dl):
+            raise _DimError(
+                "pow with a non-constant exponent requires a dimensionless "
+                "base, got %s" % _fmt(dl))
+        return dict(DIMENSIONLESS)
+    # unknown binary op: require dimensionless to be safe
+    return _mul(dl, dr)
+
+
+
+def _ref_reachable(target, feats, _cache):
+    if _is_dimensionless(target):
+        return True
+    k = _ref_key(target)
+    if k in _cache:
+        return _cache[k]
+    try:
+        import numpy as np
+        bases = sorted({b for _, d in feats for b in d} | set(target))
+        if not bases or not feats:
+            r = _is_dimensionless(target)
+        else:
+            V = np.array([[float(d.get(b, 0)) for _, d in feats] for b in bases])
+            y = np.array([float(target.get(b, 0)) for b in bases])
+            sol, *_ = np.linalg.lstsq(V, y, rcond=None)
+            r = bool(np.linalg.norm(V @ sol - y) < 1e-6)
+    except Exception:
+        r = True                       # numpy absent / degenerate: don't prune
+    _cache[k] = r
+    return r
+
+
+# ── constructive generation ─────────────────────────────────────────────────
+
+def _ref_build(target, depth, feats, rng, cache, budget, ops=None):
+    """Return a tree of dimension exactly `target`, or None."""
+    budget[0] -= 1
+    if budget[0] <= 0 or not _ref_reachable(target, feats, cache):
+        return None
+
+    tk = _ref_key(target)
+    terms = [name for name, d in feats if _ref_key(d) == tk]
+    dimless = _is_dimensionless(target)
+
+    if depth <= 0:
+        if terms:
+            return Node(rng.choice(terms))
+        return Node(round(rng.uniform(-3, 3), 4)) if dimless else None
+
+    if terms and rng.random() < 0.30:
+        return Node(rng.choice(terms))
+    if dimless and rng.random() < 0.12:
+        return Node(round(rng.uniform(-3, 3), 4))
+
+    prods = [("neg",), ("abs",), ("+",), ("-",), ("sqrt",), ("sq",), ("cube",)]
+    if dimless:
+        prods += [(f,) for f in _TRANSCENDENTAL]
+    factors = [d for _, d in feats] + [dict(DIMENSIONLESS)]
+    for A in factors:
+        prods.append(("*", A))
+        prods.append(("/", A))
+    # cube n'etait pas produit historiquement : seulement si le pool le demande
+    prods = [p for p in prods if _ok(p[0], ops) and
+             (p[0] != "cube" or ops is not None)]
+    rng.shuffle(prods)
+
+    for p in prods:
+        op = p[0]
+        if op in ("neg", "abs"):
+            c = _ref_build(target, depth - 1, feats, rng, cache, budget, ops)
+            if c is not None:
+                return Node(op, c)
+        elif op in ("+", "-"):
+            l = _ref_build(target, depth - 1, feats, rng, cache, budget, ops)
+            if l is None:
+                continue
+            r = _ref_build(target, depth - 1, feats, rng, cache, budget, ops)
+            if r is not None:
+                return Node(op, l, r)
+        elif op == "sqrt":
+            c = _ref_build(_pow(target, 2), depth - 1, feats, rng, cache, budget, ops)
+            if c is not None:
+                return Node("sqrt", c)
+        elif op == "sq":
+            c = _ref_build(_pow(target, 0.5), depth - 1, feats, rng, cache, budget, ops)
+            if c is not None:
+                return Node("sq", c)
+        elif op == "cube":
+            c = _ref_build(_pow(target, 1.0 / 3.0), depth - 1, feats, rng, cache, budget, ops)
+            if c is not None:
+                return Node("cube", c)
+        elif op in _TRANSCENDENTAL:
+            c = _ref_build(dict(DIMENSIONLESS), depth - 1, feats, rng, cache, budget, ops)
+            if c is not None:
+                return Node(op, c)
+        elif op == "*":
+            A = p[1]
+            l = _ref_build(A, depth - 1, feats, rng, cache, budget, ops)
+            if l is None:
+                continue
+            r = _ref_build(_mul(target, _inv(A)), depth - 1, feats, rng, cache, budget, ops)
+            if r is not None:
+                return Node("*", l, r)
+        elif op == "/":
+            A = p[1]
+            l = _ref_build(A, depth - 1, feats, rng, cache, budget, ops)
+            if l is None:
+                continue
+            r = _ref_build(_mul(A, _inv(target)), depth - 1, feats, rng, cache, budget, ops)
+            if r is not None:
+                return Node("/", l, r)
+
+    if terms:
+        return Node(rng.choice(terms))
+    return Node(round(rng.uniform(-3, 3), 4)) if dimless else None
+
+
+
+def _ref_typed_mutate(tree, feat_dims, max_depth, rng=None, ops=None):
+    fd = DS._norm_feat_dims(feat_dims)
+    feats = DS._feat_list(fd)
+    cache = {}
+    nodes = DS._nodes(tree)
+    rng.shuffle(nodes)
+    for pick in nodes:
+        try:
+            d = _ref_infer(pick, fd)
+        except _DimError:
+            continue
+        for _ in range(12):
+            sub = _ref_build(d, rng.randint(1, max(2, max_depth)), feats, rng,
+                             cache, [2000], ops)
+            if sub is not None:
+                return DS._graft(tree, pick, sub).copy()
+    return tree
+
+
+def _ref_typed_crossover(p1, p2, feat_dims, rng=None):
+    fd = DS._norm_feat_dims(feat_dims)
+
+    def annotated(t):
+        out = []
+        for n in DS._nodes(t):
+            try:
+                out.append((n, _ref_key(_ref_infer(n, fd))))
+            except _DimError:
+                pass
+        return out
+
+    a, b = annotated(p1), annotated(p2)
+    by = {}
+    for n, k in b:
+        by.setdefault(k, []).append(n)
+
+    cands = []
+    for n, k in a:
+        if k in by:
+            partners = [m for m in by[k] if not (n is p1 and m is p2)]
+            if partners:
+                cands.append((n, partners))
+    if not cands:
+        return p1.copy(), p2.copy()
+
+    n1, partners = rng.choice(cands)
+    n2 = rng.choice(partners)
+    return (DS._graft(p1, n1, n2.copy()).copy(),
+            DS._graft(p2, n2, n1.copy()).copy())
+
+
+def _tkey(t):
+    out, st = [], [t]
+    while st:
+        n = st.pop()
+        if n is None:
+            out.append("_")
+            continue
+        out.append(float(n.value).hex() if isinstance(n.value, float) else str(n.value))
+        if n.left is not None or n.right is not None:
+            st.append(n.right)
+            st.append(n.left)
+    return " ".join(out)
+
+
+# feature units: Feynman II.11.3 (ab_ood.py), I.12.2 with units (the D_units
+# configuration), and a set with fractional and integer exponents mixed
+_UNIT_SETS = [
+    {0: {"A": 1, "s": 1}, 1: {"kg": 1, "m": 1, "s": -3, "A": -1}, 2: {"kg": 1},
+     3: {"s": -1}, 4: {"s": -1}},
+    {0: {"A": 1, "s": 1}, 1: {"A": 1, "s": 1}, 2: {"A": 2, "s": 4, "kg": -1, "m": -3},
+     3: {"m": 1}},
+    {0: {"m": 0.5}, 1: {"m": 1.0, "s": -2}, 2: {"s": 1}, 3: {}},
+]
+_POOLS = [None, frozenset({"+", "-", "*", "/", "neg", "sqrt", "sq", "cube"}),
+          frozenset({"+", "-", "*", "/", "sin", "cos", "exp", "log", "neg", "abs"})]
+
+
+def _targets(fd, rng, n):
+    keys = sorted(fd)
+    out = [{}]
+    for _ in range(n):
+        d = {}
+        for k in keys:
+            e = rng.choice((-2, -1, -1, 0, 0, 1, 1, 2, 0.5))
+            for b, v in fd[k].items():
+                d[b] = d.get(b, 0) + e * v
+        out.append({b: v for b, v in d.items() if v != 0})
+    return out
+
+
+def test_typed_builder_and_mutation_draw_the_same():
+    trees = 0
+    for fd in _UNIT_SETS:
+        feats = DS._feat_list(DS._norm_feat_dims(fd))
+        for ops in _POOLS:
+            DS._CTX.clear()
+            for seed, target in enumerate(_targets(fd, _random.Random(1), 8)):
+                r1, r2 = _random.Random(seed), _random.Random(seed)
+                for depth in (1, 3, 5):
+                    a = _ref_build(target, depth, feats, r1, {}, [4000], ops)
+                    b = DS._build(target, depth, feats, r2, {}, [4000], ops)
+                    assert (a is None) == (b is None)
+                    if a is not None:
+                        assert _tkey(a) == _tkey(b)
+                        trees += 1
+                        for _ in range(3):
+                            a = _ref_typed_mutate(a, fd, 4, r1, ops)
+                            b = DS.typed_mutate(b, fd, 4, r2, ops)
+                            assert _tkey(a) == _tkey(b)
+                    assert r1.getstate() == r2.getstate()
+    assert trees > 60
+
+
+def _any_tree(rng, d, n_feat):
+    """Any tree, dimensionally sound or not, with every operator the
+    inference rules know and one they do not."""
+    if d <= 0 or rng.random() < 0.25:
+        return Node(rng.choice(["X[%d]" % i for i in range(n_feat)] + [1.5, 2.0, -0.25]))
+    if rng.random() < 0.4:
+        return Node(rng.choice(["neg", "abs", "sqrt", "sq", "cube", "inv", "exp",
+                                "log", "sin", "cos", "tanh", "foo"]), _any_tree(rng, d - 1, n_feat))
+    op = rng.choice(["+", "-", "*", "/", "pow", "max2"])
+    return Node(op, _any_tree(rng, d - 1, n_feat), _any_tree(rng, d - 1, n_feat))
+
+
+def test_infer_all_and_crossover_match_0_8():
+    rng = _random.Random(3)
+    for fd in _UNIT_SETS:
+        n = len(fd)
+        fdn = DS._norm_feat_dims(fd)
+        for i in range(300):
+            t = _any_tree(rng, rng.randint(0, 6), n)
+            dims = DS._infer_all(t, fdn)
+            for node in DS._nodes(t):
+                try:
+                    ref = _ref_infer(node, fdn)
+                except _DimError:
+                    ref = None
+                got = dims[id(node)]
+                assert (ref is None) == (got is None)
+                if ref is not None:
+                    assert ref == got
+            u = _any_tree(rng, rng.randint(0, 6), n)
+            r1, r2 = _random.Random(i), _random.Random(i)
+            a = _ref_typed_crossover(t, u, fd, r1)
+            b = DS.typed_crossover(t, u, fd, r2)
+            assert [_tkey(x) for x in a] == [_tkey(x) for x in b]
+            assert r1.getstate() == r2.getstate()

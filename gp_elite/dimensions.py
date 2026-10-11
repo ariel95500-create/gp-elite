@@ -73,18 +73,32 @@ _TRANSCENDENTAL = {"exp", "log", "sin", "cos", "tan", "tanh", "sinh", "cosh"}
 def _infer(node, feat_dims):
     """Return the dimension dict of `node`, or raise _DimError on a violation.
     feat_dims maps 'X[i]' -> dimension dict."""
-    # leaf
     if node.left is None and node.right is None:
-        v = node.value
-        if isinstance(v, (int, float)) and not isinstance(v, bool):
-            return dict(DIMENSIONLESS)          # a fitted constant is dimensionless*
-        return dict(feat_dims.get(str(v), DIMENSIONLESS))
+        return _leaf_dim(node.value, feat_dims)
+    if node.right is None:
+        return _combine(node, _infer(node.left, feat_dims), None)
+    dl = _infer(node.left, feat_dims)
+    dr = _infer(node.right, feat_dims)
+    return _combine(node, dl, dr)
 
+
+def _leaf_dim(v, feat_dims):
+    """Dimension of a leaf of value `v`."""
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        return dict(DIMENSIONLESS)          # a fitted constant is dimensionless*
+    return dict(feat_dims.get(str(v), DIMENSIONLESS))
+
+
+def _combine(node, dl, dr):
+    """Dimension of the operator node `node` from those of its children (dr is
+    None for a unary node), or raise _DimError. [v0.9] Split out of _infer so
+    that dim_search can infer every subtree of a tree in one pass with the same
+    rules."""
     op = node.value
 
     # unary
     if node.right is None:
-        d = _infer(node.left, feat_dims)
+        d = dl
         if op in _TRANSCENDENTAL:
             if not _is_dimensionless(d):
                 raise _DimError(f"{op}(...) needs a dimensionless argument, "
@@ -104,8 +118,6 @@ def _infer(node, feat_dims):
         return d
 
     # binary
-    dl = _infer(node.left, feat_dims)
-    dr = _infer(node.right, feat_dims)
     if op in ("+", "-"):
         if not _eq(dl, dr):
             raise _DimError(f"cannot add/subtract {_fmt(dl)} and {_fmt(dr)}")

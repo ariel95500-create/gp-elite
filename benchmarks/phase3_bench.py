@@ -17,6 +17,9 @@ interpreter imports (PYTHONPATH, or the installed package); PYTHONHASHSEED=0.
       e.g. 080,/venv08/bin/python,,typed ; seeds as 0-9 or 0,2,5 ;
       resumable: a (label, arm, seed) already in <out> is skipped
   python benchmarks/phase3_bench.py report <out.jsonl> [<out2.jsonl> ...]
+  python benchmarks/phase3_bench.py e3 <out.jsonl> <python> [<pythonpath>]
+  python benchmarks/phase3_bench.py e3_compare <a.jsonl> <b.jsonl>
+      equivalence E3: the three laws of test_constante_mystere.py
 """
 import hashlib
 import json
@@ -127,6 +130,67 @@ def one(arm, seed):
         exact_stop_gen=int(stop.group(1)) if stop else None,
         improvements=impr)
     print(json.dumps(rec))
+
+
+def one_e3(case):
+    """Equivalence E3: one law of test_constante_mystere.py fitted as that
+    script fits it (its defaults: 25 generations, 2 restarts, random_state=0,
+    unknown_constant=True, parallel left to the engine)."""
+    import warnings
+    from contextlib import redirect_stdout
+    import io
+
+    import test_constante_mystere as TCM
+    import gp_elite
+    from gp_elite import GPEliteRegressor
+    from speed_equivalence import ser, hx
+
+    X, y, spec = getattr(TCM, case)()
+    est = GPEliteRegressor(operators="physical", generations=25, speed="fast",
+                           restarts=2, random_state=0, units=spec["units"],
+                           target_units=spec["target_units"],
+                           unknown_constant=True)
+    t0 = time.time()
+    with warnings.catch_warnings(), redirect_stdout(io.StringIO()):
+        warnings.simplefilter("ignore")
+        est.fit(X, y)
+    r = est.model_
+    print(json.dumps(dict(
+        case=case, engine=gp_elite.__file__, seconds=round(time.time() - t0, 2),
+        node=ser(r.node), mse_validation=hx(r.mse_validation),
+        constant_units=getattr(est, "constant_units_", None),
+        constant_value=hx(getattr(est, "constant_value_", None)),
+        pareto=[[p.size, ser(p.node), hx(p.mse_validation)]
+                for p in (r.pareto or [])])))
+
+
+def e3(out, py, pp):
+    env = dict(os.environ, PYTHONHASHSEED="0", PYTHONDONTWRITEBYTECODE="1")
+    env.pop("PYTHONPATH", None)
+    if pp:
+        env["PYTHONPATH"] = pp
+    with open(out, "w") as fh:
+        for case in ("cas_hooke", "cas_newton", "cas_gaz"):
+            p = subprocess.run([py, os.path.abspath(__file__), "one_e3", case],
+                               capture_output=True, text=True, env=env, cwd="/")
+            line = (p.stdout.strip().splitlines() or [""])[-1]
+            fh.write((line if p.returncode == 0 else json.dumps(
+                dict(case=case, error=p.stderr[-500:]))) + "\n")
+            print(case, "ok" if p.returncode == 0 else "FAILED", flush=True)
+
+
+def e3_compare(a, b):
+    ra = [json.loads(l) for l in open(a) if l.strip()]
+    rb = [json.loads(l) for l in open(b) if l.strip()]
+    same = True
+    for x, y in zip(ra, rb):
+        keys = [k for k in x if k not in ("engine", "seconds")]
+        diff = [k for k in keys if x.get(k) != y.get(k)]
+        same &= not diff and "error" not in x
+        print("%-11s %s (%.1f s -> %.1f s)" % (
+            x["case"], "same" if not diff else "DIFFERENT: %s" % diff,
+            x.get("seconds", 0), y.get("seconds", 0)))
+    print("ALL IDENTICAL" if same and len(ra) == len(rb) == 3 else "DIFFERENCES")
 
 
 def _seeds(text):
@@ -250,5 +314,11 @@ if __name__ == "__main__":
         side(sys.argv[2], sys.argv[3], sys.argv[4:])
     elif sys.argv[1] == "report":
         report(sys.argv[2:])
+    elif sys.argv[1] == "one_e3":
+        one_e3(sys.argv[2])
+    elif sys.argv[1] == "e3":
+        e3(sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else "")
+    elif sys.argv[1] == "e3_compare":
+        e3_compare(sys.argv[2], sys.argv[3])
     else:
         raise SystemExit(__doc__)

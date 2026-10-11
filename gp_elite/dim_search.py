@@ -32,7 +32,7 @@ import random
 
 from .core import Node
 from .dimensions import (_infer, _mul, _inv, _pow, _eq, _is_dimensionless,
-                         _DimError, DIMENSIONLESS)
+                         _DimError, DIMENSIONLESS, _leaf_dim, _combine)
 
 _TRANSCENDENTAL = ("exp", "log", "sin", "cos", "tanh")
 
@@ -48,8 +48,9 @@ def _ok(op, ops):
 # ── canonical hashable key for a dimension dict ─────────────────────────────
 
 def _key(d):
-    return tuple(sorted((k, round(float(v), 9))
-                        for k, v in d.items() if abs(v) > 1e-9))
+    out = [(k, round(float(v), 9)) for k, v in d.items() if abs(v) > 1e-9]
+    out.sort()
+    return tuple(out)
 
 
 def _norm_feat_dims(feat_dims):
@@ -95,17 +96,123 @@ def _reachable(target, feats, _cache):
     return r
 
 
+# ── what _build reuses from one call to the next ────────────────────────────
+#
+# [v0.9] _build runs millions of times in a typed fit (phase 3 profile of
+# Feynman II.11.3: 86 % of the time). At each call it computed again the key
+# of every feature dimension and twice the key of its target, the
+# reachability of the target (a least-squares solve) with a cache rebuilt at
+# every mutation, its list of productions, and the dimension dicts of its
+# subtrees. None of these draws a random number. They are now computed once
+# per set of units and pool of operators, and kept: a dimension travels
+# through _build as its exact key (the sorted items of its dict, floats
+# untouched), and every result is computed from the same floats as before,
+# then memorised. Every draw, and the order of the draws, is unchanged, so
+# the trees built are the same.
+
+_CTX = {}
+_EMPTY = ()
+_MEMO_MAX = 200000
+
+
+def _ek(d):
+    """Exact key of a dimension dict: its items sorted, values untouched."""
+    return tuple(sorted(d.items()))
+
+
+class _Ctx:
+    __slots__ = ("feats", "terms", "reach", "prods", "info", "mi", "pw")
+
+
+def _context(feats, ops):
+    sig = (tuple((name, _ek(d)) for name, d in feats), ops)
+    ctx = _CTX.get(sig)
+    if ctx is not None:
+        return ctx
+    if len(_CTX) >= 64:
+        _CTX.clear()
+    ctx = _Ctx()
+    ctx.feats = feats
+    ctx.terms = {}
+    for name, d in feats:
+        ctx.terms.setdefault(_key(d), []).append(name)
+    ctx.reach = {}
+    ctx.info = {}
+    ctx.mi = {}
+    ctx.pw = {}
+    prods = {}
+    for dimless in (False, True):
+        p = [("neg",), ("abs",), ("+",), ("-",), ("sqrt",), ("sq",), ("cube",)]
+        if dimless:
+            p += [(f,) for f in _TRANSCENDENTAL]
+        for A in [d for _, d in feats] + [dict(DIMENSIONLESS)]:
+            p.append(("*", _ek(A)))
+            p.append(("/", _ek(A)))
+        # cube n'etait pas produit historiquement : seulement si le pool le demande
+        prods[dimless] = tuple(q for q in p if _ok(q[0], ops) and
+                               (q[0] != "cube" or ops is not None))
+    ctx.prods = prods
+    _CTX[sig] = ctx
+    return ctx
+
+
+def _info(ctx, ek):
+    """(dimensionless?, feature names of exactly this dimension, reachable?)
+    for the dimension of exact key `ek`."""
+    r = ctx.info.get(ek)
+    if r is None:
+        if len(ctx.info) >= _MEMO_MAX:
+            ctx.info.clear()
+        target = dict(ek)
+        dimless = _is_dimensionless(target)
+        tk = _key(target)
+        if dimless:
+            reach = True
+        else:
+            reach = ctx.reach.get(tk)
+            if reach is None:
+                reach = ctx.reach[tk] = _reachable(target, ctx.feats, {})
+        r = ctx.info[ek] = (dimless, ctx.terms.get(tk, _EMPTY), reach)
+    return r
+
+
+def _mi(ctx, a, b):
+    """Exact key of _mul(a, _inv(b))."""
+    k = (a, b)
+    r = ctx.mi.get(k)
+    if r is None:
+        if len(ctx.mi) >= _MEMO_MAX:
+            ctx.mi.clear()
+        r = ctx.mi[k] = _ek(_mul(dict(a), _inv(dict(b))))
+    return r
+
+
+def _pw(ctx, a, p):
+    """Exact key of _pow(a, p)."""
+    k = (a, p)
+    r = ctx.pw.get(k)
+    if r is None:
+        if len(ctx.pw) >= _MEMO_MAX:
+            ctx.pw.clear()
+        r = ctx.pw[k] = _ek(_pow(dict(a), p))
+    return r
+
+
 # ── constructive generation ─────────────────────────────────────────────────
 
 def _build(target, depth, feats, rng, cache, budget, ops=None):
-    """Return a tree of dimension exactly `target`, or None."""
-    budget[0] -= 1
-    if budget[0] <= 0 or not _reachable(target, feats, cache):
-        return None
+    """Return a tree of dimension exactly `target`, or None. (`cache` is no
+    longer used: what it held is kept per set of units, see _context.)"""
+    return _build_ek(_ek(target), depth, _context(feats, ops), rng, budget)
 
-    tk = _key(target)
-    terms = [name for name, d in feats if _key(d) == tk]
-    dimless = _is_dimensionless(target)
+
+def _build_ek(ek, depth, ctx, rng, budget):
+    budget[0] -= 1
+    if budget[0] <= 0:
+        return None
+    dimless, terms, reach = _info(ctx, ek)
+    if not reach:
+        return None
 
     if depth <= 0:
         if terms:
@@ -117,61 +224,52 @@ def _build(target, depth, feats, rng, cache, budget, ops=None):
     if dimless and rng.random() < 0.12:
         return Node(round(rng.uniform(-3, 3), 4))
 
-    prods = [("neg",), ("abs",), ("+",), ("-",), ("sqrt",), ("sq",), ("cube",)]
-    if dimless:
-        prods += [(f,) for f in _TRANSCENDENTAL]
-    factors = [d for _, d in feats] + [dict(DIMENSIONLESS)]
-    for A in factors:
-        prods.append(("*", A))
-        prods.append(("/", A))
-    # cube n'etait pas produit historiquement : seulement si le pool le demande
-    prods = [p for p in prods if _ok(p[0], ops) and
-             (p[0] != "cube" or ops is not None)]
+    prods = list(ctx.prods[dimless])
     rng.shuffle(prods)
 
     for p in prods:
         op = p[0]
         if op in ("neg", "abs"):
-            c = _build(target, depth - 1, feats, rng, cache, budget, ops)
+            c = _build_ek(ek, depth - 1, ctx, rng, budget)
             if c is not None:
                 return Node(op, c)
         elif op in ("+", "-"):
-            l = _build(target, depth - 1, feats, rng, cache, budget, ops)
+            l = _build_ek(ek, depth - 1, ctx, rng, budget)
             if l is None:
                 continue
-            r = _build(target, depth - 1, feats, rng, cache, budget, ops)
+            r = _build_ek(ek, depth - 1, ctx, rng, budget)
             if r is not None:
                 return Node(op, l, r)
         elif op == "sqrt":
-            c = _build(_pow(target, 2), depth - 1, feats, rng, cache, budget, ops)
+            c = _build_ek(_pw(ctx, ek, 2), depth - 1, ctx, rng, budget)
             if c is not None:
                 return Node("sqrt", c)
         elif op == "sq":
-            c = _build(_pow(target, 0.5), depth - 1, feats, rng, cache, budget, ops)
+            c = _build_ek(_pw(ctx, ek, 0.5), depth - 1, ctx, rng, budget)
             if c is not None:
                 return Node("sq", c)
         elif op == "cube":
-            c = _build(_pow(target, 1.0 / 3.0), depth - 1, feats, rng, cache, budget, ops)
+            c = _build_ek(_pw(ctx, ek, 1.0 / 3.0), depth - 1, ctx, rng, budget)
             if c is not None:
                 return Node("cube", c)
         elif op in _TRANSCENDENTAL:
-            c = _build(dict(DIMENSIONLESS), depth - 1, feats, rng, cache, budget, ops)
+            c = _build_ek(_EMPTY, depth - 1, ctx, rng, budget)
             if c is not None:
                 return Node(op, c)
         elif op == "*":
             A = p[1]
-            l = _build(A, depth - 1, feats, rng, cache, budget, ops)
+            l = _build_ek(A, depth - 1, ctx, rng, budget)
             if l is None:
                 continue
-            r = _build(_mul(target, _inv(A)), depth - 1, feats, rng, cache, budget, ops)
+            r = _build_ek(_mi(ctx, ek, A), depth - 1, ctx, rng, budget)
             if r is not None:
                 return Node("*", l, r)
         elif op == "/":
             A = p[1]
-            l = _build(A, depth - 1, feats, rng, cache, budget, ops)
+            l = _build_ek(A, depth - 1, ctx, rng, budget)
             if l is None:
                 continue
-            r = _build(_mul(A, _inv(target)), depth - 1, feats, rng, cache, budget, ops)
+            r = _build_ek(_mi(ctx, A, ek), depth - 1, ctx, rng, budget)
             if r is not None:
                 return Node("/", l, r)
 
@@ -341,8 +439,7 @@ def typed_mutate(tree, feat_dims, max_depth, rng=None, ops=None):
     """Replace a random subtree by a fresh one of the SAME dimension."""
     rng = rng or random
     fd = _norm_feat_dims(feat_dims)
-    feats = _feat_list(fd)
-    cache = {}
+    ctx = _context(_feat_list(fd), ops)
     nodes = _nodes(tree)
     rng.shuffle(nodes)
     for pick in nodes:
@@ -350,12 +447,43 @@ def typed_mutate(tree, feat_dims, max_depth, rng=None, ops=None):
             d = _infer(pick, fd)
         except _DimError:
             continue
+        ek = _ek(d)
         for _ in range(12):
-            sub = _build(d, rng.randint(1, max(2, max_depth)), feats, rng,
-                         cache, [2000], ops)
+            sub = _build_ek(ek, rng.randint(1, max(2, max_depth)), ctx, rng,
+                            [2000])
             if sub is not None:
                 return _graft(tree, pick, sub).copy()
     return tree
+
+
+def _infer_all(root, fd):
+    """[v0.9] The dimension of every subtree of `root`, in one pass from the
+    leaves up: {id(node): dimension dict, or None where _infer would raise
+    _DimError}. The same rules as _infer (dimensions._leaf_dim and _combine),
+    but each subtree is inferred once instead of once per ancestor."""
+    out = {}
+    stack = [(root, False)]
+    while stack:
+        n, ready = stack.pop()
+        if n.left is None and n.right is None:
+            out[id(n)] = _leaf_dim(n.value, fd)
+            continue
+        if not ready:
+            stack.append((n, True))
+            if n.right is not None:
+                stack.append((n.right, False))
+            stack.append((n.left, False))
+            continue
+        dl = out[id(n.left)]
+        dr = out[id(n.right)] if n.right is not None else None
+        if dl is None or (n.right is not None and dr is None):
+            out[id(n)] = None
+            continue
+        try:
+            out[id(n)] = _combine(n, dl, dr)
+        except _DimError:
+            out[id(n)] = None
+    return out
 
 
 def typed_crossover(p1, p2, feat_dims, rng=None):
@@ -364,12 +492,12 @@ def typed_crossover(p1, p2, feat_dims, rng=None):
     fd = _norm_feat_dims(feat_dims)
 
     def annotated(t):
+        dims = _infer_all(t, fd)
         out = []
         for n in _nodes(t):
-            try:
-                out.append((n, _key(_infer(n, fd))))
-            except _DimError:
-                pass
+            d = dims[id(n)]
+            if d is not None:
+                out.append((n, _key(d)))
         return out
 
     a, b = annotated(p1), annotated(p2)
