@@ -1,10 +1,10 @@
 cProfile of the typed fit of Feynman II.11.3, seed 0 (benchmarks/phase3_bench.py one typed 0), phase 3a (commit 118a42d).
-Times are inflated by the profiler.
+Times are inflated by the profiler. The 45 functions of largest cumulative time.
 
 function calls (159886315 primitive calls) in 104.940 seconds
 
    Ordered by: cumulative time
-   List reduced from 5536 to 25 due to restriction <25>
+   List reduced from 5536 to 45 due to restriction <45>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
    2725/1    0.605    0.000  105.698  105.698 {built-in method builtins.exec}
@@ -32,5 +32,25 @@ function calls (159886315 primitive calls) in 104.940 seconds
    513649    0.131    0.000    6.272    0.000 {method 'sort' of 'list' objects}
     62530    0.257    0.000    6.052    0.000 core.py:5084(_column)
     13348    0.447    0.000    5.713    0.000 dim_search.py:494(annotated)
+    55163    0.100    0.000    5.151    0.000 dim_search.py:551(is_typed_valid)
+  2683956    1.966    0.000    5.057    0.000 random.py:367(choice)
+ 18037238    5.044    0.000    5.044    0.000 {method 'get' of 'dict' objects}
+   499286    1.302    0.000    5.031    0.000 core.py:4905(_simplify_node)
+   177614    3.623    0.000    4.812    0.000 core.py:2295(copy)
+    13180    2.273    0.000    4.800    0.000 core.py:5384(select)
+    14767    0.102    0.000    4.750    0.000 core.py:5079(_eval)
+1252103/64617    1.135    0.000    4.710    0.000 dimensions.py:73(_infer)
+    24902    0.116    0.000    4.523    0.000 core.py:4002(_predict_cached)
+   855142    0.805    0.000    4.112    0.000 dimensions.py:92(_combine)
+     3139    0.109    0.000    4.106    0.001 core.py:5965(build_stigmergic_tree_v3)
+    17350    0.278    0.000    3.964    0.000 core.py:3428(evaluate_vector)
+    62530    0.382    0.000    3.368    0.000 core.py:3214(_lm_column)
+    15960    0.012    0.000    3.260    0.000 core.py:6268(<lambda>)
+     8834    0.229    0.000    3.240    0.000 core.py:4366(raw_mse)
+     7534    0.050    0.000    3.159    0.000 core.py:5452(tournament)
+445782/14284    0.994    0.000    3.118    0.000 core.py:3396(_interp)
+  1347521    2.996    0.000    2.996    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+  3160282    1.311    0.000    2.985    0.000 dim_search.py:179(_mi)
+   373659    0.399    0.000    2.906    0.000 core.py:3057(_lm_apply)
 
 

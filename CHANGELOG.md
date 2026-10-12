@@ -2,17 +2,18 @@
 
 ## 0.9.0 — "Steady"
 
-This release makes the search with `units=` more than five times faster with
-the same models, names the exact formulas of the Pareto front when the
+This release makes the search with `units=` faster with the same models
+(more than five times on Feynman II.11.3), names the exact formulas of the Pareto front when the
 returned formula departs from the model, and is the first measured on a test
 set frozen before any decision of its work. The search itself does not
 change: every change tried on it during this work was measured against
 criteria written before it ran, and none met them (they are listed in
 `benchmarks/results_0.9/`, with their numbers).
 
-The release was measured as installed from its wheel, side by side with
-0.8.0 installed from PyPI on the same machine, each fit started with both
-versions at the same time (`benchmarks/results_0.9/release/`). Without
+The release was measured as installed from its wheel
+(`benchmarks/results_0.9/release/`); on the whole suite of the 0.9 work it ran
+side by side with 0.8.0 installed from PyPI on the same machine, each fit
+started with both versions at the same time. Without
 `units=` the two return the same model at equal work; at 30 s per fit they
 return the same expression on 1,746 of 1,775 fits, the others differing
 where the deadline falls. On the 41 equations of the decision bench with
@@ -28,17 +29,19 @@ notebooks and of the paper was measured again on the wheel: the laws,
 formulas and counts are those of 0.8.0, the times those of a different
 machine (`benchmarks/results_0.9/release/README.md`).
 
-- The search with `units=` is more than five times faster and returns the
-  same models, bit for bit. Its typed operators computed again, millions of times
+- The search with `units=` is faster and returns the same models, bit for
+  bit. Its typed operators computed again, millions of times
   per fit, the same keys of dimensions and the same least-squares test of
   whether a dimension can be built from the inputs; they now compute them
   once per set of units, and the crossover infers the dimension of every
   subtree in one pass. On Feynman II.11.3 (40 generations, seeds 0 to 9,
   two fits at a time on one 4-core machine), the median run goes from 179 s
   to 33.5 s, and a typed generation costs 1.44 times an untyped one instead
-  of 8.5. The thirteen reference configurations, the ten II.11.3 fits and
-  the three laws of the unknown-constant mode return the same models as
-  0.8.0, and two new tests compare the typed operators with the 0.8.0 code
+  of 8.5. The unknown-constant mode, which shares the typed generator, takes
+  about half the time on Newton's law and the ideal gas, and the same 3.5 s on
+  Hooke's law, with one variable. The thirteen reference configurations, the
+  ten II.11.3 fits and the three laws of the unknown-constant mode return the
+  same models as 0.8.0, and two new tests compare the typed operators with the 0.8.0 code
   (`benchmarks/results_0.9/PLAN_PHASE3.md`).
 - The README said that setting `seed=` and `parallel=` returns the same model
   on another machine. It does on the same machine; on another one, NumPy's
@@ -56,9 +59,10 @@ machine (`benchmarks/results_0.9/release/README.md`).
   prepared).
 - The README now advises `normalize='none'` for laws with an angle inside a
   sine or a cosine (13 of 50 fits exact against 2 of 50 on the ten
-  trigonometric laws of the bench), and the default for real data. Making it
-  the default, for every pool or only for the trigonometric ones, was
-  measured and not adopted: on real data it predicted worse out of the
+  trigonometric laws of the bench), and the default for real data. Leaving
+  the columns as given by default when their scales are close (the setting
+  `normalize='smart'`), for every pool or only for the trigonometric ones,
+  was measured and not adopted: on real data it predicted worse out of the
   training range (`benchmarks/results_0.9/PLAN_TRIG.md`).
 - When the formula of the returned model departs from `predict()`, the
   warning now says how many entries of `result.pareto` have an exact formula

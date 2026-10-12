@@ -9,7 +9,7 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 *[🇬🇧 English version](README.md)*
 
-[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, quatre étapes, dix minutes.
+[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, quatre étapes.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
@@ -296,7 +296,7 @@ La troisième colonne donne au bras non contraint quatre fois plus de générati
 reste à **0/5** modèles physiquement valides : le calcul ne remplace pas la
 contrainte. (Depuis la 0.9, la recherche contrainte prend à peu près autant de
 temps que la recherche libre : une génération typée coûte 1,4 fois une génération
-non typée, contre 8,5 fois avec la 0.8, qui prenait 180 s par run sur la même
+non typée, contre 8,5 fois avec la 0.8, qui prenait 179 s par run sur la même
 machine, pour les mêmes modèles. Une recherche ne s'arrête plus tôt que sur une loi
 exacte, si bien que les runs contraints qui finissent sur une approximation
 parcourent les 40 générations ; `time_limit=` les borne.) Les échecs sans contrainte ne sont pas
@@ -452,7 +452,8 @@ contient un angle dans un sinus ou un cosinus, passez `normalize='none'` : divis
 angle par sa plus grande valeur change la période que le sinus doit retrouver. Mesuré
 pour la 0.9 sur les dix lois trigonométriques du banc de 41 équations, cinq seeds
 chacune : 13 ajustements exacts sur 50, contre 2 sur 50 avec le réglage par défaut ;
-sur données réelles, gardez le réglage par défaut, qui prédit mieux hors de la plage
+sur données réelles, gardez le réglage par défaut : y laisser telles quelles les
+colonnes d'échelles proches (`normalize='smart'`) a moins bien prédit hors de la plage
 d'apprentissage
 ([`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)). Avec les unités physiques déclarées
 (`units=`, même budget, sans normalisation), 14/15 reviennent exactes, chacune sous sa
@@ -498,10 +499,11 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**0.9 « Steady »** — la recherche avec `units=` plus de cinq fois plus rapide,
-pour les mêmes modèles ; une formule qui s'écarte du modèle nomme les formules
-exactes du front de Pareto ; un jeu de test figé avant toute décision, sur lequel
-chaque version est mesurée une fois. **0.8 « Swift »** — plus rapide (les accélérations seules rendent les mêmes
+**0.9 « Steady »** — la recherche avec `units=` plus rapide, pour les mêmes
+modèles (plus de cinq fois sur Feynman II.11.3) ; une formule qui s'écarte du
+modèle nomme les formules exactes du front de Pareto ; un jeu de test figé avant
+toute décision et jamais utilisé pour en prendre une, sur lequel chaque version
+publiée est mesurée. **0.8 « Swift »** — plus rapide (les accélérations seules rendent les mêmes
 modèles), davantage de lois retrouvées (lois de puissance amorcées, structures
 justes menées jusqu'à la loi exacte), des données de toute échelle, des entrées
 vérifiées ; chaque changement destiné à améliorer la recherche décidé par une

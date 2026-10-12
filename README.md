@@ -6,7 +6,7 @@ constraint, not a soft penalty. The operating envelope is measured, not claimed:
 points it needs, how its runtime grows, and where it fails.
 
 *[🇫🇷 Version française](https://github.com/ariel95500-create/gp-elite/blob/main/README.fr.md)*
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.ipynb) **Try it in your browser** — no install, five steps, fifteen minutes.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.ipynb) **Try it in your browser** — no install, five steps.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
@@ -279,7 +279,7 @@ The third column gives the unconstrained arm four times the generations. It stil
 yields **0/5** physically valid models: compute does not substitute for the
 constraint. (Since 0.9 the constrained search takes about as long as the
 unconstrained one: a typed generation costs 1.4 times an untyped one, against 8.5
-times with 0.8, which took 180 s per run on the same machine, for the same models.
+times with 0.8, which took 179 s per run on the same machine, for the same models.
 A search stops early only on an exact law, so the constrained runs that end on an
 approximation go through all 40 generations; `time_limit=` bounds them.)
 The unconstrained failures are not marginal: across the ten unconstrained runs, the
@@ -425,8 +425,9 @@ cosine all come back exact, I.18.12 and III.15.12 included
 has an angle inside a sine or a cosine, pass `normalize='none'`: dividing an angle
 by its largest value changes the period the sine has to find. Measured for 0.9 on
 the ten trigonometric laws of the 41-equation bench with five seeds each: 13 of 50
-fits exact against 2 of 50 with the default; on real data, keep the default, which
-predicts better out of the training range
+fits exact against 2 of 50 with the default; on real data, keep the default:
+leaving the columns of close scales as given there (`normalize='smart'`) predicted
+worse out of the training range
 ([`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)). With the physical
 units declared (`units=`, same budget, no normalisation), 14/15 come back exact, each
 in its textbook form (`benchmarks/feynman_units.py`). One seed on fifteen equations is
@@ -470,10 +471,10 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**0.9 "Steady"** — the search with `units=` more than five times faster, with the
-same models; a formula that departs from the model names the exact formulas of
-the Pareto front; a test set frozen before any decision, on which each version is
-measured once. **0.8 "Swift"** — faster (the speed-ups alone return the same models), more laws
+**0.9 "Steady"** — the search with `units=` faster, with the same models (more
+than five times on Feynman II.11.3); a formula that departs from the model names
+the exact formulas of the Pareto front; a test set frozen before any decision and
+never used to make one, on which each release is measured. **0.8 "Swift"** — faster (the speed-ups alone return the same models), more laws
 recovered (power laws seeded, right structures finished into exact laws), data of
 any scale, inputs checked; every change meant to improve the search decided by a
 comparison written before it ran. **0.7 "Sound"** — the formula you get is the model you got: written in your

@@ -211,7 +211,8 @@ def run_range(i0, i1):
                                     operators=pool, normalize="none",
                                     generations=30, speed="fast",
                                     validation_split=0.15, seed=0, restarts=4,
-                                    units=units, target_units=tunits)
+                                    units=units, target_units=tunits,
+                                    parallel=False)
         dt = time.time() - t0
         v_te = float(np.var(y[te])); v_tr = float(np.var(y[tr]))
 

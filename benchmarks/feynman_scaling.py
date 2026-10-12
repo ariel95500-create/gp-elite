@@ -224,7 +224,8 @@ def run(sizes, eq_filter, arm):
                         r = symbolic_regression(
                             X[tr], y[tr], feature_names=names, operators=pool,
                             normalize=arm, generations=30, speed="fast",
-                            validation_split=0.15, seed=0, restarts=4)
+                            validation_split=0.15, seed=0, restarts=4,
+                            parallel=False)
                     err_run = None
                 except Exception as exc:                    # on n'arrête pas le banc
                     err_run = f"{type(exc).__name__}: {exc}"

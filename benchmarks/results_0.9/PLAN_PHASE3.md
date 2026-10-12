@@ -191,11 +191,12 @@ about 0.5 s, hence 180 s for the 149 s of the README.
 
 Under the profiler, the typed fit of seed 0 took 519 s, of which 448 s in
 `typed_mutate`, almost all of it in `_build` (8.1 million calls for 8,745
-mutations): 244 s computing the keys of dimension dicts (55 million calls,
+mutations): 244 s computing the keys of dimension dicts (56 million calls,
 most of them for the features, the same at every call) and 125 s testing
-reachability (552,000 least-squares solves), the rest building the trees.
-The crossover took 14 s, the validity gate 5 s, and the evaluation and the
-fitting of constants, which the untyped search shares, about 40 s. The
+reachability (553,000 least-squares solves), the rest building the trees.
+The crossover took 14 s and the validity gate 5 s; among the steps the
+untyped search shares, the fitting of constants by Levenberg-Marquardt took
+16 s, the simplification 12 s and the fitness 9 s. The
 expectation that 3a might gain little was wrong: the time went into the
 typed operators.
 
@@ -238,7 +239,7 @@ times faster (median), 4.77 times at least. 3a typed and untyped side by
 side (`ratio_3a_typed_vs_untyped.jsonl`): typed 31.8 s (worst 42.4 s),
 untyped 22.7 s; a typed generation costs 1.44 times an untyped one per seed
 (median), 1.74 at worst. The profile of 3a (`profile_3a_typed_seed0.txt`):
-105 s under the profiler against 519 s, `_build` 39 s.
+the fit took 103 s under the profiler against 519 s, `_build` 39 s.
 
 **Decision: 3a adopted.** E1 to E4 hold and the median time falls by 81 %
 (178.9 s to 33.5 s), well beyond the 10 % asked.
@@ -252,8 +253,8 @@ Campaign U1 is not needed, and the plateau stop stays an idea, not measured.
 
 | | 0.8.0 (this machine) | after 3a | target |
 |---|---|---|---|
-| II.11.3, median s per run | 179.6 | 33.5 | at most 60 |
-| worst s per run | 211.4 | 42.8 | — |
+| II.11.3, median s per run (paired timing) | 178.9 | 33.5 | at most 60 |
+| worst s per run (paired timing) | 211.4 | 42.8 | — |
 | valid | 10 of 10 | 10 of 10 | 5 of 5 |
 | exact, seeds 0 to 4 | 2 of 5 | 2 of 5 | at least 2 of 5 |
 | typed / untyped s per generation | 8.47 | 1.44 (worst 1.74) | at most 3 |
@@ -262,3 +263,11 @@ All met, with the same models as 0.8.0, so the same laws. The README table
 of 0.8 (149 s on a 2-core container) describes the published version and is
 measured again on the 0.9 release, like every public figure; the CHANGELOG
 has an entry.
+
+Corrections of 12 October 2026, after the first independent review of the
+release: the counts of the profile are rounded as the records give them (56
+million calls, 553,000 solves; they read 55 million and 552,000), the steps
+outside the typed operators are named with their own times from the profile,
+now printed with its 45 largest entries, the time of 3a under the profiler
+is that of the fit (103 s; 105 s was the whole process), and both columns of
+the exit table come from the paired timing (the median was U0's 179.6 s).

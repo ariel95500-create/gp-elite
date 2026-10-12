@@ -50,15 +50,16 @@ the notebook snippets, the missing or infinite values and Nikuradse.
 
 - Times. This machine runs one fit about 30 % slower than the 2-core
   container of 0.8 (the size study takes 139 s at 1,000 points and 380 s at
-  10,000, against 108 s and 284 s), and the typed search more than five times
-  faster than 0.8.0 (phase 3): the table of `units=` gives 29 s, 34 s and
+  10,000, against 108 s and 284 s), and the typed search on II.11.3 more
+  than five times faster than 0.8.0 (phase 3): the table of `units=` gives 29 s, 34 s and
   114 s per run (median) for its three arms, against 21 s, 149 s and 84 s.
 - `time_limit=`: for a 15 s budget the fits end at 17.4 s in sequence and
   17.6 s in parallel (`m3/time_limit_check.txt`, 13 of 16 checks), and at
   17.0 s and 17.5 s when run again (`m3/time_limit_check_rerun.txt`, 15 of
   16). gp-elite 0.8.0 on this machine ends at 17.5 s and 17.6 s
   (`m3/time_limit_check_0.8.0_rerun.txt`, 14 of 16): the checks that fail
-  bound the overrun at one generation plus one second, and the final
+  bound the overrun at one generation plus one second (two seconds for the
+  check of three restarts), and the final
   selection takes longer on this machine whatever the version. The README
   now says two to three seconds instead of under two.
 - The battery example: the random forest it compares with gives R² −2.521 on
@@ -69,7 +70,7 @@ the notebook snippets, the missing or infinite values and Nikuradse.
   describes that release and its machine.
 - `robustness_check.txt` and `small_data_release.txt` are the summaries the
   scripts print today, with more fields than in 0.8; their records
-  (`.jsonl`) are identical.
+  (`.jsonl`) are identical apart from the engine path and the times.
 
 ## M2, campaign R paired with 0.8.0 (11 and 12 October 2026)
 
@@ -111,4 +112,5 @@ environment, 142 passed under Python 3.9.23, 3.11.15 and 3.14.0rc2 (the 3.14
 build uv provides here), each importing the installed package; `twine check`
 passes for the wheel and the source archive. The **Tests** workflow of the
 repository (Linux, Python 3.9 to 3.14; Windows, 3.12 and 3.14) is green on
-the release commit `0ae3e9f` and on every later commit of the branch.
+the release commit `0ae3e9f` and on the later commits of the branch listed
+in `M4_ci_runs.txt` (taken from GitHub's list of workflow runs).
