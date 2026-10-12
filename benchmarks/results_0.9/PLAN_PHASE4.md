@@ -440,3 +440,107 @@ the new seeds. What remains at zero: the trigonometric laws (where the
 measurements of 4a stand), the exponentials and the logarithm, and
 `III.10.19` (a root of a sum of three squares). Next in the plan: 4c,
 columns of order one left as given.
+
+## Decision of the author on 4c (12 October 2026)
+
+4c, the columns of order one left as given, was the next step of the plan.
+On the standardised real data of the decision bench (R6, the setting of
+SRBench) every column is of order one (largest absolute value between 1.07
+and 4.16 on the training rows), so 4c would act there exactly as
+`normalize="smart"` did in campaign S1 (`PLAN_TRIG.md`), which failed: on R6
+out of domain the median R² fell from 0.630 to 0.521 and six formulas more
+were flagged inexact. Asked whether to run 4c anyway or to apply instead the
+method of B1 to the trigonometric, exponential and logarithmic laws, the
+author chose the second. 4c is set aside; what follows is a third attempt
+at 4a.
+
+## 4a, third attempt: functions of a monomial held exactly (change E1), plan written before it is implemented (12 October 2026)
+
+T1 and A1 gave the sine its argument in the variable's own units and
+recovered trigonometric laws, but each also changed the models on real data
+and was not adopted. B1 showed a way to act on laws without touching real
+data: fit a family of forms directly, and seed the search only with a form
+that holds to numerical precision. E1 applies it to
+
+- y = b·f·exp(c·g), y = b·f·log(c·g), y = b·f·tanh(c·g), y = b·f/cosh(c·g),
+  f and g monomials of the inputs: the function inverted, the transformed
+  target is a power law of the inputs, found by least squares once one
+  constant is searched in one dimension (none for the logarithm);
+- y = f·(a + β·sin(ω·g) + γ·cos(ω·g)), g one input or a product or ratio of
+  two, f a monomial of the other inputs: ω is searched on a grid and refined,
+  a, β and γ follow by least squares; the exponents of f are estimated by
+  least squares on the logarithms, rounded, and kept only if the form then
+  holds.
+
+**What a prototype showed, before this plan.** As for B1, a prototype
+outside the engine (no fit, no test rows, the frozen test set untouched) was
+run on the training rows of F41 and of every split of R6 and R7raw, the
+columns divided by their largest value as the engine does, the
+trigonometric form tried only with a pool that has sine and cosine (on the
+real data, with both the default pool and `"trig"`). Seven F41 equations
+hold to numerical precision (relative residual below 1e-29), none of the
+130 real training sets with either pool:
+
+| equation | form | engine with B1, exact (campaign B1, confirmation) |
+|---|---|---|
+| I.40.1 n0·exp(−m·g·x/(kb·T)) | f·exp(c·g) | 0 of 5, 0 of 5 |
+| II.35.18 n0/(exp(μB/kT) + exp(−μB/kT)) | f/cosh(c·g) | 0 of 5, 0 of 5 |
+| I.44.4 n·kb·T·log(V2/V1) | f·log(c·g) | 0 of 5, 0 of 5 |
+| II.6.15b 3·p·cos θ·sin θ/(4π·ε·r³) | f·sin(ω·θ) | 0 of 5, 0 of 5 |
+| II.15.4 −μ·B·cos θ | f·cos(ω·θ) | 1 of 5, 4 of 5 |
+| I.18.12 r·F·sin θ | f·sin(ω·θ) | 1 of 5, 2 of 5 |
+| III.15.12 2·U·(1 − cos(k·d)) | f·(a + cos(ω·k·d)) | 0 of 5, 0 of 5 |
+
+The first four are in the five families at zero. A first version also
+"found" a hyperbolic tangent in every pure power law (tanh(c·g) ≈ c·g as c
+shrinks); as for B1, nothing is sought when the target is already a power
+law to numerical precision. The search costs 0.1 s per fit in the median on
+F41 (0.49 s at most), 0.21 s at most on the real data with the default pool
+and 0.36 s with `"trig"`.
+
+**The change.** `_make_elementary_seeds(xs, ys, cfg)` in
+`gp_elite/core.py`, called after the binomial seeds, with their guards
+(generic CSV mode, not under `units=`, not in extrapolation mode). Each form
+is sought only if the active pool has its operator (`exp`; `log`; `tanh`;
+`exp` and `/` for 1/cosh, written 1/(exp(c·g) + exp(−c·g)); `sin` or `cos`
+for the trigonometric form). f is taken among the monomials of up to three
+columns of constant sign (exponents ±1, or ±1 and ±2 for one column) for the
+first four forms, and fitted for the trigonometric one; the exponents of g
+are rounded to half-integers and the form must still hold. The thresholds
+are those of B1 (residual below 1e-12 of the variance). Each form found
+becomes one tree, one copy per island after the binomial seeds, judged like
+every other individual. No random number is drawn: when no form holds,
+nothing is injected and the fit is that of the engine with B1. Flag
+`_ELEMENTARY_SEEDS`, off by default.
+
+**Mechanics, before any fit.** Flag off: the thirteen reference
+configurations identical to the 0.9.0 wheel and the test suite passing. Flag
+on: for each configuration, whether a seed was injected; every configuration
+without one identical to the 0.9.0 wheel. One fit of 30 generations of
+I.40.1 and one of II.6.15b, outside any measurement.
+
+**Campaign E1** (decides). A (the engine with B1, flag off) against E1 side
+by side, budget T, four fits at a time: F41, R6 and R7raw, seeds 0 to 4 (335
+jobs), and R6 and R7raw again with `operators="trig"` in both arms (130
+jobs), where the trigonometric form can act on real data, as in campaigns S2
+and T1. E1 is adopted when all hold:
+
+1. **exact laws:** F41 exact in E1 at least 8 more than in A, among which at
+   least 4 more in the five families at zero; and no equation exact in A at
+   three seeds or more falls to one seed or none;
+2. **real data in the domain:** with each pool, the median paired
+   difference of test R² over the R6 and R7raw folds at least −0.005;
+3. **out of domain:** with each pool, on R6 and R7raw, no more than 2
+   collapses more than A, and the median R² no lower than A's by more than
+   0.01;
+4. **formulas:** no more than 3 formulas flagged inexact more than A on the
+   260 real fits.
+
+Reported beside the criteria: the fits on which a seed was injected, and
+the time the search took.
+
+**Confirmation on new seeds**, if the campaign adopts E1: the same jobs with
+seeds 5 to 9 (folds with seed 5). E1 is kept when F41 exact in E1 is at
+least 5 more than in A, and with each pool the median paired difference
+over the folds is at least −0.005 and out of domain E1 has no more than 2
+collapses more than A.
