@@ -1,0 +1,33 @@
+| indicator | 0.8.0 | 0.9.0 |
+|---|---|---|
+| F41 exact | 86 | 86 |
+| F41N1 structure retrieved | 66 | 66 |
+| F41N10 structure retrieved | 62 | 62 |
+| TF78 exact | 144 | 144 |
+| TS14 test exact | 7 | 7 |
+| R6 folds median R² | 0.8095 | 0.8095 |
+| R6 out-of-domain collapses | 5 | 5 |
+| R6 worst out-of-domain R² | -224.2 | -224.2 |
+| R7raw folds median R² | 0.8787 | 0.8787 |
+| R7raw out-of-domain collapses | 5 | 5 |
+| R7raw worst out-of-domain R² | -232.5 | -232.5 |
+| TR25 folds median R² | 0.7466 | 0.7466 |
+| TR25 out-of-domain collapses | 37 | 36 |
+| TR25 worst out-of-domain R² | -254500.0 | -254500.0 |
+| TR25raw folds median R² | 0.7544 | 0.7544 |
+| TR25raw out-of-domain collapses | 27 | 27 |
+| TR25raw worst out-of-domain R² | -17110.0 | -17110.0 |
+| R6 + R7raw out-of-domain collapses | 10 | 10 |
+| formula_exact False, R6 + R7raw folds and test | 4 | 5 |
+| crashes | 0 | 0 |
+| fits | 1775 | 1775 |
+
+Paired: 1775 jobs in both files, 1746 with the same returned expression (29 differ).
+Same expression by suite: feyn 204/205, feyn_n1 199/205, feyn_n10 199/205, real 59/60, realraw 69/70, tf 380/390, tr 249/250, trraw 250/250, ts 137/140
+
+Criteria written before the run (PLAN_RELEASE_0.9.md, M2):
+  [met] F41 not more than 6 exact laws below 0.8.0
+  [met] R6 folds median R² not more than 0.005 below
+  [met] TR25 folds median R² not more than 0.005 below
+  [met] R6 + R7raw collapses out of domain not more than 0.8.0 plus 2
+ALL MET

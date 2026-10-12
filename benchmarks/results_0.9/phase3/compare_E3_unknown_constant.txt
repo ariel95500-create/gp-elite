@@ -1,0 +1,4 @@
+cas_hooke   same (3.5 s -> 3.5 s)
+cas_newton  same (8.4 s -> 4.2 s)
+cas_gaz     same (9.3 s -> 4.6 s)
+ALL IDENTICAL

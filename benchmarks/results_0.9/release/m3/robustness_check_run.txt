@@ -1,0 +1,16 @@
+constant_column                model  1 + 2 * X0
+zero_column                    model  1 + 2 * X0
+constant_target                model  3
+duplicated_columns             model  X0²
+three_rows                     model  2 * X0
+ten_rows                       model  X0²
+huge_inputs                    model  1e-150 * X0
+tiny_inputs                    model  1e+150 * X0
+huge_target                    model  1e+200 * X0
+tiny_target                    model  1e-200 * X0
+wide_dynamic_range             model  -11.9104 - 3.32435 * (-1.77992 * X1 - (0.681933 - 0.201878 * X1) * (-0.501332 * X1 + 1.02418e-06 * X0 + 5.10129 - log((X0 * X1)^1.50217)) - 1.02418e-06 * X0 + 0.210765 * |X1 * X1| - log(X0))
+integer_and_boolean_columns    model  15 + 15 * (0.2 * X0 - 0.866667^X1)
+twenty_columns_two_used        model  X3 * X7
+negative_target_power_law      model  -X0 / X1²
+one_outlier                    model  0.634831 + 35.7292 * (|0.0407546 * X0 * X0 - 0.201878 * X0 - 0.523091| - 0.201878 * X0) / (-0.792015 * |X0| + 3.55702 * (2.13599 + 0.201878 * X0) / X0)
+no_holdout_small_signed        model  2.9608 - 2.338 * |0.519959 * X0|^(0.519959 * X0)

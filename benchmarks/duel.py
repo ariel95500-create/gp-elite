@@ -28,7 +28,8 @@ def run_range(i0, i1, out="duel_results.jsonl"):
             r = symbolic_regression(X[tr], y[tr],
                     feature_names=[f"v{k}" for k in range(nv)],
                     operators=pool, generations=30, speed="fast",
-                    validation_split=0.15, seed=0, restarts=4)
+                    validation_split=0.15, seed=0, restarts=4,
+                    parallel=False)
         tg = time.time() - t0
         # [v0.7] EQUITE : chaque methode est jugee sur le modele qu'elle REND.
         # L'ancienne version prenait pour GP_ELITE le meilleur point de son

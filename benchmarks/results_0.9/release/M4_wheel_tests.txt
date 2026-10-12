@@ -1,0 +1,15 @@
+# M4 of PLAN_RELEASE_0.9.md, 12 October 2026: the test suite (tests/ of commit 0ae3e9f, copied
+# alone into an empty folder) run against the wheel gp_elite-0.9.0-py3-none-any.whl installed
+# in a fresh environment for each Python, with pytest and sympy; PYTHONHASHSEED=0.
+# Python 3.9 and 3.14 come from uv (3.14.0rc2 is the build uv 0.8.17 provides); the Tests
+# workflow of the repository runs the released 3.14 on GitHub.
+[3.9.23] 142 passed in 175.65s (0:02:55)
+[3.11.15] 142 passed in 151.03s (0:02:31)
+[3.14.0rc2] 142 passed in 147.57s (0:02:27)
+# engine imported by each environment:
+[3.9.23] 0.9.0 /venvt3.9.23/lib/python3.9/site-packages/gp_elite/__init__.py numpy 2.0.2 sklearn 1.6.1
+[3.11.15] 0.9.0 /venvt3.11.15/lib/python3.11/site-packages/gp_elite/__init__.py numpy 2.4.6 sklearn 1.9.1
+[3.14.0rc2] 0.9.0 /venvt3.14.0rc2/lib/python3.14/site-packages/gp_elite/__init__.py numpy 2.5.4 sklearn 1.9.1
+# twine check of the wheel and the source archive (twine 7.0.0):
+gp_elite-0.9.0.tar.gz: PASSED
+gp_elite-0.9.0-py3-none-any.whl: PASSED

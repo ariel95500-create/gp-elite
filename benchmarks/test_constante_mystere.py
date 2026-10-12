@@ -141,7 +141,7 @@ def lancer(fabrique, gens, restarts):
                                speed="fast", restarts=restarts, random_state=0,
                                units=spec["units"],
                                target_units=spec["target_units"],
-                               unknown_constant=True)
+                               unknown_constant=True, parallel=False)
     except TypeError as e:
         print(f"\n  >>> NON IMPLEMENTE : {e}")
         RESULTS.append((spec["nom"], None))

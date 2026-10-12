@@ -1,0 +1,56 @@
+cProfile of the typed fit of Feynman II.11.3, seed 0 (benchmarks/phase3_bench.py one typed 0), gp-elite 0.8.0.
+Times are inflated by the profiler. The 45 functions of largest cumulative time.
+
+function calls (872896110 primitive calls) in 515.657 seconds
+
+   Ordered by: cumulative time
+   List reduced from 5568 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   2727/1    0.643    0.000  521.019  521.019 {built-in method builtins.exec}
+        1    0.000    0.000  521.019  521.019 phase3_bench.py:1(<module>)
+        1    0.000    0.000  520.875  520.875 phase3_bench.py:51(one)
+        1    0.001    0.001  519.020  519.020 sklearn_api.py:100(fit)
+        1    0.003    0.003  519.016  519.016 api.py:475(symbolic_regression)
+        1    0.003    0.003  518.970  518.970 core.py:7937(evolve)
+      120    0.090    0.001  516.602    4.305 phase3_bench.py:73(counted)
+      120    0.989    0.008  516.512    4.304 core.py:6259(evolve_island)
+     8745    0.175    0.000  447.891    0.051 dim_search.py:340(typed_mutate)
+8086121/15223   38.234    0.000  445.540    0.029 dim_search.py:100(_build)
+ 55564049   44.271    0.000  243.752    0.000 dim_search.py:50(_key)
+ 56186967   45.445    0.000  195.316    0.000 {built-in method builtins.sorted}
+  7952547   19.679    0.000  183.385    0.000 dim_search.py:107(<listcomp>)
+161448165   82.506    0.000  148.490    0.000 dim_search.py:51(<genexpr>)
+  7952547   20.905    0.000  125.431    0.000 dim_search.py:76(_reachable)
+106499549   56.568    0.000   56.568    0.000 {built-in method builtins.round}
+ 15971790   17.969    0.000   33.981    0.000 dimensions.py:43(_is_dimensionless)
+   552547   20.230    0.000   32.569    0.000 _linalg.py:2418(lstsq)
+      902    1.151    0.001   15.865    0.018 core.py:5007(optimize_constants_lm)
+  4585925   10.141    0.000   15.270    0.000 dimensions.py:27(_mul)
+     6674    0.533    0.000   14.387    0.002 dim_search.py:361(typed_crossover)
+      862    0.018    0.000   14.324    0.017 core.py:5169(optimize_constants_adam)
+4196624/575927    5.483    0.000   13.018    0.000 dimensions.py:73(_infer)
+ 16230760    4.834    0.000   12.680    0.000 {built-in method builtins.all}
+    13348    0.578    0.000   12.064    0.001 dim_search.py:366(annotated)
+    26031    0.157    0.000   11.656    0.000 core.py:4840(simplify)
+121399283   11.510    0.000   11.510    0.000 {built-in method builtins.abs}
+   419496    4.088    0.000   10.621    0.000 random.py:376(shuffle)
+ 10135262    7.677    0.000   10.248    0.000 random.py:235(_randbelow_with_getrandbits)
+ 30731958    7.915    0.000    9.373    0.000 dimensions.py:44(<genexpr>)
+    41384    2.355    0.000    9.193    0.000 core.py:4863(_simplify_tree)
+    55106    0.306    0.000    8.890    0.000 core.py:4681(fitness)
+   577204    6.005    0.000    8.002    0.000 core.py:2710(_np_safe_div)
+ 69882073    7.545    0.000    7.545    0.000 {method 'items' of 'dict' objects}
+      147    0.007    0.000    7.285    0.050 __init__.py:1(<module>)
+   847141    5.238    0.000    7.216    0.000 core.py:2332(exact_hash)
+  2683956    2.709    0.000    7.079    0.000 random.py:367(choice)
+   552148    1.318    0.000    7.028    0.000 dim_search.py:88(<listcomp>)
+    62530    0.273    0.000    6.380    0.000 core.py:5084(_column)
+  4135950    3.317    0.000    6.129    0.000 dimensions.py:34(_inv)
+     7748    0.038    0.000    6.095    0.001 {method 'sort' of 'list' objects}
+    13180    2.697    0.000    5.553    0.000 core.py:5384(select)
+   499286    1.297    0.000    5.278    0.000 core.py:4905(_simplify_node)
+    14767    0.112    0.000    4.986    0.000 core.py:5079(_eval)
+    55163    0.108    0.000    4.908    0.000 dim_search.py:423(is_typed_valid)
+
+

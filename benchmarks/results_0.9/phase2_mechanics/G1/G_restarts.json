@@ -1,0 +1,1 @@
+{"config": "G_restarts", "time_s": 2.385, "node": "+ 0x1.98ccf7cdce617p-3 * 0x1.00ff0143eda9ep+3 X[0]", "expression": "0.19961 + 2.69316 * X0", "mse_validation": "0x1.5ca1bfb4bba3ep+4", "mse_train": "0x1.f20a7a0c0ca4fp+3", "size": 5, "formula_exact": true, "pareto": [[5, "+ 0x1.98ccf7cdce617p-3 * 0x1.00ff0143eda9ep+3 X[0]", "0x1.5ca1bfb4bba3ep+4"]]}

@@ -1,0 +1,12 @@
+# Workflow "Tests" (.github/workflows/tests.yml: Linux, Python 3.9 to 3.14; Windows, 3.12 and 3.14)
+# on branch claude/peaceful-knuth-4q7m4p-phase2, from the release commit on; taken on 12 October 2026
+# from GitHub's list of workflow runs (run number, commit, conclusion, run page).
+33  0ae3e9f  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38167755742   (release commit: version 0.9.0)
+34  e8994b5  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38168673631
+35  656e4ff  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38168714944
+36  a5d7f32  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38173473542
+37  9c3bb9e  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38173618222
+--  aba4125  no run   (a README of the records only; GitHub lists no run for this push)
+38  7ee4610  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38201112539
+39  1897676  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38201759979
+40  cc39568  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38203809799

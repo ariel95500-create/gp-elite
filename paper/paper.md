@@ -14,7 +14,7 @@ authors:
 affiliations:
   - index: 1
     name: Independent Researcher, France
-date: 30 September 2026
+date: 12 October 2026
 bibliography: paper.bib
 ---
 
@@ -104,7 +104,7 @@ baseline (2000 programs over 30 generations, against 400 over 30 generations
 and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
 before any measurement,
 and each method judged on the model it returns, it recovers 12/15 exactly
-($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.8.0,
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 0.9.0,
 `benchmarks/duel.py`). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
@@ -142,12 +142,11 @@ arithmetic, which it is not.
 proved unsatisfying: on the tested problem it reported that none of the returned
 models were physically meaningful, without offering a remedy. v0.4 moves the
 check inside the search, reusing the same algebra so that auditor and engine
-cannot diverge. The cost, on the problem measured below, is a run about seven
-times longer at equal generations (median 149 s against 21 s for 40
-generations), because a typed generation costs more; with version 0.7 the
-ratio was smaller (57 s against 22 s) mainly because a search then stopped as
-soon as its hold-out error fell below a fixed threshold, even on an
-approximation. The benefit is that every returned model is valid by
+cannot diverge. The cost, on the problem measured below, is a typed generation
+1.4 times as long as an untyped one since version 0.9 (median of ten seeds, run
+side by side), against 8.5 times in version 0.8, whose typed operators computed
+the same dimension keys and reachability tests again millions of times per fit;
+the returned models are the same. The benefit is that every returned model is valid by
 construction.
 
 *Deducing rather than requiring.* Under `unknown_constant=True` the validity
@@ -173,7 +172,7 @@ documentation.
 
 The dimensional mode has been evaluated in a controlled A/B experiment on
 Feynman equation II.11.3, five seeds, identical budget for the unconstrained
-and constrained arms (`benchmarks/ab_ood.py`, version 0.8.0). Unconstrained,
+and constrained arms (`benchmarks/ab_ood.py`, version 0.9.0). Unconstrained,
 0/5 returned models are dimensionally valid; with `units=`, 5/5 are valid and
 more than twice as small (median 27 versus 59 nodes) at a better test $R^2$
 (0.99957 versus 0.99157). A third arm grants the unconstrained search four
@@ -184,8 +183,9 @@ times the generations, 0.32 to 0.65 for the three constrained
 approximations); the two other constrained runs recovered the exact law, which
 holds there. The constraint mostly buys physically coherent and compact
 approximations; it finds the law itself only in some runs at these budgets,
-and it is the slowest arm (median 149 s per run, against 21 s unconstrained
-and 84 s with four times the generations).
+and since version 0.9 it costs about as much as the unconstrained arm (median
+34 s per run, against 29 s unconstrained and 114 s with four times the
+generations).
 
 The mystery-constant mode is validated on three reference laws whose answer is
 known in advance (`benchmarks/test_constante_mystere.py`, 25 generations, two
@@ -201,7 +201,7 @@ merged into that project ahead of its next evaluation round.
 
 Generative AI was used extensively in the development of this software, and in
 the writing of its documentation and of this paper. The assistant was Claude
-(Anthropic), used across several model versions between May and September
+(Anthropic), used across several model versions between May and October
 2026.
 
 The project began as the author's own work, before any AI involvement: the
@@ -241,7 +241,9 @@ reproduced before being fixed and re-tested afterwards, and the absence of
 regression was verified by comparing fits before and after each change on a
 fixed set of seeds. The benchmark figures quoted in this paper were produced
 with the scripts in the repository, whose raw results, machine and dates are
-recorded in `benchmarks/results_0.8/`, and the project's test suite passes on
+recorded in `benchmarks/results_0.8/` and, for the figures of version 0.9.0,
+in `benchmarks/results_0.9/` (`phase3/` and `release/`), and the project's test
+suite passes on
 the released version. The scientific claims and
 their stated limits are the author's own, as is responsibility for the whole.
 

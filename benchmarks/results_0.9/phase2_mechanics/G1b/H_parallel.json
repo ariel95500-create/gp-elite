@@ -1,0 +1,1 @@
+{"config": "H_parallel", "time_s": 1.569, "node": "* 0x1.2e8de46b7eb07p-4 / * X[0] X[1] * X[2] sq X[3] _", "expression": "0.0795775 * X0 * X1 / (X2 * X3\u00b2)", "mse_validation": "0x1.92b6db6db6db7p-110", "mse_train": "0x1.28a0000000000p-110", "size": 10, "formula_exact": true, "pareto": [[10, "* 0x1.2e8de46b7eb07p-4 / * X[0] X[1] * X[2] sq X[3] _", "0x1.92b6db6db6db7p-110"]]}

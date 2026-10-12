@@ -9,11 +9,11 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 *[🇬🇧 English version](README.md)*
 
-[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, quatre étapes, dix minutes.
+[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, quatre étapes.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, n'est retrouvée exactement à aucune taille. Les cinq ajustements prennent 108 s au total à 1 000 points et 284 s à 10 000 (`benchmarks/feynman_scaling.py`, version 0.8.0).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, n'est retrouvée exactement à aucune taille. Les cinq ajustements prennent 139 s au total à 1 000 points et 380 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 0.9.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -125,6 +125,7 @@ if __name__ == "__main__":        # nécessaire dans un script, voir la note plu
         generations=60,
         speed="fast",             # 'ultrafast' | 'fast' | 'normal' | 'thorough'
         seed=0,
+        parallel=False,           # le même modèle sur toute machine, voir plus bas
     )
     print(resultat.expression)      # 2 + 3 * sqrt(a) - 0.5 * b
     print(resultat.r2_validation)   # 1.0
@@ -146,8 +147,9 @@ exacte, sans garantie.
   lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  sélection finale qui suit ajoute un peu (moins de deux secondes pour un budget
-  de 15 s dans notre mesure : 16,7 s sur 3 000 lignes).
+  génération en cours et la sélection finale ajoutent un peu (deux à trois
+  secondes pour un budget de 15 s dans nos mesures : 17,0 à 17,7 s sur 3 000
+  lignes).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 
@@ -179,7 +181,11 @@ tournent dans des processus parallèles. Ces processus sont démarrés en mode
 `spawn` sur tous les systèmes (Linux compris) et ré-importent votre script :
 gardez le code de premier niveau sous
 `if __name__ == "__main__":`, comme ci-dessus. Sans cette garde, GP_ELITE détecte
-la situation, termine sur un cœur avec le même résultat, et le signale une fois.
+la situation, termine sur un cœur avec les îles en séquence, et le signale une
+fois ; les îles en séquence suivent un autre chemin qu'en parallèle, et le modèle
+peut différer. D'où `parallel=False` dans l'exemple ci-dessus : avec les îles en
+parallèle (le défaut dès quatre cœurs), il rend un autre modèle, une approximation
+de R² 0,99998.
 Rien à faire dans un notebook.
 
 ### Lire le résultat
@@ -206,7 +212,12 @@ Rien à faire dans un notebook.
   par ajustement, pour aucun des 60 ajustements sur données réelles
   standardisées et 8 des 70 sur données réelles dans leurs unités (campagnes 5b
   et 6b), et pour 1 des 105 ajustements de la comparaison à travail égal
-  (100 générations).
+  (100 générations). L'avertissement dit aussi combien d'entrées de
+  `resultat.pareto` ont une formule exacte et nomme la plus précise d'entre
+  elles : imposer une formule exacte au modèle rendu coûte de la précision
+  (mesuré pour la 0.9 dans
+  [`benchmarks/results_0.9/PLAN_PHASE2.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_PHASE2.md)),
+  le choix vous revient donc.
 - **`r2_validation` est un score de sélection.** Le hold-out sur lequel il est
   calculé sert aussi à choisir le modèle rendu parmi les candidats : il est donc
   optimiste. Pour estimer comment la formule généralise, gardez vos propres
@@ -285,15 +296,16 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 | R² test médian | 0.99157 | **0.99957** | 0.99863 |
 | R² hors domaine médian | 0.34 | **0.65** | 0.42 |
 | taille médiane du modèle | 59 nœuds | **27 nœuds** | 60 nœuds |
-| secondes / run (médiane) | 21 | 149 | 84 |
+| secondes / run (médiane) | 29 | 34 | 114 |
 
 La troisième colonne donne au bras non contraint quatre fois plus de générations. Il
 reste à **0/5** modèles physiquement valides : le calcul ne remplace pas la
-contrainte. (La recherche contrainte est la plus lente, et plus lente qu'avec la
-0.7, qui prenait 57 s : une recherche ne s'arrête plus tôt que sur une loi exacte,
-si bien que les runs contraints qui finissent sur une approximation parcourent les
-40 générations, même si chaque génération prend environ un cinquième de temps de
-moins qu'avec la 0.7 (deux seeds, lancées côte à côte). `time_limit=` la borne.) Les échecs sans contrainte ne sont pas
+contrainte. (Depuis la 0.9, la recherche contrainte prend à peu près autant de
+temps que la recherche libre : une génération typée coûte 1,4 fois une génération
+non typée, contre 8,5 fois avec la 0.8, qui prenait 179 s par run sur la même
+machine, pour les mêmes modèles. Une recherche ne s'arrête plus tôt que sur une loi
+exacte, si bien que les runs contraints qui finissent sur une approximation
+parcourent les 40 générations ; `time_limit=` les borne.) Les échecs sans contrainte ne sont pas
 marginaux : sur les dix runs non contraints, les modèles prennent le logarithme
 d'une fréquence ou d'une autre grandeur dotée d'unités, additionnent des
 kilogrammes ou des hertz à des nombres purs, ou élèvent une grandeur à un exposant
@@ -303,8 +315,9 @@ en coulombs ou en hertz.
 d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), les
 approximations se dégradent dans tous les bras. Deux runs contraints sur cinq ont
 trouvé la loi exacte, qui y tient (R² = 1.00000) ; les trois autres sont des
-approximations physiquement cohérentes, pas la loi. Temps mesurés sur un conteneur
-Linux à 2 cœurs, un run par cœur. Reproductible avec `benchmarks/ab_ood.py`.
+approximations physiquement cohérentes, pas la loi. Temps mesurés sur une machine
+Linux à 4 cœurs, deux runs à la fois, avec les îles en séquence (`parallel=False`).
+Reproductible avec `benchmarks/ab_ood.py`.
 
 **Quand s'en servir.** Pour découvrir une loi physique quand vous connaissez les
 unités et que la loi est dimensionnellement homogène, et pour garantir que ce que
@@ -372,7 +385,7 @@ PROTOCOL 1 — random split (INTERPOLATION, leaks info)
   XGBoost       R² = +0.997
 
 PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
-  RandomForest (300)      R² = -2.515
+  RandomForest (300)      R² = -2.521
   XGBoost (300 trees)     R² = -2.324
   GP_ELITE (one equation) R² = -0.314
 
@@ -440,7 +453,15 @@ sur des données tenues à l'écart) et **13/15 sous 1e-3** ; les échecs sont I
 égalité sur 6, derrière sur une (I.18.12). Sans la normalisation des colonnes
 (`normalize='none'`, même budget), les trois lois qui contiennent un sinus ou un
 cosinus reviennent toutes exactes, I.18.12 et III.15.12 compris
-(`python benchmarks/feynman_bench.py 12 15 --normalize none`). Avec les unités physiques déclarées
+(`python benchmarks/feynman_bench.py 12 15 --normalize none`). Donc, quand votre loi
+contient un angle dans un sinus ou un cosinus, passez `normalize='none'` : diviser un
+angle par sa plus grande valeur change la période que le sinus doit retrouver. Mesuré
+pour la 0.9 sur les dix lois trigonométriques du banc de 41 équations, cinq seeds
+chacune : 13 ajustements exacts sur 50, contre 2 sur 50 avec le réglage par défaut ;
+sur données réelles, gardez le réglage par défaut : y laisser telles quelles les
+colonnes d'échelles proches (`normalize='smart'`) a moins bien prédit hors de la plage
+d'apprentissage
+([`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)). Avec les unités physiques déclarées
 (`units=`, même budget, sans normalisation), 14/15 reviennent exactes, chacune sous sa
 forme de manuel (`benchmarks/feynman_units.py`). Une seed sur quinze équations est une
 vitrine, pas une comparaison statistique :
@@ -484,7 +505,11 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**0.8 « Swift »** — plus rapide (les accélérations seules rendent les mêmes
+**0.9 « Steady »** — la recherche avec `units=` plus rapide, pour les mêmes
+modèles (plus de cinq fois sur Feynman II.11.3) ; une formule qui s'écarte du
+modèle nomme les formules exactes du front de Pareto ; un jeu de test figé avant
+toute décision et jamais utilisé pour en prendre une, sur lequel chaque version
+publiée est mesurée. **0.8 « Swift »** — plus rapide (les accélérations seules rendent les mêmes
 modèles), davantage de lois retrouvées (lois de puissance amorcées, structures
 justes menées jusqu'à la loi exacte), des données de toute échelle, des entrées
 vérifiées ; chaque changement destiné à améliorer la recherche décidé par une

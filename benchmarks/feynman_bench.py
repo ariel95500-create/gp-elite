@@ -197,7 +197,7 @@ def run_range(i0, i1, out="feyn_results.jsonl", normalize=None):
             r = symbolic_regression(X[tr], y[tr], feature_names=names,
                                     operators=pool, generations=30, speed="fast",
                                     validation_split=0.15, seed=0, restarts=4,
-                                    **extra)
+                                    parallel=False, **extra)
         dt = time.time()-t0
         pred = r.predict(X[te]); v = np.var(y[te])
         one_minus_r2 = float(np.mean((pred-y[te])**2)/v)

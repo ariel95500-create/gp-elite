@@ -1,7 +1,49 @@
 # Changelog
 
-## Unreleased
+## 0.9.0 — "Steady"
 
+This release makes the search with `units=` faster with the same models
+(more than five times on Feynman II.11.3), names the exact formulas of the Pareto front when the
+returned formula departs from the model, and is the first measured on a test
+set frozen before any decision of its work. The search itself does not
+change: every change tried on it during this work was measured against
+criteria written before it ran, and none met them (they are listed in
+`benchmarks/results_0.9/`, with their numbers).
+
+The release was measured as installed from its wheel
+(`benchmarks/results_0.9/release/`); on the whole suite of the 0.9 work it ran
+side by side with 0.8.0 installed from PyPI on the same machine, each fit
+started with both versions at the same time. Without
+`units=` the two return the same model at equal work; at 30 s per fit they
+return the same expression on 1,746 of 1,775 fits, the others differing
+where the deadline falls. On the 41 equations of the decision bench with
+five seeds, both recover the exact law 86 times in 205 (88 for 0.8.0 on the
+machine of its own measurement: under a time budget the figures depend on
+the machine). On the frozen test set, measured once for this release and
+never used to decide: 144 exact laws in 390 fits on 78 Feynman equations
+absent from the decision bench, 7 in 70 on the 14 Strogatz systems, and a
+median test R² of 0.747 on the folds of 25 real datasets, with 36 models of
+125 collapsing (R² < 0) when they predict outside the training range
+(`benchmarks/results_0.9/release/m2/`). The figures of the README, of the
+notebooks and of the paper that 0.8.0 had measured were measured again on
+the wheel: the laws, formulas and counts are those of 0.8.0, the times those
+of a different machine (`benchmarks/results_0.9/release/README.md`); the
+figures new in 0.9.0 come from the records of its work
+(`benchmarks/results_0.9/`), and those that describe 0.7 or the campaigns of
+0.8 are kept as they were measured.
+
+- The search with `units=` is faster and returns the same models, bit for
+  bit. Its typed operators computed again, millions of times per fit, the
+  same keys of dimensions and the same test of whether a dimension can be
+  built from the inputs (hundreds of thousands of least-squares solves);
+  they now compute them once per set of units, and the crossover infers the dimension of every
+  subtree in one pass. On Feynman II.11.3 (40 generations, seeds 0 to 9,
+  two fits at a time on one 4-core machine), the median run goes from 179 s
+  to 33.5 s, and a typed generation costs 1.44 times an untyped one instead
+  of 8.5. The thirteen reference configurations, the
+  ten II.11.3 fits and the three laws of the unknown-constant mode return the
+  same models as 0.8.0, and two new tests compare the typed operators with the 0.8.0 code
+  (`benchmarks/results_0.9/PLAN_PHASE3.md`).
 - The README said that setting `seed=` and `parallel=` returns the same model
   on another machine. It does on the same machine; on another one, NumPy's
   floating-point functions (`exp`, `tanh`...) can differ in the last digit
@@ -9,13 +51,30 @@
   another path. The README now says so.
 - `test_delivered_formula_is_the_model` assumed that no numerical safety net
   acts on the Pareto candidates of its data. On one of GitHub's Windows
-  runners one did, with the same code, seed and package versions as runs that
-  passed, and the engine flagged that formula inexact as documented. The test
+  runners one did (Python 3.14, the run started by the tag v0.8.0:
+  https://github.com/ariel95500-create/gp-elite/actions/runs/37277459477),
+  with the same code, seed and package versions as runs that passed, and the
+  engine flagged that formula inexact as documented. The test
   now checks the flag: a formula flagged exact reproduces `predict()`, and an
   inexact returned model warns.
-- `CITATION.cff`: `date-released` is 5 October 2026, the day 0.8.0 was
-  published on PyPI (it said 30 September 2026, the date the release was
-  prepared).
+- `CITATION.cff`: the date of 0.8.0 was corrected to 5 October 2026, the
+  day it was published on PyPI (it said 30 September 2026, the date the
+  release was prepared); the file now gives 0.9.0 and the day of its
+  publication.
+- The README now advises `normalize='none'` for laws with an angle inside a
+  sine or a cosine (13 of 50 fits exact against 2 of 50 on the ten
+  trigonometric laws of the bench), and the default for real data. Leaving
+  the columns as given by default when their scales are close (the setting
+  `normalize='smart'`), for every pool or only for the trigonometric ones,
+  was measured and not adopted: on real data it predicted worse out of the
+  training range (`benchmarks/results_0.9/PLAN_TRIG.md`).
+- When the formula of the returned model departs from `predict()`, the
+  warning now says how many entries of `result.pareto` have an exact formula
+  and names the most accurate of them on the hold-out. No model changes. Two
+  ways of making the returned formula always exact were measured and not
+  adopted: rejecting such candidates during the search lost exact laws, and
+  removing them at the final selection lowered the test R² on real data
+  (`benchmarks/results_0.9/PLAN_PHASE2.md`).
 
 ## 0.8.0 — "Swift"
 

@@ -61,6 +61,7 @@ def rmse_per_seed(X, y, y_true, clean, robust):
             X, y, feature_names=["x"], operators="poly",
             generations=35, speed="fast", validation_split=0.0,
             seed=s, robust=robust,
+            parallel=False,      # the figures of the README: islands in sequence
         )
         p = r.predict(X)
         out.append(float(np.sqrt(np.mean((p[clean] - y_true[clean]) ** 2))))

@@ -1,0 +1,20 @@
+F    3 sin(2x) + 1          s0  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    3 sin(2x) + 1          s1  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    3 sin(2x) + 1          s2  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    3 sin(2x) + 1          s3  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x^1.5                  s0  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x^1.5                  s1  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x^1.5                  s2  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x^1.5                  s3  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    2.5 exp(-0.7x) + 0.3   s0  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    2.5 exp(-0.7x) + 0.3   s1  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    2.5 exp(-0.7x) + 0.3   s2  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    2.5 exp(-0.7x) + 0.3   s3  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 x1^2                s0  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 x1^2                s1  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 x1^2                s2  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 x1^2                s3  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 / (x0 + x1)         s0  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 / (x0 + x1)         s1  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 / (x0 + x1)         s2  train R2     1.0000  (rescaled     1.0000)  test R2     1.0000
+F    x0 / (x0 + x1)         s3  train R2     0.9974  (rescaled     0.9974)  test R2     0.9980
