@@ -94,3 +94,69 @@ relative error of 0.026 at least (power law, `nikuradse_1`) and 0.032 (B1
 and E1; `phase5/finders_real.jsonl`).
 
 This changes the lever of phase 5; the choice goes to the author.
+
+## Decision of the author (12 October 2026)
+
+Asked whether to keep the lever of the plan (the final selection, at most 4
+fits) or to let the seeds of the power law, B1 and E1 tolerate noise, the
+author chose the seeds. What follows replaces the lever named in the plan of
+0.9 for phase 5.
+
+## Change N1: seeds that tolerate noise, plan written before it is implemented (12 October 2026)
+
+**The change.** When neither B1 nor E1 placed a seed (no form holds to
+numerical precision), the three finders are run again with their thresholds
+lifted: the power law without its log-log R² of 0.999, B1 and E1 without
+their threshold of numerical precision (the guard that leaves an exact power
+law to its own seeds is kept). Each form they return is judged as the data
+judge it: its relative error after linear scaling on the training rows,
+1 − R². It becomes a seed only if that error is at most 0.015. The threshold
+is set between the two measurements of D5: the seeds with the structure of
+the law fit 10 % noise at 0.008 to 0.014 (1 % noise at about 1e-4), and on
+the real training rows of R6 and R7raw no such seed fits better than 0.026.
+One copy per island after the other seeds, judged like every other
+individual; the guards of B1 and E1 (generic CSV mode, not under `units=`,
+not in extrapolation mode). No random number is drawn. Flag
+`_TOLERANT_SEEDS` in `gp_elite/core.py`, off by default; the finders gain a
+threshold argument whose default keeps them as they are.
+
+Checked before this plan, outside the engine, on the noiseless training
+rows of F41: three equations without an exact seed would receive a tolerant
+one (`I.16.6` at 0.005, `I.26.2` at 0.005, `I.37.4` at 0.008), all three
+exact in none of the fits of the engine with B1 and E1.
+
+**Mechanics, before any fit.** Flag off: the thirteen reference
+configurations identical to the 0.9.0 wheel and the test suite passing. Flag
+on: for each configuration, whether a seed was placed; every configuration
+without one identical to the 0.9.0 wheel. One fit of 30 generations of
+I.34.1 with 1 % noise, outside any measurement.
+
+**Campaign N1** (decides). A (the engine with B1 and E1, flag off) against
+N1 side by side, budget T, four fits at a time: F41, F41 with 1 % and 10 %
+noise, R6 and R7raw with the default pool, R6 and R7raw with `"trig"`,
+seeds 0 to 4 (875 jobs). N1 is adopted when all hold:
+
+1. **structure under noise:** with 1 % noise, the structure retrieved in at
+   least 10 more fits than A; with 10 % noise, in no fewer than A's minus 2;
+2. **exact laws:** on F41 without noise, no more than 3 fewer than A, and no
+   equation exact in A at three seeds or more falls to one seed or none;
+3. **real data in the domain:** with each pool, the median paired difference
+   of test R² over the folds at least −0.005;
+4. **out of domain:** with each pool, no more than 2 collapses more than A,
+   and the median R² no lower than A's by more than 0.01;
+5. **formulas:** no more than 3 formulas flagged inexact more than A on the
+   260 real fits.
+
+Reported beside the criteria: the fits on which a tolerant seed was placed,
+and the time the search took.
+
+**Confirmation on new seeds**, if the campaign adopts N1: the same jobs with
+seeds 5 to 9 (folds with seed 5). N1 is kept when, with 1 % noise, the
+structure is retrieved in at least 5 more fits than A and, with 10 %, in no
+fewer than A's minus 2; F41 exact no more than 3 fewer than A; and with each
+pool the median paired difference over the folds at least −0.005 and out of
+domain no more than 2 collapses more than A.
+
+The targets of gate 2 (80 and 77 fits with the structure) are read on the
+campaign and the confirmation; the ceiling measured above (54 and 13 more
+fits) says the second may stay out of reach.
