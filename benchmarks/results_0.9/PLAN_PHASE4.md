@@ -558,3 +558,37 @@ and all thirteen identical to the 0.9.0 wheel (`compare_0.9.0_vs_E1_on.txt`).
 II.6.15b, flag off 1 − R² 0.20 in 13.3 s, flag on `0.119366 * v0 / (v2 *
 v3 * v3²) * sin(2 * v1)` exact in 0.4 s (0.119366 = 3/(8π)). Three tests are
 added to `tests/test_guarantees.py` (section 22). The campaign is run.
+
+### Campaign E1, result (12 October 2026)
+
+Run from 17:59 to 19:33 UTC, 930 fits, 465 complete pairs, no crash
+(`campaign_E1.jsonl`; `python benchmarks/phase2_bench.py summary campaigne1
+benchmarks/results_0.9/campaign_E1.jsonl`). A is the engine with B1. The
+criteria are applied as written.
+
+1. Exact laws: F41 124 in A, **157 in E1** (+33); the five families at zero
+   35 in A, **55 of 90 in E1**; no law lost. The seven equations of the
+   prototype go to 5 seeds of 5 each (`I.40.1`, `II.35.18`, `I.44.4`,
+   `II.6.15b`, `III.15.12` from 0, `II.15.4` and `I.18.12` from 1), and no
+   other equation changes. **Holds.**
+2. Real data in the domain: median paired difference over the folds +0.0000
+   with the default pool (worst −0.001) and +0.0000 with `"trig"` (worst
+   +0). **Holds.**
+3. Out of domain: collapses 10 in both arms with the default pool and 12 in
+   both with `"trig"`; medians 0.647 and 0.700 in both arms. **Holds.**
+4. Formulas flagged inexact on the 260 real fits: 11 in A, 12 in E1.
+   **Holds.**
+
+**E1 is adopted by the campaign**; the confirmation on new seeds follows.
+Beside the criteria: a seed was placed in 35 F41 fits, exactly the seven
+equations at all five seeds, each exact at the first generation (0.92 s at
+most), written `v0 * exp(-v1 * v2 * v3 / (v4 * v5))`,
+`v0 / (exp(v1 * v2 / v3) + exp(-v1 * v2 / v3))`, `v0 * v1 * v2 * log(v3)`,
+`0.119366 * v0 / (v2 * v3 * v3²) * sin(2 * v1)`, `2 * v0 * (1 - cos(v1 *
+v2))`, `-v0 * v1 * cos(v2)`, `v0 * v1 * sin(v2)`; and in none of the 260
+real fits. The search took 0.10 s in the median (0.47 s at most) on F41,
+0.10 and 0.11 s on the real data (0.22 and 0.42 s at most). 257 of the 260
+real fits return the same expression in both arms; in the three others no
+seed was placed and the arms reached another number of generations in their
+30 s (the formula flagged inexact in E1 and not in A, `561_cpu` in its units
+fold 3, is one of them: 65 and 64 generations).
