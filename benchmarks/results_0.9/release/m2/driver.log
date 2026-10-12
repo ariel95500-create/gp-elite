@@ -1,0 +1,91 @@
+Traceback (most recent call last):
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 428, in <module>
+    main()
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 419, in main
+    drive_paired(a.python, a.out, a.pairs,
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 305, in drive_paired
+    todo = [j for j in all_jobs() if (kinds is None or j["kind"] in kinds)
+                       ^^^^^^^^^^
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 53, in all_jobs
+    import feynman_bench as F
+  File "/home/user/gp-elite/benchmarks/feynman_bench.py", line 31, in <module>
+    from gp_elite import symbolic_regression
+ModuleNotFoundError: No module named 'gp_elite'
+1775 jobs to run with 2 engines
+25 jobs done, 26 s elapsed, 1749 left
+50 jobs done, 274 s elapsed, 1724 left
+75 jobs done, 518 s elapsed, 1699 left
+100 jobs done, 842 s elapsed, 1675 left
+125 jobs done, 1114 s elapsed, 1649 left
+150 jobs done, 1521 s elapsed, 1624 left
+175 jobs done, 1852 s elapsed, 1599 left
+200 jobs done, 2180 s elapsed, 1575 left
+225 jobs done, 2521 s elapsed, 1549 left
+250 jobs done, 2940 s elapsed, 1524 left
+275 jobs done, 3344 s elapsed, 1499 left
+300 jobs done, 3760 s elapsed, 1474 left
+325 jobs done, 4165 s elapsed, 1449 left
+350 jobs done, 4404 s elapsed, 1425 left
+375 jobs done, 4600 s elapsed, 1399 left
+400 jobs done, 4790 s elapsed, 1375 left
+425 jobs done, 5043 s elapsed, 1350 left
+450 jobs done, 5078 s elapsed, 1324 left
+475 jobs done, 5310 s elapsed, 1299 left
+500 jobs done, 5556 s elapsed, 1275 left
+525 jobs done, 5841 s elapsed, 1249 left
+550 jobs done, 6248 s elapsed, 1224 left
+time slice over: 1221 jobs left for the next call
+1221 jobs to run with 2 engines
+25 jobs done, 258 s elapsed, 1195 left
+50 jobs done, 422 s elapsed, 1170 left
+75 jobs done, 822 s elapsed, 1145 left
+100 jobs done, 1249 s elapsed, 1120 left
+125 jobs done, 1650 s elapsed, 1095 left
+150 jobs done, 2073 s elapsed, 1070 left
+175 jobs done, 2483 s elapsed, 1045 left
+200 jobs done, 2871 s elapsed, 1020 left
+225 jobs done, 3286 s elapsed, 995 left
+250 jobs done, 3682 s elapsed, 970 left
+275 jobs done, 4109 s elapsed, 945 left
+300 jobs done, 4507 s elapsed, 920 left
+325 jobs done, 4767 s elapsed, 895 left
+350 jobs done, 5177 s elapsed, 870 left
+375 jobs done, 5583 s elapsed, 845 left
+400 jobs done, 5991 s elapsed, 820 left
+time slice over: 801 jobs left for the next call
+801 jobs to run with 2 engines
+25 jobs done, 425 s elapsed, 775 left
+50 jobs done, 821 s elapsed, 750 left
+75 jobs done, 1240 s elapsed, 725 left
+100 jobs done, 1640 s elapsed, 700 left
+125 jobs done, 2060 s elapsed, 675 left
+150 jobs done, 2460 s elapsed, 650 left
+175 jobs done, 2884 s elapsed, 625 left
+200 jobs done, 3277 s elapsed, 600 left
+225 jobs done, 3704 s elapsed, 575 left
+250 jobs done, 4102 s elapsed, 550 left
+275 jobs done, 4527 s elapsed, 525 left
+300 jobs done, 4926 s elapsed, 500 left
+325 jobs done, 5344 s elapsed, 475 left
+350 jobs done, 5746 s elapsed, 450 left
+375 jobs done, 6174 s elapsed, 425 left
+time slice over: 417 jobs left for the next call
+417 jobs to run with 2 engines
+25 jobs done, 426 s elapsed, 391 left
+50 jobs done, 825 s elapsed, 366 left
+75 jobs done, 1253 s elapsed, 341 left
+100 jobs done, 1653 s elapsed, 316 left
+125 jobs done, 2081 s elapsed, 291 left
+150 jobs done, 2477 s elapsed, 266 left
+175 jobs done, 2905 s elapsed, 241 left
+200 jobs done, 3302 s elapsed, 216 left
+225 jobs done, 3722 s elapsed, 191 left
+250 jobs done, 4119 s elapsed, 166 left
+275 jobs done, 4545 s elapsed, 141 left
+300 jobs done, 4943 s elapsed, 116 left
+325 jobs done, 5374 s elapsed, 91 left
+350 jobs done, 5771 s elapsed, 66 left
+375 jobs done, 6198 s elapsed, 42 left
+time slice over: 33 jobs left for the next call
+33 jobs to run with 2 engines
+25 jobs done, 423 s elapsed, 7 left

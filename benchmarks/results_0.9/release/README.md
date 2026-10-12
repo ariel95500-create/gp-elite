@@ -2,9 +2,12 @@
 
 Plan: `../PLAN_RELEASE_0.9.md`, committed before the first measurement of the
 release. Every record here is of gp-elite 0.9.0 **installed from its wheel**
-(built from commit `0ae3e9f`, SHA-256 of the wheel `999288fc…a6bd55e`) in a
-fresh environment, never of the sources, except where 0.8.0 is named: it is
-then gp-elite 0.8.0 installed from PyPI in another fresh environment.
+(built from commit `0ae3e9f`; SHA-256 of the wheel and of the source archive
+in `environments.txt`) in a fresh environment, never of the sources, except
+where 0.8.0 is named: it is then gp-elite 0.8.0 installed from PyPI in
+another fresh environment. `environments.txt` lists the packages of each
+environment: `/venv08` (0.8.0), `/venv09` (the wheel alone, for M1 and M2)
+and `/venv09x` (the wheel with the packages some scripts of M3 use).
 
 Machine: Linux, 4 cores (Intel Xeon at 2.8 GHz with AVX-512), 15 GB; Python
 3.11.15, NumPy 2.4.6, scikit-learn 1.9.1, pandas 3.0.6, and for the scripts
@@ -20,10 +23,14 @@ the other figures are.
 | `M1_compare_13_configurations.txt` | the thirteen reference configurations of `benchmarks/speed_equivalence.py` return with the wheel the same models as 0.8.0 (`../repro/default`) |
 | `M1_ii113_0.9.0.jsonl`, `M1_compare_ii113.txt` | the typed fits of Feynman II.11.3, seeds 0 to 9 (`benchmarks/phase3_bench.py`), return the same models as 0.8.0 in phase 3 (`../phase3/u0_0.8.0.jsonl`) |
 
-## M3, every public figure measured again (11 October 2026)
+## M3, every public figure of 0.8.0 measured again (11 and 12 October 2026)
 
-`m3/` holds the records of every figure quoted in `README.md`,
-`README.fr.md`, the notebooks and `paper/paper.md`, produced by
+`m3/` holds the records of the figures of `README.md`, `README.fr.md`, the
+notebooks and `paper/paper.md` that 0.8.0 had measured (the list of
+`../../results_0.8/README.md`). The figures new in 0.9.0 come from the
+records of its work (`../phase3/`, `../PLAN_TRIG.md` and the files it
+names); those that describe 0.7 or the campaigns of 0.8 are kept as they
+were measured. The records of `m3/` were produced by
 `benchmarks/release_claims/run_claims.py` in two queues side by side (the
 start of each command is in `m3/claims_queues.txt`), with the commands listed
 in `../../results_0.8/README.md`. The scripts ran from a copy of
@@ -31,8 +38,14 @@ in `../../results_0.8/README.md`. The scripts ran from a copy of
 could import the sources. The islands ran in sequence under the default
 `parallel=None`, as on the 2-core machine of the 0.8 figures, through
 `benchmarks/release_claims/sitecustomize.py`; an explicit `parallel=True`
-still ran them in parallel. `benchmarks/ab_ood.py` now passes
-`parallel=False` itself, which is the same thing.
+still ran them in parallel. The scripts behind these figures, the README
+example that prints a model and the notebook cells whose output the text
+quotes now pass `parallel=False` themselves, which is the same thing: run
+again without the switch, they give the same records (`m3_rerun/`, with
+`run_info.txt`). With the islands in parallel, the default from four cores,
+the README example returns another model, an approximation of R² 0.99998,
+while the law of Kepler comes back the same
+(`m3_rerun/parallel_islands/`).
 
 **What is the same as for 0.8.0.** Every law, formula, error, size and count
 of the records: Feynman 15 (12/15 exact, 13/15 within 1e-3), the three angle
@@ -55,13 +68,14 @@ the notebook snippets, the missing or infinite values and Nikuradse.
   114 s per run (median) for its three arms, against 21 s, 149 s and 84 s.
 - `time_limit=`: for a 15 s budget the fits end at 17.4 s in sequence and
   17.6 s in parallel (`m3/time_limit_check.txt`, 13 of 16 checks), and at
-  17.0 s and 17.5 s when run again (`m3/time_limit_check_rerun.txt`, 15 of
-  16). gp-elite 0.8.0 on this machine ends at 17.5 s and 17.6 s
-  (`m3/time_limit_check_0.8.0_rerun.txt`, 14 of 16): the checks that fail
-  bound the overrun at one generation plus one second (two seconds for the
-  check of three restarts), and the final
-  selection takes longer on this machine whatever the version. The README
-  now says two to three seconds instead of under two.
+  17.7 s and 17.1 s when run again alone (`m3_rerun/time_limit_check_0.9.0.txt`,
+  15 of 16). gp-elite 0.8.0, run just before it on this machine, ends at
+  17.2 s and 17.2 s (`m3_rerun/time_limit_check_0.8.0.txt`, 15 of 16). The
+  checks that fail bound the overrun at one generation plus one second (two
+  seconds for the check of three restarts); the overrun, the generation under
+  way and the final selection, is longer on this machine whatever the
+  version. The README now says two to three seconds instead of under two,
+  and 17.0 to 17.7 s.
 - The battery example: the random forest it compares with gives R² −2.521 on
   the forward split with scikit-learn 1.9.1, against −2.515 with
   scikit-learn 1.8; the figures of gp-elite and of XGBoost are unchanged.
@@ -79,7 +93,9 @@ phase 1 (F41, F41 with 1 % and 10 % noise, R6, R7raw, and the frozen test set
 TF78, TS14, TR25, TR25raw: 1,775 fits per version, budget T of 30 s per fit),
 run by `benchmarks/phase1_bench.py run-paired`, each job started with both
 versions at the same time, two jobs at a time, from 20:44 on 11 October to
-03:55 on 12 October, in four time slices (the bench resumes). No crash.
+03:55 on 12 October, in five time slices (the bench resumes;
+`m2/driver.log`, which also shows a first start that stopped at once,
+before any fit, because its driver could not import the package). No crash.
 `m2/tables_*.md` are the tables of `benchmarks/phase1_report.py` for each
 version; `m2/compare.txt` the comparison and the criteria of the plan
 (`benchmarks/release_claims/compare_m2.py`).

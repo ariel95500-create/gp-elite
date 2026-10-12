@@ -1,12 +1,13 @@
-  [FAIL] sequentiel : arret a l'echeance              T=15s duree=17.5s (1 gen = 1.3s)
+# 2026-10-12 05:27:22 UTC; 0.9.0 /venv09x/lib/python3.11/site-packages/gp_elite/__init__.py; command: PYTHONHASHSEED=0 python -W ignore benchmarks/time_limit_check.py (no other measurement running)
+  [FAIL] sequentiel : arret a l'echeance              T=15s duree=17.7s (1 gen = 1.0s)
   [PASS] sequentiel : modele valide rendu             R2=0.9995
   [PASS] sequentiel : time_limit_reached = True       
-  [FAIL] parallele : arret a l'echeance               T=15s duree=17.6s (1 gen = 1.3s)
+  [PASS] parallele : arret a l'echeance               T=15s duree=17.1s (1 gen = 1.1s)
   [PASS] parallele : modele valide rendu              R2=0.9992
   [PASS] parallele : time_limit_reached = True        
   [PASS] budget genereux : non atteint                
   [PASS] budget genereux : resultat identique         
-  [PASS] 3 redemarrages dans 24 s                     duree=26.6s, lances=3
+  [PASS] 3 redemarrages dans 24 s                     duree=26.4s, lances=3
   [PASS] 3 redemarrages : tous lances                 
   [PASS] drapeau non transmis au fit suivant          
   [PASS] time_limit=0 rejete                          
@@ -15,4 +16,4 @@
   [PASS] time_limit=inf rejete                        
   [PASS] GPEliteRegressor : diagnostic expose         
 
-BILAN : 14/16
+BILAN : 15/16

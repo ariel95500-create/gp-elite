@@ -190,7 +190,8 @@ with contextlib.redirect_stdout(io.StringIO()):
     m = symbolic_regression(X[tr], y[tr], feature_names=feats,
                             operators="physical", normalize=norm,
                             generations=gens, speed="fast",
-                            validation_split=0.15, seed=0, restarts=4)
+                            validation_split=0.15, seed=0, restarts=4,
+                            parallel=False)
 dt = time.time() - t0
 
 def r2(e):
@@ -278,7 +279,8 @@ if mask_out.sum() > 0:
         m2 = symbolic_regression(Xin, yin, feature_names=feats,
                                  operators="physical", normalize=norm,
                                  generations=gens, speed="fast",
-                                 validation_split=0.15, seed=0, restarts=4)
+                                 validation_split=0.15, seed=0, restarts=4,
+                                 parallel=False)
     def r2o(e):
         return 1 - np.mean((e.predict(Xout) - yout)**2) / np.var(yout)
     rows2, seen2 = [], set()

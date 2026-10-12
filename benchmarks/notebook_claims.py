@@ -17,7 +17,8 @@ def kepler30():
     period   = np.array([0.241, 0.615, 1.000, 1.881, 11.862, 29.457, 84.011, 164.79])
     t0 = time.time()
     result = symbolic_regression(distance.reshape(-1, 1), period, feature_names=['distance'],
-                                 operators='physical', generations=30, speed='fast', seed=0)
+                                 operators='physical', generations=30, speed='fast', seed=0,
+                                 parallel=False)
     print(result.expression, " (%.0fs)" % (time.time() - t0))
 
 def hooke():
@@ -25,7 +26,7 @@ def hooke():
     elongation = rng.uniform(0.01, 0.10, 150).reshape(-1, 1)
     force = 250.0 * elongation[:, 0]
     est = GPEliteRegressor(units=['m'], target_units='N', unknown_constant=True,
-                           generations=25, speed='fast', random_state=0)
+                           generations=25, speed='fast', random_state=0, parallel=False)
     est.fit(elongation, force)
     print('deduced units :', est.constant_units_string())
     print('deduced value :', round(est.constant_value_, 4))
@@ -38,7 +39,8 @@ def coulomb():
     X = np.column_stack([q1, q2, eps, r]); y = q1 * q2 / (4 * np.pi * eps * r**2)
     t0 = time.time()
     model = symbolic_regression(X, y, feature_names=["q1", "q2", "eps", "r"], operators="physical",
-                                normalize="none", generations=25, speed="fast", restarts=3, seed=0)
+                                normalize="none", generations=25, speed="fast", restarts=3, seed=0,
+                                parallel=False)
     print(f"found in {time.time()-t0:.0f} s")
     print("equation :", model.expression)
     print("1/(4*pi) =", round(1/(4*np.pi), 6))
@@ -50,7 +52,7 @@ def torque():
     def run(label, **extra):
         t0 = time.time()
         m = symbolic_regression(X2, y2, feature_names=["r", "F", "theta"], operators="trig",
-                                normalize="none", generations=25, speed="fast", restarts=3, seed=0, **extra)
+                                normalize="none", generations=25, speed="fast", restarts=3, seed=0, parallel=False, **extra)
         err = np.mean((m.predict(X2) - y2)**2) / np.var(y2)
         print(f"{label:<22} {time.time()-t0:5.0f} s   error={err:.1e}   size={m.size}")
         print(f"{'':22} {m.expression}")
@@ -64,17 +66,18 @@ def optionB():
     energy   = [3.0, 4.5, 6.0, 11.25, 13.5, 15.75, 24.0, 27.0, 37.5, 41.25]
     Xu = np.column_stack([pressure, volume]); yu = np.asarray(energy, dtype=float)
     model = symbolic_regression(Xu, yu, feature_names=["pressure", "volume"], operators="physical",
-                                generations=30, speed="fast", restarts=4, seed=0)
+                                generations=30, speed="fast", restarts=4, seed=0,
+                                parallel=False)
     print("equation:", model.expression)
 
 def tp():
     rng = np.random.RandomState(0); x = rng.uniform(-3, 3, 200)
     X, y = np.column_stack([x]), x * np.sin(x**2) * np.cos(x/2)
-    res = symbolic_regression(X, y, feature_names=['x'], operators='full', generations=40, speed='fast', seed=0)
+    res = symbolic_regression(X, y, feature_names=['x'], operators='full', generations=40, speed='fast', seed=0, parallel=False)
     print("TP loi :", res.expression)
     for g in (10, 30, 60):
         t = time.time()
-        r = symbolic_regression(X, y, feature_names=['x'], operators='full', generations=g, speed='fast', seed=0)
+        r = symbolic_regression(X, y, feature_names=['x'], operators='full', generations=g, speed='fast', seed=0, parallel=False)
         print(f'{g:>3} generations : MSE = {np.mean((y - r.predict(X))**2):.3e}   taille = {r.size:<3} ({time.time()-t:.0f} s)')
 
 def nikuradse():
@@ -85,7 +88,8 @@ def nikuradse():
     print("PvK R2 = %.4f" % (1 - np.mean((pvk(Xn[:, 0]) - yn)**2) / np.var(yn)))
     t0 = time.time()
     m = symbolic_regression(Xn, yn, feature_names=["r_k", "log_Re"], operators="physical",
-                            normalize="none", generations=30, speed="fast", restarts=2, seed=0)
+                            normalize="none", generations=30, speed="fast", restarts=2, seed=0,
+                            parallel=False)
     print(f"searched for {time.time()-t0:.0f} s")
     r2 = lambda e: 1 - np.mean((e.predict(Xn) - yn)**2) / np.var(yn)
     print("size  R2      formula_exact  expression")

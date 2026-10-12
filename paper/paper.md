@@ -242,7 +242,8 @@ regression was verified by comparing fits before and after each change on a
 fixed set of seeds. The benchmark figures quoted in this paper were produced
 with the scripts in the repository, whose raw results, machine and dates are
 recorded in `benchmarks/results_0.8/` and, for the figures of version 0.9.0,
-in `benchmarks/results_0.9/release/`, and the project's test suite passes on
+in `benchmarks/results_0.9/` (`phase3/` and `release/`), and the project's test
+suite passes on
 the released version. The scientific claims and
 their stated limits are the author's own, as is responsibility for the whole.
 

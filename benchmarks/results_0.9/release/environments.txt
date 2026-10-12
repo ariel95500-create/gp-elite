@@ -1,0 +1,55 @@
+# SHA-256 of the release files built from commit 0ae3e9f (python -m build), 11 October 2026
+999288fc5253a367009d55b0db44978298b942794b7a096dea21490b9a6bd55e  gp_elite-0.9.0-py3-none-any.whl
+eabc5531b937564cb15d014817ca5fb9b196572c2e50d48bcad8b0533dc0d86b  gp_elite-0.9.0.tar.gz
+
+# /venv08: Python 3.11.15 — pip freeze
+cloudpickle==3.1.2
+gp-elite==0.8.0
+joblib==1.6.0
+narwhals==2.27.1
+numpy==2.4.6
+pandas==3.0.6
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+six==1.17.0
+threadpoolctl==3.7.0
+
+# /venv09: Python 3.11.15 — pip freeze
+cloudpickle==3.1.2
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist09/gp_elite-0.9.0-py3-none-any.whl#sha256=999288fc5253a367009d55b0db44978298b942794b7a096dea21490b9a6bd55e
+joblib==1.6.0
+narwhals==2.27.1
+numpy==2.4.6
+pandas==3.0.6
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+six==1.17.0
+threadpoolctl==3.7.0
+
+# /venv09x: Python 3.11.15 — pip freeze
+cloudpickle==3.1.2
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.66.1
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist09/gp_elite-0.9.0-py3-none-any.whl#sha256=999288fc5253a367009d55b0db44978298b942794b7a096dea21490b9a6bd55e
+gplearn==0.4.3
+joblib==1.6.0
+kiwisolver==1.5.1
+matplotlib==3.11.2
+mpmath==1.3.0
+narwhals==2.27.1
+numpy==2.4.6
+nvidia-nccl-cu12==2.32.3
+packaging==26.3
+pandas==3.0.6
+pillow==12.3.0
+pyparsing==3.3.3
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+six==1.17.0
+sympy==1.14.0
+threadpoolctl==3.7.0
+xgboost==3.2.0

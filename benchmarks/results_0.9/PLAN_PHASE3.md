@@ -171,7 +171,8 @@ before this phase: the machine has four cores like the one of phases 1, 2
 and 4, but an Intel Xeon at 2.8 GHz with AVX-512 (that one ran at 2.1 GHz),
 with the same Python 3.11.15, NumPy 2.4.6 and scikit-learn 1.9.1. Before U0,
 gp-elite 0.8.0 installed from PyPI returned on it the same models as on that
-machine for the thirteen reference configurations.
+machine for the thirteen reference configurations
+(`compare_E0_0.8.0_this_machine.txt`, models in `equiv_0.8.0_this_machine/`).
 
 ### U0, gp-elite 0.8.0 (`u0_0.8.0.jsonl`)
 
@@ -185,7 +186,8 @@ the README); those runs stop on the law after 5, 22, 8 and 14 generations,
 the six others go through the 40. Per seed, a typed generation cost 8.47
 times an untyped one (median; worst 13.67). This machine is slower per fit
 than the 2-core container of 0.8: 0.605 s per untyped generation against
-about 0.5 s, hence 180 s for the 149 s of the README.
+0.53 s (21 s for 40 generations in the README table), and the typed median
+of U0, 179.6 s, against the 149 s of the README.
 
 ### Profile (`profile_0.8.0_typed_seed0.txt`)
 
@@ -193,7 +195,8 @@ Under the profiler, the typed fit of seed 0 took 519 s, of which 448 s in
 `typed_mutate`, almost all of it in `_build` (8.1 million calls for 8,745
 mutations): 244 s computing the keys of dimension dicts (56 million calls,
 most of them for the features, the same at every call) and 125 s testing
-reachability (553,000 least-squares solves), the rest building the trees.
+reachability (553,000 least-squares solves, and keys of their own: the two
+times overlap).
 The crossover took 14 s and the validity gate 5 s; among the steps the
 untyped search shares, the fitting of constants by Levenberg-Marquardt took
 16 s, the simplification 12 s and the fitness 9 s. The

@@ -118,6 +118,7 @@ if __name__ == "__main__":        # needed in scripts, see the note below
         generations=60,
         speed="fast",             # 'ultrafast' | 'fast' | 'normal' | 'thorough'
         seed=0,
+        parallel=False,           # the same model on every machine, see below
     )
     print(result.expression)      # 2 + 3 * sqrt(a) - 0.5 * b
     print(result.r2_validation)   # 1.0
@@ -138,9 +139,9 @@ guarantee.
   exact law; with twice the default number of generations, it is slower, and not
   guaranteed to do better.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
-  best model found so far, instead of being killed without a result; the final
-  selection that follows adds a little (two to three seconds for a 15 s budget in
-  our measurements: 17.0 to 17.6 s on 3,000 rows).
+  best model found so far, instead of being killed without a result; the
+  generation under way and the final selection add a little (two to three seconds
+  for a 15 s budget in our measurements: 17.0 to 17.7 s on 3,000 rows).
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
 
@@ -169,7 +170,10 @@ in parallel worker processes. Those workers are started with `spawn` on every
 system (Linux included) and re-import your script, so keep the top-level code
 under `if __name__ == "__main__":`, as above.
 Without the guard GP_ELITE detects the situation, finishes on one core with the
-same result, and says so once. Notebooks need nothing.
+islands in sequence, and says so once; the islands in sequence take another path
+than in parallel, so the model can differ. Hence `parallel=False` in the example
+above: with the islands in parallel (the default from four cores) it returns
+another model, an approximation of R² 0.99998. Notebooks need nothing.
 
 ### Reading the result
 

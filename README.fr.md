@@ -125,6 +125,7 @@ if __name__ == "__main__":        # nécessaire dans un script, voir la note plu
         generations=60,
         speed="fast",             # 'ultrafast' | 'fast' | 'normal' | 'thorough'
         seed=0,
+        parallel=False,           # le même modèle sur toute machine, voir plus bas
     )
     print(resultat.expression)      # 2 + 3 * sqrt(a) - 0.5 * b
     print(resultat.r2_validation)   # 1.0
@@ -146,8 +147,9 @@ exacte, sans garantie.
   lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  sélection finale qui suit ajoute un peu (deux à trois secondes pour un budget
-  de 15 s dans nos mesures : 17,0 à 17,6 s sur 3 000 lignes).
+  génération en cours et la sélection finale ajoutent un peu (deux à trois
+  secondes pour un budget de 15 s dans nos mesures : 17,0 à 17,7 s sur 3 000
+  lignes).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 
@@ -179,7 +181,11 @@ tournent dans des processus parallèles. Ces processus sont démarrés en mode
 `spawn` sur tous les systèmes (Linux compris) et ré-importent votre script :
 gardez le code de premier niveau sous
 `if __name__ == "__main__":`, comme ci-dessus. Sans cette garde, GP_ELITE détecte
-la situation, termine sur un cœur avec le même résultat, et le signale une fois.
+la situation, termine sur un cœur avec les îles en séquence, et le signale une
+fois ; les îles en séquence suivent un autre chemin qu'en parallèle, et le modèle
+peut différer. D'où `parallel=False` dans l'exemple ci-dessus : avec les îles en
+parallèle (le défaut dès quatre cœurs), il rend un autre modèle, une approximation
+de R² 0,99998.
 Rien à faire dans un notebook.
 
 ### Lire le résultat
