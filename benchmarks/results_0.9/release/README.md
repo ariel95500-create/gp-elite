@@ -103,3 +103,12 @@ instead of 88, 66 and 62 structures instead of 70 and 67, 144 on TF78
 instead of 145, and a median R² of 0.747 on the TR25 folds instead of 0.766,
 with the same engine. Under a time budget the figures depend on the machine;
 the comparison of versions is the paired one above.
+
+## M4, tests (12 October 2026)
+
+`M4_wheel_tests.txt`: the test suite against the wheel installed in a fresh
+environment, 142 passed under Python 3.9.23, 3.11.15 and 3.14.0rc2 (the 3.14
+build uv provides here), each importing the installed package; `twine check`
+passes for the wheel and the source archive. The **Tests** workflow of the
+repository (Linux, Python 3.9 to 3.14; Windows, 3.12 and 3.14) is green on
+the release commit `0ae3e9f` and on every later commit of the branch.
