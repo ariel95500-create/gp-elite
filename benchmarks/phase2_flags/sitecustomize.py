@@ -1,6 +1,8 @@
 """Sets the phase 2 flags of gp_elite.core in every Python process started
 with this directory first on PYTHONPATH (benchmarks/speed_equivalence.py
-runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b, S2, T1, A1 or B1.
+runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b, S2, T1, A1, B1 or noB1
+(B1 is on by default since its adoption; its mechanics ran at commit 273061b,
+where A had it off).
 With GP_ELITE_TRACE_LOG, each process appends its check counters there. The
 flags exist in the engine at commit 0038a29 only (PLAN_PHASE2.md, decision).
 
@@ -43,10 +45,10 @@ if _arm:
         raise SystemExit("the flag of A1 is not in this engine: run from commit 878fd47")
     if hasattr(_C, "_ARG_MUT"):
         _C._ARG_MUT = _arm == "A1"
-    if _arm == "B1" and not hasattr(_C, "_BINOMIAL_SEEDS"):
+    if _arm in ("B1", "noB1") and not hasattr(_C, "_BINOMIAL_SEEDS"):
         raise SystemExit("the flag of B1 is not in this engine")
-    if hasattr(_C, "_BINOMIAL_SEEDS"):            # PLAN_PHASE4.md, change B1
-        _C._BINOMIAL_SEEDS = _arm == "B1"
+    if _arm in ("B1", "noB1"):                    # PLAN_PHASE4.md, change B1,
+        _C._BINOMIAL_SEEDS = _arm == "B1"         # on by default since its adoption
 
     def _log():
         path = os.environ.get("GP_ELITE_TRACE_LOG")

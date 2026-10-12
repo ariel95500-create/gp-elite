@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+Measured on the decision bench, not yet on the frozen test set; the figures
+of the README describe 0.9.0 until the next release.
+
+### More laws recovered
+- Laws that are a monomial times a power of a binomial,
+  y = b·f·(1 + c·g)^p with p one of −1, −½, ½, 1, are fitted directly and
+  seed the search: rational laws such as om0/(1 − v/c) or
+  q·Ef/(m·(w0² − w²)), the factor 1/√(1 − v²/c²), the square root of a sum of
+  two terms. Once the binomial is known such a law is a straight line in log
+  scale; for each candidate g the constant c is searched in one dimension and
+  the exponents of f follow by least squares. The seed is placed only when the
+  form holds to numerical precision, so on real or noisy data nothing
+  changes. On the 41 equations of the decision bench with five seeds, at 30 s
+  per fit, the exact law is recovered 124 times in 205 instead of 86 (126
+  instead of 86 on five seeds never run); the families of rational laws and
+  of roots, never recovered by 0.8.0 or 0.9.0, reach 35 of their 40 fits,
+  each in less than a second. No seed was placed on any of the 260 fits on
+  real data, whose results are those of 0.9.0
+  (`benchmarks/results_0.9/PLAN_PHASE4.md`, change B1).
+
 ## 0.9.0 — "Steady"
 
 This release makes the search with `units=` faster with the same models

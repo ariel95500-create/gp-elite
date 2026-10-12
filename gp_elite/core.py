@@ -4312,9 +4312,12 @@ def _make_power_law_seeds(xs, ys, cfg) -> list:
 # loi exactement, données réelles et bruitées comprises, rien n'est injecté
 # et l'ajustement est celui d'avant. Aucun tirage aléatoire. Mêmes gardes que
 # les graines de loi de puissance. Mesuré dans benchmarks/results_0.9/
-# PLAN_PHASE4.md (changement B1) ; drapeau coupé par défaut.
+# PLAN_PHASE4.md (changement B1, adopté le 12 octobre 2026) : banc de
+# décision, lois exactes 86 -> 124 sur 205 (familles rationnelle et racine
+# 0 -> 35 sur 90), puis 86 -> 126 sur des graines neuves ; données réelles
+# inchangées (aucune graine injectée sur les 260 ajustements réels).
 
-_BINOMIAL_SEEDS = False
+_BINOMIAL_SEEDS = True
 _BINOM_EXPS = (-2, -1, 1, 2)          # exposants des colonnes dans g
 _BINOM_TOL = 1e-12                    # variance résiduelle de log t, relative
 _BINOM_MAX_LIB = 4096                 # monômes g essayés au plus
@@ -4471,7 +4474,8 @@ def _monomial(terms, pairs, uops) -> Optional["Node"]:
 
 
 def _make_binomial_seeds(xs, ys, cfg) -> list:
-    """[0.10, phase 4b] Voir le commentaire ci-dessus. Rend 0 à 4 arbres."""
+    """[0.10, phase 4b] Voir le commentaire ci-dessus. Rend 0 à 4 arbres.
+    Le drapeau _BINOMIAL_SEEDS (actif par défaut) les coupe."""
     if not _BINOMIAL_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []

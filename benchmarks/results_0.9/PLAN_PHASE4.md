@@ -402,3 +402,41 @@ The gain is concentrated on the equations the change was built for, found
 by a prototype on the training rows of this bench: whether laws of this
 shape elsewhere are recovered as well, the frozen test set will say, once,
 with the version.
+
+### Confirmation of B1 on new seeds, result (12 October 2026)
+
+Run from 14:17 to 15:24 UTC, 670 fits, 335 complete pairs, no crash
+(`confirm_B1.jsonl`; `python benchmarks/phase2_bench.py summary confirmb1
+benchmarks/results_0.9/confirm_B1.jsonl`), seeds 5 to 9 never run on this
+bench.
+
+1. F41 exact: 86 in A, **126 in B1** (+40, at least +5 required); the five
+   families at zero 0 in A, 36 in B1: the same eight equations at all five
+   seeds (`I.27.6` from 1), and `I.50.26` once (seed 7, a trigonometric law
+   on which no seed was placed: the run-to-run variation of the search).
+   **Holds.**
+2. Folds: median paired difference +0.0000. **Holds.**
+3. Out of domain: collapses 17 in both arms. **Holds.**
+
+**B1 is confirmed and adopted.** Again a seed was placed in exactly 40 F41
+fits, each exact at the first generation (1 s at most), and in none of the
+130 real fits; 127 of these return the same expression in both arms, the
+three others reaching another number of generations in their 30 s.
+
+The flag `_BINOMIAL_SEEDS` is now on by default. With it on, the thirteen
+reference configurations are still identical to the 0.9.0 wheel
+(`phase4_mechanics/compare_0.9.0_vs_B1_default.txt`, none of them has such a
+form) and the test suite passes (145 tests,
+`phase4_mechanics/tests_B1_default.txt`). The campaign and the confirmation
+can be run again from this commit (`campaignb1`, `confirmb1`: arm A turns
+the flag off); in every other run, arm A is the engine as it stands, B1
+included. The frozen test set is measured with the next version.
+
+### Where phase 4 stands
+
+The target of gate 2 for the five families at zero, at least 20 of 90 with
+the gain confirmed on seeds 5 to 9, is met by B1 alone: 35 of 90, then 36 on
+the new seeds. What remains at zero: the trigonometric laws (where the
+measurements of 4a stand), the exponentials and the logarithm, and
+`III.10.19` (a root of a sum of three squares). Next in the plan: 4c,
+columns of order one left as given.

@@ -20,7 +20,9 @@ Usage, from the repository root:
   (trial3/campaign3: the same with F3, trial3r/campaign3r with F3R;
   run accepts --max-seconds)
 Phase 4b (PLAN_PHASE4.md, change B1): campaignb1 and confirmb1, arms A and B1,
-the engine of this checkout with the flag _BINOMIAL_SEEDS off or on.
+the engine of this checkout with the flag _BINOMIAL_SEEDS off or on. B1 was
+adopted on 12 October 2026 and the flag is on by default since: in every
+other run, arm A is the engine as it stands, B1 included.
 """
 import argparse
 import json
@@ -185,8 +187,10 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "retestt1": (t1_retest_jobs, ("A", "T1")),
         "campaigna1": (campaign_jobs, ("A", "A1")),
         "confirma1": (confirm_s1_jobs, ("A", "A1")),
-        "campaignb1": (campaign_jobs, ("A", "B1")),
-        "confirmb1": (confirm_s1_jobs, ("A", "B1"))}
+        "campaignb1": (lambda: [dict(j, b1=True) for j in campaign_jobs()],
+                       ("A", "B1")),
+        "confirmb1": (lambda: [dict(j, b1=True) for j in confirm_s1_jobs()],
+                      ("A", "B1"))}
 
 
 def key(j):
@@ -227,8 +231,8 @@ def run_arm(job):
         C._ARG_MUT = job["arm"] == "A1"
     if job["arm"] == "B1" and not hasattr(C, "_BINOMIAL_SEEDS"):
         sys.exit("the flag of B1 is not in this engine")
-    if hasattr(C, "_BINOMIAL_SEEDS"):             # PLAN_PHASE4.md, change B1
-        C._BINOMIAL_SEEDS = job["arm"] == "B1"
+    if job.get("b1"):                             # PLAN_PHASE4.md, change B1:
+        C._BINOMIAL_SEEDS = job["arm"] == "B1"    # A without it, B1 with it
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
         import gp_elite
         _sr0 = gp_elite.symbolic_regression

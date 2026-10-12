@@ -1238,11 +1238,12 @@ def test_polish_extras_stop_after_the_time_budget(monkeypatch):
     assert min(c[0] for c in core._VAL_CANDS) < 1e-20 * np.var(y)
 
 
-# ── 21. A monomial times a power of a binomial (phase 4b, flag off) ────────
-# Change B1 of benchmarks/results_0.9/PLAN_PHASE4.md, measured before any
-# adoption: y = b·f·(1 + c·g)^p, p in {-1, -1/2, 1/2, 1}, is a straight line
-# in log scale once the binomial is known. The seed is injected only when the
-# form holds to numerical precision, and only with the flag on.
+# ── 21. A monomial times a power of a binomial is seeded (phase 4b) ────────
+# Change B1 of benchmarks/results_0.9/PLAN_PHASE4.md, adopted on 12 October
+# 2026: y = b·f·(1 + c·g)^p, p in {-1, -1/2, 1/2, 1}, is a straight line in
+# log scale once the binomial is known. The seed is injected only when the
+# form holds to numerical precision (on the decision bench, exact laws 86 to
+# 124 of 205, no seed on any real dataset).
 
 def _binom_cfg(n):
     cfg = core.Config()
@@ -1252,7 +1253,6 @@ def _binom_cfg(n):
 
 def test_binomial_forms_found_exactly(monkeypatch):
     _set_pool(monkeypatch, "physical")
-    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", True)
     rng = np.random.RandomState(0)
     Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140),
                rng.uniform(3, 10, 140)]
@@ -1275,10 +1275,11 @@ def test_binomial_seed_only_where_it_applies(monkeypatch):
                rng.uniform(3, 10, 140)]
     y = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
     cfg = _binom_cfg(3)
-    # the flag is off by default: nothing is injected
+    # on by default; the flag turns it off
+    assert len(core._make_binomial_seeds(Xr, y, cfg)) == 1
+    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", False)
     assert core._make_binomial_seeds(Xr, y, cfg) == []
     monkeypatch.setattr(core, "_BINOMIAL_SEEDS", True)
-    assert len(core._make_binomial_seeds(Xr, y, cfg)) == 1
     # 1 % noise: the form no longer holds to numerical precision
     noisy = y * (1 + 0.01 * rng.randn(140))
     assert core._binomial_forms(Xr, noisy) == []
@@ -1291,8 +1292,7 @@ def test_binomial_seed_only_where_it_applies(monkeypatch):
     assert core._make_binomial_seeds(Xr, y, cfg) == []
 
 
-def test_binomial_law_recovered_in_a_short_fit(monkeypatch):
-    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", True)
+def test_binomial_law_recovered_in_a_short_fit():
     rng = np.random.RandomState(2)
     Xr = np.c_[rng.uniform(1, 3, 200), rng.uniform(1, 3, 200),
                rng.uniform(1, 3, 200), rng.uniform(3, 5, 200),
