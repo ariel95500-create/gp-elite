@@ -30,3 +30,5 @@ reported 19 findings. Each is corrected or answered below.
 Outside the scope of figures, the review noted that `CITATION.cff` still said
 version 0.8.0: it now says 0.9.0, dated 12 October 2026, to be set to the day
 of publication.
+
+Gate 3 (12 October 2026): the author kept his TP note as written and left the correction of the engine warning to the next version (`../PLAN_RELEASE_0.9.md`).

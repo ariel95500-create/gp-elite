@@ -103,3 +103,20 @@ the working branch, a pull request to `main` that the author merges with
 "Create a merge commit", then the author publishes on PyPI and creates the
 release v0.9.0 on GitHub, with written instructions. Claude never publishes
 on PyPI and never handles its credentials.
+
+## Gate 3, decided by the author on 12 October 2026
+
+After reading the measurements (`release/README.md`) and the two reviews
+(`release/M5_review1.md`, `release/M5_review2.md`), the author decided:
+
+1. 0.9.0 is published.
+2. The warning the engine prints when parallel islands cannot start ("results
+   are identical, only slower", untrue of the model) is corrected in the next
+   version, so that the published 0.9.0 is the package measured here.
+3. His note in the TP notebook (4 problems, 15 datasets, p ≈ 0.24) stays as
+   written.
+4. The name of the version is "Steady".
+
+The package code of the release commit `0ae3e9f` is unchanged in the
+branch submitted for merging (`gp_elite/` and `pyproject.toml`); the commits
+after it change documentation, benchmark scripts and records only.

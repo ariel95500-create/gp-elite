@@ -33,3 +33,5 @@ islands cannot start (no `if __name__ == "__main__":` guard) says "results
 are identical, only slower", which is not true of the model (the islands in
 sequence take another path). It is text of the engine, in the wheel that was
 measured; changing it is left to the author at gate 3.
+
+Gate 3 (12 October 2026): the author kept his TP note as written and left the correction of the engine warning to the next version (`../PLAN_RELEASE_0.9.md`).
