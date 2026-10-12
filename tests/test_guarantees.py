@@ -1236,3 +1236,70 @@ def test_polish_extras_stop_after_the_time_budget(monkeypatch):
     core._track_val_candidate(t)
     core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
     assert min(c[0] for c in core._VAL_CANDS) < 1e-20 * np.var(y)
+
+
+# ── 21. A monomial times a power of a binomial (phase 4b, flag off) ────────
+# Change B1 of benchmarks/results_0.9/PLAN_PHASE4.md, measured before any
+# adoption: y = b·f·(1 + c·g)^p, p in {-1, -1/2, 1/2, 1}, is a straight line
+# in log scale once the binomial is known. The seed is injected only when the
+# form holds to numerical precision, and only with the flag on.
+
+def _binom_cfg(n):
+    cfg = core.Config()
+    cfg.TERMINALS = ["X[%d]" % i for i in range(n)]
+    return cfg
+
+
+def test_binomial_forms_found_exactly(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", True)
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140),
+               rng.uniform(3, 10, 140)]
+    Xs = Xr / np.abs(Xr).max(axis=0)          # normalize="auto"
+    cases = ((Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2]), -1.0),            # I.34.1
+             (Xr[:, 0] / np.sqrt(1 - Xr[:, 1] ** 2 / Xr[:, 2] ** 2), -0.5),
+             (np.sqrt(Xr[:, 0] ** 2 + 2.0 * Xr[:, 1] ** 2), 0.5))
+    for y, p in cases:
+        forms = core._binomial_forms(Xs, y)
+        assert [f[0] for f in forms] == [p]
+        seeds = core._make_binomial_seeds(Xs, y, _binom_cfg(3))
+        assert len(seeds) == 1
+        assert _scaled_residual(seeds[0], Xs, y) < 1e-20
+
+
+def test_binomial_seed_only_where_it_applies(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140),
+               rng.uniform(3, 10, 140)]
+    y = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    cfg = _binom_cfg(3)
+    # the flag is off by default: nothing is injected
+    assert core._make_binomial_seeds(Xr, y, cfg) == []
+    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", True)
+    assert len(core._make_binomial_seeds(Xr, y, cfg)) == 1
+    # 1 % noise: the form no longer holds to numerical precision
+    noisy = y * (1 + 0.01 * rng.randn(140))
+    assert core._binomial_forms(Xr, noisy) == []
+    # a power law is left to the power-law seeds
+    assert core._binomial_forms(Xr, Xr[:, 0] * Xr[:, 1] ** 2) == []
+    # a target that changes sign: nothing
+    assert core._binomial_forms(Xr, y - np.median(y)) == []
+    # under units= the typed population is left alone
+    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}, 2: {"s": 1}}
+    assert core._make_binomial_seeds(Xr, y, cfg) == []
+
+
+def test_binomial_law_recovered_in_a_short_fit(monkeypatch):
+    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", True)
+    rng = np.random.RandomState(2)
+    Xr = np.c_[rng.uniform(1, 3, 200), rng.uniform(1, 3, 200),
+               rng.uniform(1, 3, 200), rng.uniform(3, 5, 200),
+               rng.uniform(1, 2, 200)]
+    y = Xr[:, 0] * Xr[:, 1] / (Xr[:, 2] * (Xr[:, 3] ** 2 - Xr[:, 4] ** 2))
+    r = symbolic_regression(Xr[:140], y[:140], generations=5, seed=0,
+                            parallel=False)
+    pred = r.predict(Xr[140:])
+    assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
+    assert r.formula_exact

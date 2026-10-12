@@ -380,6 +380,7 @@ import bisect
 import math
 import struct
 import hashlib
+import itertools
 import operator
 import weakref
 import random
@@ -4291,6 +4292,223 @@ def _make_power_law_seeds(xs, ys, cfg) -> list:
         TRACE.set("power_law_seed", "exposants %s ; %d graine(s) : %s" % (
             ", ".join("%s^%.3g" % (terms[j], float(a)) for j, a in zip(cols, expo)),
             len(seeds), " | ".join(to_string(s) for s in seeds)))
+    return seeds
+
+
+# ════════════════════════════════════════════════════════════════
+# [0.10, phase 4b] GRAINES « MONÔME FOIS PUISSANCE D'UN BINÔME »
+# ════════════════════════════════════════════════════════════════
+# Constat (base de la 0.8.0, banc de décision) : les familles rationnelle et
+# racine ne sont jamais retrouvées (0 sur 40 ajustements), alors que leurs
+# lois ont une forme commune, y = b·f·(1 + c·g)^p, f et g des monômes des
+# variables, p dans {-1, -1/2, 1/2, 1} : om0/(1 - v/c), m/sqrt(1 - v²/c²),
+# sqrt(om²/c² - pi²/d²). Le binôme connu, c'est une droite en échelle log :
+# log|y| - p·log(1 + c·g) = log|b| + Σ e_j·log|x_j|. Pour chaque monôme g
+# d'une à trois colonnes (exposants -2, -1, 1, 2), c se cherche sur une
+# dimension et les exposants de f suivent par moindres carrés, comme les
+# graines de loi de puissance. La forme n'est injectée que si elle tient à la
+# précision numérique (variance résiduelle de log|y| sous 1e-12 de sa
+# variance, exposants arrondis) : sur des données qui ne suivent pas une telle
+# loi exactement, données réelles et bruitées comprises, rien n'est injecté
+# et l'ajustement est celui d'avant. Aucun tirage aléatoire. Mêmes gardes que
+# les graines de loi de puissance. Mesuré dans benchmarks/results_0.9/
+# PLAN_PHASE4.md (changement B1) ; drapeau coupé par défaut.
+
+_BINOMIAL_SEEDS = False
+_BINOM_EXPS = (-2, -1, 1, 2)          # exposants des colonnes dans g
+_BINOM_TOL = 1e-12                    # variance résiduelle de log t, relative
+_BINOM_MAX_LIB = 4096                 # monômes g essayés au plus
+_BINOM_GRID_ROWS = 64                 # lignes du tri initial sur la grille
+_BINOM_GRID = np.array(sorted(set(
+    [float(v) for v in -1.0 + np.geomspace(1e-3, 1.0, 12)[:-1]]
+    + [-0.5, -0.3, -0.1, -0.03, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0])))
+
+
+def _binom_library(cols, n_max):
+    """Monômes g : tuples ((colonne, exposant), ...) d'une à n_max colonnes.
+    None au-delà de _BINOM_MAX_LIB."""
+    lib = []
+    for r in range(1, n_max + 1):
+        for js in itertools.combinations(cols, r):
+            for es in itertools.product(_BINOM_EXPS, repeat=r):
+                lib.append(tuple(zip(js, es)))
+                if len(lib) > _BINOM_MAX_LIB:
+                    return None
+    return lib
+
+
+def _golden_min(f, a, b, it=60):
+    """Minimum de f sur [a, b] par la section dorée : (x, f(x))."""
+    gr = (math.sqrt(5.0) - 1.0) / 2.0
+    c1, c2 = b - gr * (b - a), a + gr * (b - a)
+    f1, f2 = f(c1), f(c2)
+    for _ in range(it):
+        if f1 < f2:
+            b, c2, f2 = c2, c1, f1
+            c1 = b - gr * (b - a)
+            f1 = f(c1)
+        else:
+            a, c1, f1 = c1, c2, f2
+            c2 = a + gr * (b - a)
+            f2 = f(c2)
+    return (c1, f1) if f1 < f2 else (c2, f2)
+
+
+def _binomial_forms(X, y, top: int = 8) -> list:
+    """Formes y = b·f·(1 + c·g)^p qui tiennent à la précision numérique.
+    Rend une liste de (p, cols, exposants de f dans y, g, c)."""
+    X = np.asarray(X, dtype=float)
+    y = np.asarray(y, dtype=float)
+    n = y.shape[0]
+    out = []
+    with np.errstate(all="ignore"):
+        if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
+            return out
+        if not (np.all(y > 0) or np.all(y < 0)):
+            return out
+        cols = [j for j in range(X.shape[1])
+                if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
+        if not cols or n < len(cols) + 6:
+            return out
+        lib = _binom_library(cols, 3 if len(cols) <= 6 else 2)
+        if lib is None:
+            return out
+        LU = np.log(np.abs(X[:, cols]))
+        L = np.column_stack([np.ones(n), LU])
+        Q, Rr = np.linalg.qr(L)
+        dR = np.abs(np.diag(Rr))
+        if not np.min(dR) > 1e-10 * np.max(dR):
+            return out
+        sub = np.unique(np.linspace(0, n - 1, min(n, _BINOM_GRID_ROWS)).astype(int))
+        Qs = np.linalg.qr(L[sub])[0]
+        pos = {j: i for i, j in enumerate(cols)}
+        E = np.zeros((len(cols), len(lib)))
+        sg = np.ones(len(lib))
+        for m, g in enumerate(lib):
+            for j, e in g:
+                E[pos[j], m] = e
+                if X[0, j] < 0 and e % 2:
+                    sg[m] = -sg[m]
+        LG = LU @ E
+        lgmax = np.max(LG, axis=0)
+        GN = np.exp(LG - lgmax)                   # |g| / max|g|, dans (0, 1]
+        GNs = GN[sub]
+        for k in (1, 2):                          # t = |y|^k
+            lt = k * np.log(np.abs(y))
+            vt = float(np.var(lt))
+            if not vt > 0.0:
+                continue
+            if float(np.var(lt - Q @ (Q.T @ lt))) / vt < _BINOM_TOL:
+                continue                          # une loi de puissance
+            lts = lt[sub]
+            for sig in (-1.0, 1.0):               # t = f·(1 + c·g)^(-sig)
+                best = np.full(len(lib), np.inf)
+                for s in _BINOM_GRID:
+                    W = 1.0 + s * GNs
+                    ok = np.all(W > 0, axis=0)
+                    Z = lts[:, None] + sig * np.log(np.where(W > 0, W, 1.0))
+                    v = np.var(Z - Qs @ (Qs.T @ Z), axis=0)
+                    v[~ok] = np.inf
+                    best = np.minimum(best, v)
+                found = None
+                for m in np.argsort(best, kind="stable")[:top]:
+                    if not np.isfinite(best[m]):
+                        break
+                    gn = GN[:, m]
+
+                    def obj(s, gn=gn):
+                        w = 1.0 + s * gn
+                        if np.any(w <= 0):
+                            return np.inf
+                        z = lt + sig * np.log(w)
+                        return float(np.var(z - Q @ (Q.T @ z)))
+                    vals = [obj(s) for s in _BINOM_GRID]
+                    i = int(np.argmin(vals))
+                    a = _BINOM_GRID[i - 1] if i > 0 else -1.0 + 1e-9
+                    b = _BINOM_GRID[i + 1] if i + 1 < len(_BINOM_GRID) else 100.0
+                    s, v = _golden_min(obj, float(a), float(b))
+                    if v / vt < _BINOM_TOL and (found is None or v < found[0]):
+                        found = (v, int(m), s)
+                if found is None:
+                    continue
+                _v, m, s = found
+                gn = GN[:, m]
+                z = lt + sig * np.log(1.0 + s * gn)
+                coef = np.linalg.lstsq(L, z, rcond=None)[0][1:]
+                step = 2.0 if k == 1 else 1.0     # demi-entiers dans y
+                ex = np.round(coef * step) / step
+                if not np.all(np.abs(ex) <= 6.0 * k):
+                    continue
+                base = lt - LU @ ex
+
+                def obj2(s2):
+                    w2 = 1.0 + s2 * gn
+                    if np.any(w2 <= 0):
+                        return np.inf
+                    return float(np.var(base + sig * np.log(w2)))
+                h = 0.05 * (1.0 + abs(s))
+                s2, v2 = _golden_min(obj2, s - h, s + h)
+                if not v2 / vt < _BINOM_TOL:
+                    continue
+                c = float(sg[m] * s2 / math.exp(lgmax[m]))
+                out.append((-sig / k, cols, ex / k, lib[m], c))
+    return out
+
+
+def _monomial(terms, pairs, uops) -> Optional["Node"]:
+    """Π terms[j]^e (e demi-entiers, non nuls) avec les opérateurs du pool ;
+    None si une racine manque."""
+    num, den = [], []
+    for j, e in pairs:
+        f = _half_integer_power(terms[j], int(round(2.0 * abs(e))), uops)
+        if f is None:
+            return None
+        (num if e > 0 else den).append(f)
+    top, bot = _product(num), _product(den)
+    if bot is None:
+        return top
+    return Node("/", top if top is not None else Node(1.0), bot)
+
+
+def _make_binomial_seeds(xs, ys, cfg) -> list:
+    """[0.10, phase 4b] Voir le commentaire ci-dessus. Rend 0 à 4 arbres."""
+    if not _BINOMIAL_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
+            or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
+        return []
+    terms = list(getattr(cfg, "TERMINALS", []) or [])
+    try:
+        X = np.asarray(xs, dtype=float)
+        y = np.asarray(ys, dtype=float)
+    except Exception:
+        return []
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+    if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
+            or X.shape[1] != len(terms):
+        return []
+    t0 = time.time()
+    forms = _binomial_forms(X, y)
+    TRACE.set("binomial_seed_s", round(time.time() - t0, 3))
+    bops = set(_GENERIC_BINARY_OPS)
+    uops = set(_GENERIC_UNARY_OPS)
+    if not {"+", "*", "/"} <= bops:
+        return []
+    seeds = []
+    for p, cols, ex, g, c in forms:
+        f = _monomial(terms, [(j, float(e)) for j, e in zip(cols, ex) if e != 0],
+                      uops)
+        gnode = _monomial(terms, [(j, float(e)) for j, e in g], uops)
+        if gnode is None or (abs(p) == 0.5 and "sqrt" not in uops):
+            continue
+        w = Node("+", Node(1.0), Node("*", Node(c), gnode))
+        if abs(p) == 0.5:
+            w = Node("sqrt", w)
+        if p < 0:
+            seeds.append(Node("/", f if f is not None else Node(1.0), w))
+        else:
+            seeds.append(w if f is None else Node("*", f, w))
+    if seeds:
+        TRACE.set("binomial_seed", " | ".join(to_string(s) for s in seeds))
     return seeds
 
 
@@ -8339,6 +8557,18 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                 slot = _base3 + j
                 if slot < len(target_island.population):
                     target_island.population[slot] = pnd.copy()
+    # [0.10, phase 4b] Graines « monôme fois puissance d'un binôme » (voir
+    # _make_binomial_seeds) : une copie dans chaque île, après les graines de
+    # loi de puissance. Rien n'est injecté sans une forme exacte.
+    _binom = _make_binomial_seeds(xs, ys, cfg)
+    if _binom:
+        _base4 = ((len(seeds) + (len(_cseeds) if _cseeds else 0)
+                   + len(_motifs)) // cfg.N_ISLANDS + 1 + len(_plaw))
+        for target_island in islands:
+            for j, bnd in enumerate(_binom):
+                slot = _base4 + j
+                if slot < len(target_island.population):
+                    target_island.population[slot] = bnd.copy()
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.

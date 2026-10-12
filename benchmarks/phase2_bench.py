@@ -19,6 +19,8 @@ Usage, from the repository root:
   python benchmarks/phase2_bench.py summary trial benchmarks/results_0.9/phase2_trial_F1.jsonl
   (trial3/campaign3: the same with F3, trial3r/campaign3r with F3R;
   run accepts --max-seconds)
+Phase 4b (PLAN_PHASE4.md, change B1): campaignb1 and confirmb1, arms A and B1,
+the engine of this checkout with the flag _BINOMIAL_SEEDS off or on.
 """
 import argparse
 import json
@@ -182,7 +184,9 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "confirmt1": (s2_confirm_jobs, ("A", "T1")),
         "retestt1": (t1_retest_jobs, ("A", "T1")),
         "campaigna1": (campaign_jobs, ("A", "A1")),
-        "confirma1": (confirm_s1_jobs, ("A", "A1"))}
+        "confirma1": (confirm_s1_jobs, ("A", "A1")),
+        "campaignb1": (campaign_jobs, ("A", "B1")),
+        "confirmb1": (confirm_s1_jobs, ("A", "B1"))}
 
 
 def key(j):
@@ -221,6 +225,10 @@ def run_arm(job):
         sys.exit("the flag of A1 is not in this engine: run from commit 878fd47")
     if hasattr(C, "_ARG_MUT"):                    # PLAN_PHASE4.md, change A1
         C._ARG_MUT = job["arm"] == "A1"
+    if job["arm"] == "B1" and not hasattr(C, "_BINOMIAL_SEEDS"):
+        sys.exit("the flag of B1 is not in this engine")
+    if hasattr(C, "_BINOMIAL_SEEDS"):             # PLAN_PHASE4.md, change B1
+        C._BINOMIAL_SEEDS = job["arm"] == "B1"
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
         import gp_elite
         _sr0 = gp_elite.symbolic_regression
@@ -241,6 +249,9 @@ def run_arm(job):
     rec["trig_smart"] = bool(getattr(C, "_TRIG_SMART", False))
     rec["trig_seeds"] = C.TRACE.value.get("trig_seeds")
     rec["arg_mutations"] = int(C.TRACE.count.get("arg_mutations", 0))
+    rec["binomial_seeds_on"] = bool(getattr(C, "_BINOMIAL_SEEDS", False))
+    rec["binomial_seed"] = C.TRACE.value.get("binomial_seed")
+    rec["binomial_seed_s"] = C.TRACE.value.get("binomial_seed_s")
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -891,6 +902,22 @@ def summary_a1(path, arms, confirm=False):
                 int((_r2([v[a] for v in rr]) < 0).sum())) for a in arms))
 
 
+def seeds_b1(path, arm="B1"):
+    """Beside the criteria of B1 (PLAN_PHASE4.md): the fits on which a
+    binomial seed was injected, and the time the search for seeds took."""
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    rr = [r for r in recs if r.get("arm") == arm]
+    for kind in ("feyn", "real", "realraw"):
+        k = [r for r in rr if r.get("kind") == kind]
+        seeded = sorted({r["problem"] for r in k if r.get("binomial_seed")})
+        t = [r["binomial_seed_s"] for r in k if r.get("binomial_seed_s") is not None]
+        print("%s: seed injected in %d fits of %d%s; search %s" % (
+            kind, sum(1 for r in k if r.get("binomial_seed")), len(k),
+            (" (" + ", ".join(seeded) + ")") if seeded else "",
+            ("median %.3f s, max %.3f s" % (np.median(t), max(t))) if t
+            else "never run (no target or column of constant sign)"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -920,6 +947,10 @@ def main():
         summary_trig(a.path, RUNS[a.which][1])
     elif a.which in ("campaigna1", "confirma1"):
         summary_a1(a.path, RUNS[a.which][1], confirm=a.which == "confirma1")
+    elif a.which in ("campaignb1", "confirmb1"):
+        summary_a1(a.path, RUNS[a.which][1], confirm=a.which == "confirmb1")
+        print()
+        seeds_b1(a.path)
     elif a.which in ("campaigns2", "confirms2", "campaignt1", "confirmt1",
                      "retestt1"):
         summary_s2(a.path, RUNS[a.which][1], confirm=a.which.startswith("confirm"))
