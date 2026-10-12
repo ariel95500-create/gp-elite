@@ -251,3 +251,99 @@ trigonometric laws that 0.8.0 misses. Every way of doing it tried so far also
 touched something else (the scaling of all inputs, or exp and log) or moved
 a small count by one, and none was adopted. Users can already get the gain
 with `normalize="none"`, as the README now says.
+
+## 4b: a monomial times a power of a binomial (change B1), plan written before it is implemented (12 October 2026)
+
+Phase 4 resumes after the release of 0.9.0, as the plan of 0.9 says. 4b is
+the rational form of that plan, (a + b·f)/(1 + c·g), taken in the shape
+physical laws give it: y = b·f·(1 + c·g)^p, with f and g monomials of the
+inputs and p one of −1, −½, ½, 1. With p = −1 it is the rational form (the
+offset a is left to the engine's linear scaling); with p = −½ the factor
+1/√(1 − v²/c²) of the laws of the "racine" family; with p = ½ the square
+root of a sum of two terms; with p = 1 a sum of two terms.
+
+**Why a direct fit and not a search.** Such a law becomes a straight line
+once the binomial is known: log|y| − p·log(1 + c·g) = log|b| + Σ e_j·log|x_j|.
+For a given g, the best c is a search in one dimension, and the exponents
+then follow by least squares, as for the power-law seeds of 0.8. The engine
+divides each column by its largest value, which only changes b and c.
+
+**What a prototype showed, before this plan.** A prototype outside the
+engine (no fit of the engine, no test rows, the frozen test set untouched)
+was run on the training rows of the decision bench: F41, and every fold and
+the out-of-domain split of R6 and R7raw, the columns divided by their
+largest value as the engine does. It holds to numerical precision (residual
+variance of log|y| below 1e-29 of its variance) on eight F41 equations, and
+on none of the 130 real training sets:
+
+| equation | family | p | 0.8.0 exact (baseline) |
+|---|---|---|---|
+| I.34.1 om0/(1 − v/c) | rationnelle | −1 | 0 of 5 |
+| II.11.3 q·Ef/(m·(w0² − w²)) | rationnelle | −1 | 0 of 5 |
+| II.11.27 n·α·ε·Ef/(1 − n·α/3) | rationnelle | −1 | 0 of 5 |
+| I.10.7 m/√(1 − v²/c²) | racine | −½ | 0 of 5 |
+| I.15.10 m·v/√(1 − v²/c²) | racine | −½ | 0 of 5 |
+| II.13.23 ρ/√(1 − v²/c²) | racine | −½ | 0 of 5 |
+| II.24.17 √(ω²/c² − π²/d²) | racine | ½ | 0 of 5 |
+| I.27.6 1/(1/d1 + n/d2) | historique | −1 | 2 of 5 |
+
+The next best fit on F41 is far from it (relative residual 7e-7 at best).
+It costs 0.1 s per fit in the median on F41 (0.46 s at most), and 0.85 s at
+most on the real data. That seven of the eighteen equations at zero have
+this form is what the prototype found; whether the engine recovers them
+once seeded is what the campaign measures.
+
+**The change.** `_make_binomial_seeds(xs, ys, cfg)` in `gp_elite/core.py`,
+called beside the power-law seeds, on the same rows and with the same
+guards. On the scaled columns of constant sign and a target of constant
+sign, for t = |y| and t = y², for both directions of the binomial, and for
+each monomial g of one to three such columns with exponents in {−2, −1, 1,
+2} (three columns only when at most six qualify; at most 4,096 monomials),
+c is searched on a fixed grid refined by golden section, and the
+exponents of f are fitted by least squares on the logarithms. The best g is
+kept only if the residual variance of log t is below 1e-12 of its variance;
+the exponents of f are then rounded (half-integers in y) and the form must
+still hold below 1e-12 with c fitted again. Each form that holds becomes a
+tree, f/(1 + c·g), f·(1 + c·g), f/√(1 + c·g) or f·√(1 + c·g), with the
+operators of the active pool (none if a needed operator is missing), and
+one copy is placed in each island after the power-law seeds, judged like
+every other individual (Levenberg-Marquardt may move c). No random number is
+drawn: on data that do not follow such a law to numerical precision, which
+includes all real data and all noisy data, nothing is injected and the fit
+is that of 0.9.0. Not under `units=` (typed population), not in
+extrapolation mode, not outside the generic CSV mode, as the power-law
+seeds. Flag `_BINOMIAL_SEEDS` in `gp_elite/core.py`, off by default.
+
+**Mechanics, before any fit.** Flag off: the thirteen reference
+configurations identical to the 0.9.0 wheel and the test suite passing. Flag
+on: for each configuration, whether a seed was injected; every
+configuration without a seed identical to the 0.9.0 wheel. One fit of 30
+generations of I.34.1, outside any measurement, shows whether the seed
+reaches the returned model.
+
+**Campaign B1** (decides). The decision bench, A (flag off) against B1 side
+by side, budget T, four fits at a time: F41, R6 and R7raw, seeds 0 to 4 (335
+jobs). The criteria are those of A1, written before it, including the
+allowance on small counts. B1 is adopted when all hold:
+
+1. **exact laws:** F41 exact in B1 at least 8 more than in A, among which at
+   least 4 more in the five families at zero; and no equation exact in A at
+   three seeds or more falls to one seed or none;
+2. **real data in the domain:** R6 folds median test R² at least 0.804, and
+   the median paired difference over R6 and R7raw folds at least −0.005;
+3. **out of domain:** on R6 and R7raw, no more than 2 collapses more than A,
+   and the median R² no lower than A's by more than 0.01;
+4. **formulas:** no more than 3 formulas flagged inexact more than A on the
+   335 fits.
+
+Reported beside the criteria: the fits on which a seed was injected (the
+prototype expects none of the 130 real fits), and the time the search for
+seeds took.
+
+**Confirmation on new seeds**, if the campaign adopts B1: the same 335 jobs
+with seeds 5 to 9 (folds with seed 5). B1 is kept when F41 exact in B1 is at
+least 5 more than in A, the median paired difference over the folds is at
+least −0.005, and out of domain B1 has no more than 2 collapses more than
+A.
+
+The frozen test set is measured once, with the version, as for every change.
