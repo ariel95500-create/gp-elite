@@ -4516,6 +4516,377 @@ def _make_binomial_seeds(xs, ys, cfg) -> list:
     return seeds
 
 
+# ════════════════════════════════════════════════════════════════
+# [0.10, phase 4a] GRAINES « FONCTION D'UN MONÔME », TENUES EXACTEMENT
+# ════════════════════════════════════════════════════════════════
+# Même principe que les graines binomiales, pour les fonctions élémentaires :
+#   y = b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g)
+#   y = f·(a + β·sin(ω·g) + γ·cos(ω·g))
+# f et g des monômes. Pour les quatre premières, la fonction inversée rend
+# une loi de puissance des entrées (une constante cherchée sur une dimension,
+# aucune pour le logarithme) ; pour la forme trigonométrique, ω se cherche
+# sur une grille, a, β, γ par moindres carrés, et les exposants de f par
+# moindres carrés sur les logarithmes, arrondis. Une forme n'est injectée
+# que si elle tient à la précision numérique, exposants arrondis : sur des
+# données qui ne suivent pas une telle loi exactement, rien n'est injecté et
+# l'ajustement est celui d'avant. Aucun tirage aléatoire. Mêmes gardes que
+# les graines binomiales. Mesuré dans benchmarks/results_0.9/PLAN_PHASE4.md
+# (changement E1) ; drapeau coupé par défaut.
+
+_ELEMENTARY_SEEDS = False
+_ELEM_MAX_LIB = 4096                  # monômes f (ou g trigonométriques) au plus
+_ELEM_S_GRID = np.linspace(-6.0, 3.0, 37)
+_ELEM_W_GRID = np.linspace(0.05, 40.0, 800)
+_ELEM_TRIG_GATE = 0.05                # résidu de grille sous lequel on affine
+
+
+def _elem_flib(cols):
+    """Monômes f : 1, une colonne (±1, ±2), deux ou trois colonnes (±1 ;
+    trois seulement jusqu'à huit colonnes). None au-delà de _ELEM_MAX_LIB."""
+    lib = [()]
+    for j in cols:
+        for e in (-2, -1, 1, 2):
+            lib.append(((j, e),))
+    for r in ((2, 3) if len(cols) <= 8 else (2,)):
+        for js in itertools.combinations(cols, r):
+            for es in itertools.product((-1, 1), repeat=r):
+                lib.append(tuple(zip(js, es)))
+                if len(lib) > _ELEM_MAX_LIB:
+                    return None
+    return lib
+
+
+def _elem_mono(X, m):
+    v = np.ones(X.shape[0])
+    for j, e in m:
+        v = v * X[:, j] ** e
+    return v
+
+
+def _elem_rel(Z, Q):
+    """Variance résiduelle relative de chaque colonne de Z après projection
+    sur l'espace de Q."""
+    V = np.var(Z, axis=0)
+    R = Z - Q @ (Q.T @ Z)
+    with np.errstate(all="ignore"):
+        out = np.var(R, axis=0) / V
+    return np.where(V > 0, out, np.inf)
+
+
+def _elem_transform(kind, R, s):
+    """Transformée colonne par colonne qui est une loi de puissance des
+    entrées quand la forme tient (NaN là où elle n'est pas définie)."""
+    if kind == "exp-":                    # w - a > 0, a = min(w) - étendue·10^s
+        W = np.log(np.abs(R))
+        return np.log(W - (W.min(axis=0) - np.ptp(W, axis=0) * 10.0 ** s))
+    if kind == "exp+":                    # a - w > 0, a = max(w) + étendue·10^s
+        W = np.log(np.abs(R))
+        return np.log((W.max(axis=0) + np.ptp(W, axis=0) * 10.0 ** s) - W)
+    A = np.abs(R)
+    mx = A.max(axis=0)
+    if kind == "tanh":
+        return np.log(np.arctanh(A / (mx * (1.0 + 10.0 ** s))))
+    return np.log(np.arccosh(mx * (1.0 + 10.0 ** s) / A))      # "sech"
+
+
+def _elem_inverse_forms(X, y, cols, kinds, top: int = 6) -> list:
+    """Formes y = b·f·φ(c·g), φ dans exp, log, tanh, 1/cosh. Rend des
+    tuples (kind, f, g, c), exposants de g arrondis au demi-entier."""
+    n = y.shape[0]
+    out = []
+    lib = _elem_flib(cols)
+    if lib is None:
+        return out
+    FV = np.column_stack([_elem_mono(X, m) for m in lib])
+    R = y[:, None] / FV
+    ok = np.all(R > 0, axis=0) | np.all(R < 0, axis=0)
+    idx = np.where(ok)[0]
+    if not idx.size:
+        return out
+    R = R[:, idx]
+    LU = np.log(np.abs(X[:, cols]))
+    L = np.column_stack([np.ones(n), LU])
+    Q = np.linalg.qr(L)[0]
+    sub = np.unique(np.linspace(0, n - 1, min(n, _BINOM_GRID_ROWS)).astype(int))
+    Qs = np.linalg.qr(L[sub])[0]
+
+    def g_of(coef):
+        """Exposants de g arrondis (demi-entiers), None si tous nuls."""
+        ex = np.round(2.0 * coef) / 2.0
+        if not np.any(ex) or not np.all(np.abs(ex) <= 6.0):
+            return None
+        return tuple((j, float(e)) for j, e in zip(cols, ex) if e)
+
+    if "log" in kinds:                    # r = a + Σ e_j·log|u_j|, linéaire
+        v = _elem_rel(R, Q)
+        for m in np.where(v < _BINOM_TOL)[0]:
+            r = R[:, m]
+            coef = np.linalg.lstsq(L, r, rcond=None)[0][1:]
+            nzc = np.abs(coef)[np.abs(coef) > 1e-6]
+            if not nzc.size:
+                continue
+            g = g_of(coef / float(nzc.min()))
+            if g is None:
+                continue
+            lg = np.log(np.abs(_elem_mono(X, g)))
+            A = np.column_stack([np.ones(n), lg])
+            a0, s0 = np.linalg.lstsq(A, r, rcond=None)[0]
+            if not (float(np.var(r - A @ np.array([a0, s0]))) / float(np.var(r))
+                    < _BINOM_TOL) or s0 == 0.0 or abs(a0 / s0) > 700.0:
+                continue
+            out.append(("log", lib[idx[m]], g, float(math.exp(a0 / s0))))
+            break
+    for kind in [k for k in ("exp-", "exp+", "tanh", "sech")
+                 if k.rstrip("+-") in kinds]:
+        best = np.full(R.shape[1], np.inf)
+        with np.errstate(all="ignore"):
+            for s in _ELEM_S_GRID:
+                T = _elem_transform(kind, R[sub], s)
+                fin = np.all(np.isfinite(T), axis=0)
+                v = _elem_rel(np.where(np.isfinite(T), T, 0.0), Qs)
+                v[~fin] = np.inf
+                best = np.minimum(best, v)
+        for m in np.argsort(best, kind="stable")[:top]:
+            if not np.isfinite(best[m]):
+                break
+            r = R[:, [m]]
+
+            def obj(s, r=r):
+                with np.errstate(all="ignore"):
+                    t = _elem_transform(kind, r, s)[:, 0]
+                if not np.all(np.isfinite(t)):
+                    return np.inf
+                return float(_elem_rel(t[:, None], Q)[0])
+            vals = [obj(s) for s in _ELEM_S_GRID]
+            i = int(np.argmin(vals))
+            if i in (0, len(_ELEM_S_GRID) - 1):
+                continue                  # limite dégénérée de la forme
+            s, v = _golden_min(obj, float(_ELEM_S_GRID[i - 1]),
+                               float(_ELEM_S_GRID[i + 1]))
+            if not v < _BINOM_TOL:
+                continue
+            with np.errstate(all="ignore"):
+                t = _elem_transform(kind, r, s)[:, 0]
+            g = g_of(np.linalg.lstsq(L, t, rcond=None)[0][1:])
+            if g is None:
+                continue
+            lg = np.log(np.abs(_elem_mono(X, g)))
+
+            def obj2(s2, r=r, lg=lg):
+                with np.errstate(all="ignore"):
+                    t2 = _elem_transform(kind, r, s2)[:, 0] - lg
+                if not np.all(np.isfinite(t2)):
+                    return np.inf
+                vt = float(np.var(t2 + lg))
+                return float(np.var(t2)) / vt if vt > 0 else np.inf
+            s2, v2 = _golden_min(obj2, s - 0.5, s + 0.5)
+            if not v2 < _BINOM_TOL:
+                continue
+            with np.errstate(all="ignore"):
+                k0 = float(np.mean(_elem_transform(kind, r, s2)[:, 0] - lg))
+            if abs(k0) > 700.0:
+                continue
+            c = math.exp(k0) * (-1.0 if kind == "exp+" else 1.0)
+            out.append((kind.rstrip("+-"), lib[idx[m]], g, c))
+            break
+    return out
+
+
+def _elem_trig_grid(z, gn):
+    """Résidu relatif de z ~ 1 + sin(ω·gn) + cos(ω·gn) pour chaque ω de la
+    grille (équations normales : pour classer seulement)."""
+    n = len(z)
+    w = _ELEM_W_GRID
+    P = np.outer(gn, w)
+    S, C = np.sin(P), np.cos(P)
+    G = np.empty((len(w), 3, 3))
+    G[:, 0, 0] = n
+    G[:, 0, 1] = G[:, 1, 0] = S.sum(0)
+    G[:, 0, 2] = G[:, 2, 0] = C.sum(0)
+    G[:, 1, 1] = (S * S).sum(0)
+    G[:, 1, 2] = G[:, 2, 1] = (S * C).sum(0)
+    G[:, 2, 2] = (C * C).sum(0)
+    rhs = np.stack([np.full(len(w), z.sum()), z @ S, z @ C], axis=1)
+    with np.errstate(all="ignore"):
+        try:
+            coef = np.linalg.solve(G, rhs[..., None])[..., 0]
+        except np.linalg.LinAlgError:
+            return np.full(len(w), np.inf)
+        rss = float(z @ z) - np.einsum("ij,ij->i", coef, rhs)
+        vz = float(np.var(z)) * n
+    return np.where(np.isfinite(rss), np.maximum(rss, 0.0) / vz, np.inf)
+
+
+def _elem_trig_exact(z, gn, sub):
+    """(résidu relatif, ω, (a, β, γ)) de la meilleure forme trigonométrique,
+    affinée seulement si la grille la place sous _ELEM_TRIG_GATE."""
+    v = _elem_trig_grid(z[sub], gn[sub])
+    i = int(np.argmin(v))
+    if not v[i] < _ELEM_TRIG_GATE:
+        return np.inf, None, None
+    vz = float(np.var(z))
+
+    def obj(w):
+        A = np.column_stack([np.ones_like(gn), np.sin(w * gn), np.cos(w * gn)])
+        c = np.linalg.lstsq(A, z, rcond=None)[0]
+        return float(np.var(z - A @ c)) / vz
+    W = _ELEM_W_GRID
+    w, val = _golden_min(obj, float(W[max(i - 1, 0)]), float(W[min(i + 1, len(W) - 1)]))
+    A = np.column_stack([np.ones_like(gn), np.sin(w * gn), np.cos(w * gn)])
+    return val, w, np.linalg.lstsq(A, z, rcond=None)[0]
+
+
+def _elem_trig_forms(X, y, cols) -> list:
+    """Forme y = f·(a + β·sin(ω·g) + γ·cos(ω·g)) : au plus une. Rend des
+    tuples ("trig", f, g, ω rapporté à g, (a, β, γ))."""
+    n = y.shape[0]
+    glib = [((j, 1),) for j in range(X.shape[1])]
+    if len(cols) <= 8:
+        for j, k in itertools.combinations(cols, 2):
+            for e1, e2 in ((1, 1), (1, -1), (-1, 1)):
+                glib.append(((j, e1), (k, e2)))
+    nz = np.abs(y) > 0
+    sub = np.unique(np.linspace(0, n - 1, min(n, _BINOM_GRID_ROWS)).astype(int))
+    for g in glib:
+        gv = _elem_mono(X, g)
+        gmax = float(np.max(np.abs(gv)))
+        if not (np.all(np.isfinite(gv)) and gmax > 0):
+            continue
+        gn = gv / gmax
+        gcols = {j for j, _ in g}
+        others = [j for j in cols if j not in gcols]
+        if others:
+            LU = np.log(np.abs(X[:, others]))
+            L = np.column_stack([np.ones(n), LU])
+            e0 = np.linalg.lstsq(L[nz], np.log(np.abs(y[nz])), rcond=None)[0][1:]
+            f0 = np.exp(LU @ e0)
+        else:
+            e0, f0 = np.zeros(0), np.ones(n)
+        cands = []
+        if others:
+            z0 = y / f0
+            v = _elem_trig_grid(z0[sub], gn[sub])
+            i = int(np.argmin(v))
+            if np.isfinite(v[i]):
+                w0 = float(_ELEM_W_GRID[i])
+                A = np.column_stack([np.ones(n), np.sin(w0 * gn), np.cos(w0 * gn)])
+                h = A @ np.linalg.lstsq(A, z0, rcond=None)[0]
+                keep = np.abs(h) > 0.3 * np.max(np.abs(h))
+                if keep.sum() > len(others) + 3:
+                    e1 = np.linalg.lstsq(
+                        L[keep], (np.log(np.abs(y)) - np.log(np.abs(h)))[keep],
+                        rcond=None)[0][1:]
+                    cands += [np.round(e1), np.round(2.0 * e1) / 2.0]
+        cands += [np.round(e0), np.round(2.0 * e0) / 2.0]
+        seen = set()
+        for ex in cands:
+            key = tuple(float(e) for e in ex)
+            if key in seen or not np.all(np.abs(ex) <= 6.0):
+                continue
+            seen.add(key)
+            fv = np.ones(n)
+            for j, e in zip(others, ex):
+                fv = fv * X[:, j] ** e
+            val, w, c = _elem_trig_exact(y / fv, gn, sub)
+            if val < _BINOM_TOL:
+                f = tuple((j, float(e)) for j, e in zip(others, ex) if e)
+                return [("trig", f, g, float(w) / gmax, tuple(float(x) for x in c))]
+    return []
+
+
+def _elementary_forms(X, y, kinds) -> list:
+    """Formes de la phase 4a qui tiennent à la précision numérique."""
+    X = np.asarray(X, dtype=float)
+    y = np.asarray(y, dtype=float)
+    n = y.shape[0]
+    out = []
+    with np.errstate(all="ignore"):
+        if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
+            return out
+        cols = [j for j in range(X.shape[1])
+                if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
+        inv = [k for k in kinds if k != "trig"]
+        if inv and cols and n > len(cols) + 6 \
+                and (np.all(y > 0) or np.all(y < 0)):
+            L = np.column_stack([np.ones(n), np.log(np.abs(X[:, cols]))])
+            Q = np.linalg.qr(L)[0]
+            if _elem_rel(np.log(np.abs(y))[:, None], Q)[0] < _BINOM_TOL:
+                return out                # une loi de puissance : ses graines
+            out += _elem_inverse_forms(X, y, cols, inv)
+        if "trig" in kinds and n > 10 and np.var(y) > 0:
+            out += _elem_trig_forms(X, y, cols)
+    return out
+
+
+def _make_elementary_seeds(xs, ys, cfg) -> list:
+    """[0.10, phase 4a] Voir le commentaire ci-dessus. Rend 0 à 5 arbres."""
+    if not _ELEMENTARY_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
+            or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
+        return []
+    terms = list(getattr(cfg, "TERMINALS", []) or [])
+    try:
+        X = np.asarray(xs, dtype=float)
+        y = np.asarray(ys, dtype=float)
+    except Exception:
+        return []
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+    if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
+            or X.shape[1] != len(terms):
+        return []
+    bops = set(_GENERIC_BINARY_OPS)
+    uops = set(_GENERIC_UNARY_OPS)
+    if not {"+", "*", "/"} <= bops:
+        return []
+    kinds = [k for k, need in (("exp", {"exp"}), ("log", {"log"}),
+                               ("tanh", {"tanh"}), ("sech", {"exp"}),
+                               ("trig", {"sin", "cos"})) if need <= uops]
+    if not kinds:
+        return []
+    t0 = time.time()
+    forms = _elementary_forms(X, y, kinds)
+    TRACE.set("elementary_seed_s", round(time.time() - t0, 3))
+    seeds = []
+    for form in forms:
+        kind, fm, g = form[0], form[1], form[2]
+        f = _monomial(terms, [(j, float(e)) for j, e in fm], uops)
+        gnode = _monomial(terms, [(j, float(e)) for j, e in g], uops)
+        if gnode is None or (fm and f is None):
+            continue
+        if kind == "trig":
+            w, (a, b, c) = form[3], form[4]
+            mx = max(abs(a), abs(b), abs(c))
+            arg = lambda: Node("*", Node(w), gnode.copy())
+            terms_ = []
+            if abs(a) > 1e-9 * mx:
+                terms_.append(Node(a / mx))
+            if abs(b) > 1e-9 * mx:
+                terms_.append(Node("*", Node(b / mx), Node("sin", arg())))
+            if abs(c) > 1e-9 * mx:
+                terms_.append(Node("*", Node(c / mx), Node("cos", arg())))
+            inner = terms_[0]
+            for t_ in terms_[1:]:
+                inner = Node("+", inner, t_)
+            seeds.append(inner if f is None else Node("*", f, inner))
+            continue
+        c = form[3]
+        cg = lambda cc: Node("*", Node(cc), gnode.copy())
+        if kind == "exp":
+            h = Node("exp", cg(c))
+        elif kind == "log":
+            h = Node("log", cg(c))
+        elif kind == "tanh":
+            h = Node("tanh", cg(c))
+        else:                             # 1/cosh(c·g) = 2/(exp(c·g) + exp(-c·g))
+            den = Node("+", Node("exp", cg(c)), Node("exp", cg(-c)))
+            seeds.append(Node("/", f if f is not None else Node(1.0), den))
+            continue
+        seeds.append(h if f is None else Node("*", f, h))
+    if seeds:
+        TRACE.set("elementary_seed", " | ".join(to_string(s) for s in seeds))
+    return seeds
+
+
 # [CUSTOM-LOSS PARSIMONY] Poids de la pénalité de taille pour la loss custom
 # (0 = désactivé). Favorise les lois simples ; utile pour la découverte de
 # lois de conservation (sinon des arbres géants exploitent le bruit numérique).
@@ -8573,6 +8944,19 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                 slot = _base4 + j
                 if slot < len(target_island.population):
                     target_island.population[slot] = bnd.copy()
+    # [0.10, phase 4a] Graines « fonction d'un monôme » (voir
+    # _make_elementary_seeds) : une copie dans chaque île, après les graines
+    # binomiales. Rien n'est injecté sans une forme exacte.
+    _elem = _make_elementary_seeds(xs, ys, cfg)
+    if _elem:
+        _base5 = ((len(seeds) + (len(_cseeds) if _cseeds else 0)
+                   + len(_motifs)) // cfg.N_ISLANDS + 1 + len(_plaw)
+                  + len(_binom))
+        for target_island in islands:
+            for j, end in enumerate(_elem):
+                slot = _base5 + j
+                if slot < len(target_island.population):
+                    target_island.population[slot] = end.copy()
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.

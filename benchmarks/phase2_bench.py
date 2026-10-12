@@ -23,6 +23,9 @@ Phase 4b (PLAN_PHASE4.md, change B1): campaignb1 and confirmb1, arms A and B1,
 the engine of this checkout with the flag _BINOMIAL_SEEDS off or on. B1 was
 adopted on 12 October 2026 and the flag is on by default since: in every
 other run, arm A is the engine as it stands, B1 included.
+Phase 4a, third attempt (change E1): campaigne1 and confirme1, arms A and E1
+(flag _ELEMENTARY_SEEDS), the decision bench and R6 and R7raw again with
+operators="trig" (a job is keyed by its pool too).
 """
 import argparse
 import json
@@ -164,6 +167,22 @@ def t1_retest_jobs():
                                 for j in confirm_jobs()]
 
 
+def e1_jobs():
+    """Campaign E1 (PLAN_PHASE4.md): the decision bench, and R6 and R7raw
+    again with operators="trig" in both arms."""
+    out = campaign_jobs() + [dict(j, group="real_trig", force_pool="trig")
+                             for j in campaign_jobs()
+                             if j["kind"] in ("real", "realraw")]
+    return [dict(j, e1=True) for j in out]
+
+
+def e1_confirm_jobs():
+    """Confirmation of E1: the same with seeds 5 to 9 (folds with seed 5)."""
+    out = confirm_s1_jobs() + [dict(j, group="real_trig", force_pool="trig")
+                               for j in confirm_jobs()]
+    return [dict(j, e1=True) for j in out]
+
+
 # name: (jobs, arms)
 RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaign": (campaign_jobs, ("A", "F1")),
@@ -190,11 +209,14 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "campaignb1": (lambda: [dict(j, b1=True) for j in campaign_jobs()],
                        ("A", "B1")),
         "confirmb1": (lambda: [dict(j, b1=True) for j in confirm_s1_jobs()],
-                      ("A", "B1"))}
+                      ("A", "B1")),
+        "campaigne1": (e1_jobs, ("A", "E1")),
+        "confirme1": (e1_confirm_jobs, ("A", "E1"))}
 
 
 def key(j):
-    return (j["arm"], j["kind"], j["problem"], j["split"], j["seed"])
+    return (j["arm"], j["kind"], j["problem"], j["split"], j["seed"],
+            j.get("force_pool") or "")
 
 
 def run_arm(job):
@@ -233,6 +255,10 @@ def run_arm(job):
         sys.exit("the flag of B1 is not in this engine")
     if job.get("b1"):                             # PLAN_PHASE4.md, change B1:
         C._BINOMIAL_SEEDS = job["arm"] == "B1"    # A without it, B1 with it
+    if job["arm"] == "E1" and not hasattr(C, "_ELEMENTARY_SEEDS"):
+        sys.exit("the flag of E1 is not in this engine")
+    if job.get("e1"):                             # PLAN_PHASE4.md, change E1
+        C._ELEMENTARY_SEEDS = job["arm"] == "E1"
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
         import gp_elite
         _sr0 = gp_elite.symbolic_regression
@@ -256,6 +282,9 @@ def run_arm(job):
     rec["binomial_seeds_on"] = bool(getattr(C, "_BINOMIAL_SEEDS", False))
     rec["binomial_seed"] = C.TRACE.value.get("binomial_seed")
     rec["binomial_seed_s"] = C.TRACE.value.get("binomial_seed_s")
+    rec["elementary_seeds_on"] = bool(getattr(C, "_ELEMENTARY_SEEDS", False))
+    rec["elementary_seed"] = C.TRACE.value.get("elementary_seed")
+    rec["elementary_seed_s"] = C.TRACE.value.get("elementary_seed_s")
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -326,8 +355,8 @@ def drive(which, python, out, pairs, max_seconds=None):
 def _pairs(recs, arms):
     by = {}
     for r in recs:
-        by.setdefault((r["kind"], r["problem"], r["split"], r["seed"]),
-                      {})[r["arm"]] = r
+        by.setdefault((r["kind"], r["problem"], r["split"], r["seed"],
+                       r.get("force_pool") or ""), {})[r["arm"]] = r
     return {k: v for k, v in by.items() if all(a in v for a in arms)}
 
 
@@ -906,6 +935,90 @@ def summary_a1(path, arms, confirm=False):
                 int((_r2([v[a] for v in rr]) < 0).sum())) for a in arms))
 
 
+def summary_e1(path, arms, confirm=False):
+    """The criteria of campaign E1, or of its confirmation (PLAN_PHASE4.md)."""
+    from collections import defaultdict
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    feyn = [v for v in pairs.values() if v[A]["kind"] == "feyn"]
+    ex = {a: sum(1 for v in feyn if v[a].get("status") == "EXACT") for a in arms}
+    zf = [v for v in feyn if v[A].get("family") in ZERO_FAMILIES]
+    exz = {a: sum(1 for v in zf if v[a].get("status") == "EXACT") for a in arms}
+    per = defaultdict(lambda: {A: 0, B: 0})
+    for v in feyn:
+        for a in arms:
+            per[v[A]["problem"]][a] += v[a].get("status") == "EXACT"
+    lost = sorted(n for n, c in per.items() if c[A] >= 3 and c[B] <= 1)
+    if confirm:
+        c1 = len(feyn) == 205 and ex[B] >= ex[A] + 5
+    else:
+        c1 = (len(feyn) == 205 and len(zf) == 90 and ex[B] >= ex[A] + 8
+              and exz[B] >= exz[A] + 4 and not lost)
+    print("1. F41 exact: %s %d, %s %d (at least +%d); zero families (%d fits)"
+          " %s %d, %s %d%s; laws lost %s -> %s" % (
+              A, ex[A], B, ex[B], 5 if confirm else 8, len(zf), A, exz[A], B,
+              exz[B], "" if confirm else " (at least +4)", lost,
+              "PASS" if c1 else "FAIL"))
+    ok = c1
+    real_all = []
+    for pool in ("", "trig"):
+        real = [v for v in pairs.values() if v[A]["kind"] in ("real", "realraw")
+                and (v[A].get("force_pool") or "") == pool]
+        real_all += real
+        name = "pool %s" % (pool or "default")
+        folds = [v for v in real if v[A]["split"].startswith("fold")]
+        ood = [v for v in real if v[A]["split"] == "ood"]
+        d = _r2([v[B] for v in folds]) - _r2([v[A] for v in folds])
+        c2 = len(folds) == 65 and np.median(d) >= -0.005
+        col = {a: int((_r2([v[a] for v in ood]) < 0).sum()) for a in arms}
+        mA = float(np.median(_r2([v[A] for v in ood])))
+        mB = float(np.median(_r2([v[B] for v in ood])))
+        c3 = len(ood) == 65 and col[B] <= col[A] + 2 and (confirm or mB >= mA - 0.01)
+        print("2. %s, folds (%d): median paired difference %+.4f, mean %+.4g, worst"
+              " %+.4g -> %s" % (name, len(folds), np.median(d), np.mean(d),
+                                d.min(), "PASS" if c2 else "FAIL"))
+        print("3. %s, out of domain (%d): collapses %s %d, %s %d (at most +2);"
+              " median %s %.4f, %s %.4f -> %s" % (
+                  name, len(ood), A, col[A], B, col[B], A, mA, B, mB,
+                  "PASS" if c3 else "FAIL"))
+        ok = ok and c2 and c3
+    if not confirm:
+        ie = {a: sum(1 for v in real_all if v[a].get("formula_exact") is False)
+              for a in arms}
+        c4 = len(real_all) == 260 and ie[B] <= ie[A] + 3
+        print("4. formulas flagged inexact on the %d real fits: %s %d, %s %d (at"
+              " most +3) -> %s" % (len(real_all), A, ie[A], B, ie[B],
+                                   "PASS" if c4 else "FAIL"))
+        ok = ok and c4
+    print("%s %s" % (B, ("CONFIRMED" if ok else "NOT CONFIRMED") if confirm
+                     else ("ADOPTED" if ok else "NOT ADOPTED")))
+    print("\nF41 by equation, exact seeds (%s, %s), where they differ:" % (A, B))
+    for n, c in sorted(per.items()):
+        if c[A] != c[B]:
+            print("  %-10s %d %d" % (n, c[A], c[B]))
+    print("median generations: " + ", ".join("%s %.0f" % (
+        a, np.median([v[a].get("generations", 0) for v in pairs.values()]))
+        for a in arms))
+    rr = [r for r in recs if r.get("arm") == B]
+    for label, sel in (("feyn", lambda r: r["kind"] == "feyn"),
+                       ("real, default pool", lambda r: r["kind"] != "feyn"
+                        and not r.get("force_pool")),
+                       ("real, pool trig", lambda r: r["kind"] != "feyn"
+                        and r.get("force_pool") == "trig")):
+        k = [r for r in rr if sel(r)]
+        seeded = sorted({r["problem"] for r in k if r.get("elementary_seed")})
+        t = [r["elementary_seed_s"] for r in k
+             if r.get("elementary_seed_s") is not None]
+        print("%s: seed injected in %d fits of %d%s; search %s" % (
+            label, sum(1 for r in k if r.get("elementary_seed")), len(k),
+            (" (" + ", ".join(seeded) + ")") if seeded else "",
+            ("median %.3f s, max %.3f s" % (np.median(t), max(t))) if t
+            else "never run"))
+
+
 def seeds_b1(path, arm="B1"):
     """Beside the criteria of B1 (PLAN_PHASE4.md): the fits on which a
     binomial seed was injected, and the time the search for seeds took."""
@@ -951,6 +1064,8 @@ def main():
         summary_trig(a.path, RUNS[a.which][1])
     elif a.which in ("campaigna1", "confirma1"):
         summary_a1(a.path, RUNS[a.which][1], confirm=a.which == "confirma1")
+    elif a.which in ("campaigne1", "confirme1"):
+        summary_e1(a.path, RUNS[a.which][1], confirm=a.which == "confirme1")
     elif a.which in ("campaignb1", "confirmb1"):
         summary_a1(a.path, RUNS[a.which][1], confirm=a.which == "confirmb1")
         print()

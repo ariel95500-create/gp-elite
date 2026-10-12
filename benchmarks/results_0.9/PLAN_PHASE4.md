@@ -544,3 +544,17 @@ seeds 5 to 9 (folds with seed 5). E1 is kept when F41 exact in E1 is at
 least 5 more than in A, and with each pool the median paired difference
 over the folds is at least −0.005 and out of domain E1 has no more than 2
 collapses more than A.
+
+### Mechanics of E1, result (12 October 2026)
+
+Flag off: the thirteen reference configurations identical to the 0.9.0
+wheel (`phase4_mechanics/compare_0.9.0_vs_E1_off.txt`) and the test suite
+passing (148 tests, the three of E1 included; `tests_E1_off.txt`). Flag on:
+no seed injected in any of the thirteen configurations (`trace_E1_on.jsonl`)
+and all thirteen identical to the 0.9.0 wheel (`compare_0.9.0_vs_E1_on.txt`).
+**Holds.** The fits of 30 generations, seed 0, outside any measurement
+(`one_fit_E1.txt`): I.40.1, flag off an approximation of 1 − R² 5e-2 in
+13.2 s, flag on `v0 * exp(-v1 * v2 * v3 / (v4 * v5))` exact in 0.8 s;
+II.6.15b, flag off 1 − R² 0.20 in 13.3 s, flag on `0.119366 * v0 / (v2 *
+v3 * v3²) * sin(2 * v1)` exact in 0.4 s (0.119366 = 3/(8π)). Three tests are
+added to `tests/test_guarantees.py` (section 22). The campaign is run.

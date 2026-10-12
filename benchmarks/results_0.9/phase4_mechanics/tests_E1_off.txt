@@ -1,0 +1,3 @@
+PYTHONHASHSEED=0 PYTHONPATH=. python -m pytest -q tests  (flag _ELEMENTARY_SEEDS off, B1 on by default, Python 3.11.15, 12 October 2026)
+....                                                                     [100%]
+148 passed in 158.36s (0:02:38)

@@ -1303,3 +1303,67 @@ def test_binomial_law_recovered_in_a_short_fit():
     pred = r.predict(Xr[140:])
     assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
     assert r.formula_exact
+
+
+# ── 22. A function of a monomial held exactly (phase 4a, flag off) ──────────
+# Change E1 of benchmarks/results_0.9/PLAN_PHASE4.md, measured before any
+# adoption: y = b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g) and
+# y = f·(a + β·sin(ω·g) + γ·cos(ω·g)), seeded only when the form holds to
+# numerical precision, and only with the flag on.
+
+def test_elementary_forms_found_exactly(monkeypatch):
+    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", True)
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140),
+               rng.uniform(1, 5, 140)]
+    Xs = Xr / np.abs(Xr).max(axis=0)          # normalize="auto"
+    cases = (("physical", Xr[:, 0] * np.exp(-Xr[:, 1] / Xr[:, 2]), "exp"),
+             ("physical", Xr[:, 0] * Xr[:, 1] * np.log(Xr[:, 2]), "log"),
+             ("physical", Xr[:, 0] / np.cosh(Xr[:, 1] * Xr[:, 2] / 5), "sech"),
+             ("physical", Xr[:, 0] * np.tanh(Xr[:, 1] / Xr[:, 2]), "tanh"),
+             ("trig", Xr[:, 0] * Xr[:, 1] * np.sin(Xr[:, 2]), "sin"))
+    for pool, y, op in cases:
+        _set_pool(monkeypatch, pool)
+        seeds = core._make_elementary_seeds(Xs, y, _binom_cfg(3))
+        assert len(seeds) >= 1, op
+        assert _scaled_residual(seeds[0], Xs, y) < 1e-20, op
+        assert op in _ops_in(seeds[0], set()) or (op == "sech"
+                                                  and "exp" in _ops_in(seeds[0], set()))
+
+
+def test_elementary_seed_only_where_it_applies(monkeypatch):
+    _set_pool(monkeypatch, "trig")
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140),
+               rng.uniform(1, 5, 140)]
+    y = Xr[:, 0] * np.exp(-Xr[:, 1] / Xr[:, 2])
+    cfg = _binom_cfg(3)
+    assert core._make_elementary_seeds(Xr, y, cfg) == []      # flag off
+    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", True)
+    assert len(core._make_elementary_seeds(Xr, y, cfg)) >= 1
+    kinds = ["exp", "log", "tanh", "sech", "trig"]
+    # 1 % noise: no form holds to numerical precision
+    assert core._elementary_forms(Xr, y * (1 + 0.01 * rng.randn(140)), kinds) == []
+    # a power law is left to its own seeds (tanh(c·g) ≈ c·g would mimic it)
+    assert core._elementary_forms(Xr, Xr[:, 0] * Xr[:, 1] ** 2, kinds) == []
+    # the trigonometric form needs sine and cosine in the pool
+    s = Xr[:, 0] * np.sin(Xr[:, 2])
+    _set_pool(monkeypatch, "physical")
+    assert core._make_elementary_seeds(Xr, s, cfg) == []
+    # under units= the typed population is left alone
+    _set_pool(monkeypatch, "trig")
+    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}, 2: {"s": 1}}
+    assert core._make_elementary_seeds(Xr, y, cfg) == []
+
+
+def test_elementary_law_recovered_in_a_short_fit(monkeypatch):
+    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", True)
+    rng = np.random.RandomState(2)
+    Xr = np.c_[rng.uniform(1, 5, 200), rng.uniform(1, 5, 200),
+               rng.uniform(1, 5, 200), rng.uniform(1, 5, 200)]
+    y = Xr[:, 0] * np.exp(-Xr[:, 1] * Xr[:, 2] / Xr[:, 3])
+    r = symbolic_regression(Xr[:140], y[:140], generations=5, seed=0,
+                            parallel=False)
+    pred = r.predict(Xr[140:])
+    assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
+    assert r.formula_exact
