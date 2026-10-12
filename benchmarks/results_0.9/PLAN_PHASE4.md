@@ -363,3 +363,41 @@ measurement (`one_fit_I.34.1.txt`): flag off, an approximation of 1 − R²
 seed with the flag off, with 1 % noise, on a power law, on a target that
 changes sign or under `units=`, and a short fit of II.11.3. The campaign is
 run.
+
+### Campaign B1, result (12 October 2026)
+
+Run from 13:09 to 14:16 UTC, 670 fits, 335 complete pairs, no crash
+(`campaign_B1.jsonl`; `python benchmarks/phase2_bench.py summary campaignb1
+benchmarks/results_0.9/campaign_B1.jsonl`). The criteria are applied as
+written.
+
+1. Exact laws: F41 86 in A, **124 in B1** (+38); the five families at zero
+   0 in A, **35 of 90 in B1**; no law lost. The eight equations of the
+   prototype go to 5 seeds of 5 each (`I.10.7`, `I.15.10`, `II.13.23`,
+   `II.24.17`, `I.34.1`, `II.11.3`, `II.11.27` from 0, `I.27.6` from 2), and
+   no other equation changes. **Holds.**
+2. Real data in the domain: R6 folds median 0.8095 in both arms; median
+   paired difference over the folds +0.0000 (mean +0.0005, worst +0).
+   **Holds.**
+3. Out of domain: collapses 10 in both arms; median R² 0.647 in both.
+   **Holds.**
+4. Formulas flagged inexact: 16 in both. **Holds.**
+
+**B1 is adopted by the campaign**; the confirmation on new seeds follows, as
+written. Beside the criteria: a seed was injected in 40 fits of 205 on F41,
+exactly the eight equations at all five seeds, and in none of the 130 real
+fits. Each of the 40 came back exact at the first generation, in 0.8 s at
+most, written in the user's variables: `v0 / (1 - v1 / v2)`,
+`v0 / sqrt(1 - v1² / v2²)`, `v0 * v1 / (v2 * v3²) / (1 - v4² / v3²)`,
+`v0 * v1 * v2 * v3 / (1 - 0.333333 * v0 * v1)`, `v0 / v1 * sqrt(1 - 9.8696
+* v1² / (v0² * v2²))` (9.8696 = π²). The search for seeds took 0.09 s in the
+median (0.23 s at most); on the real data it does not run when no column or
+target has a constant sign (R6, standardised) and takes 0.09 s otherwise
+(R7raw). 128 of the 130 real fits return the same expression in both arms;
+the two others differ by the load of the machine, the seed having found
+nothing.
+
+The gain is concentrated on the equations the change was built for, found
+by a prototype on the training rows of this bench: whether laws of this
+shape elsewhere are recovered as well, the frozen test set will say, once,
+with the version.
