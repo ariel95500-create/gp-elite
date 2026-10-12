@@ -1,0 +1,15 @@
+A_feyn       same
+B_cpu        DIFFERENT: ['node', 'mse_validation', 'mse_train', 'pareto']
+C_big        DIFFERENT: ['node', 'expression', 'mse_validation', 'mse_train', 'pareto']
+D_units      same
+E_minmax     DIFFERENT: ['node', 'expression', 'mse_validation', 'mse_train', 'size', 'pareto']
+F_robust     same
+G_restarts   DIFFERENT: ['node', 'mse_validation', 'mse_train', 'pareto']
+H_parallel   same
+I_sklearn    DIFFERENT: ['node', 'mse_validation', 'mse_train', 'pareto']
+J_extrap     DIFFERENT: ['node', 'expression', 'mse_validation', 'mse_train', 'size', 'pareto']
+K_thorough   same
+L_standard   DIFFERENT: ['node', 'expression', 'mse_validation', 'mse_train', 'size', 'pareto']
+M_twice      DIFFERENT: ['node', 'expression', 'mse_validation', 'mse_train', 'size', 'pareto']
+total time 52.1 s -> 49.9 s
+DIFFERENCES
