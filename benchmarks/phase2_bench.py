@@ -28,7 +28,8 @@ Phase 4a, third attempt (change E1): campaigne1 and confirme1, arms A and E1
 operators="trig" (a job is keyed by its pool too).
 Phase 5 (PLAN_PHASE5.md): diag5 (one arm, F41 with 1 % and 10 % noise, the
 pool of the final selection examined) and finders5 (the finders of B1 and E1
-with their threshold lifted, on the real training rows). E1 was adopted on 12
+with their threshold lifted, on the real training rows); campaignn1 and
+confirmn1, arms A and N1 (flag _TOLERANT_SEEDS). E1 was adopted on 12
 October 2026 and is on by default since, as B1.
 """
 import argparse
@@ -216,6 +217,8 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
                       ("A", "B1")),
         "campaigne1": (e1_jobs, ("A", "E1")),
         "diag5": (lambda: diag5_jobs(), ("A",)),
+        "campaignn1": (lambda: n1_jobs(), ("A", "N1")),
+        "confirmn1": (lambda: n1_jobs(confirm=True), ("A", "N1")),
         "confirme1": (e1_confirm_jobs, ("A", "E1"))}
 
 
@@ -264,6 +267,10 @@ def run_arm(job):
         sys.exit("the flag of E1 is not in this engine")
     if job.get("e1"):                             # PLAN_PHASE4.md, change E1
         C._ELEMENTARY_SEEDS = job["arm"] == "E1"
+    if job["arm"] == "N1" and not hasattr(C, "_TOLERANT_SEEDS"):
+        sys.exit("the flag of N1 is not in this engine")
+    if job.get("n1"):                             # PLAN_PHASE5.md, change N1
+        C._TOLERANT_SEEDS = job["arm"] == "N1"
     if job.get("force_pool"):             # PLAN_TRIG.md, campaign S2 part 2
         import gp_elite
         _sr0 = gp_elite.symbolic_regression
@@ -302,6 +309,9 @@ def run_arm(job):
     rec["elementary_seeds_on"] = bool(getattr(C, "_ELEMENTARY_SEEDS", False))
     rec["elementary_seed"] = C.TRACE.value.get("elementary_seed")
     rec["elementary_seed_s"] = C.TRACE.value.get("elementary_seed_s")
+    rec["tolerant_seeds_on"] = bool(getattr(C, "_TOLERANT_SEEDS", False))
+    rec["tolerant_seed"] = C.TRACE.value.get("tolerant_seed")
+    rec["tolerant_seed_s"] = C.TRACE.value.get("tolerant_seed_s")
     rec["far_guard"] = bool(getattr(C, "_FAR_GUARD", False))
     rec["far_ext"] = float(getattr(C, "_FAR_EXT", 0.0))
     rec["far_linear"] = bool(getattr(C, "_FAR_LINEAR", False))
@@ -472,6 +482,122 @@ def summary_diag5(path):
         print("   by equation (S/P-band/P-out/N): " + "; ".join(
             "%s %d/%d/%d/%d" % (n, c["S"], c["P-band"], c["P-out"], c["N"])
             for n, c in sorted(per.items())))
+
+
+def n1_jobs(confirm=False):
+    """Campaign N1 (PLAN_PHASE5.md): F41, F41 with 1 % and 10 % noise, R6 and
+    R7raw with the default pool and with "trig"; the confirmation with seeds
+    5 to 9 (folds with seed 5)."""
+    import feynman_bench as F
+    base = confirm_s1_jobs() if confirm else campaign_jobs()
+    real = confirm_jobs() if confirm else [j for j in campaign_jobs()
+                                           if j["kind"] in ("real", "realraw")]
+    seeds = range(5, 10) if confirm else range(5)
+    noisy = [dict(kind=kind, problem=p[0], index=i, split="test", seed=s,
+                  group=kind)
+             for kind in ("feyn_n1", "feyn_n10")
+             for i, p in enumerate(F.PROBS) for s in seeds]
+    out = base + noisy + [dict(j, group="real_trig", force_pool="trig")
+                          for j in real]
+    return [dict(j, n1=True) for j in out]
+
+
+def summary_n1(path, arms, confirm=False):
+    """The criteria of campaign N1, or of its confirmation (PLAN_PHASE5.md)."""
+    from collections import defaultdict
+    A, B = arms
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    pairs = _pairs(recs, arms)
+    print("%d records, %d complete pairs, crashes %d" % (
+        len(recs), len(pairs), sum(1 for r in recs if r.get("status") == "CRASH")))
+    ok = True
+    st = {}
+    for kind in ("feyn_n1", "feyn_n10"):
+        v = [x for x in pairs.values() if x[A]["kind"] == kind]
+        st[kind] = {a: sum(1 for x in v if x[a].get("structure")) for a in arms}
+        st[kind]["n"] = len(v)
+    need = 5 if confirm else 10
+    c1 = (st["feyn_n1"]["n"] == 205 and st["feyn_n10"]["n"] == 205
+          and st["feyn_n1"][B] >= st["feyn_n1"][A] + need
+          and st["feyn_n10"][B] >= st["feyn_n10"][A] - 2)
+    print("1. structure retrieved: 1 %% noise %s %d, %s %d (at least +%d);"
+          " 10 %% noise %s %d, %s %d (at least -2) -> %s" % (
+              A, st["feyn_n1"][A], B, st["feyn_n1"][B], need, A,
+              st["feyn_n10"][A], B, st["feyn_n10"][B], "PASS" if c1 else "FAIL"))
+    ok = ok and c1
+    feyn = [x for x in pairs.values() if x[A]["kind"] == "feyn"]
+    ex = {a: sum(1 for x in feyn if x[a].get("status") == "EXACT") for a in arms}
+    per = defaultdict(lambda: {A: 0, B: 0})
+    for x in feyn:
+        for a in arms:
+            per[x[A]["problem"]][a] += x[a].get("status") == "EXACT"
+    lost = sorted(n for n, c in per.items() if c[A] >= 3 and c[B] <= 1)
+    c2 = len(feyn) == 205 and ex[B] >= ex[A] - 3 and (confirm or not lost)
+    print("2. F41 exact: %s %d, %s %d (at most -3); laws lost %s -> %s" % (
+        A, ex[A], B, ex[B], lost, "PASS" if c2 else "FAIL"))
+    ok = ok and c2
+    real_all = []
+    for pool in ("", "trig"):
+        real = [x for x in pairs.values() if x[A]["kind"] in ("real", "realraw")
+                and (x[A].get("force_pool") or "") == pool]
+        real_all += real
+        name = "pool %s" % (pool or "default")
+        folds = [x for x in real if x[A]["split"].startswith("fold")]
+        ood = [x for x in real if x[A]["split"] == "ood"]
+        d = _r2([x[B] for x in folds]) - _r2([x[A] for x in folds])
+        c3 = len(folds) == 65 and np.median(d) >= -0.005
+        col = {a: int((_r2([x[a] for x in ood]) < 0).sum()) for a in arms}
+        mA = float(np.median(_r2([x[A] for x in ood])))
+        mB = float(np.median(_r2([x[B] for x in ood])))
+        c4 = len(ood) == 65 and col[B] <= col[A] + 2 and (confirm or mB >= mA - 0.01)
+        print("3. %s, folds (%d): median paired difference %+.4f, mean %+.4g,"
+              " worst %+.4g -> %s" % (name, len(folds), np.median(d), np.mean(d),
+                                       d.min(), "PASS" if c3 else "FAIL"))
+        print("4. %s, out of domain (%d): collapses %s %d, %s %d (at most +2);"
+              " median %s %.4f, %s %.4f -> %s" % (
+                  name, len(ood), A, col[A], B, col[B], A, mA, B, mB,
+                  "PASS" if c4 else "FAIL"))
+        ok = ok and c3 and c4
+    if not confirm:
+        ie = {a: sum(1 for x in real_all if x[a].get("formula_exact") is False)
+              for a in arms}
+        c5 = len(real_all) == 260 and ie[B] <= ie[A] + 3
+        print("5. formulas flagged inexact on the %d real fits: %s %d, %s %d (at"
+              " most +3) -> %s" % (len(real_all), A, ie[A], B, ie[B],
+                                   "PASS" if c5 else "FAIL"))
+        ok = ok and c5
+    print("%s %s" % (B, ("CONFIRMED" if ok else "NOT CONFIRMED") if confirm
+                     else ("ADOPTED" if ok else "NOT ADOPTED")))
+    for kind in ("feyn_n1", "feyn_n10", "feyn"):
+        key = "structure" if kind != "feyn" else "status"
+        per = defaultdict(lambda: {A: 0, B: 0})
+        for x in pairs.values():
+            if x[A]["kind"] != kind:
+                continue
+            for a in arms:
+                per[x[A]["problem"]][a] += (bool(x[a].get("structure")) if kind != "feyn"
+                                            else x[a].get("status") == "EXACT")
+        diff = ["%s %d %d" % (n, c[A], c[B]) for n, c in sorted(per.items())
+                if c[A] != c[B]]
+        print("%s, by equation where they differ (%s, %s): %s" % (
+            kind, A, B, "; ".join(diff) or "none"))
+    rr = [r for r in recs if r.get("arm") == B]
+    for label, sel in (("feyn", lambda r: r["kind"] == "feyn"),
+                       ("feyn_n1", lambda r: r["kind"] == "feyn_n1"),
+                       ("feyn_n10", lambda r: r["kind"] == "feyn_n10"),
+                       ("real, default pool", lambda r: r["kind"] in ("real", "realraw")
+                        and not r.get("force_pool")),
+                       ("real, pool trig", lambda r: r["kind"] in ("real", "realraw")
+                        and r.get("force_pool") == "trig")):
+        k = [r for r in rr if sel(r)]
+        seeded = [r for r in k if r.get("tolerant_seed")]
+        t = [r["tolerant_seed_s"] for r in k if r.get("tolerant_seed_s") is not None]
+        print("%s: tolerant seed placed in %d fits of %d%s; search %s" % (
+            label, len(seeded), len(k),
+            (" (" + ", ".join(sorted({r["problem"] for r in seeded})) + ")")
+            if seeded and len({r["problem"] for r in seeded}) <= 30 else "",
+            ("median %.3f s, max %.3f s" % (np.median(t), max(t))) if t
+            else "never run"))
 
 
 def diag5_jobs():
@@ -1258,6 +1384,8 @@ def main():
         summary_a1(a.path, RUNS[a.which][1], confirm=a.which == "confirma1")
     elif a.which == "diag5":
         summary_diag5(a.path)
+    elif a.which in ("campaignn1", "confirmn1"):
+        summary_n1(a.path, RUNS[a.which][1], confirm=a.which == "confirmn1")
     elif a.which in ("campaigne1", "confirme1"):
         summary_e1(a.path, RUNS[a.which][1], confirm=a.which == "confirme1")
     elif a.which in ("campaignb1", "confirmb1"):

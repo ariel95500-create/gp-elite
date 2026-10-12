@@ -1367,3 +1367,46 @@ def test_elementary_law_recovered_in_a_short_fit():
     pred = r.predict(Xr[140:])
     assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
     assert r.formula_exact
+
+
+# ── 23. Seeds that tolerate noise (phase 5, flag off) ───────────────────────
+# Change N1 of benchmarks/results_0.9/PLAN_PHASE5.md, measured before any
+# adoption: when no form holds exactly, the finders of the power law, B1 and
+# E1 are run with their thresholds lifted, and a form becomes a seed only if
+# its 1 - R² after linear scaling is at most _TOLERANT_REL.
+
+def test_tolerant_seed_carries_a_noisy_law(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140),
+               rng.uniform(3, 10, 140)]
+    clean = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    y = clean + 0.01 * np.std(clean) * rng.randn(140)
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    cfg = _binom_cfg(3)
+    assert core._make_binomial_seeds(Xs, y, cfg) == []        # not exact
+    assert core._make_tolerant_seeds(Xs, y, cfg) == []        # flag off
+    monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)
+    seeds = core._make_tolerant_seeds(Xs, y, cfg)
+    assert seeds and core._seed_rel_error(seeds[0], Xs, y) < 1e-3
+    # the first seed has the structure: refitted on the clean target, exact
+    assert _scaled_residual(seeds[0], Xs, clean) < 1e-6
+
+
+def test_tolerant_seed_only_under_its_threshold(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+    cfg = _binom_cfg(2)
+    # far from every form of the finders: nothing
+    y = np.sin(3 * Xr[:, 0]) * Xr[:, 1] + np.cos(Xr[:, 0] * Xr[:, 1])
+    assert core._make_tolerant_seeds(Xr, y, cfg) == []
+    # 30 % noise on a power law: the best form explains less than 98.5 %
+    clean = Xr[:, 0] ** 2 / Xr[:, 1]
+    noisy = clean + 0.3 * np.std(clean) * rng.randn(140)
+    for t in core._make_tolerant_seeds(Xr, noisy, cfg):
+        assert core._seed_rel_error(t, Xr, noisy) <= core._TOLERANT_REL
+    # under units= nothing
+    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}}
+    assert core._make_tolerant_seeds(Xr, clean * 1.001, cfg) == []

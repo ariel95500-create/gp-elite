@@ -1,0 +1,3 @@
+PYTHONHASHSEED=0 PYTHONPATH=. python -m pytest -q tests  (flag _TOLERANT_SEEDS off, B1 and E1 on, Python 3.11.15, 12-13 October 2026)
+......                                                                   [100%]
+150 passed in 149.44s (0:02:29)

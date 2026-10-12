@@ -160,3 +160,37 @@ domain no more than 2 collapses more than A.
 The targets of gate 2 (80 and 77 fits with the structure) are read on the
 campaign and the confirmation; the ceiling measured above (54 and 13 more
 fits) says the second may stay out of reach.
+
+### Mechanics of N1, result (12 and 13 October 2026)
+
+Flag off: the thirteen reference configurations identical to the 0.9.0
+wheel (`phase5/mechanics/compare_0.9.0_vs_N1_off.txt`) and the test suite
+passing (150 tests, the two of N1 included; `tests_N1_off.txt`). Flag on
+(`compare_0.9.0_vs_N1_on.txt`, `trace_N1_on.jsonl`): a tolerant seed was
+placed in two configurations, which return another model; the eleven others
+are identical to the wheel. **Holds**, as written. The two changes:
+
+- `C_big`, X0·X1/X2 with noise on 5,000 rows: 0.9.0 returned an
+  approximation of 17 nodes (hold-out MSE 0.00295); with N1 the law itself,
+  `1.00045 * X0 * X1 / X2` (9 nodes, 0.00223).
+- `E_minmax`, Kepler's law a^1.5 without noise, normalised by min-max: a
+  trigonometric form fits the training rows to 2.5e-5 and was placed; 0.9.0
+  returned the exact law (10 generations), the engine with N1 a
+  trigonometric approximation (hold-out MSE 1.86). Fitted again, seeds 0 to
+  9, outside any measurement (`kepler_minmax_check.txt`): exact law in 0
+  and 0 fits of 10 at 10 generations without and with N1, in 3 and 1 at 40.
+  On exact data that no exact seed covers, a tolerant seed can draw the
+  search away from the law. On F41, with the default normalisation, only
+  three equations are in that case, and the engine finds none of them
+  exactly; the campaign's criterion 2 watches the rest. A guard telling
+  noisy data from exact data by an estimate of the noise taken from the data
+  alone (local linear fits, `noise_estimate_check.py`) was tried outside any
+  measurement: it separates them in one dimension (Kepler, 8.5e-6) but not
+  in three to six (exact F41 laws estimated as noisy as 1 % noise), so none
+  is added. This limit is reported with the campaign.
+
+The fit of I.34.1 with 1 % noise, seed 0, 30 s, outside any measurement: A
+returns an approximation of 70 nodes (structure not retrieved, 1.7e-3 on
+the clean test rows), N1 `0.00115247 + 1.00099 * v0 / (1 - 0.997137 * v1 /
+v2)` (13 nodes, structure retrieved), six tolerant seeds placed in 0.17 s.
+The campaign is run.

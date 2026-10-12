@@ -4158,7 +4158,7 @@ def _make_motif_seeds(cfg, n_max: int = 32) -> list:
 _POWER_LAW_MIN_R2 = 0.999    # part de la variance de log|y| que le monôme doit expliquer
 
 
-def _power_law_exponents(X, y):
+def _power_law_exponents(X, y, min_r2=None):
     """Exposants (a_j) de |y| ≈ c·Π |x_j|^a_j par moindres carrés sur les
     logarithmes, pour les colonnes de signe constant. Rend (cols, a) ou
     None si la cible change de signe, si aucune colonne ne convient, si le
@@ -4194,7 +4194,7 @@ def _power_law_exponents(X, y):
         return None
     with np.errstate(all="ignore"):
         r2 = 1.0 - float(np.var(ly - A @ coef)) / v
-    if not r2 >= _POWER_LAW_MIN_R2:
+    if not r2 >= (_POWER_LAW_MIN_R2 if min_r2 is None else min_r2):
         return None
     return cols, coef[1:]
 
@@ -4236,8 +4236,9 @@ def _product(nodes: list) -> Optional["Node"]:
     return out
 
 
-def _make_power_law_seeds(xs, ys, cfg) -> list:
-    """[v0.8] Voir le commentaire ci-dessus. Rend 0, 1 ou 2 arbres."""
+def _make_power_law_seeds(xs, ys, cfg, min_r2=None) -> list:
+    """[v0.8] Voir le commentaire ci-dessus. Rend 0, 1 ou 2 arbres. min_r2
+    remplace _POWER_LAW_MIN_R2 (graines tolérantes au bruit, phase 5)."""
     if not _GENERIC_CSV_MODE or _dim_active(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) \
             or not bool(getattr(cfg, "POWER_LAW_SEEDS", True)):
@@ -4253,7 +4254,7 @@ def _make_power_law_seeds(xs, ys, cfg) -> list:
     if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
             or X.shape[1] != len(terms):
         return []
-    fit = _power_law_exponents(X, y)
+    fit = _power_law_exponents(X, y, min_r2)
     if fit is None:
         return []
     cols, expo = fit
@@ -4358,9 +4359,11 @@ def _golden_min(f, a, b, it=60):
     return (c1, f1) if f1 < f2 else (c2, f2)
 
 
-def _binomial_forms(X, y, top: int = 8) -> list:
+def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
     """Formes y = b·f·(1 + c·g)^p qui tiennent à la précision numérique.
-    Rend une liste de (p, cols, exposants de f dans y, g, c)."""
+    Rend une liste de (p, cols, exposants de f dans y, g, c). tol remplace
+    _BINOM_TOL (graines tolérantes au bruit, phase 5)."""
+    tol = _BINOM_TOL if tol is None else tol
     X = np.asarray(X, dtype=float)
     y = np.asarray(y, dtype=float)
     n = y.shape[0]
@@ -4431,7 +4434,7 @@ def _binomial_forms(X, y, top: int = 8) -> list:
                     a = _BINOM_GRID[i - 1] if i > 0 else -1.0 + 1e-9
                     b = _BINOM_GRID[i + 1] if i + 1 < len(_BINOM_GRID) else 100.0
                     s, v = _golden_min(obj, float(a), float(b))
-                    if v / vt < _BINOM_TOL and (found is None or v < found[0]):
+                    if v / vt < tol and (found is None or v < found[0]):
                         found = (v, int(m), s)
                 if found is None:
                     continue
@@ -4452,7 +4455,7 @@ def _binomial_forms(X, y, top: int = 8) -> list:
                     return float(np.var(base + sig * np.log(w2)))
                 h = 0.05 * (1.0 + abs(s))
                 s2, v2 = _golden_min(obj2, s - h, s + h)
-                if not v2 / vt < _BINOM_TOL:
+                if not v2 / vt < tol:
                     continue
                 c = float(sg[m] * s2 / math.exp(lgmax[m]))
                 out.append((-sig / k, cols, ex / k, lib[m], c))
@@ -4474,7 +4477,7 @@ def _monomial(terms, pairs, uops) -> Optional["Node"]:
     return Node("/", top if top is not None else Node(1.0), bot)
 
 
-def _make_binomial_seeds(xs, ys, cfg) -> list:
+def _make_binomial_seeds(xs, ys, cfg, tol=None) -> list:
     """[0.10, phase 4b] Voir le commentaire ci-dessus. Rend 0 à 4 arbres.
     Le drapeau _BINOMIAL_SEEDS (actif par défaut) les coupe."""
     if not _BINOMIAL_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
@@ -4492,7 +4495,7 @@ def _make_binomial_seeds(xs, ys, cfg) -> list:
             or X.shape[1] != len(terms):
         return []
     t0 = time.time()
-    forms = _binomial_forms(X, y)
+    forms = _binomial_forms(X, y, tol=tol)
     TRACE.set("binomial_seed_s", round(time.time() - t0, 3))
     bops = set(_GENERIC_BINARY_OPS)
     uops = set(_GENERIC_UNARY_OPS)
@@ -4593,7 +4596,7 @@ def _elem_transform(kind, R, s):
     return np.log(np.arccosh(mx * (1.0 + 10.0 ** s) / A))      # "sech"
 
 
-def _elem_inverse_forms(X, y, cols, kinds, top: int = 6) -> list:
+def _elem_inverse_forms(X, y, cols, kinds, top: int = 6, tol=_BINOM_TOL) -> list:
     """Formes y = b·f·φ(c·g), φ dans exp, log, tanh, 1/cosh. Rend des
     tuples (kind, f, g, c), exposants de g arrondis au demi-entier."""
     n = y.shape[0]
@@ -4623,7 +4626,7 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6) -> list:
 
     if "log" in kinds:                    # r = a + Σ e_j·log|u_j|, linéaire
         v = _elem_rel(R, Q)
-        for m in np.where(v < _BINOM_TOL)[0]:
+        for m in np.where(v < tol)[0]:
             r = R[:, m]
             coef = np.linalg.lstsq(L, r, rcond=None)[0][1:]
             nzc = np.abs(coef)[np.abs(coef) > 1e-6]
@@ -4636,7 +4639,7 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6) -> list:
             A = np.column_stack([np.ones(n), lg])
             a0, s0 = np.linalg.lstsq(A, r, rcond=None)[0]
             if not (float(np.var(r - A @ np.array([a0, s0]))) / float(np.var(r))
-                    < _BINOM_TOL) or s0 == 0.0 or abs(a0 / s0) > 700.0:
+                    < tol) or s0 == 0.0 or abs(a0 / s0) > 700.0:
                 continue
             out.append(("log", lib[idx[m]], g, float(math.exp(a0 / s0))))
             break
@@ -4667,7 +4670,7 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6) -> list:
                 continue                  # limite dégénérée de la forme
             s, v = _golden_min(obj, float(_ELEM_S_GRID[i - 1]),
                                float(_ELEM_S_GRID[i + 1]))
-            if not v < _BINOM_TOL:
+            if not v < tol:
                 continue
             with np.errstate(all="ignore"):
                 t = _elem_transform(kind, r, s)[:, 0]
@@ -4684,7 +4687,7 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6) -> list:
                 vt = float(np.var(t2 + lg))
                 return float(np.var(t2)) / vt if vt > 0 else np.inf
             s2, v2 = _golden_min(obj2, s - 0.5, s + 0.5)
-            if not v2 < _BINOM_TOL:
+            if not v2 < tol:
                 continue
             with np.errstate(all="ignore"):
                 k0 = float(np.mean(_elem_transform(kind, r, s2)[:, 0] - lg))
@@ -4740,7 +4743,7 @@ def _elem_trig_exact(z, gn, sub):
     return val, w, np.linalg.lstsq(A, z, rcond=None)[0]
 
 
-def _elem_trig_forms(X, y, cols) -> list:
+def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL) -> list:
     """Forme y = f·(a + β·sin(ω·g) + γ·cos(ω·g)) : au plus une. Rend des
     tuples ("trig", f, g, ω rapporté à g, (a, β, γ))."""
     n = y.shape[0]
@@ -4792,14 +4795,16 @@ def _elem_trig_forms(X, y, cols) -> list:
             for j, e in zip(others, ex):
                 fv = fv * X[:, j] ** e
             val, w, c = _elem_trig_exact(y / fv, gn, sub)
-            if val < _BINOM_TOL:
+            if val < tol:
                 f = tuple((j, float(e)) for j, e in zip(others, ex) if e)
                 return [("trig", f, g, float(w) / gmax, tuple(float(x) for x in c))]
     return []
 
 
-def _elementary_forms(X, y, kinds) -> list:
-    """Formes de la phase 4a qui tiennent à la précision numérique."""
+def _elementary_forms(X, y, kinds, tol=None) -> list:
+    """Formes de la phase 4a qui tiennent à la précision numérique (à tol
+    près, graines tolérantes au bruit de la phase 5)."""
+    tol = _BINOM_TOL if tol is None else tol
     X = np.asarray(X, dtype=float)
     y = np.asarray(y, dtype=float)
     n = y.shape[0]
@@ -4816,13 +4821,13 @@ def _elementary_forms(X, y, kinds) -> list:
             Q = np.linalg.qr(L)[0]
             if _elem_rel(np.log(np.abs(y))[:, None], Q)[0] < _POWER_TOL:
                 return out                # une loi de puissance : ses graines
-            out += _elem_inverse_forms(X, y, cols, inv)
+            out += _elem_inverse_forms(X, y, cols, inv, tol=tol)
         if "trig" in kinds and n > 10 and np.var(y) > 0:
-            out += _elem_trig_forms(X, y, cols)
+            out += _elem_trig_forms(X, y, cols, tol=tol)
     return out
 
 
-def _make_elementary_seeds(xs, ys, cfg) -> list:
+def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
     """[0.10, phase 4a] Voir le commentaire ci-dessus. Rend 0 à 5 arbres.
     Le drapeau _ELEMENTARY_SEEDS (actif par défaut) les coupe."""
     if not _ELEMENTARY_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
@@ -4849,7 +4854,7 @@ def _make_elementary_seeds(xs, ys, cfg) -> list:
     if not kinds:
         return []
     t0 = time.time()
-    forms = _elementary_forms(X, y, kinds)
+    forms = _elementary_forms(X, y, kinds, tol=tol)
     TRACE.set("elementary_seed_s", round(time.time() - t0, 3))
     seeds = []
     for form in forms:
@@ -4889,6 +4894,91 @@ def _make_elementary_seeds(xs, ys, cfg) -> list:
         seeds.append(h if f is None else Node("*", f, h))
     if seeds:
         TRACE.set("elementary_seed", " | ".join(to_string(s) for s in seeds))
+    return seeds
+
+
+# ════════════════════════════════════════════════════════════════
+# [0.10, phase 5] GRAINES TOLÉRANTES AU BRUIT
+# ════════════════════════════════════════════════════════════════
+# Constat (diagnostic D5, benchmarks/results_0.9/PLAN_PHASE5.md) : avec du
+# bruit sur y, la structure de la loi manque parmi les candidats dans deux
+# ajustements sur trois, alors que les graines de loi de puissance, B1 et E1
+# la porteraient : leurs seuils (R² log-log de 0,999, précision numérique)
+# sont défaits par le bruit, qui est bien plus fort sur log|y| là où y est
+# petit. Quand aucune forme exacte n'a été trouvée, on relance donc les trois
+# chercheurs seuils levés, et on juge chaque forme comme les données la
+# jugent : 1 - R² après mise à l'échelle linéaire sur les lignes
+# d'entraînement. Elle devient une graine si cette erreur ne dépasse pas
+# _TOLERANT_REL : les graines qui ont la structure de la loi ajustent 10 % de
+# bruit à 0,008-0,014 (1 % de bruit vers 1e-4) ; sur les données réelles du
+# banc de décision, aucune n'ajuste mieux que 0,026. Mêmes gardes que les
+# graines exactes ; aucun tirage aléatoire. Mesuré dans PLAN_PHASE5.md
+# (changement N1) ; drapeau coupé par défaut.
+
+_TOLERANT_SEEDS = False
+_TOLERANT_REL = 0.015
+
+
+def _seed_rel_error(tree, X, y) -> float:
+    """1 - R² d'un arbre après mise à l'échelle linéaire (inf s'il n'est pas
+    évaluable)."""
+    try:
+        with np.errstate(all="ignore"):
+            p = np.asarray(evaluate_vector(tree, X), dtype=float)
+        if not np.all(np.isfinite(p)) or not np.var(p) > 0:
+            return float("inf")
+        a, b, ok = _linear_scale_params(p, y)
+        if not ok:
+            return float("inf")
+        r = float(np.mean((y - (a + b * p)) ** 2) / np.var(y))
+        return r if math.isfinite(r) else float("inf")
+    except Exception:
+        return float("inf")
+
+
+def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
+    """[0.10, phase 5] Voir le commentaire ci-dessus. Appelée seulement quand
+    ni B1 ni E1 n'ont placé de graine ; sans la loi de puissance si ses
+    graines exactes ont déjà été placées (power_done)."""
+    if not _TOLERANT_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
+            or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
+        return []
+    try:
+        X = np.asarray(xs, dtype=float)
+        y = np.asarray(ys, dtype=float)
+    except Exception:
+        return []
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+    if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
+            or not np.var(y) > 0:
+        return []
+    t0 = time.time()
+    trace = {k: TRACE.value.get(k) for k in ("power_law_seed", "binomial_seed",
+                                             "binomial_seed_s", "elementary_seed",
+                                             "elementary_seed_s")}
+    cands = []
+    finders = [(_make_binomial_seeds, dict(tol=1.0)),
+               (_make_elementary_seeds, dict(tol=1.0))]
+    if not power_done:
+        finders.insert(0, (_make_power_law_seeds, dict(min_r2=-math.inf)))
+    for fn, kw in finders:
+        try:
+            cands += fn(X, y, cfg, **kw)
+        except Exception:
+            pass
+    for k, v in trace.items():                    # les traces des graines exactes
+        if v is None:
+            TRACE.value.pop(k, None)
+        else:
+            TRACE.set(k, v)
+    scored = sorted(((_seed_rel_error(t, X, y), i, t) for i, t in enumerate(cands)),
+                    key=lambda r: (r[0], r[1]))
+    seeds = [t for r, _, t in scored if r <= _TOLERANT_REL]
+    TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
+    if seeds:
+        TRACE.set("tolerant_seed", " | ".join(
+            "%s (%.2g)" % (to_string(t), r) for r, _, t in scored if r <= _TOLERANT_REL))
     return seeds
 
 
@@ -8962,6 +9052,20 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                 slot = _base5 + j
                 if slot < len(target_island.population):
                     target_island.population[slot] = end.copy()
+    # [0.10, phase 5] Graines tolérantes au bruit (voir _make_tolerant_seeds) :
+    # seulement si aucune forme exacte de B1 ou E1 n'a été trouvée ; une copie
+    # dans chaque île, après les autres graines.
+    _tol = [] if (_binom or _elem) else _make_tolerant_seeds(
+        xs, ys, cfg, power_done=bool(_plaw))
+    if _tol:
+        _base6 = ((len(seeds) + (len(_cseeds) if _cseeds else 0)
+                   + len(_motifs)) // cfg.N_ISLANDS + 1 + len(_plaw)
+                  + len(_binom) + len(_elem))
+        for target_island in islands:
+            for j, tnd in enumerate(_tol):
+                slot = _base6 + j
+                if slot < len(target_island.population):
+                    target_island.population[slot] = tnd.copy()
     # [v16-NDIM] Pas de seeds spécifiques pour les problèmes N-D.
     # La couverture des opérateurs est assurée par _nd_diverse_population()
     # dans Island.initialize_nd(), et le transfert de grammaire par SEQ_MEM.
