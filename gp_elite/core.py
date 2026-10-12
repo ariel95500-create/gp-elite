@@ -4320,6 +4320,7 @@ def _make_power_law_seeds(xs, ys, cfg) -> list:
 _BINOMIAL_SEEDS = True
 _BINOM_EXPS = (-2, -1, 1, 2)          # exposants des colonnes dans g
 _BINOM_TOL = 1e-12                    # variance résiduelle de log t, relative
+_POWER_TOL = 1e-12                    # celle qui reconnaît une loi de puissance
 _BINOM_MAX_LIB = 4096                 # monômes g essayés au plus
 _BINOM_GRID_ROWS = 64                 # lignes du tri initial sur la grille
 _BINOM_GRID = np.array(sorted(set(
@@ -4401,7 +4402,7 @@ def _binomial_forms(X, y, top: int = 8) -> list:
             vt = float(np.var(lt))
             if not vt > 0.0:
                 continue
-            if float(np.var(lt - Q @ (Q.T @ lt))) / vt < _BINOM_TOL:
+            if float(np.var(lt - Q @ (Q.T @ lt))) / vt < _POWER_TOL:
                 continue                          # une loi de puissance
             lts = lt[sub]
             for sig in (-1.0, 1.0):               # t = f·(1 + c·g)^(-sig)
@@ -4813,7 +4814,7 @@ def _elementary_forms(X, y, kinds) -> list:
                 and (np.all(y > 0) or np.all(y < 0)):
             L = np.column_stack([np.ones(n), np.log(np.abs(X[:, cols]))])
             Q = np.linalg.qr(L)[0]
-            if _elem_rel(np.log(np.abs(y))[:, None], Q)[0] < _BINOM_TOL:
+            if _elem_rel(np.log(np.abs(y))[:, None], Q)[0] < _POWER_TOL:
                 return out                # une loi de puissance : ses graines
             out += _elem_inverse_forms(X, y, cols, inv)
         if "trig" in kinds and n > 10 and np.var(y) > 0:

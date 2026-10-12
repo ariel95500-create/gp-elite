@@ -25,7 +25,10 @@ adopted on 12 October 2026 and the flag is on by default since: in every
 other run, arm A is the engine as it stands, B1 included.
 Phase 4a, third attempt (change E1): campaigne1 and confirme1, arms A and E1
 (flag _ELEMENTARY_SEEDS), the decision bench and R6 and R7raw again with
-operators="trig" (a job is keyed by its pool too). E1 was adopted on 12
+operators="trig" (a job is keyed by its pool too).
+Phase 5 (PLAN_PHASE5.md): diag5 (one arm, F41 with 1 % and 10 % noise, the
+pool of the final selection examined) and finders5 (the finders of B1 and E1
+with their threshold lifted, on the real training rows). E1 was adopted on 12
 October 2026 and is on by default since, as B1.
 """
 import argparse
@@ -212,6 +215,7 @@ RUNS = {"trial": (trial_jobs, ("A", "F1")),
         "confirmb1": (lambda: [dict(j, b1=True) for j in confirm_s1_jobs()],
                       ("A", "B1")),
         "campaigne1": (e1_jobs, ("A", "E1")),
+        "diag5": (lambda: diag5_jobs(), ("A",)),
         "confirme1": (e1_confirm_jobs, ("A", "E1"))}
 
 
@@ -272,7 +276,19 @@ def run_arm(job):
         _norm = "none" if job["arm"] == "N" else "smart"
         gp_elite.symbolic_regression = (
             lambda *a, **k: _sr(*a, **dict(k, normalize=_norm)))
+    if job.get("diag5"):                  # PLAN_PHASE5.md, diagnostic D5
+        import gp_elite
+        _sr5 = gp_elite.symbolic_regression
+        _got = []
+
+        def _keep(*a, **k):
+            r = _sr5(*a, **k)
+            _got.append(r)
+            return r
+        gp_elite.symbolic_regression = _keep
     rec = P.run_one(job)
+    if job.get("diag5") and _got:
+        rec.update(diag5_pool(job, _got[-1]))
     rec["guard_strict"] = bool(getattr(C, "_GUARD_STRICT", False))
     rec["guard_search"] = bool(getattr(C, "_GUARD_STRICT", False)
                                and getattr(C, "_GUARD_SEARCH", False))
@@ -296,6 +312,177 @@ def run_arm(job):
     rec["catchup_offered"] = int(C.TRACE.count.get("rattrapage_proposes", 0))
     rec["catchup_s"] = C.TRACE.value.get("rattrapage_s")
     return rec
+
+
+def _rel_scaled(tree, Xs, y):
+    """Relative error of a tree after linear scaling (1 - R² on these rows)."""
+    import gp_elite.core as C
+    with np.errstate(all="ignore"):
+        p = np.asarray(C.evaluate_vector(tree, Xs), dtype=float)
+        if not np.all(np.isfinite(p)) or np.var(p) == 0:
+            return float("inf")
+        A = np.column_stack([np.ones_like(p), p])
+        c = np.linalg.lstsq(A, y, rcond=None)[0]
+        return float(np.mean((y - A @ c) ** 2) / np.var(y))
+
+
+def finder_rel(Xs, y, pool):
+    """How well the forms of B1 and E1 fit these rows with the threshold of
+    numerical precision lifted (PLAN_PHASE5.md): the best relative error of
+    each, inf when no form is returned."""
+    import gp_elite.core as C
+    saved = (C._BINOM_TOL, C._GENERIC_CSV_MODE, list(C._GENERIC_BINARY_OPS),
+             list(C._GENERIC_UNARY_OPS), C._BINOMIAL_SEEDS, C._ELEMENTARY_SEEDS)
+    b_ops, _bw, u_ops, _uw = C._GENCSV_POOLS[pool]
+    cfg = C.Config()
+    cfg.TERMINALS = ["X[%d]" % i for i in range(Xs.shape[1])]
+    out = {}
+    try:
+        C._BINOM_TOL, C._GENERIC_CSV_MODE = 1.0, True
+        C._GENERIC_BINARY_OPS, C._GENERIC_UNARY_OPS = list(b_ops), list(u_ops)
+        C._BINOMIAL_SEEDS = C._ELEMENTARY_SEEDS = True
+        for name, fn in (("binomial", C._make_binomial_seeds),
+                         ("elementary", C._make_elementary_seeds)):
+            try:
+                seeds = fn(Xs, y, cfg)
+            except Exception:
+                seeds = []
+            out[name] = min([_rel_scaled(t, Xs, y) for t in seeds] or [float("inf")])
+    finally:
+        (C._BINOM_TOL, C._GENERIC_CSV_MODE, C._GENERIC_BINARY_OPS,
+         C._GENERIC_UNARY_OPS, C._BINOMIAL_SEEDS, C._ELEMENTARY_SEEDS) = saved
+    return out
+
+
+def diag5_pool(job, r):
+    """Diagnostic D5 (PLAN_PHASE5.md): the pool of the final selection, the
+    candidates that have the structure of the law, the class of the fit."""
+    import io
+    from contextlib import redirect_stdout
+    import gp_elite.core as C
+    import phase1_bench as P
+    import decision_bench as D
+    Xtr, ytr, Xte, yte, Xo, yo, names, pool, clean = P._data(job)
+    ys = float(r.y_scale or 1.0)
+    xs_tr = r.scaler.transform(Xtr) if r.scaler is not None else Xtr
+    xs_te = r.scaler.transform(Xte) if r.scaler is not None else Xte
+    cfg = C.make_cfg_nd(n_features=Xtr.shape[1])
+    y_int = np.asarray(clean, dtype=float) / ys
+    cands = list(C._VAL_CANDS)
+    vy = C._VAL_YS
+    var_val = float(np.var(vy)) if vy is not None and len(vy) > 1 else 0.0
+    sel = r.eval_node if (r.eval_node is not None and r.y_scale != 1.0) else r.node
+    out = dict(pool_n=len(cands))
+    if not cands or not var_val > 0:
+        return out
+    with np.errstate(all="ignore"):
+        p_sel = np.asarray(C.evaluate_vector(sel, C._VAL_XS), dtype=float)
+    best = min(cands, key=lambda t: t[0])
+    thr = best[0] + max(best[1], 0.003 * var_val)
+    seen, rows = {}, []
+    for m, se, size, node in cands:
+        key = C.to_string(node)
+        if key not in seen:
+            ok = False
+            if size <= 60:
+                try:
+                    with redirect_stdout(io.StringIO()), np.errstate(all="ignore"):
+                        f = C._lm_to_convergence(node.copy(), xs_tr, y_int, cfg)
+                        t = C._refit_scaling(f if f is not None else node.copy(),
+                                             xs_tr, y_int)
+                        p = np.asarray(C.evaluate_vector(t, xs_te), dtype=float) * ys
+                    ok = bool(D.one_minus_r2(yte, p) < 1e-9)
+                except Exception:
+                    ok = False
+            seen[key] = ok
+        with np.errstate(all="ignore"):
+            pv = np.asarray(C.evaluate_vector(node, C._VAL_XS), dtype=float)
+        rows.append(dict(rel=m / var_val, size=int(size), struct=seen[key],
+                         band=bool(m <= thr),
+                         selected=bool(np.all(np.abs(pv - p_sel) <= 1e-12
+                                              * (1.0 + np.abs(p_sel))))))
+    st = [x for x in rows if x["struct"]]
+    out.update(pool_struct=len(st), pool_distinct=len(seen),
+               best_rel=best[0] / var_val, band_rel=(thr - best[0]) / var_val,
+               sel_size=int(C.tree_size(sel)),
+               struct_min_size=min((x["size"] for x in st), default=None),
+               struct_best_rel=min((x["rel"] for x in st), default=None),
+               struct_in_band=any(x["band"] for x in st))
+    out["finder"] = finder_rel(np.asarray(xs_tr, dtype=float),
+                               np.asarray(ytr, dtype=float) / ys, pool)
+    return out
+
+
+def classify5(rec):
+    if rec.get("structure"):
+        return "S"
+    if rec.get("pool_struct"):
+        return "P-band" if rec.get("struct_in_band") else "P-out"
+    return "N"
+
+
+def finders5_real():
+    """The finders of B1 and E1 with the threshold lifted, on the training
+    rows of R6 and R7raw, default pool and "trig" (no fit of the engine)."""
+    import decision_bench as D
+    for pool in ("physical", "trig"):
+        for raw in (False, True):
+            for name in (D.REAL_RAW if raw else D.REAL):
+                for split in ["fold%d" % k for k in range(5)] + ["ood"]:
+                    Xtr, ytr, _, _ = D.real_data(name, split, raw=raw)
+                    Xtr = np.asarray(Xtr, dtype=float)
+                    m = np.max(np.abs(Xtr), axis=0)
+                    m[m == 0] = 1.0
+                    f = finder_rel(Xtr / m, np.asarray(ytr, dtype=float), pool)
+                    print(json.dumps(dict(pool=pool, raw=raw, problem=name,
+                                          split=split, **f)), flush=True)
+
+
+def summary_diag5(path):
+    from collections import Counter, defaultdict
+    recs = [json.loads(l) for l in open(path) if l.strip()]
+    print("%d records, crashes %d" % (len(recs), sum(1 for r in recs
+                                                   if r.get("status") == "CRASH")))
+    for kind in ("feyn_n1", "feyn_n10"):
+        rr = [r for r in recs if r["kind"] == kind]
+        c = Counter(classify5(r) for r in rr)
+        print("%s (%d fits): structure retrieved %d; classes %s" % (
+            kind, len(rr), sum(1 for r in rr if r.get("structure")),
+            ", ".join("%s %d" % (k, c[k]) for k in ("S", "P-band", "P-out", "N"))))
+        pb = [r for r in rr if classify5(r) == "P-band"]
+        if pb:
+            print("   P-band: structural candidate size median %.0f, returned size"
+                  " median %.0f; its relative hold-out error median %.2e, best %.2e,"
+                  " band %.2e" % (
+                      np.median([r["struct_min_size"] for r in pb]),
+                      np.median([r["sel_size"] for r in pb]),
+                      np.median([r["struct_best_rel"] for r in pb]),
+                      np.median([r["best_rel"] for r in pb]),
+                      np.median([r["band_rel"] for r in pb])))
+        for fam in ("binomial", "elementary"):
+            v = np.array([r.get("finder", {}).get(fam, np.inf) for r in rr])
+            v = v[np.isfinite(v)]
+            if v.size:
+                print("   finder %s: best relative error on the noisy training rows,"
+                      " quartiles %.2e %.2e %.2e (%d fits with a form)" % (
+                          fam, *np.percentile(v, [25, 50, 75]), v.size))
+        per = defaultdict(Counter)
+        for r in rr:
+            per[r["problem"]][classify5(r)] += 1
+        print("   by equation (S/P-band/P-out/N): " + "; ".join(
+            "%s %d/%d/%d/%d" % (n, c["S"], c["P-band"], c["P-out"], c["N"])
+            for n, c in sorted(per.items())))
+
+
+def diag5_jobs():
+    import feynman_bench as F
+    out = []
+    for kind in ("feyn_n1", "feyn_n10"):
+        for i, p in enumerate(F.PROBS):
+            for s in range(5):
+                out.append(dict(kind=kind, problem=p[0], index=i, split="test",
+                                seed=s, group=kind, diag5=True))
+    return out
 
 
 def drive(which, python, out, pairs, max_seconds=None):
@@ -1050,7 +1237,11 @@ def main():
     s = sub.add_parser("summary")
     s.add_argument("which", choices=sorted(RUNS))
     s.add_argument("path")
+    sub.add_parser("finders5")
     a = ap.parse_args()
+    if a.cmd == "finders5":
+        finders5_real()
+        return
     if a.cmd == "run":
         drive(a.which, a.python, a.out, a.pairs, a.max_seconds)
     elif a.cmd == "one":
@@ -1065,6 +1256,8 @@ def main():
         summary_trig(a.path, RUNS[a.which][1])
     elif a.which in ("campaigna1", "confirma1"):
         summary_a1(a.path, RUNS[a.which][1], confirm=a.which == "confirma1")
+    elif a.which == "diag5":
+        summary_diag5(a.path)
     elif a.which in ("campaigne1", "confirme1"):
         summary_e1(a.path, RUNS[a.which][1], confirm=a.which == "confirme1")
     elif a.which in ("campaignb1", "confirmb1"):
