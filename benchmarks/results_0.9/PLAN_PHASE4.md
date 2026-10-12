@@ -394,8 +394,9 @@ most, written in the user's variables: `v0 / (1 - v1 / v2)`,
 median (0.23 s at most); on the real data it does not run when no column or
 target has a constant sign (R6, standardised) and takes 0.09 s otherwise
 (R7raw). 128 of the 130 real fits return the same expression in both arms;
-the two others differ by the load of the machine, the seed having found
-nothing.
+in the two others no seed was found either, and the arms reached another
+number of generations in their 30 s (57 and 55 on `690_visualizing_galaxy`
+fold 3, 47 and 48 on `nikuradse_1` fold 1).
 
 The gain is concentrated on the equations the change was built for, found
 by a prototype on the training rows of this bench: whether laws of this
