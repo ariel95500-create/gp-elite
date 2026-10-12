@@ -71,6 +71,35 @@ the notebook snippets, the missing or infinite values and Nikuradse.
   scripts print today, with more fields than in 0.8; their records
   (`.jsonl`) are identical.
 
-## M2, campaign R paired with 0.8.0
+## M2, campaign R paired with 0.8.0 (11 and 12 October 2026)
 
-To be added when it ends.
+`m2/campaignR_0.8.0.jsonl` and `m2/campaignR_0.9.0.jsonl`: the whole suite of
+phase 1 (F41, F41 with 1 % and 10 % noise, R6, R7raw, and the frozen test set
+TF78, TS14, TR25, TR25raw: 1,775 fits per version, budget T of 30 s per fit),
+run by `benchmarks/phase1_bench.py run-paired`, each job started with both
+versions at the same time, two jobs at a time, from 20:44 on 11 October to
+03:55 on 12 October, in four time slices (the bench resumes). No crash.
+`m2/tables_*.md` are the tables of `benchmarks/phase1_report.py` for each
+version; `m2/compare.txt` the comparison and the criteria of the plan
+(`benchmarks/release_claims/compare_m2.py`).
+
+| indicator | 0.8.0 | 0.9.0 |
+|---|---|---|
+| F41 exact laws (205 fits) | 86 | 86 |
+| structure retrieved, F41N1 / F41N10 (205 fits each) | 66 / 62 | 66 / 62 |
+| R6 folds, median test R² | 0.8095 | 0.8095 |
+| R6 + R7raw, collapses out of domain (65 fits), worst R² | 10, −232.5 | 10, −232.5 |
+| TF78 exact laws (390 fits) | 144 | 144 |
+| TS14 exact laws (70 fits) | 7 | 7 |
+| TR25 folds, median test R² | 0.7466 | 0.7466 |
+| TR25, collapses out of domain (125 fits) | 37 | 36 |
+
+The two versions return the same expression on 1,746 of the 1,775 jobs; the
+29 others differ where the deadline of 30 s falls (the untyped search returns
+the same models at equal work, M1). The four criteria of the plan are met.
+
+Against phase 1 (0.8.0 on another machine, at 2.1 GHz): 86 exact laws on F41
+instead of 88, 66 and 62 structures instead of 70 and 67, 144 on TF78
+instead of 145, and a median R² of 0.747 on the TR25 folds instead of 0.766,
+with the same engine. Under a time budget the figures depend on the machine;
+the comparison of versions is the paired one above.

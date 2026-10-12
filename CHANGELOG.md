@@ -1,6 +1,32 @@
 # Changelog
 
-## 0.9.0
+## 0.9.0 — "Steady"
+
+This release makes the search with `units=` more than five times faster with
+the same models, names the exact formulas of the Pareto front when the
+returned formula departs from the model, and is the first measured on a test
+set frozen before any decision of its work. The search itself does not
+change: every change tried on it during this work was measured against
+criteria written before it ran, and none met them (they are listed in
+`benchmarks/results_0.9/`, with their numbers).
+
+The release was measured as installed from its wheel, side by side with
+0.8.0 installed from PyPI on the same machine, each fit started with both
+versions at the same time (`benchmarks/results_0.9/release/`). Without
+`units=` the two return the same model at equal work; at 30 s per fit they
+return the same expression on 1,746 of 1,775 fits, the others differing
+where the deadline falls. On the 41 equations of the decision bench with
+five seeds, both recover the exact law 86 times in 205 (88 for 0.8.0 on the
+machine of its own measurement: under a time budget the figures depend on
+the machine). On the frozen test set, measured once for this release and
+never used to decide: 144 exact laws in 390 fits on 78 Feynman equations the
+engine was not developed on, 7 in 70 on the 14 Strogatz systems, and a
+median test R² of 0.747 on the folds of 25 real datasets, with 36 models of
+125 collapsing (R² < 0) when they predict outside the training range
+(`benchmarks/results_0.9/release/m2/`). Every figure of the README, of the
+notebooks and of the paper was measured again on the wheel: the laws,
+formulas and counts are those of 0.8.0, the times those of a different
+machine (`benchmarks/results_0.9/release/README.md`).
 
 - The search with `units=` is more than five times faster and returns the
   same models, bit for bit. Its typed operators computed again, millions of times
