@@ -347,3 +347,19 @@ least −0.005, and out of domain B1 has no more than 2 collapses more than
 A.
 
 The frozen test set is measured once, with the version, as for every change.
+
+### Mechanics of B1, result (12 October 2026)
+
+Flag off: the thirteen reference configurations identical to the 0.9.0
+wheel (`phase4_mechanics/compare_0.9.0_vs_B1_off.txt`) and the test suite
+passing (145 tests, the three of B1 included; `phase4_mechanics/tests_B1_off.txt`). Flag on: no seed injected in any of the thirteen
+configurations (none follows such a form; `trace_B1_on.jsonl`), and all
+thirteen identical to the 0.9.0 wheel (`compare_0.9.0_vs_B1_on.txt`).
+**Holds.** The fit of I.34.1, 30 generations, seed 0, outside any
+measurement (`one_fit_I.34.1.txt`): flag off, an approximation of 1 − R²
+9e-3 on the test rows in 11.8 s; flag on, `v0 / (1 - v1 / v2)` exact (1 − R²
+2e-28) in 0.6 s, the seed found in 0.09 s. Three tests are added to
+`tests/test_guarantees.py` (section 21): the three shapes found exactly, no
+seed with the flag off, with 1 % noise, on a power law, on a target that
+changes sign or under `units=`, and a short fit of II.11.3. The campaign is
+run.

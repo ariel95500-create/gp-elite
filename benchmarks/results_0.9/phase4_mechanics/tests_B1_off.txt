@@ -1,0 +1,3 @@
+PYTHONHASHSEED=0 PYTHONPATH=. python -m pytest -q tests  (commit 273061b, flag _BINOMIAL_SEEDS off, Python 3.11.15, 12 October 2026)
+.                                                                        [100%]
+145 passed in 152.85s (0:02:32)
