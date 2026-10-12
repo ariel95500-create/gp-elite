@@ -57,3 +57,40 @@ rest N.
 
 The changes N1 and N2 are planned from this diagnostic, each with its own
 criteria, before it is implemented.
+
+## Diagnostic D5, result (12 October 2026)
+
+Run from 21:24 to 22:24 UTC, 410 fits, no crash (`phase5/diag5.jsonl`;
+`python benchmarks/phase2_bench.py summary diag5
+benchmarks/results_0.9/phase5/diag5.jsonl`).
+
+| | 1 % noise | 10 % noise |
+|---|---|---|
+| S, structure retrieved | 66 | 63 |
+| P-band, in the pool and in the band, a smaller one preferred | 3 | 1 |
+| P-out, in the pool, outside the band | 0 | 0 |
+| N, not in the pool | 136 | 141 |
+
+The expectation on S holds (66 and 63, against 70 and 67 for 0.8.0 on the
+machine of its baseline); the one on P-band does not: **the final selection
+loses the structure in 3 fits of 205 at 1 % noise and 1 at 10 %**. In two
+fits of three the structure is not among the candidates at all. Setting the
+selection on the level of the noise, the lever the plan of 0.9 named, could
+recover at most those 4 fits, far from the 14 and 14 the targets ask of the
+current engine.
+
+Where the structure could come from instead: the seeds of the power law, B1
+and E1 have thresholds set in log scale or at numerical precision, which
+noise defeats (with noise added to y, log|y| is far noisier where y is
+small). With the thresholds lifted, and each seed judged by its relative
+error after linear scaling on the training rows (outside the engine's
+search, `phase5/seed_ceiling.py`, `phase5/seed_ceiling.jsonl`), a seed with
+the structure of the law exists for 23 equations at 1 % noise, at the level
+of the noise (relative error 0.8e-4 to 1.2e-4), and for 12 at 10 % (0.8e-2
+to 1.4e-2, and 3.1e-2 for `I.27.6`). Counting the fits the engine misses on
+those equations, the ceiling is 54 more fits at 1 % noise and 13 at 10 %.
+On the real training rows of R6 and R7raw, the best such seeds fit with a
+relative error of 0.026 at least (power law, `nikuradse_1`) and 0.032 (B1
+and E1; `phase5/finders_real.jsonl`).
+
+This changes the lever of phase 5; the choice goes to the author.
