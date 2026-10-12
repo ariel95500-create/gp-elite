@@ -4531,9 +4531,12 @@ def _make_binomial_seeds(xs, ys, cfg) -> list:
 # données qui ne suivent pas une telle loi exactement, rien n'est injecté et
 # l'ajustement est celui d'avant. Aucun tirage aléatoire. Mêmes gardes que
 # les graines binomiales. Mesuré dans benchmarks/results_0.9/PLAN_PHASE4.md
-# (changement E1) ; drapeau coupé par défaut.
+# (changement E1, adopté le 12 octobre 2026) : banc de décision avec B1,
+# lois exactes 124 -> 157 sur 205 (familles à zéro 35 -> 55 sur 90), puis
+# 126 -> 155 sur des graines neuves ; données réelles inchangées (aucune
+# graine injectée sur les 520 ajustements réels, pool par défaut et "trig").
 
-_ELEMENTARY_SEEDS = False
+_ELEMENTARY_SEEDS = True
 _ELEM_MAX_LIB = 4096                  # monômes f (ou g trigonométriques) au plus
 _ELEM_S_GRID = np.linspace(-6.0, 3.0, 37)
 _ELEM_W_GRID = np.linspace(0.05, 40.0, 800)
@@ -4819,7 +4822,8 @@ def _elementary_forms(X, y, kinds) -> list:
 
 
 def _make_elementary_seeds(xs, ys, cfg) -> list:
-    """[0.10, phase 4a] Voir le commentaire ci-dessus. Rend 0 à 5 arbres."""
+    """[0.10, phase 4a] Voir le commentaire ci-dessus. Rend 0 à 5 arbres.
+    Le drapeau _ELEMENTARY_SEEDS (actif par défaut) les coupe."""
     if not _ELEMENTARY_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []

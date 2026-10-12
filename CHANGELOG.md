@@ -21,6 +21,21 @@ of the README describe 0.9.0 until the next release.
   each in less than a second. No seed was placed on any of the 260 fits on
   real data, whose results are those of 0.9.0
   (`benchmarks/results_0.9/PLAN_PHASE4.md`, change B1).
+- Laws that are a monomial times a function of a monomial are fitted
+  directly too, by the same rule: y = b·f·exp(c·g), b·f·log(c·g),
+  b·f·tanh(c·g), b·f/cosh(c·g), and, with a pool that has sine and cosine,
+  y = f·(a + β·sin(ω·g) + γ·cos(ω·g)). The function inverted, the first four
+  become power laws once one constant is searched in one dimension; for the
+  trigonometric form, ω is searched on a grid. The seed is placed only when
+  the form holds to numerical precision. On the same bench, with the change
+  above, the exact law is recovered 157 times in 205 instead of 124 (155
+  instead of 126 on five seeds never run), among which n0·exp(−m·g·x/(kb·T)),
+  n·kb·T·log(V2/V1), a law in 1/cosh, 3·p·cos θ·sin θ/(4π·ε·r³) and
+  2·U·(1 − cos(k·d)), each in less than a second; no seed was placed on any
+  of the 520 fits on real data, with the default pool or with `"trig"`
+  (`PLAN_PHASE4.md`, change E1). Together, the five families of laws that
+  0.8.0 and 0.9.0 never recovered on this bench (roots, rational forms,
+  trigonometry, exponentials, logarithms) go from 0 to 55 of their 90 fits.
 
 ## 0.9.0 — "Steady"
 

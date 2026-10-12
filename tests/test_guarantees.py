@@ -1305,14 +1305,14 @@ def test_binomial_law_recovered_in_a_short_fit():
     assert r.formula_exact
 
 
-# ── 22. A function of a monomial held exactly (phase 4a, flag off) ──────────
-# Change E1 of benchmarks/results_0.9/PLAN_PHASE4.md, measured before any
-# adoption: y = b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g) and
+# ── 22. A function of a monomial held exactly is seeded (phase 4a) ─────────
+# Change E1 of benchmarks/results_0.9/PLAN_PHASE4.md, adopted on 12 October
+# 2026: y = b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g) and
 # y = f·(a + β·sin(ω·g) + γ·cos(ω·g)), seeded only when the form holds to
-# numerical precision, and only with the flag on.
+# numerical precision (on the decision bench, exact laws 124 to 157 of 205,
+# no seed on any real dataset).
 
 def test_elementary_forms_found_exactly(monkeypatch):
-    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", True)
     rng = np.random.RandomState(0)
     Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140),
                rng.uniform(1, 5, 140)]
@@ -1338,9 +1338,10 @@ def test_elementary_seed_only_where_it_applies(monkeypatch):
                rng.uniform(1, 5, 140)]
     y = Xr[:, 0] * np.exp(-Xr[:, 1] / Xr[:, 2])
     cfg = _binom_cfg(3)
-    assert core._make_elementary_seeds(Xr, y, cfg) == []      # flag off
+    assert len(core._make_elementary_seeds(Xr, y, cfg)) >= 1   # on by default
+    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", False)
+    assert core._make_elementary_seeds(Xr, y, cfg) == []
     monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", True)
-    assert len(core._make_elementary_seeds(Xr, y, cfg)) >= 1
     kinds = ["exp", "log", "tanh", "sech", "trig"]
     # 1 % noise: no form holds to numerical precision
     assert core._elementary_forms(Xr, y * (1 + 0.01 * rng.randn(140)), kinds) == []
@@ -1356,8 +1357,7 @@ def test_elementary_seed_only_where_it_applies(monkeypatch):
     assert core._make_elementary_seeds(Xr, y, cfg) == []
 
 
-def test_elementary_law_recovered_in_a_short_fit(monkeypatch):
-    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", True)
+def test_elementary_law_recovered_in_a_short_fit():
     rng = np.random.RandomState(2)
     Xr = np.c_[rng.uniform(1, 5, 200), rng.uniform(1, 5, 200),
                rng.uniform(1, 5, 200), rng.uniform(1, 5, 200)]

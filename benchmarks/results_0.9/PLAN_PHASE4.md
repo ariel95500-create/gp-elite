@@ -592,3 +592,41 @@ real fits return the same expression in both arms; in the three others no
 seed was placed and the arms reached another number of generations in their
 30 s (the formula flagged inexact in E1 and not in A, `561_cpu` in its units
 fold 3, is one of them: 65 and 64 generations).
+
+### Confirmation of E1 on new seeds, result (12 October 2026)
+
+Run from 19:33 to 21:06 UTC, 930 fits, 465 complete pairs, no crash
+(`confirm_E1.jsonl`; `python benchmarks/phase2_bench.py summary confirme1
+benchmarks/results_0.9/confirm_E1.jsonl`), seeds 5 to 9.
+
+1. F41 exact: 126 in A, **155 in E1** (+29, at least +5 required); the five
+   families at zero 36 in A, 56 in E1: the same seven equations at all five
+   seeds. **Holds.**
+2. Folds: median paired difference +0.0000 with each pool. **Holds.**
+3. Out of domain: collapses 17 in both arms with each pool. **Holds.**
+
+**E1 is confirmed and adopted.** A seed was again placed in exactly 35 F41
+fits, each exact at the first generation (0.99 s at most), and in none of
+the 260 real fits; 255 of these return the same expression in both arms, the
+five others reaching another number of generations in their 30 s.
+
+The flag `_ELEMENTARY_SEEDS` is now on by default. With B1 and E1 on, the
+thirteen reference configurations are still identical to the 0.9.0 wheel
+(`phase4_mechanics/compare_0.9.0_vs_B1_E1_default.txt`) and the test suite
+passes (148 tests, `tests_B1_E1_default.txt`). The campaign and the
+confirmation can be run again from this commit (`campaigne1`, `confirme1`:
+arm A turns the flag off).
+
+### Where phase 4 stands
+
+On the decision bench, the five families at zero go from 0 of 90 fits
+(0.9.0) to 55 with B1 and E1 (56 on the new seeds), and F41 as a whole from
+86 to 157 exact laws of 205 (155 on the new seeds), with the real data
+unchanged. What remains at zero: `I.26.2` and `I.30.5` (an arcsine, which no
+pool of the engine has), `I.37.4` and `III.17.37` (a sum of terms, one of
+them trigonometric), `I.50.26` and `III.9.52` (nested or shifted
+arguments), and `III.10.19` (a root of a sum of three squares). The gain
+rests on twelve equations the two changes were built for, found by
+prototypes on the training rows of this bench: whether laws of these shapes
+elsewhere are recovered as well, the frozen test set will say, once, with
+the next version.

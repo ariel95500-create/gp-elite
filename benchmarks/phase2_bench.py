@@ -25,7 +25,8 @@ adopted on 12 October 2026 and the flag is on by default since: in every
 other run, arm A is the engine as it stands, B1 included.
 Phase 4a, third attempt (change E1): campaigne1 and confirme1, arms A and E1
 (flag _ELEMENTARY_SEEDS), the decision bench and R6 and R7raw again with
-operators="trig" (a job is keyed by its pool too).
+operators="trig" (a job is keyed by its pool too). E1 was adopted on 12
+October 2026 and is on by default since, as B1.
 """
 import argparse
 import json
