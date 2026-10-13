@@ -13,8 +13,9 @@ discrepancy between the documents and the records.
    and their source, what the engine returns, what it does not find, and a
    held-out check. The choice of the three goes to the author.
 3. **A page of the limits**: what the engine does not do, with the records
-   behind each point (the families still at zero, real data out of domain,
-   noise above 10 %, the known limit of N1, the parallel islands, units).
+   behind each point. Written on 13 October, `LIMITATIONS.md` and
+   `LIMITATIONS.fr.md` (nine points; figures from the campaigns of phases 4
+   and 5, to be measured again on the wheel).
 4. **The paper brought up to date**, after the release figures are measured.
 
 The figures of the README, the notebooks, the case studies and the paper are
