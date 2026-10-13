@@ -127,11 +127,11 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
         self.equation_ = self.model_.expression
         self.is_fitted_ = True
         if self.unknown_constant:
-            self._deduce_constant()
+            self._deduce_constant(X)
         return self
 
     # ── [v0.5] constante mystere ────────────────────────────────────────────
-    def _deduce_constant(self):
+    def _deduce_constant(self, X=None):
         """Deduit dimension et valeur de la constante multiplicative de tete.
 
         L'arbre livre a la forme  b * f(x)  (mise a l'echelle par l'origine,
@@ -201,6 +201,28 @@ class GPEliteRegressor(RegressorMixin, BaseEstimator):
             if e:
                 rho *= float(sc[i]) ** (-e)
         val = float(b) * rho
+        # [0.10] Une constante peut se cacher a l'interieur de f (sqrt de
+        # (k*x)^2, que la formule imprimee replie) : b * rho ne tient alors
+        # pas compte de k, et la valeur rendue s'ecartait du coefficient de la
+        # formule (vu sur la loi de Kepler en unites SI : 4.34e-10 annonce pour
+        # 5.45e-10 * sqrt(X0 * sqrt(X0^2)^2)). Quand le modele est bien
+        # c * prod x_i^e_i sur les donnees, c se lit sur ses predictions.
+        if X is not None:
+            try:
+                Xa = np.asarray(X, dtype=float)
+                mono = np.ones(Xa.shape[0])
+                for i in range(self.n_features_in_):
+                    e = float(expo.get(f"__s{i}", 0.0))
+                    if e:
+                        mono = mono * Xa[:, i] ** e
+                with np.errstate(all="ignore"):
+                    ratio = np.asarray(self.model_.predict(Xa), dtype=float) / mono
+                if ratio.size and np.all(np.isfinite(ratio)):
+                    c = float(np.median(ratio))
+                    if c != 0.0 and np.max(np.abs(ratio / c - 1.0)) < 1e-6:
+                        val = c
+            except Exception:
+                pass
         self.constant_value_ = val if C.math.isfinite(val) else None
 
     def constant_units_string(self):

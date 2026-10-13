@@ -1411,3 +1411,27 @@ def test_tolerant_seed_only_under_its_threshold(monkeypatch):
     # under units= nothing
     cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}}
     assert core._make_tolerant_seeds(Xr, clean * 1.001, cfg) == []
+
+
+# ── 24. The deduced constant is the coefficient of the formula ──────────────
+# Found while writing the case study of Kepler's law in SI units (phase 6):
+# with seed 0 the engine returned 5.45084e-10 * sqrt(X0 * sqrt(X0²)²) but
+# announced 4.34e-10 s/m^1.5, a constant hidden inside the square root having
+# escaped the deduction. When the model is c * prod x_i^e_i on the data, the
+# constant is now read off its predictions.
+
+def test_deduced_constant_matches_the_predictions():
+    AU, YR = 1.495978707e11, 365.25 * 86400.0
+    a = np.array([0.387, 0.723, 1.000, 1.524, 5.203, 9.537, 19.191, 30.069]) * AU
+    T = np.array([0.241, 0.615, 1.000, 1.881, 11.862, 29.457, 84.011, 164.79]) * YR
+    for seed in (0, 1):
+        est = GPEliteRegressor(units=["m"], target_units="s", unknown_constant=True,
+                               generations=30, speed="fast", random_state=seed,
+                               parallel=False)
+        est.fit(a.reshape(-1, 1), T)
+        assert est.constant_units_string() == "[s / m^1.5]"
+        c = est.constant_value_
+        p = est.predict(a.reshape(-1, 1))
+        assert np.max(np.abs(c * a ** 1.5 / p - 1.0)) < 1e-6
+        gm = (2 * np.pi / c) ** 2                 # G·M of the Sun, m³/s²
+        assert abs(gm / 1.32712440018e20 - 1.0) < 0.01

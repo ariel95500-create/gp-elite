@@ -11421,10 +11421,17 @@ def _interactive_menu():
                 print("\n  Dimensional constraint was active: every candidate "
                       "was\n  dimensionally consistent by construction.")
                 if unknown_const_cli:
+                    _bn2 = best.node if hasattr(best, "node") else best
+                    try:
+                        _xr = _scaler.inverse_transform(np.asarray(X_data, dtype=float))
+                        _pr = np.asarray(evaluate_vector(
+                            _bn2, np.asarray(X_data, dtype=float)), dtype=float) * _y_scale
+                    except Exception:
+                        _xr = _pr = None
                     _u, _v = _deduce_console_constant(
-                        _scale_tree(best.node if hasattr(best, "node") else best,
-                                    _y_scale),
-                        feat_dims_cli, target_dim_cli, _scaler, n_feat)
+                        _scale_tree(_bn2, _y_scale),
+                        feat_dims_cli, target_dim_cli, _scaler, n_feat,
+                        Xraw=_xr, preds=_pr)
                     if _u is not None:
                         from .dimensions import _fmt as _fmtdim
                         print(f"  Deduced constant units : {_fmtdim(_u)}")
@@ -11440,7 +11447,8 @@ def _interactive_menu():
         _pause()
 
 
-def _deduce_console_constant(node, feat_dims, target_dim, scaler, n_feat):
+def _deduce_console_constant(node, feat_dims, target_dim, scaler, n_feat,
+                             Xraw=None, preds=None):
     """[v0.6] Unités et valeur de la constante de tête, pour le mode console.
 
     Le mode CSV appelle evolve() directement et non l'estimateur scikit-learn :
@@ -11494,6 +11502,25 @@ def _deduce_console_constant(node, feat_dims, target_dim, scaler, n_feat):
         if e:
             rho *= float(sc[i]) ** (-e)
     val = float(b) * rho
+    # [0.10] Comme GPEliteRegressor._deduce_constant : une constante cachée à
+    # l'intérieur de f échappe à b * rho ; quand le modèle est bien
+    # c * prod x_i^e_i sur les données, c se lit sur ses prédictions.
+    if Xraw is not None and preds is not None:
+        try:
+            Xa = np.asarray(Xraw, dtype=float)
+            mono = np.ones(Xa.shape[0])
+            for i in range(n_feat):
+                e = float(expo.get(f"__s{i}", 0.0))
+                if e:
+                    mono = mono * Xa[:, i] ** e
+            with np.errstate(all="ignore"):
+                ratio = np.asarray(preds, dtype=float) / mono
+            if ratio.size and np.all(np.isfinite(ratio)):
+                c = float(np.median(ratio))
+                if c != 0.0 and np.max(np.abs(ratio / c - 1.0)) < 1e-6:
+                    val = c
+        except Exception:
+            pass
     return units, (val if math.isfinite(val) else None)
 
 

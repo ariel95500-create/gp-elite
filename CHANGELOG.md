@@ -38,6 +38,13 @@ of the README describe 0.9.0 until the next release.
   trigonometry, exponentials, logarithms) go from 0 to 55 of their 90 fits.
 
 ### Fixed
+- With `unknown_constant=True`, the value of the deduced constant could differ
+  from the coefficient of the returned formula when the model hid a second
+  constant inside a function: on Kepler's law in SI units, seed 0 returned
+  `5.45084e-10 * sqrt(X0 * sqrt(X0²)²)` and announced 4.34e-10 s/m^1.5. When the
+  model is a constant times a product of powers of the inputs, the constant is
+  now read off its predictions (5.45084e-10, hence G·M of the Sun within 0.12 %),
+  in the estimator and in the console.
 - When parallel islands cannot start (a script without
   `if __name__ == "__main__":`), the engine no longer says that the results
   are identical: it says that the islands then run in sequence, which is
