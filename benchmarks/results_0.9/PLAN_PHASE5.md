@@ -269,3 +269,9 @@ known limit of N1 (an approximate seed on exact data that no exact seed
 covers) is in the CHANGELOG. Like the gains of phase 4, these rest on a
 bench the changes were built on; the frozen test set is measured with the
 next version.
+
+### Decision of the author on N1 (13 October 2026)
+
+Asked whether to keep N1 on by default, its known limit documented, or to
+turn it off by default and let users with noisy data turn it on, the author
+chose to keep it on by default.
