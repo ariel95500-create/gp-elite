@@ -21,6 +21,9 @@ discrepancy between the documents and the records.
    `LIMITATIONS.fr.md` (nine points; figures from the campaigns of phases 4
    and 5, to be measured again on the wheel).
 4. **The paper brought up to date**, after the release figures are measured.
+5. **The launch of 1.0**, added on 13 October on the author's choice: no
+   change of direction for the engine, a campaign the week of the release
+   towards the people who can use it. Its plan follows.
 
 The figures of the README, the notebooks, the case studies and the paper are
 measured again on the wheel of the next version, as for 0.9.0; the
@@ -169,4 +172,41 @@ planet of fit C); the run was made again, and every figure printed before is
 unchanged. The first launch of the Nikuradse driver would have moved telemetry
 files the repository keeps; it was stopped during seed 0, before anything was
 written, and the driver now leaves those files as they were.
+
+## Launch of 1.0
+
+Written on 13 October, before any launch text is drafted.
+
+**Why.** Four months after the first release, the repository has 41 stars, 3
+forks and no issue from anyone (13 October; the PyPI download counts cannot be
+read from the measuring machine). The author asked whether to change
+direction towards a more striking problem, or to campaign on X or Hacker
+News. Recommendation, chosen by the author: keep the engine's place (plain
+Python and NumPy, physical units, formulas checked against the model, French
+documentation), and make it known when 1.0 is out, to targeted audiences.
+
+**When.** The week 1.0 is on PyPI, once the Colab links of the notebooks and
+case studies work from `main` and every figure has been measured on the
+wheel. Nothing is posted before.
+
+**Channels**, in this order: the SRBench announcement and the JOSS
+submission already planned; a "Show HN" on a weekday when the author can
+answer for several hours; the Python newsletters that take submitted links
+(PyCoder's Weekly, Python Weekly); the "Showcase" posts of r/Python, in the
+format its rules ask for on the day; the networks of French-speaking physics
+teachers the author knows. X only to point at the demonstration.
+
+**Who does what.** Claude drafts every text in English with a French
+translation for the author, the demonstration (Kepler with units in Colab,
+two minutes), and answers to the questions likely to come. The author
+publishes and answers himself, in his own words; Claude posts nothing
+anywhere. Every figure in a launch text is one measured on the wheel of 1.0;
+no comparison with another engine that is not in the records.
+
+**What is measured**, 7, 30 and 90 days after the launch: people other than
+the author who open an issue or a discussion, or say they use the engine;
+stars; PyPI downloads without mirrors (pypistats, read by the author).
+Criterion: if fewer than 3 people from outside have written within 90 days,
+the audience aimed at is reviewed with the author before any further
+campaign.
 
