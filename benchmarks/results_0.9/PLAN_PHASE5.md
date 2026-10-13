@@ -194,3 +194,39 @@ returns an approximation of 70 nodes (structure not retrieved, 1.7e-3 on
 the clean test rows), N1 `0.00115247 + 1.00099 * v0 / (1 - 0.997137 * v1 /
 v2)` (13 nodes, structure retrieved), six tolerant seeds placed in 0.17 s.
 The campaign is run.
+
+### Campaign N1, result (13 October 2026)
+
+Run from 23:32 on 12 October to 02:52 UTC, 1,750 fits, 875 complete pairs,
+no crash (`phase5/campaign_N1.jsonl`; `python benchmarks/phase2_bench.py
+summary campaignn1 benchmarks/results_0.9/phase5/campaign_N1.jsonl`). The
+machine of the session restarted at about 00:52 UTC after 872 fits: the fits
+running at that moment left no record and were run again in full when the
+campaign resumed at 00:53 (`phase5/campaign_N1_driver.log`). A is the engine
+with B1 and E1. The criteria are applied as written.
+
+1. Structure retrieved: with 1 % noise 69 in A, **106 in N1** (+37); with
+   10 % noise 68 in A, **86 in N1** (+18). **Holds.** With 1 % noise,
+   `I.10.7`, `I.12.2`, `I.34.1`, `II.13.23` and `II.24.17` go from 0 to 5
+   seeds, `II.6.15b` from 1 to 5, `I.18.12`, `I.27.6` and `II.15.4` from 2
+   to 5, and `III.19.51` falls from 2 to 1; with 10 %, `I.34.1` 0 to 5,
+   `III.15.12` 0 to 4, `I.12.2`, `I.18.12` and `II.15.4` 2 to 5.
+2. F41 without noise: exact 157 in A, 160 in N1; no law lost. **Holds.**
+   (`I.16.6`, (u + v)/(1 + u·v/c²), from 0 to 3: the tolerant seed placed
+   on these exact data led to the law.)
+3. Real data in the domain: median paired difference over the folds +0.0000
+   with each pool (worst +0 with the default pool, −0.078 with `"trig"`).
+   **Holds.**
+4. Out of domain: collapses 10 in both arms with the default pool, 13 in
+   both with `"trig"`; medians 0.647 and 0.647, 0.629 and 0.694. **Holds.**
+5. Formulas flagged inexact on the 260 real fits: 11 in both. **Holds.**
+
+**N1 is adopted by the campaign**; the confirmation on new seeds follows.
+The targets of gate 2, 80 and 77 fits with the structure, are passed in
+this campaign (106 and 86). Beside the criteria: a tolerant seed was placed
+in 140 fits of 205 with 1 % noise, 95 with 10 %, 20 on F41 without noise
+(`I.16.6`, `I.26.2`, `I.30.5`, `I.37.4`), and in none of the 260 real fits;
+the search took 0.17 s in the median with noise (0.34 s at most). 256 of the
+260 real fits return the same expression in both arms; in the four others no
+seed was placed and the arms reached another number of generations in their
+30 s.
