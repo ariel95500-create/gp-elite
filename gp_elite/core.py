@@ -7618,9 +7618,11 @@ def _warn_unguarded_main(err):
         msg = ("gp-elite: parallel islands could not start, most likely "
                "because the script %r is not protected by "
                "`if __name__ == \"__main__\":` (required by multiprocessing). "
-               "Continuing SEQUENTIALLY: results are identical, only slower. "
+               "Continuing SEQUENTIALLY: the fit completes, but the islands "
+               "then run one after the other, which is slower and can return "
+               "another model than in parallel. "
                "Wrap your top-level code in that guard to use several cores, "
-               "or pass parallel=False to silence this message."
+               "or pass parallel=False to run in sequence without this message."
                % os.path.basename(main_file))
     else:
         msg = ("gp-elite: parallel islands could not start (%s); continuing "

@@ -37,6 +37,12 @@ of the README describe 0.9.0 until the next release.
   0.8.0 and 0.9.0 never recovered on this bench (roots, rational forms,
   trigonometry, exponentials, logarithms) go from 0 to 55 of their 90 fits.
 
+### Fixed
+- When parallel islands cannot start (a script without
+  `if __name__ == "__main__":`), the engine no longer says that the results
+  are identical: it says that the islands then run in sequence, which is
+  slower and can return another model (the known issue of 0.9.0).
+
 ### Noisy data
 - When no form holds exactly, the seeds of the power law and of the two
   changes above are sought again with their thresholds lifted, and each form
