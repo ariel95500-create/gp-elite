@@ -275,3 +275,14 @@ next version.
 Asked whether to keep N1 on by default, its known limit documented, or to
 turn it off by default and let users with noisy data turn it on, the author
 chose to keep it on by default.
+
+### Provenance note on the field `engine_version` (13 October 2026)
+
+The records of the campaigns run from the repository checkout after the
+release of 0.9.0 (B1, E1, N1 and their confirmations, D5) carry
+`engine_version` "0.8.0": a stale local `gp_elite.egg-info` of 0.8.0 (ignored
+by git) answered `importlib.metadata` before the fallback of
+`gp_elite/__init__.py`. The engine measured is the checkout named by
+`engine_file`, at the commit given beside each result in this plan. The
+stale directory was removed on 13 October; later records read the version of
+`pyproject.toml`.
