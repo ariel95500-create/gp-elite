@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.0
 
 Measured on the decision bench, not yet on the frozen test set; the figures
 of the README describe 0.9.0 until the next release.
