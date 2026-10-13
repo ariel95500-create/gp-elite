@@ -230,3 +230,42 @@ the search took 0.17 s in the median with noise (0.34 s at most). 256 of the
 260 real fits return the same expression in both arms; in the four others no
 seed was placed and the arms reached another number of generations in their
 30 s.
+
+### Confirmation of N1 on new seeds, result (13 October 2026)
+
+Run from 02:52 to 06:15 UTC, 1,750 fits, 875 complete pairs, no crash
+(`phase5/confirm_N1.jsonl`; `python benchmarks/phase2_bench.py summary
+confirmn1 benchmarks/results_0.9/phase5/confirm_N1.jsonl`), seeds 5 to 9. It
+ran in two slices, and the machine of the session restarted at about 04:52
+UTC after 1,176 fits; the fits running then were run again in full from
+04:53 (`phase5/confirm_N1_driver.log`).
+
+1. Structure retrieved: with 1 % noise 64 in A, **103 in N1** (+39, at least
+   +5 required); with 10 % noise 65 in A, **81 in N1** (+16). **Holds.**
+   (One equation loses: `I.44.4` with 1 % noise, 2 to 0.)
+2. F41 without noise: exact 156 in A, 158 in N1 (`I.16.6` 0 to 2). **Holds.**
+3. Folds: median paired difference +0.0000 with each pool. **Holds.**
+4. Out of domain: collapses 16 and 16 with the default pool, 15 and 16 with
+   `"trig"`. **Holds.**
+
+**N1 is confirmed and adopted.** No tolerant seed was placed on any of the
+260 real fits; 256 return the same expression in both arms, the four others
+reaching another number of generations in their 30 s (one of them,
+`561_cpu` out of domain with `"trig"`, seed 6, falls from 0.744 to −0.158,
+the collapse that moves the median of that group from 0.578 to 0.488).
+
+The flag `_TOLERANT_SEEDS` is now on by default. With B1, E1 and N1 on, the
+thirteen reference configurations are those of the mechanics of N1
+(`phase5/mechanics/compare_N1_on_vs_default.txt`): identical to the 0.9.0
+wheel but for `C_big` and `E_minmax` (`compare_0.9.0_vs_B1_E1_N1_default.txt`);
+from here on the reference for equivalence is `B1_E1_N1_default`. The test
+suite passes (150 tests, `tests_B1_E1_N1_default.txt`).
+
+### Where phase 5 stands
+
+The target of gate 2 is met in the campaign (106 and 86 fits with the
+structure, against 80 and 77) and in the confirmation (103 and 81). The
+known limit of N1 (an approximate seed on exact data that no exact seed
+covers) is in the CHANGELOG. Like the gains of phase 4, these rest on a
+bench the changes were built on; the frozen test set is measured with the
+next version.

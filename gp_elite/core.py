@@ -4913,9 +4913,14 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
 # bruit à 0,008-0,014 (1 % de bruit vers 1e-4) ; sur les données réelles du
 # banc de décision, aucune n'ajuste mieux que 0,026. Mêmes gardes que les
 # graines exactes ; aucun tirage aléatoire. Mesuré dans PLAN_PHASE5.md
-# (changement N1) ; drapeau coupé par défaut.
+# (changement N1, adopté le 13 octobre 2026) : structure retrouvée sous bruit
+# 69 -> 106 sur 205 (1 %) et 68 -> 86 (10 %), puis 64 -> 103 et 65 -> 81 sur
+# des graines neuves ; lois exactes sans bruit 157 -> 160 ; aucune graine sur
+# les 520 ajustements réels. Limite connue : sur des données exactes qu'aucune
+# graine exacte ne couvre, une forme approchée peut détourner la recherche
+# (loi de Kepler normalisée par min-max, PLAN_PHASE5.md).
 
-_TOLERANT_SEEDS = False
+_TOLERANT_SEEDS = True
 _TOLERANT_REL = 0.015
 
 
@@ -4939,7 +4944,8 @@ def _seed_rel_error(tree, X, y) -> float:
 def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
     """[0.10, phase 5] Voir le commentaire ci-dessus. Appelée seulement quand
     ni B1 ni E1 n'ont placé de graine ; sans la loi de puissance si ses
-    graines exactes ont déjà été placées (power_done)."""
+    graines exactes ont déjà été placées (power_done). Le drapeau
+    _TOLERANT_SEEDS (actif par défaut) les coupe."""
     if not _TOLERANT_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []

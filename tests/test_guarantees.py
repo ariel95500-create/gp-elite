@@ -1369,11 +1369,12 @@ def test_elementary_law_recovered_in_a_short_fit():
     assert r.formula_exact
 
 
-# ── 23. Seeds that tolerate noise (phase 5, flag off) ───────────────────────
-# Change N1 of benchmarks/results_0.9/PLAN_PHASE5.md, measured before any
-# adoption: when no form holds exactly, the finders of the power law, B1 and
-# E1 are run with their thresholds lifted, and a form becomes a seed only if
-# its 1 - R² after linear scaling is at most _TOLERANT_REL.
+# ── 23. Seeds that tolerate noise (phase 5) ─────────────────────────────────
+# Change N1 of benchmarks/results_0.9/PLAN_PHASE5.md, adopted on 13 October
+# 2026: when no form holds exactly, the finders of the power law, B1 and E1
+# are run with their thresholds lifted, and a form becomes a seed only if its
+# 1 - R² after linear scaling is at most _TOLERANT_REL (on the decision bench,
+# the structure retrieved under 1 % noise 69 to 106 fits of 205).
 
 def test_tolerant_seed_carries_a_noisy_law(monkeypatch):
     _set_pool(monkeypatch, "physical")
@@ -1385,8 +1386,9 @@ def test_tolerant_seed_carries_a_noisy_law(monkeypatch):
     Xs = Xr / np.abs(Xr).max(axis=0)
     cfg = _binom_cfg(3)
     assert core._make_binomial_seeds(Xs, y, cfg) == []        # not exact
-    assert core._make_tolerant_seeds(Xs, y, cfg) == []        # flag off
-    monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)
+    monkeypatch.setattr(core, "_TOLERANT_SEEDS", False)
+    assert core._make_tolerant_seeds(Xs, y, cfg) == []
+    monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)        # the default
     seeds = core._make_tolerant_seeds(Xs, y, cfg)
     assert seeds and core._seed_rel_error(seeds[0], Xs, y) < 1e-3
     # the first seed has the structure: refitted on the clean target, exact
@@ -1395,7 +1397,6 @@ def test_tolerant_seed_carries_a_noisy_law(monkeypatch):
 
 def test_tolerant_seed_only_under_its_threshold(monkeypatch):
     _set_pool(monkeypatch, "physical")
-    monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)
     rng = np.random.RandomState(1)
     Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
     cfg = _binom_cfg(2)

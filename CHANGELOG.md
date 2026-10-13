@@ -37,6 +37,23 @@ of the README describe 0.9.0 until the next release.
   0.8.0 and 0.9.0 never recovered on this bench (roots, rational forms,
   trigonometry, exponentials, logarithms) go from 0 to 55 of their 90 fits.
 
+### Noisy data
+- When no form holds exactly, the seeds of the power law and of the two
+  changes above are sought again with their thresholds lifted, and each form
+  is judged as the data judge it: it becomes a seed if it leaves at most
+  1.5 % of the variance of the training target unexplained. With Gaussian
+  noise on the training target of the 41 equations, the structure of the law
+  (the returned model, its constants refitted on clean data, reproduces the
+  clean test rows) is retrieved in 106 fits of 205 instead of 69 with 1 %
+  noise, and 86 instead of 68 with 10 % (103 instead of 64 and 81 instead of
+  65 on five seeds never run); without noise the exact laws go from 157 to
+  160. On the real data of the bench no such form fits better than 2.6 %,
+  and none was placed on the 520 real fits. Known limit: on exact data that
+  no exact seed covers, an approximate form can draw the search away from the
+  law (seen on Kepler's law normalised by min-max: exact in 1 fit of 10
+  instead of 3 at 40 generations). `benchmarks/results_0.9/PLAN_PHASE5.md`,
+  change N1.
+
 ## 0.9.0 — "Steady"
 
 This release makes the search with `units=` faster with the same models

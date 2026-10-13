@@ -29,7 +29,8 @@ operators="trig" (a job is keyed by its pool too).
 Phase 5 (PLAN_PHASE5.md): diag5 (one arm, F41 with 1 % and 10 % noise, the
 pool of the final selection examined) and finders5 (the finders of B1 and E1
 with their threshold lifted, on the real training rows); campaignn1 and
-confirmn1, arms A and N1 (flag _TOLERANT_SEEDS). E1 was adopted on 12
+confirmn1, arms A and N1 (flag _TOLERANT_SEEDS). N1 was adopted on 13 October 2026
+and is on by default since, as B1 and E1. E1 was adopted on 12
 October 2026 and is on by default since, as B1.
 """
 import argparse
