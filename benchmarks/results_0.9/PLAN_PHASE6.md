@@ -13,7 +13,9 @@ discrepancy between the documents and the records.
    and their source, what the engine returns, what it does not find, and a
    held-out check. The author chose the three on 13 October: Kepler with
    units, Nikuradse in full, Hubble in 1929. Their protocol, written before
-   any of their figures is measured, follows.
+   any of their figures is measured, follows. Done on 13 October:
+   `examples/case_studies/`, six notebooks (English and French); results
+   below.
 3. **A page of the limits**: what the engine does not do, with the records
    behind each point. Written on 13 October, `LIMITATIONS.md` and
    `LIMITATIONS.fr.md` (nine points; figures from the campaigns of phases 4
@@ -110,3 +112,61 @@ release, as every public figure.
 
 **What the notebooks say they do not find** is written after the figures,
 from them, and never by choosing among the seeds.
+
+## Results of the case studies
+
+Measured on 13 October with the engine of this branch (it still reports
+version 0.9.0: the number changes at the release), `PYTHONHASHSEED=0`, outputs
+in `benchmarks/results_0.9/case_studies/`. The code of each notebook, run as a
+script (seed 0, data from the files of the repository), prints the figures of
+`case_studies.py` to the last digit, in English and in French.
+
+**Kepler with units** (`kepler.txt`). On the table, a³/T² is 0.99994 to 0.99997
+from Mercury to Mars, 1.00080 for Jupiter, 1.0053 to 1.0055 from Saturn to
+Neptune. Fit A, five seeds of five: `5.43909e-10 * X0 * sqrt(X0)`, constant in
+s/m^1.5, G·M☉ = 1.334467e20 (+0.55 % from the IAU value), pulled by the outer
+planets. Fit B, five of five: c = 5.454157e-10 s/m^1.5, G·M☉ = 1.327103e20
+(−1.6e-5); outer periods predicted +0.043 % (Jupiter) and +0.27 % to +0.28 %
+(Saturn to Neptune), the gap of the table itself; the law is written in five
+ways, seed 4 as a difference of two terms in a^1.5, and the deduced constant,
+read on the predictions since commit a354dea, is the same for all. Fit C, five of five: `0.00684983 + 0.997207 * X0 *
+sqrt(X0)` on the eight planets (2.6 % off on Mercury), `-7.16378e-06 +
+1.00003 * X0 * sqrt(X0)` on the four inner ones. In fit C on the eight
+planets, the power-law seed and the noise-tolerant seeds (five forms) are
+placed; in fit A, under units, none. A diagnostic outside the protocol, fit C
+on the eight planets with the noise-tolerant seeds off, returns the same
+formula for the five seeds (`kepler_noN1_diagnostic.txt`): here they change
+nothing.
+
+**Hubble in 1929** (`hubble.txt`). Five seeds of five, every fit: with units
+`423.937 * X0` (constant in km/(Mpc·s)), the line through the origin of least
+squares; without units `-40.7836 + 454.158 * X0`, the line with an intercept.
+Held out, 6 nebulae beyond 1.1 Mpc: with units `427.063 * X0`, root mean square
+error 203.4 km/s, as least squares through the origin; without units
+`-74.9921 + 520.269 * X0`, 230.6 km/s. Transcription `stars1`: `415.4 * X0`
+and `-68.1539 + 465.903 * X0`. No seed of the power law, B1, E1 or N1 places
+anything on these data: the best line leaves 38 % of the variance, far above
+the 1.5 % of N1.
+
+**Nikuradse in full** (`nikuradse_seed*.txt` and their telemetry). References
+on the 109 test rows: straight line R² 0.6778, line in log10(r_k) 0.9346,
+Prandtl–von Kármán 0.9456 (0.9434 on all rows). Five seeds of five open the
+front with `1.10108 - 0.133625 * log(r_k)`, R² 0.9357. Seeds 0, 2 and 4 return a
+power of r_k at 7 to 9 nodes, R² 0.9441 to 0.9447; seeds 1 and 3 forms in
+log(tanh(...)) at 7 and 8 nodes, R² 0.9404 to 0.9426. Champion 48 to 70 nodes,
+R² 0.980 to 0.995. Roughness 126 removed: reference level gap +0.042 standard
+deviations; the six-node form +0.225 in every seed; 10 to 13 forms per seed,
+from −1.20 to +0.88; best per seed 0.014 to 0.225; only two forms do better
+than the reference, both of seed 0, at 52 and 59 nodes. A logarithm of a
+logarithm of r_k appears in one front of five, in a form of 30 nodes.
+
+**Deviations from the protocol, none in the figures.** The Kepler data are those
+of Simon et al. (1994), not the NASA pages proposed to the author: those
+cannot be reached from the measuring machine (written in the protocol before
+any measurement). After the first Kepler run, `case_studies.py` was made to
+print two more things the text needed (a³/T² per planet, and the error per
+planet of fit C); the run was made again, and every figure printed before is
+unchanged. The first launch of the Nikuradse driver would have moved telemetry
+files the repository keeps; it was stopped during seed 0, before anything was
+written, and the driver now leaves those files as they were.
+

@@ -1,0 +1,5 @@
+seed 0: benchmarks/results_0.9/case_studies/nikuradse_seed0.txt
+seed 1: benchmarks/results_0.9/case_studies/nikuradse_seed1.txt
+seed 2: benchmarks/results_0.9/case_studies/nikuradse_seed2.txt
+seed 3: benchmarks/results_0.9/case_studies/nikuradse_seed3.txt
+seed 4: benchmarks/results_0.9/case_studies/nikuradse_seed4.txt

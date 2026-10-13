@@ -1,0 +1,13 @@
+# Diagnostic outside the protocol (PLAN_PHASE6.md): fit C of Kepler on the eight
+# planets, without units, seeds 0 to 4, with the noise-tolerant seeds (N1) on and
+# off (gp_elite.core._TOLERANT_SEEDS); PYTHONHASHSEED=0, generations=30, speed='fast'.
+N1 0 0.00684983 + 0.997207 * X0 * sqrt(X0)
+N1 1 0.00684983 + 0.997207 * X0 * sqrt(X0)
+N1 2 0.00684983 + 0.997207 * X0 * sqrt(X0)
+N1 3 0.00684983 + 0.997207 * X0 * sqrt(X0)
+N1 4 0.00684983 + 0.997207 * X0 * sqrt(X0)
+noN1 0 0.00684983 + 0.997207 * X0 * sqrt(X0)
+noN1 1 0.00684983 + 0.997207 * X0 * sqrt(X0)
+noN1 2 0.00684983 + 0.997207 * X0 * sqrt(X0)
+noN1 3 0.00684983 + 0.997207 * X0 * sqrt(X0)
+noN1 4 0.00684983 + 0.997207 * X0 * sqrt(X0)

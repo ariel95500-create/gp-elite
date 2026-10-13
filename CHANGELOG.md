@@ -67,6 +67,16 @@ of the README describe 0.9.0 until the next release.
   instead of 3 at 40 generations). `benchmarks/results_0.9/PLAN_PHASE5.md`,
   change N1.
 
+### Case studies
+- Three notebooks on public data, in English and in French
+  (`examples/case_studies/`), each with its source, what the engine returns,
+  what it does not find, and a check on data kept out of the fit: Kepler's
+  third law with units (the units of the constant, and G·M☉ within 0.002 %
+  from the four inner planets), Hubble's measurements of 1929, and
+  Nikuradse's pipes in full, with a roughness removed from the fit. Their
+  figures come from `benchmarks/case_studies.py`, for five seeds;
+  `benchmarks/real_nikuradse.py` takes `--seed`.
+
 ## 0.9.0 — "Steady"
 
 This release makes the search with `units=` faster with the same models

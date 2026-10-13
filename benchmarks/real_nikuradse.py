@@ -26,6 +26,7 @@ Lancement :
 Options :
   --explore-only   s'arrête après l'inspection des données
   --gens 40          budget de générations (défaut 30)
+  --seed 3           graine du moteur (défaut 0) ; le découpage ne change pas
   --normalize none   force le mode de normalisation. Depuis la 0.7, les
                      expressions sont rendues dans les variables brutes quel
                      que soit ce mode (auparavant, sous 'auto', elles étaient
@@ -182,6 +183,11 @@ print(f"  Prandtl-von Karman EXACTE (0 p.)  R2 test = {r2_pvk:.4f}"
 gens = 30
 if "--gens" in sys.argv:
     gens = int(sys.argv[sys.argv.index("--gens") + 1])
+# [0.10] Graine du moteur (défaut 0) ; le découpage 70/30 reste celui de la
+# graine 0 quelle qu'elle soit (études de cas, PLAN_PHASE6.md).
+SEED = 0
+if "--seed" in sys.argv:
+    SEED = int(sys.argv[sys.argv.index("--seed") + 1])
 
 print(f"\n=== GP_ELITE (normalize='{norm}', gens={gens}, restarts=4) ===")
 print("    patience : quelques minutes.")
@@ -190,7 +196,7 @@ with contextlib.redirect_stdout(io.StringIO()):
     m = symbolic_regression(X[tr], y[tr], feature_names=feats,
                             operators="physical", normalize=norm,
                             generations=gens, speed="fast",
-                            validation_split=0.15, seed=0, restarts=4,
+                            validation_split=0.15, seed=SEED, restarts=4,
                             parallel=False)
 dt = time.time() - t0
 
@@ -279,7 +285,7 @@ if mask_out.sum() > 0:
         m2 = symbolic_regression(Xin, yin, feature_names=feats,
                                  operators="physical", normalize=norm,
                                  generations=gens, speed="fast",
-                                 validation_split=0.15, seed=0, restarts=4,
+                                 validation_split=0.15, seed=SEED, restarts=4,
                                  parallel=False)
     def r2o(e):
         return 1 - np.mean((e.predict(Xout) - yout)**2) / np.var(yout)
@@ -335,7 +341,8 @@ if mask_out.sum() > 0:
 else:
     rows2, r2_lin_out, best2 = [], None, None
 
-out = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"real_nikuradse_{norm}.json")
+out = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"real_nikuradse_{norm}.json" if SEED == 0 else
+                   f"real_nikuradse_{norm}_seed{SEED}.json")
 with open(out, "w", encoding="utf-8") as fh:
     json.dump(dict(dataset="nikuradse_1", engine=gp_elite.__version__,
                    n=len(y), features=feats, target=str(target),
