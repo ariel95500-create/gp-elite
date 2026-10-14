@@ -1,0 +1,84 @@
+gp_elite 1.0.0  <-  /venv10x/lib/python3.11/site-packages/gp_elite/__init__.py
+
+=== téléchargement de nikuradse_1 ===
+  source : PMLB, contenu vérifié par SHA-256
+forme : 362 lignes x 3 colonnes
+colonnes : ['r_k', 'log_Re', 'target']
+
+cible : 'target'   entrées : ['r_k', 'log_Re']
+
+colonne                    min           max       moyenne    écart-type
+r_k                         15           507         138.6         159.9
+log_Re                    3.63         6.008         4.975        0.6383
+target                    0.25         0.785        0.5304        0.1598
+
+rapport d'échelle entre colonnes : x250.6
+  -> normalize='auto' (défaut) est indiqué
+valeurs manquantes : 0
+
+=== vérification du repère : la théorie décrit-elle ces données ? ===
+  Prandtl-von Karman EXACTE (0 paramètre) sur les 362 pts : R2 = 0.9434
+
+=== références (ce que GP_ELITE doit battre) ===
+  linéaire brute                    R2 test = 0.6778
+  log simple ajustée (3 paramètres) R2 test = 0.9346   [mauvaise famille : la loi est un log DE log]
+  Prandtl-von Karman EXACTE (0 p.)  R2 test = 0.9456   <- LA barre honnête
+
+=== GP_ELITE (normalize='auto', gens=30, restarts=4) ===
+    patience : quelques minutes.
+
+durée : 51 s
+champion  R2 test = 0.9952   taille 56
+  -0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.27766 + exp(0.166445 * log_Re)))) + sqrt(|3.74778 * log_Re / sqrt(r_k) + 1.61081 * log_Re - 9.03139|))
+
+front de Pareto (le compromis taille / précision) :
+  taille   6  R2=  0.9357   1.10108 - 0.133625 * log(r_k)  <- bat le linéaire
+  taille   7  R2=  0.9404   0.244436 - 0.142565 * log(tanh(0.00197239 * r_k))  <- bat le linéaire
+  taille   8  R2=  0.9412   0.226932 - 0.148772 * log(tanh(tanh(0.00197239 * r_k)))  <- bat le linéaire
+  taille  11  R2=  0.9599   0.522618 + (0.315645 * r_k^(-0.259885) - 0.106446) * log_Re  <- bat le linéaire
+  taille  35  R2=  0.9686   0.162434 + 0.0253361 * (0.166445 * log_Re + 3.26052 + tanh(tanh(1.2973  <- bat le linéaire
+  taille  38  R2=  0.9775   -1.17286 - 5.65352 * 0.320758^(0.166445 * log_Re) * log_Re * (0.780226  <- bat le linéaire
+  taille  46  R2=  0.9865   0.716926 + 0.121306 * ((17.5831 * r_k^(-0.460293) - 6.04322) * tanh(15  <- bat le linéaire
+  taille  48  R2=  0.9887   0.669539 + 0.734701 * ((3.2562 * r_k^(-0.189541) - 2.05692) * tanh(15^  <- bat le linéaire
+  taille  49  R2=  0.9891   0.718886 + 0.598683 * ((3.90107 * r_k^(-0.218551) - 2.37966) * tanh(15  <- bat le linéaire
+  taille  56  R2=  0.9952   -0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23  <- bat le linéaire
+
+--- lecture ---
+GP_ELITE bat la référence linéaire : 0.9952 contre 0.6778.
+À vérifier avant d'en tirer quoi que ce soit : l'expression est-elle
+interprétable, ou juste un ajustement opaque ? Une petite expression
+qui bat le linéaire est un résultat ; une grosse ne prouve rien.
+
+=== généralisation : rugosité r_k=126.0 retirée de l'entraînement ===
+    entraînement 291 pts (5 rugosités) -> test 71 pts
+    dispersion interne de la courbe retirée : sigma = 0.0457  (niveau moyen 0.4504)
+    biais de niveau, en sigma  (plus petit = mieux) :
+      Prandtl-von Karman EXACTE : +0.042 sigma   (R2 brut -0.0018)
+      log simple ajustée        : +0.199 sigma   (R2 brut -0.2308)
+      linéaire brute            : +2.460 sigma   (R2 brut -6.0166)
+
+    GP_ELITE (57 s) sur la rugosité inconnue :
+      taille   6  biais +0.225s  R2= -0.0504   1.10096 - 0.132395 * log(r_k)
+      taille   7  biais +0.225s  R2= -0.0504   1.10096 - 0.264791 * log(sqrt(r_k))
+      taille   8  biais -0.617s  R2= -0.3812   1.24422 + 0.179174 * (0.00197239 * r_k - log(r_k
+      taille  10  biais -0.791s  R2= -0.4333   1.27689 + 0.190334 * (0.0118501 * r_k / log_Re -
+      taille  11  biais -0.457s  R2= -0.1034   0.302895 + 0.210891 * |log(sqrt(r_k)) - 3.11426|
+      taille  12  biais -0.542s  R2= -0.1882   0.293071 + 0.216336 * |log(sqrt(tanh(0.00197239 
+      taille  20  biais -0.338s  R2= -0.2842   0.221038 + 0.359902 * sqrt(|(log(sqrt(tanh(0.001
+      taille  30  biais -0.469s  R2= -0.0205   -0.111563 + 0.127981 * |log(sqrt(tanh(0.00197239
+      taille  35  biais +0.047s  R2=  0.7996   0.372347 + (tanh(21.9422 - 14.5889 * log(log_Re)
+      taille  37  biais -0.480s  R2= -0.3541   5.39841 - 0.172424 * ((log(log(|0.00197239 * r_k
+      taille  39  biais -0.632s  R2= -0.4671   0.08841 - 0.185802 * ((log(|log(|0.00197239 * r_
+      taille  58  biais -0.557s  R2= -1.2271   2.12934 - 0.0651107 * log(r_k * (-15 + exp((0.00
+      taille  72  biais +0.086s  R2= -0.5640   0.385026 + 0.00858188 * (((((0.166445 * log_Re)^
+
+    --- lecture de la généralisation ---
+    meilleur biais GP_ELITE : +0.047 sigma   (la meilleure des 13 formes, choisie APRÈS avoir vu la courbe retirée)
+    biais de la théorie     : +0.042 sigma   (aucun choix)
+    -> la loi classique prédit mieux le niveau. Écart : +0.005 sigma.
+
+    -> la meilleure forme, choisie après coup, bat la loi log ajustée sur la rugosité jamais vue (0.7996 > -0.2308).
+       Choisie en regardant le test : un plafond optimiste, pas une
+       prédiction que l'on aurait pu faire d'avance.
+
+télémétrie -> /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/work10/benchmarks/real_nikuradse_auto_seed3.json

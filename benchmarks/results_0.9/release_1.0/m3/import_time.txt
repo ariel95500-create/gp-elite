@@ -1,0 +1,2 @@
+# import time of gp_elite, 7 fresh processes, seconds (python -c 'import time; t = time.perf_counter(); import gp_elite; print("%.3f" % (time.perf_counter() - t))')
+0.191 0.181 0.190 0.182 0.197 0.128 0.172

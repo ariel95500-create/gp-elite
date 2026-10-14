@@ -1,0 +1,43 @@
+Feynman II.11.3  x = q*Ef/(m*(w0^2-w^2))   5 variables
+5 seeds x 40 generations x 1 restart(s), speed=fast
+bras : untyped, typed, untyped_fair  (untyped_fair : x4 generations)
+sortie : /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel10/m3/units_ab_ood.jsonl
+Test hors domaine : w/w0 dans [0.70, 0.90] (entrainement : [0.20, 0.67])
+
+  [untyped     ] seed 0 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (0s)
+  [untyped     ] seed 1 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (0s)
+  [untyped     ] seed 2 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (1s)
+  [untyped     ] seed 3 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (1s)
+  [untyped     ] seed 4 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (1s)
+  [typed       ] seed 0 ... [valide  ] R2=0.99753 hors_dom=0.40827 (32s)
+  [typed       ] seed 1 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (3s)
+  [typed       ] seed 2 ... [valide  ] R2=0.99957 hors_dom=0.65087 (27s)
+  [typed       ] seed 3 ... [valide  ] R2=0.99780 hors_dom=0.31874 (30s)
+  [typed       ] seed 4 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (16s)
+  [untyped_fair] seed 0 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (0s)
+  [untyped_fair] seed 1 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (1s)
+  [untyped_fair] seed 2 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (1s)
+  [untyped_fair] seed 3 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (1s)
+  [untyped_fair] seed 4 ... [RECUPERE] R2=1.00000 hors_dom=1.00000 (1s)
+
+============================================================================
+                             sans units=       avec units=    sans units= x4
+----------------------------------------------------------------------------
+modeles valides                      5/5               5/5               5/5
+colle en domaine                     5/5               2/5               5/5
+RECUPERE (hors dom.)                 5/5               2/5               5/5
+R2 test median                   1.00000           0.99957           1.00000
+R2 HORS DOM. median              1.00000           0.65087           1.00000
+taille mediane                        20                27                20
+secondes / run                         1                27                 1
+============================================================================
+
+Lecture : 'colle en domaine' est l'ancien critere (R2 sur un test tire
+dans le meme domaine). 'RECUPERE' exige en plus que le modele tienne
+HORS du domaine d'entrainement — c'est ce qui separe la loi de
+l'approximation. Un ecart entre les deux lignes = surajustement au domaine.
+
+Exemple de modele ayant reellement recupere la loi :
+  [untyped] (1.0000000000000064*(((X0*X1)/(X2*((X3)**2)))/(1.0 - (0.9999999999999819*(((X4)**2)/((X3)**2))))))
+
+Resultats dans /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel10/m3/units_ab_ood.jsonl — envoie ce fichier pour analyse.
