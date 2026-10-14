@@ -421,7 +421,14 @@ including the changes that did not pass. When a change failed and a restricted
 version of it was then tested, the restriction was designed after seeing the
 failure and measured on the same problems; `RESULTS.md` says where. Corrections of
 defects are not decided this way; the files of `benchmarks/results_0.8/` show what
-they change.
+they change. The changes of 1.0 were decided the same way
+([`benchmarks/results_0.9/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9),
+`PLAN_PHASE4.md` and `PLAN_PHASE5.md`), and since 0.9 each release is also
+measured once on a test set frozen before any decision and never used to make
+one: 78 other Feynman equations, 14 Strogatz systems and 25 real datasets. On its
+Feynman equations, 1.0 recovers 213 exact laws of 390 against 145 for 0.9; on its
+real datasets, it does as 0.9 did
+([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
 
@@ -501,7 +508,12 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**0.9 "Steady"** — the search with `units=` faster, with the same models (more
+**1.0** — whole families of laws fitted directly (rational forms, roots,
+exponentials, logarithms, sines and cosines of a monomial), on noisy data too: on
+the 41 Feynman equations of the decision bench, 163 exact laws of 205 against 88
+for 0.9, and on 78 other Feynman equations frozen before the work, 213 of 390
+against 145; real data unchanged; three case studies on public data and a page of
+what the engine does not do. **0.9 "Steady"** — the search with `units=` faster, with the same models (more
 than five times on Feynman II.11.3); a formula that departs from the model names
 the exact formulas of the Pareto front; a test set frozen before any decision and
 never used to make one, on which each release is measured. **0.8 "Swift"** — faster (the speed-ups alone return the same models), more laws

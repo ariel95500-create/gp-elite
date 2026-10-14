@@ -91,3 +91,56 @@ torque, Nikuradse under the full protocol, and the check of min-max Kepler
 (exact in 0 and 0 of 10 at 10 generations, 3 and 1 at 40, N1 off and on).
 The three case studies return on the wheel what they returned on the branch
 (`../case_studies/`), to the last printed digit.
+
+## M2, campaign R paired with 0.9.0 (14 October 2026)
+
+`m2/campaignR_0.9.0.jsonl` and `m2/campaignR_1.0.0.jsonl`: the whole suite of
+phase 1 (F41, F41 with 1 % and 10 % noise, R6, R7raw, and the frozen test set
+TF78, TS14, TR25, TR25raw: 1,775 fits per version, budget T of 30 s per fit),
+run by `benchmarks/phase1_bench.py run-paired`, each job started with both
+versions at the same time, two jobs at a time, from 00:48 to 07:52 on 14
+October, in four time slices of 6,600 s (`m2/driver.log`). No crash.
+`m2/tables_*.md` are the tables of `benchmarks/phase1_report.py` for each
+version; `m2/compare.txt` the comparison, the criteria of the plan and the
+targets of gate 2 (`benchmarks/release_claims/compare_m2_1.0.py`).
+
+| indicator | 0.9.0 | 1.0.0 |
+|---|---|---|
+| F41 exact laws (205 fits) | 88 | 163 |
+| the five families at zero in 0.8.0, exact (90 fits) | 0 | 55 |
+| F41 equations never exact in five seeds | 20 | 7 |
+| structure retrieved, F41N1 / F41N10 (205 fits each) | 67 / 66 | 105 / 85 |
+| TF78 exact laws (390 fits): main 290 / bonus 100 | 145: 144 / 1 | 213: 203 / 10 |
+| TF78 equations never exact in five seeds (of 78) | 46 | 34 |
+| TS14 exact on the test rows (70 fits) | 8 | 7 |
+| R6 folds, median test R² | 0.8095 | 0.8095 |
+| R6 + R7raw, collapses out of domain (65 fits), worst R² | 11, −232.5 | 11, −232.5 |
+| TR25 folds, median test R² | 0.7657 | 0.7657 |
+| TR25raw folds, median test R² | 0.7544 | 0.7580 |
+| TR25, collapses out of domain (125 fits) | 37 | 37 |
+| formulas flagged as departing from the model, R6 + R7raw (130 fits) | 8 | 7 |
+
+The two versions return the same expression on 1,286 of the 1,775 jobs: all the
+fits of R6, 69 of 70 on R7raw, 486 of 500 on TR25 and TR25raw; the others are
+the Feynman and Strogatz suites, where 1.0.0 fits forms directly. On F41, 16
+equations gain exact fits and none loses any; on TF78, one fit exact with 0.9.0
+is not with 1.0.0 (II.11.28, seed 9, within 1e-3), and on TS14 one (bacres2,
+seed 9, within 1e-3).
+
+**Criteria of the plan**: the five are met (F41, F41N1 and F41N10 not below
+0.9.0; R6 median within 0.005; collapses of R6 + R7raw not above 0.9.0 plus 2).
+
+**Targets of gate 2**: nine of eleven are met, among them F41 at least 110
+(163), the five families at least 20 of 90 (55), TF78 at least half the
+relative gain on F41 (at least 206.8; 213), and the structures at least 80 and
+77 (105 and 85). Two are missed, by 1.0.0 and by 0.9.0 alike on this machine:
+the collapses out of domain of R6 + R7raw, 11 for a target of at most 10 (0.9.0
+measured 10 for its release, on the same machine type), and those of TR25, 37
+for a target of fewer than 37. 1.0.0 changes nothing on these real data; the
+targets asked that it improve them.
+
+Against the measurement of 0.9.0 for its release (`../release/m2/`): 0.9.0
+gives here 88 exact laws on F41 instead of 86, 67 and 66 structures instead of
+66 and 62, 145 on TF78 instead of 144, and 0.7657 on the TR25 folds instead of
+0.7466. Under a time budget the figures depend on the machine and its load; the
+comparison of versions is the paired one above.

@@ -446,7 +446,16 @@ y compris ceux des changements qui n'ont pas passé. Quand un changement a écho
 et qu'une version restreinte en a ensuite été testée, la restriction a été conçue
 après avoir vu l'échec et mesurée sur les mêmes problèmes ; `RESULTS.md` dit où.
 Les corrections de défauts ne sont pas décidées ainsi ; les fichiers de
-`benchmarks/results_0.8/` montrent ce qu'elles changent.
+`benchmarks/results_0.8/` montrent ce qu'elles changent. Les changements de la
+1.0 ont été décidés de la même façon
+([`benchmarks/results_0.9/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9),
+`PLAN_PHASE4.md` et `PLAN_PHASE5.md`), et depuis la 0.9 chaque version est aussi
+mesurée une fois sur un jeu de test figé avant toute décision et jamais utilisé
+pour en prendre une : 78 autres équations de Feynman, 14 systèmes de Strogatz et
+25 jeux de données réels. Sur ses équations de Feynman, la 1.0 retrouve 213 lois
+exactes sur 390, contre 145 pour la 0.9 ; sur ses jeux réels, elle fait comme la
+0.9
+([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 
@@ -528,7 +537,13 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**0.9 « Steady »** — la recherche avec `units=` plus rapide, pour les mêmes
+**1.0** — des familles entières de lois ajustées directement (formes
+rationnelles, racines, exponentielles, logarithmes, sinus et cosinus d'un monôme),
+sur des données bruitées aussi : sur les 41 équations de Feynman du banc de
+décision, 163 lois exactes sur 205 contre 88 pour la 0.9, et sur 78 autres
+équations de Feynman figées avant le travail, 213 sur 390 contre 145 ; données
+réelles inchangées ; trois études de cas sur données publiques et une page de ce
+que le moteur ne fait pas. **0.9 « Steady »** — la recherche avec `units=` plus rapide, pour les mêmes
 modèles (plus de cinq fois sur Feynman II.11.3) ; une formule qui s'écarte du
 modèle nomme les formules exactes du front de Pareto ; un jeu de test figé avant
 toute décision et jamais utilisé pour en prendre une, sur lequel chaque version
