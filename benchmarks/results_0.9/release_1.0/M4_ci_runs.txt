@@ -1,0 +1,14 @@
+# Workflow "Tests" (.github/workflows/tests.yml: Linux, Python 3.9 to 3.14; Windows, 3.12 and 3.14)
+# on branch claude/peaceful-knuth-4q7m4p, from the commit before the release on; taken on 14 October
+# 2026 from GitHub's list of workflow runs (run number, commit, conclusion, run page). The release
+# commit 61b78ba was pushed with a1b563e and has no run of its own. Runs 62 to 68 failed on one test
+# only, test_deduced_constant_matches_the_predictions (added with a354dea), which expected a model
+# the search does not return on every processor; run 66 passed. The test was rewritten in e29f169.
+62  a354dea  failure  https://github.com/ariel95500-create/gp-elite/actions/runs/38467081525
+63  2a13e5b  failure  https://github.com/ariel95500-create/gp-elite/actions/runs/38472361769
+64  a1b563e  failure  https://github.com/ariel95500-create/gp-elite/actions/runs/38487366461   (pushed with the release commit 61b78ba)
+65  3fceeab  failure  https://github.com/ariel95500-create/gp-elite/actions/runs/38487530582
+66  e93a52b  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38492206075
+67  96c3720  failure  https://github.com/ariel95500-create/gp-elite/actions/runs/38492579744
+68  35dd41d  failure  https://github.com/ariel95500-create/gp-elite/actions/runs/38531288838
+69  e29f169  success  https://github.com/ariel95500-create/gp-elite/actions/runs/38532517840   (the test rewritten)

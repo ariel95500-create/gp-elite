@@ -145,3 +145,18 @@ gives here 88 exact laws on F41 instead of 86, 67 and 66 structures instead of
 66 and 62, 145 on TF78 instead of 144, and 0.7657 on the TR25 folds instead of
 0.7466. Under a time budget the figures depend on the machine and its load; the
 comparison of versions is the paired one above.
+
+## M4, tests (14 October 2026)
+
+`M4_wheel_tests.txt`: the test suite against the wheel installed in a fresh
+environment, under Python 3.9.23, 3.11.15 and 3.14.0rc2, each importing the
+installed package; `twine check --strict` passes for the wheel and the source
+archive. The first run failed one test under 3.9 and 3.14,
+`test_deduced_constant_matches_the_predictions`, added with the correction of
+the deduced constant: it expected the constant in s/m^1.5, while the search
+returns another model with other versions of NumPy, and on the processors of
+GitHub, where the same test had failed since its commit. It now checks the
+guarantee on whatever model comes back, and still fails on the code before the
+correction (20 % off); with it, 151 tests pass under the three versions. The
+**Tests** workflow is green again from that commit on (`M4_ci_runs.txt`). The
+package code is unchanged: the test is not in the wheel.
