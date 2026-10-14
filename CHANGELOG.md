@@ -2,8 +2,19 @@
 
 ## 1.0.0
 
-Measured on the decision bench, not yet on the frozen test set; the figures
-of the README describe 0.9.0 until the next release.
+This release fits whole families of laws directly (rational forms, roots,
+exponentials, logarithms, sines and cosines of a monomial) and seeds the search
+with them, on noisy data too. Measured on the package, side by side with 0.9.0
+(`benchmarks/results_0.9/release_1.0/`): on the 41 Feynman equations of the
+decision bench, five seeds at 30 s per fit, 163 exact laws of 205 against 88; on
+the 78 Feynman equations of the test set frozen before this work, measured once,
+213 of 390 against 145; with 1 % and 10 % noise on the bench, the structure of the
+law in 105 and 85 fits of 205 against 67 and 66; on the 38 real datasets, the
+same median R² within 0.004 and the same number of collapses out of the training
+range. On the 15 equations of the README, 15 exact laws instead
+of 12, and 15 against 6 for gplearn. Under `units=` these forms do not act
+(`LIMITATIONS.md`, point 8). The figures of each change below are those of the
+campaign that decided it.
 
 ### More laws recovered
 - Laws that are a monomial times a power of a binomial,
@@ -70,7 +81,9 @@ of the README describe 0.9.0 until the next release.
   instead of 3 at 40 generations). `benchmarks/results_0.9/PLAN_PHASE5.md`,
   change N1.
 
-### Case studies
+### Case studies and limits
+- What GP_ELITE does not do, in English and in French (`LIMITATIONS.md`,
+  `LIMITATIONS.fr.md`): nine points, each with the measurement behind it.
 - Three notebooks on public data, in English and in French
   (`examples/case_studies/`), each with its source, what the engine returns,
   what it does not find, and a check on data kept out of the fit: Kepler's
