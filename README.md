@@ -10,7 +10,7 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more, and in 5 of the 13 runs below. The five fits take 58 s in total at 1,000 points and 151 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.0.0).
+On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 58 s in total at 1,000 points and 151 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.0.0).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -146,10 +146,10 @@ guarantee.
   guaranteed to do better.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result; the
-  generation under way and the final selection add a little (16.5 s for a 15 s
+  generation under way and the final selection add a little (16.9 s for a 15 s
   budget on 3,000 rows in the measurement of 1.0.0, islands in parallel; in
-  sequence, the same fit found the exact law and stopped at 9.2 s, as a search
-  does when its law is exact).
+  sequence, the same fit stopped at 10.2 s with a model of R² 1.0000, before the
+  budget, as a search does only on an exact law).
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
 
@@ -406,6 +406,9 @@ against the alternatives, and where it does not.
 | Stability of the answer | **bootstrap report** (`stability_analysis`) | no | no |
 | Speed and accuracy at scale | lower | — | **higher** |
 
+The last row is not a measurement of this project: it is a concession, from the
+published results of the compiled engines.
+
 **How changes are decided.** Since 0.8, a change meant to improve the search or
 the final selection becomes part of the default behaviour only if it passes a
 comparison written in advance: the hypothesis and the decision criteria are
@@ -426,8 +429,9 @@ they change. The changes of 1.0 were decided the same way
 `PLAN_PHASE4.md` and `PLAN_PHASE5.md`), and since 0.9 each release is also
 measured once on a test set frozen before any decision and never used to make
 one: 78 other Feynman equations, 14 Strogatz systems and 25 real datasets. On its
-Feynman equations, 1.0 recovers 213 exact laws of 390 against 145 for 0.9; on its
-real datasets, it does as 0.9 did
+Feynman equations, 1.0 recovers 213 exact laws of 390 against 145 for 0.9 measured
+beside it; on its real datasets, the same median R² within 0.004 and the same
+number of collapses
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
@@ -511,8 +515,9 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 **1.0** — whole families of laws fitted directly (rational forms, roots,
 exponentials, logarithms, sines and cosines of a monomial), on noisy data too: on
 the 41 Feynman equations of the decision bench, 163 exact laws of 205 against 88
-for 0.9, and on 78 other Feynman equations frozen before the work, 213 of 390
-against 145; real data unchanged; three case studies on public data and a page of
+for 0.9 measured beside it, and on 78 other Feynman equations frozen before the
+work, 213 of 390 against 145; on real data, the same median R² within 0.004 and
+the same number of collapses; three case studies on public data and a page of
 what the engine does not do. **0.9 "Steady"** — the search with `units=` faster, with the same models (more
 than five times on Feynman II.11.3); a formula that departs from the model names
 the exact formulas of the Pareto front; a test set frozen before any decision and

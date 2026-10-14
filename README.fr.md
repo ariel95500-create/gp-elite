@@ -9,11 +9,11 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 *[🇬🇧 English version](README.md)*
 
-[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, quatre étapes.
+[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, cinq étapes.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points, et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 58 s au total à 1 000 points et 151 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.0.0).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 58 s au total à 1 000 points et 151 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.0.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -153,10 +153,10 @@ exacte, sans garantie.
   lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  génération en cours et la sélection finale ajoutent un peu (16,5 s pour un
+  génération en cours et la sélection finale ajoutent un peu (16,9 s pour un
   budget de 15 s sur 3 000 lignes dans la mesure de la 1.0.0, îles en parallèle ;
-  en séquence, le même ajustement a trouvé la loi exacte et s'est arrêté à 9,2 s,
-  comme le fait une recherche dont la loi est exacte).
+  en séquence, le même ajustement s'est arrêté à 10,2 s avec un modèle de R²
+  1,0000, avant le budget, comme une recherche ne le fait que sur une loi exacte).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 
@@ -431,6 +431,9 @@ ce que ça vaut face aux alternatives, et ce que ça ne vaut pas.
 | Stabilité de la réponse | **rapport bootstrap** (`stability_analysis`) | non | non |
 | Vitesse et précision à grande échelle | moindres | — | **supérieures** |
 
+La dernière ligne n'est pas une mesure de ce projet : c'est une concession, tirée
+des résultats publiés des moteurs compilés.
+
 **Comment les changements sont décidés.** Depuis la 0.8, un changement destiné à
 améliorer la recherche ou la sélection finale n'entre dans le comportement par
 défaut que s'il passe une comparaison écrite d'avance : l'hypothèse et les
@@ -453,8 +456,8 @@ Les corrections de défauts ne sont pas décidées ainsi ; les fichiers de
 mesurée une fois sur un jeu de test figé avant toute décision et jamais utilisé
 pour en prendre une : 78 autres équations de Feynman, 14 systèmes de Strogatz et
 25 jeux de données réels. Sur ses équations de Feynman, la 1.0 retrouve 213 lois
-exactes sur 390, contre 145 pour la 0.9 ; sur ses jeux réels, elle fait comme la
-0.9
+exactes sur 390, contre 145 pour la 0.9 mesurée à côté ; sur ses jeux réels, le
+même R² médian à 0,004 près et le même nombre d'effondrements
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
@@ -540,9 +543,10 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 **1.0** — des familles entières de lois ajustées directement (formes
 rationnelles, racines, exponentielles, logarithmes, sinus et cosinus d'un monôme),
 sur des données bruitées aussi : sur les 41 équations de Feynman du banc de
-décision, 163 lois exactes sur 205 contre 88 pour la 0.9, et sur 78 autres
-équations de Feynman figées avant le travail, 213 sur 390 contre 145 ; données
-réelles inchangées ; trois études de cas sur données publiques et une page de ce
+décision, 163 lois exactes sur 205 contre 88 pour la 0.9 mesurée à côté, et sur
+78 autres équations de Feynman figées avant le travail, 213 sur 390 contre 145 ;
+sur données réelles, le même R² médian à 0,004 près et le même nombre
+d'effondrements ; trois études de cas sur données publiques et une page de ce
 que le moteur ne fait pas. **0.9 « Steady »** — la recherche avec `units=` plus rapide, pour les mêmes
 modèles (plus de cinq fois sur Feynman II.11.3) ; une formule qui s'écarte du
 modèle nomme les formules exactes du front de Pareto ; un jeu de test figé avant

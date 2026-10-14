@@ -9,9 +9,12 @@ with them, on noisy data too. Measured on the package, side by side with 0.9.0
 decision bench, five seeds at 30 s per fit, 163 exact laws of 205 against 88; on
 the 78 Feynman equations of the test set frozen before this work, measured once,
 213 of 390 against 145; with 1 % and 10 % noise on the bench, the structure of the
-law in 105 and 85 fits of 205 against 67 and 66; on the 38 real datasets, the
-same median R² within 0.004 and the same number of collapses out of the training
-range. On the 15 equations of the README, 15 exact laws instead
+law in 105 and 85 fits of 205 against 67 and 66. On the 32 real datasets (7 of the
+bench, 25 of the test set, standardised and in their own units), the same median
+R² within 0.004 and the same number of collapses out of the training range; 15 of
+the 630 fits return another expression. (0.9.0, measured beside 1.0.0 on this
+machine, gives 88 and 145; its own release measurement gave 86 and 144: under a
+time budget the figures depend on the machine and its load.) On the 15 equations of the README, 15 exact laws instead
 of 12, and 15 against 6 for gplearn. Under `units=` these forms do not act
 (`LIMITATIONS.md`, point 8). The figures of each change below are those of the
 campaign that decided it.
@@ -30,8 +33,7 @@ campaign that decided it.
   instead of 86 on five seeds never run); the families of rational laws and
   of roots, never recovered by 0.8.0 or 0.9.0, reach 35 of their 40 fits,
   each in less than a second. No seed was placed on any of the 260 fits on
-  real data, whose results are those of 0.9.0
-  (`benchmarks/results_0.9/PLAN_PHASE4.md`, change B1).
+  real data (`benchmarks/results_0.9/PLAN_PHASE4.md`, change B1).
 - Laws that are a monomial times a function of a monomial are fitted
   directly too, by the same rule: y = b·f·exp(c·g), b·f·log(c·g),
   b·f·tanh(c·g), b·f/cosh(c·g), and, with a pool that has sine and cosine,

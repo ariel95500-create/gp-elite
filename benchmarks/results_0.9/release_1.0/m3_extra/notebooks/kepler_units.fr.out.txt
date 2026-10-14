@@ -1,0 +1,31 @@
+GP_ELITE 1.0.0 prêt.
+ planet      a_au  period_yr  a3_over_T2
+Mercury  0.387098   0.240847    0.999960
+  Venus  0.723330   0.615197    0.999955
+  Earth  1.000001   1.000017    0.999968
+   Mars  1.523679   1.880848    0.999938
+Jupiter  5.202603  11.861983    1.000800
+ Saturn  9.554909  29.457157    1.005305
+ Uranus 19.218446  84.020473    1.005506
+Neptune 30.110387 164.770132    1.005523
+loi       : 5.43909e-10 * X0 * sqrt(X0)
+constante : 5.439086684486386e-10 [s / m^1.5]
+G * M_sol : 1.334467e+20 m^3/s^2   (+0.553 % de la valeur UAI)
+loi, de Mercure à Mars : 5.45416e-10 * sqrt(sqrt(X0)) * sqrt(X0) * sqrt(X0) * sqrt(sqrt(X0))
+constante : 5.454156846656129e-10 [s / m^1.5]
+G * M_sol : 1.327103e+20 m^3/s^2   (-0.0016 % de la valeur UAI)
+
+Jupiter  prédite   11.8671 ans   table   11.8620 ans   écart +0.043 %
+Saturn   prédite   29.5360 ans   table   29.4572 ans   écart +0.268 %
+Uranus   prédite   84.2537 ans   table   84.0205 ans   écart +0.278 %
+Neptune  prédite  165.2290 ans   table  164.7701 ans   écart +0.278 %
+loi sans unités : 0.00684983 + 0.997207 * X0 * sqrt(X0)
+
+Mercury  écart +2.563 %
+Venus    écart +0.832 %
+Earth    écart +0.404 %
+Mars     écart +0.082 %
+Jupiter  écart -0.182 %
+Saturn   écart +0.008 %
+Uranus   écart +0.003 %
+Neptune  écart -0.000 %

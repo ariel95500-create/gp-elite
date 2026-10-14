@@ -1,0 +1,9 @@
+# Starting point of the launch of 1.0 (PLAN_PHASE6.md, item 5), read on 13 October 2026 through
+# GitHub's API (repository ariel95500-create/gp-elite): repository record and list of issues.
+created_at           2026-06-14T15:47:06Z
+stargazers_count     41
+forks_count          3
+open_issues_count    0
+issues, all states   0 (list of issues: totalCount 0)
+# PyPI downloads: pypistats.org cannot be reached from the measuring machine; to be read by the
+# author on the day of the launch.

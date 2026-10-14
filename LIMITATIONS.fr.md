@@ -5,7 +5,7 @@
 Cette page dit ce que le moteur ne fait pas, ou fait mal, chaque point avec la
 mesure qui le fonde. Les chiffres ont été mesurés sur le paquet de la version
 1.0.0, côte à côte avec la 0.9.0, sur le banc de décision (41 équations de Feynman,
-cinq graines, 30 secondes par ajustement ; 13 jeux de données réels) et sur un jeu
+cinq graines, 30 secondes par ajustement ; 7 jeux de données réels) et sur un jeu
 de test figé avant tout le travail de la 1.0 (78 autres équations de Feynman, 14
 systèmes de Strogatz, 25 jeux de données réels) :
 `benchmarks/results_0.9/release_1.0/`.
@@ -51,12 +51,13 @@ pas été mesuré.
 
 ## 4. Des données réelles, hors du domaine d'entraînement
 
-Une formule qui ajuste n'est pas une loi. Sur les 13 jeux réels du banc, pour
-prédire les 20 % de lignes les plus éloignées des autres, 11 modèles sur 65
-s'effondrent (R² de test négatif), le pire à −233 ; sur les 25 jeux réels du jeu de
-test, 37 sur 125. La 1.0 n'y change rien : la 0.9.0, mesurée à côté, donne les mêmes
-nombres. Les effondrements se concentrent sur les petits jeux ou ceux surtout faits
-de catégories. Gardez des lignes hors de
+Une formule qui ajuste n'est pas une loi. Sur les 7 jeux réels du banc (chacun dans
+ses propres unités, six d'entre eux standardisés aussi), pour prédire les 20 % de
+lignes les plus éloignées du centre des données, 11 modèles sur 65 s'effondrent (R²
+de test négatif), le pire à −233 ; sur les 25 jeux réels du jeu de test, 64 sur 250
+(37 sur 125 standardisés, 27 dans leurs propres unités). La 1.0 n'y change rien : la
+0.9.0, mesurée à côté, donne les mêmes nombres. Sur le jeu de test, les
+effondrements se concentrent sur quelques jeux : six des 25 en font 28 sur 37. Gardez des lignes hors de
 l'ajustement pour juger une formule, et regardez le front de Pareto : sur des
 données réelles, la réponse lisible est souvent une entrée courte du front, pas le
 champion rendu.
@@ -66,9 +67,10 @@ champion rendu.
 Quand des données suivent exactement une loi qu'aucune graine exacte ne couvre,
 une graine qui ne fait qu'approcher les données peut détourner la recherche de la
 loi. Vu sur la loi de Kepler normalisée par min-max (`normalize="minmax"`) : exacte
-dans 1 ajustement sur 10 au lieu de 3, à 40 générations. Avec la normalisation par
-défaut, sur le banc, aucune loi n'a été perdue ainsi. `PLAN_PHASE5.md`, mécanique
-de N1.
+dans 1 ajustement sur 10 au lieu de 3, à 40 générations
+(`release_1.0/m3/kepler_minmax_check.txt`). Avec la normalisation par défaut, sur le
+banc, aucune loi n'a été perdue ainsi : aucune équation n'a moins d'ajustements
+exacts qu'avec la 0.9.0. `PLAN_PHASE5.md`, mécanique de N1.
 
 ## 6. Une formule qui s'écarte de ses prédictions
 

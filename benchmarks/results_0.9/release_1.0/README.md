@@ -11,7 +11,8 @@ for M1 and M2) and `/venv10x` (the wheel with the packages some scripts of M3
 use). The 0.9.0 wheel on PyPI differs from the one measured for 0.9.0 in its
 description only (`environments.txt`).
 
-Machine: Linux, 4 cores (Intel Xeon with AVX-512), 15 GB; Python 3.11.15,
+Machine: Linux, 4 cores (Intel Xeon at 2.1 GHz with AVX-512), 15 GB
+(`m3_extra/machine.txt`); Python 3.11.15,
 NumPy 2.4.6, scikit-learn 1.9.1, pandas 3.0.6, and for the scripts that use
 them sympy 1.14.0, gplearn 0.4.3, xgboost 3.2.0, matplotlib 3.11.2, the
 versions of the 0.9.0 measurements. `PYTHONHASHSEED=0`, one process per
@@ -71,9 +72,14 @@ as in 0.9.0 (M1).
 - `small_data_release.txt`: worst train and test R² 1 instead of 0.9974 and
   0.998.
 - `time_limit=` (`time_limit_check.txt`, 15 of 16 checks): with a 15 s budget
-  the fit in parallel ends at 16.5 s (17.6 s); the fit in sequence finds the
-  exact law and ends at 9.2 s, before the budget, so the check that expects the
-  budget to be reached fails; three restarts in a 24 s budget end at 21.6 s.
+  the fit in parallel ends at 16.5 s (17.6 s); the fit in sequence stops at
+  9.2 s with a model of R² 1.0000, before the budget (a search stops early only
+  on an exact law), so the check that expects the budget to be reached fails;
+  three restarts in a 24 s budget end at 21.6 s. In this run the check, in the
+  second queue, overlapped the end of the first (Nikuradse); run again alone
+  after the first review of M5 (`m3_extra/time_limit_check_alone.txt`), the
+  same 15 of 16: 16.9 s in parallel, 10.2 s in sequence, 21.5 s for the three
+  restarts. The README quotes the run alone.
 - The deduced constant (`deduced_constant_*.txt`): on seven typed fits of
   Kepler's law in SI units, 0.9.0 reports the coefficient of the law in five
   and departs from it in two (−20 % and +344 %); 1.0.0 reports it in all
@@ -85,7 +91,8 @@ fifteen equations with `units=` (14/15), the mystery constant (three laws),
 the robust regression, the README examples (Kepler
 `0.00279171 + 0.999396 * a * sqrt(a)`, the programmatic example), the
 examples, the console (the law and the constant), the 1,500 printed formulas,
-the 48 fits of the operator pools, the sixteen unusual inputs, the eleven
+the 48 fits of the operator pools, 15 of the sixteen unusual inputs (the sixteenth is under "What changes"), the
+eleven
 scales, the missing or infinite values, the notebook snippets other than the
 torque, Nikuradse under the full protocol, and the check of min-max Kepler
 (exact in 0 and 0 of 10 at 10 generations, 3 and 1 at 40, N1 off and on).
@@ -131,14 +138,23 @@ seed 9, within 1e-3).
 **Criteria of the plan**: the five are met (F41, F41N1 and F41N10 not below
 0.9.0; R6 median within 0.005; collapses of R6 + R7raw not above 0.9.0 plus 2).
 
-**Targets of gate 2**: nine of eleven are met, among them F41 at least 110
-(163), the five families at least 20 of 90 (55), TF78 at least half the
-relative gain on F41 (at least 206.8; 213), and the structures at least 80 and
-77 (105 and 85). Two are missed, by 1.0.0 and by 0.9.0 alike on this machine:
-the collapses out of domain of R6 + R7raw, 11 for a target of at most 10 (0.9.0
-measured 10 for its release, on the same machine type), and those of TR25, 37
-for a target of fewer than 37. 1.0.0 changes nothing on these real data; the
-targets asked that it improve them.
+**Targets of gate 2** (the ten rows of the table of `../PLAN.md`): eight are met
+and two are missed. Met: F41 at least 110 (163); the five families at least 20
+of 90 (55); TF78 at least half the relative gain on F41 (at least 206.8, read
+from the starting values of gate 2 or from 0.9.0 here, which are the same: 213);
+the structures at least 80 and 77 (105 and 85); every formula that departs from
+the model flagged, with its exact alternatives named (the warning of 0.9.0,
+unchanged); the median R² of the R6 folds at least 0.804 (0.8095) and of the
+TR25 folds at least 0.761 (0.7657); the units mode on II.11.3 within 60 s (27 s,
+`m3/units_ab_ood.txt`). Missed, by 1.0.0 and by 0.9.0 alike on this machine:
+the collapses out of domain of R6 + R7raw, 11 for a target of at most 10 (the
+worst, −232.5, is within its target of −233; 0.9.0 measured 10 for its release,
+on the same machine type), and those of TR25, 37 for a target of fewer than 37.
+1.0.0 does not change these counts; the targets asked that it lower them.
+(`m2/compare.txt` lists eleven lines because it reads the TF78 target both
+ways, and leaves out the two qualitative or M3 rows; its line "formula_exact
+False, R6 + R7raw folds and test" counts the folds only, 4 and 3, where the
+table above counts folds and out of domain.)
 
 Against the measurement of 0.9.0 for its release (`../release/m2/`): 0.9.0
 gives here 88 exact laws on F41 instead of 86, 67 and 66 structures instead of
@@ -157,6 +173,24 @@ the deduced constant: it expected the constant in s/m^1.5, while the search
 returns another model with other versions of NumPy, and on the processors of
 GitHub, where the same test had failed since its commit. It now checks the
 guarantee on whatever model comes back, and still fails on the code before the
-correction (20 % off); with it, 151 tests pass under the three versions. The
+correction (20 % off on seed 0, as `m3/deduced_constant_venv09p.txt` records
+for 0.9.0); with it, 151 tests pass under the three versions. The
 **Tests** workflow is green again from that commit on (`M4_ci_runs.txt`). The
 package code is unchanged: the test is not in the wheel.
+
+## After the first review of M5 (14 October 2026)
+
+`m3_extra/`, measured on the wheel (`/venv10x`) one step after the other, with
+nothing else on the machine (`m3_extra/driver.sh`, `driver.log`):
+
+- `parallel_islands/`: without the switch that runs the islands in sequence, as
+  for 0.9.0 (`../release/m3_rerun/parallel_islands/`). The README example as it
+  stood before 0.9.0 (no `parallel=`) returns with the islands in parallel the
+  same approximation as with 0.9.0, validation R² 0.9999765, 14 nodes; the README
+  Kepler block returns the same law as printed; `kepler_demo.py` and
+  `pools_check.py` (48 fits, no violation) give the records of `m3/`.
+- `time_limit_check_alone.txt`: the check of `time_limit=`, alone (above, M3).
+- `notebooks/`: the code of the six case-study notebooks, run as scripts with
+  the wheel (the Nikuradse data from the local copy of the PMLB file the
+  benchmarks check by SHA-256): they print the figures their text quotes.
+- `machine.txt`: the processor, the cores and the memory.

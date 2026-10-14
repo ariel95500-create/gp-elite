@@ -1,0 +1,39 @@
+GP_ELITE 1.0.0 prêt.
+ distance_mpc  velocity_kms
+        0.032           170
+        0.034           290
+        0.214          -130
+        0.263           -70
+        0.275          -185
+        0.275          -220
+        0.450           200
+        0.500           290
+        0.500           270
+        0.630           200
+        0.800           300
+        0.900           -30
+        0.900           650
+        0.900           150
+        0.900           500
+        1.000           920
+        1.100           450
+        1.100           500
+        1.400           500
+        1.700           960
+        2.000           500
+        2.000           850
+        2.000           800
+        2.000          1090
+par l'origine             : v = 423.94 d             R2 0.6194   erreur 224.2 km/s
+avec ordonnée à l'origine : v = -40.78 + 454.16 d   R2 0.6235   erreur 223.0 km/s
+avec unités : 423.937 * X0
+constante   : 423.93732323163016 [km / Mpc s]
+              R2 0.6194   erreur 224.2 km/s
+sans unités : -40.7836 + 454.158 * X0
+              R2 0.6235   erreur 223.0 km/s
+18 nébuleuses pour ajuster, 6 à prédire
+moindres carrés par l'origine : v = 427.06 d   erreur sur les 6 : 203.4 km/s
+avec unités : 427.063 * X0   erreur sur les 6 : 203.4 km/s
+sans unités : -74.9921 + 520.269 * X0   erreur sur les 6 : 230.6 km/s
+avec unités : 415.4 * X0   R2 0.5904
+sans unités : -68.1539 + 465.903 * X0   R2 0.6009

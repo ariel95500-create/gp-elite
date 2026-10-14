@@ -54,7 +54,7 @@ binomial (rational forms, roots), or times an exponential, logarithm, hyperbolic
 or trigonometric function of a monomial — and seeds the evolutionary search with
 them, on noisy data too. On a test set of 78 Feynman equations frozen before this
 work and measured once, it recovers the exact law in 213 of 390 fits, against 145
-for version 0.9.
+for version 0.9 measured side by side.
 
 # Statement of need
 
@@ -165,8 +165,11 @@ selection retains the one that fits.
 
 *Fitting known families before evolving.* Many laws are a monomial times a
 simple function of another monomial. Since version 1.0 such families are fitted
-directly: once a single inner constant is searched in one dimension, each becomes
-a straight line in logarithmic scale, solved by least squares. A fitted form that
+directly. For a power of a binomial and for the exponential, logarithm,
+hyperbolic tangent and secant, once a single inner constant is searched in one
+dimension, the law becomes a straight line in logarithmic scale, solved by least
+squares; for sines and cosines, the frequency is searched on a grid and the rest
+is linear. A fitted form that
 holds to numerical precision joins the starting population; when none does, one
 that leaves at most 1.5 % of the variance unexplained does. The search keeps its
 generality and gains starting points. The typed population of the dimensional mode
@@ -203,8 +206,9 @@ Each release is also measured once on a test set frozen before any decision of
 its development: 78 Feynman equations absent from the decision bench, 14
 Strogatz systems and 25 real datasets from PMLB [@olson2017pmlb]. Version 1.0.0
 recovers 213 exact laws in 390 fits on its Feynman equations against 145 for
-0.9.0, measured side by side at 30 s per fit, and leaves the results on its real
-datasets unchanged (`benchmarks/results_0.9/release_1.0/`). Three case studies
+0.9.0, measured side by side at 30 s per fit; on its real datasets, the median
+$R^2$ moves by less than 0.004 and the number of collapses out of the training
+range does not change (`benchmarks/results_0.9/release_1.0/`). Three case studies
 on public data accompany it: Kepler's third law with units, where the four
 inner planets give the product of the gravitational constant and the mass of
 the Sun within 0.002 % of its nominal value; Hubble's measurements of 1929; and
@@ -218,7 +222,8 @@ returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
 Structure is exact and $R^2 = 1.000000$ in all three.
 
 An integration for the SRBench living benchmark [@lacava2021srbench] has been
-merged into that project ahead of its next evaluation round.
+proposed to that project for its next evaluation round (cavalab/srbench, pull
+request 227).
 
 # AI usage disclosure
 

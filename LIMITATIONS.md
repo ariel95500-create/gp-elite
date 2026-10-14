@@ -5,7 +5,7 @@
 This page lists what the engine does not do, or does badly, each point with the
 measurement behind it. The figures were measured on the package of version 1.0.0,
 side by side with 0.9.0, on the decision bench (41 Feynman equations, five seeds,
-30 seconds per fit; 13 real datasets) and on a test set frozen before any of the
+30 seconds per fit; 7 real datasets) and on a test set frozen before any of the
 work of 1.0 (78 other Feynman equations, 14 Strogatz systems, 25 real datasets):
 `benchmarks/results_0.9/release_1.0/`.
 
@@ -48,11 +48,13 @@ Above 10 % the engine has not been measured.
 
 ## 4. Real data, out of the training range
 
-A formula that fits is not a law. On the 13 real datasets of the bench, predicting
-the 20 % of rows farthest from the others, 11 models of 65 collapse (test R² below
-zero), the worst to −233; on the 25 real datasets of the test set, 37 of 125. 1.0
-changes nothing there: 0.9.0, measured beside it, gives the same counts. The
-collapses concentrate on small or mostly categorical datasets. Keep rows out of the fit to judge a formula, and look at the Pareto
+A formula that fits is not a law. On the 7 real datasets of the bench (each in its
+own units, six of them standardised too), predicting the 20 % of rows farthest
+from the centre of the data, 11 models of 65 collapse (test R² below zero), the
+worst to −233; on the 25 real datasets of the test set, 64 of 250 (37 of 125
+standardised, 27 in their own units). 1.0 changes nothing there: 0.9.0, measured
+beside it, gives the same counts. On the test set the collapses concentrate on a
+few datasets: six of the 25 account for 28 of the 37. Keep rows out of the fit to judge a formula, and look at the Pareto
 front: on real data the readable answer is often a short entry of the front, not
 the returned champion.
 
@@ -61,8 +63,9 @@ the returned champion.
 When data follow a law exactly but no exact seed covers it, a seed that only
 approximates the data can draw the search away from the law. Seen on Kepler's law
 normalised by min-max (`normalize="minmax"`): exact in 1 fit of 10 instead of 3 at
-40 generations. With the default normalisation, on the bench, no law was lost this
-way. `PLAN_PHASE5.md`, mechanics of N1.
+40 generations (`release_1.0/m3/kepler_minmax_check.txt`). With the default
+normalisation, on the bench, no law was lost this way: no equation has fewer exact
+fits than with 0.9.0. `PLAN_PHASE5.md`, mechanics of N1.
 
 ## 6. A formula that departs from its predictions
 

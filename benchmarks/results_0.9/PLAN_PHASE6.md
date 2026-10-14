@@ -124,7 +124,9 @@ Measured on 13 October with the engine of this branch (it still reports
 version 0.9.0: the number changes at the release), `PYTHONHASHSEED=0`, outputs
 in `benchmarks/results_0.9/case_studies/`. The code of each notebook, run as a
 script (seed 0, data from the files of the repository), prints the figures of
-`case_studies.py` to the last digit, in English and in French.
+`case_studies.py` to the last digit, in English and in French; run again on the
+package of 1.0.0 after the first review of M5, with its output kept
+(`release_1.0/m3_extra/notebooks/`).
 
 **Kepler with units** (`kepler.txt`). On the table, a³/T² is 0.99994 to 0.99997
 from Mercury to Mars, 1.00080 for Jupiter, 1.0053 to 1.0055 from Saturn to
@@ -138,7 +140,8 @@ read on the predictions since commit a354dea, is the same for all. Fit C, five o
 sqrt(X0)` on the eight planets (2.6 % off on Mercury), `-7.16378e-06 +
 1.00003 * X0 * sqrt(X0)` on the four inner ones. In fit C on the eight
 planets, the power-law seed and the noise-tolerant seeds (five forms) are
-placed; in fit A, under units, none. A diagnostic outside the protocol, fit C
+placed; in fit A, under units, none (the seed functions return nothing under
+units, as `hubble.txt` records for its typed fits). A diagnostic outside the protocol, fit C
 on the eight planets with the noise-tolerant seeds off, returns the same
 formula for the five seeds (`kepler_noN1_diagnostic.txt`): here they change
 nothing.
@@ -163,7 +166,10 @@ R² 0.980 to 0.995. Roughness 126 removed: reference level gap +0.042 standard
 deviations; the six-node form +0.225 in every seed; 10 to 13 forms per seed,
 from −1.20 to +0.88; best per seed 0.014 to 0.225; only two forms do better
 than the reference, both of seed 0, at 52 and 59 nodes. A logarithm of a
-logarithm of r_k appears in one front of five, in a form of 30 nodes.
+logarithm of r_k appears in one front of the random split out of five, in a
+form of 30 nodes, and in the fronts of the removed roughness at 12 nodes (seed
+1) and at 37 and 39 nodes (seed 3), which miss its level by 1.20, 0.48 and 0.63
+standard deviations.
 
 **Measured again on the package of 1.0.0** (M3 of `PLAN_RELEASE_1.0.md`, 14
 October): the three studies return what they returned on the branch, to the
@@ -183,9 +189,10 @@ written, and the driver now leaves those files as they were.
 
 Written on 13 October, before any launch text is drafted.
 
-**Why.** Four months after the first release, the repository has 41 stars, 3
-forks and no issue from anyone (13 October; the PyPI download counts cannot be
-read from the measuring machine). The author asked whether to change
+**Why.** Four months after the repository was created (14 June 2026; first
+release 2 July), it has 41 stars, 3 forks and no issue from anyone
+(`launch/baseline_2026-10-13.txt`; the PyPI download counts cannot be read from
+the measuring machine). The author asked whether to change
 direction towards a more striking problem, or to campaign on X or Hacker
 News. Recommendation, chosen by the author: keep the engine's place (plain
 Python and NumPy, physical units, formulas checked against the model, French
