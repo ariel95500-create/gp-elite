@@ -3,7 +3,8 @@
 *[Version française](LIMITATIONS.fr.md)*
 
 This page lists what the engine does not do, or does badly, each point with the
-measurement behind it. The figures were measured on the package of version 1.0.0,
+measurement behind it. Unless a point says otherwise, the figures were measured on
+the package of version 1.0.0,
 side by side with 0.9.0, on the decision bench (41 Feynman equations, five seeds,
 30 seconds per fit; 7 real datasets) and on a test set frozen before any of the
 work of 1.0 (78 other Feynman equations, 14 Strogatz systems, 25 real datasets):
@@ -86,15 +87,17 @@ in the last digits and then in the model.
 ## 8. Physical units
 
 Under `units=`, the population is typed: the seeds of the power law, of B1, E1 and
-N1 do not act, and a typed generation costs about 1.4 times an untyped one. On
+N1 do not act, and a typed generation costs about 1.4 times an untyped one
+(measured in phase 3, `PLAN_PHASE3.md`; the typed search of 1.0 is the same). On
 Feynman II.11.3, a law B1 fits directly, the search without units returns the
-exact law in 5 runs of 5, in about a second each, and with units in 2 of 5, in 27
-seconds (median).
+exact law in 5 runs of 5, in about a second each, and with units in 2 of 5, in 3
+and 16 seconds; the three others end on approximations after 27 to 32 seconds.
 
 ## 9. Size and kind of data
 
 GP_ELITE is plain Python and NumPy. It is meant for a hundred to a few thousand
-rows and up to about ten variables; beyond fifteen to twenty variables the search
-space explodes. It is not meant for chaotic sequences, nor for large datasets where
+rows and up to about ten variables, the range of its measurements (10,000 rows at
+most, in the size study); beyond, nothing is measured, and the search space grows
+quickly with the number of variables. It is not meant for chaotic sequences, nor for large datasets where
 raw accuracy matters more than a formula you can read: ensemble models or engines
 such as PySR and Operon serve those better.

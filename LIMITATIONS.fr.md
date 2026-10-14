@@ -3,7 +3,8 @@
 *[English version](LIMITATIONS.md)*
 
 Cette page dit ce que le moteur ne fait pas, ou fait mal, chaque point avec la
-mesure qui le fonde. Les chiffres ont été mesurés sur le paquet de la version
+mesure qui le fonde. Sauf quand un point dit autre chose, les chiffres ont été
+mesurés sur le paquet de la version
 1.0.0, côte à côte avec la 0.9.0, sur le banc de décision (41 équations de Feynman,
 cinq graines, 30 secondes par ajustement ; 7 jeux de données réels) et sur un jeu
 de test figé avant tout le travail de la 1.0 (78 autres équations de Feynman, 14
@@ -94,15 +95,18 @@ derniers chiffres, puis dans le modèle.
 
 Sous `units=`, la population est typée : les graines de la loi de puissance, de
 B1, E1 et N1 n'agissent pas, et une génération typée coûte environ 1,4 fois une
-génération non typée. Sur Feynman II.11.3, une loi que B1 ajuste directement, la
+génération non typée (mesuré en phase 3, `PLAN_PHASE3.md` ; la recherche typée de
+la 1.0 est la même). Sur Feynman II.11.3, une loi que B1 ajuste directement, la
 recherche sans unités rend la loi exacte dans 5 runs sur 5, en une seconde environ
-chacun, et avec les unités dans 2 sur 5, en 27 secondes (médiane).
+chacun, et avec les unités dans 2 sur 5, en 3 et 16 secondes ; les trois autres
+finissent sur des approximations après 27 à 32 secondes.
 
 ## 9. La taille et la nature des données
 
 GP_ELITE est écrit en Python et NumPy seulement. Il est fait pour une centaine à
-quelques milliers de lignes et jusqu'à une dizaine de variables ; au-delà de quinze
-à vingt variables, l'espace de recherche explose. Il n'est pas fait pour les suites
+quelques milliers de lignes et jusqu'à une dizaine de variables, la plage de ses
+mesures (10 000 lignes au plus, dans l'étude de taille) ; au-delà, rien n'est
+mesuré, et l'espace de recherche grandit vite avec le nombre de variables. Il n'est pas fait pour les suites
 chaotiques, ni pour les grands jeux de données où la précision brute compte plus
 qu'une formule lisible : des modèles d'ensemble, ou des moteurs comme PySR et
 Operon, y conviennent mieux.

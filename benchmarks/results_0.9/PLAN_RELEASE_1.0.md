@@ -119,6 +119,13 @@ against 0.9.0 side by side. The starting values of gate 2 were measured on
 another processor, and a figure under a time budget depends on the machine:
 both readings are given.
 
+*Note of 14 October 2026, after the second review of M5:* the sentence above is
+wrong. The starting values of gate 2 (0.8.0 in phase 1, `PLAN.md`) were
+measured on the processor type of the measurements of 1.0.0, an Intel Xeon at
+2.1 GHz (`release_1.0/m3_extra/machine.txt`); it is the release of 0.9.0 that
+ran on another one, an Intel Xeon at 2.8 GHz (`release/README.md`). Both
+readings are given all the same (`release_1.0/README.md`, M2).
+
 | Indicator | Target for 1.0 |
 |---|---|
 | F41 exact laws (205 fits, 30 s) | at least 110 |

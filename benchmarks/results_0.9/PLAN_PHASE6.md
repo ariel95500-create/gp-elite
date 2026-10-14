@@ -123,7 +123,8 @@ from them, and never by choosing among the seeds.
 Measured on 13 October with the engine of this branch (it still reports
 version 0.9.0: the number changes at the release), `PYTHONHASHSEED=0`, outputs
 in `benchmarks/results_0.9/case_studies/`. The code of each notebook, run as a
-script (seed 0, data from the files of the repository), prints the figures of
+script (seed 0, data from the files of the repository, Nikuradse's from the PMLB
+file the benchmarks check by SHA-256), prints the figures of
 `case_studies.py` to the last digit, in English and in French; run again on the
 package of 1.0.0 after the first review of M5, with its output kept
 (`release_1.0/m3_extra/notebooks/`).
@@ -140,8 +141,8 @@ read on the predictions since commit a354dea, is the same for all. Fit C, five o
 sqrt(X0)` on the eight planets (2.6 % off on Mercury), `-7.16378e-06 +
 1.00003 * X0 * sqrt(X0)` on the four inner ones. In fit C on the eight
 planets, the power-law seed and the noise-tolerant seeds (five forms) are
-placed; in fit A, under units, none (the seed functions return nothing under
-units, as `hubble.txt` records for its typed fits). A diagnostic outside the protocol, fit C
+placed; in fit A, under units, none (each seed function returns nothing when
+units are declared: the guard `_dim_active` in `gp_elite/core.py`). A diagnostic outside the protocol, fit C
 on the eight planets with the noise-tolerant seeds off, returns the same
 formula for the five seeds (`kepler_noN1_diagnostic.txt`): here they change
 nothing.
@@ -165,11 +166,11 @@ log(tanh(...)) at 7 and 8 nodes, R² 0.9404 to 0.9426. Champion 48 to 70 nodes,
 R² 0.980 to 0.995. Roughness 126 removed: reference level gap +0.042 standard
 deviations; the six-node form +0.225 in every seed; 10 to 13 forms per seed,
 from −1.20 to +0.88; best per seed 0.014 to 0.225; only two forms do better
-than the reference, both of seed 0, at 52 and 59 nodes. A logarithm of a
-logarithm of r_k appears in one front of the random split out of five, in a
-form of 30 nodes, and in the fronts of the removed roughness at 12 nodes (seed
-1) and at 37 and 39 nodes (seed 3), which miss its level by 1.20, 0.48 and 0.63
-standard deviations.
+than the reference, both of seed 0, at 52 and 59 nodes. A logarithm whose
+argument holds a logarithm of an expression in r_k appears in the fronts of the
+random split only in long forms (30 and 41 nodes for seed 1, 70 for seed 4), and
+in the fronts of the removed roughness at 12, 14 and 69 nodes (seed 1) and 37 and
+39 nodes (seed 3), which miss its level by 0.20 to 1.20 standard deviations.
 
 **Measured again on the package of 1.0.0** (M3 of `PLAN_RELEASE_1.0.md`, 14
 October): the three studies return what they returned on the branch, to the

@@ -21,7 +21,7 @@ Pur **Python / NumPy** — pas de Julia, pas de compilation, pas de GPU. `pip in
 
 Trois [études de cas sur données publiques](https://github.com/ariel95500-create/gp-elite/tree/main/examples/case_studies)
 (la loi de Kepler avec les unités, les mesures de Hubble en 1929, les tuyaux de
-Nikuradse) montrent ce qu'il rend sur de vraies mesures et ce qu'il ne trouve pas, et
+Nikuradse) montrent ce qu'il rend sur des données publiques et ce qu'il ne trouve pas, et
 [ce que GP_ELITE ne fait pas](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.fr.md)
 liste ses limites connues, chacune avec la mesure qui la fonde.
 
@@ -456,8 +456,10 @@ Les corrections de défauts ne sont pas décidées ainsi ; les fichiers de
 mesurée une fois sur un jeu de test figé avant toute décision et jamais utilisé
 pour en prendre une : 78 autres équations de Feynman, 14 systèmes de Strogatz et
 25 jeux de données réels. Sur ses équations de Feynman, la 1.0 retrouve 213 lois
-exactes sur 390, contre 145 pour la 0.9 mesurée à côté ; sur ses jeux réels, le
-même R² médian à 0,004 près et le même nombre d'effondrements
+exactes sur 390, contre 145 pour la 0.9 mesurée à côté ; sur ses systèmes de
+Strogatz, 7 ajustements exacts sur 70 contre 8 ; sur ses jeux réels, le même R²
+médian à 0,004 près et le même nombre d'effondrements hors de la plage
+d'apprentissage
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
@@ -471,9 +473,10 @@ La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un 
 Sur le **banc Feynman gelé** (15 équations de physique, `restarts=4`, une seed), jugé
 sur le modèle qu'il rend : **15/15 récupérations symboliques exactes** (1−R² < 1e-9
 sur des données tenues à l'écart), contre 12/15 pour la 0.9 ; les trois qu'il ajoute
-sont I.16.6 (addition relativiste des vitesses, une forme rationnelle imbriquée) et
-deux lois avec un sinus ou un cosinus, I.18.12 (r·F·sin θ) et III.15.12, que la 1.0
-ajuste directement. Face-à-face contre **gplearn** sur les mêmes données et
+sont I.16.6 (addition relativiste des vitesses, une forme rationnelle imbriquée qui
+ne fait pas partie des formes que la 1.0 ajuste directement, atteinte par la
+recherche) et deux lois avec un sinus ou un cosinus, I.18.12 (r·F·sin θ) et
+III.15.12, que la 1.0 ajuste directement. Face-à-face contre **gplearn** sur les mêmes données et
 découpages (population 2000 × 30 générations), chaque méthode jugée sur le modèle
 qu'elle rend : **15/15 contre 6/15** exactes, 15/15 contre 7/15 sous 1e-3 — GP_ELITE
 devant sur 9 équations et à égalité sur 6. Jusqu'à la 0.9, une loi avec un angle dans
@@ -488,7 +491,7 @@ avec la 1.0, le réglage par défaut rend les trois lois de cette vitrine qui en
 un, et `normalize='none'` reste à essayer quand une telle loi ne revient pas. Avec
 les unités physiques déclarées (`units=`, même budget, sans normalisation), 14/15
 reviennent exactes, chacune sous sa forme de manuel (`benchmarks/feynman_units.py`) ;
-l'échec, I.16.6, est une forme que la 1.0 n'ajuste directement que sans unités. Une seed sur quinze équations est une
+l'échec est I.16.6. Une seed sur quinze équations est une
 vitrine, pas une comparaison statistique :
 [`benchmarks/results_0.8/RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)
 mesure la 0.7.0 et chaque changement de la recherche et de la sélection finale
@@ -544,9 +547,10 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 rationnelles, racines, exponentielles, logarithmes, sinus et cosinus d'un monôme),
 sur des données bruitées aussi : sur les 41 équations de Feynman du banc de
 décision, 163 lois exactes sur 205 contre 88 pour la 0.9 mesurée à côté, et sur
-78 autres équations de Feynman figées avant le travail, 213 sur 390 contre 145 ;
-sur données réelles, le même R² médian à 0,004 près et le même nombre
-d'effondrements ; trois études de cas sur données publiques et une page de ce
+78 autres équations de Feynman figées avant le travail, 213 sur 390 contre 145
+(sur les 14 systèmes de Strogatz figés avec elles, 7 sur 70 contre 8) ; sur
+données réelles, le même R² médian à 0,004 près et le même nombre d'effondrements
+hors de la plage d'apprentissage ; trois études de cas sur données publiques et une page de ce
 que le moteur ne fait pas. **0.9 « Steady »** — la recherche avec `units=` plus rapide, pour les mêmes
 modèles (plus de cinq fois sur Feynman II.11.3) ; une formule qui s'écarte du
 modèle nomme les formules exactes du front de Pareto ; un jeu de test figé avant

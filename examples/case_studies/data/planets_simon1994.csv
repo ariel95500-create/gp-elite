@@ -9,6 +9,9 @@
 #   mean_motion   linear term of the mean longitude, arcseconds per Julian
 #                 millennium; period in Julian years = 1296000000 / mean_motion
 # The Earth row is the Earth-Moon barycentre.
+# The same file gives the inverse planetary masses, M_sun / m (table amas[]),
+# not used by the fits: Mercury 6023600.0, Venus 408523.5, Earth-Moon 328900.5,
+# Mars 3098710.0, Jupiter 1047.355, Saturn 3498.5, Uranus 22869.0, Neptune 19314.0.
 planet,a_au,mean_motion
 Mercury,0.3870983098,5381016286.88982
 Venus,0.7233298200,2106641364.33548

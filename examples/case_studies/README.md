@@ -2,8 +2,8 @@
 
 Three short notebooks on public data. Each says where the data come from, what
 GP_ELITE returns, what it does not find, and checks the result on data kept out
-of the fit. Every figure in their text comes from
-`benchmarks/case_studies.py`; the protocol, written before the measurements, is
+of the fit. Every measured figure in their text comes from
+`benchmarks/case_studies.py`, and the data files give their sources; the protocol, written before the measurements, is
 in `benchmarks/results_0.9/PLAN_PHASE6.md`.
 
 Trois courts notebooks sur des données publiques. Chacun dit d'où viennent les

@@ -206,7 +206,8 @@ Each release is also measured once on a test set frozen before any decision of
 its development: 78 Feynman equations absent from the decision bench, 14
 Strogatz systems and 25 real datasets from PMLB [@olson2017pmlb]. Version 1.0.0
 recovers 213 exact laws in 390 fits on its Feynman equations against 145 for
-0.9.0, measured side by side at 30 s per fit; on its real datasets, the median
+0.9.0, measured side by side at 30 s per fit, and 7 against 8 in 70 on its
+Strogatz systems; on its real datasets, the median
 $R^2$ moves by less than 0.004 and the number of collapses out of the training
 range does not change (`benchmarks/results_0.9/release_1.0/`). Three case studies
 on public data accompany it: Kepler's third law with units, where the four
@@ -222,8 +223,8 @@ returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
 Structure is exact and $R^2 = 1.000000$ in all three.
 
 An integration for the SRBench living benchmark [@lacava2021srbench] has been
-proposed to that project for its next evaluation round (cavalab/srbench, pull
-request 227).
+proposed to that project for its next evaluation round
+(<https://github.com/cavalab/srbench/pull/227>).
 
 # AI usage disclosure
 

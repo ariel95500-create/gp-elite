@@ -18,7 +18,7 @@ Pure **Python / NumPy** — no Julia, no compilation, no GPU. `pip install` and 
 
 Three [case studies on public data](https://github.com/ariel95500-create/gp-elite/tree/main/examples/case_studies)
 (Kepler's law with units, Hubble's measurements of 1929, Nikuradse's pipes) show what
-it returns on real measurements and what it does not find, and
+it returns on public data and what it does not find, and
 [what GP_ELITE does not do](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.md)
 lists its known limits, each with the measurement behind it.
 
@@ -430,8 +430,9 @@ they change. The changes of 1.0 were decided the same way
 measured once on a test set frozen before any decision and never used to make
 one: 78 other Feynman equations, 14 Strogatz systems and 25 real datasets. On its
 Feynman equations, 1.0 recovers 213 exact laws of 390 against 145 for 0.9 measured
-beside it; on its real datasets, the same median R² within 0.004 and the same
-number of collapses
+beside it; on its Strogatz systems, 7 exact fits of 70 against 8; on its real
+datasets, the same median R² within 0.004 and the same number of collapses out of
+the training range
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
@@ -445,8 +446,9 @@ GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a tec
 On the frozen **Feynman benchmark** (15 physics equations, `restarts=4`, one seed),
 judged on the model it returns: **15/15 exact symbolic recoveries** (1−R² < 1e-9 on
 held-out data), against 12/15 for 0.9; the three it adds are I.16.6 (relativistic
-velocity addition, a nested rational form) and two laws with a sine or a cosine,
-I.18.12 (r·F·sin θ) and III.15.12, which 1.0 fits directly. Head-to-head against
+velocity addition, a nested rational form that is not among the forms 1.0 fits
+directly, reached by the search) and two laws with a sine or a cosine, I.18.12
+(r·F·sin θ) and III.15.12, which 1.0 fits directly. Head-to-head against
 **gplearn** on identical data and splits (population 2000 × 30 generations), each
 method judged on its returned model: **15/15 against 6/15** exact, 15/15 against 7/15
 within 1e-3 — GP_ELITE ahead on 9 equations and tied on 6. Up to 0.9, a law with an
@@ -460,8 +462,8 @@ range,
 with 1.0 the default returns the three laws of this showcase that have one, and
 `normalize='none'` remains worth a try when such a law does not come back. With the
 physical units declared (`units=`, same budget, no normalisation), 14/15 come back
-exact, each in its textbook form (`benchmarks/feynman_units.py`); the miss, I.16.6,
-is a form 1.0 fits directly only without units. One seed on fifteen equations is
+exact, each in its textbook form (`benchmarks/feynman_units.py`); the miss is
+I.16.6. One seed on fifteen equations is
 a showcase, not a statistical comparison:
 [`benchmarks/results_0.8/RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)
 measures 0.7.0 and each change of 0.8 to the search and the final selection on 41
@@ -516,8 +518,9 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 exponentials, logarithms, sines and cosines of a monomial), on noisy data too: on
 the 41 Feynman equations of the decision bench, 163 exact laws of 205 against 88
 for 0.9 measured beside it, and on 78 other Feynman equations frozen before the
-work, 213 of 390 against 145; on real data, the same median R² within 0.004 and
-the same number of collapses; three case studies on public data and a page of
+work, 213 of 390 against 145 (on the 14 Strogatz systems frozen with them, 7 of 70
+against 8); on real data, the same median R² within 0.004 and the same number of
+collapses out of the training range; three case studies on public data and a page of
 what the engine does not do. **0.9 "Steady"** — the search with `units=` faster, with the same models (more
 than five times on Feynman II.11.3); a formula that departs from the model names
 the exact formulas of the Pareto front; a test set frozen before any decision and

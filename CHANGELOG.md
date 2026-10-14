@@ -9,7 +9,8 @@ with them, on noisy data too. Measured on the package, side by side with 0.9.0
 decision bench, five seeds at 30 s per fit, 163 exact laws of 205 against 88; on
 the 78 Feynman equations of the test set frozen before this work, measured once,
 213 of 390 against 145; with 1 % and 10 % noise on the bench, the structure of the
-law in 105 and 85 fits of 205 against 67 and 66. On the 32 real datasets (7 of the
+law in 105 and 85 fits of 205 against 67 and 66; on the 14 Strogatz systems of
+the test set, 7 exact fits of 70 against 8. On the 32 real datasets (7 of the
 bench, 25 of the test set, standardised and in their own units), the same median
 R² within 0.004 and the same number of collapses out of the training range; 15 of
 the 630 fits return another expression. (0.9.0, measured beside 1.0.0 on this
@@ -27,8 +28,8 @@ campaign that decided it.
   two terms. Once the binomial is known such a law is a straight line in log
   scale; for each candidate g the constant c is searched in one dimension and
   the exponents of f follow by least squares. The seed is placed only when the
-  form holds to numerical precision, so on real or noisy data nothing
-  changes. On the 41 equations of the decision bench with five seeds, at 30 s
+  form holds to numerical precision, so on real or noisy data this change
+  alone places nothing (the noise-tolerant seeds below lift that threshold). On the 41 equations of the decision bench with five seeds, at 30 s
   per fit, the exact law is recovered 124 times in 205 instead of 86 (126
   instead of 86 on five seeds never run); the families of rational laws and
   of roots, never recovered by 0.8.0 or 0.9.0, reach 35 of their 40 fits,

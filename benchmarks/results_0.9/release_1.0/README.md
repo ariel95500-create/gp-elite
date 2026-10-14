@@ -42,9 +42,12 @@ islands in sequence under the default `parallel=None` as for 0.9.0; then
 `benchmarks/release_claims/deduced_constant_check.py` ran with 0.9.0 and with
 1.0.0 (`m3/deduced_constant_venv09p.txt`, `m3/deduced_constant_venv10.txt`).
 
-**What changes, and why.** Every change below comes from the forms fitted
-directly (B1, E1) and from the deduced constant; the typed search is the same
-as in 0.9.0 (M1).
+**What changes, and why.** Every change below comes from the seeds of 1.0
+(the forms fitted directly, B1 and E1, and the noise-tolerant seeds, N1, which
+`PLAN_PHASE5.md` credits with I.16.6) and from the deduced constant; the typed
+search is the same as in 0.9.0 (M1). The figures of 0.9.0 in parentheses are
+those of its release (`../release/m3/`), measured on another processor (Intel Xeon at 2.8 GHz): its times do not compare
+directly with those of 1.0.0 here.
 
 - Feynman 15 (`feynman15.txt`): 15/15 exact and 15/15 within 1e-3 for the
   returned model, against 12/15 and 13/15. I.16.6, I.18.12 and III.15.12
@@ -148,19 +151,24 @@ unchanged); the median R² of the R6 folds at least 0.804 (0.8095) and of the
 TR25 folds at least 0.761 (0.7657); the units mode on II.11.3 within 60 s (27 s,
 `m3/units_ab_ood.txt`). Missed, by 1.0.0 and by 0.9.0 alike on this machine:
 the collapses out of domain of R6 + R7raw, 11 for a target of at most 10 (the
-worst, −232.5, is within its target of −233; 0.9.0 measured 10 for its release,
-on the same machine type), and those of TR25, 37 for a target of fewer than 37.
-1.0.0 does not change these counts; the targets asked that it lower them.
+worst, −232.5, is within its target of −233), and those of TR25, 37 for a
+target of fewer than 37. 1.0.0 does not change these counts; the targets asked
+that it lower them. For its own release, on another processor (Intel Xeon at
+2.8 GHz), 0.9.0 measured 10 and 36, which met both targets; the starting
+values of gate 2 (0.8.0 in phase 1) were measured on the processor type used
+here, Intel Xeon at 2.1 GHz.
 (`m2/compare.txt` lists eleven lines because it reads the TF78 target both
 ways, and leaves out the two qualitative or M3 rows; its line "formula_exact
 False, R6 + R7raw folds and test" counts the folds only, 4 and 3, where the
 table above counts folds and out of domain.)
 
-Against the measurement of 0.9.0 for its release (`../release/m2/`): 0.9.0
-gives here 88 exact laws on F41 instead of 86, 67 and 66 structures instead of
-66 and 62, 145 on TF78 instead of 144, and 0.7657 on the TR25 folds instead of
-0.7466. Under a time budget the figures depend on the machine and its load; the
-comparison of versions is the paired one above.
+Against the measurement of 0.9.0 for its release (`../release/m2/`, on the
+2.8 GHz processor): 0.9.0 gives here 88 exact laws on F41 instead of 86, 67 and
+66 structures instead of 66 and 62, 145 on TF78 instead of 144, 8 exact fits on
+TS14 instead of 7, 0.7657 on the TR25 folds instead of 0.7466, and 6 collapses
+out of domain on R7raw instead of 5 (11 with R6 instead of 10) and 37 on TR25
+instead of 36. Under a time budget the figures depend on the machine and its
+load; the comparison of versions is the paired one above.
 
 ## M4, tests (14 October 2026)
 
@@ -171,7 +179,8 @@ archive. The first run failed one test under 3.9 and 3.14,
 `test_deduced_constant_matches_the_predictions`, added with the correction of
 the deduced constant: it expected the constant in s/m^1.5, while the search
 returns another model with other versions of NumPy, and on the processors of
-GitHub, where the same test had failed since its commit. It now checks the
+GitHub, where the same test had failed in 6 of the 7 runs since its commit (run
+66 passed). It now checks the
 guarantee on whatever model comes back, and still fails on the code before the
 correction (20 % off on seed 0, as `m3/deduced_constant_venv09p.txt` records
 for 0.9.0); with it, 151 tests pass under the three versions. The
@@ -192,5 +201,8 @@ nothing else on the machine (`m3_extra/driver.sh`, `driver.log`):
 - `time_limit_check_alone.txt`: the check of `time_limit=`, alone (above, M3).
 - `notebooks/`: the code of the six case-study notebooks, run as scripts with
   the wheel (the Nikuradse data from the local copy of the PMLB file the
-  benchmarks check by SHA-256): they print the figures their text quotes.
+  benchmarks check by SHA-256): they print the figures of seed 0 their text
+  quotes. The other figures of their text (seeds 1 to 4, and in Kepler the
+  fit of the inner planets without units) come from `benchmarks/case_studies.py`
+  (`m3/case_*`).
 - `machine.txt`: the processor, the cores and the memory.
