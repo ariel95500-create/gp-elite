@@ -2,6 +2,15 @@
 0f0264e1943c1e996a9fee9200ca17dd46d42afa80f071f5ce4cf2086210989c  gp_elite-1.0.0-py3-none-any.whl
 26b8e4bbfc0b6024342b7f5461de0b332d13a893943d52f394b40fdaea19494b  gp_elite-1.0.0.tar.gz
 
+# SHA-256 of the files to publish, built again from commit 1651f08 after the corrections of M5
+# (python -m build from a clean export of the commit), 14 October 2026. Every gp_elite/ file of the
+# wheel and of the source archive is identical to those of the files measured above; the wheel
+# differs in gp_elite-1.0.0.dist-info/METADATA and RECORD only (the description, from the README),
+# the source archive in PKG-INFO, README.md and tests/test_guarantees.py (rewritten in e29f169).
+# twine check --strict passes for both.
+7a74eacac90744c26e27b9c7a6241ad3b65a2c083d85112363d1cc2cde6177f1  gp_elite-1.0.0-py3-none-any.whl
+963e992ef7515e5275655cd8fedd1b549e298d0af1809543e3a46bef146c53d8  gp_elite-1.0.0.tar.gz
+
 # gp-elite 0.9.0 from PyPI (pip download gp-elite==0.9.0), 13 October 2026
 46f49d47892d82f49553efae3a4ebf685b8f12cf2318d035ca0de31cf05e950c  gp_elite-0.9.0-py3-none-any.whl
 # It differs from the wheel measured for 0.9.0 (999288fc..., release/environments.txt) in
