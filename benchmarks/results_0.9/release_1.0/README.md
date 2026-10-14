@@ -121,8 +121,9 @@ targets of gate 2 (`benchmarks/release_claims/compare_m2_1.0.py`).
 | formulas flagged as departing from the model, R6 + R7raw (130 fits) | 8 | 7 |
 
 The two versions return the same expression on 1,286 of the 1,775 jobs: all the
-fits of R6, 69 of 70 on R7raw, 486 of 500 on TR25 and TR25raw; the others are
-the Feynman and Strogatz suites, where 1.0.0 fits forms directly. On F41, 16
+fits of R6, 69 of 70 on R7raw, 486 of 500 on TR25 and TR25raw; 474 of the 489
+that differ are in the Feynman and Strogatz suites, where 1.0.0 fits forms
+directly. On F41, 16
 equations gain exact fits and none loses any; on TF78, one fit exact with 0.9.0
 is not with 1.0.0 (II.11.28, seed 9, within 1e-3), and on TS14 one (bacres2,
 seed 9, within 1e-3).
