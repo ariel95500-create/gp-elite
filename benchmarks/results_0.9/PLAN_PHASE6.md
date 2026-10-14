@@ -21,6 +21,8 @@ discrepancy between the documents and the records.
    `LIMITATIONS.fr.md` (nine points; figures from the campaigns of phases 4
    and 5, to be measured again on the wheel).
 4. **The paper brought up to date**, after the release figures are measured.
+   Done on 14 October with the figures of M2 and M3 of 1.0.0
+   (`PLAN_RELEASE_1.0.md`), before the reviews of M5.
 5. **The launch of 1.0**, added on 13 October on the author's choice: no
    change of direction for the engine, a campaign the week of the release
    towards the people who can use it. Its plan follows.
@@ -162,6 +164,10 @@ deviations; the six-node form +0.225 in every seed; 10 to 13 forms per seed,
 from −1.20 to +0.88; best per seed 0.014 to 0.225; only two forms do better
 than the reference, both of seed 0, at 52 and 59 nodes. A logarithm of a
 logarithm of r_k appears in one front of five, in a form of 30 nodes.
+
+**Measured again on the package of 1.0.0** (M3 of `PLAN_RELEASE_1.0.md`, 14
+October): the three studies return what they returned on the branch, to the
+last printed digit, for the five seeds (`release_1.0/m3/case_*`).
 
 **Deviations from the protocol, none in the figures.** The Kepler data are those
 of Simon et al. (1994), not the NASA pages proposed to the author: those
