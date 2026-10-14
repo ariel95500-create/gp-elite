@@ -13,11 +13,17 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, n'est retrouvée exactement à aucune taille. Les cinq ajustements prennent 139 s au total à 1 000 points et 380 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 0.9.0).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points, et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 58 s au total à 1 000 points et 151 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.0.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
 Pur **Python / NumPy** — pas de Julia, pas de compilation, pas de GPU. `pip install` et c'est parti.
+
+Trois [études de cas sur données publiques](https://github.com/ariel95500-create/gp-elite/tree/main/examples/case_studies)
+(la loi de Kepler avec les unités, les mesures de Hubble en 1929, les tuyaux de
+Nikuradse) montrent ce qu'il rend sur de vraies mesures et ce qu'il ne trouve pas, et
+[ce que GP_ELITE ne fait pas](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.fr.md)
+liste ses limites connues, chacune avec la mesure qui la fonde.
 
 ![GP_ELITE redécouvre la 3ᵉ loi de Kepler à partir de 8 points (R² = 1.000000)](kepler_plot.png)
 
@@ -147,9 +153,10 @@ exacte, sans garantie.
   lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  génération en cours et la sélection finale ajoutent un peu (deux à trois
-  secondes pour un budget de 15 s dans nos mesures : 17,0 à 17,7 s sur 3 000
-  lignes).
+  génération en cours et la sélection finale ajoutent un peu (16,5 s pour un
+  budget de 15 s sur 3 000 lignes dans la mesure de la 1.0.0, îles en parallèle ;
+  en séquence, le même ajustement a trouvé la loi exacte et s'est arrêté à 9,2 s,
+  comme le fait une recherche dont la loi est exacte).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 
@@ -291,40 +298,46 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 
 | | sans `units=` | `units=` | sans `units=`, 4× générations |
 |---|---:|---:|---:|
-| dimensionnellement valides | **0 / 5** | **5 / 5** | 0 / 5 |
-| loi exacte retrouvée (tient hors domaine) | 0 / 5 | **2 / 5** | 0 / 5 |
-| R² test médian | 0.99157 | **0.99957** | 0.99863 |
-| R² hors domaine médian | 0.34 | **0.65** | 0.42 |
-| taille médiane du modèle | 59 nœuds | **27 nœuds** | 60 nœuds |
-| secondes / run (médiane) | 29 | 34 | 114 |
+| dimensionnellement valides | 5 / 5 | 5 / 5 | 5 / 5 |
+| loi exacte retrouvée (tient hors domaine) | **5 / 5** | 2 / 5 | 5 / 5 |
+| R² test médian | **1.00000** | 0.99957 | 1.00000 |
+| R² hors domaine médian | **1.00000** | 0.65 | 1.00000 |
+| taille médiane du modèle | **20 nœuds** | 27 nœuds | 20 nœuds |
+| secondes / run (médiane) | **1** | 27 | 1 |
 
-La troisième colonne donne au bras non contraint quatre fois plus de générations. Il
-reste à **0/5** modèles physiquement valides : le calcul ne remplace pas la
-contrainte. (Depuis la 0.9, la recherche contrainte prend à peu près autant de
-temps que la recherche libre : une génération typée coûte 1,4 fois une génération
-non typée, contre 8,5 fois avec la 0.8, qui prenait 179 s par run sur la même
-machine, pour les mêmes modèles. Une recherche ne s'arrête plus tôt que sur une loi
-exacte, si bien que les runs contraints qui finissent sur une approximation
-parcourent les 40 générations ; `time_limit=` les borne.) Les échecs sans contrainte ne sont pas
-marginaux : sur les dix runs non contraints, les modèles prennent le logarithme
-d'une fréquence ou d'une autre grandeur dotée d'unités, additionnent des
-kilogrammes ou des hertz à des nombres purs, ou élèvent une grandeur à un exposant
-en coulombs ou en hertz.
+Depuis la 1.0, cette loi fait partie des formes que le moteur ajuste directement,
+un monôme multiplié par une puissance d'un binôme : sans `units=`, elle est placée
+dans la population de départ, et chaque run la rend en une seconde environ. Avec
+`units=`, la population est typée et ces formes ajustées n'agissent pas
+(`LIMITATIONS.fr.md`, point 8) : la recherche contrainte trouve la loi dans deux
+runs sur cinq, comme en 0.9, et rend des approximations physiquement cohérentes
+dans les trois autres. Jusqu'à la 0.9, la recherche libre ne rendait aucun modèle
+valide sur cette loi, même avec quatre fois plus de générations : ses modèles
+prenaient le logarithme d'une fréquence, additionnaient des kilogrammes ou des
+hertz à des nombres purs, ou élevaient une grandeur à un exposant en coulombs, et
+la contrainte était le seul chemin vers une réponse valide. Elle le reste pour les
+lois que le moteur n'ajuste pas directement. (Depuis la 0.9, une génération typée
+coûte 1,4 fois une génération non typée, contre 8,5 fois avec la 0.8. Une
+recherche ne s'arrête plus tôt que sur une loi exacte, si bien que les runs
+contraints qui finissent sur une approximation parcourent les 40 générations ;
+`time_limit=` les borne.)
 
 **Ce que ça ne fait *pas*.** Sur un jeu de test tiré *hors* du domaine
 d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), les
-approximations se dégradent dans tous les bras. Deux runs contraints sur cinq ont
-trouvé la loi exacte, qui y tient (R² = 1.00000) ; les trois autres sont des
-approximations physiquement cohérentes, pas la loi. Temps mesurés sur une machine
-Linux à 4 cœurs, deux runs à la fois, avec les îles en séquence (`parallel=False`).
-Reproductible avec `benchmarks/ab_ood.py`.
+approximations se dégradent ; la loi exacte y tient (R² = 1.00000), dans les dix
+runs non contraints et dans deux runs contraints sur cinq. Temps mesurés sur une
+machine Linux à 4 cœurs, deux runs à la fois, avec les îles en séquence
+(`parallel=False`). Reproductible avec `benchmarks/ab_ood.py`.
 
-**Quand s'en servir.** Pour découvrir une loi physique quand vous connaissez les
-unités et que la loi est dimensionnellement homogène, et pour garantir que ce que
-le moteur rend a au moins un sens physique. **Pas** pour de la prédiction en boîte
-noire : la contrainte écarte les approximations dimensionnellement fausses mais
-numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif est
-d'ajuster plutôt que de trouver une loi.
+**Quand s'en servir.** Pour garantir que ce que le moteur rend a un sens physique,
+et pour déduire les unités et la valeur d'une constante (ci-dessous, et
+[l'étude de cas de Kepler](https://github.com/ariel95500-create/gp-elite/blob/main/examples/case_studies/kepler_units.fr.ipynb),
+où les unités écartent aussi un terme que les données seules ajouteraient). Sur
+une loi que le moteur ajuste directement, la recherche sans unités est plus rapide
+et la trouve plus souvent ; comparez les deux. **Pas** pour de la prédiction en
+boîte noire : la contrainte écarte les approximations dimensionnellement fausses
+mais numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif
+est d'ajuster plutôt que de trouver une loi.
 
 **Lois à constante dimensionnée** (`unknown_constant=`). Par défaut les
 constantes ajustées sont sans dimension — convention AI Feynman — ce qui met une
@@ -380,24 +393,25 @@ vraies batteries. Le script y affiche (extrait) :
 
 ```
 PROTOCOL 1 — random split (INTERPOLATION, leaks info)
-  GP_ELITE      R² = +0.991
+  GP_ELITE      R² = +0.993
   RandomForest  R² = +0.997
   XGBoost       R² = +0.997
 
 PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
   RandomForest (300)      R² = -2.521
   XGBoost (300 trees)     R² = -2.324
-  GP_ELITE (one equation) R² = -0.314
+  GP_ELITE (one equation) R² = +0.162
 
-  Equation: SOH = 0.413666 + 0.500082 * tanh(2.40159 * temperature / cycle)
+  Equation: SOH = 0.428836 + 0.111661 * courant * exp(0.51573 * courant) - 0.0181691 * sqrt(cycle)
 ```
 
 Un découpage aléatoire de données séquentielles est de l'interpolation, qui flatte
 toutes les méthodes. Sur le découpage chronologique, les forêts d'arbres ne peuvent
 que répéter des valeurs vues à l'entraînement et passent loin sous la moyenne.
-L'équation trouvée par la 0.8 fait mieux qu'elles, mais pas bien (R² −0,31, sous la
-moyenne elle aussi) ; celle que la 0.7 trouvait sur le même découpage, en fonction du
-cycle et du courant, continuait de suivre la tendance (R² +0,594). Une formule peut
+L'équation que rend la 1.0, en fonction du courant et du cycle, fait mieux qu'elles,
+mais pas bien (R² +0,16) ; la 0.8 et la 0.9 en rendaient une à R² −0,31, sous la
+moyenne elle aussi, et la 0.7 une en fonction du cycle et du courant qui continuait de
+suivre la tendance (R² +0,594). Une formule peut
 extrapoler là où une forêt d'arbres ne le peut pas ; qu'elle le fasse dépend de la
 formule que rend la recherche — sur ce jeu simulé, à vérifier sur les vôtres.
 
@@ -443,27 +457,26 @@ La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un 
 **Bon** : lois physiques / d'ingénierie à structure multiplicative ou exponentielle, données expérimentales de taille modeste, problèmes où l'interprétabilité prime.
 
 Sur le **banc Feynman gelé** (15 équations de physique, `restarts=4`, une seed), jugé
-sur le modèle qu'il rend : **12/15 récupérations symboliques exactes** (1−R² < 1e-9
-sur des données tenues à l'écart) et **13/15 sous 1e-3** ; les échecs sont I.16.6
-(addition relativiste des vitesses, une forme rationnelle imbriquée) et I.18.12
-(r·F·sin θ, que la 0.7 retrouvait avec le même budget), et III.15.12 revient sous
-1e-3. Face-à-face contre **gplearn** sur les mêmes données et découpages (population
-2000 × 30 générations), chaque méthode jugée sur le modèle qu'elle rend : **12/15 contre
-6/15** exactes, 13/15 contre 7/15 sous 1e-3 — GP_ELITE devant sur 8 équations, à
-égalité sur 6, derrière sur une (I.18.12). Sans la normalisation des colonnes
-(`normalize='none'`, même budget), les trois lois qui contiennent un sinus ou un
-cosinus reviennent toutes exactes, I.18.12 et III.15.12 compris
-(`python benchmarks/feynman_bench.py 12 15 --normalize none`). Donc, quand votre loi
-contient un angle dans un sinus ou un cosinus, passez `normalize='none'` : diviser un
-angle par sa plus grande valeur change la période que le sinus doit retrouver. Mesuré
-pour la 0.9 sur les dix lois trigonométriques du banc de 41 équations, cinq seeds
-chacune : 13 ajustements exacts sur 50, contre 2 sur 50 avec le réglage par défaut ;
-sur données réelles, gardez le réglage par défaut : y laisser telles quelles les
-colonnes d'échelles proches (`normalize='smart'`) a moins bien prédit hors de la plage
-d'apprentissage
-([`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)). Avec les unités physiques déclarées
-(`units=`, même budget, sans normalisation), 14/15 reviennent exactes, chacune sous sa
-forme de manuel (`benchmarks/feynman_units.py`). Une seed sur quinze équations est une
+sur le modèle qu'il rend : **15/15 récupérations symboliques exactes** (1−R² < 1e-9
+sur des données tenues à l'écart), contre 12/15 pour la 0.9 ; les trois qu'il ajoute
+sont I.16.6 (addition relativiste des vitesses, une forme rationnelle imbriquée) et
+deux lois avec un sinus ou un cosinus, I.18.12 (r·F·sin θ) et III.15.12, que la 1.0
+ajuste directement. Face-à-face contre **gplearn** sur les mêmes données et
+découpages (population 2000 × 30 générations), chaque méthode jugée sur le modèle
+qu'elle rend : **15/15 contre 6/15** exactes, 15/15 contre 7/15 sous 1e-3 — GP_ELITE
+devant sur 9 équations et à égalité sur 6. Jusqu'à la 0.9, une loi avec un angle dans
+un sinus ou un cosinus demandait `normalize='none'`, car diviser un angle par sa plus
+grande valeur change la période que le sinus doit retrouver (mesuré pour la 0.9 sur
+les dix lois trigonométriques du banc de 41 équations, cinq seeds chacune : 13
+ajustements exacts sur 50, contre 2 sur 50 avec le réglage par défaut ; sur données
+réelles, laisser telles quelles les colonnes d'échelles proches,
+`normalize='smart'`, a moins bien prédit hors de la plage d'apprentissage,
+[`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)) ;
+avec la 1.0, le réglage par défaut rend les trois lois de cette vitrine qui en ont
+un, et `normalize='none'` reste à essayer quand une telle loi ne revient pas. Avec
+les unités physiques déclarées (`units=`, même budget, sans normalisation), 14/15
+reviennent exactes, chacune sous sa forme de manuel (`benchmarks/feynman_units.py`) ;
+l'échec, I.16.6, est une forme que la 1.0 n'ajuste directement que sans unités. Une seed sur quinze équations est une
 vitrine, pas une comparaison statistique :
 [`benchmarks/results_0.8/RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)
 mesure la 0.7.0 et chaque changement de la recherche et de la sélection finale
@@ -478,13 +491,23 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Caractéristiques techniques
 
+- **Formes ajustées directement** (v1.0) : un monôme multiplié par une puissance
+  d'un binôme, b·f·(1 + c·g)^p avec p parmi −1, −½, ½, 1 (lois rationnelles,
+  1/√(1 − v²/c²), la racine d'une somme de deux termes), et un monôme multiplié par
+  une fonction d'un monôme, b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g)
+  ou f·(a + β·sin(ω·g) + γ·cos(ω·g)) : chacune est ajustée par une recherche à une
+  dimension et des moindres carrés, et placée dans la population de départ
+  lorsqu'elle tient à la précision numérique
+- **Graines tolérantes au bruit** (v1.0) : quand aucune forme ne tient exactement, la
+  loi de puissance et les formes ci-dessus sont recherchées de nouveau avec leurs
+  seuils levés, et placées si elles laissent au plus 1,5 % de la variance inexpliquée
 - **Lois de puissance amorcées** (v0.8) : quand les données suivent une loi de puissance, le monôme ajusté sur les logarithmes entre dans la population initiale
 - **Polissage vers la loi exacte** (v0.8) : les finalistes reçoivent des constantes ajustées jusqu'à convergence et un coefficient par terme de chaque somme ; une variante n'est admise que si elle est exacte
 - **Constantes ajustées pour la forme jugée** (v0.8) : Levenberg–Marquardt en projection variable (l'échelle et le décalage de la mise à l'échelle linéaire résolus dans le résidu)
 - **Données de toute échelle** (v0.8) : une cible de n'importe quel ordre de grandeur est divisée en interne par une puissance de dix, et la normalisation par défaut divise chaque colonne par sa plus grande valeur absolue
 - **Formule dans vos variables, vérifiée** (v0.7) : la mise à l'échelle interne est repliée dans les constantes ; `formula_exact` indique si la formule reproduit `predict()` sur les données d'entraînement
 - **Budget de temps** (v0.7) : `time_limit=` arrête proprement et rend le meilleur modèle trouvé
-- **Déduction de la constante mystère** (v0.5) : la constante de tête peut porter une dimension, inférée par homogénéité ; unités et valeur brute exposées sur l'estimateur
+- **Déduction de la constante mystère** (v0.5) : la constante de tête peut porter une dimension, inférée par homogénéité ; unités et valeur brute exposées sur l'estimateur, la valeur lue sur les prédictions quand le modèle est un monôme (v1.0)
 - **Recherche sous contrainte dimensionnelle** (v0.4) : génération typée constructive, mutation et croisement préservant les dimensions, filtre de validité dans `fitness()` — une seule sémantique partagée avec l'auditeur (v0.7)
 - **Mise à l'échelle purement multiplicative sous `units=`** (v0.4.1) : régression par l'origine, pour que la forme *notée* soit la forme *livrée*
 - **Garde numérique de l'optimiseur LM** (v0.4) : plus d'overflow float64 sur les chaînes `sq`/`cube`/`*` non bornées
