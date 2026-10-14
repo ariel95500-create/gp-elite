@@ -222,8 +222,10 @@ returns `m³·kg⁻¹·s⁻²` and 6.674e-11, exact; the ideal gas law returns
 `kg·m²·s⁻²·mol⁻¹·K⁻¹` and 8.314462618, the value used to generate the data.
 Structure is exact and $R^2 = 1.000000$ in all three.
 
-An integration for the SRBench living benchmark [@lacava2021srbench] has been
-proposed to that project for its next evaluation round
+GP_ELITE is part of the SRBench living benchmark [@lacava2021srbench]: its
+maintainers merged the integration in September 2026
+(<https://github.com/cavalab/srbench/pull/212>) and its update for version
+0.8.0 into the development branch in October 2026
 (<https://github.com/cavalab/srbench/pull/227>).
 
 # AI usage disclosure
