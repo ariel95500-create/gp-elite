@@ -1,0 +1,36 @@
+# Distance and recession velocity of 24 extra-galactic nebulae (Hubble 1929,
+# Proceedings of the National Academy of Sciences 15, 168).
+# Source: R package Sleuth2, dataset case0701 (F.L. Ramsey and D.W. Schafer,
+# The Statistical Sleuth, 2nd edition, case study 7.1); file data/case0701.rda,
+# SHA-256 e26c52092b9c44d9f0b1c45a2d87cbb19c40c39de08ca629c121b7c9935c781f.
+# Distances stored there in single precision, written here to their three
+# decimals. Rows in the order of the source.
+# A second transcription, R package lmreg, dataset stars1, gives -200 instead
+# of 200 for the row at 0.63 Mpc (the tenth); the other rows agree.
+#   distance_mpc   distance, megaparsecs
+#   velocity_kms   recession velocity, km/s
+distance_mpc,velocity_kms
+0.032,170
+0.034,290
+0.214,-130
+0.263,-70
+0.275,-185
+0.275,-220
+0.450,200
+0.500,290
+0.500,270
+0.630,200
+0.800,300
+0.900,-30
+0.900,650
+0.900,150
+0.900,500
+1.000,920
+1.100,450
+1.100,500
+1.400,500
+1.700,960
+2.000,500
+2.000,850
+2.000,800
+2.000,1090

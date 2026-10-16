@@ -1,6 +1,8 @@
 """Sets the phase 2 flags of gp_elite.core in every Python process started
 with this directory first on PYTHONPATH (benchmarks/speed_equivalence.py
-runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b, S2, T1 or A1.
+runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b, S2, T1, A1, B1, noB1, E1, noE1, N1 or
+noN1 (B1, E1 and N1 are on by default since their adoption; their mechanics
+ran at commits 273061b, 4b12ba7 and 28fae46, where A had them off).
 With GP_ELITE_TRACE_LOG, each process appends its check counters there. The
 flags exist in the engine at commit 0038a29 only (PLAN_PHASE2.md, decision).
 
@@ -43,6 +45,18 @@ if _arm:
         raise SystemExit("the flag of A1 is not in this engine: run from commit 878fd47")
     if hasattr(_C, "_ARG_MUT"):
         _C._ARG_MUT = _arm == "A1"
+    if _arm in ("B1", "noB1") and not hasattr(_C, "_BINOMIAL_SEEDS"):
+        raise SystemExit("the flag of B1 is not in this engine")
+    if _arm in ("B1", "noB1"):                    # PLAN_PHASE4.md, change B1,
+        _C._BINOMIAL_SEEDS = _arm == "B1"         # on by default since its adoption
+    if _arm in ("E1", "noE1") and not hasattr(_C, "_ELEMENTARY_SEEDS"):
+        raise SystemExit("the flag of E1 is not in this engine")
+    if _arm in ("E1", "noE1"):                    # PLAN_PHASE4.md, change E1,
+        _C._ELEMENTARY_SEEDS = _arm == "E1"       # on by default since its adoption
+    if _arm in ("N1", "noN1") and not hasattr(_C, "_TOLERANT_SEEDS"):
+        raise SystemExit("the flag of N1 is not in this engine")
+    if _arm in ("N1", "noN1"):                    # PLAN_PHASE5.md, change N1,
+        _C._TOLERANT_SEEDS = _arm == "N1"         # on by default since its adoption
 
     def _log():
         path = os.environ.get("GP_ELITE_TRACE_LOG")
@@ -55,5 +69,8 @@ if _arm:
                         "candidats_rejetes_garde", 0)),
                     catchups=int(_C.TRACE.count.get("rattrapages", 0)),
                     far_rejected=int(_C.TRACE.count.get("far_rejets", 0)),
-                    catchup=_C.TRACE.value.get("rattrapage"))) + "\n")
+                    catchup=_C.TRACE.value.get("rattrapage"),
+                    binomial_seed=_C.TRACE.value.get("binomial_seed"),
+                    elementary_seed=_C.TRACE.value.get("elementary_seed"),
+                    tolerant_seed=_C.TRACE.value.get("tolerant_seed"))) + "\n")
     atexit.register(_log)

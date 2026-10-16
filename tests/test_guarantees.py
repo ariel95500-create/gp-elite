@@ -1236,3 +1236,209 @@ def test_polish_extras_stop_after_the_time_budget(monkeypatch):
     core._track_val_candidate(t)
     core._polish_finalists(list(core._VAL_CANDS), Xs[tr], y[tr], cfg)
     assert min(c[0] for c in core._VAL_CANDS) < 1e-20 * np.var(y)
+
+
+# ── 21. A monomial times a power of a binomial is seeded (phase 4b) ────────
+# Change B1 of benchmarks/results_0.9/PLAN_PHASE4.md, adopted on 12 October
+# 2026: y = b·f·(1 + c·g)^p, p in {-1, -1/2, 1/2, 1}, is a straight line in
+# log scale once the binomial is known. The seed is injected only when the
+# form holds to numerical precision (on the decision bench, exact laws 86 to
+# 124 of 205, no seed on any real dataset).
+
+def _binom_cfg(n):
+    cfg = core.Config()
+    cfg.TERMINALS = ["X[%d]" % i for i in range(n)]
+    return cfg
+
+
+def test_binomial_forms_found_exactly(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140),
+               rng.uniform(3, 10, 140)]
+    Xs = Xr / np.abs(Xr).max(axis=0)          # normalize="auto"
+    cases = ((Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2]), -1.0),            # I.34.1
+             (Xr[:, 0] / np.sqrt(1 - Xr[:, 1] ** 2 / Xr[:, 2] ** 2), -0.5),
+             (np.sqrt(Xr[:, 0] ** 2 + 2.0 * Xr[:, 1] ** 2), 0.5))
+    for y, p in cases:
+        forms = core._binomial_forms(Xs, y)
+        assert [f[0] for f in forms] == [p]
+        seeds = core._make_binomial_seeds(Xs, y, _binom_cfg(3))
+        assert len(seeds) == 1
+        assert _scaled_residual(seeds[0], Xs, y) < 1e-20
+
+
+def test_binomial_seed_only_where_it_applies(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140),
+               rng.uniform(3, 10, 140)]
+    y = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    cfg = _binom_cfg(3)
+    # on by default; the flag turns it off
+    assert len(core._make_binomial_seeds(Xr, y, cfg)) == 1
+    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", False)
+    assert core._make_binomial_seeds(Xr, y, cfg) == []
+    monkeypatch.setattr(core, "_BINOMIAL_SEEDS", True)
+    # 1 % noise: the form no longer holds to numerical precision
+    noisy = y * (1 + 0.01 * rng.randn(140))
+    assert core._binomial_forms(Xr, noisy) == []
+    # a power law is left to the power-law seeds
+    assert core._binomial_forms(Xr, Xr[:, 0] * Xr[:, 1] ** 2) == []
+    # a target that changes sign: nothing
+    assert core._binomial_forms(Xr, y - np.median(y)) == []
+    # under units= the typed population is left alone
+    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}, 2: {"s": 1}}
+    assert core._make_binomial_seeds(Xr, y, cfg) == []
+
+
+def test_binomial_law_recovered_in_a_short_fit():
+    rng = np.random.RandomState(2)
+    Xr = np.c_[rng.uniform(1, 3, 200), rng.uniform(1, 3, 200),
+               rng.uniform(1, 3, 200), rng.uniform(3, 5, 200),
+               rng.uniform(1, 2, 200)]
+    y = Xr[:, 0] * Xr[:, 1] / (Xr[:, 2] * (Xr[:, 3] ** 2 - Xr[:, 4] ** 2))
+    r = symbolic_regression(Xr[:140], y[:140], generations=5, seed=0,
+                            parallel=False)
+    pred = r.predict(Xr[140:])
+    assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
+    assert r.formula_exact
+
+
+# ── 22. A function of a monomial held exactly is seeded (phase 4a) ─────────
+# Change E1 of benchmarks/results_0.9/PLAN_PHASE4.md, adopted on 12 October
+# 2026: y = b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g) and
+# y = f·(a + β·sin(ω·g) + γ·cos(ω·g)), seeded only when the form holds to
+# numerical precision (on the decision bench, exact laws 124 to 157 of 205,
+# no seed on any real dataset).
+
+def test_elementary_forms_found_exactly(monkeypatch):
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140),
+               rng.uniform(1, 5, 140)]
+    Xs = Xr / np.abs(Xr).max(axis=0)          # normalize="auto"
+    cases = (("physical", Xr[:, 0] * np.exp(-Xr[:, 1] / Xr[:, 2]), "exp"),
+             ("physical", Xr[:, 0] * Xr[:, 1] * np.log(Xr[:, 2]), "log"),
+             ("physical", Xr[:, 0] / np.cosh(Xr[:, 1] * Xr[:, 2] / 5), "sech"),
+             ("physical", Xr[:, 0] * np.tanh(Xr[:, 1] / Xr[:, 2]), "tanh"),
+             ("trig", Xr[:, 0] * Xr[:, 1] * np.sin(Xr[:, 2]), "sin"))
+    for pool, y, op in cases:
+        _set_pool(monkeypatch, pool)
+        seeds = core._make_elementary_seeds(Xs, y, _binom_cfg(3))
+        assert len(seeds) >= 1, op
+        assert _scaled_residual(seeds[0], Xs, y) < 1e-20, op
+        assert op in _ops_in(seeds[0], set()) or (op == "sech"
+                                                  and "exp" in _ops_in(seeds[0], set()))
+
+
+def test_elementary_seed_only_where_it_applies(monkeypatch):
+    _set_pool(monkeypatch, "trig")
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140),
+               rng.uniform(1, 5, 140)]
+    y = Xr[:, 0] * np.exp(-Xr[:, 1] / Xr[:, 2])
+    cfg = _binom_cfg(3)
+    assert len(core._make_elementary_seeds(Xr, y, cfg)) >= 1   # on by default
+    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", False)
+    assert core._make_elementary_seeds(Xr, y, cfg) == []
+    monkeypatch.setattr(core, "_ELEMENTARY_SEEDS", True)
+    kinds = ["exp", "log", "tanh", "sech", "trig"]
+    # 1 % noise: no form holds to numerical precision
+    assert core._elementary_forms(Xr, y * (1 + 0.01 * rng.randn(140)), kinds) == []
+    # a power law is left to its own seeds (tanh(c·g) ≈ c·g would mimic it)
+    assert core._elementary_forms(Xr, Xr[:, 0] * Xr[:, 1] ** 2, kinds) == []
+    # the trigonometric form needs sine and cosine in the pool
+    s = Xr[:, 0] * np.sin(Xr[:, 2])
+    _set_pool(monkeypatch, "physical")
+    assert core._make_elementary_seeds(Xr, s, cfg) == []
+    # under units= the typed population is left alone
+    _set_pool(monkeypatch, "trig")
+    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}, 2: {"s": 1}}
+    assert core._make_elementary_seeds(Xr, y, cfg) == []
+
+
+def test_elementary_law_recovered_in_a_short_fit():
+    rng = np.random.RandomState(2)
+    Xr = np.c_[rng.uniform(1, 5, 200), rng.uniform(1, 5, 200),
+               rng.uniform(1, 5, 200), rng.uniform(1, 5, 200)]
+    y = Xr[:, 0] * np.exp(-Xr[:, 1] * Xr[:, 2] / Xr[:, 3])
+    r = symbolic_regression(Xr[:140], y[:140], generations=5, seed=0,
+                            parallel=False)
+    pred = r.predict(Xr[140:])
+    assert 1 - np.var(y[140:] - pred) / np.var(y[140:]) > 1 - 1e-9
+    assert r.formula_exact
+
+
+# ── 23. Seeds that tolerate noise (phase 5) ─────────────────────────────────
+# Change N1 of benchmarks/results_0.9/PLAN_PHASE5.md, adopted on 13 October
+# 2026: when no form holds exactly, the finders of the power law, B1 and E1
+# are run with their thresholds lifted, and a form becomes a seed only if its
+# 1 - R² after linear scaling is at most _TOLERANT_REL (on the decision bench,
+# the structure retrieved under 1 % noise 69 to 106 fits of 205).
+
+def test_tolerant_seed_carries_a_noisy_law(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140),
+               rng.uniform(3, 10, 140)]
+    clean = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    y = clean + 0.01 * np.std(clean) * rng.randn(140)
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    cfg = _binom_cfg(3)
+    assert core._make_binomial_seeds(Xs, y, cfg) == []        # not exact
+    monkeypatch.setattr(core, "_TOLERANT_SEEDS", False)
+    assert core._make_tolerant_seeds(Xs, y, cfg) == []
+    monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)        # the default
+    seeds = core._make_tolerant_seeds(Xs, y, cfg)
+    assert seeds and core._seed_rel_error(seeds[0], Xs, y) < 1e-3
+    # the first seed has the structure: refitted on the clean target, exact
+    assert _scaled_residual(seeds[0], Xs, clean) < 1e-6
+
+
+def test_tolerant_seed_only_under_its_threshold(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+    cfg = _binom_cfg(2)
+    # far from every form of the finders: nothing
+    y = np.sin(3 * Xr[:, 0]) * Xr[:, 1] + np.cos(Xr[:, 0] * Xr[:, 1])
+    assert core._make_tolerant_seeds(Xr, y, cfg) == []
+    # 30 % noise on a power law: the best form explains less than 98.5 %
+    clean = Xr[:, 0] ** 2 / Xr[:, 1]
+    noisy = clean + 0.3 * np.std(clean) * rng.randn(140)
+    for t in core._make_tolerant_seeds(Xr, noisy, cfg):
+        assert core._seed_rel_error(t, Xr, noisy) <= core._TOLERANT_REL
+    # under units= nothing
+    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}}
+    assert core._make_tolerant_seeds(Xr, clean * 1.001, cfg) == []
+
+
+# ── 24. The deduced constant is the coefficient of the formula ──────────────
+# Found while writing the case study of Kepler's law in SI units (phase 6):
+# with seed 0 the engine returned 5.45084e-10 * sqrt(X0 * sqrt(X0²)²) but
+# announced 4.34e-10 s/m^1.5, a constant hidden inside the square root having
+# escaped the deduction. When the model is c * prod x_i^e_i on the data, the
+# constant is now read off its predictions.
+
+# The model returned depends on the processor (README, reproducibility): on
+# this machine seed 0 returns the model above, on runners without AVX2 others
+# (X0^1.49986, or a constant in s/m^2), and the first version of this test,
+# which expected s/m^1.5 everywhere, failed there. Whatever the model, when it
+# is c * a^e on the data, the constant reported must be c.
+
+def test_deduced_constant_matches_the_predictions():
+    AU, YR = 1.495978707e11, 365.25 * 86400.0
+    a = np.array([0.387, 0.723, 1.000, 1.524, 5.203, 9.537, 19.191, 30.069]) * AU
+    T = np.array([0.241, 0.615, 1.000, 1.881, 11.862, 29.457, 84.011, 164.79]) * YR
+    for seed in (0, 1):
+        est = GPEliteRegressor(units=["m"], target_units="s", unknown_constant=True,
+                               generations=30, speed="fast", random_state=seed,
+                               parallel=False)
+        est.fit(a.reshape(-1, 1), T)
+        assert est.constant_units_ is not None
+        e = -float(est.constant_units_.get("m", 0.0))
+        ratio = est.predict(a.reshape(-1, 1)) / a ** e
+        c_data = float(np.median(ratio))
+        if np.max(np.abs(ratio / c_data - 1.0)) < 1e-6:     # the model is c * a^e
+            assert est.constant_value_ is not None
+            assert abs(est.constant_value_ / c_data - 1.0) < 1e-6

@@ -10,11 +10,17 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, is not recovered exactly at any size. The five fits take 139 s in total at 1,000 points and 380 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 0.9.0).
+On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 58 s in total at 1,000 points and 151 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.0.0).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
 Pure **Python / NumPy** — no Julia, no compilation, no GPU. `pip install` and you're ready.
+
+Three [case studies on public data](https://github.com/ariel95500-create/gp-elite/tree/main/examples/case_studies)
+(Kepler's law with units, Hubble's measurements of 1929, Nikuradse's pipes) show what
+it returns on public data and what it does not find, and
+[what GP_ELITE does not do](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.md)
+lists its known limits, each with the measurement behind it.
 
 ![GP_ELITE rediscovers Kepler's Third Law from 8 data points (R² = 1.000000)](https://raw.githubusercontent.com/ariel95500-create/gp-elite/main/kepler_plot.png)
 
@@ -140,8 +146,10 @@ guarantee.
   guaranteed to do better.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result; the
-  generation under way and the final selection add a little (two to three seconds
-  for a 15 s budget in our measurements: 17.0 to 17.7 s on 3,000 rows).
+  generation under way and the final selection add a little (16.9 s for a 15 s
+  budget on 3,000 rows in the measurement of 1.0.0, islands in parallel; in
+  sequence, the same fit stopped at 10.2 s with a model of R² 1.0000, before the
+  budget, as a search does only on an exact law).
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
 
@@ -272,36 +280,43 @@ per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms. A malformed string
 
 | | no `units=` | `units=` | no `units=`, 4x generations |
 |---|---:|---:|---:|
-| dimensionally valid | **0 / 5** | **5 / 5** | 0 / 5 |
-| exact law recovered (holds out of domain) | 0 / 5 | **2 / 5** | 0 / 5 |
-| median test R² | 0.99157 | **0.99957** | 0.99863 |
-| median out-of-domain R² | 0.34 | **0.65** | 0.42 |
-| median model size | 59 nodes | **27 nodes** | 60 nodes |
-| median seconds / run | 29 | 34 | 114 |
+| dimensionally valid | 5 / 5 | 5 / 5 | 5 / 5 |
+| exact law recovered (holds out of domain) | **5 / 5** | 2 / 5 | 5 / 5 |
+| median test R² | **1.00000** | 0.99957 | 1.00000 |
+| median out-of-domain R² | **1.00000** | 0.65 | 1.00000 |
+| median model size | **20 nodes** | 27 nodes | 20 nodes |
+| median seconds / run | **1** | 27 | 1 |
 
-The third column gives the unconstrained arm four times the generations. It still
-yields **0/5** physically valid models: compute does not substitute for the
-constraint. (Since 0.9 the constrained search takes about as long as the
-unconstrained one: a typed generation costs 1.4 times an untyped one, against 8.5
-times with 0.8, which took 179 s per run on the same machine, for the same models.
-A search stops early only on an exact law, so the constrained runs that end on an
-approximation go through all 40 generations; `time_limit=` bounds them.)
-The unconstrained failures are not marginal: across the ten unconstrained runs, the
-models take the logarithm of a frequency or of another quantity with units, add
-kilograms or hertz to pure numbers, or raise a quantity to an exponent in coulombs
-or in hertz.
+Since 1.0 this law is one of the forms the engine fits directly, a monomial times
+a power of a binomial: without `units=` it is placed in the starting population,
+and every run returns it in about a second. Under `units=` the population is
+typed and those fitted forms do not act (`LIMITATIONS.md`, point 8): the
+constrained search finds the law in two runs of five, as in 0.9, and returns
+physically coherent approximations in the other three. Up to 0.9 the
+unconstrained search returned no valid model on this law, even with four times the
+generations: its models took the logarithm of a frequency, added kilograms or
+hertz to pure numbers, or raised a quantity to an exponent in coulombs, and the
+constraint was the only way to a valid answer. It still is for the laws the
+engine does not fit directly. (Since 0.9 a typed generation costs 1.4 times an
+untyped one, against 8.5 times with 0.8. A search stops early only on an exact
+law, so the constrained runs that end on an approximation go through all 40
+generations; `time_limit=` bounds them.)
 
 **What it does *not* do.** On a test set drawn *outside* the training domain (w/w0
-pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), approximations degrade
-in every arm. Two constrained runs in five found the exact law, which holds there
-(R² = 1.00000); the other three are physically coherent approximations, not the law. Timings are from a 4-core Linux machine, two runs at a time, with the
-islands in sequence (`parallel=False`). Reproduce with `benchmarks/ab_ood.py`.
+pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), approximations
+degrade; the exact law holds there (R² = 1.00000), in the ten unconstrained runs
+and in two constrained runs of five. Timings are from a 4-core Linux machine, two
+runs at a time, with the islands in sequence (`parallel=False`). Reproduce with
+`benchmarks/ab_ood.py`.
 
-**When to use it.** For discovering physical laws when you know the units and the
-law is dimensionally homogeneous, and to guarantee that whatever the engine returns
-is at least physically meaningful. **Not** for black-box prediction: the constraint
-rules out dimensionally wrong but numerically good approximations, so it can *lower*
-R² when fitting is the goal rather than finding a law.
+**When to use it.** To guarantee that whatever the engine returns is physically
+meaningful, and to deduce the units and value of a constant (below, and the
+[Kepler case study](https://github.com/ariel95500-create/gp-elite/blob/main/examples/case_studies/kepler_units.ipynb),
+where the units also rule out a term the data alone would add). On a law the
+engine fits directly, the search without units is faster and finds it more often;
+compare both. **Not** for black-box prediction: the constraint rules out
+dimensionally wrong but numerically good approximations, so it can *lower* R²
+when fitting is the goal rather than finding a law.
 
 **Laws with a dimensioned constant** (`unknown_constant=`). By default, fitted
 constants are dimensionless — the AI Feynman convention — which puts a law like
@@ -354,23 +369,24 @@ prints (abridged):
 
 ```
 PROTOCOL 1 — random split (INTERPOLATION, leaks info)
-  GP_ELITE      R² = +0.991
+  GP_ELITE      R² = +0.993
   RandomForest  R² = +0.997
   XGBoost       R² = +0.997
 
 PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
   RandomForest (300)      R² = -2.521
   XGBoost (300 trees)     R² = -2.324
-  GP_ELITE (one equation) R² = -0.314
+  GP_ELITE (one equation) R² = +0.162
 
-  Equation: SOH = 0.413666 + 0.500082 * tanh(2.40159 * temperature / cycle)
+  Equation: SOH = 0.428836 + 0.111661 * courant * exp(0.51573 * courant) - 0.0181691 * sqrt(cycle)
 ```
 
 A random split of sequential data is interpolation and flatters every method. On the
 forward split, the tree ensembles can only repeat values seen in training and fall far
-below the mean. The equation found by 0.8 does better than them but not well
-(R² −0.31, below the mean too); the one 0.7 found on the same split, in the cycle and
-the current, kept following the trend (R² +0.594). A formula can extrapolate where a
+below the mean. The equation 1.0 returns, in the current and the cycle, does better
+than them, but not well (R² +0.16); 0.8 and 0.9 returned one at R² −0.31, below the
+mean too, and 0.7 one in the cycle and the current that kept following the trend
+(R² +0.594). A formula can extrapolate where a
 tree ensemble cannot; whether it does depends on which formula the search returns —
 on this simulated set, to be checked on yours.
 
@@ -390,6 +406,9 @@ against the alternatives, and where it does not.
 | Stability of the answer | **bootstrap report** (`stability_analysis`) | no | no |
 | Speed and accuracy at scale | lower | — | **higher** |
 
+The last row is not a measurement of this project: it is a concession, from the
+published results of the compiled engines.
+
 **How changes are decided.** Since 0.8, a change meant to improve the search or
 the final selection becomes part of the default behaviour only if it passes a
 comparison written in advance: the hypothesis and the decision criteria are
@@ -405,7 +424,16 @@ including the changes that did not pass. When a change failed and a restricted
 version of it was then tested, the restriction was designed after seeing the
 failure and measured on the same problems; `RESULTS.md` says where. Corrections of
 defects are not decided this way; the files of `benchmarks/results_0.8/` show what
-they change.
+they change. The changes of 1.0 were decided the same way
+([`benchmarks/results_0.9/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9),
+`PLAN_PHASE4.md` and `PLAN_PHASE5.md`), and since 0.9 each release is also
+measured once on a test set frozen before any decision and never used to make
+one: 78 other Feynman equations, 14 Strogatz systems and 25 real datasets. On its
+Feynman equations, 1.0 recovers 213 exact laws of 390 against 145 for 0.9 measured
+beside it; on its Strogatz systems, 7 exact fits of 70 against 8; on its real
+datasets, the same median R² within 0.004 and the same number of collapses out of
+the training range
+([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
 
@@ -416,25 +444,26 @@ GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a tec
 **Good at**: physical / engineering laws with multiplicative or exponential structure, modest-size experimental data, problems where interpretability matters most.
 
 On the frozen **Feynman benchmark** (15 physics equations, `restarts=4`, one seed),
-judged on the model it returns: **12/15 exact symbolic recoveries** (1−R² < 1e-9 on
-held-out data) and **13/15 within 1e-3**; the misses are I.16.6 (relativistic velocity
-addition, a nested rational form) and I.18.12 (r·F·sin θ, which 0.7 recovered with the
-same budget), and III.15.12 comes back within 1e-3. Head-to-head against **gplearn** on
-identical data and splits (population 2000 × 30 generations), each method judged on
-its returned model: **12/15 against 6/15** exact, 13/15 against 7/15 within 1e-3 —
-GP_ELITE ahead on 8 equations, tied on 6, behind on one (I.18.12). Without the column
-normalisation (`normalize='none'`, same budget), the three laws with a sine or a
-cosine all come back exact, I.18.12 and III.15.12 included
-(`python benchmarks/feynman_bench.py 12 15 --normalize none`). So when your law
-has an angle inside a sine or a cosine, pass `normalize='none'`: dividing an angle
-by its largest value changes the period the sine has to find. Measured for 0.9 on
-the ten trigonometric laws of the 41-equation bench with five seeds each: 13 of 50
-fits exact against 2 of 50 with the default; on real data, keep the default:
-leaving the columns of close scales as given there (`normalize='smart'`) predicted
-worse out of the training range
-([`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)). With the physical
-units declared (`units=`, same budget, no normalisation), 14/15 come back exact, each
-in its textbook form (`benchmarks/feynman_units.py`). One seed on fifteen equations is
+judged on the model it returns: **15/15 exact symbolic recoveries** (1−R² < 1e-9 on
+held-out data), against 12/15 for 0.9; the three it adds are I.16.6 (relativistic
+velocity addition, a nested rational form that is not among the forms 1.0 fits
+directly, reached by the search) and two laws with a sine or a cosine, I.18.12
+(r·F·sin θ) and III.15.12, which 1.0 fits directly. Head-to-head against
+**gplearn** on identical data and splits (population 2000 × 30 generations), each
+method judged on its returned model: **15/15 against 6/15** exact, 15/15 against 7/15
+within 1e-3 — GP_ELITE ahead on 9 equations and tied on 6. Up to 0.9, a law with an
+angle inside a sine or a cosine called for `normalize='none'`, since dividing an
+angle by its largest value changes the period the sine has to find (measured for
+0.9 on the ten trigonometric laws of the 41-equation bench with five seeds each: 13
+of 50 fits exact against 2 of 50 with the default; on real data, leaving the columns
+of close scales as given, `normalize='smart'`, predicted worse out of the training
+range,
+[`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md));
+with 1.0 the default returns the three laws of this showcase that have one, and
+`normalize='none'` remains worth a try when such a law does not come back. With the
+physical units declared (`units=`, same budget, no normalisation), 14/15 come back
+exact, each in its textbook form (`benchmarks/feynman_units.py`); the miss is
+I.16.6. One seed on fifteen equations is
 a showcase, not a statistical comparison:
 [`benchmarks/results_0.8/RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)
 measures 0.7.0 and each change of 0.8 to the search and the final selection on 41
@@ -448,13 +477,23 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## Technical features
 
+- **Forms fitted directly** (v1.0): a monomial times a power of a binomial,
+  b·f·(1 + c·g)^p with p one of −1, −½, ½, 1 (rational laws, 1/√(1 − v²/c²), the
+  root of a sum of two terms), and a monomial times a function of a monomial,
+  b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g) or
+  f·(a + β·sin(ω·g) + γ·cos(ω·g)): each is fitted by a one-dimensional search and
+  least squares, and placed in the starting population when it holds to numerical
+  precision
+- **Noise-tolerant seeds** (v1.0): when no form holds exactly, the power law and the
+  forms above are sought again with their thresholds lifted, and placed if they
+  leave at most 1.5 % of the variance unexplained
 - **Power-law seeds** (v0.8): when the data follow a power law, the monomial fitted on the logarithms starts in the population
 - **Exact-law polish** (v0.8): finalists get converged constants and a coefficient per term of each sum; a variant is admitted only if it is exact
 - **Constants fitted for the judged form** (v0.8): Levenberg–Marquardt in variable projection (the scale and offset of the linear scaling solved inside the residual)
 - **Scale-free data** (v0.8): a target of any magnitude is divided internally by a power of ten, and the default normalisation divides each column by its largest absolute value
 - **Formula in your variables, checked** (v0.7): the internal rescaling is folded back into the constants; `formula_exact` reports whether the formula reproduces `predict()` on the training data
 - **Time budget** (v0.7): `time_limit=` stops cleanly and returns the best model found
-- **Mystery-constant deduction** (v0.5): the leading constant may carry a dimension, inferred by homogeneity; units and raw value exposed on the estimator
+- **Mystery-constant deduction** (v0.5): the leading constant may carry a dimension, inferred by homogeneity; units and raw value exposed on the estimator, the value read on the predictions when the model is a monomial (v1.0)
 - **Dimensionally-constrained search** (v0.4): constructive typed generation, dimension-preserving mutation and crossover, validity gate in `fitness()` — one semantics shared with the post-hoc auditor (v0.7)
 - **Scale-only linear scaling under `units=`** (v0.4.1): regression through the origin, so the form that is *scored* is the form that is *delivered*
 - **Numerical guard in the LM optimizer** (v0.4): no more float64 overflow on unbounded `sq`/`cube`/`*` chains
@@ -475,7 +514,14 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**0.9 "Steady"** — the search with `units=` faster, with the same models (more
+**1.0 "Families"** — whole families of laws fitted directly (rational forms, roots,
+exponentials, logarithms, sines and cosines of a monomial), on noisy data too: on
+the 41 Feynman equations of the decision bench, 163 exact laws of 205 against 88
+for 0.9 measured beside it, and on 78 other Feynman equations frozen before the
+work, 213 of 390 against 145 (on the 14 Strogatz systems frozen with them, 7 of 70
+against 8); on real data, the same median R² within 0.004 and the same number of
+collapses out of the training range; three case studies on public data and a page of
+what the engine does not do. **0.9 "Steady"** — the search with `units=` faster, with the same models (more
 than five times on Feynman II.11.3); a formula that departs from the model names
 the exact formulas of the Pareto front; a test set frozen before any decision and
 never used to make one, on which each release is measured. **0.8 "Swift"** — faster (the speed-ups alone return the same models), more laws

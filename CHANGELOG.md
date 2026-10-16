@@ -1,5 +1,101 @@
 # Changelog
 
+## 1.0.0 — "Families"
+
+This release fits whole families of laws directly (rational forms, roots,
+exponentials, logarithms, sines and cosines of a monomial) and seeds the search
+with them, on noisy data too. Measured on the package, side by side with 0.9.0
+(`benchmarks/results_0.9/release_1.0/`): on the 41 Feynman equations of the
+decision bench, five seeds at 30 s per fit, 163 exact laws of 205 against 88; on
+the 78 Feynman equations of the test set frozen before this work, measured once,
+213 of 390 against 145; with 1 % and 10 % noise on the bench, the structure of the
+law in 105 and 85 fits of 205 against 67 and 66; on the 14 Strogatz systems of
+the test set, 7 exact fits of 70 against 8. On the 32 real datasets (7 of the
+bench, 25 of the test set, standardised and in their own units), the same median
+R² within 0.004 and the same number of collapses out of the training range; 15 of
+the 630 fits return another expression. (0.9.0, measured beside 1.0.0 on this
+machine, gives 88 and 145; its own release measurement gave 86 and 144: under a
+time budget the figures depend on the machine and its load.) On the 15 equations of the README, 15 exact laws instead
+of 12, and 15 against 6 for gplearn. Under `units=` these forms do not act
+(`LIMITATIONS.md`, point 8). The figures of each change below are those of the
+campaign that decided it.
+
+### More laws recovered
+- Laws that are a monomial times a power of a binomial,
+  y = b·f·(1 + c·g)^p with p one of −1, −½, ½, 1, are fitted directly and
+  seed the search: rational laws such as om0/(1 − v/c) or
+  q·Ef/(m·(w0² − w²)), the factor 1/√(1 − v²/c²), the square root of a sum of
+  two terms. Once the binomial is known such a law is a straight line in log
+  scale; for each candidate g the constant c is searched in one dimension and
+  the exponents of f follow by least squares. The seed is placed only when the
+  form holds to numerical precision, so on real or noisy data this change
+  alone places nothing (the noise-tolerant seeds below lift that threshold). On the 41 equations of the decision bench with five seeds, at 30 s
+  per fit, the exact law is recovered 124 times in 205 instead of 86 (126
+  instead of 86 on five seeds never run); the families of rational laws and
+  of roots, never recovered by 0.8.0 or 0.9.0, reach 35 of their 40 fits,
+  each in less than a second. No seed was placed on any of the 260 fits on
+  real data (`benchmarks/results_0.9/PLAN_PHASE4.md`, change B1).
+- Laws that are a monomial times a function of a monomial are fitted
+  directly too, by the same rule: y = b·f·exp(c·g), b·f·log(c·g),
+  b·f·tanh(c·g), b·f/cosh(c·g), and, with a pool that has sine and cosine,
+  y = f·(a + β·sin(ω·g) + γ·cos(ω·g)). The function inverted, the first four
+  become power laws once one constant is searched in one dimension; for the
+  trigonometric form, ω is searched on a grid. The seed is placed only when
+  the form holds to numerical precision. On the same bench, with the change
+  above, the exact law is recovered 157 times in 205 instead of 124 (155
+  instead of 126 on five seeds never run), among which n0·exp(−m·g·x/(kb·T)),
+  n·kb·T·log(V2/V1), a law in 1/cosh, 3·p·cos θ·sin θ/(4π·ε·r³) and
+  2·U·(1 − cos(k·d)), each in less than a second; no seed was placed on any
+  of the 520 fits on real data, with the default pool or with `"trig"`
+  (`PLAN_PHASE4.md`, change E1). Together, the five families of laws that
+  0.8.0 and 0.9.0 never recovered on this bench (roots, rational forms,
+  trigonometry, exponentials, logarithms) go from 0 to 55 of their 90 fits.
+
+### Fixed
+- With `unknown_constant=True`, the value of the deduced constant could differ
+  from the coefficient of the returned formula when the model hid a second
+  constant inside a function or a sum: on Kepler's law in SI units, seed 0
+  returned `5.45084e-10 * sqrt(X0 * sqrt(X0²)²)` and announced 4.34e-10 s/m^1.5.
+  When the model is a constant times a product of powers of the inputs, the
+  constant is now read off its predictions, in the estimator and in the
+  console. On seven typed fits of Kepler's law, the same models in both
+  versions, 0.9.0 departed from the coefficient in two (−20 % and +344 %) and
+  1.0.0 in none
+  (`benchmarks/results_0.9/release_1.0/m3/deduced_constant_*.txt`).
+- When parallel islands cannot start (a script without
+  `if __name__ == "__main__":`), the engine no longer says that the results
+  are identical: it says that the islands then run in sequence, which is
+  slower and can return another model (the known issue of 0.9.0).
+
+### Noisy data
+- When no form holds exactly, the seeds of the power law and of the two
+  changes above are sought again with their thresholds lifted, and each form
+  is judged as the data judge it: it becomes a seed if it leaves at most
+  1.5 % of the variance of the training target unexplained. With Gaussian
+  noise on the training target of the 41 equations, the structure of the law
+  (the returned model, its constants refitted on clean data, reproduces the
+  clean test rows) is retrieved in 106 fits of 205 instead of 69 with 1 %
+  noise, and 86 instead of 68 with 10 % (103 instead of 64 and 81 instead of
+  65 on five seeds never run); without noise the exact laws go from 157 to
+  160. On the real data of the bench no such form fits better than 2.6 %,
+  and none was placed on the 520 real fits. Known limit: on exact data that
+  no exact seed covers, an approximate form can draw the search away from the
+  law (seen on Kepler's law normalised by min-max: exact in 1 fit of 10
+  instead of 3 at 40 generations). `benchmarks/results_0.9/PLAN_PHASE5.md`,
+  change N1.
+
+### Case studies and limits
+- What GP_ELITE does not do, in English and in French (`LIMITATIONS.md`,
+  `LIMITATIONS.fr.md`): nine points, each with the measurement behind it.
+- Three notebooks on public data, in English and in French
+  (`examples/case_studies/`), each with its source, what the engine returns,
+  what it does not find, and a check on data kept out of the fit: Kepler's
+  third law with units (the units of the constant, and G·M☉ within 0.002 %
+  from the four inner planets), Hubble's measurements of 1929, and
+  Nikuradse's pipes in full, with a roughness removed from the fit. Their
+  figures come from `benchmarks/case_studies.py`, for five seeds;
+  `benchmarks/real_nikuradse.py` takes `--seed`.
+
 ## 0.9.0 — "Steady"
 
 This release makes the search with `units=` faster with the same models

@@ -251,3 +251,393 @@ trigonometric laws that 0.8.0 misses. Every way of doing it tried so far also
 touched something else (the scaling of all inputs, or exp and log) or moved
 a small count by one, and none was adopted. Users can already get the gain
 with `normalize="none"`, as the README now says.
+
+## 4b: a monomial times a power of a binomial (change B1), plan written before it is implemented (12 October 2026)
+
+Phase 4 resumes after the release of 0.9.0, as the plan of 0.9 says. 4b is
+the rational form of that plan, (a + b·f)/(1 + c·g), taken in the shape
+physical laws give it: y = b·f·(1 + c·g)^p, with f and g monomials of the
+inputs and p one of −1, −½, ½, 1. With p = −1 it is the rational form (the
+offset a is left to the engine's linear scaling); with p = −½ the factor
+1/√(1 − v²/c²) of the laws of the "racine" family; with p = ½ the square
+root of a sum of two terms; with p = 1 a sum of two terms.
+
+**Why a direct fit and not a search.** Such a law becomes a straight line
+once the binomial is known: log|y| − p·log(1 + c·g) = log|b| + Σ e_j·log|x_j|.
+For a given g, the best c is a search in one dimension, and the exponents
+then follow by least squares, as for the power-law seeds of 0.8. The engine
+divides each column by its largest value, which only changes b and c.
+
+**What a prototype showed, before this plan.** A prototype outside the
+engine (no fit of the engine, no test rows, the frozen test set untouched)
+was run on the training rows of the decision bench: F41, and every fold and
+the out-of-domain split of R6 and R7raw, the columns divided by their
+largest value as the engine does. It holds to numerical precision (residual
+variance of log|y| below 1e-29 of its variance) on eight F41 equations, and
+on none of the 130 real training sets:
+
+| equation | family | p | 0.8.0 exact (baseline) |
+|---|---|---|---|
+| I.34.1 om0/(1 − v/c) | rationnelle | −1 | 0 of 5 |
+| II.11.3 q·Ef/(m·(w0² − w²)) | rationnelle | −1 | 0 of 5 |
+| II.11.27 n·α·ε·Ef/(1 − n·α/3) | rationnelle | −1 | 0 of 5 |
+| I.10.7 m/√(1 − v²/c²) | racine | −½ | 0 of 5 |
+| I.15.10 m·v/√(1 − v²/c²) | racine | −½ | 0 of 5 |
+| II.13.23 ρ/√(1 − v²/c²) | racine | −½ | 0 of 5 |
+| II.24.17 √(ω²/c² − π²/d²) | racine | ½ | 0 of 5 |
+| I.27.6 1/(1/d1 + n/d2) | historique | −1 | 2 of 5 |
+
+The next best fit on F41 is far from it (relative residual 7e-7 at best).
+It costs 0.1 s per fit in the median on F41 (0.46 s at most), and 0.85 s at
+most on the real data. That seven of the eighteen equations at zero have
+this form is what the prototype found; whether the engine recovers them
+once seeded is what the campaign measures.
+
+**The change.** `_make_binomial_seeds(xs, ys, cfg)` in `gp_elite/core.py`,
+called beside the power-law seeds, on the same rows and with the same
+guards. On the scaled columns of constant sign and a target of constant
+sign, for t = |y| and t = y², for both directions of the binomial, and for
+each monomial g of one to three such columns with exponents in {−2, −1, 1,
+2} (three columns only when at most six qualify; at most 4,096 monomials),
+c is searched on a fixed grid refined by golden section, and the
+exponents of f are fitted by least squares on the logarithms. The best g is
+kept only if the residual variance of log t is below 1e-12 of its variance;
+the exponents of f are then rounded (half-integers in y) and the form must
+still hold below 1e-12 with c fitted again. Each form that holds becomes a
+tree, f/(1 + c·g), f·(1 + c·g), f/√(1 + c·g) or f·√(1 + c·g), with the
+operators of the active pool (none if a needed operator is missing), and
+one copy is placed in each island after the power-law seeds, judged like
+every other individual (Levenberg-Marquardt may move c). No random number is
+drawn: on data that do not follow such a law to numerical precision, which
+includes all real data and all noisy data, nothing is injected and the fit
+is that of 0.9.0. Not under `units=` (typed population), not in
+extrapolation mode, not outside the generic CSV mode, as the power-law
+seeds. Flag `_BINOMIAL_SEEDS` in `gp_elite/core.py`, off by default.
+
+**Mechanics, before any fit.** Flag off: the thirteen reference
+configurations identical to the 0.9.0 wheel and the test suite passing. Flag
+on: for each configuration, whether a seed was injected; every
+configuration without a seed identical to the 0.9.0 wheel. One fit of 30
+generations of I.34.1, outside any measurement, shows whether the seed
+reaches the returned model.
+
+**Campaign B1** (decides). The decision bench, A (flag off) against B1 side
+by side, budget T, four fits at a time: F41, R6 and R7raw, seeds 0 to 4 (335
+jobs). The criteria are those of A1, written before it, including the
+allowance on small counts. B1 is adopted when all hold:
+
+1. **exact laws:** F41 exact in B1 at least 8 more than in A, among which at
+   least 4 more in the five families at zero; and no equation exact in A at
+   three seeds or more falls to one seed or none;
+2. **real data in the domain:** R6 folds median test R² at least 0.804, and
+   the median paired difference over R6 and R7raw folds at least −0.005;
+3. **out of domain:** on R6 and R7raw, no more than 2 collapses more than A,
+   and the median R² no lower than A's by more than 0.01;
+4. **formulas:** no more than 3 formulas flagged inexact more than A on the
+   335 fits.
+
+Reported beside the criteria: the fits on which a seed was injected (the
+prototype expects none of the 130 real fits), and the time the search for
+seeds took.
+
+**Confirmation on new seeds**, if the campaign adopts B1: the same 335 jobs
+with seeds 5 to 9 (folds with seed 5). B1 is kept when F41 exact in B1 is at
+least 5 more than in A, the median paired difference over the folds is at
+least −0.005, and out of domain B1 has no more than 2 collapses more than
+A.
+
+The frozen test set is measured once, with the version, as for every change.
+
+### Mechanics of B1, result (12 October 2026)
+
+Flag off: the thirteen reference configurations identical to the 0.9.0
+wheel (`phase4_mechanics/compare_0.9.0_vs_B1_off.txt`) and the test suite
+passing (145 tests, the three of B1 included; `phase4_mechanics/tests_B1_off.txt`). Flag on: no seed injected in any of the thirteen
+configurations (none follows such a form; `trace_B1_on.jsonl`), and all
+thirteen identical to the 0.9.0 wheel (`compare_0.9.0_vs_B1_on.txt`).
+**Holds.** The fit of I.34.1, 30 generations, seed 0, outside any
+measurement (`one_fit_I.34.1.txt`): flag off, an approximation of 1 − R²
+9e-3 on the test rows in 11.8 s; flag on, `v0 / (1 - v1 / v2)` exact (1 − R²
+2e-28) in 0.6 s, the seed found in 0.09 s. Three tests are added to
+`tests/test_guarantees.py` (section 21): the three shapes found exactly, no
+seed with the flag off, with 1 % noise, on a power law, on a target that
+changes sign or under `units=`, and a short fit of II.11.3. The campaign is
+run.
+
+### Campaign B1, result (12 October 2026)
+
+Run from 13:09 to 14:16 UTC, 670 fits, 335 complete pairs, no crash
+(`campaign_B1.jsonl`; `python benchmarks/phase2_bench.py summary campaignb1
+benchmarks/results_0.9/campaign_B1.jsonl`). The criteria are applied as
+written.
+
+1. Exact laws: F41 86 in A, **124 in B1** (+38); the five families at zero
+   0 in A, **35 of 90 in B1**; no law lost. The eight equations of the
+   prototype go to 5 seeds of 5 each (`I.10.7`, `I.15.10`, `II.13.23`,
+   `II.24.17`, `I.34.1`, `II.11.3`, `II.11.27` from 0, `I.27.6` from 2), and
+   no other equation changes. **Holds.**
+2. Real data in the domain: R6 folds median 0.8095 in both arms; median
+   paired difference over the folds +0.0000 (mean +0.0005, worst +0).
+   **Holds.**
+3. Out of domain: collapses 10 in both arms; median R² 0.647 in both.
+   **Holds.**
+4. Formulas flagged inexact: 16 in both. **Holds.**
+
+**B1 is adopted by the campaign**; the confirmation on new seeds follows, as
+written. Beside the criteria: a seed was injected in 40 fits of 205 on F41,
+exactly the eight equations at all five seeds, and in none of the 130 real
+fits. Each of the 40 came back exact at the first generation, in 0.8 s at
+most, written in the user's variables: `v0 / (1 - v1 / v2)`,
+`v0 / sqrt(1 - v1² / v2²)`, `v0 * v1 / (v2 * v3²) / (1 - v4² / v3²)`,
+`v0 * v1 * v2 * v3 / (1 - 0.333333 * v0 * v1)`, `v0 / v1 * sqrt(1 - 9.8696
+* v1² / (v0² * v2²))` (9.8696 = π²). The search for seeds took 0.09 s in the
+median (0.23 s at most); on the real data it does not run when no column or
+target has a constant sign (R6, standardised) and takes 0.09 s otherwise
+(R7raw). 128 of the 130 real fits return the same expression in both arms;
+in the two others no seed was found either, and the arms reached another
+number of generations in their 30 s (57 and 55 on `690_visualizing_galaxy`
+fold 3, 47 and 48 on `nikuradse_1` fold 1).
+
+The gain is concentrated on the equations the change was built for, found
+by a prototype on the training rows of this bench: whether laws of this
+shape elsewhere are recovered as well, the frozen test set will say, once,
+with the version.
+
+### Confirmation of B1 on new seeds, result (12 October 2026)
+
+Run from 14:17 to 15:24 UTC, 670 fits, 335 complete pairs, no crash
+(`confirm_B1.jsonl`; `python benchmarks/phase2_bench.py summary confirmb1
+benchmarks/results_0.9/confirm_B1.jsonl`), seeds 5 to 9 never run on this
+bench.
+
+1. F41 exact: 86 in A, **126 in B1** (+40, at least +5 required); the five
+   families at zero 0 in A, 36 in B1: the same eight equations at all five
+   seeds (`I.27.6` from 1), and `I.50.26` once (seed 7, a trigonometric law
+   on which no seed was placed: the run-to-run variation of the search).
+   **Holds.**
+2. Folds: median paired difference +0.0000. **Holds.**
+3. Out of domain: collapses 17 in both arms. **Holds.**
+
+**B1 is confirmed and adopted.** Again a seed was placed in exactly 40 F41
+fits, each exact at the first generation (1 s at most), and in none of the
+130 real fits; 127 of these return the same expression in both arms, the
+three others reaching another number of generations in their 30 s.
+
+The flag `_BINOMIAL_SEEDS` is now on by default. With it on, the thirteen
+reference configurations are still identical to the 0.9.0 wheel
+(`phase4_mechanics/compare_0.9.0_vs_B1_default.txt`, none of them has such a
+form) and the test suite passes (145 tests,
+`phase4_mechanics/tests_B1_default.txt`). The campaign and the confirmation
+can be run again from this commit (`campaignb1`, `confirmb1`: arm A turns
+the flag off); in every other run, arm A is the engine as it stands, B1
+included. The frozen test set is measured with the next version.
+
+### Where phase 4 stands
+
+The target of gate 2 for the five families at zero, at least 20 of 90 with
+the gain confirmed on seeds 5 to 9, is met by B1 alone: 35 of 90, then 36 on
+the new seeds. What remains at zero: the trigonometric laws (where the
+measurements of 4a stand), the exponentials and the logarithm, and
+`III.10.19` (a root of a sum of three squares). Next in the plan: 4c,
+columns of order one left as given.
+
+## Decision of the author on 4c (12 October 2026)
+
+4c, the columns of order one left as given, was the next step of the plan.
+On the standardised real data of the decision bench (R6, the setting of
+SRBench) every column is of order one (largest absolute value between 1.07
+and 4.16 on the training rows), so 4c would act there exactly as
+`normalize="smart"` did in campaign S1 (`PLAN_TRIG.md`), which failed: on R6
+out of domain the median R² fell from 0.630 to 0.521 and six formulas more
+were flagged inexact. Asked whether to run 4c anyway or to apply instead the
+method of B1 to the trigonometric, exponential and logarithmic laws, the
+author chose the second. 4c is set aside; what follows is a third attempt
+at 4a.
+
+## 4a, third attempt: functions of a monomial held exactly (change E1), plan written before it is implemented (12 October 2026)
+
+T1 and A1 gave the sine its argument in the variable's own units and
+recovered trigonometric laws, but each also changed the models on real data
+and was not adopted. B1 showed a way to act on laws without touching real
+data: fit a family of forms directly, and seed the search only with a form
+that holds to numerical precision. E1 applies it to
+
+- y = b·f·exp(c·g), y = b·f·log(c·g), y = b·f·tanh(c·g), y = b·f/cosh(c·g),
+  f and g monomials of the inputs: the function inverted, the transformed
+  target is a power law of the inputs, found by least squares once one
+  constant is searched in one dimension (none for the logarithm);
+- y = f·(a + β·sin(ω·g) + γ·cos(ω·g)), g one input or a product or ratio of
+  two, f a monomial of the other inputs: ω is searched on a grid and refined,
+  a, β and γ follow by least squares; the exponents of f are estimated by
+  least squares on the logarithms, rounded, and kept only if the form then
+  holds.
+
+**What a prototype showed, before this plan.** As for B1, a prototype
+outside the engine (no fit, no test rows, the frozen test set untouched) was
+run on the training rows of F41 and of every split of R6 and R7raw, the
+columns divided by their largest value as the engine does, the
+trigonometric form tried only with a pool that has sine and cosine (on the
+real data, with both the default pool and `"trig"`). Seven F41 equations
+hold to numerical precision (relative residual below 1e-29), none of the
+130 real training sets with either pool:
+
+| equation | form | engine with B1, exact (campaign B1, confirmation) |
+|---|---|---|
+| I.40.1 n0·exp(−m·g·x/(kb·T)) | f·exp(c·g) | 0 of 5, 0 of 5 |
+| II.35.18 n0/(exp(μB/kT) + exp(−μB/kT)) | f/cosh(c·g) | 0 of 5, 0 of 5 |
+| I.44.4 n·kb·T·log(V2/V1) | f·log(c·g) | 0 of 5, 0 of 5 |
+| II.6.15b 3·p·cos θ·sin θ/(4π·ε·r³) | f·sin(ω·θ) | 0 of 5, 0 of 5 |
+| II.15.4 −μ·B·cos θ | f·cos(ω·θ) | 1 of 5, 4 of 5 |
+| I.18.12 r·F·sin θ | f·sin(ω·θ) | 1 of 5, 2 of 5 |
+| III.15.12 2·U·(1 − cos(k·d)) | f·(a + cos(ω·k·d)) | 0 of 5, 0 of 5 |
+
+The first four are in the five families at zero. A first version also
+"found" a hyperbolic tangent in every pure power law (tanh(c·g) ≈ c·g as c
+shrinks); as for B1, nothing is sought when the target is already a power
+law to numerical precision. The search costs 0.1 s per fit in the median on
+F41 (0.49 s at most), 0.21 s at most on the real data with the default pool
+and 0.36 s with `"trig"`.
+
+**The change.** `_make_elementary_seeds(xs, ys, cfg)` in
+`gp_elite/core.py`, called after the binomial seeds, with their guards
+(generic CSV mode, not under `units=`, not in extrapolation mode). Each form
+is sought only if the active pool has its operator (`exp`; `log`; `tanh`;
+`exp` and `/` for 1/cosh, written 1/(exp(c·g) + exp(−c·g)); `sin` or `cos`
+for the trigonometric form). f is taken among the monomials of up to three
+columns of constant sign (exponents ±1, or ±1 and ±2 for one column) for the
+first four forms, and fitted for the trigonometric one; the exponents of g
+are rounded to half-integers and the form must still hold. The thresholds
+are those of B1 (residual below 1e-12 of the variance). Each form found
+becomes one tree, one copy per island after the binomial seeds, judged like
+every other individual. No random number is drawn: when no form holds,
+nothing is injected and the fit is that of the engine with B1. Flag
+`_ELEMENTARY_SEEDS`, off by default.
+
+**Mechanics, before any fit.** Flag off: the thirteen reference
+configurations identical to the 0.9.0 wheel and the test suite passing. Flag
+on: for each configuration, whether a seed was injected; every configuration
+without one identical to the 0.9.0 wheel. One fit of 30 generations of
+I.40.1 and one of II.6.15b, outside any measurement.
+
+**Campaign E1** (decides). A (the engine with B1, flag off) against E1 side
+by side, budget T, four fits at a time: F41, R6 and R7raw, seeds 0 to 4 (335
+jobs), and R6 and R7raw again with `operators="trig"` in both arms (130
+jobs), where the trigonometric form can act on real data, as in campaigns S2
+and T1. E1 is adopted when all hold:
+
+1. **exact laws:** F41 exact in E1 at least 8 more than in A, among which at
+   least 4 more in the five families at zero; and no equation exact in A at
+   three seeds or more falls to one seed or none;
+2. **real data in the domain:** with each pool, the median paired
+   difference of test R² over the R6 and R7raw folds at least −0.005;
+3. **out of domain:** with each pool, on R6 and R7raw, no more than 2
+   collapses more than A, and the median R² no lower than A's by more than
+   0.01;
+4. **formulas:** no more than 3 formulas flagged inexact more than A on the
+   260 real fits.
+
+Reported beside the criteria: the fits on which a seed was injected, and
+the time the search took.
+
+**Confirmation on new seeds**, if the campaign adopts E1: the same jobs with
+seeds 5 to 9 (folds with seed 5). E1 is kept when F41 exact in E1 is at
+least 5 more than in A, and with each pool the median paired difference
+over the folds is at least −0.005 and out of domain E1 has no more than 2
+collapses more than A.
+
+### Mechanics of E1, result (12 October 2026)
+
+Flag off: the thirteen reference configurations identical to the 0.9.0
+wheel (`phase4_mechanics/compare_0.9.0_vs_E1_off.txt`) and the test suite
+passing (148 tests, the three of E1 included; `tests_E1_off.txt`). Flag on:
+no seed injected in any of the thirteen configurations (`trace_E1_on.jsonl`)
+and all thirteen identical to the 0.9.0 wheel (`compare_0.9.0_vs_E1_on.txt`).
+**Holds.** The fits of 30 generations, seed 0, outside any measurement
+(`one_fit_E1.txt`): I.40.1, flag off an approximation of 1 − R² 5e-2 in
+13.2 s, flag on `v0 * exp(-v1 * v2 * v3 / (v4 * v5))` exact in 0.8 s;
+II.6.15b, flag off 1 − R² 0.20 in 13.3 s, flag on `0.119366 * v0 / (v2 *
+v3 * v3²) * sin(2 * v1)` exact in 0.4 s (0.119366 = 3/(8π)). Three tests are
+added to `tests/test_guarantees.py` (section 22). The campaign is run.
+
+### Campaign E1, result (12 October 2026)
+
+Run from 17:59 to 19:33 UTC, 930 fits, 465 complete pairs, no crash
+(`campaign_E1.jsonl`; `python benchmarks/phase2_bench.py summary campaigne1
+benchmarks/results_0.9/campaign_E1.jsonl`). A is the engine with B1. The
+criteria are applied as written.
+
+1. Exact laws: F41 124 in A, **157 in E1** (+33); the five families at zero
+   35 in A, **55 of 90 in E1**; no law lost. The seven equations of the
+   prototype go to 5 seeds of 5 each (`I.40.1`, `II.35.18`, `I.44.4`,
+   `II.6.15b`, `III.15.12` from 0, `II.15.4` and `I.18.12` from 1), and no
+   other equation changes. **Holds.**
+2. Real data in the domain: median paired difference over the folds +0.0000
+   with the default pool (worst −0.001) and +0.0000 with `"trig"` (worst
+   +0). **Holds.**
+3. Out of domain: collapses 10 in both arms with the default pool and 12 in
+   both with `"trig"`; medians 0.647 and 0.700 in both arms. **Holds.**
+4. Formulas flagged inexact on the 260 real fits: 11 in A, 12 in E1.
+   **Holds.**
+
+**E1 is adopted by the campaign**; the confirmation on new seeds follows.
+Beside the criteria: a seed was placed in 35 F41 fits, exactly the seven
+equations at all five seeds, each exact at the first generation (0.92 s at
+most), written `v0 * exp(-v1 * v2 * v3 / (v4 * v5))`,
+`v0 / (exp(v1 * v2 / v3) + exp(-v1 * v2 / v3))`, `v0 * v1 * v2 * log(v3)`,
+`0.119366 * v0 / (v2 * v3 * v3²) * sin(2 * v1)`, `2 * v0 * (1 - cos(v1 *
+v2))`, `-v0 * v1 * cos(v2)`, `v0 * v1 * sin(v2)`; and in none of the 260
+real fits. The search took 0.10 s in the median (0.47 s at most) on F41,
+0.10 and 0.11 s on the real data (0.22 and 0.42 s at most). 257 of the 260
+real fits return the same expression in both arms; in the three others no
+seed was placed and the arms reached another number of generations in their
+30 s (the formula flagged inexact in E1 and not in A, `561_cpu` in its units
+fold 3, is one of them: 65 and 64 generations).
+
+### Confirmation of E1 on new seeds, result (12 October 2026)
+
+Run from 19:33 to 21:06 UTC, 930 fits, 465 complete pairs, no crash
+(`confirm_E1.jsonl`; `python benchmarks/phase2_bench.py summary confirme1
+benchmarks/results_0.9/confirm_E1.jsonl`), seeds 5 to 9.
+
+1. F41 exact: 126 in A, **155 in E1** (+29, at least +5 required); the five
+   families at zero 36 in A, 56 in E1: the same seven equations at all five
+   seeds. **Holds.**
+2. Folds: median paired difference +0.0000 with each pool. **Holds.**
+3. Out of domain: collapses 17 in both arms with each pool. **Holds.**
+
+**E1 is confirmed and adopted.** A seed was again placed in exactly 35 F41
+fits, each exact at the first generation (0.99 s at most), and in none of
+the 260 real fits; 255 of these return the same expression in both arms, the
+five others reaching another number of generations in their 30 s.
+
+The flag `_ELEMENTARY_SEEDS` is now on by default. With B1 and E1 on, the
+thirteen reference configurations are still identical to the 0.9.0 wheel
+(`phase4_mechanics/compare_0.9.0_vs_B1_E1_default.txt`) and the test suite
+passes (148 tests, `tests_B1_E1_default.txt`). The campaign and the
+confirmation can be run again from this commit (`campaigne1`, `confirme1`:
+arm A turns the flag off).
+
+### Where phase 4 stands
+
+On the decision bench, the five families at zero go from 0 of 90 fits
+(0.9.0) to 55 with B1 and E1 (56 on the new seeds), and F41 as a whole from
+86 to 157 exact laws of 205 (155 on the new seeds), with the real data
+unchanged. What remains at zero: `I.26.2` and `I.30.5` (an arcsine, which no
+pool of the engine has), `I.37.4` and `III.17.37` (a sum of terms, one of
+them trigonometric), `I.50.26` and `III.9.52` (nested or shifted
+arguments), and `III.10.19` (a root of a sum of three squares). The gain
+rests on twelve equations the two changes were built for, found by
+prototypes on the training rows of this bench: whether laws of these shapes
+elsewhere are recovered as well, the frozen test set will say, once, with
+the next version.
+
+### Provenance note on the field `engine_version` (13 October 2026)
+
+The records of the campaigns run from the repository checkout after the
+release of 0.9.0 (B1, E1, N1 and their confirmations, D5) carry
+`engine_version` "0.8.0": a stale local `gp_elite.egg-info` of 0.8.0 (ignored
+by git) answered `importlib.metadata` before the fallback of
+`gp_elite/__init__.py`. The engine measured is the checkout named by
+`engine_file`, at the commit given beside each result in this plan. The
+stale directory was removed on 13 October; later records read the version of
+`pyproject.toml`.

@@ -1,0 +1,55 @@
+| indicator | 0.9.0 | 1.0.0 |
+|---|---|---|
+| F41 exact | 88 | 163 |
+| F41N1 structure retrieved | 67 | 105 |
+| F41N10 structure retrieved | 66 | 85 |
+| TF78 exact | 145 | 213 |
+| TS14 test exact | 8 | 7 |
+| R6 folds median R² | 0.8095 | 0.8095 |
+| R6 out-of-domain collapses | 5 | 5 |
+| R6 worst out-of-domain R² | -224.2 | -224.2 |
+| R7raw folds median R² | 0.8787 | 0.8787 |
+| R7raw out-of-domain collapses | 6 | 6 |
+| R7raw worst out-of-domain R² | -232.5 | -232.5 |
+| TR25 folds median R² | 0.7657 | 0.7657 |
+| TR25 out-of-domain collapses | 37 | 37 |
+| TR25 worst out-of-domain R² | -1661000000000.0 | -1661000000000.0 |
+| TR25raw folds median R² | 0.7544 | 0.758 |
+| TR25raw out-of-domain collapses | 27 | 27 |
+| TR25raw worst out-of-domain R² | -17110.0 | -17110.0 |
+| R6 + R7raw out-of-domain collapses | 11 | 11 |
+| formula_exact False, R6 + R7raw folds and test | 4 | 3 |
+| crashes | 0 | 0 |
+| fits | 1775 | 1775 |
+| five families at zero in 0.8.0, exact (90 fits) | 0 | 55 |
+| fits of those families | 90 | 90 |
+| R6 + R7raw worst out-of-domain R² | -232.5 | -232.5 |
+
+F41 equations never exact in 5 seeds: 0.9.0 20, 1.0.0 7
+  1.0.0: I.26.2, I.30.5, I.37.4, I.50.26, III.10.19, III.17.37, III.9.52
+  equations with more exact fits in 1.0.0: 16; with fewer: 0 []
+  exact fits per equation, 1.0.0 (0.9.0): I.10.7 5 (0), I.11.19 1 (1), I.12.1 5 (5), I.12.2 5 (5), I.12.5 5 (5), I.14.4 5 (5), I.15.10 5 (0), I.16.6 4 (0), I.18.12 5 (1), I.25.13 5 (5), I.26.2 0 (0), I.27.6 5 (2), I.29.4 5 (5), I.30.5 0 (0), I.32.5 5 (5), I.34.1 5 (0), I.34.8 5 (5), I.37.4 0 (0), I.39.1 5 (5), I.40.1 5 (0), I.43.16 5 (5), I.44.4 5 (0), I.50.26 0 (0), I.6.20a 4 (4), I.8.14 5 (5), II.11.27 5 (0), II.11.3 5 (0), II.13.23 5 (0), II.15.4 5 (1), II.2.42 4 (4), II.24.17 5 (0), II.3.24 5 (5), II.34.2 5 (5), II.35.18 5 (0), II.38.3 5 (5), II.6.15b 5 (0), III.10.19 0 (0), III.15.12 5 (0), III.17.37 0 (0), III.19.51 5 (5), III.9.52 0 (0)
+
+Paired: 1775 jobs in both files, 1286 with the same returned expression (489 differ).
+Same expression by suite: feyn 107/205, feyn_n1 99/205, feyn_n10 126/205, real 60/60, realraw 69/70, tf 213/390, tr 246/250, trraw 240/250, ts 126/140
+
+Criteria written before the run (PLAN_RELEASE_1.0.md, M2):
+  [met] F41: not fewer exact laws than 0.9.0
+  [met] F41N1: not fewer structures than 0.9.0
+  [met] F41N10: not fewer structures than 0.9.0
+  [met] R6 folds median R² not more than 0.005 below 0.9.0
+  [met] R6 + R7raw collapses out of domain not more than 0.9.0 plus 2
+ALL MET
+
+Targets of gate 2 (PLAN.md), on the wheel of 1.0.0:
+  [met] F41 exact laws at least 110: 163
+  [met] five families at zero: at least 20 of 90: 55
+  [met] TF78 at least half the relative gain on F41, from gate 2 (F41 88 -> 163, +85 %: TF78 at least 206.8): 213
+  [met] TF78 the same, against 0.9.0 here (F41 88 -> 163, +85 %: TF78 at least 206.8): 213
+  [met] F41N1 structure at least 80: 105
+  [met] F41N10 structure at least 77: 85
+  [NOT MET] R6 + R7raw collapses out of domain no more than 10: 11
+  [met] R6 + R7raw worst out-of-domain R² no deeper than -233: -232.5
+  [met] R6 folds median R² at least 0.804: 0.8095
+  [met] TR25 folds median R² at least 0.761 (0.9.0 here: 0.7657): 0.7657
+  [NOT MET] TR25 collapses out of domain fewer than 37 (0.9.0 here: 37): 37

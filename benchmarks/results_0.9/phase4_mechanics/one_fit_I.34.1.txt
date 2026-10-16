@@ -1,0 +1,4 @@
+I.34.1 flag False 1-R2 8.94e-03 11.8s 0.00114707 + 5.05286 * v0 * |0.101211 * v2 + 0.501989 * v1| / sqrt(v2 * sqrt(v2 * sqrt(v2 * v1)))
+  seed: None | search s: None
+I.34.1 flag True 1-R2 2.26e-28 0.6s v0 / (1 - v1 / v2)
+  seed: (v0 / (1.0 + (-0.20162 * (v1 / v2)))) | search s: 0.091

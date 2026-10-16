@@ -1,0 +1,23 @@
+# Mean orbital elements of the eight planets, epoch J2000.0.
+# Source: J.L. Simon, P. Bretagnon, J. Chapront, M. Chapront-Touze, G. Francou
+# and J. Laskar (1994), Astronomy and Astrophysics 282, 663, as tabulated in
+# the file liberfa/erfa/src/plan94.c of the ERFA library, source package
+# pyerfa 2.0.1.5 on PyPI (pyerfa-2.0.1.5.tar.gz, SHA-256
+# 17d6b24fe4846c65d5e7d8c362dcb08199dc63b30a236aedd73875cc83e1f6c0):
+# constant term of the table a[] and linear term of the table dlm[].
+#   a_au          semi-major axis, astronomical units
+#   mean_motion   linear term of the mean longitude, arcseconds per Julian
+#                 millennium; period in Julian years = 1296000000 / mean_motion
+# The Earth row is the Earth-Moon barycentre.
+# The same file gives the inverse planetary masses, M_sun / m (table amas[]),
+# not used by the fits: Mercury 6023600.0, Venus 408523.5, Earth-Moon 328900.5,
+# Mars 3098710.0, Jupiter 1047.355, Saturn 3498.5, Uranus 22869.0, Neptune 19314.0.
+planet,a_au,mean_motion
+Mercury,0.3870983098,5381016286.88982
+Venus,0.7233298200,2106641364.33548
+Earth,1.0000010178,1295977422.83429
+Mars,1.5236793419,689050774.93988
+Jupiter,5.2026032092,109256603.77991
+Saturn,9.5549091915,43996098.55732
+Uranus,19.2184460618,15424811.93933
+Neptune,30.1103868694,7865503.20744

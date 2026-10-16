@@ -1,0 +1,83 @@
+gp_elite 0.9.0  <-  /home/user/gp-elite/gp_elite/__init__.py
+
+=== téléchargement de nikuradse_1 ===
+  source : PMLB, contenu vérifié par SHA-256
+forme : 362 lignes x 3 colonnes
+colonnes : ['r_k', 'log_Re', 'target']
+
+cible : 'target'   entrées : ['r_k', 'log_Re']
+
+colonne                    min           max       moyenne    écart-type
+r_k                         15           507         138.6         159.9
+log_Re                    3.63         6.008         4.975        0.6383
+target                    0.25         0.785        0.5304        0.1598
+
+rapport d'échelle entre colonnes : x250.6
+  -> normalize='auto' (défaut) est indiqué
+valeurs manquantes : 0
+
+=== vérification du repère : la théorie décrit-elle ces données ? ===
+  Prandtl-von Karman EXACTE (0 paramètre) sur les 362 pts : R2 = 0.9434
+
+=== références (ce que GP_ELITE doit battre) ===
+  linéaire brute                    R2 test = 0.6778
+  log simple ajustée (3 paramètres) R2 test = 0.9346   [mauvaise famille : la loi est un log DE log]
+  Prandtl-von Karman EXACTE (0 p.)  R2 test = 0.9456   <- LA barre honnête
+
+=== GP_ELITE (normalize='auto', gens=30, restarts=4) ===
+    patience : quelques minutes.
+/home/user/gp-elite/benchmarks/real_nikuradse.py:196: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 48 of 253 training rows (largest gap 0.0602), most often because a numerical safety net of the engine acts there (a power capped at 1e6 or clipped, a division by a near-zero denominator...). predict() is the model; result.formula_exact is False. 6 of the 10 entries of result.pareto have an exact formula (formula_exact True); the most accurate of them on the hold-out (validation R² 0.964272, size 40) is: 1.13682 - 0.186748 * (log(r_k) - (1.11029e-05 * r_k * r_k / (2447.41 / r_k - 5.41114) - 0.166445 * log_Re) * (0.00197239 * r_k - 0.166445 * log_Re) + 0.00197...
+  m = symbolic_regression(X[tr], y[tr], feature_names=feats,
+
+durée : 52 s
+champion  R2 test = 0.9802   taille 48
+  0.100003 + 0.102214 * log(|(0.166445 * log_Re)^(-2.96822e-05 * r_k²) / (log_Re * (-1.19127 + 0.166445 * log_Re)) * exp((44711.6 * (log_Re^(-5.46892) * log_Re * r_k)^6)^(0.0849001 * (0.00197239 * r_k + 0.166445 * log_Re)^(-6))) / tanh(0.00197239 * r_k)²|)
+
+front de Pareto (le compromis taille / précision) :
+  taille   6  R2=  0.9357   1.10108 - 0.133625 * log(r_k)  <- bat le linéaire
+  taille   7  R2=  0.9441   0.00351323 + 1.56459 * r_k^(-0.265753)  <- bat le linéaire
+  taille   9  R2=  0.9422   1.16039 + 0.076157 * (0.00197239 * r_k - log(r_k²))  <- bat le linéaire
+  taille  10  R2=  0.9409   1.21653 - 0.173439 * (log(r_k) - (0.00197239 * r_k)^(0.166445 * log_Re  <- bat le linéaire
+  taille  12  R2=  0.9488   1.22087 - 0.171976 * (-0.00934992 * r_k / log_Re + log(r_k))  <- bat le linéaire
+  taille  31  R2=  0.9567   0.0735337 + 0.522343 * (0.00197239 * r_k * sqrt(|(-15 + 0.00197239 * r  <- bat le linéaire
+  taille  32  R2=  0.9662   -0.638923 - 0.660059 * sqrt(0.192295 + 0.01827 * log_Re) * (-5.84805 +  <- bat le linéaire
+  taille  40  R2=  0.9738   1.13682 - 0.186748 * (log(r_k) - (1.11029e-05 * r_k * r_k / (2447.41 /  <- bat le linéaire
+  taille  47  R2=  0.9771   1.32442 + 0.0946928 * log(|(0.166445 * log_Re)^(-2.33452e-05 * r_k²) /  <- bat le linéaire
+  taille  48  R2=  0.9802   0.100003 + 0.102214 * log(|(0.166445 * log_Re)^(-2.96822e-05 * r_k²) /  <- bat le linéaire
+
+--- lecture ---
+GP_ELITE bat la référence linéaire : 0.9802 contre 0.6778.
+À vérifier avant d'en tirer quoi que ce soit : l'expression est-elle
+interprétable, ou juste un ajustement opaque ? Une petite expression
+qui bat le linéaire est un résultat ; une grosse ne prouve rien.
+
+=== généralisation : rugosité r_k=126.0 retirée de l'entraînement ===
+    entraînement 291 pts (5 rugosités) -> test 71 pts
+    dispersion interne de la courbe retirée : sigma = 0.0457  (niveau moyen 0.4504)
+    biais de niveau, en sigma  (plus petit = mieux) :
+      Prandtl-von Karman EXACTE : +0.042 sigma   (R2 brut -0.0018)
+      log simple ajustée        : +0.199 sigma   (R2 brut -0.2308)
+      linéaire brute            : +2.460 sigma   (R2 brut -6.0166)
+
+    GP_ELITE (58 s) sur la rugosité inconnue :
+      taille   6  biais +0.225s  R2= -0.0504   1.10096 - 0.132395 * log(r_k)
+      taille   7  biais -0.329s  R2= -0.1082   -0.0200676 + 1.58221 * r_k^(-0.257488)
+      taille   8  biais -0.617s  R2= -0.3812   1.24422 + 0.179174 * (0.00197239 * r_k - log(r_k
+      taille  10  biais -0.791s  R2= -0.4333   1.27689 - 0.190334 * (log(r_k) - 0.0118501 * r_k
+      taille  11  biais -0.340s  R2= -0.5063   1.30771 - 0.177569 * log(r_k / (tanh(0.166445 * 
+      taille  14  biais -0.352s  R2= -0.3056   1.38654 - 0.195884 * log(r_k / (tanh(tanh(0.1664
+      taille  15  biais -0.827s  R2= -0.8628   0.237842 - 0.194177 * (log(|0.00197239 * r_k + 0
+      taille  28  biais -0.626s  R2=  0.0335   1.16214 - 0.121446 * log(r_k) + 0.364823 * (1.12
+      taille  32  biais -0.471s  R2=  0.3568   0.910322 - 0.0857633 * (log(r_k) - 6.008 * (log(
+      taille  51  biais -0.253s  R2=  0.7375   1.14002 - 0.0589407 * (log(r_k / log_Re) - 6.008
+
+    --- lecture de la généralisation ---
+    meilleur biais GP_ELITE : +0.225 sigma   (la meilleure des 10 formes, choisie APRÈS avoir vu la courbe retirée)
+    biais de la théorie     : +0.042 sigma   (aucun choix)
+    -> la loi classique prédit mieux le niveau. Écart : +0.183 sigma.
+
+    -> la meilleure forme, choisie après coup, bat la loi log ajustée sur la rugosité jamais vue (0.7375 > -0.2308).
+       Choisie en regardant le test : un plafond optimiste, pas une
+       prédiction que l'on aurait pu faire d'avance.
+
+télémétrie -> /home/user/gp-elite/benchmarks/real_nikuradse_auto_seed2.json

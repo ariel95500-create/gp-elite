@@ -1,0 +1,84 @@
+slice 1 start 2026-10-14 00:48:13
+1775 jobs to run with 2 engines
+25 jobs done, 22 s elapsed, 1749 left
+50 jobs done, 259 s elapsed, 1725 left
+75 jobs done, 497 s elapsed, 1699 left
+100 jobs done, 811 s elapsed, 1675 left
+125 jobs done, 1078 s elapsed, 1649 left
+150 jobs done, 1486 s elapsed, 1624 left
+175 jobs done, 1803 s elapsed, 1599 left
+200 jobs done, 2125 s elapsed, 1575 left
+225 jobs done, 2462 s elapsed, 1549 left
+250 jobs done, 2874 s elapsed, 1524 left
+275 jobs done, 3275 s elapsed, 1499 left
+300 jobs done, 3684 s elapsed, 1474 left
+325 jobs done, 4086 s elapsed, 1449 left
+350 jobs done, 4319 s elapsed, 1425 left
+375 jobs done, 4507 s elapsed, 1400 left
+400 jobs done, 4681 s elapsed, 1375 left
+425 jobs done, 4926 s elapsed, 1350 left
+450 jobs done, 4953 s elapsed, 1324 left
+475 jobs done, 5175 s elapsed, 1299 left
+500 jobs done, 5416 s elapsed, 1275 left
+525 jobs done, 5693 s elapsed, 1249 left
+550 jobs done, 6096 s elapsed, 1224 left
+575 jobs done, 6345 s elapsed, 1199 left
+600 jobs done, 6546 s elapsed, 1175 left
+time slice over: 1166 jobs left for the next call
+slice end 2026-10-14 02:38:36 exit 0
+slice 2 start 2026-10-14 02:38:44
+1166 jobs to run with 2 engines
+25 jobs done, 427 s elapsed, 1140 left
+50 jobs done, 821 s elapsed, 1115 left
+75 jobs done, 1241 s elapsed, 1090 left
+100 jobs done, 1640 s elapsed, 1065 left
+125 jobs done, 2051 s elapsed, 1040 left
+150 jobs done, 2434 s elapsed, 1015 left
+175 jobs done, 2826 s elapsed, 990 left
+200 jobs done, 3239 s elapsed, 965 left
+225 jobs done, 3633 s elapsed, 940 left
+250 jobs done, 3967 s elapsed, 916 left
+275 jobs done, 4297 s elapsed, 890 left
+300 jobs done, 4697 s elapsed, 865 left
+325 jobs done, 5102 s elapsed, 840 left
+350 jobs done, 5508 s elapsed, 815 left
+375 jobs done, 5913 s elapsed, 790 left
+400 jobs done, 6315 s elapsed, 765 left
+time slice over: 747 jobs left for the next call
+slice end 2026-10-14 04:29:08 exit 0
+slice 3 start 2026-10-14 04:29:16
+747 jobs to run with 2 engines
+25 jobs done, 419 s elapsed, 721 left
+50 jobs done, 806 s elapsed, 696 left
+75 jobs done, 1227 s elapsed, 671 left
+100 jobs done, 1615 s elapsed, 646 left
+125 jobs done, 2035 s elapsed, 621 left
+150 jobs done, 2425 s elapsed, 596 left
+175 jobs done, 2847 s elapsed, 571 left
+200 jobs done, 3241 s elapsed, 546 left
+225 jobs done, 3661 s elapsed, 521 left
+250 jobs done, 4055 s elapsed, 496 left
+275 jobs done, 4471 s elapsed, 471 left
+300 jobs done, 4867 s elapsed, 446 left
+325 jobs done, 5289 s elapsed, 421 left
+350 jobs done, 5686 s elapsed, 396 left
+375 jobs done, 6104 s elapsed, 371 left
+400 jobs done, 6503 s elapsed, 346 left
+time slice over: 340 jobs left for the next call
+slice end 2026-10-14 06:19:46 exit 0
+slice 4 start 2026-10-14 06:19:55
+340 jobs to run with 2 engines
+25 jobs done, 427 s elapsed, 314 left
+50 jobs done, 820 s elapsed, 289 left
+75 jobs done, 1243 s elapsed, 264 left
+100 jobs done, 1637 s elapsed, 239 left
+125 jobs done, 2063 s elapsed, 214 left
+150 jobs done, 2456 s elapsed, 189 left
+175 jobs done, 2880 s elapsed, 164 left
+200 jobs done, 3275 s elapsed, 139 left
+225 jobs done, 3695 s elapsed, 114 left
+250 jobs done, 4094 s elapsed, 89 left
+275 jobs done, 4510 s elapsed, 64 left
+300 jobs done, 4909 s elapsed, 39 left
+325 jobs done, 5325 s elapsed, 14 left
+slice end 2026-10-14 07:52:34 exit 0
