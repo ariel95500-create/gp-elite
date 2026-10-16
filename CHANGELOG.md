@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0
+## 1.0.0 — "Families"
 
 This release fits whole families of laws directly (rational forms, roots,
 exponentials, logarithms, sines and cosines of a monomial) and seeds the search

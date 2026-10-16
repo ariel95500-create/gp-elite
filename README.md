@@ -514,7 +514,7 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**1.0** — whole families of laws fitted directly (rational forms, roots,
+**1.0 "Families"** — whole families of laws fitted directly (rational forms, roots,
 exponentials, logarithms, sines and cosines of a monomial), on noisy data too: on
 the 41 Feynman equations of the decision bench, 163 exact laws of 205 against 88
 for 0.9 measured beside it, and on 78 other Feynman equations frozen before the

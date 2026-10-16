@@ -543,7 +543,7 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**1.0** — des familles entières de lois ajustées directement (formes
+**1.0 « Families »** — des familles entières de lois ajustées directement (formes
 rationnelles, racines, exponentielles, logarithmes, sinus et cosinus d'un monôme),
 sur des données bruitées aussi : sur les 41 équations de Feynman du banc de
 décision, 163 lois exactes sur 205 contre 88 pour la 0.9 mesurée à côté, et sur

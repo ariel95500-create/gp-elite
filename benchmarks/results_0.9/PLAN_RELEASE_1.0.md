@@ -175,3 +175,22 @@ pull request to `main` that the author merges with "Create a merge commit",
 then the author publishes on PyPI and creates the release v1.0.0 on GitHub,
 with written instructions. Claude never publishes on PyPI and never handles
 its credentials.
+
+## Gate 4, decided by the author on 16 October 2026
+
+After reading the measurements (`release_1.0/README.md`), the differences with
+0.9.0, the targets of gate 2 (eight met, two missed as by 0.9.0 measured
+beside it) and the two reviews (`release_1.0/M5_review1.md`,
+`release_1.0/M5_review2.md`), the author decided:
+
+1. 1.0.0 is published.
+2. The name of the version is "Families".
+
+On 14 October he also answered the question of the paper: pull request 227 of
+cavalab/srbench is merged (`release_1.0/M5_review2.md`, finding 4).
+
+The package code of the measured wheel, built from commit `61b78ba`, is
+unchanged in the branch submitted for merging (`gp_elite/` and
+`pyproject.toml`); the commits after it change documentation, tests, benchmark
+scripts and records only. `CITATION.cff` gives 16 October 2026, the day of the
+decision, as the date of the release.
