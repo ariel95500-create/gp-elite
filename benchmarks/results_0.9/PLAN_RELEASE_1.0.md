@@ -192,5 +192,6 @@ cavalab/srbench is merged (`release_1.0/M5_review2.md`, finding 4).
 The package code of the measured wheel, built from commit `61b78ba`, is
 unchanged in the branch submitted for merging (`gp_elite/` and
 `pyproject.toml`); the commits after it change documentation, tests, benchmark
-scripts and records only. `CITATION.cff` gives 16 October 2026, the day of the
-decision, as the date of the release.
+scripts and records only. `CITATION.cff` gives 17 October 2026, the first day the
+author can publish, as the date of the release; it is set to the day of
+publication if that is another. `CITATION.cff` is not in the published files.
