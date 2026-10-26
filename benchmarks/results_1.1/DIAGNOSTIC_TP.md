@@ -187,3 +187,13 @@ measurements suggest:
 3. a front of candidate laws on small tables;
 4. the exponential written as such;
 5. the arcsine.
+
+## Decision of the author (26 October 2026)
+
+Teaching becomes the first audience of GP_ELITE. On the author's choice of
+the recommended order:
+1. version 1.1 is implemented and measured as its plan says (`PLAN.md`);
+2. a plan for a version 1.2 for teaching follows, from the list above;
+3. meanwhile, without any change to the engine, a French notebook of the
+   six lab laws that work today is written, with the figures of this
+   diagnostic, and the launch texts of 1.0 are turned towards teachers.
