@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 455, in <module>
+    main()
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 446, in main
+    drive_paired(a.python, a.out, a.pairs,
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 328, in drive_paired
+    todo = [j for j in all_jobs(_with_units(kinds))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/gp-elite/benchmarks/phase1_bench.py", line 60, in all_jobs
+    import feynman_bench as F
+  File "/home/user/gp-elite/benchmarks/feynman_bench.py", line 31, in <module>
+    from gp_elite import symbolic_regression
+ModuleNotFoundError: No module named 'gp_elite'
+slice end 18:45 exit 0
+--- 18:45 the first start stopped at once, before any fit: its driver (/venvdev) could not import gp_elite; started again with /venv10 as the driver
+615 jobs to run with 2 engines
+25 jobs done, 26 s elapsed, 589 left
+50 jobs done, 231 s elapsed, 564 left
+75 jobs done, 475 s elapsed, 539 left
+100 jobs done, 769 s elapsed, 515 left
+125 jobs done, 1013 s elapsed, 489 left
+150 jobs done, 1331 s elapsed, 465 left
+175 jobs done, 1602 s elapsed, 439 left
+200 jobs done, 1916 s elapsed, 414 left
+225 jobs done, 3710 s elapsed, 389 left
+250 jobs done, 4124 s elapsed, 364 left
+275 jobs done, 4526 s elapsed, 339 left
+300 jobs done, 4939 s elapsed, 314 left
+325 jobs done, 5343 s elapsed, 289 left
+350 jobs done, 5754 s elapsed, 264 left
+375 jobs done, 6157 s elapsed, 239 left
+time slice over: 230 jobs left for the next call
+--- slice ended 20:31
+--- second slice 20:31
+230 jobs to run with 2 engines
