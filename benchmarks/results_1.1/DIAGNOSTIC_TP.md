@@ -119,3 +119,71 @@ Reported beside the reading, and deciding nothing:
 
 The result goes to the author, who decides whether teaching becomes the
 first audience of GP_ELITE.
+
+## Result (26 October 2026)
+
+**The run.** 400 fits from 04:45 to 06:52 UTC, no crash, gp-elite 1.0.0
+from its wheel (`tp/tp_1.0.0.jsonl`, summary in `tp/summary_1.0.0.txt`). It
+ran in two parts. The runner was stopped at 374 fits by the two-hour limit of
+a background task in this session; it resumed and ran the 26 left, which it
+had not started. The machine is that of `PLAN.md`.
+
+**One deviation.** Below 30 points the engine keeps no hold-out and returns
+no Pareto front (`pareto` is None). The measure "front" is therefore empty
+on every fit, and the reading rests on "law" alone. That is stricter than
+the rule written above, and the verdict holds under it.
+
+**The reading: favourable.** Plain arm, 2 % noise: the textbook law comes
+back in at least 3 of 5 draws for 7 of the 9 experiments at 10 points and
+8 of 9 at 20 points. The rule asked for at least 6 of 9 at both sizes.
+
+Exact law in 5 draws, and in parentheses the fits whose model reproduces the
+noiseless law with R² ≥ 0.99 whatever its form:
+
+| experiment | plain 10 pts 2 % | plain 20 pts 2 % | plain 10 pts 5 % | plain 20 pts 5 % | units 10 pts 2 % | units 20 pts 2 % | units 10 pts 5 % | units 20 pts 5 % |
+|---|---|---|---|---|---|---|---|---|
+| pendule | 5 (5) | 5 (5) | 3 (4) | 4 (4) | 5 (5) | 5 (5) | 5 (5) | 5 (5) |
+| ressort | 4 (4) | 5 (5) | 3 (3) | 4 (4) | 5 (5) | 5 (5) | 5 (5) | 5 (5) |
+| chute | 5 (5) | 4 (5) | 5 (5) | 5 (5) | 5 (5) | 5 (5) | 5 (5) | 5 (5) |
+| puissance | 5 (5) | 5 (5) | 5 (5) | 4 (4) | 5 (5) | 5 (5) | 5 (5) | 5 (5) |
+| gaz | 3 (5) | 5 (5) | 4 (5) | 3 (4) | 5 (5) | 5 (5) | 5 (5) | 5 (5) |
+| eclairement | 4 (5) | 4 (5) | 3 (4) | 4 (5) | 5 (5) | 5 (5) | 5 (4) | 5 (5) |
+| rc | 4 (5) | 4 (5) | 2 (5) | 4 (5) | 0 (0) | 0 (0) | 0 (0) | 0 (0) |
+| refroidissement | 0 (3) | 3 (5) | 0 (3) | 0 (2) | 0 (1) | 0 (0) | 0 (0) | 0 (1) |
+| lentille | 0 (5) | 1 (5) | 0 (0) | 0 (3) | 0 (0) | 0 (0) | 0 (0) | 0 (0) |
+| snell | 0 (5) | 0 (5) | 0 (3) | 0 (5) | 0 (5) | 0 (5) | 0 (4) | 0 (5) |
+
+**Beside the reading, deciding nothing:**
+
+- **With units, the six laws within reach come back every time**: 120 fits
+  of 120, at both sizes and both noise levels. They come back in their
+  textbook form, for instance `2.01981 * sqrt(L)` and `8.39929 * T * n / V`.
+  Without units the same laws often carry an offset that the law does not
+  have (`-0.0256563 + 2.05312 * sqrt(L)`, `-793.918 + 8.47651 * n / V * T`).
+  The test of structure accepts it, but a student reads it.
+- **The deduced constant.** With units, g from the pendulum and from free
+  fall, and R from the ideal gas, are within 0.3 % to 1.6 % of their values
+  in the median, and 4.7 % at worst, on 60 fits.
+- **The three laws with a constant inside a function or a sum** (rc,
+  refroidissement, lentille) never come back with units, as the rules said.
+  What the units arm returns instead is poor: R² below 0.99 on all but two
+  of the 60 fits. Some formulas exploit a safety net of the engine, for
+  instance `exp(-t / (t - |t|))`, in which t − |t| is zero.
+- **Without units, the exponentials come back written as a power.** The
+  capacitor discharge is returned as `4.86249 * 0.00784758^(0.2 * t)`
+  rather than as an exponential of −t/τ. Newton's cooling is not found at
+  10 points; at 20 points it is found in 3 draws of 5 at 2 % noise.
+- **The thin lens is found once in 40 plain fits.** Snell's law is never
+  found, as no pool has the arcsine; its approximations are good.
+- **Time.** A fit takes 61 s in the median without units and 88 s with
+  them (172 s at most), on 10 or 20 points. A student waits about a minute.
+
+**What would have to improve first for teaching**, in the order the
+measurements suggest:
+1. under units, constants with units inside a function or a sum (a time
+   constant τ, an offset θa, a focal length f), or at least an honest
+   message instead of a poor formula;
+2. the time of a fit on a small table;
+3. a front of candidate laws on small tables;
+4. the exponential written as such;
+5. the arcsine.

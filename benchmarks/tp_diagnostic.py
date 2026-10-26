@@ -282,6 +282,37 @@ def summary(path):
         print("\nreading, plain arm, 2 %% noise, %d points: %d of 9" % (n, c))
 
 
+def constants(path):
+    """The physical constant deduced by the units arm where the law came
+    back: g from the pendulum (T = c*sqrt(L), g = (2*pi/c)^2) and from free
+    fall (d = c*t^2, g = 2c), R from the ideal gas (P = c*n*T/V). Read off
+    the leading coefficient of the returned formula, in the raw variables.
+    Added after the run (it decides nothing)."""
+    import math
+    import re
+    recs = [json.loads(ln) for ln in open(path, encoding="utf-8") if ln.strip()]
+    out = {}
+    for r in recs:
+        if r.get("crash") or r["arm"] != "units" or not r["law"] \
+                or r["exp"] not in ("pendule", "chute", "gaz"):
+            continue
+        m = re.match(r"^\s*([0-9.eE+-]+)\s*\*", r["expr"])
+        if not m:
+            continue
+        c = float(m.group(1))
+        val, true = {"pendule": ((2 * math.pi / c) ** 2, 9.81),
+                     "chute": (2 * c, 9.81),
+                     "gaz": (c, 8.314)}[r["exp"]]
+        out.setdefault((r["exp"], r["n"], r["noise"]), []).append(
+            100.0 * (val / true - 1.0))
+    print("\n== constants deduced by the units arm (relative error, %)")
+    for k in sorted(out):
+        v = [abs(x) for x in out[k]]
+        print("  %-8s %2d points %d %% noise: %d fits, median %.1f %%, "
+              "largest %.1f %%" % (k[0], k[1], round(100 * k[2]), len(v),
+                                   float(np.median(v)), max(v)))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -302,6 +333,7 @@ def main():
         print(json.dumps(worker(json.loads(a.job))))
     else:
         summary(a.path)
+        constants(a.path)
 
 
 if __name__ == "__main__":
