@@ -33,3 +33,13 @@ time slice over: 230 jobs left for the next call
 --- slice ended 20:31
 --- second slice 20:31
 230 jobs to run with 2 engines
+25 jobs done, 1533 s elapsed, 205 left
+50 jobs done, 2175 s elapsed, 179 left
+75 jobs done, 2574 s elapsed, 154 left
+100 jobs done, 2983 s elapsed, 129 left
+125 jobs done, 3387 s elapsed, 104 left
+150 jobs done, 3794 s elapsed, 79 left
+175 jobs done, 4196 s elapsed, 54 left
+200 jobs done, 4602 s elapsed, 29 left
+225 jobs done, 5007 s elapsed, 4 left
+--- slice 2 ended 22:21

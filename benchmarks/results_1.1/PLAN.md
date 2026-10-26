@@ -245,3 +245,63 @@ wheel for 1.0.0, the repository for U1 (`mechanics/`).
   first on the path, the flag set by `phase2_flags/sitecustomize.py`.
 - `units_real.py` runs the 20 typed fits of the case studies, one process
   each.
+
+### Campaign U1, result (26 October 2026)
+
+**The run.** A, the 1.0.0 wheel, against U1, both in the 1.0.0 environment,
+side by side with `run-paired`, two jobs at a time. 615 jobs per version,
+from 18:46 to 22:21 UTC in two time slices. No crash. The records carry
+the engine of each: A the installed wheel, U1 the repository with the flag
+on, in all 615 jobs. The files are in `campaign/`:
+- `U41_A_1.0.0.jsonl`, `U41_U1.jsonl`;
+- `compare_u1.txt`, from `compare_u1.py`;
+- `driver.log`. A first start stopped at once, before any fit: its driver
+  could not import the package. It was started again with the right
+  interpreter.
+
+The 20 typed fits of the case studies ran after, one process each
+(`real_A_1.0.0.jsonl`, `real_U1.jsonl`, `real_compare.txt`).
+
+**Criteria: all five are met. U1 is adopted.**
+
+1. **Exact laws under units.**
+   - U41 exact: A 107, U1 165 of 205 (+58; at least +10 asked).
+   - The five families: A 16, U1 57 of 90 (+41; at least +5 asked).
+   - No equation loses exact fits.
+   - 14 equations gain, among them:
+     - II.11.3, 3 → 5;
+     - the roots I.10.7, I.15.10, II.13.23 and II.24.17, each 0 → 5;
+     - the exponentials I.40.1 and II.35.18, each 0 → 5;
+     - the trigonometric II.15.4, 0 → 5;
+     - I.16.6, 0 → 4.
+   - Equations never exact: 14 in A, 6 in U1.
+2. **Structure under noise:** with 1 % noise, A 79 and U1 113 of 205; with
+   10 % noise, A 80 and U1 99 (no fewer than A's minus 2 asked).
+3. **The units guarantee:** every model passes the audit, 615 of 615 in
+   U1 and in A. The 20 typed fits of the case studies are internally
+   consistent.
+4. **Real data under units:**
+   - on Kepler B and Hubble CA the median held-out errors are the same as
+     A's (ratio 1.000; at most 1.10 asked);
+   - no fit is worse (largest ratio 1.000; at most 10 asked);
+   - the deduced constants are the same.
+   - On Kepler B, U1 returns `5.45416e-10 * X0 * sqrt(X0)` in the five
+     seeds, in 0.2 s; A returns the same law, written in longer forms.
+5. **Formulas flagged inexact:** A 6, U1 4 (at most A's plus 3 asked).
+
+**Beside the criteria:**
+- **Median time per fit on U41:** A 30.2 s, U1 0.7 s. U1 stops early on an
+  exact law; with noise both use the 30 s budget.
+- **II.11.3:** exact in 5 of 5 with U1, in 1.4 to 1.7 s, against 3 of 5 in
+  10 to 31 s with A.
+- **Seeds placed by U1** (`seeds_in_campaign.txt`). The training rows of a
+  kind do not depend on the seed, so this holds for all five seeds:
+  - on 33 equations of 41 without noise: the power law 16 times, B1 8, E1 7,
+    N1 10;
+  - on 28 with 1 % noise;
+  - on 17 with 10 % noise, all of them noise-tolerant seeds.
+- **Not recorded:** the time the search for seeds took in each fit. It is
+  part of the fit times above.
+
+**Confirmation on new seeds** follows: the same 615 jobs with seeds 5 to 9
+(`phase1_bench.py --seeds 5,6,7,8,9`, an option added for it).

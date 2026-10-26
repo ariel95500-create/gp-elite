@@ -1,0 +1,25 @@
+fit         seed  A error      U1 error     A time  U1 time  U1 units consistent
+kepler_A    0  0.002767     0.002767        9.9    10.4   True
+kepler_A    1  0.002767     0.002767       10.3    10.8   True
+kepler_A    2  0.002767     0.002767       10.4     8.9   True
+kepler_A    3  0.002767     0.002767       17.2     8.5   True
+kepler_A    4  0.002767     0.002767       16.6     9.5   True
+kepler_B    0  0.002785     0.002785        1.2     0.2   True
+kepler_B    1  0.002785     0.002785        1.2     0.2   True
+kepler_B    2  0.002785     0.002785        3.5     0.2   True
+kepler_B    3  0.002785     0.002785        0.9     0.2   True
+kepler_B    4  0.002785     0.002785        1.7     0.2   True
+hubble_A    0  224.2        224.2          21.2    21.8   True
+hubble_A    1  224.2        224.2          18.0    18.1   True
+hubble_A    2  224.2        224.2          19.5    19.8   True
+hubble_A    3  224.2        224.2          20.6    21.2   True
+hubble_A    4  224.2        224.2          18.7    17.6   True
+hubble_CA   0  203.4        203.4          24.4    24.6   True
+hubble_CA   1  203.4        203.4          13.5    13.6   True
+hubble_CA   2  203.4        203.4          20.5    21.1   True
+hubble_CA   3  203.4        203.4          17.8    17.8   True
+hubble_CA   4  203.4        203.4          22.1    22.2   True
+
+kepler_B: median held-out error A 0.002785, U1 0.002785 (ratio 1.000; the plan allows 1.10)
+hubble_CA: median held-out error A 203.4, U1 203.4 (ratio 1.000; the plan allows 1.10)
+largest ratio U1 / A on one fit: 1.000 (the plan allows 10)

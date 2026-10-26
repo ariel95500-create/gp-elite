@@ -1,0 +1,130 @@
+gp_elite 1.0.0 /home/user/gp-elite/gp_elite/__init__.py
+ufeyn      I.12.1     power_law (v0 * v1)
+ufeyn      I.12.5     power_law (v0 * v1)
+ufeyn      I.14.4     power_law (v0 * (v1)²)
+ufeyn      I.39.1     power_law (v0 * v1)
+ufeyn      II.3.24    power_law (v0 / (v1)²)
+ufeyn      I.6.20a    none
+ufeyn      I.8.14     none
+ufeyn      I.16.6     N1 ((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2, N1 ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.032613 * ((v0 * v1) / (v, N1 ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.057916 * ((v0 * v1), N1 ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.109 * ((v0 * v1) / (
+ufeyn      I.27.6     B1 ((v1 / v2) / (1.0 + (0.49869 * (v1 / (v0 * v2)))))
+ufeyn      I.34.8     power_law (((v0 * v1) * v2) / v3)
+ufeyn      I.43.16    power_law (((v0 * v1) * v2) / v3)
+ufeyn      I.12.2     power_law ((v0 * v1) / (v2 * (v3)²))
+ufeyn      II.15.4    E1 ((v0 * v1) * (-1.0 * cos((6.226701 * v2))))
+ufeyn      I.18.12    E1 ((v0 * v1) * (1.0 * sin((3.133946 * v2))))
+ufeyn      III.15.12  E1 (v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))
+ufeyn      I.10.7     B1 (v0 / sqrt((1.0 + (-0.040043 * ((v1)² / (v2)²)))))
+ufeyn      I.11.19    none
+ufeyn      I.15.10    power_law (v0 * v1), B1 ((v0 * v1) / sqrt((1.0 + (-0.040127 * ((v1)² / (v2)²)))))
+ufeyn      I.25.13    power_law (v0 / v1)
+ufeyn      I.26.2     N1 (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792
+ufeyn      I.29.4     power_law (v0 / v1)
+ufeyn      I.30.5     power_law (v0 / (v1 * v2)), N1 ((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)² / ((v1)², N1 ((v0 / (v1 * v2)) / (1.0 + (-0.001203 * ((v0)² / ((v1)² * (v, N1 ((v0 / (v1 * v2)) * (1.0 + (0.001266 * ((v0)² / ((v1)² * (v2, N1 ((v0 / (v1 * v2)) * sqrt((1.0 + (0.002596 * ((v0)² / ((v1)² 
+ufeyn      I.32.5     power_law (((v0)² * (v1)²) / (v2 * (v3 * (v3)²)))
+ufeyn      I.34.1     B1 (v0 / (1.0 + (-0.20162 * (v1 / v2))))
+ufeyn      I.37.4     N1 ((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 *
+ufeyn      I.40.1     E1 (v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))
+ufeyn      I.44.4     E1 (((v0 * v1) * v2) * log((4.943794 * v3)))
+ufeyn      I.50.26    none
+ufeyn      II.2.42    none
+ufeyn      II.6.15b   E1 ((v0 / (v2 * (v3 * (v3)²))) * (1.0 * sin((5.950302 * v1))))
+ufeyn      II.11.3    B1 (((v0 * v1) / (v2 * (v3)²)) / (1.0 + (-0.159964 * ((v4)² / (
+ufeyn      II.11.27   B1 ((((v0 * v1) * v2) * v3) / (1.0 + (-0.329947 * (v0 * v1))))
+ufeyn      II.13.23   B1 (v0 / sqrt((1.0 + (-0.040069 * ((v1)² / (v2)²)))))
+ufeyn      II.24.17   B1 ((v0 / v1) * sqrt((1.0 + (-0.068024 * ((v1)² / ((v0)² * (v2)
+ufeyn      II.34.2    power_law ((v0 * v1) * v2)
+ufeyn      II.35.18   E1 (v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 *
+ufeyn      II.38.3    power_law (((v0 * v1) * v2) / v3)
+ufeyn      III.9.52   none
+ufeyn      III.10.19  none
+ufeyn      III.17.37  none
+ufeyn      III.19.51  power_law ((v0 * ((v1)²)²) / (((v2)² * (v3)²) * (v4)²))
+== ufeyn: a seed placed on 33 equations of 41
+
+ufeyn_n1   I.12.1     power_law (v0 * v1)
+ufeyn_n1   I.12.5     power_law (v0 * v1)
+ufeyn_n1   I.14.4     power_law (v0 * (v1)²)
+ufeyn_n1   I.39.1     power_law (v0 * v1)
+ufeyn_n1   II.3.24    power_law (v0 / (v1)²)
+ufeyn_n1   I.6.20a    none
+ufeyn_n1   I.8.14     none
+ufeyn_n1   I.16.6     N1 ((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041566 * ((v0 * v1) / (v2, N1 ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.032661 * ((v0 * v1) / (v, N1 ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.057993 * ((v0 * v1), N1 ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.108377 * ((v0 * v1) 
+ufeyn_n1   I.27.6     N1 (v0 / (1.0 + (2.004357 * ((v0 * v2) / v1)))), N1 (v0 * exp((-1.321063 * ((sqrt(v0) * sqrt(v2)) / sqrt(v1)))))
+ufeyn_n1   I.34.8     N1 (((v0 * v1) * v2) / v3)
+ufeyn_n1   I.43.16    N1 (((v0 * v1) * v2) / v3)
+ufeyn_n1   I.12.2     N1 ((v0 * v1) / (v2 * (v3)²))
+ufeyn_n1   II.15.4    N1 ((v0 * v1) * ((-0.001189 + (0.004025 * sin((6.21892 * v2))))
+ufeyn_n1   I.18.12    N1 ((v0 * v1) * ((0.04636 + (1.0 * sin((3.219961 * v2)))) + (-0, N1 (((v0 * v1) * v2) * (1.0 + (-0.998994 * v2)))
+ufeyn_n1   III.15.12  N1 (((v0 * (v1)²) * (v2)²) * (1.0 + (-0.803253 * (v1 * v2)))), N1 (((v0 * (v1)²) * (v2)²) * sqrt((1.0 + (-1.022173 * (v1 * v2), N1 ((v0 / (v1 * v2)) * tanh((3.65076 * ((v1 * (v1)²) * (v2 * (v, N1 ((v0 / (v1 * v2)) * exp((-2.869579 * (1.0 / (sqrt(v1) * sqrt, N1 (((v0 * (v1)²) * (v2)²) / (1.0 + (3.125641 * ((v1)² * (v2)²)
+ufeyn_n1   I.10.7     N1 (v0 / sqrt((1.0 + (-0.040165 * ((v1)² / (v2)²))))), N1 (v0 / (1.0 + (-0.021636 * ((v1)² / (v2)²)))), N1 (v0 * (1.0 + (0.025164 * ((v1)² / (v2)²)))), N1 (v0 * sqrt((1.0 + (0.058179 * ((v1)² / (v2)²))))), N1 v0
+ufeyn_n1   I.11.19    none
+ufeyn_n1   I.15.10    power_law (v0 * v1), N1 ((v0 * v1) / sqrt((1.0 + (-0.040184 * ((v1)² / (v2)²))))), N1 ((v0 * v1) / (1.0 + (-0.0214 * ((v1)² / (v2)²)))), N1 ((v0 * v1) * (1.0 + (0.024177 * ((v1)² / (v2)²)))), N1 ((v0 * v1) * sqrt((1.0 + (0.053471 * ((v1)² / (v2)²)))))
+ufeyn_n1   I.25.13    power_law (v0 / v1)
+ufeyn_n1   I.26.2     N1 (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172 
+ufeyn_n1   I.29.4     power_law (v0 / v1)
+ufeyn_n1   I.30.5     power_law (v0 / (v1 * v2))
+ufeyn_n1   I.32.5     none
+ufeyn_n1   I.34.1     N1 (v0 / (1.0 + (-0.201043 * (v1 / v2)))), N1 (((v0 * (v1)²) / (v2)²) * (1.0 + (7.651686 * ((v2)² / (v1)²), N1 (((v0 * v2) / v1) * exp((2.432366 * (sqrt(v1) / sqrt(v2))))), N1 (((v0 * v1) / v2) * sqrt((1.0 + (2.431759 * ((v2)² / (v1)²)), N1 (v0 / sqrt((1.0 + (-0.291551 * (v1 / v2)))))
+ufeyn_n1   I.37.4     N1 ((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.110638 * sin((6.048124 *
+ufeyn_n1   I.40.1     none
+ufeyn_n1   I.44.4     N1 ((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.20178 * (1.0 / v, N1 (((v0 * v1) * v2) * exp((-0.293544 * (1.0 / (v3 * sqrt(v3))), N1 (((v0 * v1) * v2) / (exp((0.722908 * (1.0 / v3))) + exp((-0.
+ufeyn_n1   I.50.26    none
+ufeyn_n1   II.2.42    none
+ufeyn_n1   II.6.15b   N1 ((v0 / (v2 * (v3 * (v3)²))) * ((-0.008475 + (1.0 * sin((6.0 
+ufeyn_n1   II.11.3    N1 (((v0 * v1) / (v2 * (v3)²)) / sqrt((1.0 + (-0.435986 * (v4 /, N1 (((v0 * v1) / (v2 * (v3)²)) / (1.0 + (-0.316379 * (v4 / v3)), N1 ((((v0 * v1) * v4) / (v2 * (v3 * (v3)²))) * sqrt((1.0 + (0.9, N1 (((v0 * v1) * sqrt(v4)) / (v2 * ((v3)² * sqrt(v3)))), N1 ((((v0 * v1) * (v4)²) / (v2 * ((v3)²)²)) * (1.0 + (2.190085 
+ufeyn_n1   II.11.27   none
+ufeyn_n1   II.13.23   N1 (v0 / sqrt((1.0 + (-0.040071 * ((v1)² / (v2)²))))), N1 (v0 / (1.0 + (-0.021784 * ((v1)² / (v2)²)))), N1 (v0 * (1.0 + (0.025661 * ((v1)² / (v2)²)))), N1 (((v0 * v1) / v2) * sqrt((1.0 + (14.263644 * ((v2)² / (v1)²)
+ufeyn_n1   II.24.17   N1 ((v0 / v1) * sqrt((1.0 + (-0.068263 * ((v1)² / ((v0)² * (v2), N1 ((v0 / v1) * (1.0 + (-0.038062 * ((v1)² / ((v0)² * (v2)²)))), N1 ((((v0 * (v0)²) * (v2)²) / (v1 * (v1)²)) / (1.0 + (16.345034, N1 ((1.0 / v2) * exp((-2.082873 * (sqrt(v1) / (sqrt(v0) * sqrt(, N1 ((((v0)² * v2) / (v1)²) / sqrt((1.0 + (5.965399 * (((v0)² * 
+ufeyn_n1   II.34.2    power_law ((v0 * v1) * v2)
+ufeyn_n1   II.35.18   none
+ufeyn_n1   II.38.3    power_law (((v0 * v1) * v2) / v3)
+ufeyn_n1   III.9.52   none
+ufeyn_n1   III.10.19  none
+ufeyn_n1   III.17.37  none
+ufeyn_n1   III.19.51  none
+== ufeyn_n1: a seed placed on 28 equations of 41
+
+ufeyn_n10  I.12.1     N1 (v0 * v1)
+ufeyn_n10  I.12.5     N1 (v0 * v1)
+ufeyn_n10  I.14.4     N1 (v0 * (v1)²)
+ufeyn_n10  I.39.1     N1 (v0 * v1)
+ufeyn_n10  II.3.24    N1 (v0 / (v1)²)
+ufeyn_n10  I.6.20a    none
+ufeyn_n10  I.8.14     none
+ufeyn_n10  I.16.6     none
+ufeyn_n10  I.27.6     none
+ufeyn_n10  I.34.8     none
+ufeyn_n10  I.43.16    none
+ufeyn_n10  I.12.2     N1 ((v0 * v1) / (v2 * (v3)²))
+ufeyn_n10  II.15.4    N1 ((v0 * v1) * ((-0.011857 + (0.039781 * sin((6.15 * v2)))) + 
+ufeyn_n10  I.18.12    N1 ((v0 * v1) * ((0.641182 + (1.0 * sin((4.15 * v2)))) + (-0.59
+ufeyn_n10  III.15.12  N1 (v0 * ((1.0 + (-0.07348 * sin((4.037457 * (v1 * v2))))) + (-
+ufeyn_n10  I.10.7     none
+ufeyn_n10  I.11.19    none
+ufeyn_n10  I.15.10    N1 (v0 * v1)
+ufeyn_n10  I.25.13    N1 (v0 / v1)
+ufeyn_n10  I.26.2     none
+ufeyn_n10  I.29.4     none
+ufeyn_n10  I.30.5     N1 (v0 / (v1 * v2)), N1 ((v2 / (v0 * v1)) * tanh((0.003189 * ((v0)² / (v2)²))))
+ufeyn_n10  I.32.5     none
+ufeyn_n10  I.34.1     N1 (v0 / (1.0 + (-0.196428 * (v1 / v2)))), N1 (v0 / sqrt((1.0 + (-0.288171 * (v1 / v2))))), N1 (((v0 * (v1)²) / (v2)²) * (1.0 + (6.759361 * ((v2)² / (v1)²), N1 (((v0 * v1) / v2) * sqrt((1.0 + (2.285229 * ((v2)² / (v1)²))
+ufeyn_n10  I.37.4     none
+ufeyn_n10  I.40.1     none
+ufeyn_n10  I.44.4     none
+ufeyn_n10  I.50.26    none
+ufeyn_n10  II.2.42    none
+ufeyn_n10  II.6.15b   none
+ufeyn_n10  II.11.3    N1 (((v0 * v1) * sqrt(v4)) / (v2 * ((v3)² * sqrt(v3))))
+ufeyn_n10  II.11.27   none
+ufeyn_n10  II.13.23   none
+ufeyn_n10  II.24.17   N1 ((v0 / v1) / (1.0 + (0.055896 * ((v1)² / ((v0)² * (v2)²)))))
+ufeyn_n10  II.34.2    N1 ((v0 * v1) * v2)
+ufeyn_n10  II.35.18   none
+ufeyn_n10  II.38.3    N1 (((v0 * v1) * v2) / v3)
+ufeyn_n10  III.9.52   none
+ufeyn_n10  III.10.19  none
+ufeyn_n10  III.17.37  none
+ufeyn_n10  III.19.51  none
+== ufeyn_n10: a seed placed on 17 equations of 41
+

@@ -24,6 +24,9 @@ Usage, from the repository root:
          --out benchmarks/results_0.9/baseline_0.8.0.jsonl --workers 3
   python benchmarks/phase1_bench.py summary benchmarks/results_0.9/baseline_0.8.0.jsonl
 
+--seeds replaces the seeds 0 to 4 of the decision bench (F41, R6, R7raw and
+their noisy and units kinds), for a confirmation on new seeds.
+
 Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
   python benchmarks/phase1_bench.py run-paired --python A/bin/python --out a.jsonl \\
@@ -426,17 +429,22 @@ def main():
     r.add_argument("--workers", type=int, default=3)
     r.add_argument("--kinds", default=None)
     r.add_argument("--max-seconds", type=float, default=None)
+    r.add_argument("--seeds", default=None)
     r2 = sub.add_parser("run-paired")
     r2.add_argument("--python", action="append", required=True)
     r2.add_argument("--out", action="append", required=True)
     r2.add_argument("--pairs", type=int, default=2)
     r2.add_argument("--kinds", default=None)
     r2.add_argument("--max-seconds", type=float, default=None)
+    r2.add_argument("--seeds", default=None)
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
     s.add_argument("path")
     a = ap.parse_args()
+    if getattr(a, "seeds", None):
+        global BENCH_SEEDS
+        BENCH_SEEDS = [int(x) for x in a.seeds.split(",")]
     if a.cmd == "run":
         drive(a.python, a.out, a.workers,
               a.kinds.split(",") if a.kinds else None, a.max_seconds)
