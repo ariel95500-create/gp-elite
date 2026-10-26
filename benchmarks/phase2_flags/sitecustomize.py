@@ -1,8 +1,9 @@
 """Sets the phase 2 flags of gp_elite.core in every Python process started
 with this directory first on PYTHONPATH (benchmarks/speed_equivalence.py
-runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b, S2, T1, A1, B1, noB1, E1, noE1, N1 or
-noN1 (B1, E1 and N1 are on by default since their adoption; their mechanics
-ran at commits 273061b, 4b12ba7 and 28fae46, where A had them off).
+runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b, S2, T1, A1, B1, noB1, E1, noE1, N1,
+noN1, U1 or noU1 (B1, E1 and N1 are on by default since their adoption; their
+mechanics ran at commits 273061b, 4b12ba7 and 28fae46, where A had them off;
+U1 is the change of phase 7, benchmarks/results_1.1/PLAN.md, off by default).
 With GP_ELITE_TRACE_LOG, each process appends its check counters there. The
 flags exist in the engine at commit 0038a29 only (PLAN_PHASE2.md, decision).
 
@@ -57,6 +58,10 @@ if _arm:
         raise SystemExit("the flag of N1 is not in this engine")
     if _arm in ("N1", "noN1"):                    # PLAN_PHASE5.md, change N1,
         _C._TOLERANT_SEEDS = _arm == "N1"         # on by default since its adoption
+    if _arm in ("U1", "noU1") and not hasattr(_C, "_SEEDS_UNDER_UNITS"):
+        raise SystemExit("the flag of U1 is not in this engine")
+    if _arm in ("U1", "noU1"):                    # results_1.1/PLAN.md, change U1
+        _C._SEEDS_UNDER_UNITS = _arm == "U1"
 
     def _log():
         path = os.environ.get("GP_ELITE_TRACE_LOG")
@@ -72,5 +77,8 @@ if _arm:
                     catchup=_C.TRACE.value.get("rattrapage"),
                     binomial_seed=_C.TRACE.value.get("binomial_seed"),
                     elementary_seed=_C.TRACE.value.get("elementary_seed"),
-                    tolerant_seed=_C.TRACE.value.get("tolerant_seed"))) + "\n")
+                    tolerant_seed=_C.TRACE.value.get("tolerant_seed"),
+                    power_law_seed=_C.TRACE.value.get("power_law_seed"),
+                    seeds_rejected_units=int(_C.TRACE.count.get(
+                        "graines_rejetees_dim", 0)))) + "\n")
     atexit.register(_log)

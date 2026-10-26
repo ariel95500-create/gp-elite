@@ -1,0 +1,74 @@
+gp_elite 1.0.0 /home/user/gp-elite/gp_elite/__init__.py
+I.12.1     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(v0 * v1)')]
+   expected: [('power_law', '(v0 * v1)'), ('tolerant', '(v0 * v1)')]
+I.12.5     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(v0 * v1)')]
+   expected: [('power_law', '(v0 * v1)'), ('tolerant', '(v0 * v1)')]
+I.14.4     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(v0 * (v1)²)')]
+   expected: [('power_law', '(v0 * (v1)²)'), ('tolerant', '(v0 * (v1)²)')]
+I.39.1     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(v0 * v1)')]
+   expected: [('power_law', '(v0 * v1)'), ('tolerant', '(v0 * v1)')]
+II.3.24    DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(v0 / (v1)²)')]
+   expected: [('power_law', '(v0 / (v1)²)'), ('tolerant', '(v0 / (v1)²)')]
+I.6.20a    same  placed 0, expected 0
+I.8.14     same  placed 0, expected 0
+I.16.6     same  placed 4, expected 4
+I.27.6     same  placed 1, expected 1
+I.34.8     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(((v0 * v1) * v2) / v3)')]
+   expected: [('power_law', '(((v0 * v1) * v2) / v3)'), ('tolerant', '(((v0 * v1) * v2) / v3)')]
+I.43.16    DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(((v0 * v1) * v2) / v3)')]
+   expected: [('power_law', '(((v0 * v1) * v2) / v3)'), ('tolerant', '(((v0 * v1) * v2) / v3)')]
+I.12.2     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '((v0 * v1) / (v2 * (v3)²))')]
+   expected: [('power_law', '((v0 * v1) / (v2 * (v3)²))'), ('tolerant', '((v0 * v1) / (v2 * (v3)²))')]
+II.15.4    same  placed 1, expected 1
+I.18.12    same  placed 1, expected 1
+III.15.12  same  placed 1, expected 1
+I.10.7     same  placed 1, expected 1
+I.11.19    same  placed 0, expected 0
+I.15.10    same  placed 2, expected 2
+I.25.13    DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(v0 / v1)')]
+   expected: [('power_law', '(v0 / v1)'), ('tolerant', '(v0 / v1)')]
+I.26.2     same  placed 1, expected 1
+I.29.4     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(v0 / v1)')]
+   expected: [('power_law', '(v0 / v1)'), ('tolerant', '(v0 / v1)')]
+I.30.5     DIFFERENT  placed 5, expected 6
+   placed:   [('power_law', '(v0 / (v1 * v2))'), ('tolerant', '((v0 / (v1 * v2)) * (1.0 + (0.001266 * ((v0)² / ((v1)² * (v2)²)))))'), ('tolerant', '((v0 / (v1 * v2)) * sqrt((1.0 + (0.002596 * ((v0)² / ((v1)² * (v2)²))))))'), ('tolerant', '((v0 / (v1 * v2)) / (1.0 + (-0.001203 * ((v0)² / ((v1)² * (v2)²)))))'), ('tolerant', '((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)² / ((v1)² * (v2)²))))))')]
+   expected: [('power_law', '(v0 / (v1 * v2))'), ('tolerant', '((v0 / (v1 * v2)) * (1.0 + (0.001266 * ((v0)² / ((v1)² * (v2)²)))))'), ('tolerant', '((v0 / (v1 * v2)) * sqrt((1.0 + (0.002596 * ((v0)² / ((v1)² * (v2)²))))))'), ('tolerant', '((v0 / (v1 * v2)) / (1.0 + (-0.001203 * ((v0)² / ((v1)² * (v2)²)))))'), ('tolerant', '((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)² / ((v1)² * (v2)²))))))'), ('tolerant', '(v0 / (v1 * v2))')]
+I.32.5     DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(((v0)² * (v1)²) / (v2 * (v3 * (v3)²)))')]
+   expected: [('power_law', '(((v0)² * (v1)²) / (v2 * (v3 * (v3)²)))'), ('tolerant', '(((v0)² * (v1)²) / (v2 * (v3 * (v3)²)))')]
+I.34.1     same  placed 1, expected 1
+I.37.4     same  placed 1, expected 1
+I.40.1     same  placed 1, expected 1
+I.44.4     same  placed 1, expected 1
+I.50.26    same  placed 0, expected 0
+II.2.42    same  placed 0, expected 0
+II.6.15b   same  placed 1, expected 1
+II.11.3    same  placed 1, expected 1
+II.11.27   same  placed 1, expected 1
+II.13.23   same  placed 1, expected 1
+II.24.17   same  placed 1, expected 1
+II.34.2    DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '((v0 * v1) * v2)')]
+   expected: [('power_law', '((v0 * v1) * v2)'), ('tolerant', '((v0 * v1) * v2)')]
+II.35.18   same  placed 1, expected 1
+II.38.3    DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '(((v0 * v1) * v2) / v3)')]
+   expected: [('power_law', '(((v0 * v1) * v2) / v3)'), ('tolerant', '(((v0 * v1) * v2) / v3)')]
+III.9.52   same  placed 0, expected 0
+III.10.19  same  placed 0, expected 0
+III.17.37  same  placed 0, expected 0
+III.19.51  DIFFERENT  placed 1, expected 2
+   placed:   [('power_law', '((v0 * ((v1)²)²) / (((v2)² * (v3)²) * (v4)²))')]
+   expected: [('power_law', '((v0 * ((v1)²)²) / (((v2)² * (v3)²) * (v4)²))'), ('tolerant', '((v0 * ((v1)²)²) / (((v2)² * (v3)²) * (v4)²))')]
+
+26 of 41 equations: the seeds placed are those expected

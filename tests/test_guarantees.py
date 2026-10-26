@@ -1442,3 +1442,54 @@ def test_deduced_constant_matches_the_predictions():
         if np.max(np.abs(ratio / c_data - 1.0)) < 1e-6:     # the model is c * a^e
             assert est.constant_value_ is not None
             assert abs(est.constant_value_ / c_data - 1.0) < 1e-6
+
+
+# ── 25. Under units=, a seed is placed only if it passes the gate (1.1) ─────
+# Change U1 of phase 7 (benchmarks/results_1.1/PLAN.md): with the flag
+# _SEEDS_UNDER_UNITS, the seed finders run under units= as without them, and
+# each tree they return is kept only if dim_search.is_typed_valid accepts it,
+# the gate every typed tree must pass. The guarantee of units= must not move.
+
+_II113_UNITS = {0: {"A": 1, "s": 1},                         # q
+                1: {"kg": 1, "m": 1, "s": -3, "A": -1},      # Ef
+                2: {"kg": 1}, 3: {"s": -1}, 4: {"s": -1}}    # m, w0, w
+
+
+def _ii113():
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 3, 140), rng.uniform(1, 3, 140),
+               rng.uniform(1, 3, 140), rng.uniform(3, 5, 140),
+               rng.uniform(1, 2, 140)]
+    y = Xr[:, 0] * Xr[:, 1] / (Xr[:, 2] * (Xr[:, 3] ** 2 - Xr[:, 4] ** 2))
+    return Xr, y
+
+
+def test_seeds_under_units_pass_the_gate(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    Xr, y = _ii113()
+    Xs = Xr / np.abs(Xr).max(axis=0)          # normalize="auto"
+    cfg = _binom_cfg(5)
+    cfg.FEAT_DIMS, cfg.TARGET_DIM = _II113_UNITS, {"m": 1}
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", False)    # 1.0: nothing
+    assert core._make_binomial_seeds(Xs, y, cfg) == []
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", True)
+    seeds = core._make_binomial_seeds(Xs, y, cfg)
+    assert seeds
+    for t in seeds:
+        assert DS.is_typed_valid(t, cfg.FEAT_DIMS, cfg.TARGET_DIM)
+        assert _scaled_residual(t, Xs, y) < 1e-12
+    # the same law declared with a target in kilograms: no seed passes
+    cfg.TARGET_DIM = {"kg": 1}
+    assert core._make_binomial_seeds(Xs, y, cfg) == []
+    assert core._make_tolerant_seeds(Xs, y, cfg) == []
+
+
+def test_model_under_units_with_seeds_passes_the_audit(monkeypatch):
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", True)
+    Xr, y = _ii113()
+    units = {"v%d" % i: u for i, u in _II113_UNITS.items()}
+    r = symbolic_regression(Xr, y, feature_names=list(units), units=units,
+                            target_units={"m": 1}, generations=5, seed=0,
+                            parallel=False)
+    ok, msg = GD.check_dimensions(r.node, _II113_UNITS, {"m": 1})
+    assert ok, msg

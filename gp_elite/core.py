@@ -4152,10 +4152,39 @@ def _make_motif_seeds(cfg, n_max: int = 32) -> list:
 # une centaine, jugés comme les autres. Aucun tirage aléatoire : sans colonne de signe
 # constant ou avec une cible qui change de signe (données centrées), rien
 # n'est injecté et l'ajustement est celui d'avant. Hors du mode CSV
-# générique, sous `units=` (population typée) et en mode extrapolation
-# (où les motifs sont déjà coupés), rien n'est injecté non plus.
+# générique, sous `units=` (population typée ; voir _SEEDS_UNDER_UNITS
+# ci-dessous, phase 7) et en mode extrapolation (où les motifs sont déjà
+# coupés), rien n'est injecté non plus.
 
 _POWER_LAW_MIN_R2 = 0.999    # part de la variance de log|y| que le monôme doit expliquer
+
+# [1.1, phase 7] Sous units= (population typée), les quatre chercheurs de
+# graines (loi de puissance, B1, E1, N1) ne rendaient rien. Avec ce drapeau, ils
+# tournent comme sans unités, sur les mêmes lignes et avec les mêmes seuils,
+# et chaque arbre rendu n'est gardé que s'il passe la porte de validité des
+# dimensions (dim_search.is_typed_valid), celle de fitness() et des
+# opérateurs typés : l'invariant des unités est inchangé. Sans unités, rien
+# ne change. Plan : benchmarks/results_1.1/PLAN.md (changement U1). Coupé
+# par défaut jusqu'à la campagne qui décide.
+_SEEDS_UNDER_UNITS = False
+
+
+def _seeds_blocked_by_units(cfg) -> bool:
+    """Vrai quand units= est actif et que U1 est coupé (comportement 1.0)."""
+    return _dim_active(cfg) and not _SEEDS_UNDER_UNITS
+
+
+def _typed_seeds(seeds: list, cfg) -> list:
+    """[1.1] Sous units=, les seules graines qui passent la porte des
+    dimensions ; sans unités, toutes."""
+    if not _dim_active(cfg) or not seeds:
+        return seeds
+    gate = _ds().is_typed_valid
+    unk = bool(getattr(cfg, "UNKNOWN_CONST", False))
+    kept = [t for t in seeds if gate(t, cfg.FEAT_DIMS, cfg.TARGET_DIM, unk)]
+    if len(kept) < len(seeds):
+        TRACE.bump("graines_rejetees_dim", len(seeds) - len(kept))
+    return kept
 
 
 def _power_law_exponents(X, y, min_r2=None):
@@ -4239,7 +4268,7 @@ def _product(nodes: list) -> Optional["Node"]:
 def _make_power_law_seeds(xs, ys, cfg, min_r2=None) -> list:
     """[v0.8] Voir le commentaire ci-dessus. Rend 0, 1 ou 2 arbres. min_r2
     remplace _POWER_LAW_MIN_R2 (graines tolérantes au bruit, phase 5)."""
-    if not _GENERIC_CSV_MODE or _dim_active(cfg) \
+    if not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) \
             or not bool(getattr(cfg, "POWER_LAW_SEEDS", True)):
         return []
@@ -4289,6 +4318,7 @@ def _make_power_law_seeds(xs, ys, cfg, min_r2=None) -> list:
         if facs:
             seeds.append(_product(facs))
 
+    seeds = _typed_seeds(seeds, cfg)
     if seeds:
         TRACE.set("power_law_seed", "exposants %s ; %d graine(s) : %s" % (
             ", ".join("%s^%.3g" % (terms[j], float(a)) for j, a in zip(cols, expo)),
@@ -4480,7 +4510,7 @@ def _monomial(terms, pairs, uops) -> Optional["Node"]:
 def _make_binomial_seeds(xs, ys, cfg, tol=None) -> list:
     """[0.10, phase 4b] Voir le commentaire ci-dessus. Rend 0 à 4 arbres.
     Le drapeau _BINOMIAL_SEEDS (actif par défaut) les coupe."""
-    if not _BINOMIAL_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
+    if not _BINOMIAL_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
     terms = list(getattr(cfg, "TERMINALS", []) or [])
@@ -4515,6 +4545,7 @@ def _make_binomial_seeds(xs, ys, cfg, tol=None) -> list:
             seeds.append(Node("/", f if f is not None else Node(1.0), w))
         else:
             seeds.append(w if f is None else Node("*", f, w))
+    seeds = _typed_seeds(seeds, cfg)
     if seeds:
         TRACE.set("binomial_seed", " | ".join(to_string(s) for s in seeds))
     return seeds
@@ -4830,7 +4861,7 @@ def _elementary_forms(X, y, kinds, tol=None) -> list:
 def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
     """[0.10, phase 4a] Voir le commentaire ci-dessus. Rend 0 à 5 arbres.
     Le drapeau _ELEMENTARY_SEEDS (actif par défaut) les coupe."""
-    if not _ELEMENTARY_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
+    if not _ELEMENTARY_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
     terms = list(getattr(cfg, "TERMINALS", []) or [])
@@ -4892,6 +4923,7 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
             seeds.append(Node("/", f if f is not None else Node(1.0), den))
             continue
         seeds.append(h if f is None else Node("*", f, h))
+    seeds = _typed_seeds(seeds, cfg)
     if seeds:
         TRACE.set("elementary_seed", " | ".join(to_string(s) for s in seeds))
     return seeds
@@ -4946,7 +4978,7 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
     ni B1 ni E1 n'ont placé de graine ; sans la loi de puissance si ses
     graines exactes ont déjà été placées (power_done). Le drapeau
     _TOLERANT_SEEDS (actif par défaut) les coupe."""
-    if not _TOLERANT_SEEDS or not _GENERIC_CSV_MODE or _dim_active(cfg) \
+    if not _TOLERANT_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
     try:
@@ -4980,11 +5012,13 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
             TRACE.set(k, v)
     scored = sorted(((_seed_rel_error(t, X, y), i, t) for i, t in enumerate(cands)),
                     key=lambda r: (r[0], r[1]))
-    seeds = [t for r, _, t in scored if r <= _TOLERANT_REL]
+    seeds = _typed_seeds([t for r, _, t in scored if r <= _TOLERANT_REL], cfg)
     TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
     if seeds:
+        kept = {id(t) for t in seeds}
         TRACE.set("tolerant_seed", " | ".join(
-            "%s (%.2g)" % (to_string(t), r) for r, _, t in scored if r <= _TOLERANT_REL))
+            "%s (%.2g)" % (to_string(t), r) for r, _, t in scored
+            if r <= _TOLERANT_REL and id(t) in kept))
     return seeds
 
 

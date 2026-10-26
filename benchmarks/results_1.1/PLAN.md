@@ -206,3 +206,42 @@ Two things are added:
 615 jobs per version at 30 s, two pairs at a time on 4 cores, about 2.6
 hours for the campaign, as much for the confirmation, and 20 short typed
 fits.
+
+### Mechanics of U1, result (26 October 2026)
+
+All on the machine of this plan, in the 1.0.0 environment (`/venv10`): the
+wheel for 1.0.0, the repository for U1 (`mechanics/`).
+
+1. **Flag off.** The thirteen reference configurations are identical to the
+   1.0.0 wheel (`compare_1.0.0_vs_U1_off.txt`). The test suite passes: 153
+   tests, the 151 of 1.0.0 and the 2 new ones.
+2. **Flag on, without units.** The twelve configurations without units are
+   identical. The typed one, `D_units`, changes as it should
+   (`compare_1.0.0_vs_U1_on.txt`, `trace_U1_on.jsonl`):
+   - a power-law seed is placed;
+   - the model returned is `0.0795775 * X0 * X1 / (X2 * X3²)`, 10 nodes,
+     instead of `0.0795775 * X0 * X1 / X2 / X3 / X3`, 11 nodes.
+3. **Flag on, on the training rows of U41.** The seeds placed are those
+   expected on 41 equations of 41 (`seeds_placed.txt`).
+   - A first run of the check expected 15 more seeds than were placed.
+     Each was a noise-tolerant copy of a power-law seed.
+   - The engine does not look for these copies when the power law has
+     already placed its seed, as in 1.0; the prototype did not reproduce
+     that.
+   - The expectation of the check was corrected and the check run again.
+     The first output is kept (`seeds_placed_first_run.txt`).
+4. **II.11.3 with units, 30 generations, seed 0** (`ii113_fit.txt`).
+   - Flag off: exact in 20.1 s, 39 nodes.
+   - Flag on: exact in 1.2 s, `v0 * v1 / (v2 * v3²) / (1 - v4² / v3²)`, 20
+     nodes. This is the B1 seed, refined.
+
+**The tooling of the campaign.**
+- `phase1_bench.py` gains the kinds `ufeyn`, `ufeyn_n1` and `ufeyn_n10`,
+  run only when asked for. Its untyped job list is unchanged: the same 1,775
+  jobs. Each record of a units kind carries `units_ok`, the audit
+  `check_dimensions` of the returned model. Each record also carries
+  `seeds_under_units`, the state of the flag.
+- `run_u1.sh` starts the engine U1: the 1.0.0 environment, the repository
+  first on the path, the flag set by `phase2_flags/sitecustomize.py`.
+- `units_real.py` runs the 20 typed fits of the case studies, one process
+  each.
