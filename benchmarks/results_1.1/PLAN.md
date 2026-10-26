@@ -11,6 +11,10 @@ and decides nothing. Method as for 0.9 and 1.0:
 The author validates this plan before any change (gate 5). He decides the
 publication of 1.1 after its measurement (gate 6).
 
+*Gate 5, 26 October 2026:* the author validated this plan. On his choice,
+its implementation starts after the TP diagnostic (`DIAGNOSTIC_TP.md`), which
+changes nothing in the engine.
+
 ## What 1.1 has to do
 
 Version 1.0 fits whole families of laws directly and places them in the
