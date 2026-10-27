@@ -11,3 +11,27 @@ benchmarks/results_1.1/release/m2/driver.sh: 10: cannot open benchmarks/results_
 175 jobs done, 712 s elapsed, 2605 left
 200 jobs done, 948 s elapsed, 2580 left
 225 jobs done, 1300 s elapsed, 2554 left
+250 jobs done, 1691 s elapsed, 2529 left
+275 jobs done, 2105 s elapsed, 2504 left
+300 jobs done, 2495 s elapsed, 2479 left
+325 jobs done, 2911 s elapsed, 2454 left
+350 jobs done, 3139 s elapsed, 2430 left
+375 jobs done, 3282 s elapsed, 2404 left
+400 jobs done, 3381 s elapsed, 2379 left
+425 jobs done, 3402 s elapsed, 2355 left
+450 jobs done, 3423 s elapsed, 2329 left
+475 jobs done, 3522 s elapsed, 2305 left
+500 jobs done, 3615 s elapsed, 2280 left
+525 jobs done, 3888 s elapsed, 2254 left
+550 jobs done, 4143 s elapsed, 2229 left
+575 jobs done, 4372 s elapsed, 2204 left
+600 jobs done, 4465 s elapsed, 2180 left
+625 jobs done, 4647 s elapsed, 2154 left
+650 jobs done, 5069 s elapsed, 2129 left
+675 jobs done, 5459 s elapsed, 2104 left
+700 jobs done, 5851 s elapsed, 2080 left
+725 jobs done, 6117 s elapsed, 2054 left
+time slice over: 2043 jobs left for the next call
+--- slice 2026-10-27T04:30 (737 and 737 done)
+2043 jobs to run with 2 engines
+25 jobs done, 359 s elapsed, 2017 left
