@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.1.0
+
+The forms that 1.0 fits directly now act under `units=` as well. Under
+`units=` the population is typed, and in 1.0 the seed finders (the power law,
+B1, E1 and the noise-tolerant N1) placed nothing. They now run as without
+units, and a seed is placed only if it passes the gate of dimensions that
+every typed tree must pass, so a model returned under units stays
+dimensionally consistent. Without units nothing changes.
+
+Measured on the branch, side by side with 1.0.0, on the 41 Feynman equations
+of the decision bench with their units (`benchmarks/units_table.py`; plan and
+records in `benchmarks/results_1.1/`): 165 exact laws of 205 against 107,
+and 166 against 107 on five seeds never run; with 1 % and 10 % noise, the
+structure of the law in 113 and 99 fits of 205 against 79 and 80. Every
+model returned under units passed the audit of units. Feynman II.11.3 with
+units comes back exact in 5 runs of 5, in 1.4 to 1.7 s, against 3 of 5 in 10
+to 31 s. The typed fits of the Kepler and Hubble case studies return the
+same errors and the same deduced constants.
+
 ## 1.0.0 — "Families"
 
 This release fits whole families of laws directly (rational forms, roots,
