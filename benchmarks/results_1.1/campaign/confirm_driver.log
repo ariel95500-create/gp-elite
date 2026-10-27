@@ -1,2 +1,21 @@
 --- confirmation, seeds 5 to 9, slice 1 22:56
 615 jobs to run with 2 engines
+25 jobs done, 23 s elapsed, 589 left
+50 jobs done, 244 s elapsed, 564 left
+75 jobs done, 501 s elapsed, 539 left
+100 jobs done, 785 s elapsed, 515 left
+125 jobs done, 1028 s elapsed, 489 left
+150 jobs done, 1348 s elapsed, 464 left
+175 jobs done, 1610 s elapsed, 439 left
+200 jobs done, 1929 s elapsed, 414 left
+225 jobs done, 3621 s elapsed, 389 left
+250 jobs done, 4031 s elapsed, 364 left
+275 jobs done, 4429 s elapsed, 339 left
+300 jobs done, 4836 s elapsed, 314 left
+325 jobs done, 5238 s elapsed, 289 left
+350 jobs done, 5647 s elapsed, 264 left
+375 jobs done, 6047 s elapsed, 239 left
+time slice over: 223 jobs left for the next call
+--- slice 1 ended 00:41
+--- slice 2 00:42 (the session's worker restarted after slice 1, which had ended normally at 00:41)
+223 jobs to run with 2 engines
