@@ -13,6 +13,9 @@ Measures one engine, budget T (30 s per fit), on:
                      benchmarks/results_1.1/PLAN.md) F41, F41N1 and F41N10
                      with units= and target_units= from units_table.py; run
                      only when asked for with --kinds
+  TF78 under units   (kind utf; the release of 1.1, PLAN_RELEASE_1.1.md) TF78
+                     with units from units_table.UNITS_TF78, seeds 5 to 9,
+                     never used to decide; on request only
 
 Every fit runs in its own process with PYTHONHASHSEED=0 and one BLAS thread;
 the engine is the gp_elite package importable by the given Python (for the
@@ -53,8 +56,8 @@ NOISE = {"feyn_n1": 0.01, "feyn_n10": 0.10,
          "ufeyn_n1": 0.01, "ufeyn_n10": 0.10}
 ORDER = ["feyn", "real", "realraw", "tf", "ts", "tr", "trraw",
          "feyn_n1", "feyn_n10"]
-UNIT_KINDS = ["ufeyn", "ufeyn_n1", "ufeyn_n10"]   # phase 7, on request only
-FEYN_KINDS = ("feyn", "feyn_n1", "feyn_n10") + tuple(UNIT_KINDS)
+UNIT_KINDS = ["ufeyn", "ufeyn_n1", "ufeyn_n10", "utf"]   # phase 7, on request only
+FEYN_KINDS = ("feyn", "feyn_n1", "feyn_n10", "ufeyn", "ufeyn_n1", "ufeyn_n10")
 
 
 # ─────────────────────────────────────────────────────────────── jobs ──
@@ -79,7 +82,7 @@ def all_jobs(with_units=False):
             for n in names:
                 for s in BENCH_SEEDS:
                     out.append(dict(kind=kind, problem=n, split="ood", seed=s))
-        elif kind == "tf":
+        elif kind in ("tf", "utf"):
             for n in T.names("TF78"):
                 for s in TEST_SEEDS:
                     out.append(dict(kind=kind, problem=n, split="test", seed=s))
@@ -122,7 +125,7 @@ def _data(job):
         Xtr, ytr, Xte, yte = D.real_data(job["problem"], job["split"],
                                          raw=kind == "realraw")
         return Xtr, ytr, Xte, yte, None, None, None, "physical", ytr
-    if kind == "tf":
+    if kind in ("tf", "utf"):
         Xtr, ytr, Xte, yte, Xo, yo, names, pool = T.tf_data(job["problem"])
         return Xtr, ytr, Xte, yte, Xo, yo, names, pool, ytr
     if kind == "ts":
@@ -182,7 +185,9 @@ def run_one(job):
     units = None
     if job["kind"] in UNIT_KINDS:
         import units_table as U
-        units, tunits = U.units_of(job["problem"], names)
+        units, tunits = (U.units_of_tf(job["problem"], names)
+                         if job["kind"] == "utf"
+                         else U.units_of(job["problem"], names))
         kw.update(units=units, target_units=tunits)
     t0 = time.time()
     with redirect_stdout(io.StringIO()), warnings.catch_warnings():
@@ -200,7 +205,7 @@ def run_one(job):
                engine_version=getattr(gp_elite, "__version__", "?"))
     if hasattr(C, "_SEEDS_UNDER_UNITS"):     # phase 7, change U1
         rec["seeds_under_units"] = bool(C._SEEDS_UNDER_UNITS)
-    exact_kind = job["kind"] in FEYN_KINDS + ("tf",) or (
+    exact_kind = job["kind"] in FEYN_KINDS + ("tf", "utf") or (
         job["kind"] == "ts"
         and T.manifest()["datasets"][job["problem"]]["exact_scorable"])
     if exact_kind:
@@ -216,7 +221,7 @@ def run_one(job):
             se, rec["structure_error"] = 1e30, repr(exc)[:200]
         rec["err_structure"] = se
         rec["structure"] = bool(se < 1e-9)
-    if job["kind"] == "tf":
+    if job["kind"] in ("tf", "utf"):
         rec["family"] = T.manifest()["datasets"][job["problem"]]["family"]
     if units is not None:                   # the guarantee of units=
         from gp_elite.dimensions import check_dimensions
