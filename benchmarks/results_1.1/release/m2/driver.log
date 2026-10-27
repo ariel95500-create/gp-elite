@@ -1,0 +1,5 @@
+benchmarks/results_1.1/release/m2/driver.sh: 9: cannot open benchmarks/results_1.1/release/m2/campaignR_1.0.0.jsonl: No such file
+benchmarks/results_1.1/release/m2/driver.sh: 10: cannot open benchmarks/results_1.1/release/m2/campaignR_1.1.0.jsonl: No such file
+--- slice 2026-10-27T02:45 (0 and 0 done)
+2780 jobs to run with 2 engines
+25 jobs done, 22 s elapsed, 2754 left
