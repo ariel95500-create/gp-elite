@@ -3,3 +3,11 @@ benchmarks/results_1.1/release/m2/driver.sh: 10: cannot open benchmarks/results_
 --- slice 2026-10-27T02:45 (0 and 0 done)
 2780 jobs to run with 2 engines
 25 jobs done, 22 s elapsed, 2754 left
+50 jobs done, 192 s elapsed, 2729 left
+75 jobs done, 214 s elapsed, 2704 left
+100 jobs done, 380 s elapsed, 2680 left
+125 jobs done, 505 s elapsed, 2655 left
+150 jobs done, 691 s elapsed, 2630 left
+175 jobs done, 712 s elapsed, 2605 left
+200 jobs done, 948 s elapsed, 2580 left
+225 jobs done, 1300 s elapsed, 2554 left
