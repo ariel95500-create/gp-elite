@@ -4164,9 +4164,13 @@ _POWER_LAW_MIN_R2 = 0.999    # part de la variance de log|y| que le monôme doit
 # et chaque arbre rendu n'est gardé que s'il passe la porte de validité des
 # dimensions (dim_search.is_typed_valid), celle de fitness() et des
 # opérateurs typés : l'invariant des unités est inchangé. Sans unités, rien
-# ne change. Plan : benchmarks/results_1.1/PLAN.md (changement U1). Coupé
-# par défaut jusqu'à la campagne qui décide.
-_SEEDS_UNDER_UNITS = False
+# ne change. Plan : benchmarks/results_1.1/PLAN.md (changement U1, adopté le
+# 26 octobre 2026) : banc U41 (les 41 équations du banc de décision avec leurs
+# unités), lois exactes 107 -> 165 sur 205, puis 107 -> 166 sur des graines
+# neuves ; structure sous bruit 79 -> 113 (1 %) et 80 -> 99 (10 %) ; chaque
+# modèle rendu passe l'audit des unités ; données réelles sous unités
+# inchangées. Actif par défaut depuis son adoption.
+_SEEDS_UNDER_UNITS = True
 
 
 def _seeds_blocked_by_units(cfg) -> bool:

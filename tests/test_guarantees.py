@@ -1140,9 +1140,14 @@ def test_power_law_seed_only_where_it_applies(monkeypatch):
     assert core._make_power_law_seeds(Xr, Xr[:, 0] / Xr[:, 1] ** 2, cfg) == []
     s = core._make_power_law_seeds(Xr, Xr[:, 0] * Xr[:, 1] ** 2, cfg)
     assert len(s) == 1 and _ops_in(s[0], set()) <= {"*", "sq"}
-    # under units= the typed population is left alone
+    # under units=: nothing without U1 (1.0); with U1 (1.1) only a seed that
+    # passes the gate of dimensions, and none does with a target in kg
+    # (section 25)
     _set_pool(monkeypatch, "physical")
-    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}}
+    cfg.FEAT_DIMS, cfg.TARGET_DIM = {0: {"m": 1}, 1: {"s": 1}}, {"kg": 1}
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", False)
+    assert core._make_power_law_seeds(Xr, Xr[:, 0] * Xr[:, 1], cfg) == []
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", True)
     assert core._make_power_law_seeds(Xr, Xr[:, 0] * Xr[:, 1], cfg) == []
 
 
@@ -1287,8 +1292,14 @@ def test_binomial_seed_only_where_it_applies(monkeypatch):
     assert core._binomial_forms(Xr, Xr[:, 0] * Xr[:, 1] ** 2) == []
     # a target that changes sign: nothing
     assert core._binomial_forms(Xr, y - np.median(y)) == []
-    # under units= the typed population is left alone
+    # under units=: nothing without U1 (1.0); with U1 (1.1) only a seed that
+    # passes the gate of dimensions, and none does with a target in kg
+    # (section 25)
     cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}, 2: {"s": 1}}
+    cfg.TARGET_DIM = {"kg": 1}
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", False)
+    assert core._make_binomial_seeds(Xr, y, cfg) == []
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", True)
     assert core._make_binomial_seeds(Xr, y, cfg) == []
 
 
@@ -1351,9 +1362,15 @@ def test_elementary_seed_only_where_it_applies(monkeypatch):
     s = Xr[:, 0] * np.sin(Xr[:, 2])
     _set_pool(monkeypatch, "physical")
     assert core._make_elementary_seeds(Xr, s, cfg) == []
-    # under units= the typed population is left alone
+    # under units=: nothing without U1 (1.0); with U1 (1.1) only a seed that
+    # passes the gate of dimensions, and none does with a target in kg
+    # (section 25)
     _set_pool(monkeypatch, "trig")
     cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}, 2: {"s": 1}}
+    cfg.TARGET_DIM = {"kg": 1}
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", False)
+    assert core._make_elementary_seeds(Xr, y, cfg) == []
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", True)
     assert core._make_elementary_seeds(Xr, y, cfg) == []
 
 
@@ -1408,9 +1425,14 @@ def test_tolerant_seed_only_under_its_threshold(monkeypatch):
     noisy = clean + 0.3 * np.std(clean) * rng.randn(140)
     for t in core._make_tolerant_seeds(Xr, noisy, cfg):
         assert core._seed_rel_error(t, Xr, noisy) <= core._TOLERANT_REL
-    # under units= nothing
-    cfg.FEAT_DIMS = {0: {"m": 1}, 1: {"s": 1}}
+    # under units=: nothing without U1 (1.0); with U1 (the default since
+    # 1.1), only seeds that pass the gate of dimensions (section 25)
+    cfg.FEAT_DIMS, cfg.TARGET_DIM = {0: {"m": 1}, 1: {"s": 1}}, {"m": 2, "s": -1}
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", False)
     assert core._make_tolerant_seeds(Xr, clean * 1.001, cfg) == []
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", True)
+    for t in core._make_tolerant_seeds(Xr, clean * 1.001, cfg):
+        assert DS.is_typed_valid(t, cfg.FEAT_DIMS, cfg.TARGET_DIM)
 
 
 # ── 24. The deduced constant is the coefficient of the formula ──────────────

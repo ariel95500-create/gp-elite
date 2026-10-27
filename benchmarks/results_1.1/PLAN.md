@@ -305,3 +305,39 @@ The 20 typed fits of the case studies ran after, one process each
 
 **Confirmation on new seeds** follows: the same 615 jobs with seeds 5 to 9
 (`phase1_bench.py --seeds 5,6,7,8,9`, an option added for it).
+
+### Confirmation of U1 on new seeds, result (27 October 2026)
+
+The same 615 jobs with seeds 5 to 9, side by side, from 22:56 on 26 October
+to 02:17 on 27 October UTC, in two time slices (`campaign/U41_conf_*.jsonl`,
+`compare_u1_confirmation.txt`, `confirm_driver.log`). The worker of this
+session restarted between the slices; the first had ended normally and its
+records were checked whole before the second started. No crash. The
+engines are recorded as in the campaign.
+
+**U1 is kept: the three conditions hold.**
+1. U41 exact: A 107, U1 166 of 205 (+59; at least +5 asked). In the five
+   families: A 16, U1 57 of 90. No equation loses exact fits; 15 gain.
+2. Structure under noise: with 1 % noise A 87, U1 117; with 10 % noise A 80,
+   U1 97 (no fewer than A's minus 2 asked).
+3. Every model passes the audit of units, 615 of 615 in both.
+
+Beside them:
+- formulas flagged inexact: A 10, U1 8;
+- median time without noise: A 30.2 s, U1 0.7 s;
+- II.11.3: exact in 5 of 5 in 1.4 to 1.7 s, against 2 of 5 for A.
+
+### Adoption (27 October 2026)
+
+`_SEEDS_UNDER_UNITS` is on by default. The three earlier tests that checked
+"nothing under units" now check it both ways:
+- with the flag off, nothing is placed;
+- with the flag on, nothing is placed when no seed passes the gate (a
+  target in kilograms).
+
+The test of the noise-tolerant seeds is changed the same way. 153 tests
+pass. The thirteen reference configurations of the default engine are
+identical to those of U1 with the flag set on
+(`mechanics/compare_U1_on_vs_U1_default.txt`).
+
+What follows is the release of 1.1, as planned above.

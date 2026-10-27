@@ -3,7 +3,8 @@ with this directory first on PYTHONPATH (benchmarks/speed_equivalence.py
 runs each configuration in its own process). GP_ELITE_ARM: A, F1, F3, F3R, G1, G1b, S2, T1, A1, B1, noB1, E1, noE1, N1,
 noN1, U1 or noU1 (B1, E1 and N1 are on by default since their adoption; their
 mechanics ran at commits 273061b, 4b12ba7 and 28fae46, where A had them off;
-U1 is the change of phase 7, benchmarks/results_1.1/PLAN.md, off by default).
+U1 is the change of phase 7, benchmarks/results_1.1/PLAN.md, on by default
+since its adoption; its mechanics and campaign ran with it off by default).
 With GP_ELITE_TRACE_LOG, each process appends its check counters there. The
 flags exist in the engine at commit 0038a29 only (PLAN_PHASE2.md, decision).
 

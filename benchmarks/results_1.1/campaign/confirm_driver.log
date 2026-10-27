@@ -19,3 +19,12 @@ time slice over: 223 jobs left for the next call
 --- slice 1 ended 00:41
 --- slice 2 00:42 (the session's worker restarted after slice 1, which had ended normally at 00:41)
 223 jobs to run with 2 engines
+25 jobs done, 1319 s elapsed, 198 left
+50 jobs done, 1776 s elapsed, 172 left
+75 jobs done, 2180 s elapsed, 147 left
+100 jobs done, 2578 s elapsed, 122 left
+125 jobs done, 2980 s elapsed, 97 left
+150 jobs done, 3376 s elapsed, 72 left
+175 jobs done, 3779 s elapsed, 47 left
+200 jobs done, 4175 s elapsed, 22 left
+--- slice 2 ended 02:17
