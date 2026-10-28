@@ -1,0 +1,31 @@
+# The gas law of the TP notebook (cell 7: n, T, V at 10 points, 2 % noise,
+# units and unknown_constant=True, parallel=False, seed=0), timed alone on the
+# machine after M3, 28 October 2026, PYTHONHASHSEED=0, one process per fit.
+# gas.py is the script (its last lines print the trace and the result).
+1.0.0 8.24992 * n * T / V 51.2 s
+1.1.0 8.24992 * n * T / V 77.0 s
+1.0.0 8.24992 * n * T / V 50.2 s
+1.1.0 8.24992 * n * T / V 78.1 s
+1.0.0 8.24992 * n * T / V 49.9 s
+1.1.0 8.24992 * n * T / V 78.9 s
+
+# Trace of the 1.1.0 fit: the power law seed finds two seeds,
+# ((n * T) / V) and ((pow(n, 1.0041) * pow(T, 0.9174)) * pow(V, -0.9852));
+# both pass the gate of dimensions, the leading constant being allowed a
+# dimension (unknown_constant=True). Seeds rejected by the gate: 6.
+
+# cProfile of one fit per version (time own to the functions of core.py,
+# dim_search.py and dimensions.py; profiling slows both runs):
+own time in engine: 1.0 80 s, 1.1 121 s
+_build_ek                          own    2.9 ->   26.4 s   calls  1599152 -> 16140291
+_info                              own    0.6 ->    5.8 s   calls  1594223 -> 15960744
+_np_safe_pow                       own    0.0 ->    2.8 s   calls     1462 ->   177670
+_mi                                own    0.3 ->    3.0 s   calls   565827 ->  5754014
+_reachable                         own    0.1 ->    2.1 s   calls     4688 ->   169120
+_np_safe_pow_var                   own    0.1 ->    1.7 s   calls     4384 ->   161563
+# The seed finders themselves take 0.6 s in all. Reading of the profile: the
+# extra time goes to the constructive generation of typed subtrees
+# (dim_search._build_ek, ten times the calls). Trees that descend from the
+# second seed hold powers with non-integer exponents, and a mutation in them
+# asks the builder for a subtree of fractional units (mol^1.0041, K^0.9174...),
+# which it rarely reaches before its budget runs out.

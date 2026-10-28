@@ -86,4 +86,68 @@ and the search stops on it.
 - U41 at least 10 exact laws above 1.0.0: 108 to 165.
 - Every model returned under units passes `check_dimensions`: 1,005 of 1,005.
 
-The release goes on to M3.
+## M3, every public figure measured again (28 October 2026)
+
+`m3/` holds the records of the figures of the READMEs, the notebooks, the case
+studies and the paper. They were produced by `m3/m3_driver.sh`, one step after
+the other, from 00:24 to 01:17 on 28 October, with `/venv11x`, on a copy of
+`benchmarks/`, `examples/` and the READMEs of commit 82f303e without the package
+beside them. The steps:
+- `benchmarks/release_claims/run_claims.py` with the commands of 1.0.0;
+- the three case studies;
+- the check of Kepler normalised by min-max;
+- `deduced_constant_check.py` with 1.0.0 and with 1.1.0;
+- the French TP notebook, run as a script (`m3/tp_six_lois.py`, its code cells
+  without the `pip` line; output in `m3/notebook_tp_six_lois_1.1.0.txt`).
+
+The records of 1.0.0 are `../../results_0.9/release_1.0/m3/`, measured on the
+same machine.
+
+**Without units, the same.** Every law, formula, error, size and count:
+- Feynman 15 and the duel with gplearn (15/15 against 6/15);
+- the size study, the battery example, the robust regression;
+- the README examples, the console, the 1,500 printed formulas, the operator
+  pools, the unusual inputs, the scales, the small data;
+- Nikuradse under the full protocol, the notebook snippets, min-max Kepler;
+- `time_limit=`, 15 of 16 checks as for 1.0.0 (the fit in sequence stops at
+  8.7 s on an exact law, before the budget).
+
+Times move by a second or two either way. `import gp_elite` takes a median of
+0.11 s (0.18 s).
+
+**With units, what changes** (U1, the seeds of 1.0 under units):
+- Feynman 15 with `units=` (`feynman15_units.txt`): 15/15 exact, against 14/15;
+  I.16.6 becomes exact in 32 s (near, 59 s).
+- The table of `units=` on II.11.3 (`units_ab_ood.txt`): with units, 5/5 laws
+  recovered out of domain in 20 nodes and about a second per run, against 2/5,
+  27 nodes and 27 s. It is now the same as without units.
+- Kepler (`case_kepler.txt`, `deduced_constant_venv11.txt`): the typed fits
+  return the textbook form `5.45416e-10 * X0 * sqrt(X0)` at every seed, in
+  under a second. 1.0.0 returned the same constant in forms such as
+  `sqrt(sqrt(X0)) * sqrt(X0) * sqrt(X0) * sqrt(sqrt(X0))`, and on seed 4 of the
+  case study a two-term formula. G·M☉ is unchanged (−1.64e-05 from IAU).
+- Hubble (`case_hubble.txt`): the same models and the same constant.
+- The console example and the mystery constant: the same laws and constants
+  (250 kg/s², G), written `(249.99999999999997*X0)` and
+  `6.674e-11*((X0*X1)/((X2)**2))`.
+- The torque snippet with units: `r * F * sin(theta)`, in 6 nodes as before.
+
+**The TP notebook: the same laws, slower.** The six fits return the same
+formulas and the same deduced constants as with 1.0.0 (g 9.81 and 9.74, R 8.250,
+P 10.02 W), in 41, 50, 54, 44, 85 and 46 s, against 33, 47, 41, 37, 48 and 37 s
+(320 s in all against 243 s).
+
+The gas law was timed again alone, three times with each version
+(`m3/tp_timing/timings.txt`): 50 to 51 s with 1.0.0, 77 to 79 s with 1.1.0.
+The cause, read from a profile:
+- the power law seed of U1 places, beside `n * T / V`, a seed with fitted
+  non-integer exponents, `pow(n, 1.0041) * pow(T, 0.9174) * pow(V, -0.9852)`.
+  It passes the gate of dimensions, because the unknown constant can carry any
+  units;
+- the mutations of its descendants ask the typed builder for subtrees of
+  fractional units, which it rarely reaches before its budget runs out
+  (`_build_ek`, ten times the calls).
+
+With noise there is no exact law to stop on, so the cost stays. The plan
+expected the times of the TP notebook to change. This slowdown on the first
+audience of GP_ELITE is put to the author before M4.

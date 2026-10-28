@@ -1,0 +1,4 @@
+TP loi : -0.00141869 - 1.73061 * sin(0.999339 * x * x) / ((6.12752 + 0.136482 * x) / (-3.81258 * x + 14.1956 * tanh(0.00139088 * sign(x) * |x|^6)) + 0.0423522 - 0.334104 * x)
+ 10 generations : MSE = 9.706e-03   taille = 34  (3 s)
+ 30 generations : MSE = 1.784e-04   taille = 41  (11 s)
+ 60 generations : MSE = 1.784e-04   taille = 41  (25 s)

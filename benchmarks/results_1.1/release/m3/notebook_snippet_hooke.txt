@@ -1,0 +1,3 @@
+deduced units : [kg / s^2]
+deduced value : 250.0
+equation      : 250 * X0
