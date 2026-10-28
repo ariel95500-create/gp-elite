@@ -39,12 +39,20 @@ The two actions:
    - the SRBench test of the GP_ELITE wrapper is run with 1.0.0 and 1.1.0;
    - the wrapper, unchanged, is measured with 1.0.0 on the benches of the
      project (exact laws of F41, structures under noise, R6 folds and
-     collapses out of domain), never on the datasets of SRBench, under its
+     collapses out of domain), not on the datasets of SRBench, under its
      settings and a few others named in a plan committed before the first
-     fit, with the criteria that would make one of them better.
+     fit, with the criteria that would make one of them better;
+   - a final check on public datasets of SRBench (decided on 28 October
+     2026), as for the frozen test set of the project: it starts only after
+     the choice of setting is committed, it is published as measured, and it
+     decides nothing. The protocol of SRBench, 30 runs of up to an hour on
+     each of 24 datasets, is about 720 hours per setting and out of reach of
+     this machine. The plan of the study names beforehand the reduced check
+     it runs: which datasets, how many runs, what budget.
 
-   If one is better, a small change of the wrapper is put to the author,
-   who decides whether to propose it to SRBench.
+   If one setting is better, a small change of the wrapper is put to the
+   author with the final check beside it. The author decides whether to
+   propose it to SRBench.
 
 When the plan of 1.2 is written, its items that also act without units
 (for instance an earlier stop when the law is found, which SRBench would
