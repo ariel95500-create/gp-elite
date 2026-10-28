@@ -4,10 +4,51 @@ Kept apart from the plans of 1.1, which this file does not change.
 
 1. **Version 1.1** is released as `PLAN_RELEASE_1.1.md` says (decided on
    26 October 2026).
-2. **A plan for a version 1.2 for teaching** is written after gate 6, from
+2. **Two actions for SRBench** (decided on 28 October 2026), described
+   below: asking its maintainers for the calendar of the next update, and,
+   once the measurements of 1.1 leave the machine free, a study of the
+   settings SRBench runs GP_ELITE with.
+3. **A plan for a version 1.2 for teaching** is written after gate 6, from
    the list of `DIAGNOSTIC_TP.md` (decided on 26 October 2026).
-3. **After 1.2, a measurement of what speed would bring** (decided on
+4. **After 1.2, a measurement of what speed would bring** (decided on
    27 October 2026), described below.
+
+## SRBench
+
+What was read on 28 October 2026 in `cavalab/srbench` (master, 2aabbb6):
+- GP_ELITE is listed among the methods "staged for benchmarking", built
+  and tested by the container workflows, absent from the figures of the
+  2025 edition. No date for the next update is published, in the
+  repository or elsewhere.
+- `algorithms/gp-elite/requirements.txt` asks for `gp-elite>=0.8.0`: the
+  version evaluated is the one on PyPI on the day the containers of the run
+  are built.
+- The harness passes no units (`metadata.yml` says so). Version 1.1, which
+  changes the units mode only, changes nothing there; 1.0.0 does (F41 exact
+  laws without units: 88 with 0.9.0, 163 with 1.0.0).
+- The wrapper (`experiment/methods/gp-elite/regressor.py`), written for
+  0.8.0, runs 10 time-bounded restarts in 3,600 s, and its grid of
+  hyperparameters is `operators` in ("physical", "full") by `generations`
+  in (30, 60).
+
+The two actions:
+1. **The calendar.** Claude drafts a short question to the maintainers, in
+   English; the author decides whether and where to send it.
+2. **The settings.** After M4 of 1.1, when no measurement of the release
+   runs on the machine:
+   - the SRBench test of the GP_ELITE wrapper is run with 1.0.0 and 1.1.0;
+   - the wrapper, unchanged, is measured with 1.0.0 on the benches of the
+     project (exact laws of F41, structures under noise, R6 folds and
+     collapses out of domain), never on the datasets of SRBench, under its
+     settings and a few others named in a plan committed before the first
+     fit, with the criteria that would make one of them better.
+
+   If one is better, a small change of the wrapper is put to the author,
+   who decides whether to propose it to SRBench.
+
+When the plan of 1.2 is written, its items that also act without units
+(for instance an earlier stop when the law is found, which SRBench would
+see in its training times) are proposed first.
 
 ## What speed would bring
 
