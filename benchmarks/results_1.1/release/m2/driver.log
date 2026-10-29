@@ -3,3 +3,35 @@
 --- slice 2026-10-29T20:14 (0 and 0 done)
 2780 jobs to run with 2 engines
 25 jobs done, 25 s elapsed, 2754 left
+50 jobs done, 201 s elapsed, 2729 left
+75 jobs done, 222 s elapsed, 2704 left
+100 jobs done, 390 s elapsed, 2680 left
+125 jobs done, 519 s elapsed, 2655 left
+150 jobs done, 709 s elapsed, 2629 left
+175 jobs done, 732 s elapsed, 2604 left
+200 jobs done, 972 s elapsed, 2580 left
+225 jobs done, 1326 s elapsed, 2554 left
+250 jobs done, 1721 s elapsed, 2529 left
+275 jobs done, 2137 s elapsed, 2504 left
+300 jobs done, 2532 s elapsed, 2479 left
+325 jobs done, 2948 s elapsed, 2454 left
+350 jobs done, 3176 s elapsed, 2430 left
+375 jobs done, 3330 s elapsed, 2404 left
+400 jobs done, 3431 s elapsed, 2379 left
+425 jobs done, 3455 s elapsed, 2354 left
+450 jobs done, 3479 s elapsed, 2329 left
+475 jobs done, 3579 s elapsed, 2305 left
+500 jobs done, 3666 s elapsed, 2280 left
+525 jobs done, 3943 s elapsed, 2254 left
+550 jobs done, 4194 s elapsed, 2229 left
+575 jobs done, 4427 s elapsed, 2204 left
+600 jobs done, 4522 s elapsed, 2180 left
+625 jobs done, 4705 s elapsed, 2154 left
+650 jobs done, 5128 s elapsed, 2129 left
+675 jobs done, 5520 s elapsed, 2104 left
+700 jobs done, 5912 s elapsed, 2080 left
+725 jobs done, 6181 s elapsed, 2054 left
+time slice over: 2047 jobs left for the next call
+--- slice 2026-10-29T21:59 (733 and 733 done)
+2047 jobs to run with 2 engines
+25 jobs done, 362 s elapsed, 2021 left
