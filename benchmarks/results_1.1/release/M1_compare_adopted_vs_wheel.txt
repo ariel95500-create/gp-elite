@@ -11,5 +11,5 @@ J_extrap     same
 K_thorough   same
 L_standard   same
 M_twice      same
-total time 30.1 s -> 34.3 s
+total time 33.0 s -> 44.9 s
 ALL IDENTICAL
