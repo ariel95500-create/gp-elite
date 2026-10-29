@@ -96,3 +96,48 @@ identical to the measured wheel's.
 
 If U2 is not adopted, the engine stays U1, the measurements of 1.1.0 stand, and
 the slowdown is published with its cause, as the author's option "A".
+
+## Mechanics, result (29 October 2026)
+
+All three held (`mechanics/`):
+1. `compare_U1_default_vs_U2.txt`: the thirteen configurations are identical
+   to the adopted engine U1.
+2. `U2_gas_law.txt`: the gas law returns `8.24992 * n * T / V` with one power
+   law seed, in 45.4, 44.3 and 44.3 s (at most 55.2 s asked; 1.0.0 took 50 s,
+   1.1.0 78 s).
+3. The suite passes, 154 tests. The new test,
+   `test_no_power_law_seed_with_fractional_units`, fails on the engine before
+   the change.
+
+## Targeted check, result (29 October 2026)
+
+`u2check/`: the units arm of the TP diagnostic, 200 fits per engine, 1.1.0
+(`/venv11`) and U2 (`/venvU2`, the wheel of 26349ef, the same packages
+otherwise), each job with both at the same time, from 18:37 to 20:02. No
+crash. `compare_u2.py` reads the criteria (`compare_u2.txt`).
+
+| experiment | law, 1.1.0 | law, U2 | median time 1.1.0 (s) | U2 (s) | same expression |
+|---|---|---|---|---|---|
+| pendule | 20/20 | 20/20 | 41.0 | 40.9 | 20/20 |
+| ressort | 20/20 | 20/20 | 46.0 | 45.9 | 20/20 |
+| chute | 20/20 | 20/20 | 43.8 | 42.9 | 20/20 |
+| puissance | 20/20 | 20/20 | 42.4 | 42.4 | 20/20 |
+| gaz | 20/20 | 20/20 | 83.4 | 43.1 | 18/20 |
+| eclairement | 20/20 | 20/20 | 39.7 | 37.7 | 17/20 |
+| rc | 0/20 | 0/20 | 60.1 | 59.9 | 20/20 |
+| refroidissement | 0/20 | 0/20 | 49.9 | 50.3 | 20/20 |
+| lentille | 0/20 | 0/20 | 58.8 | 58.8 | 20/20 |
+| snell | 0/20 | 0/20 | 22.8 | 22.7 | 20/20 |
+
+The three criteria are met:
+1. No law is lost: 120 of 120 on the six reachable laws with both engines,
+   and none recovered on the four others with either.
+2. U2 is faster: the median time of the 200 fits is 44.2 s against 46.1 s.
+   The total is 9,117 s against 10,054 s. The gain is on the gas law, whose
+   median falls from 83.4 s to 43.1 s; elsewhere the times are those of
+   1.1.0.
+3. The constants hold: the median relative error of g and R is 0.98 % with
+   both engines, on 60 fits each.
+
+**U2 is adopted.** It becomes part of the engine of 1.1.0, and the release
+starts again from a new candidate, as written above.
