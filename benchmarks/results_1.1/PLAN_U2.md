@@ -63,19 +63,23 @@ If one of them fails, the change is examined before anything else runs.
 ## Targeted check, deciding adoption
 
 The units arm of the TP diagnostic (`benchmarks/tp_diagnostic.py`):
-- the nine experiments, 10 and 20 points, 2 % and 5 % noise, five draws: 180
+- the ten experiments, 10 and 20 points, 2 % and 5 % noise, five draws: 200
   fits;
 - run with 1.1.0 (its wheel, `/venv11`) and with U2, side by side, each job
   with both at the same time, two jobs at a time.
 
 U2 is adopted if all three hold:
 1. **No law lost.** On the six laws reachable under units, the law is
-   recovered in at least as many fits as with 1.1.0. On the three others,
+   recovered in at least as many fits as with 1.1.0. On the four others,
    none recovered with 1.1.0 is lost.
-2. **Faster.** The median time of the 180 fits is lower than with 1.1.0.
+2. **Faster.** The median time of the 200 fits is lower than with 1.1.0.
 3. **The constants.** The constants deduced where the law is recovered (g, R)
    have, across the fits, the same median relative error as with 1.1.0,
    within 0.1 point.
+
+Corrected on 29 October 2026, before the check ran: the diagnostic has ten
+experiments, not nine (Snell's law is the fourth one out of reach under units),
+so the arm has 200 fits; this version of the plan first said nine and 180.
 
 ## Then the release again
 

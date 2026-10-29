@@ -204,20 +204,26 @@ def key(j):
     return (j["arm"], j["exp"], j["n"], j["noise"], j["draw"])
 
 
-def run(python, out, workers):
+def _done(out):
     done = set()
     if os.path.exists(out):
         with open(out, encoding="utf-8") as fh:
             for line in fh:
                 if line.strip():
                     done.add(key(json.loads(line)))
-    jobs = [j for j in all_jobs() if key(j) not in done]
+    return done
+
+
+def run(python, out, workers, arm=None):
+    done = _done(out)
+    jobs = [j for j in all_jobs() if key(j) not in done
+            and (arm is None or j["arm"] == arm)]
     print("%d jobs to run, %d already done" % (len(jobs), len(done)))
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
                OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
     env.pop("PYTHONPATH", None)
 
-    def one(j):
+    def one(j, python=python):
         p = subprocess.run([python, "-I", os.path.abspath(__file__), "worker",
                             json.dumps(j)], capture_output=True, text=True,
                            env=env, cwd="/")
@@ -233,6 +239,45 @@ def run(python, out, workers):
             if (i + 1) % 20 == 0:
                 print("%d/%d %s" % (i + 1, len(jobs), time.strftime("%H:%M:%S")))
                 sys.stdout.flush()
+
+
+def run_paired(pythons, outs, workers, arm=None):
+    """Each job with every engine at the same time (one process per fit), so
+    that their times compare; `workers` jobs at a time."""
+    dones = [_done(o) for o in outs]
+    jobs = [j for j in all_jobs() if (arm is None or j["arm"] == arm)
+            and any(key(j) not in d for d in dones)]
+    print("%d jobs to run with %d engines" % (len(jobs), len(pythons)))
+    env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
+               OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
+    env.pop("PYTHONPATH", None)
+
+    def one(j, python):
+        p = subprocess.run([python, "-I", os.path.abspath(__file__), "worker",
+                            json.dumps(j)], capture_output=True, text=True,
+                           env=env, cwd="/")
+        lines = [ln for ln in p.stdout.splitlines() if ln.startswith("{")]
+        if p.returncode != 0 or not lines:
+            return dict(j, crash=True, stderr=p.stderr[-500:])
+        return json.loads(lines[-1])
+
+    def both(j):
+        with ThreadPoolExecutor(len(pythons)) as ex:
+            return list(ex.map(lambda py: one(j, py), pythons))
+
+    fhs = [open(o, "a", encoding="utf-8") for o in outs]
+    try:
+        with ThreadPoolExecutor(workers) as ex:
+            for i, recs in enumerate(ex.map(both, jobs)):
+                for fh, rec in zip(fhs, recs):
+                    fh.write(json.dumps(rec) + "\n")
+                    fh.flush()
+                if (i + 1) % 10 == 0:
+                    print("%d/%d %s" % (i + 1, len(jobs), time.strftime("%H:%M:%S")))
+                    sys.stdout.flush()
+    finally:
+        for fh in fhs:
+            fh.close()
 
 
 def summary(path):
@@ -320,6 +365,12 @@ def main():
     r.add_argument("--python", required=True)
     r.add_argument("--out", required=True)
     r.add_argument("--workers", type=int, default=4)
+    r.add_argument("--arm", choices=ARMS)
+    rp = sub.add_parser("run-paired")
+    rp.add_argument("--python", action="append", required=True)
+    rp.add_argument("--out", action="append", required=True)
+    rp.add_argument("--workers", type=int, default=2)
+    rp.add_argument("--arm", choices=ARMS)
     w = sub.add_parser("worker")
     w.add_argument("job")
     s = sub.add_parser("summary")
@@ -327,7 +378,11 @@ def main():
     a = ap.parse_args()
     if a.cmd == "run":
         os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
-        run(a.python, a.out, a.workers)
+        run(a.python, a.out, a.workers, a.arm)
+    elif a.cmd == "run-paired":
+        for o in a.out:
+            os.makedirs(os.path.dirname(os.path.abspath(o)), exist_ok=True)
+        run_paired(a.python, a.out, a.workers, a.arm)
     elif a.cmd == "worker":
         sys.path.insert(0, HERE)
         print(json.dumps(worker(json.loads(a.job))))

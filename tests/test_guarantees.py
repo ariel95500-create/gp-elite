@@ -1515,3 +1515,28 @@ def test_model_under_units_with_seeds_passes_the_audit(monkeypatch):
                             parallel=False)
     ok, msg = GD.check_dimensions(r.node, _II113_UNITS, {"m": 1})
     assert ok, msg
+
+
+def test_no_power_law_seed_with_fractional_units(monkeypatch):
+    """U2 (benchmarks/results_1.1/PLAN_U2.md): under units=, the power law seed
+    with fitted exponents is made only if it carries no fractional units. With
+    a constant that may carry any units it would pass the gate, and the typed
+    search would then chase subtrees of fractional units."""
+    _set_pool(monkeypatch, "physical")
+    monkeypatch.setattr(core, "_SEEDS_UNDER_UNITS", True)
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 120), rng.uniform(1, 5, 120)]
+    y = 2.3 * Xr[:, 0] ** 1.27 * Xr[:, 1] ** -0.41
+    cfg = _binom_cfg(2)
+    # without units: the seed with fitted exponents is made, as in 1.0
+    seeds = core._make_power_law_seeds(Xr, y, cfg)
+    assert len(seeds) == 2 and "pow" in _ops_in(seeds[1], set())
+    # under units, on inputs in metres and seconds: no pow seed
+    cfg.FEAT_DIMS, cfg.TARGET_DIM = {0: {"m": 1}, 1: {"s": 1}}, {"kg": 1}
+    cfg.UNKNOWN_CONST = True
+    seeds = core._make_power_law_seeds(Xr, y, cfg)
+    assert all("pow" not in _ops_in(t, set()) for t in seeds)
+    # the same exponents on dimensionless inputs: the seed is kept
+    cfg.FEAT_DIMS, cfg.TARGET_DIM = {0: {}, 1: {}}, {}
+    seeds = core._make_power_law_seeds(Xr, y, cfg)
+    assert any("pow" in _ops_in(t, set()) for t in seeds)

@@ -4316,10 +4316,24 @@ def _make_power_law_seeds(xs, ys, cfg, min_r2=None) -> list:
 
     # 2) exposants ajustés, si le pool a pow et qu'ils ne sont pas déjà
     #    des demi-entiers (sinon la graine 1 les contient)
+    # [1.1, U2] Sous units=, seulement sans unités fractionnaires : un exposant
+    # ajusté qui n'est pas un demi-entier doit porter sur une entrée sans
+    # dimension. Sinon (pow(n, 1.0041) en moles), la graine ne passe la porte
+    # que par la constante inconnue, et ses descendants font chercher au
+    # constructeur typé des sous-arbres d'unités fractionnaires, qu'il atteint
+    # rarement : la loi des gaz du notebook de TP passait de 50 s à 78 s
+    # (benchmarks/results_1.1/PLAN_U2.md).
+    def _fractional_units(j, a):
+        if not _dim_active(cfg) or abs(2.0 * a - round(2.0 * a)) <= 0.04:
+            return False
+        d = (cfg.FEAT_DIMS or {}).get(j) or {}
+        return any(abs(float(v)) > 1e-12 for v in d.values())
+
     if "pow" in bops and float(np.max(np.abs(2.0 * expo - np.round(2.0 * expo)))) > 0.04:
         facs = [Node("pow", Node(terms[j]), Node(round(float(a), 4)))
                 for j, a in zip(cols, expo) if abs(float(a)) >= 0.02]
-        if facs:
+        if facs and not any(_fractional_units(j, float(a)) for j, a in zip(cols, expo)
+                            if abs(float(a)) >= 0.02):
             seeds.append(_product(facs))
 
     seeds = _typed_seeds(seeds, cfg)
