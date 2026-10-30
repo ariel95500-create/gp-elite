@@ -58,6 +58,13 @@ When the plan of 1.2 is written, its items that also act without units
 (for instance an earlier stop when the law is found, which SRBench would
 see in its training times) are proposed first.
 
+Among them, from M3 of 1.1 (decided on 30 October 2026): on the noisy data
+of the TP notebook, version 1.1 places the law at generation 0, but no law
+is exact, so the search runs its whole budget, about 50 s per fit. A stop
+when the placed law holds to the noise of the data, if a plan shows it
+safe, could bring each fit to a few seconds. The free fall, 7 s slower with
+1.1.0 than with 1.0.0 (`release/README.md`, M3), is measured again there.
+
 ## What speed would bring
 
 The author asked whether a second GP_ELITE, free of the pure Python rule

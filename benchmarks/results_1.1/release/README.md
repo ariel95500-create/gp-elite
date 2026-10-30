@@ -177,6 +177,8 @@ Every fit returns the same formula in all four runs. Two things follow:
   is exact, so the search runs its whole budget from that seed. Where the
   7 s go has not been profiled.
 
-The free fall, 7 s slower in six fits of about 50 s, is put to the author with
-the rest of M3. M4 goes on meanwhile; it would be run again if the engine
-changed.
+The free fall, 7 s slower in six fits of about 50 s, was put to the author
+with the rest of M3. On 30 October 2026 he chose to keep the engine as it is:
+the 7 s are written in the documents of 1.1.0, and an earlier stop when the
+law placed at generation 0 holds on noisy data is proposed in the plan of 1.2
+(`../ROADMAP.md`).
