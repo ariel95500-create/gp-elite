@@ -1,0 +1,19 @@
+Without units: 1775 jobs, 114 return another expression, 114 of them reached the budget in one version or both, 3 change status.
+  status NEAR -> MISS: ('feyn', 'II.2.42', 'test', 1)
+  status NEAR -> MISS: ('ts', 'strogatz_bacres1', 'test', 7)
+  status NEAR -> MISS: ('ts', 'strogatz_predprey1', 'test', 8)
+
+U41: 205 fits, exact 108 -> 108; 0 equations gain exact fits, 0 lose some.
+  equations never exact in any seed: 13 -> 13 of 41
+  median time of a fit: 30.1 s -> 30.1 s
+  the five families of 1.0: 90 fits, exact 16 -> 16
+
+TF78 under units: 390 fits, exact 169 -> 169; 0 equations gain exact fits, 0 lose some.
+  equations never exact in any seed: 37 -> 37 of 78
+  median time of a fit: 30.3 s -> 30.3 s
+
+Out of domain, R6 + R7raw collapses by version:
+  real: 30 fits out of domain, collapses 5 -> 4, 4 in both
+  realraw: 35 fits out of domain, collapses 5 -> 6, 5 in both
+  tr: 125 fits out of domain, collapses 38 -> 37, 37 in both
+  trraw: 125 fits out of domain, collapses 26 -> 27, 26 in both
