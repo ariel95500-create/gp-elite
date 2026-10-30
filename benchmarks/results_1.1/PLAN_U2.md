@@ -1,7 +1,7 @@
 # Change U2: no fractional units from the power law seed
 
 Written on 29 October 2026, before any change of the engine, after M3 of the
-release 1.1.0 (`release/README.md`). The author chose on 28 October to correct
+release 1.1.0 (`release/README.md`, now `release/candidate1/README.md`). The author chose on 28 October to correct
 before the release ("B") rather than to publish 1.1.0 as measured.
 
 ## What M3 found
@@ -9,7 +9,7 @@ before the release ("B") rather than to publish 1.1.0 as measured.
 The French TP notebook returns with 1.1.0 the laws and constants of 1.0.0, but
 its six fits take 320 s against 243 s. The gas law, timed alone three times
 with each version, takes 77 to 79 s against 50 to 51 s
-(`release/m3/tp_timing/`).
+(`release/m3/tp_timing/`, now `release/candidate1/m3/tp_timing/`).
 
 The cause, read from the trace and a profile of that fit:
 - under units, U1 lets the power law finder run. Beside the seed with exponents
@@ -49,7 +49,8 @@ Which fits can change:
 
 1. The thirteen reference configurations of `speed_equivalence.py` return the
    models of the adopted engine (`mechanics/equiv_U1_default`): identical.
-2. The gas law of the TP notebook (`release/m3/tp_timing/gas.py`) returns
+2. The gas law of the TP notebook (`release/m3/tp_timing/gas.py`, now under
+   `release/candidate1/`) returns
    `8.24992 * n * T / V`, its trace shows one power law seed, and, timed alone
    three times, it takes at most 1.0.0's median time plus 10 % (50.2 s there,
    so at most 55.2 s).

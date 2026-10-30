@@ -219,7 +219,7 @@ Strogatz systems; on its real datasets, the median
 $R^2$ moves by less than 0.004 and the number of collapses out of the training
 range does not change (`benchmarks/results_0.9/release_1.0/`). Version 1.1.0
 changes the dimensional mode only: measured beside 1.0.0, both give the same
-counts without units (213 exact laws in 390 fits, and 8 in 70 on the Strogatz
+counts of exact laws without units (213 exact laws in 390 fits, and 8 in 70 on the Strogatz
 systems, the time budget moving the counts a little from one campaign to the
 next), and on the frozen Feynman equations with their units 1.1.0 recovers 226
 exact laws in 390 fits against 169. Three case studies
@@ -275,7 +275,8 @@ the protocol of comparisons with criteria written before each measurement,
 under which the changes to the search and the final selection were accepted
 or rejected; for version 1.0, the families of forms fitted directly, the
 noise-tolerant seeds, the correction of the deduced constant and the case
-studies; the benchmark and
+studies; for version 1.1, the seeds placed under declared units and the
+restriction of fitted exponents under units; the benchmark and
 non-regression scripts distributed in the repository; and the drafting of the
 documentation and of this paper.
 

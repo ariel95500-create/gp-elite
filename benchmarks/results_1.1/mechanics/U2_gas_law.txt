@@ -1,5 +1,5 @@
 # Mechanics 2 of PLAN_U2.md: the gas law of the TP notebook
-# (release/m3/tp_timing/gas.py), engine U2 (the branch with the change of
+# (release/m3/tp_timing/gas.py, now release/candidate1/m3/tp_timing/), engine U2 (the branch with the change of
 # _make_power_law_seeds), timed alone three times, 29 October 2026,
 # PYTHONHASHSEED=0. (The version printed is that of the installed metadata of
 # the environment used for its packages; the engine is the branch's.)
@@ -7,5 +7,5 @@ U2 8.24992 * n * T / V 45.4 s
 U2 8.24992 * n * T / V 44.3 s
 U2 8.24992 * n * T / V 44.3 s
 # trace: power_law_seed 'exposants X[0]^1, X[1]^0.917, X[2]^-0.985 ; 1 graine(s) : ((n * T) / V)'
-# 1.0.0: 51.2, 50.2, 49.9 s; 1.1.0 (U1): 77.0, 78.1, 78.9 s (release/m3/tp_timing/timings.txt)
+# 1.0.0: 51.2, 50.2, 49.9 s; 1.1.0 (U1): 77.0, 78.1, 78.9 s (release/candidate1/m3/tp_timing/timings.txt)
 # Expected at most 55.2 s: held.

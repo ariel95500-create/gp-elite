@@ -440,8 +440,8 @@ the training range
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 The change of 1.1 was decided the same way
 ([`benchmarks/results_1.1/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.1)).
-Measured beside 1.0 for the release of 1.1, both versions give the same counts
-without units on the frozen set (213 exact laws of 390 on its Feynman equations, 8
+Measured beside 1.0 for the release of 1.1, both versions give the same counts of
+exact laws without units on the frozen set (213 exact laws of 390 on its Feynman equations, 8
 of 70 on its Strogatz systems: under a time budget the counts move a little from
 one campaign to the next), and with their units 1.1 recovers 226 exact laws of 390
 against 169.

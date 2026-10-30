@@ -131,9 +131,12 @@ Times move by a second or two either way. `import gp_elite` takes a median of
 - The table of `units=` on II.11.3 (`units_ab_ood.txt`): with units, 5/5 laws
   recovered out of domain in 20 nodes and about a second per run, against 2/5,
   27 nodes and 27 s. It is now the same as without units.
-- Kepler (`case_kepler.txt`, `deduced_constant_venv11.txt`): the typed fits
-  return the textbook form `5.45416e-10 * X0 * sqrt(X0)` at every seed, in
-  under a second. 1.0.0 returned the same constant in forms such as
+- Kepler (`case_kepler.txt`, `deduced_constant_venv11.txt`): the typed fit on
+  the four inner planets returns the textbook form `5.45416e-10 * X0 * sqrt(X0)`
+  at every seed, in under a second; the typed fit on the eight planets returns
+  `5.43909e-10 * X0 * sqrt(X0)` in 8 to 10 s, as with 1.0.0 (corrected on 30
+  October 2026 after the second review of M5 of the second candidate, which
+  first read "the typed fits"). 1.0.0 returned the same constant in forms such as
   `sqrt(sqrt(X0)) * sqrt(X0) * sqrt(X0) * sqrt(sqrt(X0))`, and on seed 4 of the
   case study a two-term formula. G·M☉ is unchanged (−1.64e-05 from IAU).
 - Hubble (`case_hubble.txt`): the same models and the same constant.

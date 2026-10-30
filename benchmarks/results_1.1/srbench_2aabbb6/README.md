@@ -24,7 +24,8 @@ that commit and its git blob hash, with the lines the roadmap uses.
 - `experiment/methods/gp-elite/regressor.py`, blob
   cbf170f9be251dc44169ceba8ff4be3cb0289619,
   https://github.com/cavalab/srbench/blob/2aabbb60dad41d6e5d52779ce134191a874b756c/experiment/methods/gp-elite/regressor.py:
-  the estimator is built with `operators="physical"`, `generations=60`,
-  `max_time=3600` and `restarts=10` (lines 40 to 46), and line 139 reads
+  the estimator `est` is built at lines 129 to 136 with `operators="physical"`,
+  `generations=60`, `speed="fast"`, `restarts=10` and `max_time=3600` (the
+  defaults of its `__init__`, lines 40 to 46, are the same), and line 139 reads
   `{"operators": ("physical", "full"), "generations": (30, 60)},`, the grid of
   `hyper_params`.

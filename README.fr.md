@@ -469,7 +469,7 @@ d'apprentissage
 Le changement de la 1.1 a été décidé de la même façon
 ([`benchmarks/results_1.1/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.1)).
 Mesurées côte à côte pour la sortie de la 1.1, les deux versions donnent sans
-unités les mêmes comptes sur le jeu figé (213 lois exactes sur 390 sur ses
+unités les mêmes comptes de lois exactes sur le jeu figé (213 lois exactes sur 390 sur ses
 équations de Feynman, 8 sur 70 sur ses systèmes de Strogatz : sous un budget de
 temps, les comptes bougent un peu d'une campagne à l'autre), et avec leurs unités
 la 1.1 retrouve 226 lois exactes sur 390 contre 169.

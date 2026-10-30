@@ -4,8 +4,9 @@
 
 The forms that 1.0 fits directly now act under `units=` as well. Under
 `units=` the population is typed, and in 1.0 the seed finders (the power law,
-B1, E1 and the noise-tolerant N1) placed nothing. They now run as without
-units, and a seed is placed only if it passes the gate of dimensions that
+B1, E1 and the noise-tolerant N1) placed nothing. They now run under units
+too, on the same rows and with the same thresholds, and a seed is placed only
+if it passes the gate of dimensions that
 every typed tree must pass, so a model returned under units stays
 dimensionally consistent. Without units nothing changes. Measured on the
 package, side by side with 1.0.0 installed from PyPI, at 30 s per fit

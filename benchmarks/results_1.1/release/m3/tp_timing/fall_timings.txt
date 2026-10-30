@@ -1,3 +1,7 @@
+# The free fall of the TP notebook (fall.py), timed alone, 1.0.0 (/venv10x) and 1.1.0 (/venv11bx) in turn,
+# three times each, on 30 October 2026 after the notebook pair (which ended at 08:22 UTC), nothing else
+# running: for i in 1 2 3; do for v in 10x 11bx; do PYTHONHASHSEED=0 /venv$v/bin/python -I fall.py | head -1; done; done
+# (the line of the result only; the whole trace of one run per version: ../../m3_extra/fall_trace_*.txt).
 1.0.0 4.87056 * t² 43.7 s
 1.1.0 4.87056 * t² 51.3 s
 1.0.0 4.87056 * t² 43.1 s

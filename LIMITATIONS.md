@@ -11,9 +11,11 @@ work of 1.0 (78 other Feynman equations, 14 Strogatz systems, 25 real datasets):
 `benchmarks/results_0.9/release_1.0/`. Version 1.1 changes the units mode only.
 Without units it returns the models of 1.0.0 at equal work; under the budget of
 30 s, the counts move a little from one campaign to the next, for both versions
-alike (measured beside 1.0.0 for the release of 1.1, both give 108 and 86
+(measured beside 1.0.0 for the release of 1.1, both give 108 and 86
 structures under noise, 8 exact Strogatz fits of 70 and 10 collapses of 65, where
-the points below say 105, 85, 7 and 11). Point 8 is measured on the package of
+the points below say 105, 85, 7 and 11; on the printed formulas that depart from
+their model, point 6, 7 of 130 and 66 of 500 for 1.0.0 and 8 and 67 for 1.1.0,
+where it says 7 and 61). Point 8 is measured on the package of
 1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`).
 
 ## 1. Laws it still misses

@@ -19,8 +19,8 @@ What was read on 28 October 2026 in `cavalab/srbench` (master, 2aabbb6;
 the files and lines are recorded in `srbench_2aabbb6/`):
 - GP_ELITE is listed among the methods "staged for benchmarking", built
   and tested by the container workflows, absent from the figures of the
-  2025 edition. No date for the next update is published, in the
-  repository or elsewhere.
+  2025 edition. No date for the next update is given in the
+  repository.
 - `algorithms/gp-elite/requirements.txt` asks for `gp-elite>=0.8.0`: the
   version evaluated is the one on PyPI on the day the containers of the run
   are built.
@@ -60,8 +60,9 @@ When the plan of 1.2 is written, its items that also act without units
 see in its training times) are proposed first.
 
 Among them, from M3 of 1.1 (decided on 30 October 2026): on the noisy data
-of the TP notebook, version 1.1 places the law at generation 0, but no law
-is exact, so the search runs its whole budget, about 50 s per fit. A stop
+of the TP notebook, version 1.1 places the law at the start for some fits
+(traced for the free fall and the gas law), but no law is exact, so the
+search runs its whole budget, about 50 s per fit. A stop
 when the placed law holds to the noise of the data, if a plan shows it
 safe, could bring each fit to a few seconds. The free fall, 7 s slower with
 1.1.0 than with 1.0.0 (`release/README.md`, M3), is measured again there.

@@ -12,9 +12,11 @@ systèmes de Strogatz, 25 jeux de données réels) :
 `benchmarks/results_0.9/release_1.0/`. La version 1.1 ne change que le mode des
 unités. Sans unités, elle rend les modèles de la 1.0.0 à travail égal ; sous le
 budget de 30 s, les comptes bougent un peu d'une campagne à l'autre, pour les deux
-versions pareillement (mesurées côte à côte pour la sortie de la 1.1, les deux
+versions (mesurées côte à côte pour la sortie de la 1.1, les deux
 donnent 108 et 86 structures sous bruit, 8 ajustements de Strogatz exacts sur 70
-et 10 effondrements sur 65, là où les points ci-dessous disent 105, 85, 7 et 11).
+et 10 effondrements sur 65, là où les points ci-dessous disent 105, 85, 7 et 11 ;
+pour les formules imprimées qui s'écartent de leur modèle, point 6, 7 sur 130 et
+66 sur 500 pour la 1.0.0, 8 et 67 pour la 1.1.0, là où il dit 7 et 61).
 Le point 8 est mesuré sur le paquet de la 1.1.0, côte à côte avec la 1.0.0
 (`benchmarks/results_1.1/release/`).
 
@@ -105,8 +107,7 @@ fois une génération non typée (mesuré en phase 3, `PLAN_PHASE3.md`). Depuis 
 les graines de la loi de puissance, de B1, E1 et N1 agissent aussi avec les unités,
 chacune placée seulement si elle passe la porte des dimensions. Sur les 41
 équations avec leurs unités, le moteur rend la loi exacte dans 165 ajustements sur
-205 (1.0.0 : 108), et six équations ne sont jamais retrouvées avec cinq graines
-aléatoires
+205 (1.0.0 : 108), et six équations ne sont jamais retrouvées en cinq graines
 (1.0.0 : 13). Ce qui reste :
 
 - **les données bruitées parcourent tout le budget.** Une recherche ne s'arrête
