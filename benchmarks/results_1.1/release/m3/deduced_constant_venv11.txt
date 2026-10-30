@@ -1,0 +1,15 @@
+gp_elite 1.1.0 /venv11bx/lib/python3.11/site-packages/gp_elite/__init__.py
+README table, 8 planets      seed 0  5.45084e-10 * X0 * sqrt(X0)
+    reported 5.450842555231841e-10 [s / m^1.5]   coefficient on the data 5.450843e-10   reported / coefficient - 1 = 0.00e+00
+README table, 8 planets      seed 1  5.45084e-10 * X0 * sqrt(X0)
+    reported 5.450842555231841e-10 [s / m^1.5]   coefficient on the data 5.450843e-10   reported / coefficient - 1 = 0.00e+00
+case study, Mercury to Mars  seed 0  5.45416e-10 * X0 * sqrt(X0)
+    reported 5.454156846656129e-10 [s / m^1.5]   coefficient on the data 5.454157e-10   reported / coefficient - 1 = 0.00e+00
+case study, Mercury to Mars  seed 1  5.45416e-10 * X0 * sqrt(X0)
+    reported 5.454156846656129e-10 [s / m^1.5]   coefficient on the data 5.454157e-10   reported / coefficient - 1 = 0.00e+00
+case study, Mercury to Mars  seed 2  5.45416e-10 * X0 * sqrt(X0)
+    reported 5.454156846656129e-10 [s / m^1.5]   coefficient on the data 5.454157e-10   reported / coefficient - 1 = 0.00e+00
+case study, Mercury to Mars  seed 3  5.45416e-10 * X0 * sqrt(X0)
+    reported 5.454156846656129e-10 [s / m^1.5]   coefficient on the data 5.454157e-10   reported / coefficient - 1 = 0.00e+00
+case study, Mercury to Mars  seed 4  5.45416e-10 * X0 * sqrt(X0)
+    reported 5.454156846656129e-10 [s / m^1.5]   coefficient on the data 5.454157e-10   reported / coefficient - 1 = 0.00e+00

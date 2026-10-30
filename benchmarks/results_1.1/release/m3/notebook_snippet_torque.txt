@@ -1,0 +1,4 @@
+without units              2 s   error=0.0e+00   size=6
+                       r * F * sin(theta)
+with units                 1 s   error=0.0e+00   size=6
+                       r * F * sin(theta)

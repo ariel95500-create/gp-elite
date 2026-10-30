@@ -1,0 +1,35 @@
+queue1 == feynman_bench 0 15 2026-10-30 07:02:13
+queue2 == ab_ood 2026-10-30 07:02:13
+queue2 == units 2026-10-30 07:03:04
+queue2 == scaling 2026-10-30 07:04:14
+queue1 == feynman_bench 12 15 none 2026-10-30 07:04:15
+queue1 == duel 0 15 2026-10-30 07:04:21
+queue1 == constante 2026-10-30 07:11:44
+queue1 == robust 2026-10-30 07:11:51
+queue1 == kepler demo 2026-10-30 07:17:20
+queue1 == battery 2026-10-30 07:17:30
+queue1 == readme kepler 2026-10-30 07:18:28
+queue1 == usage 2026-10-30 07:18:38
+queue1 == console 2026-10-30 07:18:45
+queue1 == fuzz 2026-10-30 07:20:03
+queue1 == pools 2026-10-30 07:20:15
+queue1 == snippet kepler30 2026-10-30 07:21:24
+queue1 == snippet hooke 2026-10-30 07:21:36
+queue1 == snippet coulomb 2026-10-30 07:21:39
+queue1 == snippet torque 2026-10-30 07:21:43
+queue1 == snippet optionB 2026-10-30 07:21:49
+queue1 == snippet tp 2026-10-30 07:21:54
+queue1 == snippet nikuradse 2026-10-30 07:22:52
+queue1 == robustness 2026-10-30 07:23:21
+queue2 == time_limit 2026-10-30 07:23:24
+queue1 == robustness summary 2026-10-30 07:23:42
+queue1 == scale 2026-10-30 07:23:42
+queue1 == small data 2026-10-30 07:23:50
+queue1 == small data summary 2026-10-30 07:24:01
+queue1 == bad inputs 2026-10-30 07:24:02
+queue1 == nikuradse full 2026-10-30 07:24:05
+queue2    exit code 1
+queue2 == done 2026-10-30 07:24:50
+queue1 == kepler plot 2026-10-30 07:25:56
+queue1 == import time 2026-10-30 07:26:11
+queue1 == done 2026-10-30 07:26:12
