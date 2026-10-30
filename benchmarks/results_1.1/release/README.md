@@ -109,3 +109,74 @@ and three fits go from near to missed: Feynman II.2.42 seed 1 and two Strogatz
 fits. Under units, 43 differ, all at the budget, with the same counts of exact
 laws (`m2/details_1.0.0_two_campaigns.txt`). That is why the two versions are
 compared within one campaign, each job run with both at the same time.
+
+## M3, every public figure measured again (30 October 2026)
+
+`m3/` holds the records of the figures of the READMEs, the notebooks, the case
+studies and the paper, produced by `m3/m3_driver.sh` as for the first candidate,
+one step after the other, from 07:02 to 07:58, with `/venv11bx`, on a copy of
+`benchmarks/`, `examples/` and the READMEs of commit 66abffa without the package
+beside them. Outside `benchmarks/results_1.1/`, those files are the ones of
+82f303e, the commit of the first candidate's M3, but for
+`benchmarks/tp_diagnostic.py`, which M3 does not run. The driver has one step more: the gas law of the TP notebook
+timed alone three times (`m3/tp_timing/gas_1.1.0.txt`).
+
+**The figures of the first candidate.** `m3_compare.py` compares each record
+with the first candidate's once times, dates and the paths of the environments
+and folders are masked (`m3_compare_candidate1_vs_candidate2.txt`). 60 records
+are the same: every law, formula, error, size and count, with units and
+without. What differs depends on timing only:
+- the order in which the parallel queues of `run_claims.py` ended
+  (`claims_queues.txt`);
+- in the console example, run on three parallel islands, the order of the
+  islands' first prints and the statistics of the stigmergic memory. The final
+  result is the same: `force = 250 * elongation`, constant 250 kg/s²;
+- the parallel fit of `time_limit_check.txt`, stopped at its deadline: R² 0.9979
+  against 1.0000, a pass in both. 15 of 16 checks, as with 1.0.0 and the first
+  candidate;
+- `import gp_elite` takes a median of 0.12 s.
+
+So everything the first candidate's M3 found with units holds: Feynman 15 with
+`units=` 15/15 exact, the table of `units=` on II.11.3 (5/5 out of domain),
+Kepler in its textbook form at every seed, Hubble, the console and the mystery
+constant.
+
+**The TP notebook.** The six fits return the formulas and the deduced constants
+of 1.0.0 (g 9.81 and 9.74, R 8.250, P 10.02 W), in 42, 51, 55, 47, 53 and 46 s,
+294 s in all. The gas law takes 53 s against 85 s with the first candidate.
+Timed alone three times, it takes 48.6, 49.5 and 49.8 s, against 49.9 to 51.2 s
+with 1.0.0 and 77 to 79 s with the first candidate (on 28 October).
+
+The time of 1.0.0 the notebook records, 243 s, was measured on 27 October. To
+compare on the same day, the notebook script was run after M3 four times, 1.0.0
+(`/venv10x`) and the second candidate in turn, alone on the machine
+(`m3/tp_timing/notebook_pair/`):
+
+| fit | 1.0.0, run 1 / run 2 (s) | 1.1.0, run 1 / run 2 (s) |
+|---|---|---|
+| pendulum | 41 / 43 | 43 / 45 |
+| spring | 53 / 56 | 52 / 51 |
+| free fall | 46 / 49 | 58 / 55 |
+| power | 43 / 46 | 46 / 46 |
+| gas | 56 / 60 | 55 / 55 |
+| illuminance | 46 / 44 | 48 / 48 |
+| in all | 285 / 298 | 302 / 300 |
+
+Every fit returns the same formula in all four runs. Two things follow:
+- the machine was faster on 27 October: on 30 October, 1.0.0 itself takes 285
+  and 298 s, against 243 s then. The first candidate's comparison, 320 s
+  against 243 s, compared two days, and the slowdown of the five laws other
+  than the gas law was mostly the machine's. Its diagnosis of the gas law
+  stands, being timed on one day with both versions (50 s against 78 s);
+- on the same day, the notebook takes with 1.1.0 about the time of 1.0.0, 301 s
+  against 292 s on average. The one fit that stays slower is the free fall.
+  Timed alone three times in turn (`m3/tp_timing/fall.py`,
+  `fall_timings.txt`), it takes 50.5 to 51.3 s against 43.1 to 44.1 s with
+  1.0.0. Its trace shows the seed of U1, `(t)²`, placed at generation 0, and no
+  seed of fractional units: it is not the case U2 corrects. With noise no law
+  is exact, so the search runs its whole budget from that seed. Where the
+  7 s go has not been profiled.
+
+The free fall, 7 s slower in six fits of about 50 s, is put to the author with
+the rest of M3. M4 goes on meanwhile; it would be run again if the engine
+changed.
