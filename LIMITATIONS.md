@@ -8,7 +8,9 @@ the package of version 1.0.0,
 side by side with 0.9.0, on the decision bench (41 Feynman equations, five seeds,
 30 seconds per fit; 7 real datasets) and on a test set frozen before any of the
 work of 1.0 (78 other Feynman equations, 14 Strogatz systems, 25 real datasets):
-`benchmarks/results_0.9/release_1.0/`.
+`benchmarks/results_0.9/release_1.0/`. Version 1.1 changes the units mode only:
+without units it returns the same figures, and point 8 is measured on the package
+of 1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`).
 
 ## 1. Laws it still misses
 
@@ -86,12 +88,25 @@ in the last digits and then in the model.
 
 ## 8. Physical units
 
-Under `units=`, the population is typed: the seeds of the power law, of B1, E1 and
-N1 do not act, and a typed generation costs about 1.4 times an untyped one
-(measured in phase 3, `PLAN_PHASE3.md`; the typed search of 1.0 is the same). On
-Feynman II.11.3, a law B1 fits directly, the search without units returns the
-exact law in 5 runs of 5, in about a second each, and with units in 2 of 5, in 3
-and 16 seconds; the three others end on approximations after 27 to 32 seconds.
+Under `units=`, the population is typed, and a typed generation costs about 1.4
+times an untyped one (measured in phase 3, `PLAN_PHASE3.md`). Since 1.1 the seeds
+of the power law, of B1, E1 and N1 act under units too, each placed only if it
+passes the gate of dimensions. On the 41 equations with their units, the engine
+returns the exact law in 165 fits of 205 (1.0.0: 108), and six equations are never
+recovered in five seeds (1.0.0: 13). What remains:
+
+- **noisy data run the whole budget.** A search stops early only on an exact law,
+  and with noise there is none, even when the seed placed at the start is the law.
+  The six fits of the French TP notebook (`examples/tp_six_lois.ipynb`, ten points
+  and 2 % noise each) take about 40 to 60 seconds each; the free fall takes 51 s
+  against 44 s with 1.0.0, the other five about the time of 1.0.0;
+- **fitted exponents.** Under units, a seed with exponents fitted to the data is
+  placed only if each exponent that is not a half-integer falls on a dimensionless
+  input. Exponents such as 1.0041 on a quantity in moles cannot be dimensionally
+  sound, and with `unknown_constant=True` such a seed made the typed search look
+  for fractional units: the gas law of the TP notebook took 78 s instead of 50 s
+  before 1.1.0 was corrected (`benchmarks/results_1.1/PLAN_U2.md`). The seed with
+  the exponents rounded to half-integers is placed as before.
 
 ## 9. Size and kind of data
 

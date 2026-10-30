@@ -7,17 +7,54 @@ The forms that 1.0 fits directly now act under `units=` as well. Under
 B1, E1 and the noise-tolerant N1) placed nothing. They now run as without
 units, and a seed is placed only if it passes the gate of dimensions that
 every typed tree must pass, so a model returned under units stays
-dimensionally consistent. Without units nothing changes.
+dimensionally consistent. Without units nothing changes. Measured on the
+package, side by side with 1.0.0 installed from PyPI, at 30 s per fit
+(`benchmarks/results_1.1/release/`):
 
-Measured on the branch, side by side with 1.0.0, on the 41 Feynman equations
-of the decision bench with their units (`benchmarks/units_table.py`; plan and
-records in `benchmarks/results_1.1/`): 165 exact laws of 205 against 107,
-and 166 against 107 on five seeds never run; with 1 % and 10 % noise, the
-structure of the law in 113 and 99 fits of 205 against 79 and 80. Every
-model returned under units passed the audit of units. Feynman II.11.3 with
-units comes back exact in 5 runs of 5, in 1.4 to 1.7 s, against 3 of 5 in 10
-to 31 s. The typed fits of the Kepler and Hubble case studies return the
-same errors and the same deduced constants.
+- on the 41 Feynman equations of the decision bench with their units, five
+  seeds: 165 exact laws of 205 against 108; on the five families of 1.0
+  (roots, rational forms, trigonometry, exponentials, logarithms), 57 of 90
+  against 16; six equations never exact in five seeds, against 13. The median
+  fit ends in 0.5 s against 30 s: the seed placed first is the law, and the
+  search stops on it;
+- with 1 % and 10 % noise, the structure of the law in 113 and 99 fits of 205
+  against 79 and 80;
+- on the 78 Feynman equations of the frozen test set with their units,
+  measured once: 226 exact laws of 390 against 169;
+- every one of the 1,005 models returned under units passed the audit of
+  units;
+- without units, the same counts on the 1,775 fits of the bench and the frozen
+  test set; the 47 fits that return another expression all reached the time
+  budget, and none changes status;
+- Feynman II.11.3 with units comes back exact in 5 runs of 5, in about a
+  second, against 2 of 5; the 15 equations of the README with units, 15 exact
+  against 14; the typed fits of the Kepler case study write the law
+  `5.45416e-10 * X0 * sqrt(X0)` at every seed, with the constant of 1.0.
+
+The change was decided by a comparison written before it ran
+(`benchmarks/results_1.1/PLAN.md`): 107 exact laws to 165 on U41, then 107 to
+166 on five seeds never run.
+
+### Fixed before the release
+- Under `units=` with `unknown_constant=True`, the power law finder could place,
+  beside the law with exponents rounded to half-integers, a seed with the fitted
+  exponents, such as `pow(n, 1.0041) * pow(T, 0.9174) * pow(V, -0.9852)`. It
+  passed the gate only because the leading constant may carry any units, and
+  its descendants made the typed search look for fractional units. A seed with
+  fitted exponents that are not half-integers is now placed under units only
+  when those exponents fall on dimensionless inputs. The gas law of the French
+  TP notebook took 78 s with the first candidate of 1.1.0 against 50 s with
+  1.0.0, timed alone on one day; with the correction, the notebook run in turn
+  with both versions on one day gives it 55 s against 56 and 60 s. On the 200
+  fits of the units arm of the TP diagnostic, no law is lost and the constants
+  are as accurate (`benchmarks/results_1.1/PLAN_U2.md`).
+
+### Known limits
+With noise no law is exact, so a search under units runs its whole budget even
+when the seed placed at the start is the law. The six fits of the TP notebook
+take about the time of 1.0.0 (301 s against 292 s, run in turn on the same
+day); the free fall stays slower, 51 s against 44 s
+(`LIMITATIONS.md`, point 8).
 
 ## 1.0.0 — "Families"
 

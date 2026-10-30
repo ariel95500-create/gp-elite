@@ -10,7 +10,7 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 58 s in total at 1,000 points and 151 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.0.0).
+On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 58 s in total at 1,000 points and 153 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.1.0).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -146,9 +146,9 @@ guarantee.
   guaranteed to do better.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result; the
-  generation under way and the final selection add a little (16.9 s for a 15 s
-  budget on 3,000 rows in the measurement of 1.0.0, islands in parallel; in
-  sequence, the same fit stopped at 10.2 s with a model of R² 1.0000, before the
+  generation under way and the final selection add a little (16.7 s for a 15 s
+  budget on 3,000 rows in the measurement of 1.1.0, islands in parallel; in
+  sequence, the same fit stopped at 9.3 s with a model of R² 1.0000, before the
   budget, as a search does only on an exact law).
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
@@ -281,40 +281,43 @@ per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms. A malformed string
 | | no `units=` | `units=` | no `units=`, 4x generations |
 |---|---:|---:|---:|
 | dimensionally valid | 5 / 5 | 5 / 5 | 5 / 5 |
-| exact law recovered (holds out of domain) | **5 / 5** | 2 / 5 | 5 / 5 |
-| median test R² | **1.00000** | 0.99957 | 1.00000 |
-| median out-of-domain R² | **1.00000** | 0.65 | 1.00000 |
-| median model size | **20 nodes** | 27 nodes | 20 nodes |
-| median seconds / run | **1** | 27 | 1 |
+| exact law recovered (holds out of domain) | 5 / 5 | 5 / 5 | 5 / 5 |
+| median test R² | 1.00000 | 1.00000 | 1.00000 |
+| median out-of-domain R² | 1.00000 | 1.00000 | 1.00000 |
+| median model size | 20 nodes | 20 nodes | 20 nodes |
+| median seconds / run | 1 | 1 | 1 |
 
 Since 1.0 this law is one of the forms the engine fits directly, a monomial times
-a power of a binomial: without `units=` it is placed in the starting population,
-and every run returns it in about a second. Under `units=` the population is
-typed and those fitted forms do not act (`LIMITATIONS.md`, point 8): the
-constrained search finds the law in two runs of five, as in 0.9, and returns
-physically coherent approximations in the other three. Up to 0.9 the
+a power of a binomial, and the fitted form is placed in the starting population.
+Since 1.1 this holds under `units=` too, where a fitted form is placed only if it
+passes the gate of dimensions every typed tree must pass: both searches return
+the law in every run, in about a second. With 1.0, whose fitted forms did not act
+under `units=`, the constrained search found it in two runs of five and ended the
+other three on approximations (median of its five runs: 27 nodes, 27 s). Up to 0.9 the
 unconstrained search returned no valid model on this law, even with four times the
 generations: its models took the logarithm of a frequency, added kilograms or
 hertz to pure numbers, or raised a quantity to an exponent in coulombs, and the
 constraint was the only way to a valid answer. It still is for the laws the
 engine does not fit directly. (Since 0.9 a typed generation costs 1.4 times an
 untyped one, against 8.5 times with 0.8. A search stops early only on an exact
-law, so the constrained runs that end on an approximation go through all 40
-generations; `time_limit=` bounds them.)
+law, so the runs that end on an approximation, and every run on noisy data, go
+through all their generations; `time_limit=` bounds them.)
 
 **What it does *not* do.** On a test set drawn *outside* the training domain (w/w0
-pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), approximations
-degrade; the exact law holds there (R² = 1.00000), in the ten unconstrained runs
-and in two constrained runs of five. Timings are from a 4-core Linux machine, two
-runs at a time, with the islands in sequence (`parallel=False`). Reproduce with
-`benchmarks/ab_ood.py`.
+pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), the exact law holds
+(R² = 1.00000) and approximations degrade: the three constrained runs of 1.0 that
+ended on one had an out-of-domain R² of 0.32 to 0.65. Timings are from a 4-core
+Linux machine, two runs at a time, with the islands in sequence
+(`parallel=False`). Reproduce with `benchmarks/ab_ood.py`.
 
 **When to use it.** To guarantee that whatever the engine returns is physically
 meaningful, and to deduce the units and value of a constant (below, and the
 [Kepler case study](https://github.com/ariel95500-create/gp-elite/blob/main/examples/case_studies/kepler_units.ipynb),
-where the units also rule out a term the data alone would add). On a law the
-engine fits directly, the search without units is faster and finds it more often;
-compare both. **Not** for black-box prediction: the constraint rules out
+where the units also rule out a term the data alone would add). Since 1.1 the
+forms the engine fits directly act under `units=` as well: on the 41 Feynman
+equations of the decision bench with their units, five seeds at 30 s per fit,
+165 exact laws of 205 against 108 with 1.0, and 163 without units.
+**Not** for black-box prediction: the constraint rules out
 dimensionally wrong but numerically good approximations, so it can *lower* R²
 when fitting is the goal rather than finding a law.
 
@@ -342,7 +345,8 @@ of the missing physical constant**. Measured on three reference laws:
 | ideal gas `P = nRT/V` | yes | `kg m² / K mol s²` | 8.314462618 | 8.314462618 |
 
 The returned formula itself carries the physical constant: the benchmark prints
-`(250.0*X0)` for Hooke and `(8.314462617999999*((X0*X1)/X2))` for the ideal gas.
+`(249.99999999999997*X0)` for Hooke and `(8.314462617999999*((X0*X1)/X2))` for
+the ideal gas.
 Budget: 25 generations, two restarts.
 
 Reproduce with `benchmarks/test_constante_mystere.py`. Requires `units=` and
@@ -434,6 +438,11 @@ beside it; on its Strogatz systems, 7 exact fits of 70 against 8; on its real
 datasets, the same median R² within 0.004 and the same number of collapses out of
 the training range
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
+The change of 1.1 was decided the same way
+([`benchmarks/results_1.1/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.1)).
+On the Feynman equations of the frozen set with their units, 1.1 recovers 226
+exact laws of 390 against 169 for 1.0 measured beside it; without units, the
+figures of 1.0.
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
 
@@ -461,9 +470,10 @@ range,
 [`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md));
 with 1.0 the default returns the three laws of this showcase that have one, and
 `normalize='none'` remains worth a try when such a law does not come back. With the
-physical units declared (`units=`, same budget, no normalisation), 14/15 come back
-exact, each in its textbook form (`benchmarks/feynman_units.py`); the miss is
-I.16.6. One seed on fifteen equations is
+physical units declared (`units=`, same budget, no normalisation), 15/15 come back
+exact (`benchmarks/feynman_units.py`), 14 in their textbook form; I.16.6, missed up
+to 1.0, comes back with a factor 1.00758 above and below that cancels. One seed on
+fifteen equations is
 a showcase, not a statistical comparison:
 [`benchmarks/results_0.8/RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)
 measures 0.7.0 and each change of 0.8 to the search and the final selection on 41
@@ -514,7 +524,11 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**1.0 "Families"** — whole families of laws fitted directly (rational forms, roots,
+**1.1** — the forms 1.0 fits directly act under `units=` too, each placed only if
+it passes the gate of dimensions: on the 41 Feynman equations of the decision
+bench with their units, 165 exact laws of 205 against 108 for 1.0 measured beside
+it, and every one of the 1,005 models returned under units passed the audit of
+units; without units, the models of 1.0. **1.0 "Families"** — whole families of laws fitted directly (rational forms, roots,
 exponentials, logarithms, sines and cosines of a monomial), on noisy data too: on
 the 41 Feynman equations of the decision bench, 163 exact laws of 205 against 88
 for 0.9 measured beside it, and on 78 other Feynman equations frozen before the

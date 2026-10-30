@@ -9,7 +9,9 @@ mesurés sur le paquet de la version
 cinq graines, 30 secondes par ajustement ; 7 jeux de données réels) et sur un jeu
 de test figé avant tout le travail de la 1.0 (78 autres équations de Feynman, 14
 systèmes de Strogatz, 25 jeux de données réels) :
-`benchmarks/results_0.9/release_1.0/`.
+`benchmarks/results_0.9/release_1.0/`. La version 1.1 ne change que le mode des
+unités : sans unités, elle rend les mêmes chiffres, et le point 8 est mesuré sur le
+paquet de la 1.1.0, côte à côte avec la 1.0.0 (`benchmarks/results_1.1/release/`).
 
 ## 1. Les lois qu'il manque encore
 
@@ -93,13 +95,29 @@ derniers chiffres, puis dans le modèle.
 
 ## 8. Les unités physiques
 
-Sous `units=`, la population est typée : les graines de la loi de puissance, de
-B1, E1 et N1 n'agissent pas, et une génération typée coûte environ 1,4 fois une
-génération non typée (mesuré en phase 3, `PLAN_PHASE3.md` ; la recherche typée de
-la 1.0 est la même). Sur Feynman II.11.3, une loi que B1 ajuste directement, la
-recherche sans unités rend la loi exacte dans 5 runs sur 5, en une seconde environ
-chacun, et avec les unités dans 2 sur 5, en 3 et 16 secondes ; les trois autres
-finissent sur des approximations après 27 à 32 secondes.
+Sous `units=`, la population est typée, et une génération typée coûte environ 1,4
+fois une génération non typée (mesuré en phase 3, `PLAN_PHASE3.md`). Depuis la 1.1,
+les graines de la loi de puissance, de B1, E1 et N1 agissent aussi avec les unités,
+chacune placée seulement si elle passe la porte des dimensions. Sur les 41
+équations avec leurs unités, le moteur rend la loi exacte dans 165 ajustements sur
+205 (1.0.0 : 108), et six équations ne sont jamais retrouvées avec cinq graines
+aléatoires
+(1.0.0 : 13). Ce qui reste :
+
+- **les données bruitées parcourent tout le budget.** Une recherche ne s'arrête
+  plus tôt que sur une loi exacte, et avec du bruit il n'y en a pas, même quand la
+  graine placée au départ est la loi. Les six ajustements du notebook de TP
+  (`examples/tp_six_lois.ipynb`, dix points et 2 % de bruit chacun) prennent
+  environ 40 à 60 secondes chacun ; la chute libre prend 51 s contre 44 s avec la
+  1.0.0, les cinq autres à peu près le temps de la 1.0.0 ;
+- **les exposants ajustés.** Avec les unités, une graine aux exposants ajustés sur
+  les données n'est placée que si chaque exposant qui n'est pas un demi-entier
+  porte sur une entrée sans dimension. Des exposants comme 1,0041 sur une quantité
+  en moles ne peuvent pas être homogènes, et avec `unknown_constant=True` une telle
+  graine faisait chercher à la recherche typée des unités fractionnaires : la loi
+  des gaz du notebook de TP prenait 78 s au lieu de 50 s avant la correction de la
+  1.1.0 (`benchmarks/results_1.1/PLAN_U2.md`). La graine aux exposants arrondis aux
+  demi-entiers est placée comme avant.
 
 ## 9. La taille et la nature des données
 

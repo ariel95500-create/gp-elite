@@ -13,7 +13,7 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 58 s au total à 1 000 points et 151 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.0.0).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 58 s au total à 1 000 points et 153 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.1.0).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -153,9 +153,9 @@ exacte, sans garantie.
   lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  génération en cours et la sélection finale ajoutent un peu (16,9 s pour un
-  budget de 15 s sur 3 000 lignes dans la mesure de la 1.0.0, îles en parallèle ;
-  en séquence, le même ajustement s'est arrêté à 10,2 s avec un modèle de R²
+  génération en cours et la sélection finale ajoutent un peu (16,7 s pour un
+  budget de 15 s sur 3 000 lignes dans la mesure de la 1.1.0, îles en parallèle ;
+  en séquence, le même ajustement s'est arrêté à 9,3 s avec un modèle de R²
   1,0000, avant le budget, comme une recherche ne le fait que sur une loi exacte).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
@@ -299,42 +299,47 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 | | sans `units=` | `units=` | sans `units=`, 4× générations |
 |---|---:|---:|---:|
 | dimensionnellement valides | 5 / 5 | 5 / 5 | 5 / 5 |
-| loi exacte retrouvée (tient hors domaine) | **5 / 5** | 2 / 5 | 5 / 5 |
-| R² test médian | **1.00000** | 0.99957 | 1.00000 |
-| R² hors domaine médian | **1.00000** | 0.65 | 1.00000 |
-| taille médiane du modèle | **20 nœuds** | 27 nœuds | 20 nœuds |
-| secondes / run (médiane) | **1** | 27 | 1 |
+| loi exacte retrouvée (tient hors domaine) | 5 / 5 | 5 / 5 | 5 / 5 |
+| R² test médian | 1.00000 | 1.00000 | 1.00000 |
+| R² hors domaine médian | 1.00000 | 1.00000 | 1.00000 |
+| taille médiane du modèle | 20 nœuds | 20 nœuds | 20 nœuds |
+| secondes / run (médiane) | 1 | 1 | 1 |
 
 Depuis la 1.0, cette loi fait partie des formes que le moteur ajuste directement,
-un monôme multiplié par une puissance d'un binôme : sans `units=`, elle est placée
-dans la population de départ, et chaque run la rend en une seconde environ. Avec
-`units=`, la population est typée et ces formes ajustées n'agissent pas
-(`LIMITATIONS.fr.md`, point 8) : la recherche contrainte trouve la loi dans deux
-runs sur cinq, comme en 0.9, et rend des approximations physiquement cohérentes
-dans les trois autres. Jusqu'à la 0.9, la recherche libre ne rendait aucun modèle
+un monôme multiplié par une puissance d'un binôme, et la forme ajustée est placée
+dans la population de départ. Depuis la 1.1, c'est vrai aussi avec `units=`, où
+une forme ajustée n'est placée que si elle passe la porte des dimensions que tout
+arbre typé doit passer : les deux recherches rendent la loi à chaque run, en une
+seconde environ. Avec la 1.0, dont les formes ajustées n'agissaient pas avec
+`units=`, la recherche contrainte la trouvait dans deux runs sur cinq et finissait
+les trois autres sur des approximations (médiane de ses cinq runs : 27 nœuds,
+27 s). Jusqu'à la 0.9, la recherche libre ne rendait aucun modèle
 valide sur cette loi, même avec quatre fois plus de générations : ses modèles
 prenaient le logarithme d'une fréquence, additionnaient des kilogrammes ou des
 hertz à des nombres purs, ou élevaient une grandeur à un exposant en coulombs, et
 la contrainte était le seul chemin vers une réponse valide. Elle le reste pour les
 lois que le moteur n'ajuste pas directement. (Depuis la 0.9, une génération typée
 coûte 1,4 fois une génération non typée, contre 8,5 fois avec la 0.8. Une
-recherche ne s'arrête plus tôt que sur une loi exacte, si bien que les runs
-contraints qui finissent sur une approximation parcourent les 40 générations ;
-`time_limit=` les borne.)
+recherche ne s'arrête plus tôt que sur une loi exacte, si bien que les runs qui
+finissent sur une approximation, et chaque run sur des données bruitées,
+parcourent toutes leurs générations ; `time_limit=` les borne.)
 
 **Ce que ça ne fait *pas*.** Sur un jeu de test tiré *hors* du domaine
-d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), les
-approximations se dégradent ; la loi exacte y tient (R² = 1.00000), dans les dix
-runs non contraints et dans deux runs contraints sur cinq. Temps mesurés sur une
+d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), la
+loi exacte tient (R² = 1.00000) et les approximations se dégradent : les trois runs
+contraints de la 1.0 qui finissaient sur l'une d'elles avaient un R² hors domaine
+de 0,32 à 0,65. Temps mesurés sur une
 machine Linux à 4 cœurs, deux runs à la fois, avec les îles en séquence
 (`parallel=False`). Reproductible avec `benchmarks/ab_ood.py`.
 
 **Quand s'en servir.** Pour garantir que ce que le moteur rend a un sens physique,
 et pour déduire les unités et la valeur d'une constante (ci-dessous, et
 [l'étude de cas de Kepler](https://github.com/ariel95500-create/gp-elite/blob/main/examples/case_studies/kepler_units.fr.ipynb),
-où les unités écartent aussi un terme que les données seules ajouteraient). Sur
-une loi que le moteur ajuste directement, la recherche sans unités est plus rapide
-et la trouve plus souvent ; comparez les deux. **Pas** pour de la prédiction en
+où les unités écartent aussi un terme que les données seules ajouteraient).
+Depuis la 1.1, les formes que le moteur ajuste directement agissent aussi avec
+`units=` : sur les 41 équations de Feynman du banc de décision avec leurs unités,
+cinq seeds à 30 s par ajustement, 165 lois exactes sur 205 contre 108 avec la 1.0,
+et 163 sans unités. **Pas** pour de la prédiction en
 boîte noire : la contrainte écarte les approximations dimensionnellement fausses
 mais numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif
 est d'ajuster plutôt que de trouver une loi.
@@ -365,8 +370,8 @@ référence :
 | gaz parfaits `P = nRT/V` | oui | `kg m² / K mol s²` | 8,314462618 | 8,314462618 |
 
 La formule rendue porte elle-même la constante physique : le banc imprime
-`(250.0*X0)` pour Hooke et `(8.314462617999999*((X0*X1)/X2))` pour les gaz
-parfaits. Budget : 25 générations, deux redémarrages.
+`(249.99999999999997*X0)` pour Hooke et `(8.314462617999999*((X0*X1)/X2))` pour
+les gaz parfaits. Budget : 25 générations, deux redémarrages.
 
 Reproductible avec `benchmarks/test_constante_mystere.py`. Exige `units=` et
 `target_units=`. Si l'expression n'est pas un monôme des colonnes d'entrée
@@ -461,6 +466,11 @@ Strogatz, 7 ajustements exacts sur 70 contre 8 ; sur ses jeux réels, le même R
 médian à 0,004 près et le même nombre d'effondrements hors de la plage
 d'apprentissage
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
+Le changement de la 1.1 a été décidé de la même façon
+([`benchmarks/results_1.1/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.1)).
+Sur les équations de Feynman du jeu figé avec leurs unités, la 1.1 retrouve 226
+lois exactes sur 390 contre 169 pour la 1.0 mesurée à côté ; sans unités, les
+chiffres de la 1.0.
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 
@@ -489,9 +499,10 @@ réelles, laisser telles quelles les colonnes d'échelles proches,
 [`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)) ;
 avec la 1.0, le réglage par défaut rend les trois lois de cette vitrine qui en ont
 un, et `normalize='none'` reste à essayer quand une telle loi ne revient pas. Avec
-les unités physiques déclarées (`units=`, même budget, sans normalisation), 14/15
-reviennent exactes, chacune sous sa forme de manuel (`benchmarks/feynman_units.py`) ;
-l'échec est I.16.6. Une seed sur quinze équations est une
+les unités physiques déclarées (`units=`, même budget, sans normalisation), 15/15
+reviennent exactes (`benchmarks/feynman_units.py`), 14 sous leur forme de manuel ;
+I.16.6, manquée jusqu'à la 1.0, revient avec un facteur 1,00758 en haut et en bas
+qui se simplifie. Une seed sur quinze équations est une
 vitrine, pas une comparaison statistique :
 [`benchmarks/results_0.8/RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)
 mesure la 0.7.0 et chaque changement de la recherche et de la sélection finale
@@ -543,6 +554,11 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
+**1.1** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
+chacune placée seulement si elle passe la porte des dimensions : sur les 41
+équations de Feynman du banc de décision avec leurs unités, 165 lois exactes sur
+205 contre 108 pour la 1.0 mesurée à côté, et chacun des 1 005 modèles rendus avec
+unités a passé l'audit des unités ; sans unités, les modèles de la 1.0.
 **1.0 « Families »** — des familles entières de lois ajustées directement (formes
 rationnelles, racines, exponentielles, logarithmes, sinus et cosinus d'un monôme),
 sur des données bruitées aussi : sur les 41 équations de Feynman du banc de
