@@ -8,7 +8,8 @@ moved here on 29 October 2026; paths below that begin with `../` are now one
 level deeper (`../../`).
 
 What `../PLAN_RELEASE_1.1.md` asks before gate 6, as it was measured. The
-machine is an Intel Xeon at 2.8 GHz, 4 cores, AVX-512; every fit runs in its own
+machine is an Intel Xeon at 2.8 GHz (as `../../PLAN.md` recorded on 26 October;
+not recorded on the days of these measurements), 4 cores, AVX-512; every fit runs in its own
 process with `PYTHONHASHSEED=0`.
 
 ## The release candidate
@@ -81,7 +82,9 @@ the same worst R² in both versions.
 
 **Under units**, on U41, 14 equations gain exact fits and none loses any. On
 TF78 under units, 15 gain and none loses; one fit exact with 1.0.0 is not with
-1.1.0 (II.11.28, seed 5), and another seed of the same equation becomes exact.
+1.1.0 (II.11.28, seed 5), and the four other seeds of the same equation become
+exact (1 to 4; corrected on 30 October 2026 after the first review of M5 of the
+second candidate, which first read "another seed").
 Under units the median fit ends at once: the seed placed first is the exact law,
 and the search stops on it.
 

@@ -10,8 +10,13 @@ cinq graines, 30 secondes par ajustement ; 7 jeux de données réels) et sur un 
 de test figé avant tout le travail de la 1.0 (78 autres équations de Feynman, 14
 systèmes de Strogatz, 25 jeux de données réels) :
 `benchmarks/results_0.9/release_1.0/`. La version 1.1 ne change que le mode des
-unités : sans unités, elle rend les mêmes chiffres, et le point 8 est mesuré sur le
-paquet de la 1.1.0, côte à côte avec la 1.0.0 (`benchmarks/results_1.1/release/`).
+unités. Sans unités, elle rend les modèles de la 1.0.0 à travail égal ; sous le
+budget de 30 s, les comptes bougent un peu d'une campagne à l'autre, pour les deux
+versions pareillement (mesurées côte à côte pour la sortie de la 1.1, les deux
+donnent 108 et 86 structures sous bruit, 8 ajustements de Strogatz exacts sur 70
+et 10 effondrements sur 65, là où les points ci-dessous disent 105, 85, 7 et 11).
+Le point 8 est mesuré sur le paquet de la 1.1.0, côte à côte avec la 1.0.0
+(`benchmarks/results_1.1/release/`).
 
 ## 1. Les lois qu'il manque encore
 

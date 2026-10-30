@@ -146,9 +146,9 @@ guarantee.
   guaranteed to do better.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result; the
-  generation under way and the final selection add a little (16.7 s for a 15 s
-  budget on 3,000 rows in the measurement of 1.1.0, islands in parallel; in
-  sequence, the same fit stopped at 9.3 s with a model of R² 1.0000, before the
+  generation under way and the final selection add a little (17.0 s for a 15 s
+  budget on 3,000 rows in the measurement of 1.1.0, run alone, islands in
+  parallel; in sequence, the same fit stopped at 9.4 s with a model of R² 1.0000, before the
   budget, as a search does only on an exact law).
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
@@ -387,7 +387,7 @@ PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 14
 
 A random split of sequential data is interpolation and flatters every method. On the
 forward split, the tree ensembles can only repeat values seen in training and fall far
-below the mean. The equation 1.0 returns, in the current and the cycle, does better
+below the mean. The equation 1.0 and 1.1 return, in the current and the cycle, does better
 than them, but not well (R² +0.16); 0.8 and 0.9 returned one at R² −0.31, below the
 mean too, and 0.7 one in the cycle and the current that kept following the trend
 (R² +0.594). A formula can extrapolate where a
@@ -440,9 +440,11 @@ the training range
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 The change of 1.1 was decided the same way
 ([`benchmarks/results_1.1/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.1)).
-On the Feynman equations of the frozen set with their units, 1.1 recovers 226
-exact laws of 390 against 169 for 1.0 measured beside it; without units, the
-figures of 1.0.
+Measured beside 1.0 for the release of 1.1, both versions give the same counts
+without units on the frozen set (213 exact laws of 390 on its Feynman equations, 8
+of 70 on its Strogatz systems: under a time budget the counts move a little from
+one campaign to the next), and with their units 1.1 recovers 226 exact laws of 390
+against 169.
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
 
@@ -527,8 +529,9 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 **1.1** — the forms 1.0 fits directly act under `units=` too, each placed only if
 it passes the gate of dimensions: on the 41 Feynman equations of the decision
 bench with their units, 165 exact laws of 205 against 108 for 1.0 measured beside
-it, and every one of the 1,005 models returned under units passed the audit of
-units; without units, the models of 1.0. **1.0 "Families"** — whole families of laws fitted directly (rational forms, roots,
+it; every one of the 1,005 models returned under units in the release
+measurement (these equations with and without noise, and the frozen test set)
+passed the audit of units; without units, the models of 1.0 at equal work. **1.0 "Families"** — whole families of laws fitted directly (rational forms, roots,
 exponentials, logarithms, sines and cosines of a monomial), on noisy data too: on
 the 41 Feynman equations of the decision bench, 163 exact laws of 205 against 88
 for 0.9 measured beside it, and on 78 other Feynman equations frozen before the

@@ -15,7 +15,8 @@ Kept apart from the plans of 1.1, which this file does not change.
 
 ## SRBench
 
-What was read on 28 October 2026 in `cavalab/srbench` (master, 2aabbb6):
+What was read on 28 October 2026 in `cavalab/srbench` (master, 2aabbb6;
+the files and lines are recorded in `srbench_2aabbb6/`):
 - GP_ELITE is listed among the methods "staged for benchmarking", built
   and tested by the container workflows, absent from the figures of the
   2025 edition. No date for the next update is published, in the

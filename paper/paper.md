@@ -173,8 +173,9 @@ squares; for sines and cosines, the frequency is searched on a grid and the rest
 is linear. A fitted form that
 holds to numerical precision joins the starting population; when none does, one
 that leaves at most 1.5 % of the variance unexplained does. The search keeps its
-generality and gains starting points. The typed population of the dimensional mode
-does not use them yet.
+generality and gains starting points. Since version 1.1 the typed population of
+the dimensional mode uses them too, each kept only if it passes the dimensional
+gate.
 
 *Reporting honestly by default.* The estimator holds out a validation split,
 selects a parsimonious champion within an $R^2$ tolerance, and exposes a
@@ -203,8 +204,9 @@ search, unchanged, found it in 2/5. Since version 1.1.0 the fitted forms act
 under `units=` as well, each placed only if it passes the dimensional gate:
 both searches return the law in 5/5 runs, in about a second. On the 41 equations
 of the decision bench with their units, the constrained search recovers the
-exact law in 165 of 205 fits against 108 for 1.0.0, and each of the 1,005 typed
-models of that measurement passes the dimensional audit
+exact law in 165 of 205 fits against 108 for 1.0.0, and each of the 1,005 models
+returned under units in the release measurement (these equations with and
+without noise, and the frozen test set) passes the dimensional audit
 (`benchmarks/results_1.1/release/`). The constraint guarantees that whatever
 is returned is physically coherent.
 
@@ -215,10 +217,12 @@ recovers 213 exact laws in 390 fits on its Feynman equations against 145 for
 0.9.0, measured side by side at 30 s per fit, and 7 against 8 in 70 on its
 Strogatz systems; on its real datasets, the median
 $R^2$ moves by less than 0.004 and the number of collapses out of the training
-range does not change (`benchmarks/results_0.9/release_1.0/`). Version 1.1.0,
-which changes the dimensional mode only, returns the same figures without units,
-and on the frozen Feynman equations with their units 226 exact laws in 390 fits
-against 169 for 1.0.0. Three case studies
+range does not change (`benchmarks/results_0.9/release_1.0/`). Version 1.1.0
+changes the dimensional mode only: measured beside 1.0.0, both give the same
+counts without units (213 exact laws in 390 fits, and 8 in 70 on the Strogatz
+systems, the time budget moving the counts a little from one campaign to the
+next), and on the frozen Feynman equations with their units 1.1.0 recovers 226
+exact laws in 390 fits against 169. Three case studies
 on public data accompany it: Kepler's third law with units, where the four
 inner planets give the product of the gravitational constant and the mass of
 the Sun within 0.002 % of its nominal value; Hubble's measurements of 1929; and

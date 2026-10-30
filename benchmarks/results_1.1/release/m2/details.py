@@ -62,8 +62,8 @@ def main(old_path, new_path):
             print("  the five families of 1.0: %d fits, exact %d -> %d"
                   % (len(fam), sum(old[k]["status"] == "EXACT" for k in fam), sum(new[k]["status"] == "EXACT" for k in fam)))
 
-    print("\nOut of domain, R6 + R7raw collapses by version:")
-    for kind in ("real", "realraw", "tr", "trraw"):
+    print("\nOut of domain, collapses by version:")
+    for kind in ("real", "realraw", "tr", "trraw", "ts"):
         rows = [k for k in old if k[0] == kind and k[2] == "ood"]
         co = sum(old[k]["r2"] < 0 for k in rows)
         cn = sum(new[k]["r2"] < 0 for k in rows)

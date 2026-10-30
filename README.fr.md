@@ -153,9 +153,9 @@ exacte, sans garantie.
   lent, et ne garantit pas de faire mieux.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  génération en cours et la sélection finale ajoutent un peu (16,7 s pour un
-  budget de 15 s sur 3 000 lignes dans la mesure de la 1.1.0, îles en parallèle ;
-  en séquence, le même ajustement s'est arrêté à 9,3 s avec un modèle de R²
+  génération en cours et la sélection finale ajoutent un peu (17,0 s pour un
+  budget de 15 s sur 3 000 lignes dans la mesure de la 1.1.0, lancée seule, îles
+  en parallèle ; en séquence, le même ajustement s'est arrêté à 9,4 s avec un modèle de R²
   1,0000, avant le budget, comme une recherche ne le fait que sur une loi exacte).
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
@@ -413,7 +413,7 @@ PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 14
 Un découpage aléatoire de données séquentielles est de l'interpolation, qui flatte
 toutes les méthodes. Sur le découpage chronologique, les forêts d'arbres ne peuvent
 que répéter des valeurs vues à l'entraînement et passent loin sous la moyenne.
-L'équation que rend la 1.0, en fonction du courant et du cycle, fait mieux qu'elles,
+L'équation que rendent la 1.0 et la 1.1, en fonction du courant et du cycle, fait mieux qu'elles,
 mais pas bien (R² +0,16) ; la 0.8 et la 0.9 en rendaient une à R² −0,31, sous la
 moyenne elle aussi, et la 0.7 une en fonction du cycle et du courant qui continuait de
 suivre la tendance (R² +0,594). Une formule peut
@@ -468,9 +468,11 @@ d'apprentissage
 ([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
 Le changement de la 1.1 a été décidé de la même façon
 ([`benchmarks/results_1.1/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.1)).
-Sur les équations de Feynman du jeu figé avec leurs unités, la 1.1 retrouve 226
-lois exactes sur 390 contre 169 pour la 1.0 mesurée à côté ; sans unités, les
-chiffres de la 1.0.
+Mesurées côte à côte pour la sortie de la 1.1, les deux versions donnent sans
+unités les mêmes comptes sur le jeu figé (213 lois exactes sur 390 sur ses
+équations de Feynman, 8 sur 70 sur ses systèmes de Strogatz : sous un budget de
+temps, les comptes bougent un peu d'une campagne à l'autre), et avec leurs unités
+la 1.1 retrouve 226 lois exactes sur 390 contre 169.
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 
@@ -557,8 +559,10 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 **1.1** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
 chacune placée seulement si elle passe la porte des dimensions : sur les 41
 équations de Feynman du banc de décision avec leurs unités, 165 lois exactes sur
-205 contre 108 pour la 1.0 mesurée à côté, et chacun des 1 005 modèles rendus avec
-unités a passé l'audit des unités ; sans unités, les modèles de la 1.0.
+205 contre 108 pour la 1.0 mesurée à côté ; chacun des 1 005 modèles rendus avec
+unités dans la mesure de la version (ces équations avec et sans bruit, et le jeu
+de test figé) a passé l'audit des unités ; sans unités, les modèles de la 1.0 à
+travail égal.
 **1.0 « Families »** — des familles entières de lois ajustées directement (formes
 rationnelles, racines, exponentielles, logarithmes, sinus et cosinus d'un monôme),
 sur des données bruitées aussi : sur les 41 équations de Feynman du banc de

@@ -8,9 +8,13 @@ the package of version 1.0.0,
 side by side with 0.9.0, on the decision bench (41 Feynman equations, five seeds,
 30 seconds per fit; 7 real datasets) and on a test set frozen before any of the
 work of 1.0 (78 other Feynman equations, 14 Strogatz systems, 25 real datasets):
-`benchmarks/results_0.9/release_1.0/`. Version 1.1 changes the units mode only:
-without units it returns the same figures, and point 8 is measured on the package
-of 1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`).
+`benchmarks/results_0.9/release_1.0/`. Version 1.1 changes the units mode only.
+Without units it returns the models of 1.0.0 at equal work; under the budget of
+30 s, the counts move a little from one campaign to the next, for both versions
+alike (measured beside 1.0.0 for the release of 1.1, both give 108 and 86
+structures under noise, 8 exact Strogatz fits of 70 and 10 collapses of 65, where
+the points below say 105, 85, 7 and 11). Point 8 is measured on the package of
+1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`).
 
 ## 1. Laws it still misses
 

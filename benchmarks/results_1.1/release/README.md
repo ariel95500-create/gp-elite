@@ -1,8 +1,13 @@
 # Measurements of the release 1.1.0
 
 What `../PLAN_RELEASE_1.1.md` asks before gate 6, as it was measured. The
-machine is an Intel Xeon at 2.8 GHz, 4 cores, AVX-512; every fit runs in its own
-process with `PYTHONHASHSEED=0`.
+machine has 4 cores with AVX-512; every fit runs in its own process with
+`PYTHONHASHSEED=0`. Its processor was not recorded on the days of M1 to M3. On
+30 October, after M3, it reports an Intel Xeon at 2.10 GHz
+(`m3_extra/machine.txt`), while `../PLAN.md` recorded an Intel Xeon at 2.8 GHz
+on 26 October: the container does not always run on the same host. The
+versions are therefore compared within one campaign or one day, never across
+days.
 
 The first candidate (engine U1) was measured up to M3 (`candidate1/`). M3 found
 the TP notebook slower than with 1.0.0. The author chose to correct before the
@@ -79,7 +84,9 @@ script returns the figures of its README.
 Without units, the second candidate does what the first did. Of the 1,775
 jobs, 1,728 return the same expression. The 47 that differ all reached the time
 budget, in one version or both, and none changes status (exact, near or
-missed). Each suite out of domain has the same collapses in both versions.
+missed). Out of domain, R6, R7raw, TR25 and TR25raw have the same collapses in
+both versions, and TS14 one more with 1.1.0, 27 to 28 (strogatz_barmag1, seed 8,
+a fit at the budget in both versions).
 
 Under units, the figures of the first candidate, and one more law on the frozen
 test set:
@@ -87,7 +94,8 @@ test set:
   candidate;
 - on TF78 under units, 16 equations gain and none loses (15 with the first
   candidate). As then, one fit exact with 1.0.0 is not with 1.1.0 (II.11.28,
-  seed 5), and another seed of the same equation becomes exact. 30 equations
+  seed 5), and the four other seeds of the same equation become exact (1 to
+  4). 30 equations
   of 78 are never exact in five seeds, against 37 with 1.0.0.
 
 **Criteria of the plan**: the seven are met.
@@ -133,8 +141,13 @@ without. What differs depends on timing only:
   result is the same: `force = 250 * elongation`, constant 250 kg/s²;
 - the parallel fit of `time_limit_check.txt`, stopped at its deadline: R² 0.9979
   against 1.0000, a pass in both. 15 of 16 checks, as with 1.0.0 and the first
-  candidate;
-- `import gp_elite` takes a median of 0.12 s.
+  candidate. That check ran beside other scripts of `run_claims.py`; run again
+  alone after the first review of M5 (`m3_extra/time_limit_check_alone.txt`),
+  it gives 17.0 s in parallel with R² 1.0000 and 9.4 s in sequence, 15 of 16,
+  the figures the READMEs quote;
+- `import gp_elite` takes a median of 0.12 s;
+- in `scaling.txt`, the width of one time once masked; the log file of the
+  console example (`gp_elite_log.csv`); the files of the driver.
 
 So everything the first candidate's M3 found with units holds: Feynman 15 with
 `units=` 15/15 exact, the table of `units=` on II.11.3 (5/5 out of domain),
@@ -144,8 +157,9 @@ constant.
 **The TP notebook.** The six fits return the formulas and the deduced constants
 of 1.0.0 (g 9.81 and 9.74, R 8.250, P 10.02 W), in 42, 51, 55, 47, 53 and 46 s,
 294 s in all. The gas law takes 53 s against 85 s with the first candidate.
-Timed alone three times, it takes 48.6, 49.5 and 49.8 s, against 49.9 to 51.2 s
-with 1.0.0 and 77 to 79 s with the first candidate (on 28 October).
+Timed alone three times on 30 October, it takes 48.6, 49.5 and 49.8 s. On 28
+October, 1.0.0 took 49.9 to 51.2 s and the first candidate 77 to 79 s; those two
+compare with each other, not with the times of 30 October.
 
 The time of 1.0.0 the notebook records, 243 s, was measured on 27 October. To
 compare on the same day, the notebook script was run after M3 four times, 1.0.0
@@ -163,17 +177,20 @@ compare on the same day, the notebook script was run after M3 four times, 1.0.0
 | in all | 285 / 298 | 302 / 300 |
 
 Every fit returns the same formula in all four runs. Two things follow:
-- the machine was faster on 27 October: on 30 October, 1.0.0 itself takes 285
-  and 298 s, against 243 s then. The first candidate's comparison, 320 s
-  against 243 s, compared two days, and the slowdown of the five laws other
-  than the gas law was mostly the machine's. Its diagnosis of the gas law
-  stands, being timed on one day with both versions (50 s against 78 s);
+- on 30 October, 1.0.0 itself takes 285 and 298 s, against 243 s on 27
+  October: the days differ, and the processor may too (above). The first
+  candidate's comparison, 320 s against 243 s, compared two days, and the
+  slowdown of the five laws other than the gas law was mostly the day's. Its
+  diagnosis of the gas law stands, being timed on one day with both versions
+  (50 s against 78 s);
 - on the same day, the notebook takes with 1.1.0 about the time of 1.0.0, 301 s
   against 292 s on average. The one fit that stays slower is the free fall.
   Timed alone three times in turn (`m3/tp_timing/fall.py`,
   `fall_timings.txt`), it takes 50.5 to 51.3 s against 43.1 to 44.1 s with
-  1.0.0. Its trace shows the seed of U1, `(t)²`, placed at generation 0, and no
-  seed of fractional units: it is not the case U2 corrects. With noise no law
+  1.0.0. Its trace, recorded after the first review of M5
+  (`m3_extra/fall_trace_1.1.0.txt`, and `fall_trace_1.0.0.txt` for 1.0.0),
+  shows the one seed of the power law finder, `(t)²`, placed at the start, and
+  no seed of fractional units: it is not the case U2 corrects. With noise no law
   is exact, so the search runs its whole budget from that seed. Where the
   7 s go has not been profiled.
 

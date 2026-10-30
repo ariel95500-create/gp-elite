@@ -10,8 +10,9 @@ TF78 under units: 390 fits, exact 169 -> 226; 16 equations gain exact fits, 0 lo
   equations never exact in any seed: 37 -> 30 of 78
   median time of a fit: 30.3 s -> 1.6 s
 
-Out of domain, R6 + R7raw collapses by version:
+Out of domain, collapses by version:
   real: 30 fits out of domain, collapses 4 -> 4, 4 in both
   realraw: 35 fits out of domain, collapses 6 -> 6, 6 in both
   tr: 125 fits out of domain, collapses 37 -> 37, 37 in both
   trraw: 125 fits out of domain, collapses 27 -> 27, 27 in both
+  ts: 70 fits out of domain, collapses 27 -> 28, 27 in both

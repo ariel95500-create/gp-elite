@@ -23,13 +23,17 @@ package, side by side with 1.0.0 installed from PyPI, at 30 s per fit
   measured once: 226 exact laws of 390 against 169;
 - every one of the 1,005 models returned under units passed the audit of
   units;
-- without units, the same counts on the 1,775 fits of the bench and the frozen
-  test set; the 47 fits that return another expression all reached the time
-  budget, and none changes status;
+- without units, on the 1,775 fits of the bench and the frozen test set, the
+  same exact laws, structures, medians and collapses of the real data; the 47
+  fits that return another expression all reached the time budget and none
+  changes status. Among them, one Strogatz fit out of the training range
+  collapses with 1.1.0 and not with 1.0.0, and six more printed formulas depart
+  from their model (125 of the 1,775 against 119);
 - Feynman II.11.3 with units comes back exact in 5 runs of 5, in about a
   second, against 2 of 5; the 15 equations of the README with units, 15 exact
-  against 14; the typed fits of the Kepler case study write the law
-  `5.45416e-10 * X0 * sqrt(X0)` at every seed, with the constant of 1.0.
+  against 14; the typed fit of the Kepler case study on the four inner planets
+  writes the law `5.45416e-10 * X0 * sqrt(X0)` at every seed, with the constant
+  of 1.0, which wrote it in other forms at four seeds of five.
 
 The change was decided by a comparison written before it ran
 (`benchmarks/results_1.1/PLAN.md`): 107 exact laws to 165 on U41, then 107 to
