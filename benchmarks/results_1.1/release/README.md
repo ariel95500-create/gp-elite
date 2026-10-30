@@ -182,3 +182,13 @@ with the rest of M3. On 30 October 2026 he chose to keep the engine as it is:
 the 7 s are written in the documents of 1.1.0, and an earlier stop when the
 law placed at generation 0 holds on noisy data is proposed in the plan of 1.2
 (`../ROADMAP.md`).
+
+## M4, tests (30 October 2026)
+
+`M4_wheel_tests.txt`: the test suite of 6e0e296 against the wheel of the second
+candidate, installed in a fresh environment for each of Python 3.9.23, 3.11.15
+and 3.14.0rc2, with the packages of the environments of M4 of 1.0.0, each
+importing the installed package (`m4/`): 154 tests pass under the three
+versions. `twine check --strict` passes for the wheel and the source archive.
+The **Tests** workflow of the repository is green on every commit of the branch
+since the candidate; it is checked again on the commit of the release.
