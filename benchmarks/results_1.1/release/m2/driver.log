@@ -69,3 +69,25 @@ time slice over: 1641 jobs left for the next call
 --- container restarted at about 01:15 UTC on 30 October; 1475 jobs recorded in both files, all whole and paired; driver restarted 2026-10-30T01:16
 --- slice 2026-10-30T01:16 (1475 and 1475 done)
 1305 jobs to run with 2 engines
+25 jobs done, 435 s elapsed, 1279 left
+50 jobs done, 823 s elapsed, 1254 left
+75 jobs done, 1239 s elapsed, 1229 left
+100 jobs done, 1629 s elapsed, 1204 left
+125 jobs done, 2048 s elapsed, 1180 left
+150 jobs done, 2438 s elapsed, 1154 left
+175 jobs done, 2854 s elapsed, 1129 left
+200 jobs done, 3245 s elapsed, 1104 left
+225 jobs done, 3664 s elapsed, 1079 left
+250 jobs done, 4054 s elapsed, 1054 left
+275 jobs done, 4469 s elapsed, 1029 left
+300 jobs done, 4858 s elapsed, 1005 left
+325 jobs done, 4878 s elapsed, 979 left
+350 jobs done, 5074 s elapsed, 955 left
+375 jobs done, 5310 s elapsed, 929 left
+400 jobs done, 5594 s elapsed, 905 left
+425 jobs done, 5824 s elapsed, 879 left
+450 jobs done, 6129 s elapsed, 855 left
+time slice over: 838 jobs left for the next call
+--- slice 2026-10-30T03:01 (1942 and 1942 done)
+838 jobs to run with 2 engines
+25 jobs done, 239 s elapsed, 812 left
