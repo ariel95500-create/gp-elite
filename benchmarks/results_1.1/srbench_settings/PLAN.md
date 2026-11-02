@@ -147,3 +147,25 @@ committed before the first of the 745 jobs ends.
   of master, on `192_vineyard_small`), run first with 1.0.0 and 1.1.0 from
   PyPI, as `../ROADMAP.md` asks: it shows whether the wrapper runs as it is with
   both versions.
+
+## Amendment, before the 745 jobs (2 November 2026)
+
+The trial (`trial/`) ran the three settings on three jobs. At B = 120 s each of
+the ten calls of W0 gets about 11 s and stops before its 60 generations, which
+take 19 to 25 s on the data of the bench (`trial/gens60.txt`); W2 then returns
+what W0 returns (the three jobs give the same models). At 120 s the study could
+not tell the settings apart; at the 3600 s of SRBench, W0 ends its ten calls in
+about four minutes, some 7 % of its budget.
+
+Put to the author with two options, he chose on 2 November 2026 (option A):
+- **B = 300 s**, so that each call of W0 gets 27 s and runs its 60
+  generations;
+- **two settings, W0 and W1**: the question of the generations per call (W2)
+  needs budgets of the order of SRBench's, out of reach at this scale here. It
+  joins the measurement of what more time would bring, planned after 1.2
+  (`../ROADMAP.md`), where the benches run with ten times the budget;
+- each job runs W0 and W1 at the same time, two jobs at a time (four
+  processes on four cores, the same load for both settings).
+
+The criteria are those above, with S = W1. The figures are read by
+`compare.py`, committed with this amendment.

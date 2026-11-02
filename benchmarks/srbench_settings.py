@@ -1,7 +1,8 @@
 """The settings SRBench runs GP_ELITE with (benchmarks/results_1.1/srbench_settings/PLAN.md).
 
-Three settings of the same engine, each given the same budget through the code
-path SRBench uses (est.max_time = B, then est.fit(X, y)):
+Settings of the same engine, each given the same budget through the code path
+SRBench uses (est.max_time = B, then est.fit(X, y)); W0 and W1 since the
+amendment of the plan (B = 300 s), W2 kept for the trial:
 
   W0   the wrapper as published, experiment/methods/gp-elite/regressor.py of
        cavalab/srbench at 2aabbb6, imported from a clone (not copied: the file
@@ -12,9 +13,9 @@ path SRBench uses (est.max_time = B, then est.fit(X, y)):
 
 All three with parallel=False and random_state = the seed of the job, on the
 decision bench of phase1_bench.py (F41, F41N1, F41N10, R6, R7raw), scored as
-phase1_bench.py scores its own fits. Each job runs the three settings at the
-same time, one process each, PYTHONHASHSEED=0 and one BLAS thread. The run
-resumes: jobs already in the output files are skipped.
+phase1_bench.py scores its own fits. Each job runs the settings at the same
+time, one process each, PYTHONHASHSEED=0 and one BLAS thread, `--pairs` jobs at
+a time. The run resumes: jobs already in the output files are skipped.
 
 Usage, from the repository root:
   python benchmarks/srbench_settings.py run --python /venv11p/bin/python \\
@@ -39,8 +40,8 @@ sys.path.insert(0, HERE)
 
 import phase1_bench as P  # noqa: E402  (data, structure, job list)
 
-BUDGET = 120.0
-ARMS = ("W0", "W1", "W2")
+BUDGET = 300.0
+ARMS = ("W0", "W1")            # W2 left out by the amendment of the plan
 KINDS = ("feyn", "feyn_n1", "feyn_n10", "real", "realraw")
 WRAPPER = "experiment/methods/gp-elite/regressor.py"
 WRAPPER_BLOB = "cbf170f9be251dc44169ceba8ff4be3cb0289619"   # at 2aabbb6
@@ -152,8 +153,8 @@ def _done(path):
     return d
 
 
-def drive(python, srbench, outdir, todo_jobs, budget, max_seconds=None):
-    """Each job with the three settings at the same time, one job at a time."""
+def drive(python, srbench, outdir, todo_jobs, budget, pairs=1, max_seconds=None):
+    """Each job with every setting at the same time, `pairs` jobs at a time."""
     os.makedirs(outdir, exist_ok=True)
     outs = {a: os.path.join(outdir, "%s.jsonl" % a) for a in ARMS}
     done = {a: _done(outs[a]) for a in ARMS}
@@ -163,23 +164,44 @@ def drive(python, srbench, outdir, todo_jobs, budget, max_seconds=None):
                OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
     env.pop("PYTHONPATH", None)
     t_start = time.time()
-    for n, j in enumerate(todo, 1):
-        if max_seconds is not None and time.time() - t_start > max_seconds:
+    running, n_done = [], 0
+    while todo or running:
+        if max_seconds is not None and time.time() - t_start > max_seconds \
+                and todo:
             print("time slice over: %d jobs left for the next call"
-                  % (len(todo) - n + 1), flush=True)
-            return
-        procs = [(a, subprocess.Popen(
-            [python, os.path.abspath(__file__), "one", json.dumps(j), a,
-             srbench, str(budget)],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-            env=env, cwd=os.path.dirname(HERE)))
-            for a in ARMS if P.key(j) not in done[a]]
-        for a, p in procs:
-            P._record(dict(j, arm=a, budget=budget), p, outs[a])
-        if n % 25 == 0:
-            print("%d jobs done, %.0f s elapsed, %d left" % (
-                n, time.time() - t_start, len(todo) - n), flush=True)
-    print("all done", flush=True)
+                  % len(todo), flush=True)
+            todo = []
+        while todo and len(running) < pairs:
+            j = todo.pop(0)
+            procs = [(a, subprocess.Popen(
+                [python, os.path.abspath(__file__), "one", json.dumps(j), a,
+                 srbench, str(budget)],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                env=env, cwd=os.path.dirname(HERE)))
+                for a in ARMS if P.key(j) not in done[a]]
+            running.append((j, procs))
+        time.sleep(0.5)
+        still = []
+        for j, procs in running:
+            left = []
+            for a, p in procs:
+                if p.poll() is None:
+                    left.append((a, p))
+                else:
+                    P._record(dict(j, arm=a, budget=budget), p, outs[a])
+            if left:
+                still.append((j, left))
+            else:
+                n_done += 1
+                if n_done % 25 == 0:
+                    print("%d jobs done, %.0f s elapsed, %d left" % (
+                        n_done, time.time() - t_start,
+                        len(todo) + len(still)), flush=True)
+        running = still
+    if not todo:
+        print("all done" if not any(P.key(j) not in _done(outs[a])
+                                    for j in todo_jobs for a in ARMS)
+              else "slice done", flush=True)
 
 
 def main():
@@ -191,10 +213,11 @@ def main():
         r.add_argument("--srbench", required=True)
         r.add_argument("--outdir", required=True)
         r.add_argument("--budget", type=float, default=BUDGET)
+        r.add_argument("--pairs", type=int, default=1)
         r.add_argument("--max-seconds", type=float, default=None)
     o = sub.add_parser("one")
     o.add_argument("job")
-    o.add_argument("arm", choices=ARMS)
+    o.add_argument("arm", choices=("W0", "W1", "W2"))
     o.add_argument("srbench")
     o.add_argument("budget", type=float)
     a = ap.parse_args()
@@ -202,7 +225,8 @@ def main():
         print(json.dumps(run_one(json.loads(a.job), a.arm, a.srbench, a.budget)))
     else:
         js = jobs() if a.cmd == "run" else trial_jobs()
-        drive(a.python, a.srbench, a.outdir, js, a.budget, a.max_seconds)
+        drive(a.python, a.srbench, a.outdir, js, a.budget, a.pairs,
+              a.max_seconds)
 
 
 if __name__ == "__main__":
