@@ -229,3 +229,17 @@ two reviews, and decided:
 `CITATION.cff` and the paper are dated 2 November 2026, the day the author can
 publish. The files to publish are built again from the commit of this decision,
 since the description of the PyPI page is the README (`environments.txt`).
+
+## Publication (2 November 2026)
+
+- The pull request of the release (#7) was merged into `main` by a merge commit,
+  efb3b97, whose tree is that of a823f69.
+- The author published the two files on PyPI on 2 November 2026; their SHA-256
+  on PyPI are those of `environments.txt` (gp-elite 1.1.0, installed from PyPI in
+  a fresh environment on his computer, prints 1.1.0).
+- The release page v1.1.0 on GitHub, tag on efb3b97, carries the same two files.
+  The **Tests** workflow of the tag is green on every row, Python 3.9 included.
+- Before it, the release page v1.0.0 was published the same day, tag on 9b669a4,
+  with the two files of PyPI. Its tests are green but for Python 3.9 on
+  `ubuntu-latest`, which GitHub no longer provides; the workflow of 1.1.0 runs
+  Python 3.9 on `ubuntu-24.04`.

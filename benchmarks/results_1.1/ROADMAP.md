@@ -3,7 +3,8 @@
 Kept apart from the plans of 1.1, which this file does not change.
 
 1. **Version 1.1** is released as `PLAN_RELEASE_1.1.md` says (decided on
-   26 October 2026).
+   26 October 2026). Done: 1.1.0 "Coherent" was published on 2 November 2026
+   (`release/README.md`).
 2. **Two actions for SRBench** (decided on 28 October 2026), described
    below: asking its maintainers for the calendar of the next update, and,
    once the measurements of 1.1 leave the machine free, a study of the
