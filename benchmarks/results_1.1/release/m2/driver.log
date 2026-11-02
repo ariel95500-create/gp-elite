@@ -1,0 +1,131 @@
+./driver.sh: 10: cannot open benchmarks/results_1.1/release/m2/campaignR_1.0.0.jsonl: No such file
+./driver.sh: 11: cannot open benchmarks/results_1.1/release/m2/campaignR_1.1.0.jsonl: No such file
+--- slice 2026-10-29T20:14 (0 and 0 done)
+2780 jobs to run with 2 engines
+25 jobs done, 25 s elapsed, 2754 left
+50 jobs done, 201 s elapsed, 2729 left
+75 jobs done, 222 s elapsed, 2704 left
+100 jobs done, 390 s elapsed, 2680 left
+125 jobs done, 519 s elapsed, 2655 left
+150 jobs done, 709 s elapsed, 2629 left
+175 jobs done, 732 s elapsed, 2604 left
+200 jobs done, 972 s elapsed, 2580 left
+225 jobs done, 1326 s elapsed, 2554 left
+250 jobs done, 1721 s elapsed, 2529 left
+275 jobs done, 2137 s elapsed, 2504 left
+300 jobs done, 2532 s elapsed, 2479 left
+325 jobs done, 2948 s elapsed, 2454 left
+350 jobs done, 3176 s elapsed, 2430 left
+375 jobs done, 3330 s elapsed, 2404 left
+400 jobs done, 3431 s elapsed, 2379 left
+425 jobs done, 3455 s elapsed, 2354 left
+450 jobs done, 3479 s elapsed, 2329 left
+475 jobs done, 3579 s elapsed, 2305 left
+500 jobs done, 3666 s elapsed, 2280 left
+525 jobs done, 3943 s elapsed, 2254 left
+550 jobs done, 4194 s elapsed, 2229 left
+575 jobs done, 4427 s elapsed, 2204 left
+600 jobs done, 4522 s elapsed, 2180 left
+625 jobs done, 4705 s elapsed, 2154 left
+650 jobs done, 5128 s elapsed, 2129 left
+675 jobs done, 5520 s elapsed, 2104 left
+700 jobs done, 5912 s elapsed, 2080 left
+725 jobs done, 6181 s elapsed, 2054 left
+time slice over: 2047 jobs left for the next call
+--- slice 2026-10-29T21:59 (733 and 733 done)
+2047 jobs to run with 2 engines
+25 jobs done, 362 s elapsed, 2021 left
+50 jobs done, 761 s elapsed, 1996 left
+75 jobs done, 1149 s elapsed, 1971 left
+100 jobs done, 1563 s elapsed, 1946 left
+125 jobs done, 1903 s elapsed, 1922 left
+150 jobs done, 2205 s elapsed, 1896 left
+175 jobs done, 2617 s elapsed, 1871 left
+200 jobs done, 3009 s elapsed, 1846 left
+225 jobs done, 3419 s elapsed, 1821 left
+250 jobs done, 3812 s elapsed, 1796 left
+275 jobs done, 4226 s elapsed, 1771 left
+300 jobs done, 4614 s elapsed, 1746 left
+325 jobs done, 5030 s elapsed, 1721 left
+350 jobs done, 5415 s elapsed, 1696 left
+375 jobs done, 5833 s elapsed, 1671 left
+400 jobs done, 6220 s elapsed, 1646 left
+time slice over: 1641 jobs left for the next call
+--- slice 2026-10-29T23:45 (1139 and 1139 done)
+1641 jobs to run with 2 engines
+25 jobs done, 417 s elapsed, 1615 left
+50 jobs done, 806 s elapsed, 1590 left
+75 jobs done, 1223 s elapsed, 1565 left
+100 jobs done, 1613 s elapsed, 1540 left
+125 jobs done, 2030 s elapsed, 1515 left
+150 jobs done, 2416 s elapsed, 1490 left
+175 jobs done, 2832 s elapsed, 1465 left
+200 jobs done, 3220 s elapsed, 1440 left
+225 jobs done, 3636 s elapsed, 1415 left
+250 jobs done, 4025 s elapsed, 1390 left
+275 jobs done, 4438 s elapsed, 1365 left
+300 jobs done, 4828 s elapsed, 1340 left
+325 jobs done, 5235 s elapsed, 1315 left
+--- container restarted at about 01:15 UTC on 30 October; 1475 jobs recorded in both files, all whole and paired; driver restarted 2026-10-30T01:16
+--- slice 2026-10-30T01:16 (1475 and 1475 done)
+1305 jobs to run with 2 engines
+25 jobs done, 435 s elapsed, 1279 left
+50 jobs done, 823 s elapsed, 1254 left
+75 jobs done, 1239 s elapsed, 1229 left
+100 jobs done, 1629 s elapsed, 1204 left
+125 jobs done, 2048 s elapsed, 1180 left
+150 jobs done, 2438 s elapsed, 1154 left
+175 jobs done, 2854 s elapsed, 1129 left
+200 jobs done, 3245 s elapsed, 1104 left
+225 jobs done, 3664 s elapsed, 1079 left
+250 jobs done, 4054 s elapsed, 1054 left
+275 jobs done, 4469 s elapsed, 1029 left
+300 jobs done, 4858 s elapsed, 1005 left
+325 jobs done, 4878 s elapsed, 979 left
+350 jobs done, 5074 s elapsed, 955 left
+375 jobs done, 5310 s elapsed, 929 left
+400 jobs done, 5594 s elapsed, 905 left
+425 jobs done, 5824 s elapsed, 879 left
+450 jobs done, 6129 s elapsed, 855 left
+time slice over: 838 jobs left for the next call
+--- slice 2026-10-30T03:01 (1942 and 1942 done)
+838 jobs to run with 2 engines
+25 jobs done, 239 s elapsed, 812 left
+50 jobs done, 1738 s elapsed, 787 left
+75 jobs done, 2136 s elapsed, 762 left
+100 jobs done, 2542 s elapsed, 737 left
+125 jobs done, 2939 s elapsed, 712 left
+150 jobs done, 3346 s elapsed, 687 left
+175 jobs done, 3745 s elapsed, 662 left
+200 jobs done, 4154 s elapsed, 637 left
+225 jobs done, 4549 s elapsed, 612 left
+250 jobs done, 5982 s elapsed, 588 left
+time slice over: 571 jobs left for the next call
+--- slice 2026-10-30T04:47 (2209 and 2209 done)
+571 jobs to run with 2 engines
+25 jobs done, 415 s elapsed, 545 left
+50 jobs done, 802 s elapsed, 520 left
+75 jobs done, 1220 s elapsed, 495 left
+100 jobs done, 1606 s elapsed, 470 left
+125 jobs done, 2020 s elapsed, 445 left
+150 jobs done, 2409 s elapsed, 420 left
+175 jobs done, 2822 s elapsed, 395 left
+200 jobs done, 3979 s elapsed, 371 left
+225 jobs done, 4263 s elapsed, 346 left
+250 jobs done, 4462 s elapsed, 320 left
+275 jobs done, 4646 s elapsed, 295 left
+300 jobs done, 4730 s elapsed, 270 left
+325 jobs done, 4918 s elapsed, 245 left
+350 jobs done, 5095 s elapsed, 221 left
+375 jobs done, 5318 s elapsed, 195 left
+400 jobs done, 5672 s elapsed, 170 left
+425 jobs done, 5914 s elapsed, 145 left
+450 jobs done, 6094 s elapsed, 120 left
+time slice over: 105 jobs left for the next call
+--- slice 2026-10-30T06:32 (2675 and 2675 done)
+105 jobs to run with 2 engines
+25 jobs done, 419 s elapsed, 79 left
+50 jobs done, 810 s elapsed, 54 left
+75 jobs done, 1195 s elapsed, 29 left
+100 jobs done, 1604 s elapsed, 4 left
+--- all done 2026-10-30T07:01

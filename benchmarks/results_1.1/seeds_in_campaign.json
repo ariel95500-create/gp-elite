@@ -1,0 +1,1191 @@
+[
+ {
+  "kind": "ufeyn",
+  "problem": "I.12.1",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.12.5",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.14.4",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * (v1)\u00b2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.39.1",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.3.24",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / (v1)\u00b2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.6.20a",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.8.14",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.16.6",
+  "seeds": [
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.032613 * ((v0 * v1) / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.057916 * ((v0 * v1) / (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.109 * ((v0 * v1) / (v2)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.27.6",
+  "seeds": [
+   [
+    "B1",
+    "((v1 / v2) / (1.0 + (0.49869 * (v1 / (v0 * v2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.34.8",
+  "seeds": [
+   [
+    "power_law",
+    "(((v0 * v1) * v2) / v3)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.43.16",
+  "seeds": [
+   [
+    "power_law",
+    "(((v0 * v1) * v2) / v3)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.12.2",
+  "seeds": [
+   [
+    "power_law",
+    "((v0 * v1) / (v2 * (v3)\u00b2))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.15.4",
+  "seeds": [
+   [
+    "E1",
+    "((v0 * v1) * (-1.0 * cos((6.226701 * v2))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.18.12",
+  "seeds": [
+   [
+    "E1",
+    "((v0 * v1) * (1.0 * sin((3.133946 * v2))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "III.15.12",
+  "seeds": [
+   [
+    "E1",
+    "(v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.10.7",
+  "seeds": [
+   [
+    "B1",
+    "(v0 / sqrt((1.0 + (-0.040043 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.11.19",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.15.10",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ],
+   [
+    "B1",
+    "((v0 * v1) / sqrt((1.0 + (-0.040127 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.25.13",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.26.2",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 * cos((4.889472 * v1)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.29.4",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.30.5",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / (v1 * v2))"
+   ],
+   [
+    "N1",
+    "((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2))))))"
+   ],
+   [
+    "N1",
+    "((v0 / (v1 * v2)) / (1.0 + (-0.001203 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "((v0 / (v1 * v2)) * (1.0 + (0.001266 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "((v0 / (v1 * v2)) * sqrt((1.0 + (0.002596 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2))))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.32.5",
+  "seeds": [
+   [
+    "power_law",
+    "(((v0)\u00b2 * (v1)\u00b2) / (v2 * (v3 * (v3)\u00b2)))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.34.1",
+  "seeds": [
+   [
+    "B1",
+    "(v0 / (1.0 + (-0.20162 * (v1 / v2))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.37.4",
+  "seeds": [
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 * v2)))) + (0.949886 * cos((6.054448 * v2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.40.1",
+  "seeds": [
+   [
+    "E1",
+    "(v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.44.4",
+  "seeds": [
+   [
+    "E1",
+    "(((v0 * v1) * v2) * log((4.943794 * v3)))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "I.50.26",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.2.42",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.6.15b",
+  "seeds": [
+   [
+    "E1",
+    "((v0 / (v2 * (v3 * (v3)\u00b2))) * (1.0 * sin((5.950302 * v1))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.11.3",
+  "seeds": [
+   [
+    "B1",
+    "(((v0 * v1) / (v2 * (v3)\u00b2)) / (1.0 + (-0.159964 * ((v4)\u00b2 / (v3)\u00b2))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.11.27",
+  "seeds": [
+   [
+    "B1",
+    "((((v0 * v1) * v2) * v3) / (1.0 + (-0.329947 * (v0 * v1))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.13.23",
+  "seeds": [
+   [
+    "B1",
+    "(v0 / sqrt((1.0 + (-0.040069 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.24.17",
+  "seeds": [
+   [
+    "B1",
+    "((v0 / v1) * sqrt((1.0 + (-0.068024 * ((v1)\u00b2 / ((v0)\u00b2 * (v2)\u00b2))))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.34.2",
+  "seeds": [
+   [
+    "power_law",
+    "((v0 * v1) * v2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.35.18",
+  "seeds": [
+   [
+    "E1",
+    "(v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2) / v3)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "II.38.3",
+  "seeds": [
+   [
+    "power_law",
+    "(((v0 * v1) * v2) / v3)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "III.9.52",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "III.10.19",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "III.17.37",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn",
+  "problem": "III.19.51",
+  "seeds": [
+   [
+    "power_law",
+    "((v0 * ((v1)\u00b2)\u00b2) / (((v2)\u00b2 * (v3)\u00b2) * (v4)\u00b2))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.12.1",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.12.5",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.14.4",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * (v1)\u00b2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.39.1",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.3.24",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / (v1)\u00b2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.6.20a",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.8.14",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.16.6",
+  "seeds": [
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041566 * ((v0 * v1) / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.032661 * ((v0 * v1) / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.057993 * ((v0 * v1) / (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.108377 * ((v0 * v1) / (v2)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.27.6",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / (1.0 + (2.004357 * ((v0 * v2) / v1))))"
+   ],
+   [
+    "N1",
+    "(v0 * exp((-1.321063 * ((sqrt(v0) * sqrt(v2)) / sqrt(v1)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.34.8",
+  "seeds": [
+   [
+    "N1",
+    "(((v0 * v1) * v2) / v3)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.43.16",
+  "seeds": [
+   [
+    "N1",
+    "(((v0 * v1) * v2) / v3)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.12.2",
+  "seeds": [
+   [
+    "N1",
+    "((v0 * v1) / (v2 * (v3)\u00b2))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.15.4",
+  "seeds": [
+   [
+    "N1",
+    "((v0 * v1) * ((-0.001189 + (0.004025 * sin((6.21892 * v2)))) + (-1.0 * cos((6.21892 * v2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.18.12",
+  "seeds": [
+   [
+    "N1",
+    "((v0 * v1) * ((0.04636 + (1.0 * sin((3.219961 * v2)))) + (-0.044835 * cos((3.219961 * v2)))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) * v2) * (1.0 + (-0.998994 * v2)))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "III.15.12",
+  "seeds": [
+   [
+    "N1",
+    "(((v0 * (v1)\u00b2) * (v2)\u00b2) * (1.0 + (-0.803253 * (v1 * v2))))"
+   ],
+   [
+    "N1",
+    "(((v0 * (v1)\u00b2) * (v2)\u00b2) * sqrt((1.0 + (-1.022173 * (v1 * v2)))))"
+   ],
+   [
+    "N1",
+    "((v0 / (v1 * v2)) * tanh((3.65076 * ((v1 * (v1)\u00b2) * (v2 * (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "((v0 / (v1 * v2)) * exp((-2.869579 * (1.0 / (sqrt(v1) * sqrt(v2))))))"
+   ],
+   [
+    "N1",
+    "(((v0 * (v1)\u00b2) * (v2)\u00b2) / (1.0 + (3.125641 * ((v1)\u00b2 * (v2)\u00b2))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.10.7",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / sqrt((1.0 + (-0.040165 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "(v0 / (1.0 + (-0.021636 * ((v1)\u00b2 / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "(v0 * (1.0 + (0.025164 * ((v1)\u00b2 / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "(v0 * sqrt((1.0 + (0.058179 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "v0"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.11.19",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.15.10",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 * v1)"
+   ],
+   [
+    "N1",
+    "((v0 * v1) / sqrt((1.0 + (-0.040184 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "((v0 * v1) / (1.0 + (-0.0214 * ((v1)\u00b2 / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "((v0 * v1) * (1.0 + (0.024177 * ((v1)\u00b2 / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "((v0 * v1) * sqrt((1.0 + (0.053471 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.25.13",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.26.2",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172 * cos((4.861902 * v1)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.29.4",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.30.5",
+  "seeds": [
+   [
+    "power_law",
+    "(v0 / (v1 * v2))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.32.5",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.34.1",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / (1.0 + (-0.201043 * (v1 / v2))))"
+   ],
+   [
+    "N1",
+    "(((v0 * (v1)\u00b2) / (v2)\u00b2) * (1.0 + (7.651686 * ((v2)\u00b2 / (v1)\u00b2))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v2) / v1) * exp((2.432366 * (sqrt(v1) / sqrt(v2)))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) / v2) * sqrt((1.0 + (2.431759 * ((v2)\u00b2 / (v1)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "(v0 / sqrt((1.0 + (-0.291551 * (v1 / v2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.37.4",
+  "seeds": [
+   [
+    "N1",
+    "((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.110638 * sin((6.048124 * v2)))) + (0.949406 * cos((6.048124 * v2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.40.1",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.44.4",
+  "seeds": [
+   [
+    "N1",
+    "((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.20178 * (1.0 / v3))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) * v2) * exp((-0.293544 * (1.0 / (v3 * sqrt(v3))))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) * v2) / (exp((0.722908 * (1.0 / v3))) + exp((-0.722908 * (1.0 / v3)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "I.50.26",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.2.42",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.6.15b",
+  "seeds": [
+   [
+    "N1",
+    "((v0 / (v2 * (v3 * (v3)\u00b2))) * ((-0.008475 + (1.0 * sin((6.0 * v1)))) + (-0.03498 * cos((6.0 * v1)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.11.3",
+  "seeds": [
+   [
+    "N1",
+    "(((v0 * v1) / (v2 * (v3)\u00b2)) / sqrt((1.0 + (-0.435986 * (v4 / v3)))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) / (v2 * (v3)\u00b2)) / (1.0 + (-0.316379 * (v4 / v3))))"
+   ],
+   [
+    "N1",
+    "((((v0 * v1) * v4) / (v2 * (v3 * (v3)\u00b2))) * sqrt((1.0 + (0.923447 * ((v3)\u00b2 / (v4)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) * sqrt(v4)) / (v2 * ((v3)\u00b2 * sqrt(v3))))"
+   ],
+   [
+    "N1",
+    "((((v0 * v1) * (v4)\u00b2) / (v2 * ((v3)\u00b2)\u00b2)) * (1.0 + (2.190085 * ((v3)\u00b2 / (v4)\u00b2))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.11.27",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.13.23",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / sqrt((1.0 + (-0.040071 * ((v1)\u00b2 / (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "(v0 / (1.0 + (-0.021784 * ((v1)\u00b2 / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "(v0 * (1.0 + (0.025661 * ((v1)\u00b2 / (v2)\u00b2))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) / v2) * sqrt((1.0 + (14.263644 * ((v2)\u00b2 / (v1)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.24.17",
+  "seeds": [
+   [
+    "N1",
+    "((v0 / v1) * sqrt((1.0 + (-0.068263 * ((v1)\u00b2 / ((v0)\u00b2 * (v2)\u00b2))))))"
+   ],
+   [
+    "N1",
+    "((v0 / v1) * (1.0 + (-0.038062 * ((v1)\u00b2 / ((v0)\u00b2 * (v2)\u00b2)))))"
+   ],
+   [
+    "N1",
+    "((((v0 * (v0)\u00b2) * (v2)\u00b2) / (v1 * (v1)\u00b2)) / (1.0 + (16.345034 * (((v0)\u00b2 * (v2)\u00b2) / (v1)\u00b2))))"
+   ],
+   [
+    "N1",
+    "((1.0 / v2) * exp((-2.082873 * (sqrt(v1) / (sqrt(v0) * sqrt(v2))))))"
+   ],
+   [
+    "N1",
+    "((((v0)\u00b2 * v2) / (v1)\u00b2) / sqrt((1.0 + (5.965399 * (((v0)\u00b2 * (v2)\u00b2) / (v1)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.34.2",
+  "seeds": [
+   [
+    "power_law",
+    "((v0 * v1) * v2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.35.18",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "II.38.3",
+  "seeds": [
+   [
+    "power_law",
+    "(((v0 * v1) * v2) / v3)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "III.9.52",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "III.10.19",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "III.17.37",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n1",
+  "problem": "III.19.51",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.12.1",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.12.5",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.14.4",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * (v1)\u00b2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.39.1",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.3.24",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / (v1)\u00b2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.6.20a",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.8.14",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.16.6",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.27.6",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.34.8",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.43.16",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.12.2",
+  "seeds": [
+   [
+    "N1",
+    "((v0 * v1) / (v2 * (v3)\u00b2))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.15.4",
+  "seeds": [
+   [
+    "N1",
+    "((v0 * v1) * ((-0.011857 + (0.039781 * sin((6.15 * v2)))) + (-1.0 * cos((6.15 * v2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.18.12",
+  "seeds": [
+   [
+    "N1",
+    "((v0 * v1) * ((0.641182 + (1.0 * sin((4.15 * v2)))) + (-0.590458 * cos((4.15 * v2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "III.15.12",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * ((1.0 + (-0.07348 * sin((4.037457 * (v1 * v2))))) + (-0.952237 * cos((4.037457 * (v1 * v2))))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.10.7",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.11.19",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.15.10",
+  "seeds": [
+   [
+    "N1",
+    "(v0 * v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.25.13",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / v1)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.26.2",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.29.4",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.30.5",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / (v1 * v2))"
+   ],
+   [
+    "N1",
+    "((v2 / (v0 * v1)) * tanh((0.003189 * ((v0)\u00b2 / (v2)\u00b2))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.32.5",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.34.1",
+  "seeds": [
+   [
+    "N1",
+    "(v0 / (1.0 + (-0.196428 * (v1 / v2))))"
+   ],
+   [
+    "N1",
+    "(v0 / sqrt((1.0 + (-0.288171 * (v1 / v2)))))"
+   ],
+   [
+    "N1",
+    "(((v0 * (v1)\u00b2) / (v2)\u00b2) * (1.0 + (6.759361 * ((v2)\u00b2 / (v1)\u00b2))))"
+   ],
+   [
+    "N1",
+    "(((v0 * v1) / v2) * sqrt((1.0 + (2.285229 * ((v2)\u00b2 / (v1)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.37.4",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.40.1",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.44.4",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "I.50.26",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.2.42",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.6.15b",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.11.3",
+  "seeds": [
+   [
+    "N1",
+    "(((v0 * v1) * sqrt(v4)) / (v2 * ((v3)\u00b2 * sqrt(v3))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.11.27",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.13.23",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.24.17",
+  "seeds": [
+   [
+    "N1",
+    "((v0 / v1) / (1.0 + (0.055896 * ((v1)\u00b2 / ((v0)\u00b2 * (v2)\u00b2)))))"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.34.2",
+  "seeds": [
+   [
+    "N1",
+    "((v0 * v1) * v2)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.35.18",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "II.38.3",
+  "seeds": [
+   [
+    "N1",
+    "(((v0 * v1) * v2) / v3)"
+   ]
+  ]
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "III.9.52",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "III.10.19",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "III.17.37",
+  "seeds": []
+ },
+ {
+  "kind": "ufeyn_n10",
+  "problem": "III.19.51",
+  "seeds": []
+ }
+]

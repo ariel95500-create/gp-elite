@@ -1,0 +1,12 @@
+GP_ELITE 1.1.0 prêt.
+formule trouvée : 2.00564 * sqrt(L)   (43 s)
+T = 2.0056 * sqrt(L), donc g = (2*pi/2.0056)^2 = 9.81 m/s^2
+formule trouvée : 6.30042 * sqrt(m / k)   (52 s)
+facteur devant la racine : 6.3004  (2*pi = 6.2832)
+formule trouvée : 4.87056 * t²   (58 s)
+d = 4.8706 * t^2, donc g = 2 * 4.8706 = 9.74 m/s^2
+formule trouvée : 1.00285 * U² / R   (46 s)
+formule trouvée : 8.24992 * n * T / V   (55 s)
+R = 8.250 J/(mol K)  (valeur exacte 8.314)
+formule trouvée : 0.797624 * (d / d²)²   (48 s)
+E = 0.7976 / d^2, donc P = 4*pi*0.7976 = 10.02 W  (valeur exacte 10 W)

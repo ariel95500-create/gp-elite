@@ -1,0 +1,63 @@
+gp_elite 1.1.0
+periods (years): Mercury 0.240847 Venus 0.615197 Earth 1.000017 Mars 1.880848 Jupiter 11.861983 Saturn 29.457157 Uranus 84.020473 Neptune 164.770132
+a^3/P^2 (au^3/yr^2): Mercury 0.999960 Venus 0.999955 Earth 0.999968 Mars 0.999938 Jupiter 1.000800 Saturn 1.005305 Uranus 1.005506 Neptune 1.005523
+
+--- seed 0
+A  5.43909e-10 * X0 * sqrt(X0)   (9 s)
+   constant [s / m^1.5] = 5.439086684486386e-10
+   G*M_sun = 1.334467e+20  (+5.53e-03 from IAU)   largest relative error on the 8 periods 2.77e-03
+B  5.45416e-10 * X0 * sqrt(X0)   (0 s)
+   constant [s / m^1.5] = 5.454156846656129e-10   G*M_sun = 1.327103e+20  (-1.64e-05 from IAU)
+   outer planets, relative error: Jupiter +4.27e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.78e-03   largest 2.78e-03
+C8 0.00684983 + 0.997207 * X0 * sqrt(X0)   (11 s)   seeds placed [('_make_power_law_seeds', 1), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_binomial_seeds', 4), ('_make_elementary_seeds', 2), ('_make_tolerant_seeds', 5)]
+   relative error: Mercury +2.56e-02 Venus +8.32e-03 Earth +4.04e-03 Mars +8.18e-04 Jupiter -1.82e-03 Saturn +8.13e-05 Uranus +2.99e-05 Neptune -1.42e-06
+C4 -7.16378e-06 + 1.00003 * X0 * sqrt(X0)   (0 s)
+   outer planets, relative error: Jupiter +4.32e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.79e-03   largest 2.79e-03
+
+--- seed 1
+A  5.43909e-10 * X0 * sqrt(X0)   (10 s)
+   constant [s / m^1.5] = 5.439086684486386e-10
+   G*M_sun = 1.334467e+20  (+5.53e-03 from IAU)   largest relative error on the 8 periods 2.77e-03
+B  5.45416e-10 * X0 * sqrt(X0)   (0 s)
+   constant [s / m^1.5] = 5.454156846656129e-10   G*M_sun = 1.327103e+20  (-1.64e-05 from IAU)
+   outer planets, relative error: Jupiter +4.27e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.78e-03   largest 2.78e-03
+C8 0.00684983 + 0.997207 * X0 * sqrt(X0)   (10 s)   seeds placed [('_make_power_law_seeds', 1), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_binomial_seeds', 4), ('_make_elementary_seeds', 2), ('_make_tolerant_seeds', 5)]
+   relative error: Mercury +2.56e-02 Venus +8.32e-03 Earth +4.04e-03 Mars +8.18e-04 Jupiter -1.82e-03 Saturn +8.13e-05 Uranus +2.99e-05 Neptune -1.42e-06
+C4 -7.16378e-06 + 1.00003 * X0 * sqrt(X0)   (0 s)
+   outer planets, relative error: Jupiter +4.32e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.79e-03   largest 2.79e-03
+
+--- seed 2
+A  5.43909e-10 * X0 * sqrt(X0)   (9 s)
+   constant [s / m^1.5] = 5.439086684486386e-10
+   G*M_sun = 1.334467e+20  (+5.53e-03 from IAU)   largest relative error on the 8 periods 2.77e-03
+B  5.45416e-10 * X0 * sqrt(X0)   (0 s)
+   constant [s / m^1.5] = 5.454156846656129e-10   G*M_sun = 1.327103e+20  (-1.64e-05 from IAU)
+   outer planets, relative error: Jupiter +4.27e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.78e-03   largest 2.78e-03
+C8 0.00684983 + 0.997207 * X0 * sqrt(X0)   (11 s)   seeds placed [('_make_power_law_seeds', 1), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_binomial_seeds', 4), ('_make_elementary_seeds', 2), ('_make_tolerant_seeds', 5)]
+   relative error: Mercury +2.56e-02 Venus +8.32e-03 Earth +4.04e-03 Mars +8.18e-04 Jupiter -1.82e-03 Saturn +8.13e-05 Uranus +2.99e-05 Neptune -1.42e-06
+C4 -7.16378e-06 + 1.00003 * X0 * sqrt(X0)   (0 s)
+   outer planets, relative error: Jupiter +4.32e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.79e-03   largest 2.79e-03
+
+--- seed 3
+A  5.43909e-10 * X0 * sqrt(X0)   (8 s)
+   constant [s / m^1.5] = 5.439086684486386e-10
+   G*M_sun = 1.334467e+20  (+5.53e-03 from IAU)   largest relative error on the 8 periods 2.77e-03
+B  5.45416e-10 * X0 * sqrt(X0)   (0 s)
+   constant [s / m^1.5] = 5.454156846656129e-10   G*M_sun = 1.327103e+20  (-1.64e-05 from IAU)
+   outer planets, relative error: Jupiter +4.27e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.78e-03   largest 2.78e-03
+C8 0.00684983 + 0.997207 * X0 * sqrt(X0)   (10 s)   seeds placed [('_make_power_law_seeds', 1), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_binomial_seeds', 4), ('_make_elementary_seeds', 2), ('_make_tolerant_seeds', 5)]
+   relative error: Mercury +2.56e-02 Venus +8.32e-03 Earth +4.04e-03 Mars +8.18e-04 Jupiter -1.82e-03 Saturn +8.13e-05 Uranus +2.99e-05 Neptune -1.42e-06
+C4 -7.16378e-06 + 1.00003 * X0 * sqrt(X0)   (0 s)
+   outer planets, relative error: Jupiter +4.32e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.79e-03   largest 2.79e-03
+
+--- seed 4
+A  5.43909e-10 * X0 * sqrt(X0)   (9 s)
+   constant [s / m^1.5] = 5.439086684486386e-10
+   G*M_sun = 1.334467e+20  (+5.53e-03 from IAU)   largest relative error on the 8 periods 2.77e-03
+B  5.45416e-10 * X0 * sqrt(X0)   (0 s)
+   constant [s / m^1.5] = 5.454156846656129e-10   G*M_sun = 1.327103e+20  (-1.64e-05 from IAU)
+   outer planets, relative error: Jupiter +4.27e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.78e-03   largest 2.78e-03
+C8 0.00684983 + 0.997207 * X0 * sqrt(X0)   (9 s)   seeds placed [('_make_power_law_seeds', 1), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_binomial_seeds', 4), ('_make_elementary_seeds', 2), ('_make_tolerant_seeds', 5)]
+   relative error: Mercury +2.56e-02 Venus +8.32e-03 Earth +4.04e-03 Mars +8.18e-04 Jupiter -1.82e-03 Saturn +8.13e-05 Uranus +2.99e-05 Neptune -1.42e-06
+C4 -7.16378e-06 + 1.00003 * X0 * sqrt(X0)   (0 s)
+   outer planets, relative error: Jupiter +4.32e-04 Saturn +2.68e-03 Uranus +2.78e-03 Neptune +2.79e-03   largest 2.79e-03

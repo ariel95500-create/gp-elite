@@ -1,0 +1,22 @@
+Recovering y = 2x + 1 from data with outliers
+(RMSE vs the TRUE law on clean points, 5 seeds: median [worst])
+
+   outliers |    MSE (default) |      robust=True | lower median
+  --------------------------------------------------------------
+         0% |   0.063 [ 0.063] |   0.063 [ 0.063] | tie
+        10% |   1.398 [ 1.398] |   0.237 [ 0.237] | robust
+        20% |   1.925 [ 1.925] |   1.925 [ 1.925] | tie
+
+  Formulas returned (distinct formulas, with how many of the 5 seeds
+  returned each):
+     0% default  [5/5]  y = 0.914431 + 2.00473 * x
+     0% robust   [5/5]  y = 0.885403 + 2.01275 * x
+    10% default  [5/5]  y = 2.88509 + 1.53912 * x
+    10% robust   [5/5]  y = 1.20418 + 1.93211 * x
+    20% default  [5/5]  y = 4.23319 + 1.32825 * x
+    20% robust   [4/5]  y = 4.23319 + 1.32825 * x
+                 [1/5]  y = 23.2094 - 21.0825 * sqrt(|0.890655 - 0.1 * x|)
+
+  robust=True changes the loss, not the search: whether it helps
+  depends on the data. Read the table, and compare both modes on a
+  hold-out of your own before trusting either.

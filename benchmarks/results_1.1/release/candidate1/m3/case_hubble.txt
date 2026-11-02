@@ -1,0 +1,50 @@
+gp_elite 1.1.0
+rows 24, fit 18 up to 1.1 Mpc, held out 6
+
+case0701: least squares through the origin  v = 423.94 d   R2 0.6194   RMSE 224.2
+case0701: least squares with intercept    v = -40.78 + 454.16 d   R2 0.6235   RMSE 223.0
+
+stars1: least squares through the origin  v = 415.40 d   R2 0.5904   RMSE 243.1
+stars1: least squares with intercept    v = -68.15 + 465.90 d   R2 0.6009   RMSE 239.9
+held out, through the origin fitted on the 18: v = 427.06 d   RMSE on the 6 203.4
+held out, with intercept fitted on the 18:    v = -74.99 + 520.27 d   RMSE on the 6 230.6
+
+--- seed 0
+A  423.937 * X0   (19 s)   R2 0.6194   RMSE 224.2   constant [km / Mpc s] = 423.93732323163016   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CA 427.063 * X0   RMSE on the 6 203.4
+DA 415.4 * X0   R2 0.5904   constant [km / Mpc s] = 415.4001001768594
+B  -40.7836 + 454.158 * X0   (10 s)   R2 0.6235   RMSE 223.0   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CB -74.9921 + 520.269 * X0   RMSE on the 6 230.6
+DB -68.1539 + 465.903 * X0   R2 0.6009
+
+--- seed 1
+A  423.937 * X0   (16 s)   R2 0.6194   RMSE 224.2   constant [km / Mpc s] = 423.93732323163033   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CA 427.063 * X0   RMSE on the 6 203.4
+DA 415.4 * X0   R2 0.5904   constant [km / Mpc s] = 415.4001001768595
+B  -40.7836 + 454.158 * X0   (10 s)   R2 0.6235   RMSE 223.0   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CB -74.9921 + 520.269 * X0   RMSE on the 6 230.6
+DB -68.1539 + 465.903 * X0   R2 0.6009
+
+--- seed 2
+A  423.937 * X0   (17 s)   R2 0.6194   RMSE 224.2   constant [km / Mpc s] = 423.9373232316303   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CA 427.063 * X0   RMSE on the 6 203.4
+DA 415.4 * X0   R2 0.5904   constant [km / Mpc s] = 415.4001001768594
+B  -40.7836 + 454.158 * X0   (10 s)   R2 0.6235   RMSE 223.0   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CB -74.9921 + 520.269 * X0   RMSE on the 6 230.6
+DB -68.1539 + 465.903 * X0   R2 0.6009
+
+--- seed 3
+A  423.937 * X0   (19 s)   R2 0.6194   RMSE 224.2   constant [km / Mpc s] = 423.93732323163033   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CA 427.063 * X0   RMSE on the 6 203.4
+DA 415.4 * X0   R2 0.5904   constant [km / Mpc s] = 415.4001001768593
+B  -40.7836 + 454.158 * X0   (10 s)   R2 0.6235   RMSE 223.0   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CB -74.9921 + 520.269 * X0   RMSE on the 6 230.6
+DB -68.1539 + 465.903 * X0   R2 0.6009
+
+--- seed 4
+A  423.937 * X0   (15 s)   R2 0.6194   RMSE 224.2   constant [km / Mpc s] = 423.9373232316303   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CA 427.063 * X0   RMSE on the 6 203.4
+DA 415.4 * X0   R2 0.5904   constant [km / Mpc s] = 415.4001001768593
+B  -40.7836 + 454.158 * X0   (10 s)   R2 0.6235   RMSE 223.0   seeds placed [('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_power_law_seeds', 0), ('_make_binomial_seeds', 0), ('_make_elementary_seeds', 0), ('_make_tolerant_seeds', 0)]
+CB -74.9921 + 520.269 * X0   RMSE on the 6 230.6
+DB -68.1539 + 465.903 * X0   R2 0.6009

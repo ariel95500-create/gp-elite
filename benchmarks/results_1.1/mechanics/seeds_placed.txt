@@ -1,0 +1,44 @@
+gp_elite 1.0.0 /home/user/gp-elite/gp_elite/__init__.py
+I.12.1     same  placed 1, expected 1
+I.12.5     same  placed 1, expected 1
+I.14.4     same  placed 1, expected 1
+I.39.1     same  placed 1, expected 1
+II.3.24    same  placed 1, expected 1
+I.6.20a    same  placed 0, expected 0
+I.8.14     same  placed 0, expected 0
+I.16.6     same  placed 4, expected 4
+I.27.6     same  placed 1, expected 1
+I.34.8     same  placed 1, expected 1
+I.43.16    same  placed 1, expected 1
+I.12.2     same  placed 1, expected 1
+II.15.4    same  placed 1, expected 1
+I.18.12    same  placed 1, expected 1
+III.15.12  same  placed 1, expected 1
+I.10.7     same  placed 1, expected 1
+I.11.19    same  placed 0, expected 0
+I.15.10    same  placed 2, expected 2
+I.25.13    same  placed 1, expected 1
+I.26.2     same  placed 1, expected 1
+I.29.4     same  placed 1, expected 1
+I.30.5     same  placed 5, expected 5
+I.32.5     same  placed 1, expected 1
+I.34.1     same  placed 1, expected 1
+I.37.4     same  placed 1, expected 1
+I.40.1     same  placed 1, expected 1
+I.44.4     same  placed 1, expected 1
+I.50.26    same  placed 0, expected 0
+II.2.42    same  placed 0, expected 0
+II.6.15b   same  placed 1, expected 1
+II.11.3    same  placed 1, expected 1
+II.11.27   same  placed 1, expected 1
+II.13.23   same  placed 1, expected 1
+II.24.17   same  placed 1, expected 1
+II.34.2    same  placed 1, expected 1
+II.35.18   same  placed 1, expected 1
+II.38.3    same  placed 1, expected 1
+III.9.52   same  placed 0, expected 0
+III.10.19  same  placed 0, expected 0
+III.17.37  same  placed 0, expected 0
+III.19.51  same  placed 1, expected 1
+
+41 of 41 equations: the seeds placed are those expected

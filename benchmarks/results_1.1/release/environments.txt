@@ -1,0 +1,75 @@
+# SHA-256 of the release files built from commit 6e0e296 (python -m build from a clean export), 29 October 2026
+18d3bac5ab82a28aff898bae4805077cb19b9563d7967e9f61d6623aa80cb6c2  gp_elite-1.1.0-py3-none-any.whl
+c3a035f51b5a2556c41538412e1858de407ab64564bad0aaa54f2d0bd6e8c7b6  gp_elite-1.1.0.tar.gz
+
+# twine check --strict passes for both.
+# The engine is that of 26349ef (U2); the commits after it change benchmarks and documents only.
+
+# SHA-256 of the files to publish, built again from commit 346cd07 after the decision of gate 6
+# (python -m build from a clean export of the commit), 2 November 2026:
+2243c2abad0caafa8c8858aae0923cac4ae3292fef390ebaca083172320c655f  gp_elite-1.1.0-py3-none-any.whl
+3e2dacee4ad0a2e97b5aec4549e69c958d737828ce41e4ee9e608e069b93629f  gp_elite-1.1.0.tar.gz
+# Every gp_elite/ file of the wheel and of the source archive is identical to those of the files
+# measured above; the wheel differs in gp_elite-1.1.0.dist-info/METADATA (the description, from the
+# README; the headers are identical) and in the line of METADATA in RECORD, the source archive in
+# PKG-INFO, gp_elite.egg-info/PKG-INFO and README.md. twine check --strict passes for both.
+
+# /venv11b — uv pip freeze
+cloudpickle==3.1.2
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist11b/dist/gp_elite-1.1.0-py3-none-any.whl
+joblib==1.6.0
+narwhals==2.27.1
+numpy==2.4.6
+pandas==3.0.6
+pip==24.0
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+six==1.17.0
+threadpoolctl==3.7.0
+
+# /venv11bx — uv pip freeze
+cloudpickle==3.1.2
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.66.1
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist11b/dist/gp_elite-1.1.0-py3-none-any.whl
+gplearn==0.4.3
+joblib==1.6.0
+kiwisolver==1.5.1
+matplotlib==3.11.2
+mpmath==1.3.0
+narwhals==2.27.1
+numpy==2.4.6
+nvidia-nccl-cu12==2.32.3
+packaging==26.3
+pandas==3.0.6
+pillow==12.3.0
+pip==24.0
+pyparsing==3.3.3
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+six==1.17.0
+sympy==1.14.0
+threadpoolctl==3.7.0
+xgboost==3.2.0
+
+# /venv10p — uv pip freeze
+cloudpickle==3.1.2
+gp-elite==1.0.0
+joblib==1.6.0
+narwhals==2.27.1
+numpy==2.4.6
+pandas==3.0.6
+pip==24.0
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+six==1.17.0
+threadpoolctl==3.7.0
+
+# /venv10p: gp-elite 1.0.0 installed from PyPI on 29 October 2026; its gp_elite/ files are identical to those of the measured wheel (/venv10).

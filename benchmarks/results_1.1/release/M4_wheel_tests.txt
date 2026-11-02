@@ -1,0 +1,74 @@
+# M4 of PLAN_RELEASE_1.1.md, 30 October 2026: the test suite of 6e0e296 (tests/, copied alone into an
+# empty folder) run against the wheel gp_elite-1.1.0-py3-none-any.whl (SHA-256 18d3bac5...6cb2,
+# environments.txt) installed in a fresh environment for each Python, with the packages of the
+# environments of M4 of 1.0.0 (pins below); PYTHONHASHSEED=0, one Python after the other (run.sh).
+[3.9.23] 154 passed in 178.69s (0:02:58)
+[3.11.15] 154 passed in 152.87s (0:02:32)
+[3.14.0rc2] 154 passed in 139.81s (0:02:19)
+# engine imported by each environment:
+[3.9.23] 1.1.0 /venvt11_3.9.23/lib/python3.9/site-packages/gp_elite/__init__.py numpy 2.0.2 sklearn 1.6.1
+[3.11.15] 1.1.0 /venvt11_3.11.15/lib/python3.11/site-packages/gp_elite/__init__.py numpy 2.4.6 sklearn 1.9.1
+[3.14.0rc2] 1.1.0 /venvt11_3.14.0rc2/lib/python3.14/site-packages/gp_elite/__init__.py numpy 2.5.4 sklearn 1.9.1
+# twine check --strict of the wheel and the source archive (twine 7.0.0):
+gp_elite-1.1.0-py3-none-any.whl: PASSED
+gp_elite-1.1.0.tar.gz: PASSED
+# uv pip freeze, 3.9.23:
+exceptiongroup==1.3.1
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist11b/dist/gp_elite-1.1.0-py3-none-any.whl
+iniconfig==2.1.0
+joblib==1.5.3
+mpmath==1.3.0
+numpy==2.0.2
+packaging==26.3
+pandas==2.3.3
+pluggy==1.6.0
+pygments==2.21.0
+pytest==8.4.2
+python-dateutil==2.9.0.post0
+pytz==2026.5
+scikit-learn==1.6.1
+scipy==1.13.1
+six==1.17.0
+sympy==1.14.0
+threadpoolctl==3.7.0
+tomli==2.5.0
+typing-extensions==4.16.0
+tzdata==2026.5
+# uv pip freeze, 3.11.15:
+cloudpickle==3.1.2
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist11b/dist/gp_elite-1.1.0-py3-none-any.whl
+iniconfig==2.3.1
+joblib==1.6.0
+mpmath==1.3.0
+narwhals==2.27.1
+numpy==2.4.6
+packaging==26.3
+pandas==3.0.6
+pluggy==1.6.0
+pygments==2.21.0
+pytest==9.1.1
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+six==1.17.0
+sympy==1.14.0
+threadpoolctl==3.7.0
+# uv pip freeze, 3.14.0rc2:
+cloudpickle==3.1.2
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist11b/dist/gp_elite-1.1.0-py3-none-any.whl
+iniconfig==2.3.1
+joblib==1.6.0
+mpmath==1.3.0
+narwhals==2.27.1
+numpy==2.5.4
+packaging==26.3
+pandas==3.0.6
+pluggy==1.6.0
+pygments==2.21.0
+pytest==9.1.1
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.18.1
+six==1.17.0
+sympy==1.14.0
+threadpoolctl==3.7.0

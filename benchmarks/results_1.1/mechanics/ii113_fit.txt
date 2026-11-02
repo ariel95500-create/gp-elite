@@ -1,0 +1,9 @@
+gp_elite 1.0.0 /home/user/gp-elite/gp_elite/__init__.py
+
+flag False 20.1 s  1-R2 test 5.76e-31 (EXACT)  size 39  units ok
+    -0.603391 * v1 / ((-0.200021 * v4 / v3 * v4 + 0.200021 * v3) / ((0.333932 * v0 - 0.776655 * v4 * v0 / v4 + 0.111228 * v2 / (v2 / v0)) / (v3 * v2)))
+    binomial seed: None
+
+flag True  1.2 s  1-R2 test 4.18e-31 (EXACT)  size 20  units ok
+    v0 * v1 / (v2 * v3²) / (1 - v4² / v3²)
+    binomial seed: (((v0 * v1) / (v2 * (v3)²)) / (1.0 + (-0.159964 * ((v4)² / (v3)²))))

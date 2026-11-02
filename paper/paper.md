@@ -14,7 +14,7 @@ authors:
 affiliations:
   - index: 1
     name: Independent Researcher, France
-date: 14 October 2026
+date: 2 November 2026
 bibliography: paper.bib
 ---
 
@@ -54,7 +54,8 @@ binomial (rational forms, roots), or times an exponential, logarithm, hyperbolic
 or trigonometric function of a monomial — and seeds the evolutionary search with
 them, on noisy data too. On a test set of 78 Feynman equations frozen before this
 work and measured once, it recovers the exact law in 213 of 390 fits, against 145
-for version 0.9 measured side by side.
+for version 0.9 measured side by side. Version 1.1 lets these fitted forms act
+under declared units too, each kept only if it passes the dimensional gate.
 
 # Statement of need
 
@@ -111,7 +112,7 @@ baseline (2000 programs over 30 generations, against 400 over 30 generations
 and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
 before any measurement,
 and each method judged on the model it returns, it recovers 15/15 exactly
-($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (version 1.0.0,
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (versions 1.0.0 and 1.1.0,
 `benchmarks/duel.py`; 12/15 for version 0.9.0). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
@@ -172,8 +173,9 @@ squares; for sines and cosines, the frequency is searched on a grid and the rest
 is linear. A fitted form that
 holds to numerical precision joins the starting population; when none does, one
 that leaves at most 1.5 % of the variance unexplained does. The search keeps its
-generality and gains starting points. The typed population of the dimensional mode
-does not use them yet.
+generality and gains starting points. Since version 1.1 the typed population of
+the dimensional mode uses them too, each kept only if it passes the dimensional
+gate.
 
 *Reporting honestly by default.* The estimator holds out a validation split,
 selects a parsimonious champion within an $R^2$ tolerance, and exposes a
@@ -198,9 +200,15 @@ generations; with `units=`, 5/5 were valid and more than twice as small (median
 five recovered the exact law, which holds outside the training domain. With
 version 1.0.0 this law belongs to a family fitted directly: the unconstrained
 search returns it in 5/5 runs, in about a second each, while the constrained
-search, unchanged, finds it in 2/5. The constraint guarantees that whatever is
-returned is physically coherent; on the laws the engine fits directly, it is no
-longer the shortest route to the law.
+search, unchanged, found it in 2/5. Since version 1.1.0 the fitted forms act
+under `units=` as well, each placed only if it passes the dimensional gate:
+both searches return the law in 5/5 runs, in about a second. On the 41 equations
+of the decision bench with their units, the constrained search recovers the
+exact law in 165 of 205 fits against 108 for 1.0.0, and each of the 1,005 models
+returned under units in the release measurement (these equations with and
+without noise, and the frozen test set) passes the dimensional audit
+(`benchmarks/results_1.1/release/`). The constraint guarantees that whatever
+is returned is physically coherent.
 
 Each release is also measured once on a test set frozen before any decision of
 its development: 78 Feynman equations absent from the decision bench, 14
@@ -209,7 +217,12 @@ recovers 213 exact laws in 390 fits on its Feynman equations against 145 for
 0.9.0, measured side by side at 30 s per fit, and 7 against 8 in 70 on its
 Strogatz systems; on its real datasets, the median
 $R^2$ moves by less than 0.004 and the number of collapses out of the training
-range does not change (`benchmarks/results_0.9/release_1.0/`). Three case studies
+range does not change (`benchmarks/results_0.9/release_1.0/`). Version 1.1.0
+changes the dimensional mode only: measured beside 1.0.0, both give the same
+counts of exact laws without units (213 exact laws in 390 fits, and 8 in 70 on the Strogatz
+systems, the time budget moving the counts a little from one campaign to the
+next), and on the frozen Feynman equations with their units 1.1.0 recovers 226
+exact laws in 390 fits against 169. Three case studies
 on public data accompany it: Kepler's third law with units, where the four
 inner planets give the product of the gravitational constant and the mass of
 the Sun within 0.002 % of its nominal value; Hubble's measurements of 1929; and
@@ -262,7 +275,8 @@ the protocol of comparisons with criteria written before each measurement,
 under which the changes to the search and the final selection were accepted
 or rejected; for version 1.0, the families of forms fitted directly, the
 noise-tolerant seeds, the correction of the deduced constant and the case
-studies; the benchmark and
+studies; for version 1.1, the seeds placed under declared units and the
+restriction of fitted exponents under units; the benchmark and
 non-regression scripts distributed in the repository; and the drafting of the
 documentation and of this paper.
 
@@ -274,9 +288,10 @@ reproduced before being fixed and re-tested afterwards, and the absence of
 regression was verified by comparing fits before and after each change on a
 fixed set of seeds. The benchmark figures quoted in this paper were produced
 with the scripts in the repository, whose raw results, machine and dates are
-recorded in `benchmarks/results_0.8/` and, for the figures of versions 0.9.0
-and 1.0.0, in `benchmarks/results_0.9/` (`phase3/`, `release/` and
-`release_1.0/`), and the project's test
+recorded in `benchmarks/results_0.8/`, for the figures of versions 0.9.0
+and 1.0.0 in `benchmarks/results_0.9/` (`phase3/`, `release/` and
+`release_1.0/`), and for version 1.1.0 in `benchmarks/results_1.1/`, and the
+project's test
 suite passes on
 the released version. The scientific claims and
 their stated limits are the author's own, as is responsibility for the whole.

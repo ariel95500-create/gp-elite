@@ -1,0 +1,7 @@
+# machine, 2026-10-30 18:00:47
+4
+CPU(s):                                  4
+Model name:                              Intel(R) Xeon(R) Processor @ 2.10GHz
+Flags: ... avx512f ... (AVX-512 present)
+               total        used        free      shared  buff/cache   available
+Mem:              15           0          15           0           0          15

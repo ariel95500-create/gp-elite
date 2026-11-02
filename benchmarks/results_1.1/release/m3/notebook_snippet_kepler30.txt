@@ -1,0 +1,1 @@
+0.00279171 + 0.999396 * distance * sqrt(distance)  (8s)

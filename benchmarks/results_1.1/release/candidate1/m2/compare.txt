@@ -1,0 +1,46 @@
+| indicator | 1.0.0 | 1.1.0 |
+|---|---|---|
+| F41 exact | 163 | 163 |
+| F41N1 structure retrieved | 108 | 108 |
+| F41N10 structure retrieved | 86 | 86 |
+| TF78 exact | 213 | 213 |
+| TS14 test exact | 8 | 8 |
+| R6 folds median R² | 0.8095 | 0.8095 |
+| R6 out-of-domain collapses | 5 | 5 |
+| R6 worst out-of-domain R² | -1946.0 | -1946.0 |
+| R7raw folds median R² | 0.8787 | 0.8787 |
+| R7raw out-of-domain collapses | 5 | 6 |
+| R7raw worst out-of-domain R² | -232.5 | -232.5 |
+| TR25 folds median R² | 0.7691 | 0.7691 |
+| TR25 out-of-domain collapses | 38 | 38 |
+| TR25 worst out-of-domain R² | -1.275e+22 | -1.275e+22 |
+| TR25raw folds median R² | 0.7708 | 0.7708 |
+| TR25raw out-of-domain collapses | 26 | 27 |
+| TR25raw worst out-of-domain R² | -17110.0 | -17110.0 |
+| R6 + R7raw out-of-domain collapses | 10 | 11 |
+| formula_exact False, R6 + R7raw folds and test | 4 | 4 |
+| crashes | 0 | 0 |
+| fits | 2780 | 2780 |
+| U41 exact | 108 | 165 |
+| U41N1 structure retrieved | 79 | 113 |
+| U41N10 structure retrieved | 80 | 99 |
+| TF78 under units exact | 169 | 225 |
+| fits under units | 1005 | 1005 |
+| fits under units passing the audit | 1005 | 1005 |
+| crashes under units | 0 | 0 |
+
+Paired: 2780 jobs in both files, 2213 with the same returned expression (567 differ).
+Same expression by suite: feyn 202/205, feyn_n1 197/205, feyn_n10 202/205, real 60/60, realraw 68/70, tf 383/390, tr 245/250, trraw 247/250, ts 136/140, ufeyn 77/205, ufeyn_n1 105/205, ufeyn_n10 148/205, utf 143/390
+1.1.0 engine and seeds_under_units: [('1.1.0', True)]
+
+Criteria written before the run (PLAN_RELEASE_1.1.md, M2):
+  [met] F41: not more than 3 fewer exact laws than 1.0.0
+  [met] F41N1: not more than 3 fewer structures than 1.0.0
+  [met] F41N10: not more than 3 fewer structures than 1.0.0
+  [met] R6 folds median R² not more than 0.005 below 1.0.0
+  [met] R6 + R7raw collapses out of domain not more than 1.0.0 plus 2
+  [met] U41: at least 10 more exact laws than 1.0.0 (108 -> 165)
+  [met] every model returned under units passes check_dimensions (1005 of 1005)
+ALL MET
+
+Frozen test set, published as measured, deciding nothing: TF78 exact 213 -> 213, TS14 test exact 8 -> 8, TR25 folds median R² 0.7691 -> 0.7691, TF78 under units exact 169 -> 225.

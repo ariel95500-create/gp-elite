@@ -1,0 +1,165 @@
+gp_elite 1.0.0 /home/user/gp-elite/gp_elite/__init__.py
+I.12.1     historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (v0 * v1)
+    tolerant    ok    (v0 * v1)
+I.12.5     historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (v0 * v1)
+    tolerant    ok    (v0 * v1)
+I.14.4     historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (v0 * (v1)²)
+    tolerant    ok    (v0 * (v1)²)
+I.39.1     historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (v0 * v1)
+    tolerant    ok    (v0 * v1)
+II.3.24    historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (v0 / (v1)²)
+    tolerant    ok    (v0 / (v1)²)
+I.6.20a    historique       exact found 0 valid 0 | tolerant found 0 valid 0
+I.8.14     historique       exact found 0 valid 0 | tolerant found 0 valid 0
+I.16.6     historique       exact found 0 valid 0 | tolerant found 4 valid 4
+    tolerant    ok    ((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2)²))))
+    tolerant    ok    ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.032613 * ((v0 * v1) / (v2)²))))
+    tolerant    ok    ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.057916 * ((v0 * v1) / (v2)²)))))
+    tolerant    ok    ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.109 * ((v0 * v1) / (v2)²)))))
+I.27.6     historique       exact found 1 valid 1 | tolerant found 3 valid 3
+    binomial    ok    ((v1 / v2) / (1.0 + (0.49869 * (v1 / (v0 * v2)))))
+    tolerant    ok    ((v1 / v2) / (1.0 + (0.49869 * (v1 / (v0 * v2)))))
+    tolerant    ok    ((v1 / v2) * exp((-0.653234 * (sqrt(v1) / (sqrt(v0) * sqrt(v2))))))
+    tolerant    ok    ((v1 / v2) / (exp((0.905535 * (sqrt(v1) / (sqrt(v0) * sqrt(v2))))) + exp((-0.905535 * (sqrt(v1) / (sqrt(v0) * 
+I.34.8     historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (((v0 * v1) * v2) / v3)
+    tolerant    ok    (((v0 * v1) * v2) / v3)
+I.43.16    historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (((v0 * v1) * v2) / v3)
+    tolerant    ok    (((v0 * v1) * v2) / v3)
+I.12.2     historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    ((v0 * v1) / (v2 * (v3)²))
+    tolerant    ok    ((v0 * v1) / (v2 * (v3)²))
+II.15.4    historique       exact found 1 valid 1 | tolerant found 1 valid 1
+    elementary  ok    ((v0 * v1) * (-1.0 * cos((6.226701 * v2))))
+    tolerant    ok    ((v0 * v1) * (-1.0 * cos((6.226701 * v2))))
+I.18.12    historique       exact found 1 valid 1 | tolerant found 2 valid 2
+    elementary  ok    ((v0 * v1) * (1.0 * sin((3.133946 * v2))))
+    tolerant    ok    ((v0 * v1) * (1.0 * sin((3.133946 * v2))))
+    tolerant    ok    (((v0 * v1) * v2) * (1.0 + (-0.998008 * v2)))
+III.15.12  historique       exact found 1 valid 1 | tolerant found 5 valid 5
+    elementary  ok    (v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))
+    tolerant    ok    (v0 * tanh((3.495193 * ((v1)² * (v2)²))))
+    tolerant    ok    (((v0 * (v1)²) * (v2)²) * (1.0 + (-0.803317 * (v1 * v2))))
+    tolerant    ok    (((v0 * (v1)²) * (v2)²) * sqrt((1.0 + (-1.022594 * (v1 * v2)))))
+    tolerant    ok    ((v0 / (v1 * v2)) * exp((-2.870962 * (1.0 / (sqrt(v1) * sqrt(v2))))))
+    tolerant    ok    (((v0 * (v1)²) * (v2)²) / (1.0 + (3.34774 * ((v1)² * (v2)²))))
+I.10.7     racine           exact found 1 valid 1 | tolerant found 7 valid 5
+    binomial    ok    (v0 / sqrt((1.0 + (-0.040043 * ((v1)² / (v2)²)))))
+    tolerant    ok    (v0 / sqrt((1.0 + (-0.040043 * ((v1)² / (v2)²)))))
+    tolerant    ok    (v0 / (1.0 + (-0.021559 * ((v1)² / (v2)²))))
+    tolerant    ok    (v0 * (1.0 + (0.025045 * ((v1)² / (v2)²))))
+    tolerant    ok    (v0 * sqrt((1.0 + (0.058512 * ((v1)² / (v2)²)))))
+    tolerant    NO    ((pow(v0, 1.0002) * pow(v1, 0.0876)) * pow(v2, -0.0914))
+    tolerant    ok    v0
+    tolerant    NO    (((v1 * v2) / v0) * tanh((0.008948 * ((v0)² / (v1 * v2)))))
+I.11.19    somme_produits   exact found 0 valid 0 | tolerant found 0 valid 0
+I.15.10    racine           exact found 3 valid 2 | tolerant found 7 valid 5
+    power_law   ok    (v0 * v1)
+    power_law   NO    ((pow(v0, 0.9981) * pow(v1, 1.0635)) * pow(v2, -0.0773))
+    binomial    ok    ((v0 * v1) / sqrt((1.0 + (-0.040127 * ((v1)² / (v2)²)))))
+    tolerant    ok    ((v0 * v1) / sqrt((1.0 + (-0.040127 * ((v1)² / (v2)²)))))
+    tolerant    ok    ((v0 * v1) / (1.0 + (-0.021356 * ((v1)² / (v2)²))))
+    tolerant    ok    ((v0 * v1) * (1.0 + (0.024095 * ((v1)² / (v2)²))))
+    tolerant    ok    (((v0 * (v1)²) / v2) * sqrt((1.0 + (16.254672 * ((v2)² / (v1)²)))))
+    tolerant    NO    ((pow(v0, 0.9981) * pow(v1, 1.0635)) * pow(v2, -0.0773))
+    tolerant    ok    (v0 * v1)
+    tolerant    NO    ((1.0 / (v0)²) * tanh((0.013809 * ((v0 * (v0)²) * v1))))
+I.25.13    quotient         exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (v0 / v1)
+    tolerant    ok    (v0 / v1)
+I.26.2     trig             exact found 0 valid 0 | tolerant found 1 valid 1
+    tolerant    ok    (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 * cos((4.889472 * v1)))))
+I.29.4     quotient         exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (v0 / v1)
+    tolerant    ok    (v0 / v1)
+I.30.5     trig             exact found 1 valid 1 | tolerant found 6 valid 5
+    power_law   ok    (v0 / (v1 * v2))
+    tolerant    ok    ((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)² / ((v1)² * (v2)²))))))
+    tolerant    ok    ((v0 / (v1 * v2)) / (1.0 + (-0.001203 * ((v0)² / ((v1)² * (v2)²)))))
+    tolerant    ok    ((v0 / (v1 * v2)) * (1.0 + (0.001266 * ((v0)² / ((v1)² * (v2)²)))))
+    tolerant    ok    ((v0 / (v1 * v2)) * sqrt((1.0 + (0.002596 * ((v0)² / ((v1)² * (v2)²))))))
+    tolerant    NO    ((1.0 / (v1 * v2)) * ((0.223591 + (1.0 * sin((0.100454 * v0)))) + (-0.22424 * cos((0.100454 * v0)))))
+    tolerant    ok    (v0 / (v1 * v2))
+I.32.5     puissances       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (((v0)² * (v1)²) / (v2 * (v3 * (v3)²)))
+    tolerant    ok    (((v0)² * (v1)²) / (v2 * (v3 * (v3)²)))
+I.34.1     rationnelle      exact found 1 valid 1 | tolerant found 6 valid 6
+    binomial    ok    (v0 / (1.0 + (-0.20162 * (v1 / v2))))
+    tolerant    ok    (v0 / (1.0 + (-0.20162 * (v1 / v2))))
+    tolerant    ok    (((v0 * (v1)²) / (v2)²) * (1.0 + (7.856464 * ((v2)² / (v1)²))))
+    tolerant    ok    (((v0 * v2) / v1) * exp((2.436936 * (sqrt(v1) / sqrt(v2)))))
+    tolerant    ok    (((v0 * v1) / v2) * sqrt((1.0 + (2.457167 * ((v2)² / (v1)²)))))
+    tolerant    ok    (v0 / sqrt((1.0 + (-0.291977 * (v1 / v2)))))
+    tolerant    ok    ((v0 * sqrt(v1)) / sqrt(v2))
+I.37.4     trig             exact found 0 valid 0 | tolerant found 1 valid 1
+    tolerant    ok    ((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 * v2)))) + (0.949886 * cos((6.054448 * v2)))))
+I.40.1     exponentielle    exact found 1 valid 1 | tolerant found 2 valid 2
+    elementary  ok    (v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))
+    tolerant    ok    (v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))
+    tolerant    ok    (v0 / (exp((5.852008 * (((v1 * v2) * v3) / (v4 * v5)))) + exp((-5.852008 * (((v1 * v2) * v3) / (v4 * v5))))))
+I.44.4     logarithme       exact found 1 valid 1 | tolerant found 3 valid 3
+    elementary  ok    (((v0 * v1) * v2) * log((4.943794 * v3)))
+    tolerant    ok    ((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.201394 * (1.0 / v3))))
+    tolerant    ok    (((v0 * v1) * v2) * exp((-0.292246 * (1.0 / (v3 * sqrt(v3))))))
+    tolerant    ok    (((v0 * v1) * v2) / (exp((0.720556 * (1.0 / v3))) + exp((-0.720556 * (1.0 / v3)))))
+I.50.26    trig             exact found 0 valid 0 | tolerant found 0 valid 0
+II.2.42    produit_quotient exact found 0 valid 0 | tolerant found 0 valid 0
+II.6.15b   trig             exact found 1 valid 1 | tolerant found 1 valid 1
+    elementary  ok    ((v0 / (v2 * (v3 * (v3)²))) * (1.0 * sin((5.950302 * v1))))
+    tolerant    ok    ((v0 / (v2 * (v3 * (v3)²))) * (1.0 * sin((5.950302 * v1))))
+II.11.3    rationnelle      exact found 1 valid 1 | tolerant found 6 valid 5
+    binomial    ok    (((v0 * v1) / (v2 * (v3)²)) / (1.0 + (-0.159964 * ((v4)² / (v3)²))))
+    tolerant    ok    (((v0 * v1) / (v2 * (v3)²)) / (1.0 + (-0.159964 * ((v4)² / (v3)²))))
+    tolerant    ok    (((v0 * v1) / (v2 * (v3)²)) / sqrt((1.0 + (-0.434265 * (v4 / v3)))))
+    tolerant    ok    (((v0 * v1) / (v2 * (v3)²)) * sqrt((1.0 + (1.043555 * ((v4)² / (v3)²)))))
+    tolerant    NO    ((((pow(v0, 1.0002) * pow(v1, 0.9929)) * pow(v2, -0.9913)) * pow(v3, -2.3606)) * pow(v4, 0.3347))
+    tolerant    ok    (((v0 * v1) * sqrt(v4)) / (v2 * ((v3)² * sqrt(v3))))
+    tolerant    ok    ((((v0 * v1) * (v4)²) / (v2 * ((v3)²)²)) * (1.0 + (2.376878 * ((v3)² / (v4)²))))
+II.11.27   rationnelle      exact found 1 valid 1 | tolerant found 6 valid 5
+    binomial    ok    ((((v0 * v1) * v2) * v3) / (1.0 + (-0.329947 * (v0 * v1))))
+    tolerant    ok    ((((v0 * v1) * v2) * v3) / (1.0 + (-0.329947 * (v0 * v1))))
+    tolerant    ok    ((((v0 * v1) * v2) * v3) / sqrt((1.0 + (-0.574832 * (v0 * v1)))))
+    tolerant    ok    ((((v0 * v1) * v2) * v3) * sqrt((1.0 + (1.154805 * ((v0)² * (v1)²)))))
+    tolerant    ok    ((((v0 * v1) * v2) * v3) * (1.0 + (0.437084 * (v0 * v1))))
+    tolerant    NO    (((pow(v0, 1.0512) * pow(v1, 1.044)) * pow(v2, 0.9815)) * pow(v3, 1.0205))
+    tolerant    ok    (((v0 * v1) * v2) * v3)
+II.13.23   racine           exact found 1 valid 1 | tolerant found 6 valid 5
+    binomial    ok    (v0 / sqrt((1.0 + (-0.040069 * ((v1)² / (v2)²)))))
+    tolerant    ok    (v0 / sqrt((1.0 + (-0.040069 * ((v1)² / (v2)²)))))
+    tolerant    ok    (v0 / (1.0 + (-0.021778 * ((v1)² / (v2)²))))
+    tolerant    ok    (v0 * (1.0 + (0.025649 * ((v1)² / (v2)²))))
+    tolerant    ok    (v0 * exp((0.02164 * ((v1)² / (v2)²))))
+    tolerant    ok    (((v0 * v1) / v2) * sqrt((1.0 + (14.125443 * ((v2)² / (v1)²)))))
+    tolerant    NO    ((pow(v0, 1.0078) * pow(v1, 0.0828)) * pow(v2, -0.0922))
+II.24.17   racine           exact found 1 valid 1 | tolerant found 6 valid 5
+    binomial    ok    ((v0 / v1) * sqrt((1.0 + (-0.068024 * ((v1)² / ((v0)² * (v2)²))))))
+    tolerant    ok    ((v0 / v1) * sqrt((1.0 + (-0.068024 * ((v1)² / ((v0)² * (v2)²))))))
+    tolerant    ok    ((v0 / v1) * (1.0 + (-0.037891 * ((v1)² / ((v0)² * (v2)²)))))
+    tolerant    ok    ((((v0 * (v0)²) * (v2)²) / (v1 * (v1)²)) / (1.0 + (16.411041 * (((v0)² * (v2)²) / (v1)²))))
+    tolerant    ok    ((1.0 / v2) * exp((-2.081744 * (sqrt(v1) / (sqrt(v0) * sqrt(v2))))))
+    tolerant    NO    ((pow(v0, 1.1434) * pow(v1, -1.1271)) * pow(v2, 0.1526))
+    tolerant    ok    ((((v0)² * v2) / (v1)²) / sqrt((1.0 + (6.036791 * (((v0)² * (v2)²) / (v1)²)))))
+II.34.2    produit          exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    ((v0 * v1) * v2)
+    tolerant    ok    ((v0 * v1) * v2)
+II.35.18   exponentielle    exact found 1 valid 1 | tolerant found 2 valid 2
+    elementary  ok    (v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2) / v3)))))
+    tolerant    ok    (v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2) / v3)))))
+    tolerant    ok    (v0 * exp((-2.727679 * ((v1 * v2) / v3))))
+II.38.3    produit_quotient exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    (((v0 * v1) * v2) / v3)
+    tolerant    ok    (((v0 * v1) * v2) / v3)
+III.9.52   trig             exact found 0 valid 0 | tolerant found 0 valid 0
+III.10.19  racine           exact found 0 valid 0 | tolerant found 0 valid 0
+III.17.37  trig             exact found 0 valid 0 | tolerant found 0 valid 0
+III.19.51  puissances       exact found 1 valid 1 | tolerant found 1 valid 1
+    power_law   ok    ((v0 * ((v1)²)²) / (((v2)² * (v3)²) * (v4)²))
+    tolerant    ok    ((v0 * ((v1)²)²) / (((v2)² * (v3)²) * (v4)²))
+
+equations with an exact seed without units: 30; of them with one valid under units: 30

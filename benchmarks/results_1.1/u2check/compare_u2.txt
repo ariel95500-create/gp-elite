@@ -1,0 +1,23 @@
+200 fits in both; crashes U1 0, U2 0
+engines: U1 {'/venv11/lib/python3.11/site-packages/gp_elite/__init__.py'}; U2 {'/venvU2/lib/python3.11/site-packages/gp_elite/__init__.py'}
+
+| experiment | law U1 | law U2 | median time U1 (s) | U2 (s) | same expression |
+|---|---|---|---|---|---|
+| chute | 20/20 | 20/20 | 43.8 | 42.9 | 20/20 |
+| eclairement | 20/20 | 20/20 | 39.7 | 37.7 | 17/20 |
+| gaz | 20/20 | 20/20 | 83.4 | 43.1 | 18/20 |
+| pendule | 20/20 | 20/20 | 41.0 | 40.9 | 20/20 |
+| puissance | 20/20 | 20/20 | 42.4 | 42.4 | 20/20 |
+| ressort | 20/20 | 20/20 | 46.0 | 45.9 | 20/20 |
+| lentille | 0/20 | 0/20 | 58.8 | 58.8 | 20/20 |
+| rc | 0/20 | 0/20 | 60.1 | 59.9 | 20/20 |
+| refroidissement | 0/20 | 0/20 | 49.9 | 50.3 | 20/20 |
+| snell | 0/20 | 0/20 | 22.8 | 22.7 | 20/20 |
+
+Criteria written before the run (PLAN_U2.md):
+  [met] 1. no law lost: six reachable laws U1 120, U2 120 of 120; recovered by U1 and lost by U2 on the four others: 0
+  [met] 2. faster: median time of the 200 fits U1 46.1 s, U2 44.2 s
+  [met] 3. constants g and R: median relative error U1 0.98 % (60 fits), U2 0.98 % (60 fits), within 0.1 point
+ADOPTED
+
+total time of the 200 fits: U1 10054 s, U2 9117 s

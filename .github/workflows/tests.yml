@@ -22,8 +22,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         include:
+          # ubuntu-latest became Ubuntu 26.04 (first seen here on 26 October 2026),
+          # for which actions/setup-python offers no Python 3.9; 24.04 still does.
+          - os: ubuntu-24.04
+            python-version: "3.9"
           - os: windows-latest
             python-version: "3.12"
           - os: windows-latest

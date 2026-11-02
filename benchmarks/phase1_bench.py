@@ -9,6 +9,13 @@ Measures one engine, budget T (30 s per fit), on:
   TF78, TS14, TR25, TR25raw
                      the frozen test set of benchmarks/test_set.py, seeds 5
                      to 9 (never used to decide)
+  U41, U41N1, U41N10 (kinds ufeyn, ufeyn_n1, ufeyn_n10; phase 7,
+                     benchmarks/results_1.1/PLAN.md) F41, F41N1 and F41N10
+                     with units= and target_units= from units_table.py; run
+                     only when asked for with --kinds
+  TF78 under units   (kind utf; the release of 1.1, PLAN_RELEASE_1.1.md) TF78
+                     with units from units_table.UNITS_TF78, seeds 5 to 9,
+                     never used to decide; on request only
 
 Every fit runs in its own process with PYTHONHASHSEED=0 and one BLAS thread;
 the engine is the gp_elite package importable by the given Python (for the
@@ -19,6 +26,9 @@ Usage, from the repository root:
   python benchmarks/phase1_bench.py run --python /path/to/venv/bin/python \
          --out benchmarks/results_0.9/baseline_0.8.0.jsonl --workers 3
   python benchmarks/phase1_bench.py summary benchmarks/results_0.9/baseline_0.8.0.jsonl
+
+--seeds replaces the seeds 0 to 4 of the decision bench (F41, R6, R7raw and
+their noisy and units kinds), for a confirmation on new seeds.
 
 Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
@@ -42,20 +52,23 @@ sys.path.insert(0, HERE)
 TIME_LIMIT, GENERATIONS = 30.0, 1000
 BENCH_SEEDS = [0, 1, 2, 3, 4]
 TEST_SEEDS = [5, 6, 7, 8, 9]
-NOISE = {"feyn_n1": 0.01, "feyn_n10": 0.10}
+NOISE = {"feyn_n1": 0.01, "feyn_n10": 0.10,
+         "ufeyn_n1": 0.01, "ufeyn_n10": 0.10}
 ORDER = ["feyn", "real", "realraw", "tf", "ts", "tr", "trraw",
          "feyn_n1", "feyn_n10"]
+UNIT_KINDS = ["ufeyn", "ufeyn_n1", "ufeyn_n10", "utf"]   # phase 7, on request only
+FEYN_KINDS = ("feyn", "feyn_n1", "feyn_n10", "ufeyn", "ufeyn_n1", "ufeyn_n10")
 
 
 # ─────────────────────────────────────────────────────────────── jobs ──
 
-def all_jobs():
+def all_jobs(with_units=False):
     import feynman_bench as F
     import decision_bench as D
     import test_set as T
     out = []
-    for kind in ORDER:
-        if kind in ("feyn", "feyn_n1", "feyn_n10"):
+    for kind in ORDER + (UNIT_KINDS if with_units else []):
+        if kind in FEYN_KINDS:
             for i, p in enumerate(F.PROBS):
                 for s in BENCH_SEEDS:
                     out.append(dict(kind=kind, problem=p[0], index=i,
@@ -69,7 +82,7 @@ def all_jobs():
             for n in names:
                 for s in BENCH_SEEDS:
                     out.append(dict(kind=kind, problem=n, split="ood", seed=s))
-        elif kind == "tf":
+        elif kind in ("tf", "utf"):
             for n in T.names("TF78"):
                 for s in TEST_SEEDS:
                     out.append(dict(kind=kind, problem=n, split="test", seed=s))
@@ -100,7 +113,7 @@ def _data(job):
     import decision_bench as D
     import test_set as T
     kind = job["kind"]
-    if kind in ("feyn", "feyn_n1", "feyn_n10"):
+    if kind in FEYN_KINDS:
         Xtr, ytr, Xte, yte, Xo, yo, names, pool = D.feyn_data(job["index"])
         clean = ytr
         if kind in NOISE:
@@ -112,7 +125,7 @@ def _data(job):
         Xtr, ytr, Xte, yte = D.real_data(job["problem"], job["split"],
                                          raw=kind == "realraw")
         return Xtr, ytr, Xte, yte, None, None, None, "physical", ytr
-    if kind == "tf":
+    if kind in ("tf", "utf"):
         Xtr, ytr, Xte, yte, Xo, yo, names, pool = T.tf_data(job["problem"])
         return Xtr, ytr, Xte, yte, Xo, yo, names, pool, ytr
     if kind == "ts":
@@ -169,6 +182,13 @@ def run_one(job):
               seed=job["seed"], parallel=False, verbose=False, operators=pool)
     if names is not None:
         kw["feature_names"] = names
+    units = None
+    if job["kind"] in UNIT_KINDS:
+        import units_table as U
+        units, tunits = (U.units_of_tf(job["problem"], names)
+                         if job["kind"] == "utf"
+                         else U.units_of(job["problem"], names))
+        kw.update(units=units, target_units=tunits)
     t0 = time.time()
     with redirect_stdout(io.StringIO()), warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -183,7 +203,9 @@ def run_one(job):
                time_limit_reached=bool(getattr(r, "time_limit_reached", False)),
                expr=r.expression[:160], engine_file=gp_elite.__file__,
                engine_version=getattr(gp_elite, "__version__", "?"))
-    exact_kind = job["kind"] in ("feyn", "feyn_n1", "feyn_n10", "tf") or (
+    if hasattr(C, "_SEEDS_UNDER_UNITS"):     # phase 7, change U1
+        rec["seeds_under_units"] = bool(C._SEEDS_UNDER_UNITS)
+    exact_kind = job["kind"] in FEYN_KINDS + ("tf", "utf") or (
         job["kind"] == "ts"
         and T.manifest()["datasets"][job["problem"]]["exact_scorable"])
     if exact_kind:
@@ -199,9 +221,14 @@ def run_one(job):
             se, rec["structure_error"] = 1e30, repr(exc)[:200]
         rec["err_structure"] = se
         rec["structure"] = bool(se < 1e-9)
-    if job["kind"] == "tf":
+    if job["kind"] in ("tf", "utf"):
         rec["family"] = T.manifest()["datasets"][job["problem"]]["family"]
-    if job["kind"] in ("feyn", "feyn_n1", "feyn_n10"):
+    if units is not None:                   # the guarantee of units=
+        from gp_elite.dimensions import check_dimensions
+        ok, msg = check_dimensions(r.node, {i: units[n] for i, n in
+                                            enumerate(names)}, tunits)
+        rec["units_ok"], rec["units_msg"] = bool(ok), msg[:120]
+    if job["kind"] in FEYN_KINDS:
         import feynman_bench as F
         p = F.PROBS[job["index"]]
         rec["family"] = p[6] if len(p) > 6 else "historique"
@@ -221,6 +248,10 @@ def run_one(job):
 
 # ───────────────────────────────────────────────────────────── driver ──
 
+def _with_units(kinds):
+    return bool(kinds) and any(k in UNIT_KINDS for k in kinds)
+
+
 def drive(python, out, workers, kinds=None, max_seconds=None):
     """Runs the jobs not yet in `out`. With max_seconds, stops launching new
     fits after that time and returns once the running ones are recorded (the
@@ -231,7 +262,7 @@ def drive(python, out, workers, kinds=None, max_seconds=None):
             for line in fh:
                 if line.strip():
                     done.add(key(json.loads(line)))
-    todo = [j for j in all_jobs() if key(j) not in done
+    todo = [j for j in all_jobs(_with_units(kinds)) if key(j) not in done
             and (kinds is None or j["kind"] in kinds)]
     print("%d jobs to run, %d already done" % (len(todo), len(done)),
           flush=True)
@@ -302,7 +333,8 @@ def drive_paired(pythons, outs, pairs, kinds=None, max_seconds=None):
                     if line.strip():
                         d.add(key(json.loads(line)))
         done.append(d)
-    todo = [j for j in all_jobs() if (kinds is None or j["kind"] in kinds)
+    todo = [j for j in all_jobs(_with_units(kinds))
+            if (kinds is None or j["kind"] in kinds)
             and any(key(j) not in d for d in done)]
     print("%d jobs to run with %d engines" % (len(todo), len(pythons)),
           flush=True)
@@ -355,7 +387,7 @@ def summary(path):
     by = {}
     for r in recs:
         by.setdefault(r["kind"], []).append(r)
-    for kind in ORDER:
+    for kind in ORDER + UNIT_KINDS:
         rr = by.get(kind, [])
         if not rr:
             continue
@@ -368,6 +400,9 @@ def summary(path):
                 st.count(x) for x in ("EXACT", "NEAR", "MISS", "CRASH"))
         if any("structure" in r for r in rr):
             line += "  structure %d" % sum(1 for r in rr if r.get("structure"))
+        if any("units_ok" in r for r in rr):
+            line += "  units ok %d of %d" % (sum(1 for r in rr if r.get("units_ok")),
+                                            sum(1 for r in rr if "units_ok" in r))
         print(line)
         for split_name, pred in (("folds", lambda s: s.startswith("fold")),
                                  ("ood", lambda s: s == "ood"),
@@ -399,17 +434,22 @@ def main():
     r.add_argument("--workers", type=int, default=3)
     r.add_argument("--kinds", default=None)
     r.add_argument("--max-seconds", type=float, default=None)
+    r.add_argument("--seeds", default=None)
     r2 = sub.add_parser("run-paired")
     r2.add_argument("--python", action="append", required=True)
     r2.add_argument("--out", action="append", required=True)
     r2.add_argument("--pairs", type=int, default=2)
     r2.add_argument("--kinds", default=None)
     r2.add_argument("--max-seconds", type=float, default=None)
+    r2.add_argument("--seeds", default=None)
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
     s.add_argument("path")
     a = ap.parse_args()
+    if getattr(a, "seeds", None):
+        global BENCH_SEEDS
+        BENCH_SEEDS = [int(x) for x in a.seeds.split(",")]
     if a.cmd == "run":
         drive(a.python, a.out, a.workers,
               a.kinds.split(",") if a.kinds else None, a.max_seconds)

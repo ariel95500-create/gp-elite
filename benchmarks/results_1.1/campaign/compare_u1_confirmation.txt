@@ -1,0 +1,28 @@
+615 jobs in A, 615 in U1, 615 in both
+crashes: 0
+engines: A {('/venv10/lib/python3.11/site-packages/gp_elite', None): 615}; U1 {('/home/user/gp-elite/gp_elite/__init__.py', True): 615}
+
+1. U41 exact: A 107, U1 166 of 205 (gain +59, at least +10 asked); five families A 16, U1 57 of 90 (gain +41, at least +5 asked); equations exact in A at >= 3 seeds falling to <= 1: none  -> met
+   equations with more exact fits in U1: 15 [('I.10.7', 0, 5), ('I.15.10', 1, 5), ('I.16.6', 0, 3), ('I.18.12', 1, 5), ('I.27.6', 4, 5), ('I.34.1', 4, 5), ('I.40.1', 0, 5), ('I.44.4', 1, 5), ('II.11.3', 2, 5), ('II.13.23', 1, 5), ('II.15.4', 0, 5), ('II.24.17', 0, 5), ('II.35.18', 0, 5), ('II.6.15b', 0, 5), ('III.15.12', 0, 5)]
+   equations with fewer: 0 []
+   never exact (A, U1): 14, 6
+
+2. ufeyn_n1 structure retrieved: A 87, U1 117 of 205 (at least A - 2)  -> met
+
+2. ufeyn_n10 structure retrieved: A 80, U1 97 of 205 (at least A - 2)  -> met
+
+3. A: models failing the units audit: 0 of 615
+
+3. U1: models failing the units audit: 0 of 615
+   -> met
+
+5. formulas flagged inexact: A 10, U1 8 (at most A + 3)  -> met
+
+   ufeyn median time: A 30.2 s, U1 0.7 s
+
+   ufeyn_n1 median time: A 30.6 s, U1 30.6 s
+
+   ufeyn_n10 median time: A 30.4 s, U1 30.5 s
+   II.11.3 exact: A 2, U1 5 of 5; times A [31.53, 11.74, 30.64, 30.28, 23.31], U1 [1.55, 1.6, 1.72, 1.55, 1.42]
+
+criteria 1, 2, 3 and 5: all met (criterion 4: units_real.py summary)

@@ -1,0 +1,1378 @@
+[
+ {
+  "name": "I.12.1",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 * v1)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * v1)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.12.5",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 * v1)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * v1)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.14.4",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 * (v1)\u00b2)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * (v1)\u00b2)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.39.1",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 * v1)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * v1)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.3.24",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 / (v1)\u00b2)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / (v1)\u00b2)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.6.20a",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "I.8.14",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "I.16.6",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 4
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 4
+  },
+  "seeds": [
+   {
+    "finder": "tolerant",
+    "tree": "((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.032613 * ((v0 * v1) / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.057916 * ((v0 * v1) / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.109 * ((v0 * v1) / (v2)\u00b2)))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.27.6",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 3
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 3
+  },
+  "seeds": [
+   {
+    "finder": "binomial",
+    "tree": "((v1 / v2) / (1.0 + (0.49869 * (v1 / (v0 * v2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v1 / v2) / (1.0 + (0.49869 * (v1 / (v0 * v2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v1 / v2) * exp((-0.653234 * (sqrt(v1) / (sqrt(v0) * sqrt(v2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v1 / v2) / (exp((0.905535 * (sqrt(v1) / (sqrt(v0) * sqrt(v2))))) + exp((-0.905535 * (sqrt(v1) / (sqrt(v0) * sqrt(v2)))))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.34.8",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(((v0 * v1) * v2) / v3)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * v2) / v3)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.43.16",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(((v0 * v1) * v2) / v3)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * v2) / v3)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.12.2",
+  "family": "historique",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "((v0 * v1) / (v2 * (v3)\u00b2))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * v1) / (v2 * (v3)\u00b2))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.15.4",
+  "family": "historique",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "elementary",
+    "tree": "((v0 * v1) * (-1.0 * cos((6.226701 * v2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * v1) * (-1.0 * cos((6.226701 * v2))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.18.12",
+  "family": "historique",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 2
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 2
+  },
+  "seeds": [
+   {
+    "finder": "elementary",
+    "tree": "((v0 * v1) * (1.0 * sin((3.133946 * v2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * v1) * (1.0 * sin((3.133946 * v2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * v2) * (1.0 + (-0.998008 * v2)))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "III.15.12",
+  "family": "historique",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 5
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "elementary",
+    "tree": "(v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * tanh((3.495193 * ((v1)\u00b2 * (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * (v1)\u00b2) * (v2)\u00b2) * (1.0 + (-0.803317 * (v1 * v2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * (v1)\u00b2) * (v2)\u00b2) * sqrt((1.0 + (-1.022594 * (v1 * v2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / (v1 * v2)) * exp((-2.870962 * (1.0 / (sqrt(v1) * sqrt(v2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * (v1)\u00b2) * (v2)\u00b2) / (1.0 + (3.34774 * ((v1)\u00b2 * (v2)\u00b2))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.10.7",
+  "family": "racine",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 7
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "binomial",
+    "tree": "(v0 / sqrt((1.0 + (-0.040043 * ((v1)\u00b2 / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / sqrt((1.0 + (-0.040043 * ((v1)\u00b2 / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / (1.0 + (-0.021559 * ((v1)\u00b2 / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * (1.0 + (0.025045 * ((v1)\u00b2 / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * sqrt((1.0 + (0.058512 * ((v1)\u00b2 / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((pow(v0, 1.0002) * pow(v1, 0.0876)) * pow(v2, -0.0914))",
+    "valid": false
+   },
+   {
+    "finder": "tolerant",
+    "tree": "v0",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v1 * v2) / v0) * tanh((0.008948 * ((v0)\u00b2 / (v1 * v2)))))",
+    "valid": false
+   }
+  ]
+ },
+ {
+  "name": "I.11.19",
+  "family": "somme_produits",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "I.15.10",
+  "family": "racine",
+  "pool": "physical",
+  "found": {
+   "power_law": 2,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 7
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 * v1)",
+    "valid": true
+   },
+   {
+    "finder": "power_law",
+    "tree": "((pow(v0, 0.9981) * pow(v1, 1.0635)) * pow(v2, -0.0773))",
+    "valid": false
+   },
+   {
+    "finder": "binomial",
+    "tree": "((v0 * v1) / sqrt((1.0 + (-0.040127 * ((v1)\u00b2 / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * v1) / sqrt((1.0 + (-0.040127 * ((v1)\u00b2 / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * v1) / (1.0 + (-0.021356 * ((v1)\u00b2 / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * v1) * (1.0 + (0.024095 * ((v1)\u00b2 / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * (v1)\u00b2) / v2) * sqrt((1.0 + (16.254672 * ((v2)\u00b2 / (v1)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((pow(v0, 0.9981) * pow(v1, 1.0635)) * pow(v2, -0.0773))",
+    "valid": false
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * v1)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((1.0 / (v0)\u00b2) * tanh((0.013809 * ((v0 * (v0)\u00b2) * v1))))",
+    "valid": false
+   }
+  ]
+ },
+ {
+  "name": "I.25.13",
+  "family": "quotient",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 / v1)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / v1)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.26.2",
+  "family": "trig",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 * cos((4.889472 * v1)))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.29.4",
+  "family": "quotient",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 / v1)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / v1)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.30.5",
+  "family": "trig",
+  "pool": "trig",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 6
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(v0 / (v1 * v2))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / (v1 * v2)) / (1.0 + (-0.001203 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / (v1 * v2)) * (1.0 + (0.001266 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / (v1 * v2)) * sqrt((1.0 + (0.002596 * ((v0)\u00b2 / ((v1)\u00b2 * (v2)\u00b2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((1.0 / (v1 * v2)) * ((0.223591 + (1.0 * sin((0.100454 * v0)))) + (-0.22424 * cos((0.100454 * v0)))))",
+    "valid": false
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / (v1 * v2))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.32.5",
+  "family": "puissances",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(((v0)\u00b2 * (v1)\u00b2) / (v2 * (v3 * (v3)\u00b2)))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0)\u00b2 * (v1)\u00b2) / (v2 * (v3 * (v3)\u00b2)))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.34.1",
+  "family": "rationnelle",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 6
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 6
+  },
+  "seeds": [
+   {
+    "finder": "binomial",
+    "tree": "(v0 / (1.0 + (-0.20162 * (v1 / v2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / (1.0 + (-0.20162 * (v1 / v2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * (v1)\u00b2) / (v2)\u00b2) * (1.0 + (7.856464 * ((v2)\u00b2 / (v1)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v2) / v1) * exp((2.436936 * (sqrt(v1) / sqrt(v2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) / v2) * sqrt((1.0 + (2.457167 * ((v2)\u00b2 / (v1)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / sqrt((1.0 + (-0.291977 * (v1 / v2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * sqrt(v1)) / sqrt(v2))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.37.4",
+  "family": "trig",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "tolerant",
+    "tree": "((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 * v2)))) + (0.949886 * cos((6.054448 * v2)))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.40.1",
+  "family": "exponentielle",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 2
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 2
+  },
+  "seeds": [
+   {
+    "finder": "elementary",
+    "tree": "(v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / (exp((5.852008 * (((v1 * v2) * v3) / (v4 * v5)))) + exp((-5.852008 * (((v1 * v2) * v3) / (v4 * v5))))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.44.4",
+  "family": "logarithme",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 3
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 3
+  },
+  "seeds": [
+   {
+    "finder": "elementary",
+    "tree": "(((v0 * v1) * v2) * log((4.943794 * v3)))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.201394 * (1.0 / v3))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * v2) * exp((-0.292246 * (1.0 / (v3 * sqrt(v3))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * v2) / (exp((0.720556 * (1.0 / v3))) + exp((-0.720556 * (1.0 / v3)))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "I.50.26",
+  "family": "trig",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "II.2.42",
+  "family": "produit_quotient",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "II.6.15b",
+  "family": "trig",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "elementary",
+    "tree": "((v0 / (v2 * (v3 * (v3)\u00b2))) * (1.0 * sin((5.950302 * v1))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / (v2 * (v3 * (v3)\u00b2))) * (1.0 * sin((5.950302 * v1))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.11.3",
+  "family": "rationnelle",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 6
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "binomial",
+    "tree": "(((v0 * v1) / (v2 * (v3)\u00b2)) / (1.0 + (-0.159964 * ((v4)\u00b2 / (v3)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) / (v2 * (v3)\u00b2)) / (1.0 + (-0.159964 * ((v4)\u00b2 / (v3)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) / (v2 * (v3)\u00b2)) / sqrt((1.0 + (-0.434265 * (v4 / v3)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) / (v2 * (v3)\u00b2)) * sqrt((1.0 + (1.043555 * ((v4)\u00b2 / (v3)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((pow(v0, 1.0002) * pow(v1, 0.9929)) * pow(v2, -0.9913)) * pow(v3, -2.3606)) * pow(v4, 0.3347))",
+    "valid": false
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * sqrt(v4)) / (v2 * ((v3)\u00b2 * sqrt(v3))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0 * v1) * (v4)\u00b2) / (v2 * ((v3)\u00b2)\u00b2)) * (1.0 + (2.376878 * ((v3)\u00b2 / (v4)\u00b2))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.11.27",
+  "family": "rationnelle",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 6
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "binomial",
+    "tree": "((((v0 * v1) * v2) * v3) / (1.0 + (-0.329947 * (v0 * v1))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0 * v1) * v2) * v3) / (1.0 + (-0.329947 * (v0 * v1))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0 * v1) * v2) * v3) / sqrt((1.0 + (-0.574832 * (v0 * v1)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0 * v1) * v2) * v3) * sqrt((1.0 + (1.154805 * ((v0)\u00b2 * (v1)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0 * v1) * v2) * v3) * (1.0 + (0.437084 * (v0 * v1))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((pow(v0, 1.0512) * pow(v1, 1.044)) * pow(v2, 0.9815)) * pow(v3, 1.0205))",
+    "valid": false
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * v2) * v3)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.13.23",
+  "family": "racine",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 6
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "binomial",
+    "tree": "(v0 / sqrt((1.0 + (-0.040069 * ((v1)\u00b2 / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / sqrt((1.0 + (-0.040069 * ((v1)\u00b2 / (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / (1.0 + (-0.021778 * ((v1)\u00b2 / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * (1.0 + (0.025649 * ((v1)\u00b2 / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * exp((0.02164 * ((v1)\u00b2 / (v2)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) / v2) * sqrt((1.0 + (14.125443 * ((v2)\u00b2 / (v1)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((pow(v0, 1.0078) * pow(v1, 0.0828)) * pow(v2, -0.0922))",
+    "valid": false
+   }
+  ]
+ },
+ {
+  "name": "II.24.17",
+  "family": "racine",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 6
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 1,
+   "elementary": 0,
+   "tolerant": 5
+  },
+  "seeds": [
+   {
+    "finder": "binomial",
+    "tree": "((v0 / v1) * sqrt((1.0 + (-0.068024 * ((v1)\u00b2 / ((v0)\u00b2 * (v2)\u00b2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / v1) * sqrt((1.0 + (-0.068024 * ((v1)\u00b2 / ((v0)\u00b2 * (v2)\u00b2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 / v1) * (1.0 + (-0.037891 * ((v1)\u00b2 / ((v0)\u00b2 * (v2)\u00b2)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0 * (v0)\u00b2) * (v2)\u00b2) / (v1 * (v1)\u00b2)) / (1.0 + (16.411041 * (((v0)\u00b2 * (v2)\u00b2) / (v1)\u00b2))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((1.0 / v2) * exp((-2.081744 * (sqrt(v1) / (sqrt(v0) * sqrt(v2))))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((pow(v0, 1.1434) * pow(v1, -1.1271)) * pow(v2, 0.1526))",
+    "valid": false
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((((v0)\u00b2 * v2) / (v1)\u00b2) / sqrt((1.0 + (6.036791 * (((v0)\u00b2 * (v2)\u00b2) / (v1)\u00b2)))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.34.2",
+  "family": "produit",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "((v0 * v1) * v2)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * v1) * v2)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.35.18",
+  "family": "exponentielle",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 2
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 1,
+   "tolerant": 2
+  },
+  "seeds": [
+   {
+    "finder": "elementary",
+    "tree": "(v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2) / v3)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2) / v3)))))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(v0 * exp((-2.727679 * ((v1 * v2) / v3))))",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "II.38.3",
+  "family": "produit_quotient",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "(((v0 * v1) * v2) / v3)",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "(((v0 * v1) * v2) / v3)",
+    "valid": true
+   }
+  ]
+ },
+ {
+  "name": "III.9.52",
+  "family": "trig",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "III.10.19",
+  "family": "racine",
+  "pool": "physical",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "III.17.37",
+  "family": "trig",
+  "pool": "trig",
+  "found": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "valid": {
+   "power_law": 0,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 0
+  },
+  "seeds": []
+ },
+ {
+  "name": "III.19.51",
+  "family": "puissances",
+  "pool": "physical",
+  "found": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "valid": {
+   "power_law": 1,
+   "binomial": 0,
+   "elementary": 0,
+   "tolerant": 1
+  },
+  "seeds": [
+   {
+    "finder": "power_law",
+    "tree": "((v0 * ((v1)\u00b2)\u00b2) / (((v2)\u00b2 * (v3)\u00b2) * (v4)\u00b2))",
+    "valid": true
+   },
+   {
+    "finder": "tolerant",
+    "tree": "((v0 * ((v1)\u00b2)\u00b2) / (((v2)\u00b2 * (v3)\u00b2) * (v4)\u00b2))",
+    "valid": true
+   }
+  ]
+ }
+]
