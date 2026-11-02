@@ -1,0 +1,9 @@
+# One call of the wrapper (symbolic_regression, operators physical, generations 60, speed fast,
+# restarts 1, parallel False, seed 0) without time limit, on five jobs of the decision bench,
+# 2 November 2026, one after the other, alone on the machine (gens60.py; generations counted
+# as phase1_bench.py counts them). II.11.3 stops at once on an exact law.
+feyn I.16.6 test rows 140 generations 60 18.8 s
+feyn_n10 I.16.6 test rows 140 generations 60 24.6 s
+real 210_cloud fold0 rows 86 generations 60 23.2 s
+realraw 561_cpu fold0 rows 167 generations 60 23.0 s
+feyn II.11.3 test rows 140 generations 1 0.4 s
