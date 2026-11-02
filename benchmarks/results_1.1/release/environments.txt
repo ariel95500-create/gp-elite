@@ -2,6 +2,15 @@
 18d3bac5ab82a28aff898bae4805077cb19b9563d7967e9f61d6623aa80cb6c2  gp_elite-1.1.0-py3-none-any.whl
 c3a035f51b5a2556c41538412e1858de407ab64564bad0aaa54f2d0bd6e8c7b6  gp_elite-1.1.0.tar.gz
 
+# SHA-256 of the files to publish, built again from commit 346cd07 after the decision of gate 6
+# (python -m build from a clean export of the commit), 2 November 2026:
+2243c2abad0caafa8c8858aae0923cac4ae3292fef390ebaca083172320c655f  gp_elite-1.1.0-py3-none-any.whl
+3e2dacee4ad0a2e97b5aec4549e69c958d737828ce41e4ee9e608e069b93629f  gp_elite-1.1.0.tar.gz
+# Every gp_elite/ file of the wheel and of the source archive is identical to those of the files
+# measured above; the wheel differs in gp_elite-1.1.0.dist-info/METADATA (the description, from the
+# README; the headers are identical) and in the line of METADATA in RECORD, the source archive in
+# PKG-INFO, gp_elite.egg-info/PKG-INFO and README.md. twine check --strict passes for both.
+
 # twine check --strict passes for both.
 # The engine is that of 26349ef (U2); the commits after it change benchmarks and documents only.
 
