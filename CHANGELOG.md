@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.1.0 — "Coherent"
 
 The forms that 1.0 fits directly now act under `units=` as well. Under
 `units=` the population is typed, and in 1.0 the seed finders (the power law,

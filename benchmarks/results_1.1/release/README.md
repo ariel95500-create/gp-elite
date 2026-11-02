@@ -209,3 +209,23 @@ importing the installed package (`m4/`): 154 tests pass under the three
 versions. `twine check --strict` passes for the wheel and the source archive.
 The **Tests** workflow of the repository is green on every commit of the branch
 since the candidate; it is checked again on the commit of the release.
+
+## M5, two independent reviews (30 October 2026)
+
+`M5_review1.md` and `M5_review2.md`: two agents, one after the other, each
+without having seen the work, checked about 480 and 520 claims of the
+documents against the records. Neither found an error in a headline figure or a
+criterion. Their 17 and 12 findings (wording, stale sentences, records missing)
+are each corrected or answered there; their reports are in `m5/`.
+
+## Gate 6 (2 November 2026)
+
+The author received the figures measured, the differences with 1.0.0 and the
+two reviews, and decided:
+- 1.1.0 is published;
+- its name is "Coherent";
+- the line of the AI disclosure of the paper for 1.1 stands as written.
+
+`CITATION.cff` and the paper are dated 2 November 2026, the day the author can
+publish. The files to publish are built again from the commit of this decision,
+since the description of the PyPI page is the README (`environments.txt`).

@@ -556,7 +556,7 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**1.1** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
+**1.1 « Coherent »** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
 chacune placée seulement si elle passe la porte des dimensions : sur les 41
 équations de Feynman du banc de décision avec leurs unités, 165 lois exactes sur
 205 contre 108 pour la 1.0 mesurée à côté ; chacun des 1 005 modèles rendus avec

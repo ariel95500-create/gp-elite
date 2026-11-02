@@ -526,7 +526,7 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**1.1** — the forms 1.0 fits directly act under `units=` too, each placed only if
+**1.1 "Coherent"** — the forms 1.0 fits directly act under `units=` too, each placed only if
 it passes the gate of dimensions: on the 41 Feynman equations of the decision
 bench with their units, 165 exact laws of 205 against 108 for 1.0 measured beside
 it; every one of the 1,005 models returned under units in the release
