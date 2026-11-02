@@ -2,3 +2,10 @@
 745 jobs to run with 2 settings
 25 jobs done, 71 s elapsed, 719 left
 50 jobs done, 1277 s elapsed, 694 left
+75 jobs done, 2962 s elapsed, 670 left
+100 jobs done, 4242 s elapsed, 645 left
+125 jobs done, 5313 s elapsed, 620 left
+time slice over: 601 jobs left for the next call
+slice done
+--- slice 2026-11-02T20:31
+601 jobs to run with 2 settings
