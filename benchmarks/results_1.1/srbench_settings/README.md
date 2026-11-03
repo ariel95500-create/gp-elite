@@ -111,9 +111,9 @@ only if the fits end early enough; otherwise it would cost hours per run and
 change nothing. Whether to propose it is put to the author with this record.
 
 The author chose on 3 November 2026 not to propose it for now: SRBench fits
-the default `est`, which this study keeps. If he sends the question on the
-calendar of SRBench, a sentence on the grid joins it, for the maintainers to
-judge with their own budget of computation.
+the default `est`, which this study keeps. The question on the calendar of
+SRBench, drafted on 28 October, had already been sent by the author in the
+week of 26 October, without the grid; nothing more is sent.
 
 ## Departures from the plan
 

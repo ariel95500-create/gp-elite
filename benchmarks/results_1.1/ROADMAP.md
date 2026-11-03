@@ -35,7 +35,8 @@ the files and lines are recorded in `srbench_2aabbb6/`):
 
 The two actions:
 1. **The calendar.** Claude drafts a short question to the maintainers, in
-   English; the author decides whether and where to send it.
+   English; the author decides whether and where to send it. Done: the author
+   sent it in the week of 26 October 2026 (he said so on 3 November).
 2. **The settings.** After M4 of 1.1, when no measurement of the release
    runs on the machine:
    - the SRBench test of the GP_ELITE wrapper is run with 1.0.0 and 1.1.0;
@@ -60,8 +61,8 @@ The two actions:
    than 1.0.0 as `srbench_settings/PLAN.md` says: the wrapper as published
    stays, the other setting measured not being better by the criteria of the
    plan, and the final check is therefore not run. The author chose the same
-   day not to propose the correction of the grid for now; a sentence on it
-   joins the question on the calendar, if he sends it.
+   day not to propose the correction of the grid for now. The question on
+   the calendar had already been sent, without it; nothing more is sent.
 
 When the plan of 1.2 is written, its items that also act without units
 (for instance an earlier stop when the law is found, which SRBench would
