@@ -1,0 +1,55 @@
+| law | formula | sine or cosine | pool of the bench | W0 | W1 | W1 median time of exact fits (s) | 1.1.0, M2 |
+|---|---|---|---|---|---|---|---|
+| I.10.7 | `m/sqrt(1-v^2/c^2)` | no | physical | 5/5 | 5/5 | 5 | 5/5 |
+| I.11.19 | `x1*y1+x2*y2+x3*y3` | no | physical | 3/5 | 3/5 | 242 | 1/5 |
+| I.12.1 | `mu*Nn` | no | physical | 5/5 | 5/5 | 4 | 5/5 |
+| I.12.2 | `q1*q2/(4*pi*eps*r^2)` | no | physical | 5/5 | 5/5 | 3 | 5/5 |
+| I.12.5 | `q2*Ef` | no | physical | 5/5 | 5/5 | 3 | 5/5 |
+| I.14.4 | `k*x^2/2` | no | physical | 5/5 | 5/5 | 4 | 5/5 |
+| I.15.10 | `m*v/sqrt(1-v^2/c^2)` | no | physical | 5/5 | 5/5 | 6 | 5/5 |
+| I.16.6 | `(u+v)/(1+u*v/c^2)` | no | physical | 5/5 | 5/5 | 207 | 4/5 |
+| I.18.12 | `r*F*sin(th)` | yes | trig | 4/5 | 4/5 | 225 | 5/5 |
+| I.25.13 | `q/C` | no | physical | 5/5 | 5/5 | 3 | 5/5 |
+| I.26.2 | `arcsin(n*sin(th2))` | yes | trig | 0/5 | 0/5 | - | 0/5 |
+| I.27.6 | `1/(1/d1+n/d2)` | no | physical | 5/5 | 5/5 | 5 | 5/5 |
+| I.29.4 | `om/c` | no | physical | 5/5 | 5/5 | 3 | 5/5 |
+| I.30.5 | `arcsin(lam/(n*d))` | yes | trig | 3/5 | 3/5 | 116 | 0/5 |
+| I.32.5 | `q^2*a^2/(6*pi*eps*c^3)` | no | physical | 5/5 | 5/5 | 4 | 5/5 |
+| I.34.1 | `om0/(1-v/c)` | no | physical | 5/5 | 5/5 | 5 | 5/5 |
+| I.34.8 | `q*v*B/p` | no | physical | 5/5 | 5/5 | 4 | 5/5 |
+| I.37.4 | `I1+I2+2*sqrt(I1*I2)*cos(d)` | yes | trig | 0/5 | 0/5 | - | 0/5 |
+| I.39.1 | `(3/2)*pr*V` | no | physical | 5/5 | 5/5 | 4 | 5/5 |
+| I.40.1 | `n0*exp(-m*g*x/(kb*T))` | no | physical | 5/5 | 5/5 | 6 | 5/5 |
+| I.43.16 | `mu*q*V/d` | no | physical | 5/5 | 5/5 | 3 | 5/5 |
+| I.44.4 | `n*kb*T*log(V2/V1)` | no | physical | 5/5 | 5/5 | 6 | 5/5 |
+| I.50.26 | `x1*(cos(w*t)+a*cos(w*t)^2)` | yes | trig | 0/5 | 0/5 | - | 0/5 |
+| I.6.20a | `exp(-th^2/2)/sqrt(2*pi)` | no | physical | 5/5 | 5/5 | 48 | 4/5 |
+| I.8.14 | `sqrt((x2-x1)^2+(y2-y1)^2)` | no | physical | 5/5 | 5/5 | 197 | 5/5 |
+| II.11.27 | `n*al*eps*Ef/(1-n*al/3)` | no | physical | 5/5 | 5/5 | 6 | 5/5 |
+| II.11.3 | `q*Ef/(m*(w0^2-w^2))` | no | physical | 5/5 | 5/5 | 6 | 5/5 |
+| II.13.23 | `rho/sqrt(1-v^2/c^2)` | no | physical | 5/5 | 5/5 | 5 | 5/5 |
+| II.15.4 | `-mu*B*cos(th)` | yes | trig | 0/5 | 0/5 | - | 5/5 |
+| II.2.42 | `k*(T2-T1)*A/d` | no | physical | 5/5 | 5/5 | 238 | 4/5 |
+| II.24.17 | `sqrt(om^2/c^2-pi^2/d^2)` | no | physical | 5/5 | 5/5 | 6 | 5/5 |
+| II.3.24 | `P/(4*pi*r^2)` | no | physical | 5/5 | 5/5 | 3 | 5/5 |
+| II.34.2 | `q*v*r/2` | no | physical | 5/5 | 5/5 | 3 | 5/5 |
+| II.35.18 | `n0/(exp(mom*B/(kb*T))+exp(-mom*B/(kb*T)))` | no | physical | 5/5 | 5/5 | 6 | 5/5 |
+| II.38.3 | `Y*A*x/d` | no | physical | 5/5 | 5/5 | 4 | 5/5 |
+| II.6.15b | `3*pd*cos(th)*sin(th)/(4*pi*eps*r^3)` | yes | trig | 0/5 | 0/5 | - | 5/5 |
+| III.10.19 | `mom*sqrt(Bx^2+By^2+Bz^2)` | no | physical | 0/5 | 0/5 | - | 0/5 |
+| III.15.12 | `2*U*(1-cos(k*d))` | yes | trig | 0/5 | 0/5 | - | 5/5 |
+| III.17.37 | `B*(1+al*cos(th))` | yes | trig | 0/5 | 0/5 | - | 0/5 |
+| III.19.51 | `-m*q^4/(2*(4*pi*eps)^2*h^2*n^2)` | no | physical | 5/5 | 5/5 | 4 | 5/5 |
+| III.9.52 | `pd*Ef*t/h*sin((w-w0)*t/2)^2` | yes | trig | 0/5 | 0/5 | - | 0/5 |
+
+Exact fits: W0 155, W1 155 (of 205); 1.1.0 in M2: 163 (of 205).
+
+Laws by (sine or cosine, found here by W0, found in M2):
+  (False, False, False): 1
+  (False, True, True): 30
+  (True, False, False): 5
+  (True, False, True): 3
+  (True, True, False): 1
+  (True, True, True): 1
+
+Fits where W0 and W1 agree on exact or not: 205 of 205.
