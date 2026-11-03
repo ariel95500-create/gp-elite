@@ -22,3 +22,7 @@ time slice over: 443 jobs left for the next call
 slice done
 --- slice 2026-11-03T00:06
 443 jobs to run with 2 settings
+25 jobs done, 2713 s elapsed, 417 left
+--- container restarted after the last records (2026-11-03T01:08:59 W0, 2026-11-03T01:08:54 W1); resumed 2026-11-03T01:11Z, machine in machine.txt
+--- slice 2026-11-03T01:11
+407 jobs to run with 2 settings

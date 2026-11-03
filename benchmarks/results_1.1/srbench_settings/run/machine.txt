@@ -1,0 +1,6 @@
+# machine at each start or resume of the run (appended)
+## 2026-11-03T01:11:36Z resume after a container restart
+4
+CPU(s):                                  4
+Model name:                              Intel(R) Xeon(R) Processor @ 2.80GHz
+AVX-512: avx512f present
