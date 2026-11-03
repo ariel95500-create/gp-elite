@@ -104,6 +104,27 @@ def trace_section(R):
                 q([r["gen_stable"] for r in A], .9),
                 S.median(r["gen_stable"] / max(r["n_gens"], 1) for r in A)))
         print()
+        print("Replay of a stop on patience on these traces (as above; "
+              "structure: the structure retrieved at the end of the fit):\n")
+        print("| P | kind | generations run, median fraction | fits where a "
+              "later gain is cut | of which with the structure retrieved |")
+        print("|---|---|---|---|---|")
+        for P in (10, 20, 30):
+            for k in ("feyn_n1", "feyn_n10", "real", "realraw"):
+                A = [r for r in p1 if r["kind"] == k]
+                if not A:
+                    continue
+                frac, cut, cut_s = [], 0, 0
+                for r in A:
+                    stop, cur = replay(r["changes"], r["n_gens"], P, 0.01)
+                    frac.append(min(1.0, (stop + 1) / r["n_gens"]))
+                    if [c for c in r["changes"] if c[0] > stop and c[3] < cur[3] * 0.99]:
+                        cut += 1
+                        cut_s += bool(r.get("structure"))
+                print("| %d | %s | %.2f | %d | %s |" % (
+                    P, k, S.median(frac), cut,
+                    cut_s if k.startswith("feyn") else "-"))
+        print()
 
 
 def main():

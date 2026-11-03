@@ -1,0 +1,74 @@
+## Prototype 1: when the champion reaches its final form (trace.jsonl)
+
+940 records, 0 crashes
+
+TP, plain arm, 200 fits, 100 generations each:
+- the first generation's champion has the final form in 77
+- generation from which the form is final: median 3.0, 90th percentile 43, largest 94
+- time of the fit: median 62.3 s; the final form is there at a median of 2.2 s
+
+| experiment | fits | law | gen. of final form (5 largest) | time, median | final form at, median |
+|---|---|---|---|---|---|
+| pendule | 20 | 17 | 1, 1, 1, 2, 2 | 64 s | 1.2 s |
+| ressort | 20 | 16 | 33, 34, 35, 41, 47 | 62 s | 11.4 s |
+| chute | 20 | 19 | 0, 0, 0, 0, 9 | 57 s | 0.9 s |
+| puissance | 20 | 19 | 0, 0, 0, 0, 59 | 64 s | 1.2 s |
+| gaz | 20 | 15 | 43, 44, 47, 49, 94 | 63 s | 1.4 s |
+| eclairement | 20 | 15 | 37, 44, 69, 74, 79 | 61 s | 6.4 s |
+| rc | 20 | 14 | 38, 42, 43, 51, 53 | 64 s | 13.3 s |
+| refroidissement | 20 | 3 | 28, 28, 37, 41, 50 | 61 s | 5.2 s |
+| lentille | 20 | 1 | 57, 73, 75, 84, 91 | 70 s | 20.4 s |
+| snell | 20 | 0 | 5, 5, 8, 19, 20 | 61 s | 2.0 s |
+
+TP, units arm, 200 fits, 100 generations each:
+- the first generation's champion has the final form in 85
+- generation from which the form is final: median 1.0, 90th percentile 52, largest 98
+- time of the fit: median 83.1 s; the final form is there at a median of 2.1 s
+
+| experiment | fits | law | gen. of final form (5 largest) | time, median | final form at, median |
+|---|---|---|---|---|---|
+| pendule | 20 | 20 | 4, 5, 5, 7, 12 | 82 s | 1.2 s |
+| ressort | 20 | 20 | 0, 0, 0, 0, 0 | 88 s | 2.2 s |
+| chute | 20 | 20 | 0, 0, 0, 0, 0 | 83 s | 0.8 s |
+| puissance | 20 | 20 | 0, 0, 0, 0, 0 | 78 s | 1.0 s |
+| gaz | 20 | 20 | 3, 4, 4, 5, 6 | 79 s | 1.6 s |
+| eclairement | 20 | 20 | 12, 13, 15, 23, 98 | 69 s | 5.2 s |
+| rc | 20 | 0 | 39, 39, 42, 43, 44 | 112 s | 13.5 s |
+| refroidissement | 20 | 0 | 72, 72, 82, 91, 91 | 89 s | 47.3 s |
+| lentille | 20 | 0 | 59, 67, 67, 67, 69 | 105 s | 21.8 s |
+| snell | 20 | 0 | 2, 15, 27, 38, 84 | 40 s | 1.0 s |
+
+Replay of a stop on patience on the TP traces (error gain of more than 1 %, approximate):
+
+| P | generations run, median fraction | fits where a later gain of error is cut | of which the final model has the law |
+|---|---|---|---|
+| 10 | 0.11 | 71 | 4 |
+| 20 | 0.21 | 52 | 3 |
+| 30 | 0.31 | 36 | 2 |
+
+Decision bench kinds (30 s and 1,000 generations per fit):
+
+| kind | fits | generations run, median | time limit reached | gen. of final form, median | 90th pct | final form at, median fraction of the generations run |
+|---|---|---|---|---|---|---|
+| feyn_n1 | 205 | 49 | 205 | 8 | 39 | 0.16 |
+| feyn_n10 | 205 | 47 | 205 | 13 | 41 | 0.27 |
+| real | 60 | 51.0 | 60 | 8.0 | 48 | 0.16 |
+| realraw | 70 | 47.0 | 70 | 19.5 | 39 | 0.42 |
+
+Replay of a stop on patience on these traces (as above; structure: the structure retrieved at the end of the fit):
+
+| P | kind | generations run, median fraction | fits where a later gain is cut | of which with the structure retrieved |
+|---|---|---|---|---|
+| 10 | feyn_n1 | 0.23 | 34 | 2 |
+| 10 | feyn_n10 | 0.26 | 50 | 5 |
+| 10 | real | 0.25 | 16 | - |
+| 10 | realraw | 0.27 | 25 | - |
+| 20 | feyn_n1 | 0.45 | 17 | 1 |
+| 20 | feyn_n10 | 0.50 | 23 | 3 |
+| 20 | real | 0.46 | 7 | - |
+| 20 | realraw | 0.50 | 15 | - |
+| 30 | feyn_n1 | 0.66 | 6 | 0 |
+| 30 | feyn_n10 | 0.74 | 3 | 0 |
+| 30 | real | 0.65 | 5 | - |
+| 30 | realraw | 0.84 | 3 | - |
+
