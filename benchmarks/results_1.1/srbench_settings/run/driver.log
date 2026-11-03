@@ -36,3 +36,8 @@ time slice over: 313 jobs left for the next call
 slice done
 --- slice 2026-11-03T04:46
 313 jobs to run with 2 settings
+25 jobs done, 3557 s elapsed, 287 left
+time slice over: 265 jobs left for the next call
+slice done
+--- slice 2026-11-03T06:35
+265 jobs to run with 2 settings
