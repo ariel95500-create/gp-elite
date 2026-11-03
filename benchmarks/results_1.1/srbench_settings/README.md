@@ -71,6 +71,13 @@ runs) with no fit exact. One law with a sine counted exact here, I.18.12
 (`r*F*sin(th)`), is matched by formulas of 37 to 69 nodes that imitate the
 sine to the precision of the machine on the range of the data, not by the law.
 
+By group of laws (the end of `feyn_by_law.txt`), on the 31 laws without a
+sine or a cosine the settings of SRBench at 300 s and 1.1.0 in M2 at 30 s give
+nearly the same counts: 148 exact fits for W0 and W1 against 143, structures
+95 and 91 against 93 at 1 % noise, 69 and 73 against 71 at 10 %. The whole gap
+of F41 is on the 10 laws with a sine or a cosine: 7 exact fits against 20, and
+no structure under noise against 15 and 15.
+
 About 30 of the 155 exact fits come at the end of a run of 200 s or more
 (for instance I.11.19, II.2.42, I.8.14, I.16.6); the records give the time of
 the fit, not the moment the law appeared in it.
@@ -102,6 +109,11 @@ datasets of SRBench is not known here (at B = 300 s it used 194 s on R6 and
 273 s on the noisy laws). Written as intended, the grid would therefore tune
 only if the fits end early enough; otherwise it would cost hours per run and
 change nothing. Whether to propose it is put to the author with this record.
+
+The author chose on 3 November 2026 not to propose it for now: SRBench fits
+the default `est`, which this study keeps. If he sends the question on the
+calendar of SRBench, a sentence on the grid joins it, for the maintainers to
+judge with their own budget of computation.
 
 ## Departures from the plan
 

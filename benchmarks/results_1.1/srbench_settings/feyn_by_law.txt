@@ -53,3 +53,12 @@ Laws by (sine or cosine, found here by W0, found in M2):
   (True, True, True): 1
 
 Fits where W0 and W1 agree on exact or not: 205 of 205.
+
+| laws | setting | F41 exact | F41N1 structures | F41N10 structures |
+|---|---|---|---|---|
+| 31 without sine or cosine | W0 | 148 | 95 | 69 |
+| 31 without sine or cosine | W1 | 148 | 91 | 73 |
+| 31 without sine or cosine | 1.1.0, M2 | 143 | 93 | 71 |
+| 10 with sine or cosine | W0 | 7 | 0 | 0 |
+| 10 with sine or cosine | W1 | 7 | 0 | 0 |
+| 10 with sine or cosine | 1.1.0, M2 | 20 | 15 | 15 |

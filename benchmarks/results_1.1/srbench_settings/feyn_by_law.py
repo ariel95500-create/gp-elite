@@ -73,6 +73,27 @@ def main():
     print("\nFits where W0 and W1 agree on exact or not: %d of %d." % (
         paired, sum(len(w0[p]) for p in idx)))
 
+    # Added on 3 November 2026: the same counts by group of laws, with the
+    # structures under noise, for W0, W1 and 1.1.0 in M2.
+    trig = {p for p in idx if any(t in F.PROBS[idx[p]][1] for t in TRIG)}
+    srcs = {"W0": os.path.join(run, "W0.jsonl"), "W1": os.path.join(run, "W1.jsonl"),
+            "1.1.0, M2": os.path.join(HERE, "..", "release", "m2",
+                                      "campaignR_1.1.0.jsonl")}
+    print("\n| laws | setting | F41 exact | F41N1 structures | F41N10 structures |")
+    print("|---|---|---|---|---|")
+    for grp, sel in (("%d without sine or cosine" % (len(idx) - len(trig)),
+                      lambda p: p not in trig),
+                     ("%d with sine or cosine" % len(trig), lambda p: p in trig)):
+        for name, path in srcs.items():
+            e = load(path, "feyn")
+            n1 = load(path, "feyn_n1")
+            n10 = load(path, "feyn_n10")
+            print("| %s | %s | %d | %d | %d |" % (
+                grp, name,
+                sum(ex(e[p]) for p in idx if sel(p)),
+                sum(1 for p in idx if sel(p) for r in n1[p] if r.get("structure")),
+                sum(1 for p in idx if sel(p) for r in n10[p] if r.get("structure"))))
+
 
 if __name__ == "__main__":
     main()
