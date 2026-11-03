@@ -10,7 +10,13 @@ Kept apart from the plans of 1.1, which this file does not change.
    once the measurements of 1.1 leave the machine free, a study of the
    settings SRBench runs GP_ELITE with.
 3. **A plan for a version 1.2 for teaching** is written after gate 6, from
-   the list of `DIAGNOSTIC_TP.md` (decided on 26 October 2026).
+   the list of `DIAGNOSTIC_TP.md` (decided on 26 October 2026). Its content,
+   chosen by the author on 3 November 2026: a stop when the law holds to the
+   noise of the data; the exponential written as such; under units, an honest
+   message where a constant with units would have to sit inside a function or
+   a sum. The full treatment of such constants, a front of candidate laws on
+   small tables, the arcsine, and the retrieval of structure under noise come
+   after 1.2. The plan is written in `../results_1.2/`.
 4. **After 1.2, a measurement of what speed would bring** (decided on
    27 October 2026), described below.
 

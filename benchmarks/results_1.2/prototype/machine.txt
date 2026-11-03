@@ -1,0 +1,7 @@
+# machine at the start of the prototype run
+2026-11-03T18:52:54Z
+4
+Model name:                              Intel(R) Xeon(R) Processor @ 2.80GHz
+AVX-512: avx512f present
+gp-elite 1.1.0 /venv11p/lib/python3.11/site-packages/gp_elite/__init__.py
+numpy 2.4.6 python 3.11.15
