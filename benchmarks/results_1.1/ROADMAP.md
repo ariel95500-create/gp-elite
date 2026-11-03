@@ -56,6 +56,12 @@ The two actions:
    author with the final check beside it. The author decides whether to
    propose it to SRBench.
 
+   Done on 3 November 2026 (`srbench_settings/README.md`), with 1.1.0 rather
+   than 1.0.0 as `srbench_settings/PLAN.md` says: the wrapper as published
+   stays, the other setting measured not being better by the criteria of the
+   plan, and the final check is therefore not run. Whether to propose the
+   correction of the grid is put to the author.
+
 When the plan of 1.2 is written, its items that also act without units
 (for instance an earlier stop when the law is found, which SRBench would
 see in its training times) are proposed first.
