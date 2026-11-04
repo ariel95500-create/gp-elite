@@ -42,3 +42,24 @@ time slice over: 2022 jobs left for the next call
 --- slice 2026-11-04T20:24 (789 and 789 done)
 1991 jobs to run with 2 engines
 --- correction of the line above: 17 pairs (13 crashes of 1.1.0, 16 of 1.2.0, on 17 jobs), not 18.
+25 jobs done, 310 s elapsed, 1965 left
+50 jobs done, 716 s elapsed, 1940 left
+75 jobs done, 957 s elapsed, 1916 left
+100 jobs done, 1341 s elapsed, 1890 left
+125 jobs done, 1748 s elapsed, 1865 left
+150 jobs done, 2133 s elapsed, 1840 left
+175 jobs done, 2538 s elapsed, 1815 left
+200 jobs done, 2928 s elapsed, 1790 left
+225 jobs done, 3332 s elapsed, 1765 left
+250 jobs done, 3720 s elapsed, 1740 left
+275 jobs done, 4125 s elapsed, 1715 left
+300 jobs done, 4512 s elapsed, 1690 left
+325 jobs done, 4916 s elapsed, 1665 left
+350 jobs done, 5305 s elapsed, 1640 left
+375 jobs done, 5708 s elapsed, 1615 left
+400 jobs done, 6099 s elapsed, 1590 left
+time slice over: 1577 jobs left for the next call
+--- slice 2026-11-04T22:09 (1203 and 1203 done)
+1577 jobs to run with 2 engines
+25 jobs done, 415 s elapsed, 1551 left
+50 jobs done, 797 s elapsed, 1526 left
