@@ -1,0 +1,913 @@
+[
+ {
+  "problem": "I.12.1",
+  "exps": [
+   0.0,
+   1.0
+  ],
+  "rounded": [
+   0,
+   1
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 1,
+  "rank": 1,
+  "n_inputs": 2,
+  "n_bases": 3
+ },
+ {
+  "problem": "I.12.5",
+  "exps": [
+   0.9999999999999993,
+   1.0
+  ],
+  "rounded": [
+   1,
+   1
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 2,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.14.4",
+  "exps": [
+   1.0,
+   2.0
+  ],
+  "rounded": [
+   1,
+   2
+  ],
+  "rounded_exact": true,
+  "sum": 3,
+  "max": 2,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 2,
+  "n_bases": 3
+ },
+ {
+  "problem": "I.39.1",
+  "exps": [
+   1.0,
+   1.0
+  ],
+  "rounded": [
+   1,
+   1
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 2,
+  "n_bases": 3
+ },
+ {
+  "problem": "II.3.24",
+  "exps": [
+   1.0000000000000002,
+   -2.0000000000000004
+  ],
+  "rounded": [
+   1,
+   -2
+  ],
+  "rounded_exact": true,
+  "sum": 3,
+  "max": 2,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 2,
+  "n_bases": 3
+ },
+ {
+  "problem": "I.6.20a",
+  "exps": [
+   0
+  ],
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": true,
+  "dimless_inputs": 1,
+  "rank": 0
+ },
+ {
+  "problem": "I.8.14",
+  "exps": [
+   0.25,
+   0.25,
+   0.25,
+   0.25
+  ],
+  "rounded": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": false,
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 1,
+  "n_inputs": 4,
+  "n_bases": 1
+ },
+ {
+  "problem": "I.16.6",
+  "exps": [
+   0.33333333333333337,
+   0.3333333333333334,
+   0.3333333333333334
+  ],
+  "rounded": [
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": false,
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 1,
+  "n_inputs": 3,
+  "n_bases": 2
+ },
+ {
+  "problem": "I.27.6",
+  "exps": [
+   0.4999999999999998,
+   0.49999999999999994,
+   0.0
+  ],
+  "rounded": [
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": false,
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 1,
+  "rank": 1,
+  "n_inputs": 3,
+  "n_bases": 1
+ },
+ {
+  "problem": "I.34.8",
+  "exps": [
+   0.9999999999999997,
+   0.9999999999999994,
+   1.0000000000000004,
+   -1.0000000000000002
+  ],
+  "rounded": [
+   1,
+   1,
+   1,
+   -1
+  ],
+  "rounded_exact": true,
+  "sum": 4,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 4,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.43.16",
+  "exps": [
+   0.9999999999999993,
+   0.9999999999999996,
+   0.9999999999999996,
+   -0.9999999999999987
+  ],
+  "rounded": [
+   1,
+   1,
+   1,
+   -1
+  ],
+  "rounded_exact": true,
+  "sum": 4,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 4,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.12.2",
+  "exps": [
+   1.0000000000000007,
+   0.9999999999999998,
+   -0.9999999999999998,
+   -2.0
+  ],
+  "rounded": [
+   1,
+   1,
+   -1,
+   -2
+  ],
+  "rounded_exact": true,
+  "sum": 5,
+  "max": 2,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 3,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "II.15.4",
+  "exps": [
+   0.9999999999999994,
+   0.9999999999999998,
+   0.0
+  ],
+  "rounded": [
+   1,
+   1,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 1,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.18.12",
+  "exps": [
+   0.9999999999999998,
+   0.9999999999999998,
+   0.0
+  ],
+  "rounded": [
+   1,
+   1,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 1,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 3
+ },
+ {
+  "problem": "III.15.12",
+  "exps": [
+   1.0,
+   -1.59488868878714e-17,
+   1.5948886887871396e-17
+  ],
+  "rounded": [
+   1,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 3
+ },
+ {
+  "problem": "I.10.7",
+  "exps": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "rounded": [
+   1,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 3
+ },
+ {
+  "problem": "I.11.19",
+  "exps": [
+   0.33333333333333337,
+   0.3333333333333334,
+   0.3333333333333334,
+   0.3333333333333334,
+   0.3333333333333334,
+   0.3333333333333334
+  ],
+  "rounded": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": false,
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 1,
+  "n_inputs": 6,
+  "n_bases": 1
+ },
+ {
+  "problem": "I.15.10",
+  "exps": [
+   1.0,
+   0.5,
+   0.4999999999999999
+  ],
+  "rounded": [
+   1,
+   0,
+   0
+  ],
+  "rounded_exact": false,
+  "sum": 1,
+  "max": 1,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 3
+ },
+ {
+  "problem": "I.25.13",
+  "exps": [
+   1.0000000000000004,
+   -1.0
+  ],
+  "rounded": [
+   1,
+   -1
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 2,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.26.2",
+  "exps": [
+   0,
+   0
+  ],
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": true,
+  "dimless_inputs": 2,
+  "rank": 0
+ },
+ {
+  "problem": "I.29.4",
+  "exps": [
+   1.0000000000000002,
+   -1.0
+  ],
+  "rounded": [
+   1,
+   -1
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 2,
+  "n_bases": 2
+ },
+ {
+  "problem": "I.30.5",
+  "exps": [
+   -0.0,
+   0.0,
+   0.0
+  ],
+  "rounded": [
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": true,
+  "dimless_inputs": 1,
+  "rank": 1,
+  "n_inputs": 3,
+  "n_bases": 1
+ },
+ {
+  "problem": "I.32.5",
+  "exps": [
+   2.0000000000000044,
+   2.000000000000002,
+   -1.0000000000000022,
+   -3.0000000000000093
+  ],
+  "rounded": [
+   2,
+   2,
+   -1,
+   -3
+  ],
+  "rounded_exact": true,
+  "sum": 8,
+  "max": 3,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 4,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.34.1",
+  "exps": [
+   1.0000000000000002,
+   -2.870799639816851e-16,
+   -1.7605766151916947e-16
+  ],
+  "rounded": [
+   1,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 2
+ },
+ {
+  "problem": "I.37.4",
+  "exps": [
+   0.5,
+   0.5000000000000001,
+   0.0
+  ],
+  "rounded": [
+   0,
+   1,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 1,
+  "rank": 1,
+  "n_inputs": 3,
+  "n_bases": 2
+ },
+ {
+  "problem": "I.40.1",
+  "exps": [
+   0.8780487804878048,
+   0.07317073170731603,
+   0.07317073170731758,
+   -0.2926829268292683,
+   -0.07317073170731737,
+   -0.07317073170731746
+  ],
+  "rounded": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 4,
+  "n_inputs": 6,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.44.4",
+  "exps": [
+   0.0,
+   1.0000000000000004,
+   1.0000000000000002,
+   0.0
+  ],
+  "rounded": [
+   0,
+   1,
+   1,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 2,
+  "rank": 2,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "I.50.26",
+  "exps": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "rounded": [
+   1,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 2,
+  "rank": 1,
+  "n_inputs": 3,
+  "n_bases": 1
+ },
+ {
+  "problem": "II.2.42",
+  "exps": [
+   0.9999999999999992,
+   0.4999999999999999,
+   0.4999999999999999,
+   0.4000000000000001,
+   0.20000000000000004
+  ],
+  "rounded": [
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": false,
+  "sum": 1,
+  "max": 1,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 3,
+  "n_inputs": 5,
+  "n_bases": 4
+ },
+ {
+  "problem": "II.6.15b",
+  "exps": [
+   1.0000000000000002,
+   0.0,
+   -1.0000000000000002,
+   -3.000000000000002
+  ],
+  "rounded": [
+   1,
+   0,
+   -1,
+   -3
+  ],
+  "rounded_exact": true,
+  "sum": 5,
+  "max": 3,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 1,
+  "rank": 3,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "II.11.3",
+  "exps": [
+   0.9999999999999993,
+   0.9999999999999994,
+   -1.0,
+   -0.9999999999999996,
+   -0.9999999999999998
+  ],
+  "rounded": [
+   1,
+   1,
+   -1,
+   -1,
+   -1
+  ],
+  "rounded_exact": true,
+  "sum": 5,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 4,
+  "n_inputs": 5,
+  "n_bases": 4
+ },
+ {
+  "problem": "II.11.27",
+  "exps": [
+   -1.9002946000786647e-16,
+   5.551115123125783e-17,
+   1.0000000000000002,
+   1.0
+  ],
+  "rounded": [
+   0,
+   0,
+   1,
+   1
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 3,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "II.13.23",
+  "exps": [
+   0.9999999999999998,
+   2.2378500854646535e-17,
+   2.2378500854646535e-17
+  ],
+  "rounded": [
+   1,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 3
+ },
+ {
+  "problem": "II.24.17",
+  "exps": [
+   0.3333333333333332,
+   -0.3333333333333334,
+   -0.6666666666666669
+  ],
+  "rounded": [
+   0,
+   0,
+   -1
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 3,
+  "n_bases": 2
+ },
+ {
+  "problem": "II.34.2",
+  "exps": [
+   0.9999999999999998,
+   0.9999999999999998,
+   1.0000000000000002
+  ],
+  "rounded": [
+   1,
+   1,
+   1
+  ],
+  "rounded_exact": true,
+  "sum": 3,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 3,
+  "n_inputs": 3,
+  "n_bases": 3
+ },
+ {
+  "problem": "II.35.18",
+  "exps": [
+   0.9999999999999998,
+   -2.763762997000427e-16,
+   1.4662229992476137e-17,
+   -2.617140697075666e-16
+  ],
+  "rounded": [
+   1,
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 1,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 3,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "II.38.3",
+  "exps": [
+   0.9999999999999999,
+   0.6666666666666666,
+   0.3333333333333333,
+   0.3333333333333333
+  ],
+  "rounded": [
+   1,
+   1,
+   0,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 2,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 4,
+  "n_bases": 3
+ },
+ {
+  "problem": "III.9.52",
+  "exps": [
+   0.9999999999999988,
+   1.0000000000000002,
+   0.0,
+   -1.0000000000000007,
+   0.0
+  ],
+  "rounded": [
+   1,
+   1,
+   0,
+   -1,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 3,
+  "max": 1,
+  "fast_path": true,
+  "dimless_target": false,
+  "dimless_inputs": 2,
+  "rank": 3,
+  "n_inputs": 5,
+  "n_bases": 4
+ },
+ {
+  "problem": "III.10.19",
+  "exps": [
+   0.9999999999999994,
+   0.3333333333333336,
+   0.3333333333333336,
+   0.3333333333333336
+  ],
+  "rounded": [
+   1,
+   0,
+   0,
+   0
+  ],
+  "rounded_exact": false,
+  "sum": 1,
+  "max": 1,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 0,
+  "rank": 2,
+  "n_inputs": 4,
+  "n_bases": 4
+ },
+ {
+  "problem": "III.17.37",
+  "exps": [
+   0,
+   0,
+   0
+  ],
+  "sum": 0,
+  "max": 0,
+  "fast_path": false,
+  "dimless_target": true,
+  "dimless_inputs": 3,
+  "rank": 0
+ },
+ {
+  "problem": "III.19.51",
+  "exps": [
+   1.0000000000000009,
+   4.000000000000003,
+   -2.0000000000000013,
+   -2.0000000000000004,
+   0.0
+  ],
+  "rounded": [
+   1,
+   4,
+   -2,
+   -2,
+   0
+  ],
+  "rounded_exact": true,
+  "sum": 9,
+  "max": 4,
+  "fast_path": false,
+  "dimless_target": false,
+  "dimless_inputs": 1,
+  "rank": 4,
+  "n_inputs": 5,
+  "n_bases": 4
+ }
+]
