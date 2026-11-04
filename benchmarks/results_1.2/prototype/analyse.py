@@ -127,8 +127,117 @@ def trace_section(R):
         print()
 
 
+UNITS_LIMITED = ("rc", "refroidissement", "lentille")
+
+
+def units_section(R):
+    print("## Prototype 2: under units, the seeds the gate of dimensions sets "
+          "aside (units_rejected.jsonl)\n")
+    print("%d records, %d crashes\n" % (len(R), sum(r.get("status") == "CRASH" for r in R)))
+    tp = [r for r in R if r.get("bench") == "tp"]
+    if tp:
+        print("TP, units arm (err: 1 - R² on the training rows; a rejected seed "
+              "is scored on the rows its finder saw):\n")
+        print("| experiment | fits | law | err of the model returned, median | "
+              "largest | fits with a rejected seed | best rejected seed, median "
+              "err | fits where a rejected seed fits better |")
+        print("|---|---|---|---|---|---|---|---|")
+        by = collections.defaultdict(list)
+        for r in tp:
+            by[r["exp"]].append(r)
+        for e, L in by.items():
+            br = [r["best_rejected_err"] for r in L if r["best_rejected_err"] is not None]
+            print("| %s | %d | %d | %.3g | %.3g | %d | %s | %d |" % (
+                e, len(L), sum(r["law"] for r in L),
+                S.median(r["err_train_returned"] for r in L),
+                max(r["err_train_returned"] for r in L),
+                sum(r["n_rejected"] > 0 for r in L),
+                ("%.3g" % S.median(br)) if br else "-",
+                sum(r["best_rejected_err"] is not None
+                    and r["best_rejected_err"] < r["err_train_returned"] for r in L)))
+        print()
+    p1 = [r for r in R if r.get("bench") == "p1" and r.get("status") != "CRASH"]
+    if p1:
+        print("Decision bench, units kinds (30 s per fit):\n")
+        print("| kind | fits | EXACT | NEAR | MISS | fits with a rejected seed | "
+              "a rejected seed fits better | ten times better |")
+        print("|---|---|---|---|---|---|---|---|")
+        for k in ("ufeyn", "ufeyn_n1", "ufeyn_n10"):
+            A = [r for r in p1 if r["kind"] == k]
+            if not A:
+                continue
+            W = [r for r in A if r["n_rejected"] > 0]
+            print("| %s | %d | %d | %d | %d | %d | %d | %d |" % (
+                k, len(A), sum(r["status"] == "EXACT" for r in A),
+                sum(r["status"] == "NEAR" for r in A),
+                sum(r["status"] == "MISS" for r in A), len(W),
+                sum(r["best_rejected_err"] < r["err_train_returned"] for r in W),
+                sum(r["best_rejected_err"] < 0.1 * r["err_train_returned"] for r in W)))
+        print()
+
+
+def units_vs_plain_section(U, PT):
+    """The comparison a message under units could rest on: the model
+    returned under units (prototype 2, 100 generations) against the plain
+    fit with the stop on patience (prototype 4), same rows."""
+    U = {(r["exp"], r["n"], r["noise"], r["draw"]): r for r in U
+         if r.get("bench") == "tp" and r.get("status") != "CRASH"}
+    if not U or not any("err_train" in r for r in PT):
+        return
+    print("## Units arm against the plain arm, same rows (prototypes 2 and 4)\n")
+    print("ratio: err under units / err of the plain fit with the stop on "
+          "patience (training rows). Groups: within reach under units (the "
+          "six laws), limited by units (%s), snell (dimensionless).\n"
+          % ", ".join(UNITS_LIMITED))
+    for P in sorted({r["patience"] for r in PT}):
+        pairs = []
+        for r in PT:
+            if r["arm"] != "plain" or r["patience"] != P or "err_train" not in r:
+                continue
+            u = U.get((r["exp"], r["n"], r["noise"], r["draw"]))
+            if u is None:
+                continue
+            g = ("limited" if r["exp"] in UNITS_LIMITED else
+                 "snell" if r["exp"] == "snell" else "reach")
+            pairs.append((g, r["exp"], u["err_train_returned"],
+                          max(r["err_train"], 1e-300), bool(r["law"]), r))
+        if not pairs:
+            continue
+        print("P = %d, %d pairs:\n" % (P, len(pairs)))
+        print("| group | fits | ratio, min | 10th pct | median | 90th pct | max |")
+        print("|---|---|---|---|---|---|---|")
+        for g in ("reach", "limited", "snell"):
+            v = sorted(u / p for gg, _e, u, p, _l, _r in pairs if gg == g)
+            if v:
+                print("| %s | %d | %.3g | %.3g | %.3g | %.3g | %.3g |" % (
+                    g, len(v), v[0], q(v, .1), S.median(v), q(v, .9), v[-1]))
+        print()
+        print("| threshold k (message when ratio >= k) | reach | limited | "
+              "snell | limited, plain fit with the law |")
+        print("|---|---|---|---|---|")
+        for k in (2, 3, 5, 10):
+            c = collections.Counter(gg for gg, _e, u, p, _l, _r in pairs if u / p >= k)
+            cl = sum(1 for gg, _e, u, p, law, _r in pairs
+                     if gg == "limited" and u / p >= k and law)
+            print("| %d | %d | %d | %d | %d |" % (k, c["reach"], c["limited"],
+                                              c["snell"], cl))
+        print()
+        print("| experiment | fits | ratio, min | median | max |")
+        print("|---|---|---|---|---|")
+        by = collections.defaultdict(list)
+        for gg, e, u, p, _l, _r in pairs:
+            by[e].append(u / p)
+        for e, v in by.items():
+            print("| %s | %d | %.3g | %.3g | %.3g |" % (e, len(v), min(v),
+                                                     S.median(v), max(v)))
+        print()
+
+
 def main():
     trace_section(load("trace.jsonl"))
+    U = load("units_rejected.jsonl")
+    units_section(U)
+    units_vs_plain_section(U, load("patience.jsonl"))
 
 
 if __name__ == "__main__":
