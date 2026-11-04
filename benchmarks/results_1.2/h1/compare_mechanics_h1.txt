@@ -1,0 +1,10 @@
+81 records, 0 crashes
+
+Mechanic 3: 80 default fits of the TP diagnostic at draw 0
+  same model as prototype 4 at P = 30: 80 of 80
+  stop at the same generation: 80 of 80
+  gas law, plain, 10 pts, 2 %, draw 0: stop arret (sequentiel, gen 30) (last gain at generation 0 in prototype 4), 31 generations run, -1148.8 + 8.53948 * n * T / V
+  mechanic 3 HOLDS
+
+Mechanic 4, gas law with parallel=True: trace arret (parallele, gen 44), 6.3 s, -1148.8 + 8.53948 * n * T / V
+  mechanic 4 HOLDS

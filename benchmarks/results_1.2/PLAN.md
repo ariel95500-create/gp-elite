@@ -197,6 +197,20 @@ would cut late gains. A user who names a budget asks for it to be used.
 New tests: the stop acts only under the defaults or an explicit
 `patience`; `patience=0` and any explicit budget leave the run of 1.1.
 
+**Mechanics held on 4 November 2026** (commit 212d1dc, `h1/`): the thirteen
+reference configurations identical to the 1.1.0 wheel with `patience=0` and
+by default; the 80 default fits of the TP diagnostic at draw 0 return the
+models of prototype 4 at P = 30 and stop at the same generations (the gas
+law at generation 30, its last gain at generation 0); with `parallel=True`
+the stop acts in the parallel loop; 163 tests pass, seven of them new
+(`h1/compare_1.1.0_vs_equiv_patience0.txt`,
+`h1/compare_1.1.0_vs_equiv_default.txt`, `h1/compare_mechanics_h1.txt`,
+`h1/tests_h1.txt`). The estimator `GPEliteRegressor` always passes its
+number of generations, so H1 never acts there. The container was replaced
+before these mechanics; `/venv11p` was rebuilt from PyPI (`h1/machine.txt`)
+and its wheel returns the reference configurations of the previous machine
+(`h1/compare_wheel_old_vs_new_machine.txt`).
+
 **The benches.**
 - **TP.** `tp_diagnostic.py` as in the diagnostic: 10 experiments, 10 and
   20 points, 2 % and 5 % noise, the plain and the units arms, the API
