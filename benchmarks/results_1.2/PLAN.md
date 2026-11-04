@@ -14,6 +14,9 @@ is and decide nothing. Method as for 1.1:
 The author validates this plan before any change (gate 7). He decides the
 publication of 1.2 after its measurement (gate 8).
 
+Gate 7: the author validated this plan in full on 4 November 2026, and chose
+(b) for the time limit of the typed start (see the end of this plan).
+
 ## What 1.2 has to do
 
 Teaching became the first audience of GP_ELITE on 26 October 2026
@@ -370,6 +373,33 @@ decision):
   its failed draws. That changes the models of III.19.51 under units; M2
   would name them, and the campaigns above would run with the correction.
 
+**Decided by the author on 4 November 2026: (b).** His reason is not the
+README: a behaviour that is not explained may hide others. So the
+correction comes after a diagnostic, D0, which explains it first.
+
+**D0, the typed start** (decides nothing; before any change to the engine).
+On 1.1.0, wrapped from outside as the prototypes, `time_limit=30`, seed 0:
+1. III.19.51 under units: the size of the population asked, the number of
+   typed draws, how many fail and why (`dim_search._build_ek`), the time of
+   a draw that succeeds and of one that fails, and where that time goes.
+2. The time of the typed start on every equation of U41 and on the units
+   arm of the TP laws (draw 0), to see whether III.19.51 is alone or the
+   largest of several.
+3. What in III.19.51 makes the typed draws hard (its variables, their
+   dimensions, the dimension of the target), against the equations that
+   start fast.
+
+D0 is recorded in `d0/` and reported to the author with its explanation.
+If it finds a fault beyond the missing look at the deadline, that fault goes
+to the author before any correction. Otherwise the correction (b) is made as
+written above, with these mechanics:
+1. III.19.51 under units with `time_limit=30`: the fit ends within the
+   limit, up to its usual end (polishing, selection, formula), and its model
+   passes `check_dimensions`.
+2. U41, seed 0, at 30 s: every equation other than III.19.51 returns the
+   model of 1.1.0.
+3. Without `units=`, the thirteen reference configurations are unchanged.
+
 ## The release of 1.2
 
 As for 1.1 (`../results_1.1/PLAN_RELEASE_1.1.md`): M1 to M5, then gate 8.
@@ -400,5 +430,6 @@ slices of under two hours whose records resume:
 - campaign C1: about 4 hours;
 - the release, M1 to M3, as for 1.1, about 15 hours.
 
-About 40 hours of machine time in all, over several days. The engine work
-itself (H1, X1, C1, their tests) comes before, once this plan is validated.
+About 40 hours of machine time in all, over several days, and about an hour
+for D0. The engine work itself (D0 and the correction (b), H1, X1, C1, their
+tests) comes before the campaigns.
