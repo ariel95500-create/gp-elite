@@ -4,3 +4,41 @@
 --- slice 2026-11-04T18:24 (0 and 0 done)
 2780 jobs to run with 2 engines
 25 jobs done, 16 s elapsed, 2754 left
+50 jobs done, 171 s elapsed, 2730 left
+75 jobs done, 188 s elapsed, 2704 left
+100 jobs done, 351 s elapsed, 2680 left
+125 jobs done, 465 s elapsed, 2655 left
+150 jobs done, 644 s elapsed, 2630 left
+175 jobs done, 664 s elapsed, 2604 left
+200 jobs done, 896 s elapsed, 2580 left
+225 jobs done, 1245 s elapsed, 2554 left
+250 jobs done, 1632 s elapsed, 2529 left
+275 jobs done, 2042 s elapsed, 2504 left
+300 jobs done, 2426 s elapsed, 2479 left
+325 jobs done, 2837 s elapsed, 2454 left
+350 jobs done, 3047 s elapsed, 2430 left
+375 jobs done, 3179 s elapsed, 2404 left
+400 jobs done, 3275 s elapsed, 2380 left
+425 jobs done, 3295 s elapsed, 2354 left
+450 jobs done, 3315 s elapsed, 2329 left
+475 jobs done, 3409 s elapsed, 2305 left
+500 jobs done, 3493 s elapsed, 2280 left
+525 jobs done, 3731 s elapsed, 2254 left
+550 jobs done, 3971 s elapsed, 2229 left
+575 jobs done, 4188 s elapsed, 2205 left
+600 jobs done, 4277 s elapsed, 2180 left
+625 jobs done, 4455 s elapsed, 2155 left
+650 jobs done, 4842 s elapsed, 2129 left
+675 jobs done, 5227 s elapsed, 2104 left
+700 jobs done, 5588 s elapsed, 2080 left
+725 jobs done, 5850 s elapsed, 2054 left
+750 jobs done, 6191 s elapsed, 2029 left
+time slice over: 2022 jobs left for the next call
+--- slice 2026-11-04T20:09 (758 and 758 done)
+2022 jobs to run with 2 engines
+25 jobs done, 393 s elapsed, 1996 left
+--- 2026-11-04T20:24 container restarted at about 20:22; 806 pairs whole. The copy of the bench lacked benchmarks/_pmlb_cache (ignored by git): the frozen test set was downloaded during the fits by both engines at once, and 18 pairs crashed on the download. Every file of the cache (117 of the test set, 7 of pmlb_frozen) fetched once and checked against its SHA-256; the 18 pairs removed (removed_for_the_data_cache.jsonl) and run again.
+--- M2 bench of e92f86d, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-04T20:24 (789 and 789 done)
+1991 jobs to run with 2 engines
+--- correction of the line above: 17 pairs (13 crashes of 1.1.0, 16 of 1.2.0, on 17 jobs), not 18.
