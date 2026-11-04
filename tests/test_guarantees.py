@@ -1540,3 +1540,55 @@ def test_no_power_law_seed_with_fractional_units(monkeypatch):
     cfg.FEAT_DIMS, cfg.TARGET_DIM = {0: {}, 1: {}}, {}
     seeds = core._make_power_law_seeds(Xr, y, cfg)
     assert any("pow" in _ops_in(t, set()) for t in seeds)
+
+
+# ── 1.2, D0: the typed start under units (benchmarks/results_1.2/d0/D0.md) ──
+
+_EPS0 = {"A": 2, "s": 4, "kg": -1, "m": -3}
+_III1951 = {0: {"kg": 1}, 1: {"A": 1, "s": 1}, 2: _EPS0,
+            3: {"kg": 1, "m": 2, "s": -1}, 4: {}}       # m, q, eps, h, n
+_ENERGY = {"kg": 1, "m": 2, "s": -2}
+
+
+def test_fast_path_builds_products_of_nine_to_twelve_factors():
+    """Feynman III.19.51 asks for m·q^4/(eps^2·h^2), nine factors. The fast
+    path of 1.1 stopped at eight, and the typed start fell to a blind search
+    that took 440 to 735 s; it now builds the product at once."""
+    feats = DS._feat_list(DS._norm_feat_dims(_III1951))
+    rng = random.Random(0)
+    assert DS._monomial_tree(_ENERGY, feats, rng, max_terms=8) is None   # 1.1
+    t = DS._monomial_tree(_ENERGY, feats, random.Random(0))
+    assert t is not None and DS.is_typed_valid(t, _III1951, _ENERGY)
+    leaves = [n for n in DS._nodes(t) if str(n.value).startswith("X[")]
+    assert len(leaves) == 9
+    # twelve factors still pass, thirteen do not
+    four = {0: {"kg": 1}, 1: {"m": 1}, 2: {"s": 1}, 3: {"A": 1}}
+    f4 = DS._feat_list(DS._norm_feat_dims(four))
+    assert DS._monomial_tree({"kg": 4, "m": 4, "s": -4}, f4,
+                             random.Random(0)) is not None
+    assert DS._monomial_tree({"kg": 4, "m": 4, "s": -4, "A": 1}, f4,
+                             random.Random(0)) is None
+
+
+def test_typed_start_stops_at_the_deadline_with_no_empty_island():
+    """Under units, time_limit= bounds the typed start too: once the deadline
+    is reached an island stops drawing as soon as it holds one tree, and is
+    completed with copies. The target kg^4·m^4·s^-4·A needs thirteen factors,
+    beyond the fast path; the blind search builds about one tree in ten
+    draws, so a full start of 1.1 would take minutes."""
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 2, 60), rng.uniform(1, 2, 60),
+               rng.uniform(1, 2, 60), rng.uniform(1, 2, 60)]
+    y = Xr[:, 0] ** 4 * Xr[:, 1] ** 4 / Xr[:, 2] ** 4 * Xr[:, 3]
+    units = {"a": {"kg": 1}, "b": {"m": 1}, "c": {"s": 1}, "d": {"A": 1}}
+    target = {"kg": 4, "m": 4, "s": -4, "A": 1}
+    t0 = time.time()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(Xr, y, feature_names=list(units), units=units,
+                                target_units=target, time_limit=2,
+                                generations=1000, seed=0, parallel=False)
+    assert time.time() - t0 < 120
+    ok, msg = GD.check_dimensions(
+        r.node, {i: u for i, u in enumerate(units.values())}, target)
+    assert ok, msg

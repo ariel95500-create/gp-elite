@@ -6880,7 +6880,15 @@ class Island:
             ds  = _ds()
             pop = []
             fails = 0
+            # [v1.2-D0] L'echeance de time_limit= vaut aussi pour ce depart :
+            # une fois atteinte, l'ile cesse de tirer des qu'elle a un arbre,
+            # et se complete par des copies comme apres ses tirages echoues.
+            # Sans echeance, ou avant, les tirages sont ceux de 1.1.
+            _deadline = getattr(self.cfg, "DEADLINE", None)
             while len(pop) < n and fails < 20 * n:
+                if (_deadline is not None and pop
+                        and time.time() >= _deadline):
+                    break
                 t = ds.typed_random_tree(
                     self.cfg.TARGET_DIM, self.cfg.MAX_INIT_DEPTH,
                     self.cfg.FEAT_DIMS, random,
