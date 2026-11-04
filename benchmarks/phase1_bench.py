@@ -183,6 +183,23 @@ def run_one(job):
         return orig(*args, **kwargs)
     C.evolve_island = counted
 
+    # [1.2] X1 checked in M2 (PLAN_RELEASE_1.2.md): the calls of the engine
+    # to its formula are noted during the fit (arguments and text only); the
+    # formula with X1 switched off is computed after the timed fit. Where X1
+    # is absent (1.1.0 and before) nothing is wrapped.
+    import gp_elite.api as API
+    import gp_elite.formula as FM
+    x1 = hasattr(FM, "_exponentials_as_such")
+    fcalls = []
+    if x1:
+        brf = API._build_raw_formula
+
+        def noted(node, scaler, X_raw, names_, predictions=None):
+            out = brf(node, scaler, X_raw, names_, predictions=predictions)
+            fcalls.append(((node, scaler, X_raw, names_, predictions), out[1]))
+            return out
+        API._build_raw_formula = noted
+
     Xtr, ytr, Xte, yte, Xo, yo, names, pool, clean = _data(job)
     kw = dict(generations=GENERATIONS, time_limit=TIME_LIMIT,
               seed=job["seed"], parallel=False, verbose=False, operators=pool)
@@ -203,6 +220,8 @@ def run_one(job):
         r = symbolic_regression(Xtr, ytr, **kw)
     dt = time.time() - t0
     C.evolve_island = orig
+    if x1:
+        API._build_raw_formula = brf
 
     rec = dict(job)
     e = D.one_minus_r2(yte, r.predict(Xte))
@@ -215,6 +234,26 @@ def run_one(job):
         rec["seeds_under_units"] = bool(C._SEEDS_UNDER_UNITS)
     if job.get("defaults"):             # [1.2] the stop on patience, if any
         rec["patience_stop"] = C.TRACE.value.get("patience")
+    if x1:                              # [1.2] X1 checked in M2
+        mine = [a for a, text in fcalls if text == r.expression]
+        rec["x1_calls"] = len(fcalls)
+        if mine:
+            keep = FM._exponentials_as_such
+            FM._exponentials_as_such = lambda t, X: None
+            try:
+                with redirect_stdout(io.StringIO()), warnings.catch_warnings(), \
+                        np.errstate(all="ignore"):
+                    warnings.simplefilter("ignore")
+                    rf11, s11 = brf(*mine[0][:4], predictions=mine[0][4])
+            finally:
+                FM._exponentials_as_such = keep
+            with redirect_stdout(io.StringIO()), warnings.catch_warnings(), \
+                    np.errstate(all="ignore"):
+                warnings.simplefilter("ignore")
+                rf, s = brf(*mine[0][:4], predictions=mine[0][4])
+            rec.update(expr_11=s11[:160],
+                       formula_exact_11=None if rf11 is None else bool(rf11.exact),
+                       x1_again=bool(s == r.expression))
     exact_kind = job["kind"] in FEYN_KINDS + ("tf", "utf") or (
         job["kind"] == "ts"
         and T.manifest()["datasets"][job["problem"]]["exact_scorable"])
