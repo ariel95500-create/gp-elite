@@ -22,8 +22,13 @@ API defaults. One process per fit, PYTHONHASHSEED=0.
 
   python benchmarks/results_1.2/d0/d0_start.py run --python /venv11p/bin/python --workers 4
   python benchmarks/results_1.2/d0/d0_start.py dims
+  python benchmarks/results_1.2/d0/d0_start.py run --fastpath --python /venv11p/bin/python
+
+The last one asks whether a fast path accepting up to 12 factors would
+change the typed start of these fits (see one_fastpath).
 """
 import argparse
+import collections
 import io
 import json
 import os
@@ -168,6 +173,95 @@ def one(job):
                 numpy=np.__version__)
 
 
+class _Stop(Exception):
+    pass
+
+
+def one_fastpath(job, max_terms=12, compare_max=50):
+    """Would a fast path that accepts up to `max_terms` factors (1.1.0: 8)
+    change the typed start? During the real start of the fit, each call of
+    typed_random_tree runs as in 1.1.0; before it, the state of `random` is
+    kept, the same call is replayed from that state with the wider fast
+    path, the two trees are compared, and the state after the 1.1.0 call is
+    put back, so the start goes on as in 1.1.0. The fit is stopped once its
+    islands are built. On III.19.51 only the first `compare_max` calls are
+    replayed (each 1.1.0 call there takes about a second)."""
+    import random
+    import warnings
+    import gp_elite
+    import gp_elite.core as C
+    import gp_elite.dim_search as DS
+    o_trt, o_mono, o_init = DS.typed_random_tree, DS._monomial_tree, C.Island.initialize
+    st = dict(calls=0, compared=0, differ=0, wide_none=0, t8=0.0, t12=0.0,
+              ex=[])
+
+    def wide(target, feats, rng, max_terms_=8, ops=None, **k):
+        return o_mono(target, feats, rng, max_terms=max_terms, ops=ops)
+
+    def trt(*a, **k):
+        s0 = random.getstate()
+        t = time.time()
+        r8 = o_trt(*a, **k)
+        st["t8"] += time.time() - t
+        s1 = random.getstate()
+        st["calls"] += 1
+        if st["compared"] < compare_max or job.get("problem") != "III.19.51":
+            random.setstate(s0)
+            DS._monomial_tree = wide
+            t = time.time()
+            try:
+                r12 = o_trt(*a, **k)
+            finally:
+                DS._monomial_tree = o_mono
+            st["t12"] += time.time() - t
+            random.setstate(s1)
+            st["compared"] += 1
+            a8 = C.to_string(r8) if r8 is not None else None
+            a12 = C.to_string(r12) if r12 is not None else None
+            st["wide_none"] += r12 is None
+            if a8 != a12:
+                st["differ"] += 1
+                if len(st["ex"]) < 3:
+                    st["ex"].append([a8, a12])
+        return r8
+
+    def initialize(self):
+        r = o_init(self)
+        if getattr(self, "stigmergic", False):
+            raise _Stop()
+        return r
+    DS.typed_random_tree, C.Island.initialize = trt, initialize
+    t0 = time.time()
+    with redirect_stdout(io.StringIO()), warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        try:
+            if job["bench"] == "u41":
+                import decision_bench as D
+                import phase1_bench as P1
+                import units_table as U
+                Xtr, ytr, _a, _b, _c, _d, names, pool = D.feyn_data(job["index"])
+                units, tunits = U.units_of(job["problem"], names)
+                gp_elite.symbolic_regression(
+                    Xtr, ytr, generations=P1.GENERATIONS,
+                    time_limit=P1.TIME_LIMIT, seed=job["seed"], parallel=False,
+                    verbose=False, operators=pool, feature_names=names,
+                    units=units, target_units=tunits)
+            else:
+                import tp_diagnostic as TP
+                TP.worker({k: job[k] for k in ("exp", "n", "noise", "draw", "arm")})
+            stopped = False
+        except _Stop:
+            stopped = True
+    return dict(job, mode="fastpath", max_terms=max_terms, stopped=stopped,
+                time=round(time.time() - t0, 2), calls=st["calls"],
+                compared=st["compared"], differ=st["differ"],
+                wide_none=st["wide_none"], t_1_1_0=round(st["t8"], 2),
+                t_wide=round(st["t12"], 3), examples=st["ex"],
+                engine_version=gp_elite.__version__,
+                pythonhashseed=os.environ.get("PYTHONHASHSEED"),
+                date=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
+
+
 def jobs():
     import feynman_bench as F
     import tp_diagnostic as TP
@@ -186,8 +280,8 @@ def key(j):
                       sort_keys=True)
 
 
-def drive(python, workers):
-    out = os.path.join(HERE, "d0_start.jsonl")
+def drive(python, workers, fastpath=False):
+    out = os.path.join(HERE, "d0_fastpath.jsonl" if fastpath else "d0_start.jsonl")
     done = set()
     if os.path.exists(out):
         done = {key(json.loads(l)) for l in open(out) if l.strip()}
@@ -198,7 +292,8 @@ def drive(python, workers):
     env.pop("PYTHONPATH", None)
 
     def run(j):
-        p = subprocess.run([python, os.path.abspath(__file__), "one",
+        p = subprocess.run([python, os.path.abspath(__file__),
+                            "fastpath-one" if fastpath else "one",
                             json.dumps(j)], capture_output=True, text=True,
                            env=env, cwd=BENCH)
         lines = [l for l in p.stdout.splitlines() if l.startswith("{")]
@@ -253,25 +348,98 @@ def dims():
             r.get("rounded"), r.get("rounded_exact")))
 
 
+def summary():
+    """The figures of D0.md, from d0_start.jsonl, d0_dims.json and
+    d0_fastpath.jsonl."""
+    def load(n):
+        p = os.path.join(HERE, n)
+        return [json.loads(l) for l in open(p) if l.strip()] if os.path.exists(p) else []
+    R = [r for r in load("d0_start.jsonl") if r.get("status") != "CRASH"]
+    print("## The typed start, fit by fit (d0_start.jsonl)\n")
+    print("%d fits, %d crashes.\n" % (len(R), len(load("d0_start.jsonl")) - len(R)))
+    print("| fit | start, s | whole fit, s | generations | typed draws | "
+          "of which None | time of the None, s | fast path | slow path calls "
+          "| out of budget | steps of _build_ek |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|")
+    R.sort(key=lambda r: -r["init_time"])
+    for r in R:
+        s = lambda k: sum(i[k] for i in r["inits"])
+        name = r.get("problem") or "TP %s, %d pts, %d %%" % (
+            r["exp"], r["n"], round(100 * r["noise"]))
+        print("| %s | %.2f | %.1f | %d | %d | %d | %.1f | %d | %d | %d | %d |" % (
+            name, r["init_time"], r["total"], r["generations"], s("trt"),
+            s("trt_none"), s("trt_t_none"), s("mono_ok"), s("build"),
+            s("build_out"), s("build_steps")))
+    rest = [r["init_time"] for r in R if r.get("problem") != "III.19.51"]
+    if rest:
+        print("\nAll fits but III.19.51: start at most %.2f s.\n" % max(rest))
+    for r in R:
+        if r.get("problem") == "III.19.51":
+            for i in r["inits"]:
+                print("- III.19.51, island %d (%s): n %d, %d draws, %d None, "
+                      "%.1f s, %d slow-path calls, %d out of budget" % (
+                          i["island"], i["role"], i["n"], i["trt"],
+                          i["trt_none"], i["dur"], i["build"], i["build_out"]))
+            print()
+    pd = os.path.join(HERE, "d0_dims.json")
+    D = json.load(open(pd)) if os.path.exists(pd) else []
+    if D:
+        print("## The exponents the units ask for (d0_dims.json)\n")
+        print("Equations whose target needs an exact product of the inputs "
+              "with integer exponents, by the sum of their absolute values "
+              "(fast path of 1.1.0: sum at most 8, each at most 4):\n")
+        c = collections.Counter(r["sum"] for r in D if r.get("rounded_exact")
+                                and r["sum"] > 0)
+        print(", ".join("sum %d: %d" % (k, c[k]) for k in sorted(c)))
+        print("\nAbove the limit: %s\n" % ", ".join(
+            "%s (%s)" % (r["problem"], r["rounded"]) for r in D
+            if r.get("rounded_exact") and (r["sum"] > 8 or r["max"] > 4)))
+    F = [r for r in load("d0_fastpath.jsonl") if r.get("status") != "CRASH"]
+    if F:
+        print("## A fast path of up to 12 factors, replayed (d0_fastpath.jsonl)\n")
+        print("%d fits, %d crashes, %d stopped after their start.\n" % (
+            len(F), len(load("d0_fastpath.jsonl")) - len(F),
+            sum(r["stopped"] for r in F)))
+        ch = [r for r in F if r["differ"]]
+        print("Fits whose start would change: %d (%s).\n" % (len(ch), ", ".join(
+            r.get("problem") or r["exp"] for r in ch) or "none"))
+        print("Typed draws compared: %d, of which different: %d.\n" % (
+            sum(r["compared"] for r in F), sum(r["differ"] for r in F)))
+        for r in ch:
+            print("- %s: %d of %d compared draws differ; the %d draws of "
+                  "1.1.0 took %.1f s; the %d replayed with the wider fast path "
+                  "%.2f s; e.g. %s" % (
+                      r.get("problem") or r["exp"], r["differ"], r["compared"],
+                      r["calls"], r["t_1_1_0"], r["compared"], r["t_wide"],
+                      r["examples"][:1]))
+        print()
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run")
     r.add_argument("--python", required=True)
     r.add_argument("--workers", type=int, default=4)
+    r.add_argument("--fastpath", action="store_true")
     o = sub.add_parser("one")
     o.add_argument("job")
+    f = sub.add_parser("fastpath-one")
+    f.add_argument("job")
     sub.add_parser("dims")
+    sub.add_parser("summary")
     a = ap.parse_args()
-    if a.cmd == "one":
+    if a.cmd in ("one", "fastpath-one"):
         buf = io.StringIO()
         with redirect_stdout(buf):
-            rec = one(json.loads(a.job))
+            rec = (one if a.cmd == "one" else one_fastpath)(json.loads(a.job))
         print(json.dumps(rec, default=str))
     elif a.cmd == "dims":
         dims()
+    elif a.cmd == "summary":
+        summary()
     else:
-        drive(a.python, a.workers)
+        drive(a.python, a.workers, a.fastpath)
 
 
 if __name__ == "__main__":
