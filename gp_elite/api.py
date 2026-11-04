@@ -308,6 +308,77 @@ class ParetoEntry:
 
 
 @dataclass
+class UnitsCheck:
+    """[v1.2-C1] The fit of the same rows without units, kept beside a model
+    found under units (``result.units_check``). It is not the model returned.
+
+    expression          : the formula found without units
+    error_units         : 1 - R² of the model returned (under units), on the
+                          training rows
+    error_without_units : 1 - R² of the formula without units, same rows
+    warned              : True when the warning was given (error under units
+                          above 0.001 and at least 5 times the other)
+    result              : the SRResult of the fit without units
+    """
+    expression: str
+    error_units: float
+    error_without_units: float
+    warned: bool
+    result: "SRResult" = None
+
+
+_UNITS_CHECK_FLOOR = 1e-3       # [v1.2-C1] plan 1.2: floor 0.001, k = 5
+_UNITS_CHECK_RATIO = 5.0
+
+
+def _one_minus_r2(model, X, y):
+    y = np.asarray(y, dtype=float).ravel()
+    with np.errstate(all="ignore"):
+        p = np.asarray(model.predict(X), dtype=float).ravel()
+        sst = float(np.sum((y - y.mean()) ** 2))
+        sse = float(np.sum((y - p) ** 2))
+    if not (np.isfinite(sse) and sst > 0.0):
+        return float("inf") if sst > 0.0 else float("nan")
+    return sse / sst
+
+
+def _units_check(result, X, y, kwargs):
+    """[v1.2-C1] Fit the same rows without units and compare. The trace of
+    the run and the warnings of the second fit are those of the fit under
+    units: the second fit is the engine's own check, not the user's."""
+    import warnings
+    saved = (dict(core.TRACE.first), dict(core.TRACE.count),
+             dict(core.TRACE.value))
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            plain = symbolic_regression(X, y, units_check=False, verbose=False,
+                                        **kwargs)
+    finally:
+        core.TRACE.first, core.TRACE.count, core.TRACE.value = saved
+    e_u = _one_minus_r2(result, X, y)
+    e_p = _one_minus_r2(plain, X, y)
+    warned = bool(np.isfinite(e_u) and np.isfinite(e_p)
+                  and e_u > _UNITS_CHECK_FLOOR and e_u >= _UNITS_CHECK_RATIO * e_p)
+    if warned:
+        text = plain.expression if len(plain.expression) <= 160 \
+            else plain.expression[:157] + "..."
+        warnings.warn(
+            "GP_ELITE: under units, the formula found fits these data less "
+            "well than a formula found without units (1 - R² on the training "
+            "rows: %.3g under units, %.3g without): %s. Under units a "
+            "constant that carries units cannot sit inside a function or a "
+            "sum (a time constant, an offset, a focal length): if the law you "
+            "expect has one, the formula without units may be the closer one. "
+            "The model returned is the one found under units; the other is in "
+            "result.units_check." % (e_u, e_p, text),
+            UserWarning, stacklevel=3)
+    return UnitsCheck(expression=plain.expression, error_units=float(e_u),
+                      error_without_units=float(e_p), warned=warned,
+                      result=plain)
+
+
+@dataclass
 class SRResult:
     """Résultat d'une régression symbolique.
 
@@ -342,6 +413,10 @@ class SRResult:
     formula          : formula.RawFormula — l'arbre en variables brutes
     predict          : callable — predict(X_brut) -> ndarray
     sympy            : callable — sympy(noms) -> chaîne sympy exacte
+    units_check      : UnitsCheck ou None — [v1.2] sous `units=`, l'ajustement
+                               des mêmes lignes sans unités (paramètre
+                               `units_check`) : sa formule et les deux erreurs.
+                               Ce n'est pas le modèle rendu.
     """
     expression: str
     r2_validation: Optional[float]
@@ -361,6 +436,7 @@ class SRResult:
     formula: object = None          # [v0.7] formula.RawFormula (variables brutes)
     y_scale: float = 1.0            # [v0.8] voir ParetoEntry.y_scale
     eval_node: object = None
+    units_check: Optional[UnitsCheck] = None   # [v1.2-C1] voir UnitsCheck
 
     @property
     def formula_exact(self) -> Optional[bool]:
@@ -513,6 +589,7 @@ def symbolic_regression(
     restarts: int = 1,
     time_limit: Optional[float] = None,
     patience: Optional[int] = None,
+    units_check: Optional[bool] = None,
     verbose: bool = False,
 ) -> SRResult:
     """Trouve une expression symbolique reliant X à y.
@@ -569,6 +646,18 @@ def symbolic_regression(
                   son budget le reçoit en entier, comme en 1.1. Un entier k
                   applique une patience de k générations quel que soit le
                   budget ; 0 la coupe.
+    units_check : [v1.2] sous `units=`, le même ajustement SANS unités (mêmes
+                  opérateurs, même seed, même règle de budget), comparé sur
+                  les lignes d'entraînement (1 - R²). Si l'erreur sous unités
+                  dépasse 0.001 et vaut au moins 5 fois l'autre, un
+                  UserWarning le dit : sous unités une constante qui porte une
+                  unité ne peut pas entrer dans une fonction ni dans une somme
+                  (constante de temps, décalage, focale). Le modèle rendu reste
+                  celui trouvé sous unités ; l'autre est gardé dans
+                  `result.units_check`. None (défaut) : quand le moteur choisit
+                  le budget (ni `generations` ni `time_limit`) ; True : quel
+                  que soit le budget (le temps double) ; False : jamais. Sans
+                  `units=`, rien.
     restarts : nombre d'évolutions indépendantes (seeds espacés). Les archives
                   de candidats de TOUS les runs sont fusionnées — le hold-out
                   étant déterministe et identique entre runs, leurs MSE de
@@ -600,6 +689,7 @@ def symbolic_regression(
     # [v0.8] Cible d'échelle extrême : la recherche voit y / 10^k (voir
     # _target_scale) ; le modèle livré est remis dans les unités de y à la
     # fin. Pas avec une loss personnalisée, qui reçoit y tel quel.
+    _y_input = y                      # [v1.2-C1] the rows as given, for the check
     _y_scale = _target_scale(y) if loss_fn is None else 1.0
     if _y_scale != 1.0:
         y = y / _y_scale
@@ -662,6 +752,15 @@ def symbolic_regression(
             raise ValueError("patience must be None or an integer >= 0 "
                              "(got %r)" % (patience,))
         cfg.PATIENCE = int(patience)
+    # [v1.2-C1] Contrôle des unités : par défaut quand le moteur choisit le
+    # budget, comme H1 ; True quel que soit le budget ; False jamais.
+    if units_check is not None and not isinstance(units_check, (bool, np.bool_)):
+        raise ValueError("units_check must be None, True or False (got %r)"
+                         % (units_check,))
+    _run_units_check = units is not None and (
+        bool(units_check) if units_check is not None
+        else (generations is None and time_limit is None))
+    _generations_arg = generations
     if generations is None:
         generations = 200 if thorough else 100
     cfg.GENERATIONS = int(generations)
@@ -978,7 +1077,7 @@ def symbolic_regression(
                _exact_alternatives(pareto_entries)),
             RuntimeWarning, stacklevel=2)
 
-    return SRResult(
+    result = SRResult(
         expression=expression,
         r2_validation=r2_val,
         mse_validation=mse_val,
@@ -995,3 +1094,18 @@ def symbolic_regression(
         y_scale=float(_y_scale),
         eval_node=_best_eval,
     )
+
+    # [v1.2-C1] Sous unités, le même ajustement sans unités, pour dire quand
+    # les unités empêchent la formule de suivre les données. Le modèle rendu
+    # reste celui trouvé sous unités.
+    if _run_units_check:
+        result.units_check = _units_check(
+            result, X, _y_input, dict(
+                feature_names=feature_names, operators=operators,
+                normalize=normalize, generations=_generations_arg, speed=speed,
+                parallel=parallel, validation_split=validation_split, seed=seed,
+                loss_fn=loss_fn, robust=robust, extrapolate=extrapolate,
+                extrapolate_feature=extrapolate_feature,
+                extrapolate_direction=extrapolate_direction, restarts=restarts,
+                time_limit=time_limit, patience=patience))
+    return result

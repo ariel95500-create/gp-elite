@@ -1715,3 +1715,76 @@ def test_patience_refuses_what_is_not_a_count(bad):
     Xr, y = _noisy_product()
     with pytest.raises(ValueError):
         symbolic_regression(Xr, y, generations=2, patience=bad)
+
+
+# ── [v1.2] C1: an honest message under units ────────────────────────────────
+# Under units a constant that carries units cannot sit inside a function or a
+# sum: the time constant of a capacitor's discharge, exp(-t / tau), is out of
+# reach, and 1.1 returned a formula far from the data without a word. Under
+# the defaults the engine now fits the same rows without units and says so
+# (benchmarks/results_1.2/PLAN.md, change C1). The model returned stays the
+# one found under units.
+
+def _capacitor(n=10, seed=0):
+    rng = np.random.RandomState(seed)
+    t = np.sort(rng.uniform(0.0, 5.0, n))
+    y = 5.0 * np.exp(-t)
+    return t.reshape(-1, 1), y + 0.02 * np.std(y) * rng.randn(n)
+
+
+_CAPACITOR_UNITS = dict(feature_names=["t"], units={"t": {"s": 1}},
+                        target_units={"kg": 1, "m": 2, "s": -3, "A": -1},
+                        unknown_constant=True, seed=0, parallel=False)
+
+
+def test_units_check_says_when_units_keep_the_formula_from_the_data():
+    """The fit under units misses the discharge, the fit without units follows
+    it: a warning says so and names that formula. The model returned is the
+    one found under units, as with units_check=False. (An explicit budget
+    and units_check=True keep the test short; under the defaults the check
+    runs the same way, see the next test.)"""
+    Xr, y = _capacitor()
+    with pytest.warns(UserWarning, match="under units") as rec:
+        r = symbolic_regression(Xr, y, generations=25, units_check=True,
+                                **_CAPACITOR_UNITS)
+    uc = r.units_check
+    assert uc is not None and uc.warned
+    assert "exp(-t / " in uc.expression
+    assert uc.error_units > 1e-3 and uc.error_units >= 5 * uc.error_without_units
+    assert any(uc.expression[:40] in str(w.message) for w in rec)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        s = symbolic_regression(Xr, y, generations=25, units_check=False,
+                                **_CAPACITOR_UNITS)
+    assert s.units_check is None
+    assert s.expression == r.expression
+    assert np.array_equal(s.predict(Xr), r.predict(Xr))
+
+
+def test_units_check_runs_under_the_defaults_or_when_asked():
+    """None runs the check when the engine chooses the budget and not under
+    an explicit budget; True runs it whatever the budget; without units=
+    there is nothing to check. Where units hold, no warning."""
+    rng = np.random.RandomState(1)
+    L = rng.uniform(0.1, 2.0, 20).reshape(-1, 1)
+    y = 2.006 * np.sqrt(L[:, 0])
+    kw = dict(feature_names=["L"], seed=0, parallel=False)
+    uk = dict(kw, units={"L": {"m": 1}}, target_units={"s": 1},
+              unknown_constant=True)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        a = symbolic_regression(L, y, **uk)
+        b = symbolic_regression(L, y, generations=3, **uk)
+        c = symbolic_regression(L, y, generations=3, units_check=True, **uk)
+        d = symbolic_regression(L, y, generations=3, units_check=True, **kw)
+    assert a.units_check is not None and not a.units_check.warned
+    assert b.units_check is None
+    assert c.units_check is not None
+    assert d.units_check is None
+
+
+@pytest.mark.parametrize("bad", [1, 0, "yes", 0.5])
+def test_units_check_refuses_what_is_not_a_switch(bad):
+    Xr, y = _noisy_product()
+    with pytest.raises(ValueError):
+        symbolic_regression(Xr, y, generations=2, units_check=bad)
