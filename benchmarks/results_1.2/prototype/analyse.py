@@ -234,6 +234,77 @@ def units_vs_plain_section(U, PT):
         print()
 
 
+def c1_section(PT, floor=1e-3):
+    """The comparison C1 would make under the defaults with H1: both arms of
+    prototype 4 at the same P (the units fit and the fit without units, both
+    with the stop on patience), 1 - R² on the training rows. A message when
+    the error under units is above `floor` and at least k times the other."""
+    PT = [r for r in PT if r.get("status") != "CRASH" and "err_train" in r]
+    if not PT:
+        return
+    print("## Both arms with the stop on patience, same rows (prototype 4)\n")
+    print("ratio: err of the units fit / err of the plain fit, both with the "
+          "stop on patience at the same P. A message when the err under units "
+          "is above %g and the ratio at least k.\n" % floor)
+    for P in sorted({r["patience"] for r in PT}):
+        d = {(r["arm"], r["exp"], r["n"], r["noise"], r["draw"]): r
+             for r in PT if r["patience"] == P}
+        pairs = []
+        for (arm, e, n, no, dr), u in d.items():
+            p = d.get(("plain", e, n, no, dr))
+            if arm != "units" or p is None:
+                continue
+            g = ("limited" if e in UNITS_LIMITED else
+                 "snell" if e == "snell" else "reach")
+            pairs.append((g, u, p, u["err_train"] / max(p["err_train"], 1e-300)))
+        if not pairs:
+            continue
+        print("P = %d, %d pairs:\n" % (P, len(pairs)))
+        print("| group | fits | ratio, min | 10th pct | median | 90th pct | max |")
+        print("|---|---|---|---|---|---|---|")
+        for g in ("reach", "limited", "snell"):
+            v = sorted(x for gg, _u, _p, x in pairs if gg == g)
+            if v:
+                print("| %s | %d | %.3g | %.3g | %.3g | %.3g | %.3g |" % (
+                    g, len(v), v[0], q(v, .1), S.median(v), q(v, .9), v[-1]))
+        print()
+        print("| k | reach | limited | snell | limited, plain fit with the law |")
+        print("|---|---|---|---|---|")
+
+        def flag(u, x, k):
+            return u["err_train"] > floor and x >= k
+        for k in (2, 3, 5, 10):
+            c = collections.Counter(gg for gg, u, _p, x in pairs if flag(u, x, k))
+            cl = sum(1 for gg, u, p, x in pairs
+                     if gg == "limited" and p["law"] and flag(u, x, k))
+            nl = sum(1 for gg, _u, p, _x in pairs if gg == "limited" and p["law"])
+            print("| %d | %d of %d | %d of %d | %d of %d | %d of %d |" % (
+                k, c["reach"], sum(gg == "reach" for gg, *_ in pairs),
+                c["limited"], sum(gg == "limited" for gg, *_ in pairs),
+                c["snell"], sum(gg == "snell" for gg, *_ in pairs), cl, nl))
+        print()
+        print("Limited fits without a message at k = 5:\n")
+        for gg, u, p, x in sorted(pairs, key=lambda t: (t[1]["exp"], t[1]["n"],
+                                                        t[1]["noise"], t[1]["draw"])):
+            if gg == "limited" and not flag(u, x, 5):
+                print("- %s, %d pts, %d %%, draw %d: ratio %.2f, units %.3g (%s), "
+                      "plain %.3g (%s)" % (u["exp"], u["n"], round(100 * u["noise"]),
+                                           u["draw"], x, u["err_train"],
+                                           u["expr"][:50], p["err_train"],
+                                           p["expr"][:50]))
+        print()
+        print("Highest ratios outside the limited laws:\n")
+        for gg, u, p, x in sorted(pairs, key=lambda t: -t[3]):
+            if gg == "limited":
+                continue
+            if x < 2.5:
+                break
+            print("- %s, %d pts, %d %%, draw %d: ratio %.2f, units %.3g" % (
+                u["exp"], u["n"], round(100 * u["noise"]), u["draw"], x,
+                u["err_train"]))
+        print()
+
+
 def gaps(errs, eps=0.01, upto=None):
     """Under the rule of patience_try.py, the longest run of generations
     without a gain (error below (1 - eps) times the best) before generation
@@ -360,6 +431,38 @@ def patience_section(PT, TR):
                               ("%.1f s" % S.median(b["time"] for _r, b in T)) if T else "-",
                               lost, gain, S.median(sg) if sg else "-"))
     print()
+    print("The six laws within reach under units (all but rc, "
+          "refroidissement, lentille and snell), law returned:\n")
+    for arm in ("plain", "units"):
+        B = [r for r in TR if r.get("bench") == "tp" and r["arm"] == arm]
+        row = ["none (1.1.0): %d of %d" % (
+            sum(r["law"] for r in B if r["exp"] not in UNITS_LIMITED + ("snell",)),
+            sum(r["exp"] not in UNITS_LIMITED + ("snell",) for r in B))]
+        for P in sorted({r["patience"] for r in PT}):
+            A = [r for r in PT if r["arm"] == arm and r["patience"] == P
+                 and r["exp"] not in UNITS_LIMITED + ("snell",)]
+            row.append("P %d: %d of %d" % (P, sum(r["law"] for r in A), len(A)))
+        print("- %s: %s" % (arm, "; ".join(row)))
+    print()
+    print("Times after the restart (second machine, faster; not compared):\n")
+    for arm in ("plain", "units"):
+        for P in sorted({r["patience"] for r in PT}):
+            L = [r["time"] for r in PT if r["arm"] == arm and r["patience"] == P
+                 and r["date"] >= RESTART]
+            if L:
+                print("- %s, P %d: %d fits, median %.1f s" % (arm, P, len(L),
+                                                            S.median(L)))
+    print()
+    print("Fits where 'useful' changes against the baseline:\n")
+    for P in sorted({r["patience"] for r in PT}):
+        for r in PT:
+            b = base.get((r["arm"], r["exp"], r["n"], r["noise"], r["draw"]))
+            if r["patience"] == P and b and b["useful"] != r["useful"]:
+                print("- P %d, %s, %s, %d pts, %d %%, draw %d: %s (%s) against "
+                      "%s" % (P, r["arm"], r["exp"], r["n"], round(100 * r["noise"]),
+                              r["draw"], "useful" if r["useful"] else "lost",
+                              r["expr"][:60], b["expr"][:60]))
+    print()
     print("Fits where the law is lost or gained against the baseline:\n")
     for P in sorted({r["patience"] for r in PT}):
         for r in PT:
@@ -383,6 +486,7 @@ def main():
     PT = load("patience.jsonl")
     patience_section(PT, TR)
     units_vs_plain_section(U, PT)
+    c1_section(PT)
 
 
 if __name__ == "__main__":
