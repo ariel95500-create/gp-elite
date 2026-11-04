@@ -1,0 +1,11 @@
+TP jobs: old 400, new 400, the same: True
+TP data of the 400 jobs: the same: True
+TP --draws 5..9: 400 jobs, draws [5, 6, 7, 8, 9], data distinct from draws 0-4: True
+TP worker {'exp': 'gaz', 'n': 10, 'noise': 0.02, 'draw': 0, 'arm': 'plain'}: fields of the old record that differ: none; new fields ['err_train', 'generations', 'patience_stop']
+TP worker {'exp': 'rc', 'n': 20, 'noise': 0.05, 'draw': 1, 'arm': 'units'}: fields of the old record that differ: none; new fields ['err_train', 'generations', 'patience_stop']
+phase1 jobs (with units): old 2780, new 2780, the same: True
+phase1 one {'kind': 'feyn', 'problem': 'I.12.5', 'index': 1, 'split': 'test', 'seed': 0}: fields that differ: none
+phase1 one {'kind': 'realraw', 'problem': '210_cloud', 'split': 'fold0', 'seed': 0}: fields that differ: none (time limit reached in both: generations 128 and 131 not compared)
+phase1 --defaults, I.12.5: 100 generations, 24.8 s, defaults True, status NEAR
+
+ALL CHECKS HOLD

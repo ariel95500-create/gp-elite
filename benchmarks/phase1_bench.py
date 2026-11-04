@@ -30,6 +30,11 @@ Usage, from the repository root:
 --seeds replaces the seeds 0 to 4 of the decision bench (F41, R6, R7raw and
 their noisy and units kinds), for a confirmation on new seeds.
 
+[1.2] --defaults runs every fit with the API defaults (no generations=, no
+time_limit=), the regime where the stop on patience of plan 1.2 acts (bench
+D, benchmarks/results_1.2/PLAN.md); each job then carries "defaults": true.
+Without it the jobs and the fits are those of before.
+
 Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
   python benchmarks/phase1_bench.py run-paired --python A/bin/python --out a.jsonl \\
@@ -57,6 +62,7 @@ NOISE = {"feyn_n1": 0.01, "feyn_n10": 0.10,
 ORDER = ["feyn", "real", "realraw", "tf", "ts", "tr", "trraw",
          "feyn_n1", "feyn_n10"]
 UNIT_KINDS = ["ufeyn", "ufeyn_n1", "ufeyn_n10", "utf"]   # phase 7, on request only
+DEFAULTS = False                    # [1.2] --defaults
 FEYN_KINDS = ("feyn", "feyn_n1", "feyn_n10", "ufeyn", "ufeyn_n1", "ufeyn_n10")
 
 
@@ -180,6 +186,8 @@ def run_one(job):
     Xtr, ytr, Xte, yte, Xo, yo, names, pool, clean = _data(job)
     kw = dict(generations=GENERATIONS, time_limit=TIME_LIMIT,
               seed=job["seed"], parallel=False, verbose=False, operators=pool)
+    if job.get("defaults"):             # [1.2] bench D: the API defaults
+        del kw["generations"], kw["time_limit"]
     if names is not None:
         kw["feature_names"] = names
     units = None
@@ -205,6 +213,8 @@ def run_one(job):
                engine_version=getattr(gp_elite, "__version__", "?"))
     if hasattr(C, "_SEEDS_UNDER_UNITS"):     # phase 7, change U1
         rec["seeds_under_units"] = bool(C._SEEDS_UNDER_UNITS)
+    if job.get("defaults"):             # [1.2] the stop on patience, if any
+        rec["patience_stop"] = C.TRACE.value.get("patience")
     exact_kind = job["kind"] in FEYN_KINDS + ("tf", "utf") or (
         job["kind"] == "ts"
         and T.manifest()["datasets"][job["problem"]]["exact_scorable"])
@@ -262,7 +272,8 @@ def drive(python, out, workers, kinds=None, max_seconds=None):
             for line in fh:
                 if line.strip():
                     done.add(key(json.loads(line)))
-    todo = [j for j in all_jobs(_with_units(kinds)) if key(j) not in done
+    todo = [dict(j, defaults=True) if DEFAULTS else j
+            for j in all_jobs(_with_units(kinds)) if key(j) not in done
             and (kinds is None or j["kind"] in kinds)]
     print("%d jobs to run, %d already done" % (len(todo), len(done)),
           flush=True)
@@ -333,7 +344,8 @@ def drive_paired(pythons, outs, pairs, kinds=None, max_seconds=None):
                     if line.strip():
                         d.add(key(json.loads(line)))
         done.append(d)
-    todo = [j for j in all_jobs(_with_units(kinds))
+    todo = [dict(j, defaults=True) if DEFAULTS else j
+            for j in all_jobs(_with_units(kinds))
             if (kinds is None or j["kind"] in kinds)
             and any(key(j) not in d for d in done)]
     print("%d jobs to run with %d engines" % (len(todo), len(pythons)),
@@ -435,6 +447,7 @@ def main():
     r.add_argument("--kinds", default=None)
     r.add_argument("--max-seconds", type=float, default=None)
     r.add_argument("--seeds", default=None)
+    r.add_argument("--defaults", action="store_true")
     r2 = sub.add_parser("run-paired")
     r2.add_argument("--python", action="append", required=True)
     r2.add_argument("--out", action="append", required=True)
@@ -442,6 +455,7 @@ def main():
     r2.add_argument("--kinds", default=None)
     r2.add_argument("--max-seconds", type=float, default=None)
     r2.add_argument("--seeds", default=None)
+    r2.add_argument("--defaults", action="store_true")
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
@@ -450,6 +464,9 @@ def main():
     if getattr(a, "seeds", None):
         global BENCH_SEEDS
         BENCH_SEEDS = [int(x) for x in a.seeds.split(",")]
+    if getattr(a, "defaults", False):
+        global DEFAULTS
+        DEFAULTS = True
     if a.cmd == "run":
         drive(a.python, a.out, a.workers,
               a.kinds.split(",") if a.kinds else None, a.max_seconds)
