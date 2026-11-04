@@ -1592,3 +1592,66 @@ def test_typed_start_stops_at_the_deadline_with_no_empty_island():
     ok, msg = GD.check_dimensions(
         r.node, {i: u for i, u in enumerate(units.values())}, target)
     assert ok, msg
+
+
+# ── 1.2, H1: the stop on patience (benchmarks/results_1.2/PLAN.md, H1) ──────
+
+def _noisy_product(n=40, seed=0):
+    rng = np.random.RandomState(seed)
+    Xr = np.c_[rng.uniform(1, 5, n), rng.uniform(1, 5, n)]
+    y = 2.5 * Xr[:, 0] * Xr[:, 1]
+    return Xr, y + 0.05 * np.std(y) * rng.randn(n)
+
+
+def _fit_counting(monkeypatch, **kw):
+    """The fit, with the number of generations its sequential loop ran."""
+    gens = [0]
+    orig = core.evolve_island
+
+    def counted(*a, **k):
+        g = a[3] if len(a) > 3 else k.get("generation", 0)
+        gens[0] = max(gens[0], int(g) + 1)
+        return orig(*a, **k)
+    monkeypatch.setattr(core, "evolve_island", counted)
+    Xr, y = _noisy_product()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(Xr, y, seed=0, parallel=False, **kw)
+    return r, gens[0], core.TRACE.value.get("patience")
+
+
+def test_patience_stops_a_fit_whose_budget_the_engine_chooses(monkeypatch):
+    """Without generations= or time_limit=, the loop ends 30 generations
+    after the last gain of 1 % (on noisy data no exact law stops it before),
+    and the fit goes on to its usual end."""
+    r, gens, trace = _fit_counting(monkeypatch)
+    assert trace is not None and gens < 100
+    assert r.expression and r.formula_exact
+
+
+def test_patience_leaves_an_explicit_budget_as_in_1_1(monkeypatch):
+    """A call that sets its budget runs it in full (no patience), as with
+    patience=0; an explicit patience applies whatever the budget."""
+    _r, gens, trace = _fit_counting(monkeypatch, generations=45)
+    assert gens == 45 and trace is None
+    _r, gens, trace = _fit_counting(monkeypatch, generations=45, time_limit=600)
+    assert gens == 45 and trace is None
+    _r, gens, trace = _fit_counting(monkeypatch, generations=45, patience=3)
+    assert gens < 45 and trace is not None
+
+
+def test_patience_zero_is_the_search_of_1_1(monkeypatch):
+    """Under the defaults, patience=0 is the run of 1.1: the same model as
+    the same call with its 100 generations named."""
+    a, ga, ta = _fit_counting(monkeypatch, speed="ultrafast", patience=0)
+    b, gb, tb = _fit_counting(monkeypatch, speed="ultrafast", generations=100)
+    assert ga == gb == 100 and ta is None and tb is None
+    assert a.expression == b.expression
+    assert a.mse_validation == b.mse_validation
+
+
+@pytest.mark.parametrize("bad", [-1, 2.5, True, "30"])
+def test_patience_refuses_what_is_not_a_count(bad):
+    Xr, y = _noisy_product()
+    with pytest.raises(ValueError):
+        symbolic_regression(Xr, y, generations=2, patience=bad)

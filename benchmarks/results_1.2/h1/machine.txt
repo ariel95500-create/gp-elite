@@ -1,0 +1,6 @@
+4
+Model name:                              Intel(R) Xeon(R) Processor
+avx512f
+2026-11-04T07:28:34Z
+python 3.11.18 numpy 2.4.6
+container replaced about 2026-11-04T07:13Z; /venv11p rebuilt from PyPI (gp-elite 1.1.0, numpy 2.4.6, scipy 1.17.1, scikit-learn 1.9.1, sympy 1.14.0)

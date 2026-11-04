@@ -7787,6 +7787,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 _f.result()
             gen = 0
             _deadline = getattr(cfg, "DEADLINE", None)
+            _pat = _Patience(getattr(cfg, "PATIENCE", 0))     # [v1.2-H1]
             while gen < cfg.GENERATIONS:
                 # [v0.7-TIME] Echeance atteinte : pas de nouvelle ronde.
                 if _deadline is not None and gen > 0 and time.time() >= _deadline:
@@ -7876,6 +7877,13 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                         print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {_es_thr:.2e}")
                         print(f"  Early stop — remaining generations saved.")
                         print(f"{'═'*60}\n")
+                        break
+                    # [v1.2-H1] Arrêt sur patience, compté à la fin de chaque
+                    # round sur sa dernière génération (gen - 1).
+                    if _pat.spent(_es_mse, gen - 1):
+                        TRACE.set("patience", "arret (parallele, gen %d)" % (gen - 1))
+                        print(f"[PATIENCE] No gain of 1 % in {_pat.p} generations — "
+                              f"stop at generation {gen - 1}.")
                         break
 
                 if gen > 0 and gen % cfg.MIGRATION_INTERVAL == 0:
@@ -8020,6 +8028,35 @@ def _early_stop_threshold(cfg, ys_train) -> float:
     if not math.isfinite(v) or v <= 1e-300:
         return cfg.EARLY_STOPPING_MSE
     return _EXACT_REL * v
+
+
+# [v1.2-H1] Arrêt sur patience (benchmarks/results_1.2/PLAN.md, H1).
+_PATIENCE_GAIN = 0.01
+
+
+class _Patience:
+    """Compte les générations sans gain. L'erreur lue est celle de l'arrêt
+    anticipé (MSE du hold-out, ou du train sans hold-out) ; elle compte comme
+    un gain quand elle passe sous (1 - 1 %) fois la meilleure vue dans ce
+    run. `spent(err, gen)` est vrai quand `p` générations sont passées sans
+    gain : la boucle s'arrête alors comme sur une loi exacte, et le fit va à
+    sa fin habituelle. p = 0 (défaut hors API, et toute API avec un budget
+    explicite) : jamais vrai, la recherche de 1.1 est inchangée. Chaque
+    évolution (redémarrage) a la sienne."""
+    __slots__ = ("p", "best", "gen")
+
+    def __init__(self, p):
+        self.p = int(p or 0)
+        self.best = None
+        self.gen = 0
+
+    def spent(self, err, gen):
+        if self.p <= 0:
+            return False
+        if self.best is None or err < self.best * (1.0 - _PATIENCE_GAIN):
+            self.best, self.gen = err, gen
+            return False
+        return gen - self.gen >= self.p
 
 
 def _holdout_mse(node, xs_train, ys_train) -> float:
@@ -9164,6 +9201,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     _last_global_raw   = float('inf')
 
     _deadline = getattr(cfg, "DEADLINE", None)
+    _pat = _Patience(getattr(cfg, "PATIENCE", 0))     # [v1.2-H1]
     for gen in range(cfg.GENERATIONS if _seq_needed else 0):
         # [v0.7-TIME] Echeance atteinte : arret propre, meilleur modele conserve.
         if _deadline is not None and gen > 0 and time.time() >= _deadline:
@@ -9262,6 +9300,12 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                 print(f"  MSE (hold-out si actif) = {_es_mse:.2e}  ≤  seuil = {_es_thr:.2e}")
                 print(f"  Early stop — remaining generations saved.")
                 print(f"{'═'*60}\n")
+                break
+            # [v1.2-H1] Arrêt sur patience (budget choisi par le moteur).
+            if _pat.spent(_es_mse, gen):
+                TRACE.set("patience", "arret (sequentiel, gen %d)" % gen)
+                print(f"[PATIENCE] No gain of 1 % in {_pat.p} generations — "
+                      f"stop at generation {gen}.")
                 break
 
         # Migration périodique
