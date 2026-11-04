@@ -451,6 +451,38 @@ adopted when all hold:
 Reported beside: the messages on draws 0 to 4, on U41N1 and on U41N10, and
 for each message the formula without units it names.
 
+**Campaign held on 4 November 2026** (`c1/compare_c1.txt`, records
+`c1/tp_C1.jsonl` and `c1/d_C1.jsonl`, no crash). **C1 is not adopted:
+criterion 3 fails on one fit.**
+
+| Criterion | Measure | Result |
+|---|---|---|
+| 1 | Same models | 1015 of 1015 (400 TP, 615 D); the check ran on all |
+| 2 | Messages within reach, draws 5 to 9 | 2 of 140 (at most 2); none on an exact fit of U41 |
+| 3 | Messages where units limit, draws 5 to 9 | 56 of 60 (at least 45); the fit without units returns the law on 21, one without a message |
+| 4 | TP units time, median | 15.7 s against 32.3 s for 1.1.0 (ratio 0.49, at most 0.5) |
+
+The fit of criterion 3 is cooling at 20 points, 2 % noise, draw 5. Under
+units the engine returns `5.32492 * exp(exp(exp(-t / 1800)))`, with
+1 − R² of 0.0041 on the training rows; the fit without units returns
+`20.0278 + 58.7125 * exp(-t / 602.271)`, the law, with 0.0019. The ratio is
+2.1, under k = 5. On draws 0 to 4, where k was chosen, the lowest ratio on a
+fit where the fit without units returns the law was 29.8; on draws 5 to 9
+the next lowest are 13.2 and 16.3. The two messages within reach of
+criterion 2 are the spring (10 points, 5 %, draw 7, ratio 7.4) and the point
+source (10 points, 5 %, draw 8, ratio 29).
+
+Beside, deciding nothing:
+- messages on the limited laws: 56 of 60 on draws 0 to 4 as on draws 5 to 9;
+  none within reach on draws 0 to 4;
+- on D: 7 messages of 205 on U41, 14 on U41N1, 5 on U41N10;
+- the TP units fit without the check, same fits: 8.2 s;
+- a lower k alone does not meet criteria 2 and 3 together on draws 5 to 9:
+  at k = 2 the cooling fit has its message and the laws within reach have 3
+  (at most 2); this is read on the draws that judge, so it chooses nothing.
+
+The author decides what follows. Nothing changes in the engine before.
+
 ## Found during the prototypes: a time limit that does not bound the typed start
 
 Under `units=`, III.19.51 takes 600 to 735 s with `time_limit=30` and runs
