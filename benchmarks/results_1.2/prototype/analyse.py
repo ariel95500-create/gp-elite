@@ -280,6 +280,36 @@ def plateau_section(R):
             P, len(a), ", ".join(sorted({"%s s%d" % (r["problem"], r["seed"])
                                          for r in a}))[:300] or "-", len(b)))
     print()
+    print("Replay of the stop on every fit (the error of every generation is "
+          "recorded, so the replay is exact up to the loop; what the fit would "
+          "return after an earlier stop is not):\n")
+    print("| P | fits stopped | generations run when stopped, median "
+          "fraction | stopped before the final form: EXACT | NEAR | MISS | "
+          "EXACT fits concerned |")
+    print("|---|---|---|---|---|---|---|")
+    for P in (10, 20, 30, 40):
+        stopped, fr, risk, names = 0, [], collections.Counter(), []
+        for r in R:
+            e = r["err_by_gen"]
+            best, bg, s = None, 0, None
+            for g, m in enumerate(e):
+                if best is None or m < best * 0.99:
+                    best, bg = m, g
+                elif g - bg >= P:
+                    s = g
+                    break
+            if s is None:
+                continue
+            stopped += 1
+            fr.append(s / len(e))
+            if s < r["gen_stable"]:
+                risk[r["status"]] += 1
+                if r["status"] == "EXACT":
+                    names.append("%s s%d" % (r["problem"], r["seed"]))
+        print("| %d | %d | %.2f | %d | %d | %d | %s |" % (
+            P, stopped, S.median(fr) if fr else 1.0, risk["EXACT"],
+            risk["NEAR"], risk["MISS"], ", ".join(names) or "-"))
+    print()
 
 
 def patience_section(PT, TR):

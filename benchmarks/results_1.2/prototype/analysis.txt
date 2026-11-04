@@ -99,3 +99,60 @@ Decision bench, units kinds (30 s per fit):
 | ufeyn_n1 | 205 | 0 | 157 | 48 | 140 | 10 | 0 |
 | ufeyn_n10 | 205 | 0 | 139 | 66 | 110 | 5 | 0 |
 
+## Prototype 3: the plateaus before the exact laws of F41 (plateau.jsonl)
+
+205 fits (30 s and 1,000 generations each), 156 EXACT. err: 1 - R² of the champion in the loop (the error the early stop reads, over the variance of the target).
+
+- the law is the champion in the loop in 150 EXACT fits; in 6 it comes only after the loop (polishing and final selection)
+- generation of the law in the loop: median 0.0, 90th percentile 0, largest 28
+
+| P | EXACT fits whose law, in the loop, comes after a run of P generations or more without a gain | EXACT fits after the loop whose loop has such a run |
+|---|---|---|
+| 10 | 1 (I.16.6 s4) | 6 |
+| 20 | 0 (-) | 5 |
+| 30 | 0 (-) | 2 |
+| 40 | 0 (-) | 0 |
+
+Replay of the stop on every fit (the error of every generation is recorded, so the replay is exact up to the loop; what the fit would return after an earlier stop is not):
+
+| P | fits stopped | generations run when stopped, median fraction | stopped before the final form: EXACT | NEAR | MISS | EXACT fits concerned |
+|---|---|---|---|---|---|---|
+| 10 | 55 | 0.27 | 6 | 8 | 21 | I.8.14 s4, I.16.6 s2, I.16.6 s4, II.2.42 s0, II.2.42 s3, II.2.42 s4 |
+| 20 | 49 | 0.55 | 3 | 2 | 12 | I.8.14 s4, I.16.6 s2, II.2.42 s0 |
+| 30 | 34 | 0.66 | 1 | 1 | 4 | II.2.42 s0 |
+| 40 | 22 | 0.82 | 0 | 0 | 2 | - |
+
+## Prototype 4: the stop on patience on the TP fits (patience.jsonl)
+
+12 records, 0 crashes. Baseline: the same fits in prototype 1 (1.1.0, 100 generations).
+
+| arm | P | fits | law | useful | reading 10 pts | reading 20 pts | time, median | baseline time, median | law lost | law gained | stop generation, median |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | none (1.1.0) | 200 | 119 | 175 | 7 | 8 | 62.3 s | - | - | - | - |
+| plain | 20 | 12 | 10 | 11 | 1 | 0 | 10.3 s | 63.0 s | 0 | 0 | 20.0 |
+| units | none (1.1.0) | 200 | 120 | 140 | 6 | 6 | 83.1 s | - | - | - | - |
+
+Fits where the law is lost or gained against the baseline:
+
+
+## Units arm against the plain arm, same rows (prototypes 2 and 4)
+
+ratio: err under units / err of the plain fit with the stop on patience (training rows). Groups: within reach under units (the six laws), limited by units (rc, refroidissement, lentille), snell (dimensionless).
+
+P = 20, 12 pairs:
+
+| group | fits | ratio, min | 10th pct | median | 90th pct | max |
+|---|---|---|---|---|---|---|
+| reach | 12 | 1.02 | 1.04 | 1.1 | 1.27 | 1.42 |
+
+| threshold k (message when ratio >= k) | reach | limited | snell | limited, plain fit with the law |
+|---|---|---|---|---|
+| 2 | 0 | 0 | 0 | 0 |
+| 3 | 0 | 0 | 0 | 0 |
+| 5 | 0 | 0 | 0 | 0 |
+| 10 | 0 | 0 | 0 | 0 |
+
+| experiment | fits | ratio, min | median | max |
+|---|---|---|---|---|
+| pendule | 12 | 1.02 | 1.1 | 1.42 |
+
