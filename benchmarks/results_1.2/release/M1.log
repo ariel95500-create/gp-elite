@@ -1,0 +1,32 @@
+== M1 2026-11-04T18:19:37Z Model name: Intel(R) Xeon(R) Processor 1 cores
+== /venv11p 1.1.0 /venv11p/lib/python3.11/site-packages/gp_elite/__init__.py
+A_feyn       ok
+B_cpu        ok
+C_big        ok
+D_units      ok
+E_minmax     ok
+F_robust     ok
+G_restarts   ok
+H_parallel   ok
+I_sklearn    ok
+J_extrap     ok
+K_thorough   ok
+L_standard   ok
+M_twice      ok
+== /venv12b 1.2.0 /venv12b/lib/python3.11/site-packages/gp_elite/__init__.py
+A_feyn       ok
+B_cpu        ok
+C_big        ok
+D_units      ok
+E_minmax     ok
+F_robust     ok
+G_restarts   ok
+H_parallel   ok
+I_sklearn    ok
+J_extrap     ok
+K_thorough   ok
+L_standard   ok
+M_twice      ok
+compare exit 0
+== M1 done 2026-11-04T18:20:26Z
+# note: the core count above is that of nproc under OMP_NUM_THREADS=1, which nproc honours; the machine has 4 cores (nproc without it: 4)

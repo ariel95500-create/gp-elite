@@ -1,0 +1,86 @@
+# SHA-256 of the release files built from commit c3ea7fc (python -m build from a clean export, git archive), 4 November 2026
+8cc6670d0bc35817408217766f2d5f03c925084e532c3f5720fbbe9c3c2a3416   gp_elite-1.2.0-py3-none-any.whl
+926da58b5f20f39600058d71078c6fec77dfbf419fc18f649969810affde51de   gp_elite-1.2.0.tar.gz
+
+# twine check --strict passes for both.
+# The engine is that of a263177 (typed start, H1, X1); c3ea7fc changes the version number and the CHANGELOG.
+# Every gp_elite/ file of /venv12b and /venv12bx is identical to commit c3ea7fc (10 files);
+# every gp_elite/ file of /venv11p (1.1.0 from PyPI) is identical to commit 346cd07, from which 1.1.0 was published (10 files).
+
+# /venv12b (Python 3.11.18) — uv pip freeze
+cloudpickle==3.1.2
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist12b/dist/gp_elite-1.2.0-py3-none-any.whl
+iniconfig==2.3.1
+joblib==1.6.0
+mpmath==1.3.0
+narwhals==2.28.0
+numpy==2.4.6
+packaging==26.3
+pandas==3.0.6
+pip==24.0
+pluggy==1.7.0
+pygments==2.21.0
+pytest==9.2.0
+python-dateutil==4.0.0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+sympy==1.14.0
+threadpoolctl==3.7.0
+tzdata==2026.6
+wheel==0.48.0
+
+# /venv12bx (Python 3.11.18) — uv pip freeze
+cloudpickle==3.1.2
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.66.1
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist12b/dist/gp_elite-1.2.0-py3-none-any.whl
+gplearn==0.4.3
+iniconfig==2.3.1
+joblib==1.6.0
+kiwisolver==1.5.1
+matplotlib==3.11.2
+mpmath==1.3.0
+narwhals==2.28.0
+numpy==2.4.6
+nvidia-nccl-cu12==2.32.3
+packaging==26.3
+pandas==3.0.6
+pillow==12.3.0
+pip==24.0
+pluggy==1.7.0
+pygments==2.21.0
+pyparsing==3.3.3
+pytest==9.2.0
+python-dateutil==4.0.0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+sympy==1.14.0
+threadpoolctl==3.7.0
+tzdata==2026.6
+wheel==0.48.0
+xgboost==3.2.0
+
+# /venv11p (Python 3.11.18) — uv pip freeze
+cloudpickle==3.1.2
+gp-elite==1.1.0
+iniconfig==2.3.1
+joblib==1.6.0
+mpmath==1.3.0
+narwhals==2.28.0
+numpy==2.4.6
+packaging==26.3
+pandas==3.0.6
+pip==24.0
+pluggy==1.7.0
+pygments==2.21.0
+pytest==9.2.0
+python-dateutil==4.0.0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+sympy==1.14.0
+threadpoolctl==3.7.0
+tzdata==2026.6

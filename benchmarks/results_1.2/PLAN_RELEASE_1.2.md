@@ -102,15 +102,24 @@ Expected, and what would stop the release:
   - any model returned under units fails the audit `check_dimensions`;
   - a fit of III.19.51 under units (U41, U41N1, U41N10, 15 fits) takes more
     than 60 s.
-- **X1**, the check `PLAN.md` gives to M2. The release stops if, on a fit of
-  1.2.0:
-  - `formula_exact` differs from `formula_exact_11`;
-  - the formula without X1 is the expression of 1.1.0 and the error on the
-    test rows or `formula_exact` differs from 1.1.0 by a bit.
+- **X1**, the check `PLAN.md` gives to M2, on the suites outside the frozen
+  test set. The release stops if:
+  - on a fit of 1.2.0, `formula_exact` differs from `formula_exact_11`, or
+    the formula without X1 is missing;
+  - on a fit where neither version reached its time budget (III.19.51 under
+    units aside, which the typed start changes), the formula without X1,
+    the error on the test rows or `formula_exact` differs from 1.1.0 by a
+    bit.
 
   The fits whose formula without X1 is not that of 1.1.0 are reported by
   suite, with whether they reached the time budget; so are the fits where X1
-  rewrites the formula.
+  rewrites the formula, and the same checks on the frozen test set.
+
+  (Corrected on 4 November 2026, after M1 and before M2 started. The first
+  text compared every fit whose formula without X1 is that of 1.1.0, but
+  under a time budget two fits can print the same formula with constants
+  that differ beyond their sixth digit: the M2 of the release of 1.1 had 37
+  such pairs among 2,209.)
 
 A difference beyond these is examined before gate 8. The frozen test set
 (TF78, TS14 and TR25 without units, TF78 under units) is published as
