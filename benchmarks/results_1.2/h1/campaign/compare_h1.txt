@@ -1,0 +1,153 @@
+## TP diagnostic (400 fits of A, 400 of H1)
+
+crashes: 0
+
+| arm | engine | fits | median time | law | useful | reading 10 / 20 points | six laws within reach | generations, median |
+|---|---|---|---|---|---|---|---|---|
+| plain | A | 200 | 22.8 s | 119 | 175 | 7 / 8 | 101 of 120 | 100.0 |
+| plain | H1 | 200 | 6.8 s | 126 | 174 | 7 / 8 | 106 of 120 | 31.0 |
+| units | A | 200 | 32.2 s | 120 | 140 | 6 / 6 | 120 of 120 | 100.0 |
+| units | H1 | 200 | 8.1 s | 120 | 139 | 6 / 6 | 120 of 120 | 31.0 |
+
+Criterion 1, time (median of H1 at most a third of A's, each arm): plain 6.8 s against 22.8 s (ratio 0.30), units 8.1 s against 32.2 s (ratio 0.25): HOLDS
+Criterion 2, the law on TP:
+- plain: law 126 against 119 (at least 117), reading 7/8 against 7/8: HOLDS
+- units: the six laws within reach in 120 of 120 (at least 118): HOLDS
+- useful: plain 174 against 175, units 139 against 140 (at least A's minus 3): HOLDS
+
+Reading per experiment: fits with the law at 2 % noise, of the draws, at 10 and 20 points (the reading counts an experiment when 3 draws or more give the law):
+
+| arm | experiment | A, 10 pts | H1, 10 pts | A, 20 pts | H1, 20 pts |
+|---|---|---|---|---|---|
+| plain | chute | 5 of 5 | 5 of 5 | 4 of 5 | 4 of 5 |
+| plain | eclairement | 4 of 5 | 5 of 5 | 4 of 5 | 5 of 5 |
+| plain | gaz | 3 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| plain | lentille | 0 of 5 | 1 of 5 | 1 of 5 | 1 of 5 |
+| plain | pendule | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| plain | puissance | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| plain | rc | 4 of 5 | 4 of 5 | 4 of 5 | 5 of 5 |
+| plain | refroidissement | 0 of 5 | 0 of 5 | 3 of 5 | 3 of 5 |
+| plain | ressort | 4 of 5 | 3 of 5 | 5 of 5 | 5 of 5 |
+| plain | snell | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | chute | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | eclairement | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | gaz | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | lentille | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | pendule | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | puissance | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | rc | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | refroidissement | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | ressort | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | snell | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+
+Fits where A and H1 differ on the law:
+
+- plain, eclairement, 10 pts, 2 %, draw 0: H1 law (-0.0124314 + 0.797641 / d²) | A no law (0.0013005 + 0.815446 * tanh(exp(0.5 * d))^(0.5 * d) / d²)
+- plain, eclairement, 10 pts, 5 %, draw 2: H1 law (-0.110697 + 0.899559 / d²) | A no law (-0.305035 + 0.148806 * d + 0.90747 / d²)
+- plain, eclairement, 20 pts, 2 %, draw 2: H1 law (0.00590645 + 0.800563 / d²) | A no law (-0.6498 + 0.184736 * exp(0.5 * d) / tanh(0.5 * d)²)
+- plain, gaz, 10 pts, 2 %, draw 0: H1 law (-1148.8 + 8.53948 * n * T / V) | A no law (-1720.21 + 1167.09 * n * exp(0.002698 * T) / V)
+- plain, gaz, 10 pts, 2 %, draw 1: H1 law (417.567 + 8.15719 * n * T / V) | A no law (407.247 + 1095.1 * n * exp(0.00271948 * T) / V)
+- plain, gaz, 20 pts, 5 %, draw 0: H1 law (1344.17 + 8.2286 * n * T / V) | A no law (1907.63 + 3744.39 * n * tanh(0.00268691 * T) / V)
+- plain, lentille, 10 pts, 2 %, draw 3: H1 law (-0.0119846 + 0.182855 * p / (-0.162254 + 1.66667 * p)) | A no law (0.116207 + 0.0139995 * sqrt(|log(p) + 0.510826|) / (-0.16067)
+- plain, puissance, 20 pts, 5 %, draw 1: H1 law (-0.0552065 + 1.04336 * U² / R) | A no law (0.0456565 + 1.76791 * (exp(0.0844788 * U) * sqrt(U))² / R)
+- plain, rc, 20 pts, 2 %, draw 0: H1 law (0.00924128 + 4.95675 * exp(-1.00906 * t)) | A no law (-0.0590712 + 0.0060293 * exp((0.2 * t - 2.59441)²))
+- plain, ressort, 10 pts, 2 %, draw 1: H1 lost (0.323472 + 29.9527 * m / k) | A law (0.00616454 + 6.27635 * sqrt(m / k))
+- plain, ressort, 10 pts, 5 %, draw 3: H1 lost (1.92571 + 0.266787 * log(m / k)) | A law (0.0407077 + 5.9106 * sqrt(m / k))
+
+## Bench D, the API defaults (1360 fits of A, 1360 of H1)
+
+crashes: A 0, H1 0
+
+| kind | engine | fits | exact | structure | median time | max time | generations, median | size, median |
+|---|---|---|---|---|---|---|---|---|
+| feyn | A | 205 | 163 | - | 0.4 s | 30.1 s | 1 | 14 |
+| feyn | H1 | 205 | 161 | - | 0.4 s | 27.1 s | 1 | 14 |
+| feyn_n1 | A | 205 | 0 | 108 | 26.3 s | 35.7 s | 100 | 16 |
+| feyn_n1 | H1 | 205 | 0 | 107 | 7.8 s | 30.3 s | 31 | 16 |
+| feyn_n10 | A | 205 | 0 | 85 | 27.5 s | 36.1 s | 100 | 14 |
+| feyn_n10 | H1 | 205 | 0 | 83 | 8.7 s | 29.7 s | 33 | 15 |
+| ufeyn | A | 205 | 167 | - | 0.4 s | 418.9 s | 1 | 14 |
+| ufeyn | H1 | 205 | 166 | - | 0.4 s | 25.6 s | 1 | 14 |
+| ufeyn_n1 | A | 205 | 0 | 113 | 32.5 s | 464.5 s | 100 | 12 |
+| ufeyn_n1 | H1 | 205 | 0 | 112 | 9.0 s | 43.7 s | 31 | 13 |
+| ufeyn_n10 | A | 205 | 0 | 99 | 34.9 s | 459.5 s | 100 | 12 |
+| ufeyn_n10 | H1 | 205 | 0 | 100 | 9.0 s | 33.6 s | 31 | 12 |
+| real | A | 60 | 0 | - | 24.7 s | 33.2 s | 100.0 | 15.0 |
+| real | H1 | 60 | 0 | - | 7.4 s | 30.8 s | 34.0 | 13.5 |
+| realraw | A | 70 | 0 | - | 26.4 s | 36.9 s | 100.0 | 15.0 |
+| realraw | H1 | 70 | 0 | - | 9.4 s | 29.6 s | 36.0 | 15.0 |
+
+Statuses on the Feynman kinds (beside the criteria):
+
+| kind | engine | EXACT | NEAR | MISS |
+|---|---|---|---|---|
+| feyn | A | 163 | 12 | 30 |
+| feyn | H1 | 161 | 11 | 33 |
+| feyn_n1 | A | 0 | 153 | 52 |
+| feyn_n1 | H1 | 0 | 146 | 59 |
+| feyn_n10 | A | 0 | 102 | 103 |
+| feyn_n10 | H1 | 0 | 101 | 104 |
+| ufeyn | A | 167 | 6 | 32 |
+| ufeyn | H1 | 166 | 6 | 33 |
+| ufeyn_n1 | A | 0 | 161 | 44 |
+| ufeyn_n1 | H1 | 0 | 157 | 48 |
+| ufeyn_n10 | A | 0 | 142 | 63 |
+| ufeyn_n10 | H1 | 0 | 142 | 63 |
+
+Criterion 3, feyn: exact 161 against 163 (at least 160); equations exact in A at 3 seeds or more that fall to one or none: none: HOLDS
+  equations whose exact seeds change: I.16.6 4 -> 3, II.2.42 4 -> 3
+Criterion 3, ufeyn: exact 166 against 167 (at least 164); equations exact in A at 3 seeds or more that fall to one or none: none: HOLDS
+  equations whose exact seeds change: I.11.19 3 -> 2
+Criterion 4, feyn_n1: structure 107 against 108 (at least 105): HOLDS
+Criterion 4, feyn_n10: structure 83 against 85 (at least 82): HOLDS
+Criterion 4, ufeyn_n1: structure 112 against 113 (at least 110): HOLDS
+Criterion 4, ufeyn_n10: structure 100 against 99 (at least 96): HOLDS
+Criterion 5, real data: median test R² of the R6 folds 0.8021 against 0.8095; collapses out of domain (R² < 0, R6 and R7raw) 9 against 11: HOLDS
+Criterion 6, the units guarantee: 615 of 615 models under units pass check_dimensions: HOLDS
+
+Fits of D where the status or the structure differs:
+
+- feyn I.16.6 test seed 3: A EXACT, H1 NEAR
+- feyn II.2.42 test seed 0: A EXACT, H1 MISS
+- feyn III.10.19 test seed 2: A NEAR, H1 MISS
+- feyn III.17.37 test seed 4: A NEAR, H1 MISS
+- feyn_n1 I.16.6 test seed 2: A NEAR, H1 MISS
+- feyn_n1 I.16.6 test seed 3: A NEAR, H1 MISS
+- feyn_n1 I.44.4 test seed 2: A NEAR, H1 MISS
+- feyn_n1 I.6.20a test seed 0: A NEAR, H1 MISS
+- feyn_n1 I.6.20a test seed 4: A NEAR/structure, H1 MISS
+- feyn_n1 II.11.27 test seed 3: A MISS, H1 NEAR
+- feyn_n1 II.11.27 test seed 4: A NEAR, H1 MISS
+- feyn_n1 II.2.42 test seed 3: A NEAR, H1 MISS
+- feyn_n1 II.2.42 test seed 4: A NEAR, H1 MISS
+- feyn_n10 I.10.7 test seed 2: A MISS, H1 NEAR
+- feyn_n10 I.44.4 test seed 2: A NEAR/structure, H1 MISS
+- feyn_n10 I.44.4 test seed 3: A NEAR, H1 MISS
+- feyn_n10 I.6.20a test seed 3: A NEAR/structure, H1 NEAR
+- feyn_n10 II.11.27 test seed 0: A NEAR, H1 MISS
+- feyn_n10 II.2.42 test seed 3: A MISS, H1 NEAR
+- ufeyn I.11.19 test seed 2: A EXACT, H1 MISS
+- ufeyn_n1 I.16.6 test seed 0: A NEAR, H1 MISS
+- ufeyn_n1 I.40.1 test seed 2: A NEAR/structure, H1 MISS
+- ufeyn_n1 II.35.18 test seed 3: A NEAR, H1 MISS
+- ufeyn_n1 III.10.19 test seed 3: A NEAR, H1 MISS
+- ufeyn_n10 I.11.19 test seed 3: A NEAR/structure, H1 NEAR
+- ufeyn_n10 I.44.4 test seed 0: A NEAR, H1 MISS
+- ufeyn_n10 II.13.23 test seed 1: A NEAR, H1 MISS
+- ufeyn_n10 II.13.23 test seed 3: A MISS, H1 NEAR
+- ufeyn_n10 II.13.23 test seed 4: A MISS, H1 NEAR
+- ufeyn_n10 III.10.19 test seed 1: A NEAR, H1 MISS
+- ufeyn_n10 III.15.12 test seed 0: A MISS, H1 NEAR/structure
+- ufeyn_n10 III.15.12 test seed 1: A NEAR, H1 NEAR/structure
+(32 fits)
+
+## Verdict
+
+- criterion 1: HOLDS
+- criterion 2: HOLDS
+- criterion 3: HOLDS
+- criterion 4: HOLDS
+- criterion 5: HOLDS
+- criterion 6: HOLDS
+
+H1 ADOPTED: every criterion holds

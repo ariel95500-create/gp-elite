@@ -85,6 +85,22 @@ def tp_part(A, B, results):
           "minus 3): %s" % (pb["useful"], pa["useful"], ub["useful"], ua["useful"],
                             verdict(c2c)))
     results.update(c1=c1, c2=c2a and c2b and c2c)
+    print("\nReading per experiment: fits with the law at 2 % noise, of the "
+          "draws, at 10 and 20 points (the reading counts an experiment "
+          "when 3 draws or more give the law):\n")
+    print("| arm | experiment | A, 10 pts | H1, 10 pts | A, 20 pts | H1, 20 pts |")
+    print("|---|---|---|---|---|---|")
+    for arm in ("plain", "units"):
+        exps = sorted({k[1] for k in ka if k[0] == arm})
+        for e in exps:
+            cell = []
+            for n in (10, 20):
+                for D in (ka, kb):
+                    L = [r for k, r in D.items() if k[0] == arm and k[1] == e
+                         and k[2] == n and abs(k[3] - 0.02) < 1e-9]
+                    cell.append("%d of %d" % (sum(bool(r.get("law")) for r in L),
+                                              len(L)))
+            print("| %s | %s | %s | %s | %s | %s |" % ((arm, e) + tuple(cell)))
     print("\nFits where A and H1 differ on the law:\n")
     for k in sorted(set(ka) & set(kb)):
         a, b = ka[k], kb[k]
@@ -123,6 +139,19 @@ def d_part(A, B, results, feyn_only=False):
                 S.median(t) if t else 0, max(t) if t else 0,
                 S.median(r["generations"] for r in L if "generations" in r),
                 S.median(r["size"] for r in L if "size" in r)))
+    print()
+    print("Statuses on the Feynman kinds (beside the criteria):\n")
+    print("| kind | engine | EXACT | NEAR | MISS |")
+    print("|---|---|---|---|---|")
+    for kind in kinds:
+        if kind.startswith("real"):
+            continue
+        for name, D in (("A", ka), ("H1", kb)):
+            c = collections.Counter(r.get("status") for k, r in D.items()
+                                    if k[0] == kind)
+            if c:
+                print("| %s | %s | %d | %d | %d |" % (kind, name, c["EXACT"],
+                                                      c["NEAR"], c["MISS"]))
     print()
     ok3 = True
     for kind in (("feyn",) if feyn_only else ("feyn", "ufeyn")):

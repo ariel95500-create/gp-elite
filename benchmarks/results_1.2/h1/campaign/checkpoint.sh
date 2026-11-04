@@ -2,7 +2,7 @@
 # Copy the campaign's records into the repository, commit and push them.
 cd /home/user/gp-elite
 C=benchmarks/results_1.2/h1/campaign
-for f in /home/user/h1_records/*.jsonl /home/user/h1_records/run_h1.log; do
+for f in /home/user/h1_records/*.jsonl /home/user/h1_records/run_h1*.log; do
   [ -f "$f" ] && cp "$f" $C/
 done
 git add $C && git commit -q -m "Campaign H1: records at $(date -u +%FT%TZ)

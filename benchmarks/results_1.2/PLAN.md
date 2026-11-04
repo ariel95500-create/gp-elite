@@ -253,6 +253,36 @@ Reported beside the criteria: the times on D, the sizes, the generation of
 the stop, the reading per experiment, and the fits where A and H1 return
 different laws.
 
+**Campaign held on 4 November 2026** (`h1/campaign/compare_h1.txt`; the
+candidate is commit d05a33e, H1 with the correction of the typed start;
+both engines on the same 4-core machine, 4 fits at a time, one after the
+other; no crash in 3,520 fits). Every criterion holds, H1 is adopted:
+
+1. Time on TP: median 6.8 s against 22.8 s in the plain arm (ratio 0.30),
+   8.1 s against 32.2 s under units (0.25).
+2. The law on TP: plain 126 fits against 119, reading 7 and 8 experiments
+   as A; under units the six laws within reach in 120 of 120; useful 174
+   against 175 and 139 against 140. H1 gains the law in 9 fits (gas 3,
+   illuminance 3, lens, power, rc) and loses it in 2 (the spring).
+3. Exact laws: F41 161 against 163, U41 166 against 167; no equation falls
+   from three seeds to one (I.16.6 and II.2.42 go from 4 to 3, I.11.19
+   from 3 to 2 under units).
+4. Structure under noise: F41N1 107 against 108, F41N10 83 against 85,
+   U41N1 112 against 113, U41N10 100 against 99.
+5. Real data: median test R² of the R6 folds 0.802 against 0.810;
+   collapses out of domain 9 against 11.
+6. Units: 615 of 615 models pass `check_dimensions`.
+
+Beside the criteria: on the noisy kinds and real data the median fit takes
+7.4 to 9.4 s against 24.7 to 34.9 s, with a median of 31 to 36 generations
+against 100. The exact kinds stop at generation 1 in both engines. The
+longest fit under units takes 44 s against 465 s in A; A's longest fits are
+those of III.19.51, whose typed start the correction of D0 shortens. On the
+noisy Feynman kinds H1 returns a few fewer approximate laws (NEAR): 146
+against 153 on F41N1, 157 against 161 on U41N1, equal or within one
+elsewhere. The smallest margins are one fit, on F41 (161, at least 160) and
+F41N10 (83, at least 82).
+
 **Confirmation on new draws and seeds**, if the campaign adopts H1: TP with
 draws 5 to 9, and D's kinds feyn, feyn_n1 and feyn_n10 with seeds 5 to 9,
 A against H1 again. H1 is kept when criteria 1 and 2 hold on TP, and 3 and 4
