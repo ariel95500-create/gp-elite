@@ -24,8 +24,11 @@ API defaults. One process per fit, PYTHONHASHSEED=0.
   python benchmarks/results_1.2/d0/d0_start.py dims
   python benchmarks/results_1.2/d0/d0_start.py run --fastpath --python /venv11p/bin/python
 
-The last one asks whether a fast path accepting up to 12 factors would
-change the typed start of these fits (see one_fastpath).
+  python benchmarks/results_1.2/d0/d0_start.py run --cure --python /venv11p/bin/python
+
+The third asks whether a fast path accepting up to 12 factors would
+change the typed start of these fits (see one_fastpath); the fourth runs
+III.19.51 with it, as the U41 campaigns run it (see one_cure).
 """
 import argparse
 import collections
@@ -262,6 +265,28 @@ def one_fastpath(job, max_terms=12, compare_max=50):
                 date=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
 
 
+def one_cure(job, max_terms=12):
+    """A fit of phase1_bench.run_one, as in the U41 campaigns, with the fast
+    path accepting up to `max_terms` factors (1.1.0: 8). Prototype only."""
+    import gp_elite.dim_search as DS
+    import phase1_bench as P1
+    o_mono = DS._monomial_tree
+
+    def wide(target, feats, rng, max_terms_=8, ops=None, **k):
+        return o_mono(target, feats, rng, max_terms=max_terms, ops=ops)
+    DS._monomial_tree = wide
+    rec = P1.run_one(job)
+    rec.update(mode="cure", max_terms=max_terms)
+    return rec
+
+
+def cure_jobs():
+    import feynman_bench as F
+    i = [k for k, p in enumerate(F.PROBS) if p[0] == "III.19.51"][0]
+    return [dict(kind=k, problem="III.19.51", index=i, split="test", seed=s)
+            for k in ("ufeyn", "ufeyn_n1", "ufeyn_n10") for s in range(5)]
+
+
 def jobs():
     import feynman_bench as F
     import tp_diagnostic as TP
@@ -280,12 +305,18 @@ def key(j):
                       sort_keys=True)
 
 
-def drive(python, workers, fastpath=False):
-    out = os.path.join(HERE, "d0_fastpath.jsonl" if fastpath else "d0_start.jsonl")
+def drive(python, workers, fastpath=False, cure=False):
+    out = os.path.join(HERE, "d0_cure.jsonl" if cure else
+                       "d0_fastpath.jsonl" if fastpath else "d0_start.jsonl")
     done = set()
     if os.path.exists(out):
         done = {key(json.loads(l)) for l in open(out) if l.strip()}
-    todo = [j for j in jobs() if key(j) not in done]
+    if cure:
+        done = {json.dumps([r["kind"], r["seed"]]) for r in
+                map(json.loads, open(out))} if os.path.exists(out) else set()
+        todo = [j for j in cure_jobs() if json.dumps([j["kind"], j["seed"]]) not in done]
+    else:
+        todo = [j for j in jobs() if key(j) not in done]
     print("%d jobs to run" % len(todo), flush=True)
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
                OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
@@ -293,6 +324,7 @@ def drive(python, workers, fastpath=False):
 
     def run(j):
         p = subprocess.run([python, os.path.abspath(__file__),
+                            "cure-one" if cure else
                             "fastpath-one" if fastpath else "one",
                             json.dumps(j)], capture_output=True, text=True,
                            env=env, cwd=BENCH)
@@ -413,6 +445,26 @@ def summary():
                       r["calls"], r["t_1_1_0"], r["compared"], r["t_wide"],
                       r["examples"][:1]))
         print()
+    K = [r for r in load("d0_cure.jsonl") if r.get("status") != "CRASH"]
+    if K:
+        print("## III.19.51 with that fast path, as the U41 campaigns run it "
+              "(d0_cure.jsonl)\n")
+        B = {}
+        pb = os.path.join(HERE, "..", "..", "results_1.1", "campaign", "U41_U1.jsonl")
+        if os.path.exists(pb):
+            B = {(r["kind"], r["seed"]): r for r in map(json.loads, open(pb))
+                 if r["problem"] == "III.19.51"}
+        print("| kind | seed | status | structure | time, s | generations | "
+              "units ok | 1.1 (U41_U1.jsonl): status, structure, time |")
+        print("|---|---|---|---|---|---|---|---|")
+        for r in sorted(K, key=lambda r: (r["kind"], r["seed"])):
+            b = B.get((r["kind"], r["seed"]))
+            print("| %s | %d | %s | %s | %.1f | %d | %s | %s |" % (
+                r["kind"], r["seed"], r.get("status"), r.get("structure", "-"),
+                r["time"], r["generations"], r.get("units_ok"),
+                "%s, %s, %.1f" % (b["status"], b.get("structure", "-"), b["time"])
+                if b else "-"))
+        print()
 
 
 def main():
@@ -422,24 +474,28 @@ def main():
     r.add_argument("--python", required=True)
     r.add_argument("--workers", type=int, default=4)
     r.add_argument("--fastpath", action="store_true")
+    r.add_argument("--cure", action="store_true")
     o = sub.add_parser("one")
     o.add_argument("job")
     f = sub.add_parser("fastpath-one")
     f.add_argument("job")
+    c = sub.add_parser("cure-one")
+    c.add_argument("job")
     sub.add_parser("dims")
     sub.add_parser("summary")
     a = ap.parse_args()
-    if a.cmd in ("one", "fastpath-one"):
+    if a.cmd in ("one", "fastpath-one", "cure-one"):
         buf = io.StringIO()
+        fn = {"one": one, "fastpath-one": one_fastpath, "cure-one": one_cure}[a.cmd]
         with redirect_stdout(buf):
-            rec = (one if a.cmd == "one" else one_fastpath)(json.loads(a.job))
+            rec = fn(json.loads(a.job))
         print(json.dumps(rec, default=str))
     elif a.cmd == "dims":
         dims()
     elif a.cmd == "summary":
         summary()
     else:
-        drive(a.python, a.workers, a.fastpath)
+        drive(a.python, a.workers, a.fastpath, a.cure)
 
 
 if __name__ == "__main__":
