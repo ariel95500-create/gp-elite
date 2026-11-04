@@ -13,7 +13,9 @@
    it does not.
 
 Every fit goes through the bench's own worker (tp_diagnostic.worker,
-phase1_bench.run_one); one process per job, PYTHONHASHSEED=0.
+phase1_bench.run_one); one process per job, PYTHONHASHSEED=0. The run
+writes outside the repository (/home/user/c1_records); compare reads the
+copy in this folder.
 
   python benchmarks/results_1.2/c1/mechanics_c1.py run --python /venv11p/bin/python
   python benchmarks/results_1.2/c1/mechanics_c1.py compare
@@ -32,7 +34,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BENCH = os.path.normpath(os.path.join(HERE, "..", ".."))
 ROOT = os.path.dirname(BENCH)
 sys.path.insert(0, BENCH)
-OUT = os.path.join(HERE, "mechanics_c1.jsonl")
+OUT = os.path.join(HERE, "mechanics_c1.jsonl")          # the copy compared
+RUN_OUT = "/home/user/c1_records/mechanics_c1.jsonl"    # written by run, outside the repo
 
 
 def fit(job, units_check):
@@ -122,9 +125,10 @@ def key(j):
 
 
 def drive(python, workers):
+    os.makedirs(os.path.dirname(RUN_OUT), exist_ok=True)
     done = set()
-    if os.path.exists(OUT):
-        done = {key(json.loads(l)) for l in open(OUT) if l.strip()}
+    if os.path.exists(RUN_OUT):
+        done = {key(json.loads(l)) for l in open(RUN_OUT) if l.strip()}
     todo = [j for j in jobs() if key(j) not in done]
     print("%d jobs to run" % len(todo), flush=True)
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
@@ -139,7 +143,7 @@ def drive(python, workers):
         return json.loads(lines[-1]) if (p.returncode == 0 and lines) else \
             dict(j, status="CRASH", error=(p.stderr or p.stdout)[-400:])
     n = 0
-    with ThreadPoolExecutor(workers) as ex, open(OUT, "a") as fh:
+    with ThreadPoolExecutor(workers) as ex, open(RUN_OUT, "a") as fh:
         for f in as_completed([ex.submit(run, j) for j in todo]):
             fh.write(json.dumps(f.result()) + "\n")
             fh.flush()
