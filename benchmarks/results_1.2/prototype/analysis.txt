@@ -72,3 +72,30 @@ Replay of a stop on patience on these traces (as above; structure: the structure
 | 30 | real | 0.65 | 5 | - |
 | 30 | realraw | 0.84 | 3 | - |
 
+## Prototype 2: under units, the seeds the gate of dimensions sets aside (units_rejected.jsonl)
+
+815 records, 0 crashes
+
+TP, units arm (err: 1 - R² on the training rows; a rejected seed is scored on the rows its finder saw):
+
+| experiment | fits | law | err of the model returned, median | largest | fits with a rejected seed | best rejected seed, median err | fits where a rejected seed fits better |
+|---|---|---|---|---|---|---|---|
+| pendule | 20 | 20 | 0.013 | 0.0591 | 20 | 3.09 | 0 |
+| ressort | 20 | 20 | 0.00983 | 0.053 | 20 | 3.51 | 0 |
+| chute | 20 | 20 | 0.00149 | 0.00722 | 20 | 0.186 | 0 |
+| puissance | 20 | 20 | 0.000725 | 0.00578 | 20 | 0.162 | 0 |
+| gaz | 20 | 20 | 0.00177 | 0.00988 | 20 | 0.882 | 0 |
+| eclairement | 20 | 20 | 0.000182 | 0.00158 | 20 | 1.01 | 0 |
+| rc | 20 | 0 | 0.0658 | 1.55 | 0 | - | 0 |
+| refroidissement | 20 | 0 | 0.114 | 4.38 | 0 | - | 0 |
+| lentille | 20 | 0 | 0.183 | 0.293 | 20 | 555 | 0 |
+| snell | 20 | 0 | 0.00464 | 0.0203 | 0 | - | 0 |
+
+Decision bench, units kinds (30 s per fit):
+
+| kind | fits | EXACT | NEAR | MISS | fits with a rejected seed | a rejected seed fits better | ten times better |
+|---|---|---|---|---|---|---|---|
+| ufeyn | 205 | 165 | 6 | 34 | 35 | 0 | 0 |
+| ufeyn_n1 | 205 | 0 | 157 | 48 | 140 | 10 | 0 |
+| ufeyn_n10 | 205 | 0 | 139 | 66 | 110 | 5 | 0 |
+
