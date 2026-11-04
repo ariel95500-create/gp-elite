@@ -483,6 +483,15 @@ Beside, deciding nothing:
 
 The author decides what follows. Nothing changes in the engine before.
 
+**Decided by the author on 4 November 2026: C1 is not in 1.2,** as the rule
+above says. Its code is withdrawn: `gp_elite/` and `tests/` are again those
+of the X1 commit (a263177), and 169 tests pass
+(`c1/tests_without_c1.txt`). The scripts and records of `c1/` stay as the
+record of the change; they run on the engine of commit 203a1ee, which has
+C1. C1 may come back in a later version, with a plan of its own written
+before any measure. Under units, the three limited laws still come back
+without a word; the pages of the limits say so, as in 1.1.
+
 ## Found during the prototypes: a time limit that does not bound the typed start
 
 Under `units=`, III.19.51 takes 600 to 735 s with `time_limit=30` and runs
@@ -575,16 +584,19 @@ What 1.2 adds:
 - **M1** expects the reference configurations identical to 1.1.0, all of
   them setting their budget.
 - **M2**, campaign R paired with 1.1.0 on the whole suite of phase 1 and
-  U41 at 30 s: H1 and C1 do not act there, so the two versions return the
+  U41 at 30 s: H1 does not act there (C1 is withdrawn, see above), so the two versions return the
   same models at equal work, up to the timing of the time budgets, with the
   thresholds of the release of 1.1. X1 is checked on these fits. The frozen
   test set is published as measured and decides nothing.
 - **M3** measures again every public figure, and the TP notebook
   (`examples/tp_six_lois.ipynb`), whose times and formulas change.
-- **Documents:** the READMEs (time of a fit, the exponential, the message
-  under units, the two new parameters), the pages of the limits (the units
-  mode and constants with units), the CHANGELOG, the TP notebook and its
-  text, `DIAGNOSTIC_TP.md` left as written with a note.
+- **Documents:** the READMEs (time of a fit, the exponential, the new
+  parameter `patience=`), the pages of the limits (the units mode and
+  constants with units, which keep their text of 1.1 on the three limited
+  laws), the CHANGELOG, the TP notebook and its text, `DIAGNOSTIC_TP.md`
+  left as written with a note. (Changed on 4 November 2026, once C1 was
+  withdrawn: the message under units and its parameter are no longer in
+  the list.)
 
 ## Cost
 
