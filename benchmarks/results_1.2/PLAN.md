@@ -332,6 +332,22 @@ the capacitor and of Newton's cooling whose model is an exponential of t
 prints `exp(-t / τ)` and no power with a numeric base; new tests check the
 two rewritings, their refusal when the check fails, and the parsable form.
 
+**X1 written and checked on TP on 4 November 2026** (`x1/`). The rewriting
+is in `formula.raw_formula`, after the check and the rounding-noise terms;
+it is tried only when the formula of 1.1 passes its check, so
+`formula_exact` cannot change. On the 80 plain fits of the capacitor and of
+Newton's cooling, draws 0 to 9 under the API defaults, the model is the one
+of the H1 campaign in all 80 (the formula without X1, the law flag and the
+training error recorded there), and the 39 whose model is an exponential of
+t print `exp(-t / τ)` with no power of a number: the capacitor's laws give
+τ from 0.951 to 1.058 s (true value 1 s), the cooling's from 522 to 637 s
+(true value 600 s) (`x1/x1_tp_check.txt`). One other fit keeps a power of a number,
+`6.24057e-06^tanh(exp(0.2 * t))`: its formula departs from `predict()` (the
+engine adds 1e-12 to the base), as in 1.1, so X1 is not tried there. In 17
+other fits an exponential of t inside a longer formula is written with its
+scale (`exp(t / 1800)`). Six new tests; 169 pass (`x1/tests_x1.txt`). The
+check on the fits of M2 comes with the release.
+
 ## Change C1: an honest message under units
 
 C1 adds a message; the model returned under units, its formula, `predict()`

@@ -122,6 +122,10 @@ _FOLD_TREES = [
     N("*", N(3.0), N("+", N("sq", X(0)), N("neg", N("sq", X(1))))),   # distribution
     N("*", N(1.0000000002), N("*", X(0), X(1))),                        # "1 *" noise
     N("*", X(1), N("/", N(2.0), N("+", X(0), N(6.0)))),                # a * (1 / b)
+    N("*", N(5.0), N("pow", N(0.3), X(0))),            # [v1.2] X1: c^u -> exp
+    N("pow", N(-2.5), N("*", N(0.5), X(1))),           # |c|^u, negative base
+    N("exp", N("*", N(-1.7), X(0))),                   # exp(k*x) -> exp(-x/tau)
+    N("pow", N(0.3), N("tanh", X(1))),                 # c^f(x)
 ]
 
 
@@ -144,6 +148,62 @@ def test_raw_formula_folding_is_exact(kind, signed):
                                          _parsable=True)):
             assert np.max(np.abs(_eval_sympy_string(s, cols) - p)) <= tol, \
                 (kind, core.to_string(tree), s)
+
+
+# [v1.2] X1 (benchmarks/results_1.2/PLAN.md): the search writes the decay of a
+# capacitor as 0.00784758^(0.2 * t) and an exponential of one variable as
+# exp(-0.987144 * t); a student reads neither. The printed formula writes the
+# exponential as such, with its scale, and is kept only if it passes the
+# fit-time check; the model is unchanged.
+
+def _x1_case(tree):
+    td = np.linspace(0.1, 5.0, 20).reshape(-1, 1)          # max |t| = 5
+    sc = core._ShiftFreeScaler()
+    Xs = sc.fit_transform(td)
+    return FM.raw_formula(tree, sc, td, ["t"]), core.evaluate_vector(tree, Xs), td
+
+
+def _x1_forms_are_the_model(rf, p, td):
+    tol = 1e-9 * max(np.max(np.abs(p)), 1e-12)
+    for s in (rf.sympy(), FM.to_text(rf.tree, ["t"], rf._positive, _parsable=True)):
+        assert np.max(np.abs(_eval_sympy_string(s, {"t": td[:, 0]}) - p)) <= tol, s
+
+
+def test_power_with_a_numeric_base_is_written_as_an_exponential():
+    """c^u becomes exp(ln|c| u), its constants folded again: the capacitor's
+    0.00784758^(0.2 * t) prints exp(-t / 1.03145), with no power of a number."""
+    rf, p, td = _x1_case(N("+", N(0.01), N("*", N(5.0),
+                                           N("pow", N(0.00784758), X(0)))))
+    assert rf.exact
+    assert rf.text() == "0.01 + 5 * exp(-t / 1.03145)"
+    _x1_forms_are_the_model(rf, p, td)
+
+
+@pytest.mark.parametrize("tree, text", [
+    (N("exp", N("*", N(-4.93572), X(0))), "exp(-t / 1.01302)"),
+    (N("+", N(20.0), N("*", N(60.0), N("exp", N("*", N(0.5), X(0))))),
+     "20 + 60 * exp(t / 10)"),
+    (N("exp", N("*", N(-5.0), X(0))), "exp(-t)"),             # tau = 1: as in 1.1
+    (N("exp", N("*", N(-5.0000001), X(0))), "exp(-t)"),       # tau prints as 1
+])
+def test_exponential_of_one_variable_is_written_with_its_scale(tree, text):
+    """exp(k t) prints exp(-t / tau) for k < 0 and exp(t / tau) for k > 0."""
+    rf, p, td = _x1_case(tree)
+    assert rf.exact
+    assert rf.text() == text
+    _x1_forms_are_the_model(rf, p, td)
+
+
+def test_exponential_rewriting_is_refused_when_the_check_fails(monkeypatch):
+    """A rewriting that would not reproduce predict() is not kept: the
+    formula of 1.1 is printed, still exact."""
+    tree = N("+", N(0.01), N("*", N(5.0), N("pow", N(0.00784758), X(0))))
+    monkeypatch.setattr(FM, "_exponentials_as_such",
+                        lambda t, X: N("*", N(1.001), t))
+    rf, p, td = _x1_case(tree)
+    assert rf.exact
+    assert rf.text() == "0.01 + 5 * 0.00784758^(0.2 * t)"
+    _x1_forms_are_the_model(rf, p, td)
 
 
 @pytest.mark.parametrize("normalize", ["divmax", "minmax", "standard", "none", "auto"])

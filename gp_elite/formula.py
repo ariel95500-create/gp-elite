@@ -465,6 +465,74 @@ def tidy_on_data(tree, X):
     return drop_noise_constants(t, X)
 
 
+# [v1.2] X1, the exponential written as such (benchmarks/results_1.2/PLAN.md).
+# The search writes a decay as a power with a numeric base, 0.00784758^(0.2*t):
+# the engine computes |c|^u for an exponent that depends on the variables
+# (core._np_safe_pow_var), which is exp(ln|c| * u). The printed formula says
+# so, and gives an exponential of one variable its scale: exp(-t / 1.031)
+# rather than exp(-0.970 * t). raw_formula keeps the result only if it passes
+# the fit-time check; the model, predict() and the search are unchanged.
+
+def _numeric_leaf(nd):
+    return nd is not None and nd.left is None and nd.right is None \
+        and _is_num(nd.value)
+
+
+def _powers_as_exponentials(nd):
+    """c^u (numeric base, exponent not a constant) -> exp(ln|c| * u)."""
+    if nd is None:
+        return None
+    if nd.left is None and nd.right is None:
+        return Node(nd.value)
+    l = _powers_as_exponentials(nd.left)
+    r = _powers_as_exponentials(nd.right) if nd.right is not None else None
+    if nd.value == "pow" and _numeric_leaf(l) and r is not None \
+            and not _numeric_leaf(r):
+        c = abs(float(l.value))
+        if c > 0.0 and c != 1.0 and math.isfinite(c):
+            return Node("exp", _mat(math.log(c), r))
+    return Node(nd.value, l, r)
+
+
+def _exponentials_with_scale(nd):
+    """exp(k * x), x one variable -> exp(-x / tau) with tau = -1/k when k < 0,
+    exp(x / tau) with tau = 1/k when k > 0 (not when tau prints as 1)."""
+    if nd is None:
+        return None
+    if nd.left is None and nd.right is None:
+        return Node(nd.value)
+    l = _exponentials_with_scale(nd.left)
+    r = _exponentials_with_scale(nd.right) if nd.right is not None else None
+    if nd.value == "exp" and r is None and l is not None and l.value == "*" \
+            and _numeric_leaf(l.left) and l.right is not None \
+            and l.right.left is None and l.right.right is None \
+            and not _is_num(l.right.value):
+        k = float(l.left.value)
+        if k != 0.0 and math.isfinite(k):
+            tau = 1.0 / abs(k)
+            if math.isfinite(tau) and _num_text(tau) != "1":
+                q = Node("/", Node(l.right.value), Node(tau))
+                return Node("exp", Node("neg", q) if k < 0 else q)
+    return Node(nd.value, l, r)
+
+
+def _exponentials_as_such(tree, X):
+    """X1 on a raw-space tree: both rewritings, the constants folded again
+    between them. None if nothing changes."""
+    t = _powers_as_exponentials(tree)
+    if not _same(t, tree):
+        n = np.asarray(X).shape[1] if np.asarray(X).ndim == 2 else 1
+        one, zero = np.ones(n), np.zeros(n)
+        for _ in range(3):
+            c, f = _fold(t, one, zero)
+            again = _tidy(_mat(c, f))
+            if to_sympy_string(again) == to_sympy_string(t):
+                break
+            t = again
+    t = _exponentials_with_scale(t)
+    return None if _same(t, tree) else t
+
+
 def substitute_only(node, a, b):
     """Raw-space tree WITHOUT folding: each variable replaced by a*x + b.
     Fallback if folding ever failed; same function, less readable."""
@@ -849,6 +917,12 @@ def raw_formula(node, scaler, X_raw, feature_names=None, predictions=None):
             pos_c, ok_c, err_c, n_off_c = _check(clean)
             if ok_c:
                 tree, pos, err, n_off = clean, pos_c, err_c, n_off_c
+        if ok:                                       # [v1.2] X1, the exponential
+            ex = _exponentials_as_such(tree, X_raw)
+            if ex is not None:
+                pos_x, ok_x, err_x, n_off_x = _check(ex)
+                if ok_x:
+                    tree, pos, err, n_off = ex, pos_x, err_x, n_off_x
         if not ok:                                   # folding must never cost
             alt = substitute_only(node, a, b)        # exactness: compare with
             pos2, ok2, err2, n_off2 = _check(alt)    # the plain substitution
