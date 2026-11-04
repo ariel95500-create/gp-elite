@@ -1,0 +1,87 @@
+## TP diagnostic (400 fits of A, 400 of H1)
+
+crashes: 0
+
+| arm | engine | fits | median time | law | useful | reading 10 / 20 points | six laws within reach | generations, median |
+|---|---|---|---|---|---|---|---|---|
+| plain | A | 200 | 24.3 s | 112 | 170 | 6 / 8 | 92 of 120 | 100.0 |
+| plain | H1 | 200 | 6.9 s | 116 | 169 | 7 / 8 | 95 of 120 | 32.0 |
+| units | A | 200 | 32.6 s | 119 | 138 | 6 / 6 | 119 of 120 | 100.0 |
+| units | H1 | 200 | 8.4 s | 119 | 138 | 6 / 6 | 119 of 120 | 31.0 |
+
+Criterion 1, time (median of H1 at most a third of A's, each arm): plain 6.9 s against 24.3 s (ratio 0.28), units 8.4 s against 32.6 s (ratio 0.26): HOLDS
+Criterion 2, the law on TP:
+- plain: law 116 against 112 (at least 110), reading 7/8 against 6/8: HOLDS
+- units: the six laws within reach in 119 of 120 (at least 118): HOLDS
+- useful: plain 169 against 170, units 138 against 138 (at least A's minus 3): HOLDS
+
+Reading per experiment: fits with the law at 2 % noise, of the draws, at 10 and 20 points (the reading counts an experiment when 3 draws or more give the law):
+
+| arm | experiment | A, 10 pts | H1, 10 pts | A, 20 pts | H1, 20 pts |
+|---|---|---|---|---|---|
+| plain | chute | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| plain | eclairement | 2 of 5 | 3 of 5 | 4 of 5 | 5 of 5 |
+| plain | gaz | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| plain | lentille | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| plain | pendule | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| plain | puissance | 4 of 5 | 4 of 5 | 5 of 5 | 5 of 5 |
+| plain | rc | 4 of 5 | 4 of 5 | 4 of 5 | 4 of 5 |
+| plain | refroidissement | 2 of 5 | 2 of 5 | 3 of 5 | 3 of 5 |
+| plain | ressort | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| plain | snell | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | chute | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | eclairement | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | gaz | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | lentille | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | pendule | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | puissance | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | rc | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | refroidissement | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+| units | ressort | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 |
+| units | snell | 0 of 5 | 0 of 5 | 0 of 5 | 0 of 5 |
+
+Fits where A and H1 differ on the law:
+
+- plain, chute, 10 pts, 2 %, draw 7: H1 law (0.00082792 + 4.9045 * t²) | A no law (-1.49275 + 1.50587 * exp(tanh(2.77778 * t²)))
+- plain, eclairement, 10 pts, 2 %, draw 9: H1 law (0.0363269 + 0.782349 / d²) | A no law (-0.357951 + 0.71973 * exp(0.5 * d) / d²)
+- plain, eclairement, 20 pts, 2 %, draw 7: H1 law (0.0236182 + 0.780386 / d²) | A no law (-0.615736 + 0.180091 * exp(0.5 * d) / tanh(0.5 * d)²)
+- plain, eclairement, 20 pts, 5 %, draw 9: H1 law (0.0135062 + 0.812184 * d² / (d²)²) | A no law (-0.164209 + 0.775698 * sqrt(exp(0.5 * d)) / d²)
+- plain, rc, 20 pts, 5 %, draw 9: H1 law (0.0200986 + 5.28726 * exp(-1.05185 * t)) | A no law (-0.86937 - 1.53097 * log(|0.0183861 + 0.2 * t / (0.2 * t - e)
+- plain, ressort, 10 pts, 5 %, draw 8: H1 lost (0.237785 + 34.585 * m / k) | A law (-0.0426132 + 6.59176 * sqrt(m / k))
+
+## Bench D, the API defaults (615 fits of A, 615 of H1)
+
+crashes: A 0, H1 0
+
+| kind | engine | fits | exact | structure | median time | max time | generations, median | size, median |
+|---|---|---|---|---|---|---|---|---|
+| feyn | A | 205 | 159 | - | 0.4 s | 32.6 s | 1 | 14 |
+| feyn | H1 | 205 | 158 | - | 0.4 s | 25.8 s | 1 | 14 |
+| feyn_n1 | A | 205 | 0 | 103 | 26.9 s | 34.0 s | 100 | 16 |
+| feyn_n1 | H1 | 205 | 0 | 102 | 8.4 s | 29.2 s | 31 | 16 |
+| feyn_n10 | A | 205 | 0 | 82 | 27.3 s | 36.9 s | 100 | 15 |
+| feyn_n10 | H1 | 205 | 0 | 82 | 8.6 s | 29.2 s | 32 | 15 |
+
+Statuses on the Feynman kinds (beside the criteria):
+
+| kind | engine | EXACT | NEAR | MISS |
+|---|---|---|---|---|
+| feyn | A | 159 | 9 | 37 |
+| feyn | H1 | 158 | 9 | 38 |
+| feyn_n1 | A | 0 | 152 | 53 |
+| feyn_n1 | H1 | 0 | 147 | 58 |
+| feyn_n10 | A | 0 | 109 | 96 |
+| feyn_n10 | H1 | 0 | 106 | 99 |
+
+Criterion 3, feyn: exact 158 against 159 (at least 156); equations exact in A at 3 seeds or more that fall to one or none: none: HOLDS
+  equations whose exact seeds change: I.50.26 1 -> 0
+Criterion 4, feyn_n1: structure 102 against 103 (at least 100): HOLDS
+Criterion 4, feyn_n10: structure 82 against 82 (at least 79): HOLDS
+## Verdict
+
+- criterion 1: HOLDS
+- criterion 2: HOLDS
+- criterion 3: HOLDS
+- criterion 4: HOLDS
+
+H1 KEPT: every criterion of the confirmation holds

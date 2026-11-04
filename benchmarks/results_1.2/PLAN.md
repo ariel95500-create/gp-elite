@@ -288,6 +288,23 @@ draws 5 to 9, and D's kinds feyn, feyn_n1 and feyn_n10 with seeds 5 to 9,
 A against H1 again. H1 is kept when criteria 1 and 2 hold on TP, and 3 and 4
 on the F41 kinds.
 
+**Confirmation held on 4 November 2026** (`h1/campaign/compare_h1_conf.txt`,
+same machine and load as the campaign, no crash in 2,030 fits). H1 is kept:
+
+1. Time on TP: 6.9 s against 24.3 s in the plain arm (ratio 0.28), 8.4 s
+   against 32.6 s under units (0.26).
+2. The law on TP: plain 116 fits against 112, reading 7 experiments against
+   6 at 10 points and 8 as A at 20; under units the six laws within reach
+   in 119 of 120; useful 169 against 170 and 138 as A. H1 gains the law in
+   5 fits (illuminance 3, fall, rc) and loses it in 1 (the spring).
+3. Exact laws on F41: 158 against 159; no equation falls from three seeds
+   to one (only I.50.26 changes, from 1 seed to 0).
+4. Structure under noise: F41N1 102 against 103, F41N10 82 as A.
+
+Beside the criteria, as in the campaign: fewer approximate laws on F41N1
+(147 against 152) and F41N10 (106 against 109), for a median fit of 8.4 to
+8.6 s against 26.9 to 27.3 s.
+
 If H1 is not adopted, or not kept, the cause is examined and reported to the
 author before any second rule or any other P.
 

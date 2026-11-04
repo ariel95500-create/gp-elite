@@ -231,8 +231,13 @@ def main():
         print("- criterion %s: %s" % (k[1:], verdict(results[k])))
     need = ("c1", "c2", "c3", "c4") if sfx else ("c1", "c2", "c3", "c4", "c5", "c6")
     if all(k in results for k in need):
-        print("\nH1 %s" % ("ADOPTED: every criterion holds" if all(results[k] for k in need)
-                           else "NOT ADOPTED"))
+        ok = all(results[k] for k in need)
+        if sfx:
+            print("\nH1 %s" % ("KEPT: every criterion of the confirmation holds"
+                               if ok else "NOT KEPT"))
+        else:
+            print("\nH1 %s" % ("ADOPTED: every criterion holds" if ok
+                               else "NOT ADOPTED"))
     else:
         print("\n(records incomplete: no verdict)")
 
