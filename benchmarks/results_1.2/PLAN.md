@@ -417,6 +417,15 @@ Mechanics of the correction, before H1:
    target whose product needs more than 12 factors, with a deadline already
    passed, ends its start with no empty island.
 
+**Mechanics held on 4 November 2026** (commit 9a794a3, `fix/`): III.19.51
+exact in 1.2 s (430 s on the wheel), its model passing `check_dimensions`;
+40 of 41 U41 equations and 40 of 40 TP units fits the same as the wheel, to
+the bit; the thirteen reference configurations identical; 156 tests pass,
+and the two new ones fail on the 1.1.0 wheel (`fix/compare_mechanics.txt`,
+`fix/compare_1.1.0_vs_fix.txt`, `fix/tests_fix.txt`,
+`fix/new_tests_on_wheel.txt`). The campaigns below run with this
+correction.
+
 The original text of (b) follows, for the record.
 If it finds a fault beyond the missing look at the deadline, that fault goes
 to the author before any correction. Otherwise the correction (b) is made as
