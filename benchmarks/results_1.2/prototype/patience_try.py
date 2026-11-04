@@ -63,12 +63,30 @@ def install(patience):
 
 
 def one(job):
+    import numpy as np
+    import gp_elite
     st = install(int(job["patience"]))
     import tp_diagnostic as TP
+    holder = {}
+    orig = gp_elite.symbolic_regression
+
+    def keep(X, y, **kw):                  # pass-through, to score the model
+        r = orig(X, y, **kw)
+        holder.update(r=r, X=X, y=y)
+        return r
+    gp_elite.symbolic_regression = keep    # tp_diagnostic imports it in worker()
     rec = TP.worker({k: v for k, v in job.items() if k not in ("patience", "bench")})
     rec.pop("front", None)
     rec.update(patience=job["patience"], eps=EPS, stop_gen=st["stop_gen"],
                last_gen=st["gen"], best_gen=st["best_gen"], bench="tp")
+    if "r" in holder:
+        # 1 - R² of predict() on the training rows, as units_rejected.py
+        # records it for the model returned under units.
+        with np.errstate(all="ignore"):
+            y = np.asarray(holder["y"], dtype=float)
+            p = np.asarray(holder["r"].predict(holder["X"]), dtype=float)
+            e = float(np.mean((p - y) ** 2) / (np.var(y) or 1e-30))
+        rec["err_train"] = e if np.isfinite(e) else 1e30
     return rec
 
 
