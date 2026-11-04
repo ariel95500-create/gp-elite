@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.0
+
+A fit of a lab table under the defaults now ends in seconds, and an
+exponential law comes back written as one. When the call sets neither
+`generations=` nor `time_limit=`, the search stops once the error on the
+hold-out rows has not improved by 1 % in 30 generations; `patience=` sets
+that number. With a budget set, nothing changes. The printed formula writes a
+power of a number as an exponential, and an exponential of one variable with
+its scale, `exp(-t / τ)`, only when the rewritten formula still reproduces
+`predict()`: the model does not change. Under `units=`, the typed start
+accepts products of up to 12 factors and stops drawing at the deadline of
+`time_limit=`, so Feynman III.19.51 under units ends in about a second.
+Plan, measurements and records in `benchmarks/results_1.2/`; the figures of
+the release follow its measurements.
+
 ## 1.1.0 — "Coherent"
 
 The forms that 1.0 fits directly now act under `units=` as well. Under
