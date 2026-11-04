@@ -128,6 +128,7 @@ def trace_section(R):
 
 
 UNITS_LIMITED = ("rc", "refroidissement", "lentille")
+RESTART = "2026-11-04T02:00"      # container restart during prototype 4
 
 
 def units_section(R):
@@ -323,8 +324,8 @@ def patience_section(PT, TR):
     print("%d records, %d crashes. Baseline: the same fits in prototype 1 "
           "(1.1.0, 100 generations).\n" % (len(PT), 0))
     print("| arm | P | fits | law | useful | reading 10 pts | reading 20 pts | "
-          "time, median | baseline time, median | law lost | law gained | "
-          "stop generation, median |")
+          "time, median (fits on the first machine) | baseline time, median, "
+          "same fits | law lost | law gained | stop generation, median |")
     print("|---|---|---|---|---|---|---|---|---|---|---|---|")
 
     def reading(L, n):
@@ -348,11 +349,15 @@ def patience_section(PT, TR):
             lost = sum(1 for r, b in zip(A, pb) if b and b["law"] and not r["law"])
             gain = sum(1 for r, b in zip(A, pb) if b and r["law"] and not b["law"])
             sg = [r["stop_gen"] for r in A if r["stop_gen"] is not None]
-            print("| %s | %d | %d | %d | %d | %d | %d | %.1f s | %.1f s | %d | %d "
+            # times only from the fits run on the machine of prototype 1
+            # (machine.txt: the container restarted during prototype 4)
+            T = [(r, b) for r, b in zip(A, pb) if b and r["date"] < RESTART]
+            print("| %s | %d | %d | %d | %d | %d | %d | %s | %s | %d | %d "
                   "| %s |" % (arm, P, len(A), sum(r["law"] for r in A),
                               sum(r["useful"] for r in A), reading(A, 10),
-                              reading(A, 20), S.median(r["time"] for r in A),
-                              S.median(b["time"] for b in pb if b),
+                              reading(A, 20),
+                              ("%.1f s (%d fits)" % (S.median(r["time"] for r, _b in T), len(T))) if T else "-",
+                              ("%.1f s" % S.median(b["time"] for _r, b in T)) if T else "-",
                               lost, gain, S.median(sg) if sg else "-"))
     print()
     print("Fits where the law is lost or gained against the baseline:\n")
