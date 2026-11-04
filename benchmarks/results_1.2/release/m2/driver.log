@@ -1,0 +1,6 @@
+--- M2 bench of e92f86d, Model name: Intel(R) Xeon(R) Processor, 4 cores
+/home/user/gp-elite/benchmarks/results_1.2/release/m2/driver.sh: 22: cannot open /home/user/m2_records/campaignR_1.1.0.jsonl: No such file
+/home/user/gp-elite/benchmarks/results_1.2/release/m2/driver.sh: 23: cannot open /home/user/m2_records/campaignR_1.2.0.jsonl: No such file
+--- slice 2026-11-04T18:24 (0 and 0 done)
+2780 jobs to run with 2 engines
+25 jobs done, 16 s elapsed, 2754 left

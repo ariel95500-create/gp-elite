@@ -2,7 +2,7 @@
 # Copy the records of M2 into the repository, commit and push them.
 cd /home/user/gp-elite
 D=benchmarks/results_1.2/release/m2
-for f in /home/user/m2_records/campaignR_1.1.0.jsonl /home/user/m2_records/campaignR_1.2.0.jsonl /home/user/m2_records/driver.log; do
+for f in /home/user/m2_records/campaignR_1.1.0.jsonl /home/user/m2_records/campaignR_1.2.0.jsonl /home/user/m2_records/driver.log /home/user/m2_records/machine.txt; do
   [ -f "$f" ] && cp "$f" $D/
 done
 git add $D && git commit -q -m "M2 of 1.2.0: records at $(date -u +%FT%TZ)
