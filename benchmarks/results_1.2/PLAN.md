@@ -390,6 +390,34 @@ On 1.1.0, wrapped from outside as the prototypes, `time_limit=30`, seed 0:
    start fast.
 
 D0 is recorded in `d0/` and reported to the author with its explanation.
+
+**D0 done, 4 November 2026** (`d0/D0.md`). The fast path of the typed start
+refuses products of more than 8 factors; III.19.51 needs 9 and falls to a
+blind search with no bound in time, which is also what builds its law. The
+author chose, the same day, both corrections D0 proposed, which replace the
+correction (b) below:
+- **(b2)** the fast path accepts products of up to 12 factors (each exponent
+  at most 4, as before);
+- **(b1)** the typed start looks at the deadline: once it is reached, an
+  island stops drawing as soon as it has one tree, and is completed with
+  copies, as after its failed draws.
+
+Mechanics of the correction, before H1:
+1. III.19.51 under units with `time_limit=30`, U41 seed 0: the fit ends
+   within the limit, the model passes `check_dimensions`, and the law is
+   exact.
+2. U41, seed 0, with 20 generations and no time limit, so that the
+   comparison does not depend on timing: every equation other than
+   III.19.51 returns the model of the 1.1.0 wheel, run the same way; and the
+   units arm of the TP diagnostic at draw 0, under the defaults, returns the
+   models of 1.1.0.
+3. Without `units=`, the thirteen reference configurations are unchanged,
+   and the test suite passes.
+4. New tests: a product of 9 to 12 factors comes from the fast path; a
+   target whose product needs more than 12 factors, with a deadline already
+   passed, ends its start with no empty island.
+
+The original text of (b) follows, for the record.
 If it finds a fault beyond the missing look at the deadline, that fault goes
 to the author before any correction. Otherwise the correction (b) is made as
 written above, with these mechanics:
