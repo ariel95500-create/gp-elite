@@ -1,0 +1,89 @@
+== TP H1 conf 2026-11-04T12:34:43Z Model name: Intel(R) Xeon(R) Processor 4 cores
+400 jobs to run, 0 already done
+20/400 12:35:21
+40/400 12:36:06
+60/400 12:36:35
+80/400 12:37:09
+100/400 12:37:53
+120/400 12:38:33
+140/400 12:39:17
+160/400 12:40:05
+180/400 12:40:52
+200/400 12:41:26
+220/400 12:42:08
+240/400 12:42:58
+260/400 12:43:33
+280/400 12:44:14
+300/400 12:44:56
+320/400 12:45:30
+340/400 12:46:39
+360/400 12:48:21
+380/400 12:49:36
+400/400 12:49:57
+== TP A conf 2026-11-04T12:49:57Z Model name: Intel(R) Xeon(R) Processor 4 cores
+400 jobs to run, 0 already done
+20/400 12:52:03
+40/400 12:54:10
+60/400 12:56:05
+80/400 12:58:06
+100/400 13:00:20
+120/400 13:02:22
+140/400 13:04:26
+160/400 13:06:42
+180/400 13:08:53
+200/400 13:10:42
+220/400 13:13:31
+240/400 13:16:28
+260/400 13:18:59
+280/400 13:21:43
+300/400 13:24:26
+320/400 13:26:53
+340/400 13:30:02
+360/400 13:32:52
+380/400 13:36:15
+400/400 13:37:36
+== D H1 conf 2026-11-04T13:37:36Z Model name: Intel(R) Xeon(R) Processor 4 cores
+615 jobs to run, 0 already done
+25 done, 8 s elapsed, 587 left
+50 done, 51 s elapsed, 563 left
+75 done, 60 s elapsed, 537 left
+100 done, 99 s elapsed, 515 left
+125 done, 136 s elapsed, 487 left
+150 done, 169 s elapsed, 464 left
+175 done, 182 s elapsed, 438 left
+200 done, 237 s elapsed, 412 left
+225 done, 284 s elapsed, 387 left
+250 done, 343 s elapsed, 362 left
+275 done, 404 s elapsed, 338 left
+300 done, 473 s elapsed, 313 left
+325 done, 543 s elapsed, 287 left
+350 done, 633 s elapsed, 263 left
+375 done, 695 s elapsed, 237 left
+400 done, 784 s elapsed, 214 left
+425 done, 844 s elapsed, 187 left
+450 done, 917 s elapsed, 162 left
+475 done, 1006 s elapsed, 137 left
+500 done, 1088 s elapsed, 112 left
+525 done, 1161 s elapsed, 88 left
+550 done, 1237 s elapsed, 62 left
+575 done, 1310 s elapsed, 38 left
+600 done, 1375 s elapsed, 13 left
+== D A conf 2026-11-04T14:01:28Z Model name: Intel(R) Xeon(R) Processor 4 cores
+615 jobs to run, 0 already done
+25 done, 8 s elapsed, 587 left
+50 done, 76 s elapsed, 565 left
+75 done, 90 s elapsed, 537 left
+100 done, 156 s elapsed, 514 left
+125 done, 226 s elapsed, 489 left
+150 done, 295 s elapsed, 465 left
+175 done, 311 s elapsed, 437 left
+200 done, 408 s elapsed, 415 left
+225 done, 570 s elapsed, 387 left
+250 done, 739 s elapsed, 362 left
+275 done, 923 s elapsed, 337 left
+300 done, 1090 s elapsed, 312 left
+325 done, 1269 s elapsed, 287 left
+350 done, 1452 s elapsed, 262 left
+375 done, 1621 s elapsed, 237 left
+400 done, 1808 s elapsed, 212 left
+425 done, 1973 s elapsed, 187 left
