@@ -407,6 +407,28 @@ time), `False` never. Without `units=` it does nothing.
 3. On the capacitor (10 points, 2 %, draw 0) the warning comes and names an
    exponential formula; on the pendulum it does not.
 
+**Mechanics held on 4 November 2026** (`c1/`). The check is in
+`symbolic_regression`: once the fit under units is done, it calls itself on
+the same rows without units (`units_check=False`, the other arguments as
+given), compares 1 − R² on the rows given, and keeps the result in
+`result.units_check` (a `UnitsCheck`: the formula without units, the two
+errors, whether it warned, the result without units). The run trace is the
+one of the fit under units, and the warnings of the second fit are not
+shown. 1: on the 81 fits (TP units arm draw 0, U41 seed 0, API defaults),
+`units_check=True` returns the model of `units_check=False` alone (formula,
+sympy form, predictions on the training rows bit for bit,
+`check_dimensions`), and a fit run after it in the same process returns the
+same as alone (`c1/compare_mechanics_c1.txt`). 2: the thirteen reference
+configurations are identical to the 1.1.0 wheel
+(`c1/compare_1.1.0_vs_equiv_default.txt`). 3: on the capacitor the warning
+names `-0.00664979 + 4.96444 * exp(-t / 1.01302)` (1 − R² of 1.55 under
+units, 2.2e-5 without); on the pendulum the check runs and says nothing
+(0.0039 against 0.0035). Beside: at draw 0 the warning comes on 10 of the 12
+fits of the three limited laws and on none of the others; on U41 seed 0 on
+3 fits, none of them exact (I.6.20a at 0.0012 against 1e-27, I.50.26,
+III.17.37).
+Six new tests; 175 pass (`c1/tests_c1.txt`).
+
 **Campaign C1** (decides), on the candidate with H1 and C1, against the
 records of campaign H1 for the same fits: the units arm of TP, draws 0 to 9
 (400 fits), and D's kinds ufeyn, ufeyn_n1 and ufeyn_n10 (615). k was chosen
