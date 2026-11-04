@@ -233,11 +233,121 @@ def units_vs_plain_section(U, PT):
         print()
 
 
+def gaps(errs, eps=0.01, upto=None):
+    """Under the rule of patience_try.py, the longest run of generations
+    without a gain (error below (1 - eps) times the best) before generation
+    `upto`: a stop on patience P cuts the run before `upto` when this is at
+    least P."""
+    best, best_g, longest = None, 0, 0
+    for g, m in enumerate(errs[:upto] if upto is not None else errs):
+        if best is None or m < best * (1 - eps):
+            best, best_g = m, g
+        else:
+            longest = max(longest, g - best_g)
+    return longest
+
+
+def plateau_section(R):
+    R = [r for r in R if r.get("status") != "CRASH"]
+    if not R:
+        return
+    print("## Prototype 3: the plateaus before the exact laws of F41 "
+          "(plateau.jsonl)\n")
+    ex = [r for r in R if r["status"] == "EXACT"]
+    print("%d fits (30 s and 1,000 generations each), %d EXACT. err: 1 - R² "
+          "of the champion in the loop (the error the early stop reads, over "
+          "the variance of the target).\n" % (len(R), len(ex)))
+    in_loop, after = [], []
+    for r in ex:
+        e = r["err_by_gen"]
+        lg = next((g for g, m in enumerate(e) if m <= 1e-9), None)
+        (in_loop if lg is not None else after).append((r, lg))
+    print("- the law is the champion in the loop in %d EXACT fits; in %d it "
+          "comes only after the loop (polishing and final selection)" % (
+              len(in_loop), len(after)))
+    if in_loop:
+        lgs = [lg for _r, lg in in_loop]
+        print("- generation of the law in the loop: median %s, 90th percentile "
+              "%s, largest %s" % (S.median(lgs), q(lgs, .9), max(lgs)))
+    print("\n| P | EXACT fits whose law, in the loop, comes after a run of P "
+          "generations or more without a gain | EXACT fits after the loop "
+          "whose loop has such a run |")
+    print("|---|---|---|")
+    for P in (10, 20, 30, 40):
+        a = [r for r, lg in in_loop if gaps(r["err_by_gen"], upto=lg) >= P]
+        b = [r for r, _lg in after if gaps(r["err_by_gen"]) >= P]
+        print("| %d | %d (%s) | %d |" % (
+            P, len(a), ", ".join(sorted({"%s s%d" % (r["problem"], r["seed"])
+                                         for r in a}))[:300] or "-", len(b)))
+    print()
+
+
+def patience_section(PT, TR):
+    PT = [r for r in PT if r.get("status") != "CRASH"]
+    if not PT:
+        return
+    base = {(r["arm"], r["exp"], r["n"], r["noise"], r["draw"]): r
+            for r in TR if r.get("bench") == "tp"}
+    print("## Prototype 4: the stop on patience on the TP fits "
+          "(patience.jsonl)\n")
+    print("%d records, %d crashes. Baseline: the same fits in prototype 1 "
+          "(1.1.0, 100 generations).\n" % (len(PT), 0))
+    print("| arm | P | fits | law | useful | reading 10 pts | reading 20 pts | "
+          "time, median | baseline time, median | law lost | law gained | "
+          "stop generation, median |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|")
+
+    def reading(L, n):
+        by = collections.defaultdict(int)
+        for r in L:
+            if r["n"] == n and abs(r["noise"] - 0.02) < 1e-9 and r["law"]:
+                by[r["exp"]] += 1
+        return sum(v >= 3 for v in by.values())
+    for arm in ("plain", "units"):
+        B = [r for r in TR if r.get("bench") == "tp" and r["arm"] == arm]
+        if B:
+            print("| %s | none (1.1.0) | %d | %d | %d | %d | %d | %.1f s | - | - "
+                  "| - | - |" % (arm, len(B), sum(r["law"] for r in B),
+                                 sum(r["useful"] for r in B), reading(B, 10),
+                                 reading(B, 20), S.median(r["time"] for r in B)))
+        for P in sorted({r["patience"] for r in PT}):
+            A = [r for r in PT if r["arm"] == arm and r["patience"] == P]
+            if not A:
+                continue
+            pb = [base.get((arm, r["exp"], r["n"], r["noise"], r["draw"])) for r in A]
+            lost = sum(1 for r, b in zip(A, pb) if b and b["law"] and not r["law"])
+            gain = sum(1 for r, b in zip(A, pb) if b and r["law"] and not b["law"])
+            sg = [r["stop_gen"] for r in A if r["stop_gen"] is not None]
+            print("| %s | %d | %d | %d | %d | %d | %d | %.1f s | %.1f s | %d | %d "
+                  "| %s |" % (arm, P, len(A), sum(r["law"] for r in A),
+                              sum(r["useful"] for r in A), reading(A, 10),
+                              reading(A, 20), S.median(r["time"] for r in A),
+                              S.median(b["time"] for b in pb if b),
+                              lost, gain, S.median(sg) if sg else "-"))
+    print()
+    print("Fits where the law is lost or gained against the baseline:\n")
+    for P in sorted({r["patience"] for r in PT}):
+        for r in PT:
+            if r["patience"] != P:
+                continue
+            b = base.get((r["arm"], r["exp"], r["n"], r["noise"], r["draw"]))
+            if b and b["law"] != r["law"]:
+                print("- P %d, %s, %s, %d pts, %d %%, draw %d: %s (%s) against "
+                      "%s" % (P, r["arm"], r["exp"], r["n"], round(100 * r["noise"]),
+                              r["draw"], "law" if r["law"] else "lost",
+                              r["expr"][:70], b["expr"][:70]))
+    print()
+
+
 def main():
-    trace_section(load("trace.jsonl"))
+    TR = load("trace.jsonl")
+    trace_section(TR)
     U = load("units_rejected.jsonl")
     units_section(U)
-    units_vs_plain_section(U, load("patience.jsonl"))
+    plateau_section(load("plateau.jsonl"))
+    PT = load("patience.jsonl")
+    patience_section(PT, TR)
+    units_vs_plain_section(U, PT)
 
 
 if __name__ == "__main__":
