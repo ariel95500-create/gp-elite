@@ -5,13 +5,15 @@
 A fit of a lab table under the defaults now ends in seconds, and an
 exponential law comes back written as one. When the call sets neither
 `generations=` nor `time_limit=`, the search stops once the error on the
-hold-out rows has not improved by 1 % in 30 generations; `patience=` sets
-that number. With a budget set, nothing changes. The printed formula writes a
+hold-out rows (the training rows when there are none) has not improved by
+1 % in 30 generations; `patience=` sets that number. With a budget set and no
+`patience=`, the stop does not act. The printed formula writes a
 power of a number as an exponential, and an exponential of one variable with
 its scale, `exp(-t / τ)`, only when the rewritten formula still reproduces
 `predict()`: the model does not change. Under `units=`, the typed start
 accepts products of up to 12 factors and stops drawing at the deadline of
-`time_limit=`, so Feynman III.19.51 under units ends in about a second.
+`time_limit=`, so Feynman III.19.51 under units, without noise, ends in about
+a second.
 Measured on the package, side by side with 1.1.0 installed from PyPI
 (`benchmarks/results_1.2/release/`):
 
@@ -30,11 +32,15 @@ Measured on the package, side by side with 1.1.0 installed from PyPI
   never changed, and on the 787 fits where neither version reached its
   budget (Feynman III.19.51 under units aside), the formula without the
   rewriting, the error on the test rows and `formula_exact` are those of
-  1.1.0, to the bit. 40 fits return another model: 38 reached the budget in
-  both versions, and the other two are III.19.51 under units, exact in both;
+  1.1.0, to the bit. 40 fits return another model: 28 reached the budget in
+  both versions, where the model depends on how far the search got, and the
+  other 12 are III.19.51 under units, whose typed start the correction below
+  changes (two exact in both versions, and the ten with noise, where 1.1.0
+  ran one generation and 1.2.0 runs 35 to 40);
 - Feynman III.19.51 under units comes back exact in 0.99 to 1.16 s at five
-  seeds, against 342 to 387 s with 1.1.0 and `time_limit=30`; with noise, in
-  30.1 to 30.5 s against 334 to 421 s.
+  seeds, against 342 to 387 s with 1.1.0 and `time_limit=30`; with noise,
+  where neither version returns the exact law, it runs its budget, 30.1 to
+  30.5 s, against 334 to 421 s.
 
 The stop was decided by a comparison written before it ran
 (`benchmarks/results_1.2/PLAN.md`, H1): on the TP diagnostic under the
@@ -54,14 +60,15 @@ adopted.
   no bound in time, 430 to 735 s with `time_limit=30`
   (`benchmarks/results_1.2/d0/D0.md`). The fast path now accepts up to 12
   factors, and once the deadline is reached an island stops drawing as soon
-  as it has one tree. Run with 20 generations and no time limit, seed 0, the
-  other 40 equations of the bench with their units and the 40 units fits of
-  the TP diagnostic return the models of 1.1.0, to the bit.
+  as it has one tree. The other 40 equations of the bench with their units
+  (seed 0, 20 generations, no time limit) and the 40 units fits of the TP
+  diagnostic (draw 0, under the defaults) return the models of 1.1.0, to the
+  bit.
 
 ### Known limits
 - The stop can end a search that would still have improved. On the decision
   bench under the defaults, 161 exact laws of 205 against 163 for 1.1.0, and a
-  median test R² of 0.802 against 0.810 on the standardised real data
+  median test R² of 0.802 against 0.809 on the standardised real data
   (`LIMITATIONS.md`, point 10). A call that sets `generations=` or
   `time_limit=` gets its whole budget, and `patience=0` turns the stop off.
 - Under `units=`, a constant with units still cannot sit inside a function or

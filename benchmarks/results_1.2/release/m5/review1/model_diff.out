@@ -1,0 +1,52 @@
+model differs 40
+of which III.19.51 under units 13 [('feyn_n1', 0), ('ufeyn', 0), ('ufeyn', 3), ('ufeyn_n1', 0), ('ufeyn_n1', 1), ('ufeyn_n1', 2), ('ufeyn_n1', 3), ('ufeyn_n1', 4), ('ufeyn_n10', 0), ('ufeyn_n10', 1), ('ufeyn_n10', 2), ('ufeyn_n10', 3), ('ufeyn_n10', 4)]
+('feyn', 'I.11.19', 'test', 2) True True gens 106 108 MISS MISS
+('feyn', 'III.10.19', 'test', 3) True True gens 100 102 MISS MISS
+('feyn_n1', 'I.11.19', 'test', 2) True True gens 112 116 MISS MISS
+('feyn_n1', 'I.44.4', 'test', 1) True True gens 119 116 NEAR NEAR
+('feyn_n1', 'I.44.4', 'test', 4) True True gens 102 103 NEAR NEAR
+('feyn_n1', 'II.6.15b', 'test', 1) True True gens 111 113 NEAR NEAR
+('feyn_n1', 'III.19.51', 'test', 0) True True gens 106 104 NEAR NEAR
+('feyn_n1', 'III.9.52', 'test', 1) True True gens 103 102 MISS MISS
+('feyn_n10', 'I.40.1', 'test', 1) True True gens 108 107 MISS MISS
+('feyn_n10', 'II.6.15b', 'test', 4) True True gens 117 115 MISS MISS
+('feyn_n10', 'III.17.37', 'test', 1) True True gens 132 135 MISS MISS
+('realraw', '690_visualizing_galaxy', 'fold2', 0) True True gens 103 101 None None
+('tf', 'feynman_II_36_38', 'test', 7) True True gens 105 104 MISS MISS
+('tf', 'feynman_I_13_4', 'test', 7) True True gens 106 104 MISS MISS
+('tf', 'feynman_I_41_16', 'test', 7) True True gens 108 109 NEAR NEAR
+('tf', 'feynman_test_16', 'test', 5) True True gens 97 95 MISS MISS
+('tr', '1096_FacultySalaries', 'ood', 7) True True gens 124 125 None None
+('trraw', '663_rabe_266', 'ood', 6) True True gens 114 115 None None
+('trraw', 'first_principles_supernovae_zg', 'fold2', 5) True True gens 90 89 None None
+('ts', 'strogatz_lv1', 'ood', 6) True True gens 101 102 MISS MISS
+('ts', 'strogatz_shearflow1', 'ood', 9) True True gens 101 102 MISS MISS
+('ts', 'strogatz_shearflow2', 'test', 5) True True gens 129 128 MISS MISS
+('ufeyn', 'III.17.37', 'test', 3) True True gens 138 140 MISS MISS
+('ufeyn', 'III.19.51', 'test', 0) True False gens 1 1 EXACT EXACT
+('ufeyn', 'III.19.51', 'test', 3) True False gens 1 1 EXACT EXACT
+('ufeyn_n1', 'I.50.26', 'test', 3) True True gens 110 108 MISS MISS
+('ufeyn_n1', 'III.19.51', 'test', 0) True True gens 1 38 NEAR NEAR
+('ufeyn_n1', 'III.19.51', 'test', 1) True True gens 1 37 NEAR NEAR
+('ufeyn_n1', 'III.19.51', 'test', 2) True True gens 1 35 NEAR NEAR
+('ufeyn_n1', 'III.19.51', 'test', 3) True True gens 1 35 NEAR NEAR
+('ufeyn_n1', 'III.19.51', 'test', 4) True True gens 1 37 NEAR NEAR
+('ufeyn_n10', 'I.50.26', 'test', 3) True True gens 106 107 MISS MISS
+('ufeyn_n10', 'III.19.51', 'test', 0) True True gens 1 36 NEAR NEAR
+('ufeyn_n10', 'III.19.51', 'test', 1) True True gens 1 40 NEAR NEAR
+('ufeyn_n10', 'III.19.51', 'test', 2) True True gens 1 38 NEAR NEAR
+('ufeyn_n10', 'III.19.51', 'test', 3) True True gens 1 36 NEAR NEAR
+('ufeyn_n10', 'III.19.51', 'test', 4) True True gens 1 35 NEAR NEAR
+('ufeyn_n10', 'III.9.52', 'test', 3) True True gens 109 112 MISS MISS
+('utf', 'feynman_test_16', 'test', 5) True True gens 88 89 MISS MISS
+('utf', 'feynman_test_2', 'test', 6) True True gens 104 106 MISS MISS
+('ufeyn_n1', 'III.19.51', 'test', 0) DIFF err 5.352085870587522e-06 5.352085870587802e-06
+('ufeyn_n1', 'III.19.51', 'test', 1) DIFF err 5.352085870587273e-06 5.352085870588446e-06
+('ufeyn_n1', 'III.19.51', 'test', 2) DIFF err 5.352085870588311e-06 5.352085870589094e-06
+('ufeyn_n1', 'III.19.51', 'test', 3) DIFF err 5.352085870588266e-06 5.3520858705887164e-06
+('ufeyn_n1', 'III.19.51', 'test', 4) DIFF err 5.35208587058736e-06 5.352085870588945e-06
+('ufeyn_n10', 'III.19.51', 'test', 0) DIFF err 0.0005352085870586333 0.00053520858705863
+('ufeyn_n10', 'III.19.51', 'test', 1) DIFF err 0.0005352085870586348 0.0005352085870586337
+('ufeyn_n10', 'III.19.51', 'test', 2) DIFF err 0.000535208587058634 0.0005352085870586264
+('ufeyn_n10', 'III.19.51', 'test', 3) DIFF err 0.0005352085870586332 0.0005352085870586337
+('ufeyn_n10', 'III.19.51', 'test', 4) DIFF err 0.0005352085870586251 0.0005352085870586243

@@ -150,7 +150,9 @@ exacte, sans garantie.
 - `speed` : `'ultrafast' | 'fast' (défaut) | 'normal' | 'thorough'`. `'thorough'`
   (population 400, quatre îles, 200 générations) est le régime pour chercher une
   loi exacte ; avec deux fois plus de générations que par défaut, il est plus
-  lent, et ne garantit pas de faire mieux.
+  lent, et ne garantit pas de faire mieux. Sans `generations=` ni `time_limit=`,
+  depuis la 1.2, il s'arrête lui aussi dès qu'il ne progresse plus (`patience=`,
+  plus bas).
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
   génération en cours et la sélection finale ajoutent un peu (dans la mesure de
@@ -161,12 +163,14 @@ exacte, sans garantie.
   à 12,5 s avec les îles en parallèle.
 - `patience=` (depuis la 1.2) : quand l'appel ne fixe ni `generations` ni
   `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
-  côté n'a pas baissé de 1 % en 30 générations, puis polit et choisit comme
+  côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
+  30 générations, puis polit et choisit comme
   d'habitude. Un ajustement sur un tableau de TP de dix points prend alors
   quelques secondes : les six du notebook de TP (`examples/tp_six_lois.ipynb`)
   prennent 48 s en tout, contre
   194 à 198 s avec la 1.1.0 sur la même machine, et rendent les mêmes formules.
-  Un appel qui fixe son budget le reçoit en entier, comme en 1.1. Un entier k
+  Un appel qui fixe son budget (`generations=` ou `time_limit=`) le reçoit en
+  entier, comme en 1.1. Un entier k
   applique une patience de k générations quel que soit le budget, et 0 la coupe.
   `GPEliteRegressor` fixe toujours son nombre de générations, si bien que l'arrêt
   n'y agit pas.
@@ -222,8 +226,8 @@ Rien à faire dans un notebook.
   constantes affichées étaient celles de l'espace normalisé interne.) Depuis la
   1.2, une puissance d'un nombre s'écrit comme une exponentielle, et une
   exponentielle d'une seule variable avec son échelle :
-  `5.05644 * 0.00614708^(0.2 * t)` revient sous la forme
-  `5.05644 * exp(-t / 0.981975)`. La formule réécrite n'est gardée que si elle
+  `0.00538504 + 5.05644 * 0.00614708^(0.2 * t)` revient sous la forme
+  `0.00538504 + 5.05644 * exp(-t / 0.981975)`. La formule réécrite n'est gardée que si elle
   passe la même vérification, si bien que le modèle et `formula_exact` ne
   changent pas. La
   formule est la fonction mathématique pure : là où l'un des garde-fous
@@ -322,7 +326,7 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 | R² test médian | 1.00000 | 1.00000 | 1.00000 |
 | R² hors domaine médian | 1.00000 | 1.00000 | 1.00000 |
 | taille médiane du modèle | 20 nœuds | 20 nœuds | 20 nœuds |
-| secondes / run (médiane) | 1 | 1 | 1 |
+| secondes / run (médiane) | 0 | 1 | 0 |
 
 Depuis la 1.0, cette loi fait partie des formes que le moteur ajuste directement,
 un monôme multiplié par une puissance d'un binôme, et la forme ajustée est placée
@@ -546,6 +550,13 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Caractéristiques techniques
 
+- **Arrêt sur patience** (v1.2) : quand l'appel ne fixe ni `generations` ni
+  `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
+  côté n'a pas baissé de 1 % en 30 générations (`patience=`)
+- **Exponentielles écrites comme telles** (v1.2) : une puissance d'un nombre
+  s'imprime comme une exponentielle, et une exponentielle d'une seule variable
+  avec son échelle, `exp(-t / τ)`, chacune gardée seulement si elle passe la
+  vérification contre `predict()`
 - **Formes ajustées directement** (v1.0) : un monôme multiplié par une puissance
   d'un binôme, b·f·(1 + c·g)^p avec p parmi −1, −½, ½, 1 (lois rationnelles,
   1/√(1 − v²/c²), la racine d'une somme de deux termes), et un monôme multiplié par
@@ -561,7 +572,7 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 - **Constantes ajustées pour la forme jugée** (v0.8) : Levenberg–Marquardt en projection variable (l'échelle et le décalage de la mise à l'échelle linéaire résolus dans le résidu)
 - **Données de toute échelle** (v0.8) : une cible de n'importe quel ordre de grandeur est divisée en interne par une puissance de dix, et la normalisation par défaut divise chaque colonne par sa plus grande valeur absolue
 - **Formule dans vos variables, vérifiée** (v0.7) : la mise à l'échelle interne est repliée dans les constantes ; `formula_exact` indique si la formule reproduit `predict()` sur les données d'entraînement
-- **Budget de temps** (v0.7) : `time_limit=` arrête proprement et rend le meilleur modèle trouvé
+- **Budget de temps** (v0.7) : `time_limit=` arrête proprement et rend le meilleur modèle trouvé ; avec `units=`, le départ typé le respecte aussi depuis la v1.2
 - **Déduction de la constante mystère** (v0.5) : la constante de tête peut porter une dimension, inférée par homogénéité ; unités et valeur brute exposées sur l'estimateur, la valeur lue sur les prédictions quand le modèle est un monôme (v1.0)
 - **Recherche sous contrainte dimensionnelle** (v0.4) : génération typée constructive, mutation et croisement préservant les dimensions, filtre de validité dans `fitness()` — une seule sémantique partagée avec l'auditeur (v0.7)
 - **Mise à l'échelle purement multiplicative sous `units=`** (v0.4.1) : régression par l'origine, pour que la forme *notée* soit la forme *livrée*
@@ -587,7 +598,7 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 progresse plus (`patience=`) : les six lois du notebook de TP en 48 s, contre 194
 à 198 s pour la 1.1.0 sur la même machine, avec les mêmes formules ; une
 exponentielle revient écrite comme telle, `exp(-t / τ)`, sans changer le modèle ;
-avec `units=`, Feynman III.19.51 se termine en une seconde environ, là où la
+avec `units=`, Feynman III.19.51 sans bruit se termine en une seconde environ, là où la
 1.1.0 prenait environ six minutes avec un budget de 30 s. Avec un budget fixé,
 les modèles de la 1.1 à travail égal : sur les 2 780 ajustements de la mesure de
 sortie, aucun ne change de statut. **1.1 « Coherent »** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,

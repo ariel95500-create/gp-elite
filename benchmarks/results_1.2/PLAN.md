@@ -269,7 +269,9 @@ other; no crash in 3,520 fits). Every criterion holds, H1 is adopted:
    from 3 to 2 under units).
 4. Structure under noise: F41N1 107 against 108, F41N10 83 against 85,
    U41N1 112 against 113, U41N10 100 against 99.
-5. Real data: median test R² of the R6 folds 0.802 against 0.810;
+5. Real data: median test R² of the R6 folds 0.802 against 0.810 (0.8095 in
+   `compare_h1.txt`, 0.809459, that is 0.809: corrected on 5 November 2026
+   after the first review of M5; the criterion holds either way);
    collapses out of domain 9 against 11.
 6. Units: 615 of 615 models pass `check_dimensions`.
 

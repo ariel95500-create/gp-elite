@@ -58,7 +58,8 @@ for version 0.9 measured side by side. Version 1.1 lets these fitted forms act
 under declared units too, each kept only if it passes the dimensional gate.
 Version 1.2 stops a search that no longer improves when the user sets no
 budget, so a fit of a ten-point laboratory table takes seconds instead of
-about half a minute, with the same formulas; it prints an exponential law as
+about half a minute (with the same formulas on the six laws of its French lab
+notebook); it prints an exponential law as
 one, $\exp(-t/\tau)$; and its time limit now bounds the start of the
 dimensional search as well.
 
@@ -187,8 +188,9 @@ selects a parsimonious champion within an $R^2$ tolerance, and exposes a
 complexity/accuracy Pareto front. The returned formula is written in the user's
 own variables, with the internal rescaling folded back into its constants, and
 the fit checks that it reproduces the model's predictions; since version 1.2 a
-power of a number is printed as an exponential with its scale,
-$\exp(-t/\tau)$, kept only if it passes the same check. The reported score
+power of a number is printed as an exponential, and an exponential of one
+variable with its scale, $\exp(-t/\tau)$, each rewriting kept only if it
+passes the same check. The reported score
 comes from held-out rows; since those rows also choose among candidates, it is
 documented as an optimistic selection score, not a generalisation estimate.
 

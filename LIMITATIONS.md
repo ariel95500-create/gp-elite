@@ -16,9 +16,14 @@ structures under noise, 8 exact Strogatz fits of 70 and 10 collapses of 65, wher
 the points below say 105, 85, 7 and 11; on the printed formulas that depart from
 their model, point 6, 7 of 130 and 66 of 500 for 1.0.0 and 8 and 67 for 1.1.0,
 where it says 7 and 61). Point 8 is measured on the package of
-1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`).
+1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`), but for the
+times of its first bullet, measured on 1.2.0 beside 1.1.0; point 10 on the
+campaign that decided the stop of 1.2.
 
-Version 1.2 leaves the models alone when the call sets its budget. Measured
+With a budget set and `patience=` left alone, version 1.2 leaves the models
+alone without units; under units, it changes only the fits whose typed start
+needs a product of 9 to 12 factors or reaches its deadline (on the bench,
+Feynman III.19.51). Measured
 beside 1.1.0 for the release of 1.2 (`benchmarks/results_1.2/release/`, the
 figures in `m2/limits_figures.txt`), both versions give the same figure on every
 point, and from one campaign to the next the figures move as above: 214 exact
@@ -139,7 +144,8 @@ such as PySR and Operon serve those better.
 ## 10. The stop under the defaults
 
 Since 1.2, a call that sets neither `generations` nor `time_limit` stops its
-search once the error on the hold-out rows has not improved by 1 % in 30
+search once the error on the hold-out rows (on the training rows when there
+are none) has not improved by 1 % in 30
 generations (`patience=`). The stop can end a search that would still have
 improved. On the decision bench run under the defaults, five seeds, against
 1.1.0 measured beside it (campaign H1 of `benchmarks/results_1.2/PLAN.md`, on
@@ -147,7 +153,8 @@ the candidate with the stop): 161 exact laws of 205 against 163, and 166
 against 167 with units; with 10 % noise, the structure in 83 fits against 85,
 and 100 against 99 with units; with 1 % noise, a few fewer approximate laws (146
 against 153); on the six standardised real datasets, a median test R² of 0.802
-against 0.810, and 9 collapses out of the training range against 11. The median
+against 0.809, and on the 65 fits out of the training range of the seven real
+datasets, 9 collapses against 11. The median
 fit on noisy and real data took 7 to 9 s against 25 to 35 s. When the result
 matters more than the time, set `generations=` or `time_limit=`, or
 `patience=0`.

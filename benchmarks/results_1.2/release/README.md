@@ -102,12 +102,17 @@ both versions (5, 5, 38, 28 and 28).
   off, the formula of 1.2.0 is that of 1.1.0. For example, Feynman I.6.20a,
   seed 1: `0.398942 * |0.0114856^(0.11194 * v0²)|` becomes
   `0.398942 * |exp(-0.5 * v0²)|`.
-- **Another model, 40 jobs** (22 without units, 18 under units). 38 of them
+- **Another model, 40 jobs** (22 without units, 18 under units). 28 of them
   reached the time budget in both versions: a fit stopped at its budget returns
   the best model found by then, and that depends on the load of the machine.
-  The other two are III.19.51 under units, seeds 0 and 3: exact with both
-  versions, in 370.6 and 374.5 s with 1.1.0 and in 1.0 and 1.1 s with 1.2.0,
-  which writes the same law in another form.
+  The other 12 are III.19.51 under units, whose typed start D0 changes. At
+  seeds 0 and 3 of U41, exact with both versions, in 370.6 and 374.5 s with
+  1.1.0 and in 1.0 and 1.1 s with 1.2.0, which writes the same law in another
+  form. The ten fits with noise (U41N1 and U41N10) reached the budget in both
+  versions, but 1.1.0 spent it in its typed start and ran one generation,
+  where 1.2.0 runs 35 to 40. (`m2/details_x1.txt` counts those ten among the
+  16 fits under units at the budget in both versions; this split was corrected
+  after the first review of M5.)
 
 X1 rewrites the printed formula on 287 fits of 1.2.0, 267 without units and 20
 under units, the frozen test set included. On every fit,
@@ -170,7 +175,8 @@ The container restarted after M3 ended, between 05:04 and 05:20.
 the version numbers are masked (`m3_compare_1.1.0_vs_1.2.0.txt`). 40 records are
 the same: every law, formula, error, size and count, among them the Kepler and
 Hubble case studies, Feynman 15 (15 of 15 exact) and Feynman 15 with `units=`
-(15 of 15), the table of `units=` on II.11.3, the duel with gplearn, the
+(15 of 15), the records of the table of `units=` on II.11.3 (its text differs
+by the seconds, below), the duel with gplearn, the
 mystery constant and the snippets of the notebooks. What differs has two
 causes.
 
@@ -178,7 +184,7 @@ The printed formula, where X1 writes a power of a number as an exponential. The
 models, their sizes and their errors are those of 1.1:
 - the battery example: `exp(0.51573 * courant)` becomes `exp(courant / 1.939)`;
 - the Nikuradse case study, seeds 0, 1, 3 and 4 (`case_nikuradse/`,
-  `nikuradse_full.txt`), formulas of size 13 to 69, and the warning of seed 1,
+  `nikuradse_full.txt`), formulas of size 13 to 72, and the warning of seed 1,
   which quotes one of them;
 - `robustness_check`, the case of integer and boolean columns:
   `15 + 15 * (0.2 * X0 - 0.866667^X1)` becomes
@@ -233,8 +239,9 @@ other, alone on the machine:
 | in all | 198 / 194 | 48 / 48 |
 
 Every fit returns the same formula in the four runs. The notebook takes about
-a quarter of its time with 1.1.0. Its text quotes the run of 1.1.0 on another
-day (42 to 55 s a fit): those times compare with neither column.
+a quarter of its time with 1.1.0. Its text quoted the run of 1.1.0 on another
+day (42 to 55 s a fit), which compares with neither column; it now quotes the
+run of this M3.
 
 The figures of the pages of the limits read from the records of M2 are given
 with the documents.
