@@ -12,8 +12,61 @@ its scale, `exp(-t / τ)`, only when the rewritten formula still reproduces
 `predict()`: the model does not change. Under `units=`, the typed start
 accepts products of up to 12 factors and stops drawing at the deadline of
 `time_limit=`, so Feynman III.19.51 under units ends in about a second.
-Plan, measurements and records in `benchmarks/results_1.2/`; the figures of
-the release follow its measurements.
+Measured on the package, side by side with 1.1.0 installed from PyPI
+(`benchmarks/results_1.2/release/`):
+
+- under the defaults, the six fits of the French TP notebook return the
+  formulas and the constants of 1.1.0 in 7 to 10 s each, 48 s in all, against
+  194 and 198 s with 1.1.0, run in turn on the same day;
+- at 30 s per fit, on the 2,780 fits of the bench, of its noisy and units
+  kinds and of the frozen test set, no fit changes status (exact, near or
+  missed), and the two versions give the same figures: 163 exact laws of 205
+  on the decision bench and 166 with units, the structure in 108 and 85 fits
+  with 1 % and 10 % noise, the same medians and collapses of the real data,
+  and on the frozen test set 214 exact laws of 390, 10 of 70 on its Strogatz
+  systems and 229 of 390 with units. Every one of the 1,005 models returned
+  under units passed the audit of units;
+- the printed formula is rewritten on 287 of these fits; `formula_exact` is
+  never changed, and on the 787 fits where neither version reached its
+  budget (Feynman III.19.51 under units aside), the formula without the
+  rewriting, the error on the test rows and `formula_exact` are those of
+  1.1.0, to the bit. 40 fits return another model: 38 reached the budget in
+  both versions, and the other two are III.19.51 under units, exact in both;
+- Feynman III.19.51 under units comes back exact in 0.99 to 1.16 s at five
+  seeds, against 342 to 387 s with 1.1.0 and `time_limit=30`; with noise, in
+  30.1 to 30.5 s against 334 to 421 s.
+
+The stop was decided by a comparison written before it ran
+(`benchmarks/results_1.2/PLAN.md`, H1): on the TP diagnostic under the
+defaults, a median fit of 6.8 s against 22.8 s without units and 8.1 s
+against 32.2 s with them, the law in 126 fits of 200 against 119 without
+units and the six laws within reach in 120 of 120 with them; confirmed on
+draws and seeds never run. The rewriting of the formula was checked on the TP
+fits of the capacitor and of Newton's cooling, which print `exp(-t / τ)`
+with τ from 0.951 to 1.058 s and from 522 to 637 s (true values 1 s and
+600 s). A third change, an honest message under units, was measured and not
+adopted.
+
+### Fixed
+- Under `units=`, `time_limit=` did not bound the building of the typed
+  starting population: the fast path refused products of more than 8
+  factors, and Feynman III.19.51, which needs 9, fell to a blind search with
+  no bound in time, 430 to 735 s with `time_limit=30`
+  (`benchmarks/results_1.2/d0/D0.md`). The fast path now accepts up to 12
+  factors, and once the deadline is reached an island stops drawing as soon
+  as it has one tree. Run with 20 generations and no time limit, seed 0, the
+  other 40 equations of the bench with their units and the 40 units fits of
+  the TP diagnostic return the models of 1.1.0, to the bit.
+
+### Known limits
+- The stop can end a search that would still have improved. On the decision
+  bench under the defaults, 161 exact laws of 205 against 163 for 1.1.0, and a
+  median test R² of 0.802 against 0.810 on the standardised real data
+  (`LIMITATIONS.md`, point 10). A call that sets `generations=` or
+  `time_limit=` gets its whole budget, and `patience=0` turns the stop off.
+- Under `units=`, a constant with units still cannot sit inside a function or
+  a sum (a time constant, an offset, a focal length), and on such laws the
+  units mode returns poor formulas without saying why.
 
 ## 1.1.0 — "Coherent"
 

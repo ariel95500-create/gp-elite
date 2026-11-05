@@ -56,6 +56,11 @@ them, on noisy data too. On a test set of 78 Feynman equations frozen before thi
 work and measured once, it recovers the exact law in 213 of 390 fits, against 145
 for version 0.9 measured side by side. Version 1.1 lets these fitted forms act
 under declared units too, each kept only if it passes the dimensional gate.
+Version 1.2 stops a search that no longer improves when the user sets no
+budget, so a fit of a ten-point laboratory table takes seconds instead of
+about half a minute, with the same formulas; it prints an exponential law as
+one, $\exp(-t/\tau)$; and its time limit now bounds the start of the
+dimensional search as well.
 
 # Statement of need
 
@@ -112,7 +117,7 @@ baseline (2000 programs over 30 generations, against 400 over 30 generations
 and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
 before any measurement,
 and each method judged on the model it returns, it recovers 15/15 exactly
-($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (versions 1.0.0 and 1.1.0,
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (versions 1.0.0 to 1.2.0,
 `benchmarks/duel.py`; 12/15 for version 0.9.0). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
@@ -181,7 +186,9 @@ gate.
 selects a parsimonious champion within an $R^2$ tolerance, and exposes a
 complexity/accuracy Pareto front. The returned formula is written in the user's
 own variables, with the internal rescaling folded back into its constants, and
-the fit checks that it reproduces the model's predictions. The reported score
+the fit checks that it reproduces the model's predictions; since version 1.2 a
+power of a number is printed as an exponential with its scale,
+$\exp(-t/\tau)$, kept only if it passes the same check. The reported score
 comes from held-out rows; since those rows also choose among candidates, it is
 documented as an optimistic selection score, not a generalisation estimate.
 
@@ -207,8 +214,10 @@ of the decision bench with their units, the constrained search recovers the
 exact law in 165 of 205 fits against 108 for 1.0.0, and each of the 1,005 models
 returned under units in the release measurement (these equations with and
 without noise, and the frozen test set) passes the dimensional audit
-(`benchmarks/results_1.1/release/`). The constraint guarantees that whatever
-is returned is physically coherent.
+(`benchmarks/results_1.1/release/`). Measured beside 1.1.0 for the release of
+1.2.0, both versions recover 166 of 205 on these equations, and each of the
+1,005 models passes the audit again (`benchmarks/results_1.2/release/`). The
+constraint guarantees that whatever is returned is physically coherent.
 
 Each release is also measured once on a test set frozen before any decision of
 its development: 78 Feynman equations absent from the decision bench, 14
@@ -222,7 +231,10 @@ changes the dimensional mode only: measured beside 1.0.0, both give the same
 counts of exact laws without units (213 exact laws in 390 fits, and 8 in 70 on the Strogatz
 systems, the time budget moving the counts a little from one campaign to the
 next), and on the frozen Feynman equations with their units 1.1.0 recovers 226
-exact laws in 390 fits against 169. Three case studies
+exact laws in 390 fits against 169. Version 1.2.0, measured beside 1.1.0,
+gives the same counts on every suite of the frozen set: 214 exact laws in 390
+fits without units, 10 in 70 on the Strogatz systems and 229 in 390 with
+units. Three case studies
 on public data accompany it: Kepler's third law with units, where the four
 inner planets give the product of the gravitational constant and the mass of
 the Sun within 0.002 % of its nominal value; Hubble's measurements of 1929; and
@@ -245,7 +257,7 @@ maintainers merged the integration in September 2026
 
 Generative AI was used extensively in the development of this software, and in
 the writing of its documentation and of this paper. The assistant was Claude
-(Anthropic), used across several model versions between May and October
+(Anthropic), used across several model versions between May and November
 2026.
 
 The project began as the author's own work, before any AI involvement: the
@@ -276,7 +288,9 @@ under which the changes to the search and the final selection were accepted
 or rejected; for version 1.0, the families of forms fitted directly, the
 noise-tolerant seeds, the correction of the deduced constant and the case
 studies; for version 1.1, the seeds placed under declared units and the
-restriction of fitted exponents under units; the benchmark and
+restriction of fitted exponents under units; for version 1.2, the stop on
+patience, the exponential printed with its scale and the correction of the
+typed start under a time limit; the benchmark and
 non-regression scripts distributed in the repository; and the drafting of the
 documentation and of this paper.
 
@@ -290,7 +304,8 @@ fixed set of seeds. The benchmark figures quoted in this paper were produced
 with the scripts in the repository, whose raw results, machine and dates are
 recorded in `benchmarks/results_0.8/`, for the figures of versions 0.9.0
 and 1.0.0 in `benchmarks/results_0.9/` (`phase3/`, `release/` and
-`release_1.0/`), and for version 1.1.0 in `benchmarks/results_1.1/`, and the
+`release_1.0/`), for version 1.1.0 in `benchmarks/results_1.1/`, and for
+version 1.2.0 in `benchmarks/results_1.2/`, and the
 project's test
 suite passes on
 the released version. The scientific claims and
