@@ -7,6 +7,16 @@
 # Every gp_elite/ file of /venv12b and /venv12bx is identical to commit c3ea7fc (10 files);
 # every gp_elite/ file of /venv11p (1.1.0 from PyPI) is identical to commit 346cd07, from which 1.1.0 was published (10 files).
 
+# SHA-256 of the files to publish, built again from commit 192ab5f after the decision of gate 8
+# (python -m build from a clean export of the commit), 5 November 2026:
+052ee69a173289bf23396268104b7012b6d233c9b3f4e23bad307c98d879c7e5  gp_elite-1.2.0-py3-none-any.whl
+3b8db7273f52ed1332afeeb12f23edcdfa54ec3bfcbfb956f8f8dd9275cfcfda  gp_elite-1.2.0.tar.gz
+# Every gp_elite/ file of the wheel (11, py.typed included) and of the source archive is identical
+# to those of the files measured above; the wheel differs in gp_elite-1.2.0.dist-info/METADATA (the
+# description, from the README; the headers are identical) and in the line of METADATA in RECORD,
+# the source archive in PKG-INFO, gp_elite.egg-info/PKG-INFO and README.md. twine check --strict
+# passes for both.
+
 # /venv12b (Python 3.11.18) — uv pip freeze
 cloudpickle==3.1.2
 gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/dist12b/dist/gp_elite-1.2.0-py3-none-any.whl
