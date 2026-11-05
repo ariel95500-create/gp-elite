@@ -83,3 +83,30 @@ time slice over: 1179 jobs left for the next call
 50 jobs done, 796 s elapsed, 1128 left
 75 jobs done, 1207 s elapsed, 1103 left
 100 jobs done, 1592 s elapsed, 1078 left
+125 jobs done, 2003 s elapsed, 1053 left
+150 jobs done, 2384 s elapsed, 1028 left
+175 jobs done, 2767 s elapsed, 1003 left
+200 jobs done, 2783 s elapsed, 979 left
+225 jobs done, 2936 s elapsed, 953 left
+250 jobs done, 2952 s elapsed, 928 left
+275 jobs done, 3100 s elapsed, 904 left
+300 jobs done, 3237 s elapsed, 879 left
+325 jobs done, 3349 s elapsed, 854 left
+350 jobs done, 3366 s elapsed, 828 left
+375 jobs done, 3944 s elapsed, 803 left
+400 jobs done, 4859 s elapsed, 778 left
+425 jobs done, 5244 s elapsed, 753 left
+450 jobs done, 5646 s elapsed, 728 left
+475 jobs done, 6033 s elapsed, 703 left
+time slice over: 686 jobs left for the next call
+--- slice 2026-11-05T01:40 (2094 and 2094 done)
+686 jobs to run with 2 engines
+25 jobs done, 412 s elapsed, 661 left
+50 jobs done, 793 s elapsed, 635 left
+75 jobs done, 1201 s elapsed, 610 left
+100 jobs done, 2460 s elapsed, 585 left
+125 jobs done, 2839 s elapsed, 560 left
+--- 2026-11-05T02:33 container restarted again (uptime 0 min at 02:33); 2229 pairs whole, same keys in both files, no crash; the same lscpu; the cache of m2_run holds its 124 files. Driver started again.
+--- M2 bench of e92f86d, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-05T02:33 (2229 and 2229 done)
+551 jobs to run with 2 engines
