@@ -262,3 +262,16 @@ repository is green on every commit of the branch since the candidate
 before the candidate, on a test that left with C1); it is
 checked again on the commit of the release, and the files handed over for PyPI,
 built again from that commit, are checked again too.
+
+## M5, two independent reviews (5 November 2026)
+
+`M5_review1.md` and `M5_review2.md`: two agents, one after the other, each
+without having seen the work (the second without the first review either),
+checked about 280 and 450 claims of the documents against the records and the
+code, and recomputed about 170 and 220 of them. Neither found an error in a
+figure of M2 or in a criterion. The first reported 19 findings (an attribution
+of collapses, a double rounding, the cause of ten differing models, sentences
+that D0 or an explicit `patience=` make false, stale or partial sentences),
+the second 11 (all in sentences, three brought by the corrections of the
+first). Each is corrected or answered there; their reports and scripts are in
+`m5/`.
