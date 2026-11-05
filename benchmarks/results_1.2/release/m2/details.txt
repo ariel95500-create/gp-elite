@@ -1,0 +1,24 @@
+Without units: 1775 jobs, 279 return another expression, 272 of them reached the budget in one version or both, 0 change status.
+  differs without reaching the budget: ('feyn', 'I.6.20a', 'test', 1)
+  differs without reaching the budget: ('ts', 'strogatz_bacres2', 'test', 9)
+  differs without reaching the budget: ('ts', 'strogatz_bacres2', 'ood', 6)
+  differs without reaching the budget: ('ts', 'strogatz_bacres2', 'ood', 8)
+  differs without reaching the budget: ('ts', 'strogatz_lv1', 'test', 5)
+  differs without reaching the budget: ('ts', 'strogatz_lv2', 'ood', 6)
+  differs without reaching the budget: ('ts', 'strogatz_lv2', 'ood', 8)
+
+U41: 205 fits, exact 166 -> 166; 0 equations gain exact fits, 0 lose some.
+  equations never exact in any seed: 6 -> 6 of 41
+  median time of a fit: 0.4 s -> 0.3 s
+  the five families of 1.0: 90 fits, exact 57 -> 57
+
+TF78 under units: 390 fits, exact 229 -> 229; 0 equations gain exact fits, 0 lose some.
+  equations never exact in any seed: 30 -> 30 of 78
+  median time of a fit: 1.1 s -> 1.1 s
+
+Out of domain, collapses by version:
+  real: 30 fits out of domain, collapses 5 -> 5, 5 in both
+  realraw: 35 fits out of domain, collapses 5 -> 5, 5 in both
+  tr: 125 fits out of domain, collapses 38 -> 38, 38 in both
+  trraw: 125 fits out of domain, collapses 28 -> 28, 28 in both
+  ts: 70 fits out of domain, collapses 28 -> 28, 28 in both
