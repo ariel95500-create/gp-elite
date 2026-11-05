@@ -238,3 +238,15 @@ day (42 to 55 s a fit): those times compare with neither column.
 
 The figures of the pages of the limits read from the records of M2 are given
 with the documents.
+
+## M4, tests (5 November 2026)
+
+`M4_wheel_tests.txt`: the test suite of 971bcec, the same as that of a263177,
+against the wheel of c3ea7fc, installed in a fresh environment for each of
+Python 3.9.25, 3.11.18 and 3.14.6, with the pins of the environments of the M4
+of 1.1 (`m4/requirements_*.txt`), each importing the installed package
+(`m4/run.sh`): 169 tests pass under the three versions. `twine check --strict`
+passes for the wheel and the source archive. The **Tests** workflow of the
+repository is green on every commit of the branch since the candidate; it is
+checked again on the commit of the release, and the files handed over for PyPI,
+built again from that commit, are checked again too.
