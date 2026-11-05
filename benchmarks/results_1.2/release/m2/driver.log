@@ -63,3 +63,23 @@ time slice over: 1577 jobs left for the next call
 1577 jobs to run with 2 engines
 25 jobs done, 415 s elapsed, 1551 left
 50 jobs done, 797 s elapsed, 1526 left
+75 jobs done, 1207 s elapsed, 1501 left
+100 jobs done, 1589 s elapsed, 1476 left
+125 jobs done, 1998 s elapsed, 1451 left
+150 jobs done, 2384 s elapsed, 1426 left
+175 jobs done, 2794 s elapsed, 1401 left
+200 jobs done, 3178 s elapsed, 1376 left
+225 jobs done, 3586 s elapsed, 1351 left
+250 jobs done, 3969 s elapsed, 1326 left
+275 jobs done, 4378 s elapsed, 1301 left
+300 jobs done, 4761 s elapsed, 1276 left
+325 jobs done, 5172 s elapsed, 1251 left
+350 jobs done, 5553 s elapsed, 1226 left
+375 jobs done, 5967 s elapsed, 1201 left
+time slice over: 1179 jobs left for the next call
+--- slice 2026-11-04T23:55 (1601 and 1601 done)
+1179 jobs to run with 2 engines
+25 jobs done, 411 s elapsed, 1153 left
+50 jobs done, 796 s elapsed, 1128 left
+75 jobs done, 1207 s elapsed, 1103 left
+100 jobs done, 1592 s elapsed, 1078 left
