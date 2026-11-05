@@ -552,7 +552,8 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 - **Arrêt sur patience** (v1.2) : quand l'appel ne fixe ni `generations` ni
   `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
-  côté n'a pas baissé de 1 % en 30 générations (`patience=`)
+  côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
+  30 générations (`patience=`)
 - **Exponentielles écrites comme telles** (v1.2) : une puissance d'un nombre
   s'imprime comme une exponentielle, et une exponentielle d'une seule variable
   avec son échelle, `exp(-t / τ)`, chacune gardée seulement si elle passe la
@@ -600,8 +601,9 @@ progresse plus (`patience=`) : les six lois du notebook de TP en 48 s, contre 19
 exponentielle revient écrite comme telle, `exp(-t / τ)`, sans changer le modèle ;
 avec `units=`, Feynman III.19.51 sans bruit se termine en une seconde environ, là où la
 1.1.0 prenait environ six minutes avec un budget de 30 s. Avec un budget fixé,
-les modèles de la 1.1 à travail égal : sur les 2 780 ajustements de la mesure de
-sortie, aucun ne change de statut. **1.1 « Coherent »** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
+les modèles de la 1.1 à travail égal, sauf ceux dont la correction change le départ
+typé avec `units=` (III.19.51 sur le banc) : sur les 2 780 ajustements de la mesure
+de sortie, aucun ne change de statut. **1.1 « Coherent »** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
 chacune placée seulement si elle passe la porte des dimensions : sur les 41
 équations de Feynman du banc de décision avec leurs unités, 165 lois exactes sur
 205 contre 108 pour la 1.0 mesurée à côté ; chacun des 1 005 modèles rendus avec

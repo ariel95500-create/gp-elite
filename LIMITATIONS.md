@@ -32,7 +32,7 @@ never recovered, 10 exact Strogatz fits of 70, 108 and 85 structures under
 noise, 10 collapses of 65 (the worst to −1,946) and 66 of 250 on the test set
 (38 standardised, 28 in their own units), 12 departing formulas of 130 and 65 of
 500, and under units 166 exact laws of 205. What 1.2 changes is the time of a
-fit under the defaults (points 8 and 10).
+fit under the defaults, and with it some of the models (points 8 and 10).
 
 ## 1. Laws it still misses
 

@@ -512,8 +512,9 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 ## Technical features
 
 - **Stop on patience** (v1.2): when the call sets neither `generations` nor
-  `time_limit`, the search stops once its hold-out error has not improved by 1 %
-  in 30 generations (`patience=`)
+  `time_limit`, the search stops once its hold-out error (its training error
+  when there is no hold-out) has not improved by 1 % in 30 generations
+  (`patience=`)
 - **Exponentials written as such** (v1.2): a power of a number is printed as an
   exponential, and an exponential of one variable with its scale,
   `exp(-t / τ)`, each kept only if it passes the check against `predict()`
@@ -559,8 +560,9 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 198 s for 1.1.0 on the same machine, with the same formulas; an exponential
 comes back written as one, `exp(-t / τ)`, the model unchanged; under `units=`,
 Feynman III.19.51 without noise ends in about a second, where 1.1.0 took about
-six minutes with a budget of 30 s. With a budget set, the models of 1.1 at equal work: in
-the 2,780 fits of the release measurement, no fit changes status. **1.1 "Coherent"** — the forms 1.0 fits directly act under `units=` too, each placed only if
+six minutes with a budget of 30 s. With a budget set, the models of 1.1 at equal work,
+but for those whose typed start under `units=` the correction changes (III.19.51 on the
+bench): in the 2,780 fits of the release measurement, no fit changes status. **1.1 "Coherent"** — the forms 1.0 fits directly act under `units=` too, each placed only if
 it passes the gate of dimensions: on the 41 Feynman equations of the decision
 bench with their units, 165 exact laws of 205 against 108 for 1.0 measured beside
 it; every one of the 1,005 models returned under units in the release

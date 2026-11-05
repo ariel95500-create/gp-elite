@@ -35,7 +35,7 @@ sur 70, 108 et 85 structures sous bruit, 10 effondrements sur 65 (le pire à
 −1 946) et 66 sur 250 sur le jeu de test (38 standardisés, 28 dans leurs propres
 unités), 12 formules qui s'écartent sur 130 et 65 sur 500, et avec les unités 166
 lois exactes sur 205. Ce que la 1.2 change, c'est le temps d'un ajustement avec
-les réglages par défaut (points 8 et 10).
+les réglages par défaut, et avec lui une partie des modèles (points 8 et 10).
 
 ## 1. Les lois qu'il manque encore
 

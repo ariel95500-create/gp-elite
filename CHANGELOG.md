@@ -32,11 +32,12 @@ Measured on the package, side by side with 1.1.0 installed from PyPI
   never changed, and on the 787 fits where neither version reached its
   budget (Feynman III.19.51 under units aside), the formula without the
   rewriting, the error on the test rows and `formula_exact` are those of
-  1.1.0, to the bit. 40 fits return another model: 28 reached the budget in
-  both versions, where the model depends on how far the search got, and the
-  other 12 are III.19.51 under units, whose typed start the correction below
-  changes (two exact in both versions, and the ten with noise, where 1.1.0
-  ran one generation and 1.2.0 runs 35 to 40);
+  1.1.0, to the bit. 40 fits return another model. 28 of them reached the
+  budget in both versions, where the model depends on how far the search got;
+  the other 12 are III.19.51 under units, whose typed start the correction
+  below changes: two exact in both versions, and ten with noise, which reached
+  the budget in both versions too, but where 1.1.0 spent it in its typed start
+  and ran one generation, and 1.2.0 runs 35 to 40;
 - Feynman III.19.51 under units comes back exact in 0.99 to 1.16 s at five
   seeds, against 342 to 387 s with 1.1.0 and `time_limit=30`; with noise,
   where neither version returns the exact law, it runs its budget, 30.1 to
@@ -47,7 +48,7 @@ The stop was decided by a comparison written before it ran
 defaults, a median fit of 6.8 s against 22.8 s without units and 8.1 s
 against 32.2 s with them, the law in 126 fits of 200 against 119 without
 units and the six laws within reach in 120 of 120 with them; confirmed on
-draws and seeds never run. The rewriting of the formula was checked on the TP
+five other draws of the TP diagnostic and five other seeds of the bench. The rewriting of the formula was checked on the TP
 fits of the capacitor and of Newton's cooling, which print `exp(-t / τ)`
 with τ from 0.951 to 1.058 s and from 522 to 637 s (true values 1 s and
 600 s). A third change, an honest message under units, was measured and not
@@ -57,8 +58,9 @@ adopted.
 - Under `units=`, `time_limit=` did not bound the building of the typed
   starting population: the fast path refused products of more than 8
   factors, and Feynman III.19.51, which needs 9, fell to a blind search with
-  no bound in time, 430 to 735 s with `time_limit=30`
-  (`benchmarks/results_1.2/d0/D0.md`). The fast path now accepts up to 12
+  no bound in time (`benchmarks/results_1.2/d0/D0.md`): with `time_limit=30`,
+  334 to 421 s in the release measurement of 1.1.0, and 600 to 735 s on the
+  first machine of the prototypes. The fast path now accepts up to 12
   factors, and once the deadline is reached an island stops drawing as soon
   as it has one tree. The other 40 equations of the bench with their units
   (seed 0, 20 generations, no time limit) and the 40 units fits of the TP

@@ -102,10 +102,11 @@ both versions (5, 5, 38, 28 and 28).
   off, the formula of 1.2.0 is that of 1.1.0. For example, Feynman I.6.20a,
   seed 1: `0.398942 * |0.0114856^(0.11194 * v0²)|` becomes
   `0.398942 * |exp(-0.5 * v0²)|`.
-- **Another model, 40 jobs** (22 without units, 18 under units). 28 of them
-  reached the time budget in both versions: a fit stopped at its budget returns
-  the best model found by then, and that depends on the load of the machine.
-  The other 12 are III.19.51 under units, whose typed start D0 changes. At
+- **Another model, 40 jobs** (22 without units, 18 under units). 38 of them
+  reached the time budget in both versions. For 28 of those, the cause is the
+  budget: a fit stopped at its budget returns the best model found by then, and
+  that depends on the load of the machine. The other 12 are III.19.51 under
+  units, whose typed start D0 changes. At
   seeds 0 and 3 of U41, exact with both versions, in 370.6 and 374.5 s with
   1.1.0 and in 1.0 and 1.1 s with 1.2.0, which writes the same law in another
   form. The ten fits with noise (U41N1 and U41N10) reached the budget in both
@@ -180,7 +181,8 @@ by the seconds, below), the duel with gplearn, the
 mystery constant and the snippets of the notebooks. What differs has two
 causes.
 
-The printed formula, where X1 writes a power of a number as an exponential. The
+The printed formula, where X1 writes a power of a number as an exponential, or
+an exponential of one variable with its scale. The
 models, their sizes and their errors are those of 1.1:
 - the battery example: `exp(0.51573 * courant)` becomes `exp(courant / 1.939)`;
 - the Nikuradse case study, seeds 0, 1, 3 and 4 (`case_nikuradse/`,
@@ -224,8 +226,9 @@ act when `time_limit=` is set.
 **The TP notebook.** The six fits return the formulas and the deduced
 constants of 1.1.0 (g 9.81 and 9.74, R 8.250, P 10.02 W), in 8, 10, 8, 8, 8
 and 7 s, 49 s in all. That is H1: the notebook sets neither `generations` nor
-`time_limit`, so each search stops once its error on the hold-out rows has not
-improved by 1 % in 30 generations. On the same day, one version after the
+`time_limit`, so each search stops once its error has not improved by 1 % in 30
+generations; on ten rows the engine keeps no hold-out (below 30 rows), so that
+error is the error on the training rows. On the same day, one version after the
 other, alone on the machine:
 
 | fit | 1.1.0, run 1 / run 2 (s) | 1.2.0, run 1 / run 2 (s) |
@@ -254,6 +257,8 @@ Python 3.9.25, 3.11.18 and 3.14.6, with the pins of the environments of the M4
 of 1.1 (`m4/requirements_*.txt`), each importing the installed package
 (`m4/run.sh`): 169 tests pass under the three versions. `twine check --strict`
 passes for the wheel and the source archive. The **Tests** workflow of the
-repository is green on every commit of the branch since the candidate; it is
+repository is green on every commit of the branch since the candidate
+(`m4/ci_runs.txt`, which also records the two red runs of the campaign C1,
+before the candidate, on a test that left with C1); it is
 checked again on the commit of the release, and the files handed over for PyPI,
 built again from that commit, are checked again too.

@@ -494,6 +494,13 @@ C1. C1 may come back in a later version, with a plan of its own written
 before any measure. Under units, the three limited laws still come back
 without a word; the pages of the limits say so, as in 1.1.
 
+Noted on 5 November 2026, during M5: the **Tests** workflow failed on the
+two commits of the campaign C1 (11e6818 and 7f14c9d), on 6 and 5 of their
+8 jobs, all on one test of C1 whose fit, with `generations=25`, returned on
+GitHub's processors another formula than the exponential the test expects.
+That test left with C1 (9f81415), and the workflow is green on every commit
+since (`release/m4/ci_runs.txt`).
+
 ## Found during the prototypes: a time limit that does not bound the typed start
 
 Under `units=`, III.19.51 takes 600 to 735 s with `time_limit=30` and runs

@@ -291,8 +291,8 @@ or rejected; for version 1.0, the families of forms fitted directly, the
 noise-tolerant seeds, the correction of the deduced constant and the case
 studies; for version 1.1, the seeds placed under declared units and the
 restriction of fitted exponents under units; for version 1.2, the stop on
-patience, the exponential printed with its scale and the correction of the
-typed start under a time limit; the benchmark and
+patience, the exponential printed as such and with its scale, and the
+correction of the typed start under declared units; the benchmark and
 non-regression scripts distributed in the repository; and the drafting of the
 documentation and of this paper.
 
