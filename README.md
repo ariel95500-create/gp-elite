@@ -555,7 +555,7 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**1.2** — a fit under the defaults stops once it no longer improves
+**1.2 "Classroom"** — a fit under the defaults stops once it no longer improves
 (`patience=`): the six laws of the French TP notebook in 48 s, against 194 to
 198 s for 1.1.0 on the same machine, with the same formulas; an exponential
 comes back written as one, `exp(-t / τ)`, the model unchanged; under `units=`,

@@ -595,7 +595,7 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**1.2** — avec les réglages par défaut, un ajustement s'arrête dès qu'il ne
+**1.2 « Classroom »** — avec les réglages par défaut, un ajustement s'arrête dès qu'il ne
 progresse plus (`patience=`) : les six lois du notebook de TP en 48 s, contre 194
 à 198 s pour la 1.1.0 sur la même machine, avec les mêmes formules ; une
 exponentielle revient écrite comme telle, `exp(-t / τ)`, sans changer le modèle ;

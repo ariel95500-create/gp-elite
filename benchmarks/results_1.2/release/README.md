@@ -275,3 +275,15 @@ that D0 or an explicit `patience=` make false, stale or partial sentences),
 the second 11 (all in sentences, three brought by the corrections of the
 first). Each is corrected or answered there; their reports and scripts are in
 `m5/`.
+
+## Gate 8 (5 November 2026)
+
+The author received the figures measured, the differences with 1.1.0 and the
+two reviews, and decided:
+- 1.2.0 is published;
+- its name is "Classroom";
+- the line of the AI disclosure of the paper for 1.2 stands as written.
+
+`CITATION.cff` and the paper are dated 5 November 2026, the day the author can
+publish. The files to publish are built again from the commit of this decision,
+since the description of the PyPI page is the README (`environments.txt`).

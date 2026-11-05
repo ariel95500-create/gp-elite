@@ -14,7 +14,7 @@ authors:
 affiliations:
   - index: 1
     name: Independent Researcher, France
-date: 2 November 2026
+date: 5 November 2026
 bibliography: paper.bib
 ---
 

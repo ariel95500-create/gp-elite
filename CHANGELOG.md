@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0
+## 1.2.0 — "Classroom"
 
 A fit of a lab table under the defaults now ends in seconds, and an
 exponential law comes back written as one. When the call sets neither
