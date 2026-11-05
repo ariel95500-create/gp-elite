@@ -151,3 +151,90 @@ Fits that reached their time budget: 1,993 with 1.1.0 and 1,987 with 1.2.0, of
 The frozen test set decides nothing and is published as measured: TF78 214 and
 214 exact laws, TS14 10 and 10, TR25 median 0.7692 and 0.7692, TF78 under units
 229 and 229.
+
+## M3, every public figure measured again (5 November 2026)
+
+`m3/` holds the records of the figures of the READMEs, the notebooks, the case
+studies and the paper, produced by `m3/m3_driver.sh` with `/venv12bx`, one step
+after the other, from 04:23 to 05:04, nothing else on the machine. The driver
+runs the steps of the M3 of 1.1 on a copy of `benchmarks/`, `examples/` and the
+READMEs of commit 784152d without the package beside them, and one step more:
+the TP notebook four times, 1.1.0 (`/venv11p`) and 1.2.0 in turn, to compare
+its times on one day (`m3/tp_timing/notebook_pair/`). The notebook is run as
+the script of its code cells without the `pip` line (`m3/tp_six_lois.py`),
+which is the script of the M3 of 1.1 to the byte: only its text changed since.
+The container restarted after M3 ended, between 05:04 and 05:20.
+
+**Against the M3 of 1.1.** `m3_compare.py` compares each record with the one of
+30 October once times, dates, the paths of the environments and folders, and
+the version numbers are masked (`m3_compare_1.1.0_vs_1.2.0.txt`). 40 records are
+the same: every law, formula, error, size and count, among them the Kepler and
+Hubble case studies, Feynman 15 (15 of 15 exact) and Feynman 15 with `units=`
+(15 of 15), the table of `units=` on II.11.3, the duel with gplearn, the
+mystery constant and the snippets of the notebooks. What differs has two
+causes.
+
+The printed formula, where X1 writes a power of a number as an exponential. The
+models, their sizes and their errors are those of 1.1:
+- the battery example: `exp(0.51573 * courant)` becomes `exp(courant / 1.939)`;
+- the Nikuradse case study, seeds 0, 1, 3 and 4 (`case_nikuradse/`,
+  `nikuradse_full.txt`), formulas of size 13 to 69, and the warning of seed 1,
+  which quotes one of them;
+- `robustness_check`, the case of integer and boolean columns:
+  `15 + 15 * (0.2 * X0 - 0.866667^X1)` becomes
+  `15 + 15 * (0.2 * X0 - exp(-X1 / 6.98808))`, an exact formula in both;
+- `small_data_check`, four fits of the law `2.5 exp(-0.7x) + 0.3`, for example
+  `0.3 + 2.5 * 0.0436988^(0.223611 * X0)` becomes `0.3 + 2.5 * exp(-X0 / 1.42857)`;
+- `feynman_scaling`, one fit of I.16.6 at 500 points, whose census of operators
+  counts the exponential.
+
+Timing:
+- the order in which the parallel queues of `run_claims.py` ended
+  (`claims_queues.txt`);
+- in the console example, run on three parallel islands, the order of the
+  islands' prints and the statistics of the stigmergic memory. The final
+  result is the same: `force = 250 * elongation`, constant 250 kg/s²;
+- the times: the machine of this day is faster than that of 30 October. One
+  generation of `time_limit_check.py` takes 0.6 s in sequence against 1.0 s
+  then; `import gp_elite` takes a median of 0.073 s against 0.12 s; the five
+  fits of `feynman_scaling.py` take 38 s at 1,000 points and 103 s at 10,000,
+  against 58 s and 153 s; the seconds of each run in `units_ab_ood.txt` round
+  to 0 or 1 as they did;
+- `time_limit_check.py`: 13 of 16 checks, against 15 of 16 on 30 October.
+
+**`time_limit_check.py`.** The three checks that fail ask that the budget cut
+the search (`time_limit_reached` True): the fit in sequence and the fit in
+parallel with a budget of 15 s, and `GPEliteRegressor` with a budget of 6 s.
+Here the search finds the exact law first (R² 1.0000) and ends by itself, at
+6.3 s in sequence and 12.5 s in parallel, so the flag is rightly False. The
+fit in sequence did so on 30 October as well; on this faster machine the two
+others do too. Run again after M3, 1.1.0 and 1.2.0 in turn, twice each, on
+this day (`m3_extra/time_limit_pair/`): 1.1.0 passes 13 and 14 of 16, 1.2.0
+13 and 13. The fit of `GPEliteRegressor` is the one that varies: 1.1.0 reached
+its budget in its second run and not in its first. The same checks, then,
+with both versions: nothing in 1.2.0 changes the time budget, and H1 does not
+act when `time_limit=` is set.
+
+**The TP notebook.** The six fits return the formulas and the deduced
+constants of 1.1.0 (g 9.81 and 9.74, R 8.250, P 10.02 W), in 8, 10, 8, 8, 8
+and 7 s, 49 s in all. That is H1: the notebook sets neither `generations` nor
+`time_limit`, so each search stops once its error on the hold-out rows has not
+improved by 1 % in 30 generations. On the same day, one version after the
+other, alone on the machine:
+
+| fit | 1.1.0, run 1 / run 2 (s) | 1.2.0, run 1 / run 2 (s) |
+|---|---|---|
+| pendulum | 28 / 28 | 8 / 8 |
+| spring | 34 / 33 | 10 / 10 |
+| free fall | 37 / 37 | 8 / 8 |
+| power | 32 / 30 | 7 / 7 |
+| gas | 36 / 35 | 8 / 8 |
+| illuminance | 31 / 31 | 7 / 7 |
+| in all | 198 / 194 | 48 / 48 |
+
+Every fit returns the same formula in the four runs. The notebook takes about
+a quarter of its time with 1.1.0. Its text quotes the run of 1.1.0 on another
+day (42 to 55 s a fit): those times compare with neither column.
+
+The figures of the pages of the limits read from the records of M2 are given
+with the documents.
