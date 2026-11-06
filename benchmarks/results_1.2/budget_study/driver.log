@@ -88,3 +88,12 @@ time slice over: 2525 jobs left for the next call
 --- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
 --- slice 2026-11-06T21:05 (1691 done), Model name: Intel(R) Xeon(R) Processor
 2329 jobs to run, 1691 already done
+25 done, 127 s elapsed, 2304 left
+50 done, 162 s elapsed, 2279 left
+75 done, 606 s elapsed, 2251 left
+100 done, 701 s elapsed, 2228 left
+125 done, 718 s elapsed, 2203 left
+150 done, 734 s elapsed, 2178 left
+175 done, 1562 s elapsed, 2153 left
+200 done, 2098 s elapsed, 2126 left
+225 done, 2981 s elapsed, 2101 left
