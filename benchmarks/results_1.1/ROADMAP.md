@@ -16,9 +16,14 @@ Kept apart from the plans of 1.1, which this file does not change.
    message where a constant with units would have to sit inside a function or
    a sum. The full treatment of such constants, a front of candidate laws on
    small tables, the arcsine, and the retrieval of structure under noise come
-   after 1.2. The plan is written in `../results_1.2/`.
+   after 1.2. The plan is written in `../results_1.2/`. Done: 1.2.0
+   "Classroom" was published on 6 November 2026
+   (`../results_1.2/release/README.md`).
 4. **After 1.2, a measurement of what speed would bring** (decided on
-   27 October 2026), described below.
+   27 October 2026), described below. Its plan is
+   `../results_1.2/budget_study/PLAN.md`, committed on 6 November 2026
+   before the first fit; the campaign started the same day, once 1.2.0 was
+   on PyPI.
 
 ## SRBench
 

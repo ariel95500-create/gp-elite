@@ -287,3 +287,19 @@ two reviews, and decided:
 `CITATION.cff` and the paper are dated 5 November 2026, the day the author can
 publish. The files to publish are built again from the commit of this decision,
 since the description of the PyPI page is the README (`environments.txt`).
+
+## Publication (6 November 2026)
+
+- The pull request of the release (#8) was merged into `main` by a merge
+  commit, 8d3d777, whose tree is that of 8830631. The **Tests** workflow of
+  that commit is green on every row (run 239).
+- The author published the two files on PyPI on 6 November 2026, after
+  checking their SHA-256 on his computer. Their SHA-256 on PyPI are those of
+  `environments.txt`. gp-elite 1.2.0, installed from PyPI in a fresh
+  environment here (`/venv12p`, with the packages of `/venv12b`), prints
+  1.2.0, and its `gp_elite/` files are identical to those of the measured
+  wheel.
+- The release page v1.2.0 on GitHub, tag on 8d3d777, first carried the two
+  files of 1.1.0, attached by mistake; three minutes later they were
+  replaced by the two files of 1.2.0, whose SHA-256 are those of
+  `environments.txt`.
