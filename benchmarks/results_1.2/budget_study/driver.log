@@ -1,0 +1,33 @@
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+/home/user/gp-elite/benchmarks/results_1.2/budget_study/driver.sh: 25: cannot open /home/user/budget_records/campaign.jsonl: No such file
+--- slice 2026-11-06T11:53 (0 done), Model name: Intel(R) Xeon(R) Processor
+4020 jobs to run, 0 already done
+25 done, 8 s elapsed, 3992 left
+50 done, 14 s elapsed, 3968 left
+75 done, 21 s elapsed, 3942 left
+100 done, 374 s elapsed, 3917 left
+125 done, 764 s elapsed, 3894 left
+150 done, 777 s elapsed, 3869 left
+175 done, 790 s elapsed, 3844 left
+200 done, 801 s elapsed, 3818 left
+225 done, 812 s elapsed, 3793 left
+250 done, 1187 s elapsed, 3770 left
+275 done, 1269 s elapsed, 3744 left
+300 done, 1716 s elapsed, 3720 left
+325 done, 1880 s elapsed, 3695 left
+350 done, 1893 s elapsed, 3669 left
+375 done, 2343 s elapsed, 3645 left
+400 done, 2363 s elapsed, 3619 left
+425 done, 3121 s elapsed, 3592 left
+450 done, 3226 s elapsed, 3570 left
+475 done, 3250 s elapsed, 3543 left
+500 done, 3260 s elapsed, 3519 left
+525 done, 3269 s elapsed, 3493 left
+550 done, 3279 s elapsed, 3468 left
+575 done, 3982 s elapsed, 3444 left
+600 done, 4732 s elapsed, 3420 left
+625 done, 5145 s elapsed, 3395 left
+650 done, 6017 s elapsed, 3369 left
+time slice over: 3359 jobs left for the next call
+--- slice 2026-11-06T13:42 (661 done), Model name: Intel(R) Xeon(R) Processor
+3359 jobs to run, 661 already done
