@@ -1,0 +1,25 @@
+| figure | W0 | W1 |
+|---|---|---|
+| fits | 745 | 745 |
+| crashes | 0 | 0 |
+| F41 exact | 155 | 155 |
+| F41N1 structures | 95 | 91 |
+| F41N10 structures | 69 | 73 |
+| R6 folds median R2 | 0.8292 | 0.8319 |
+| R6+R7raw collapses | 23 | 23 |
+| R6+R7raw folds median size | 34 | 32 |
+| median time feyn (s) | 6.89 | 5.89 |
+| median time feyn_n1 (s) | 272.59 | 272.61 |
+| median time feyn_n10 (s) | 272.78 | 272.69 |
+| median time real (s) | 194.42000000000002 | 196.07999999999998 |
+| median time realraw (s) | 199.445 | 200.805 |
+
+Criteria of PLAN.md, S = W1:
+  [met] F41 exact laws of W1 not fewer than W0's minus 3
+  [NOT met] F41N1 structures not fewer than W0's minus 3
+  [met] F41N10 structures not fewer than W0's minus 3
+  [met] R6 folds median R2 not below W0's minus 0.005
+  [met] R6 + R7raw collapses out of domain not more than W0's plus 2
+  [met] R6 + R7raw folds median size not above 1.25 times W0's
+  [NOT met] a gain: F41 exact +10, or structures +10, or R6 median R2 +0.01
+W0 stays

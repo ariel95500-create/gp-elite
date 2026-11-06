@@ -1,0 +1,6 @@
+== TP H1 2026-11-04T07:48:39Z Model name: Intel(R) Xeon(R) Processor 4 cores
+400 jobs to run, 0 already done
+20/400 07:49:13
+40/400 07:49:54
+60/400 07:50:26
+== stopped 2026-11-04T07:50:50Z and resumed: records moved to /home/user/h1_records (copied here at each checkpoint); the 4 fits running were run again; the log goes on in run_h1.log

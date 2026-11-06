@@ -30,6 +30,11 @@ Usage, from the repository root:
 --seeds replaces the seeds 0 to 4 of the decision bench (F41, R6, R7raw and
 their noisy and units kinds), for a confirmation on new seeds.
 
+[1.2] --defaults runs every fit with the API defaults (no generations=, no
+time_limit=), the regime where the stop on patience of plan 1.2 acts (bench
+D, benchmarks/results_1.2/PLAN.md); each job then carries "defaults": true.
+Without it the jobs and the fits are those of before.
+
 Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
   python benchmarks/phase1_bench.py run-paired --python A/bin/python --out a.jsonl \\
@@ -57,6 +62,7 @@ NOISE = {"feyn_n1": 0.01, "feyn_n10": 0.10,
 ORDER = ["feyn", "real", "realraw", "tf", "ts", "tr", "trraw",
          "feyn_n1", "feyn_n10"]
 UNIT_KINDS = ["ufeyn", "ufeyn_n1", "ufeyn_n10", "utf"]   # phase 7, on request only
+DEFAULTS = False                    # [1.2] --defaults
 FEYN_KINDS = ("feyn", "feyn_n1", "feyn_n10", "ufeyn", "ufeyn_n1", "ufeyn_n10")
 
 
@@ -177,9 +183,28 @@ def run_one(job):
         return orig(*args, **kwargs)
     C.evolve_island = counted
 
+    # [1.2] X1 checked in M2 (PLAN_RELEASE_1.2.md): the calls of the engine
+    # to its formula are noted during the fit (arguments and text only); the
+    # formula with X1 switched off is computed after the timed fit. Where X1
+    # is absent (1.1.0 and before) nothing is wrapped.
+    import gp_elite.api as API
+    import gp_elite.formula as FM
+    x1 = hasattr(FM, "_exponentials_as_such")
+    fcalls = []
+    if x1:
+        brf = API._build_raw_formula
+
+        def noted(node, scaler, X_raw, names_, predictions=None):
+            out = brf(node, scaler, X_raw, names_, predictions=predictions)
+            fcalls.append(((node, scaler, X_raw, names_, predictions), out[1]))
+            return out
+        API._build_raw_formula = noted
+
     Xtr, ytr, Xte, yte, Xo, yo, names, pool, clean = _data(job)
     kw = dict(generations=GENERATIONS, time_limit=TIME_LIMIT,
               seed=job["seed"], parallel=False, verbose=False, operators=pool)
+    if job.get("defaults"):             # [1.2] bench D: the API defaults
+        del kw["generations"], kw["time_limit"]
     if names is not None:
         kw["feature_names"] = names
     units = None
@@ -195,6 +220,8 @@ def run_one(job):
         r = symbolic_regression(Xtr, ytr, **kw)
     dt = time.time() - t0
     C.evolve_island = orig
+    if x1:
+        API._build_raw_formula = brf
 
     rec = dict(job)
     e = D.one_minus_r2(yte, r.predict(Xte))
@@ -205,6 +232,28 @@ def run_one(job):
                engine_version=getattr(gp_elite, "__version__", "?"))
     if hasattr(C, "_SEEDS_UNDER_UNITS"):     # phase 7, change U1
         rec["seeds_under_units"] = bool(C._SEEDS_UNDER_UNITS)
+    if job.get("defaults"):             # [1.2] the stop on patience, if any
+        rec["patience_stop"] = C.TRACE.value.get("patience")
+    if x1:                              # [1.2] X1 checked in M2
+        mine = [a for a, text in fcalls if text == r.expression]
+        rec["x1_calls"] = len(fcalls)
+        if mine:
+            keep = FM._exponentials_as_such
+            FM._exponentials_as_such = lambda t, X: None
+            try:
+                with redirect_stdout(io.StringIO()), warnings.catch_warnings(), \
+                        np.errstate(all="ignore"):
+                    warnings.simplefilter("ignore")
+                    rf11, s11 = brf(*mine[0][:4], predictions=mine[0][4])
+            finally:
+                FM._exponentials_as_such = keep
+            with redirect_stdout(io.StringIO()), warnings.catch_warnings(), \
+                    np.errstate(all="ignore"):
+                warnings.simplefilter("ignore")
+                rf, s = brf(*mine[0][:4], predictions=mine[0][4])
+            rec.update(expr_11=s11[:160],
+                       formula_exact_11=None if rf11 is None else bool(rf11.exact),
+                       x1_again=bool(s == r.expression))
     exact_kind = job["kind"] in FEYN_KINDS + ("tf", "utf") or (
         job["kind"] == "ts"
         and T.manifest()["datasets"][job["problem"]]["exact_scorable"])
@@ -262,7 +311,8 @@ def drive(python, out, workers, kinds=None, max_seconds=None):
             for line in fh:
                 if line.strip():
                     done.add(key(json.loads(line)))
-    todo = [j for j in all_jobs(_with_units(kinds)) if key(j) not in done
+    todo = [dict(j, defaults=True) if DEFAULTS else j
+            for j in all_jobs(_with_units(kinds)) if key(j) not in done
             and (kinds is None or j["kind"] in kinds)]
     print("%d jobs to run, %d already done" % (len(todo), len(done)),
           flush=True)
@@ -333,7 +383,8 @@ def drive_paired(pythons, outs, pairs, kinds=None, max_seconds=None):
                     if line.strip():
                         d.add(key(json.loads(line)))
         done.append(d)
-    todo = [j for j in all_jobs(_with_units(kinds))
+    todo = [dict(j, defaults=True) if DEFAULTS else j
+            for j in all_jobs(_with_units(kinds))
             if (kinds is None or j["kind"] in kinds)
             and any(key(j) not in d for d in done)]
     print("%d jobs to run with %d engines" % (len(todo), len(pythons)),
@@ -435,6 +486,7 @@ def main():
     r.add_argument("--kinds", default=None)
     r.add_argument("--max-seconds", type=float, default=None)
     r.add_argument("--seeds", default=None)
+    r.add_argument("--defaults", action="store_true")
     r2 = sub.add_parser("run-paired")
     r2.add_argument("--python", action="append", required=True)
     r2.add_argument("--out", action="append", required=True)
@@ -442,6 +494,7 @@ def main():
     r2.add_argument("--kinds", default=None)
     r2.add_argument("--max-seconds", type=float, default=None)
     r2.add_argument("--seeds", default=None)
+    r2.add_argument("--defaults", action="store_true")
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
@@ -450,6 +503,9 @@ def main():
     if getattr(a, "seeds", None):
         global BENCH_SEEDS
         BENCH_SEEDS = [int(x) for x in a.seeds.split(",")]
+    if getattr(a, "defaults", False):
+        global DEFAULTS
+        DEFAULTS = True
     if a.cmd == "run":
         drive(a.python, a.out, a.workers,
               a.kinds.split(",") if a.kinds else None, a.max_seconds)

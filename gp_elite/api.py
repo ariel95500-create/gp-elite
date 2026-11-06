@@ -512,6 +512,7 @@ def symbolic_regression(
     extrapolate_direction: str = "both",
     restarts: int = 1,
     time_limit: Optional[float] = None,
+    patience: Optional[int] = None,
     verbose: bool = False,
 ) -> SRResult:
     """Trouve une expression symbolique reliant X à y.
@@ -560,6 +561,14 @@ def symbolic_regression(
                   toujours, pour garantir un modèle. Précision : environ une
                   génération au-delà de l'échéance, plus la sélection finale
                   (typiquement < 1 % du temps total).
+    patience : [v1.2] arrêt quand la loi tient. None (défaut) : si l'appel
+                  ne donne ni `generations` ni `time_limit`, la recherche
+                  s'arrête après 30 générations sans gain de plus de 1 % sur
+                  l'erreur du hold-out, puis le fit va à sa fin habituelle
+                  (constantes polies, sélection, formule) ; un appel qui fixe
+                  son budget le reçoit en entier, comme en 1.1. Un entier k
+                  applique une patience de k générations quel que soit le
+                  budget ; 0 la coupe.
     restarts : nombre d'évolutions indépendantes (seeds espacés). Les archives
                   de candidats de TOUS les runs sont fusionnées — le hold-out
                   étant déterministe et identique entre runs, leurs MSE de
@@ -643,6 +652,16 @@ def symbolic_regression(
     # [v0.7] 'thorough' annonçait 200 générations, mais symbolic_regression
     # imposait toujours son défaut de 100 (seul GPEliteRegressor appliquait
     # le preset) : le défaut dépend maintenant du preset.
+    # [v1.2-H1] Patience : 30 générations quand le moteur choisit le budget
+    # (ni generations ni time_limit), aucune sinon, sauf entier explicite.
+    if patience is None:
+        cfg.PATIENCE = 30 if (generations is None and time_limit is None) else 0
+    else:
+        if (isinstance(patience, bool) or not isinstance(patience, (int, np.integer))
+                or patience < 0):
+            raise ValueError("patience must be None or an integer >= 0 "
+                             "(got %r)" % (patience,))
+        cfg.PATIENCE = int(patience)
     if generations is None:
         generations = 200 if thorough else 100
     cfg.GENERATIONS = int(generations)

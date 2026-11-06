@@ -18,7 +18,24 @@ et 10 effondrements sur 65, là où les points ci-dessous disent 105, 85, 7 et 1
 pour les formules imprimées qui s'écartent de leur modèle, point 6, 7 sur 130 et
 66 sur 500 pour la 1.0.0, 8 et 67 pour la 1.1.0, là où il dit 7 et 61).
 Le point 8 est mesuré sur le paquet de la 1.1.0, côte à côte avec la 1.0.0
-(`benchmarks/results_1.1/release/`).
+(`benchmarks/results_1.1/release/`), sauf les temps de son premier tiret,
+mesurés sur la 1.2.0 à côté de la 1.1.0 ; le point 10 sur la campagne qui a
+décidé l'arrêt de la 1.2.
+
+Avec un budget fixé et sans toucher à `patience=`, la version 1.2 ne change pas
+les modèles sans unités ; avec les unités, elle ne change que les ajustements
+dont le départ typé demande un produit de 9 à 12 facteurs ou atteint son
+échéance (sur le banc, Feynman III.19.51). Mesurées
+côte à côte pour la sortie de la 1.2 (`benchmarks/results_1.2/release/`, les
+chiffres dans `m2/limits_figures.txt`), la 1.1.0 et la 1.2.0 donnent le même
+chiffre sur chaque point, et d'une campagne à l'autre les chiffres bougent comme
+ci-dessus : 214 lois exactes sur 390 sur le jeu de test (204 sur 290 et 10 sur
+100), 33 de ses équations jamais retrouvées, 10 ajustements de Strogatz exacts
+sur 70, 108 et 85 structures sous bruit, 10 effondrements sur 65 (le pire à
+−1 946) et 66 sur 250 sur le jeu de test (38 standardisés, 28 dans leurs propres
+unités), 12 formules qui s'écartent sur 130 et 65 sur 500, et avec les unités 166
+lois exactes sur 205. Ce que la 1.2 change, c'est le temps d'un ajustement avec
+les réglages par défaut, et avec lui une partie des modèles (points 8 et 10).
 
 ## 1. Les lois qu'il manque encore
 
@@ -110,12 +127,14 @@ chacune placée seulement si elle passe la porte des dimensions. Sur les 41
 205 (1.0.0 : 108), et six équations ne sont jamais retrouvées en cinq graines
 (1.0.0 : 13). Ce qui reste :
 
-- **les données bruitées parcourent tout le budget.** Une recherche ne s'arrête
-  plus tôt que sur une loi exacte, et avec du bruit il n'y en a pas, même quand la
-  graine placée au départ est la loi. Les six ajustements du notebook de TP
-  (`examples/tp_six_lois.ipynb`, dix points et 2 % de bruit chacun) prennent
-  environ 40 à 60 secondes chacun ; la chute libre prend 51 s contre 44 s avec la
-  1.0.0, les cinq autres à peu près le temps de la 1.0.0 ;
+- **les données bruitées parcourent tout le budget que l'appel fixe.** Avec
+  `generations=` ou `time_limit=`, une recherche ne s'arrête plus tôt que sur une
+  loi exacte, et avec du bruit il n'y en a pas, même quand la graine placée au
+  départ est la loi. Avec les réglages par défaut, depuis la 1.2, l'arrêt du
+  point 10 la termine : les six ajustements du notebook de TP
+  (`examples/tp_six_lois.ipynb`, dix points et 2 % de bruit chacun) prennent de 7
+  à 10 s chacun, contre 28 à 37 s avec la 1.1.0 sur la même machine, avec les
+  mêmes formules ;
 - **les exposants ajustés.** Avec les unités, une graine aux exposants ajustés sur
   les données n'est placée que si chaque exposant qui n'est pas un demi-entier
   porte sur une entrée sans dimension. Des exposants comme 1,0041 sur une quantité
@@ -134,3 +153,22 @@ mesuré, et l'espace de recherche grandit vite avec le nombre de variables. Il n
 chaotiques, ni pour les grands jeux de données où la précision brute compte plus
 qu'une formule lisible : des modèles d'ensemble, ou des moteurs comme PySR et
 Operon, y conviennent mieux.
+
+## 10. L'arrêt avec les réglages par défaut
+
+Depuis la 1.2, un appel qui ne fixe ni `generations` ni `time_limit` arrête sa
+recherche dès que l'erreur sur les lignes mises de côté (sur les lignes
+d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
+30 générations (`patience=`). L'arrêt peut finir une recherche qui aurait encore
+progressé. Sur le banc de décision lancé avec les réglages par défaut, en cinq
+graines, contre la 1.1.0 mesurée à côté (campagne H1 de
+`benchmarks/results_1.2/PLAN.md`, sur le candidat avec l'arrêt) : 161 lois
+exactes sur 205 contre 163, et 166 contre 167 avec les unités ; avec 10 % de
+bruit, la structure dans 83 ajustements contre 85, et 100 contre 99 avec les
+unités ; avec 1 % de bruit, un peu moins de lois approchées (146 contre 153) ;
+sur les six jeux réels standardisés, un R² de test médian de 0,802 contre 0,809,
+et sur les 65 ajustements hors de la plage d'apprentissage des sept jeux réels, 9
+effondrements contre 11. L'ajustement
+médian sur données bruitées et réelles a pris de 7 à 9 s contre 25 à 35 s. Quand
+le résultat compte plus que le temps, fixez `generations=` ou `time_limit=`, ou
+`patience=0`.

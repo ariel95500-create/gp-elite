@@ -122,6 +122,10 @@ _FOLD_TREES = [
     N("*", N(3.0), N("+", N("sq", X(0)), N("neg", N("sq", X(1))))),   # distribution
     N("*", N(1.0000000002), N("*", X(0), X(1))),                        # "1 *" noise
     N("*", X(1), N("/", N(2.0), N("+", X(0), N(6.0)))),                # a * (1 / b)
+    N("*", N(5.0), N("pow", N(0.3), X(0))),            # [v1.2] X1: c^u -> exp
+    N("pow", N(-2.5), N("*", N(0.5), X(1))),           # |c|^u, negative base
+    N("exp", N("*", N(-1.7), X(0))),                   # exp(k*x) -> exp(-x/tau)
+    N("pow", N(0.3), N("tanh", X(1))),                 # c^f(x)
 ]
 
 
@@ -144,6 +148,62 @@ def test_raw_formula_folding_is_exact(kind, signed):
                                          _parsable=True)):
             assert np.max(np.abs(_eval_sympy_string(s, cols) - p)) <= tol, \
                 (kind, core.to_string(tree), s)
+
+
+# [v1.2] X1 (benchmarks/results_1.2/PLAN.md): the search writes the decay of a
+# capacitor as 0.00784758^(0.2 * t) and an exponential of one variable as
+# exp(-0.987144 * t); a student reads neither. The printed formula writes the
+# exponential as such, with its scale, and is kept only if it passes the
+# fit-time check; the model is unchanged.
+
+def _x1_case(tree):
+    td = np.linspace(0.1, 5.0, 20).reshape(-1, 1)          # max |t| = 5
+    sc = core._ShiftFreeScaler()
+    Xs = sc.fit_transform(td)
+    return FM.raw_formula(tree, sc, td, ["t"]), core.evaluate_vector(tree, Xs), td
+
+
+def _x1_forms_are_the_model(rf, p, td):
+    tol = 1e-9 * max(np.max(np.abs(p)), 1e-12)
+    for s in (rf.sympy(), FM.to_text(rf.tree, ["t"], rf._positive, _parsable=True)):
+        assert np.max(np.abs(_eval_sympy_string(s, {"t": td[:, 0]}) - p)) <= tol, s
+
+
+def test_power_with_a_numeric_base_is_written_as_an_exponential():
+    """c^u becomes exp(ln|c| u), its constants folded again: the capacitor's
+    0.00784758^(0.2 * t) prints exp(-t / 1.03145), with no power of a number."""
+    rf, p, td = _x1_case(N("+", N(0.01), N("*", N(5.0),
+                                           N("pow", N(0.00784758), X(0)))))
+    assert rf.exact
+    assert rf.text() == "0.01 + 5 * exp(-t / 1.03145)"
+    _x1_forms_are_the_model(rf, p, td)
+
+
+@pytest.mark.parametrize("tree, text", [
+    (N("exp", N("*", N(-4.93572), X(0))), "exp(-t / 1.01302)"),
+    (N("+", N(20.0), N("*", N(60.0), N("exp", N("*", N(0.5), X(0))))),
+     "20 + 60 * exp(t / 10)"),
+    (N("exp", N("*", N(-5.0), X(0))), "exp(-t)"),             # tau = 1: as in 1.1
+    (N("exp", N("*", N(-5.0000001), X(0))), "exp(-t)"),       # tau prints as 1
+])
+def test_exponential_of_one_variable_is_written_with_its_scale(tree, text):
+    """exp(k t) prints exp(-t / tau) for k < 0 and exp(t / tau) for k > 0."""
+    rf, p, td = _x1_case(tree)
+    assert rf.exact
+    assert rf.text() == text
+    _x1_forms_are_the_model(rf, p, td)
+
+
+def test_exponential_rewriting_is_refused_when_the_check_fails(monkeypatch):
+    """A rewriting that would not reproduce predict() is not kept: the
+    formula of 1.1 is printed, still exact."""
+    tree = N("+", N(0.01), N("*", N(5.0), N("pow", N(0.00784758), X(0))))
+    monkeypatch.setattr(FM, "_exponentials_as_such",
+                        lambda t, X: N("*", N(1.001), t))
+    rf, p, td = _x1_case(tree)
+    assert rf.exact
+    assert rf.text() == "0.01 + 5 * 0.00784758^(0.2 * t)"
+    _x1_forms_are_the_model(rf, p, td)
 
 
 @pytest.mark.parametrize("normalize", ["divmax", "minmax", "standard", "none", "auto"])
@@ -1540,3 +1600,118 @@ def test_no_power_law_seed_with_fractional_units(monkeypatch):
     cfg.FEAT_DIMS, cfg.TARGET_DIM = {0: {}, 1: {}}, {}
     seeds = core._make_power_law_seeds(Xr, y, cfg)
     assert any("pow" in _ops_in(t, set()) for t in seeds)
+
+
+# ── 1.2, D0: the typed start under units (benchmarks/results_1.2/d0/D0.md) ──
+
+_EPS0 = {"A": 2, "s": 4, "kg": -1, "m": -3}
+_III1951 = {0: {"kg": 1}, 1: {"A": 1, "s": 1}, 2: _EPS0,
+            3: {"kg": 1, "m": 2, "s": -1}, 4: {}}       # m, q, eps, h, n
+_ENERGY = {"kg": 1, "m": 2, "s": -2}
+
+
+def test_fast_path_builds_products_of_nine_to_twelve_factors():
+    """Feynman III.19.51 asks for m·q^4/(eps^2·h^2), nine factors. The fast
+    path of 1.1 stopped at eight, and the typed start fell to a blind search
+    that took 440 to 735 s; it now builds the product at once."""
+    feats = DS._feat_list(DS._norm_feat_dims(_III1951))
+    rng = random.Random(0)
+    assert DS._monomial_tree(_ENERGY, feats, rng, max_terms=8) is None   # 1.1
+    t = DS._monomial_tree(_ENERGY, feats, random.Random(0))
+    assert t is not None and DS.is_typed_valid(t, _III1951, _ENERGY)
+    leaves = [n for n in DS._nodes(t) if str(n.value).startswith("X[")]
+    assert len(leaves) == 9
+    # twelve factors still pass, thirteen do not
+    four = {0: {"kg": 1}, 1: {"m": 1}, 2: {"s": 1}, 3: {"A": 1}}
+    f4 = DS._feat_list(DS._norm_feat_dims(four))
+    assert DS._monomial_tree({"kg": 4, "m": 4, "s": -4}, f4,
+                             random.Random(0)) is not None
+    assert DS._monomial_tree({"kg": 4, "m": 4, "s": -4, "A": 1}, f4,
+                             random.Random(0)) is None
+
+
+def test_typed_start_stops_at_the_deadline_with_no_empty_island():
+    """Under units, time_limit= bounds the typed start too: once the deadline
+    is reached an island stops drawing as soon as it holds one tree, and is
+    completed with copies. The target kg^4·m^4·s^-4·A needs thirteen factors,
+    beyond the fast path; the blind search builds about one tree in ten
+    draws, so a full start of 1.1 would take minutes."""
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 2, 60), rng.uniform(1, 2, 60),
+               rng.uniform(1, 2, 60), rng.uniform(1, 2, 60)]
+    y = Xr[:, 0] ** 4 * Xr[:, 1] ** 4 / Xr[:, 2] ** 4 * Xr[:, 3]
+    units = {"a": {"kg": 1}, "b": {"m": 1}, "c": {"s": 1}, "d": {"A": 1}}
+    target = {"kg": 4, "m": 4, "s": -4, "A": 1}
+    t0 = time.time()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(Xr, y, feature_names=list(units), units=units,
+                                target_units=target, time_limit=2,
+                                generations=1000, seed=0, parallel=False)
+    assert time.time() - t0 < 120
+    ok, msg = GD.check_dimensions(
+        r.node, {i: u for i, u in enumerate(units.values())}, target)
+    assert ok, msg
+
+
+# ── 1.2, H1: the stop on patience (benchmarks/results_1.2/PLAN.md, H1) ──────
+
+def _noisy_product(n=40, seed=0):
+    rng = np.random.RandomState(seed)
+    Xr = np.c_[rng.uniform(1, 5, n), rng.uniform(1, 5, n)]
+    y = 2.5 * Xr[:, 0] * Xr[:, 1]
+    return Xr, y + 0.05 * np.std(y) * rng.randn(n)
+
+
+def _fit_counting(monkeypatch, **kw):
+    """The fit, with the number of generations its sequential loop ran."""
+    gens = [0]
+    orig = core.evolve_island
+
+    def counted(*a, **k):
+        g = a[3] if len(a) > 3 else k.get("generation", 0)
+        gens[0] = max(gens[0], int(g) + 1)
+        return orig(*a, **k)
+    monkeypatch.setattr(core, "evolve_island", counted)
+    Xr, y = _noisy_product()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(Xr, y, seed=0, parallel=False, **kw)
+    return r, gens[0], core.TRACE.value.get("patience")
+
+
+def test_patience_stops_a_fit_whose_budget_the_engine_chooses(monkeypatch):
+    """Without generations= or time_limit=, the loop ends 30 generations
+    after the last gain of 1 % (on noisy data no exact law stops it before),
+    and the fit goes on to its usual end."""
+    r, gens, trace = _fit_counting(monkeypatch)
+    assert trace is not None and gens < 100
+    assert r.expression and r.formula_exact
+
+
+def test_patience_leaves_an_explicit_budget_as_in_1_1(monkeypatch):
+    """A call that sets its budget runs it in full (no patience), as with
+    patience=0; an explicit patience applies whatever the budget."""
+    _r, gens, trace = _fit_counting(monkeypatch, generations=45)
+    assert gens == 45 and trace is None
+    _r, gens, trace = _fit_counting(monkeypatch, generations=45, time_limit=600)
+    assert gens == 45 and trace is None
+    _r, gens, trace = _fit_counting(monkeypatch, generations=45, patience=3)
+    assert gens < 45 and trace is not None
+
+
+def test_patience_zero_is_the_search_of_1_1(monkeypatch):
+    """Under the defaults, patience=0 is the run of 1.1: the same model as
+    the same call with its 100 generations named."""
+    a, ga, ta = _fit_counting(monkeypatch, speed="ultrafast", patience=0)
+    b, gb, tb = _fit_counting(monkeypatch, speed="ultrafast", generations=100)
+    assert ga == gb == 100 and ta is None and tb is None
+    assert a.expression == b.expression
+    assert a.mse_validation == b.mse_validation
+
+
+@pytest.mark.parametrize("bad", [-1, 2.5, True, "30"])
+def test_patience_refuses_what_is_not_a_count(bad):
+    Xr, y = _noisy_product()
+    with pytest.raises(ValueError):
+        symbolic_regression(Xr, y, generations=2, patience=bad)

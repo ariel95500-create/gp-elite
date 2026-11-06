@@ -1,0 +1,152 @@
+== TP H1 2026-11-04T07:51:08Z Model name: Intel(R) Xeon(R) Processor 4 cores
+317 jobs to run, 83 already done
+20/317 07:51:50
+40/317 07:52:27
+60/317 07:53:16
+80/317 07:53:58
+100/317 07:54:39
+120/317 07:55:16
+140/317 07:56:01
+160/317 07:56:45
+180/317 07:57:22
+200/317 07:58:03
+220/317 07:58:40
+240/317 07:59:26
+260/317 08:00:22
+280/317 08:01:43
+300/317 08:02:42
+== TP A 2026-11-04T08:03:05Z Model name: Intel(R) Xeon(R) Processor 4 cores
+400 jobs to run, 0 already done
+20/400 08:05:02
+40/400 08:07:02
+60/400 08:08:49
+80/400 08:10:50
+100/400 08:12:50
+120/400 08:14:46
+140/400 08:16:48
+160/400 08:18:40
+180/400 08:20:40
+200/400 08:22:28
+220/400 08:25:12
+240/400 08:28:12
+260/400 08:30:59
+280/400 08:33:28
+300/400 08:36:08
+320/400 08:38:30
+340/400 08:41:39
+360/400 08:45:13
+380/400 08:48:32
+400/400 08:49:37
+== D H1 2026-11-04T08:49:37Z Model name: Intel(R) Xeon(R) Processor 4 cores
+1360 jobs to run, 0 already done
+25 done, 8 s elapsed, 1332 left
+50 done, 43 s elapsed, 1308 left
+75 done, 53 s elapsed, 1282 left
+100 done, 88 s elapsed, 1257 left
+125 done, 118 s elapsed, 1234 left
+150 done, 152 s elapsed, 1210 left
+175 done, 162 s elapsed, 1182 left
+200 done, 209 s elapsed, 1159 left
+225 done, 266 s elapsed, 1132 left
+250 done, 338 s elapsed, 1107 left
+275 done, 407 s elapsed, 1084 left
+300 done, 495 s elapsed, 1057 left
+325 done, 566 s elapsed, 1033 left
+350 done, 632 s elapsed, 1007 left
+375 done, 689 s elapsed, 983 left
+400 done, 744 s elapsed, 957 left
+425 done, 806 s elapsed, 932 left
+450 done, 874 s elapsed, 908 left
+475 done, 938 s elapsed, 882 left
+500 done, 1006 s elapsed, 857 left
+525 done, 1078 s elapsed, 832 left
+550 done, 1155 s elapsed, 807 left
+575 done, 1213 s elapsed, 782 left
+600 done, 1295 s elapsed, 757 left
+625 done, 1382 s elapsed, 732 left
+650 done, 1442 s elapsed, 707 left
+675 done, 1517 s elapsed, 684 left
+700 done, 1588 s elapsed, 658 left
+725 done, 1649 s elapsed, 632 left
+750 done, 1720 s elapsed, 609 left
+775 done, 1742 s elapsed, 582 left
+800 done, 1771 s elapsed, 557 left
+825 done, 1779 s elapsed, 532 left
+850 done, 1820 s elapsed, 507 left
+875 done, 1858 s elapsed, 483 left
+900 done, 1880 s elapsed, 458 left
+925 done, 1887 s elapsed, 433 left
+950 done, 1939 s elapsed, 408 left
+975 done, 1989 s elapsed, 382 left
+1000 done, 2061 s elapsed, 357 left
+1025 done, 2128 s elapsed, 332 left
+1050 done, 2203 s elapsed, 308 left
+1075 done, 2296 s elapsed, 282 left
+1100 done, 2382 s elapsed, 257 left
+1125 done, 2459 s elapsed, 232 left
+1150 done, 2539 s elapsed, 207 left
+1175 done, 2617 s elapsed, 182 left
+1200 done, 2685 s elapsed, 157 left
+1225 done, 2756 s elapsed, 132 left
+1250 done, 2831 s elapsed, 107 left
+1275 done, 2914 s elapsed, 82 left
+1300 done, 2999 s elapsed, 57 left
+1325 done, 3094 s elapsed, 33 left
+1350 done, 3157 s elapsed, 8 left
+== D A 2026-11-04T09:43:11Z Model name: Intel(R) Xeon(R) Processor 4 cores
+1360 jobs to run, 0 already done
+25 done, 8 s elapsed, 1332 left
+50 done, 68 s elapsed, 1309 left
+75 done, 78 s elapsed, 1282 left
+100 done, 137 s elapsed, 1259 left
+125 done, 196 s elapsed, 1234 left
+150 done, 259 s elapsed, 1210 left
+175 done, 278 s elapsed, 1182 left
+200 done, 372 s elapsed, 1160 left
+225 done, 525 s elapsed, 1132 left
+250 done, 690 s elapsed, 1107 left
+275 done, 855 s elapsed, 1082 left
+300 done, 1039 s elapsed, 1057 left
+325 done, 1211 s elapsed, 1033 left
+350 done, 1377 s elapsed, 1007 left
+375 done, 1530 s elapsed, 982 left
+400 done, 1713 s elapsed, 957 left
+425 done, 1880 s elapsed, 934 left
+450 done, 2055 s elapsed, 908 left
+475 done, 2225 s elapsed, 882 left
+500 done, 2403 s elapsed, 857 left
+525 done, 2569 s elapsed, 832 left
+550 done, 2754 s elapsed, 807 left
+575 done, 2925 s elapsed, 782 left
+600 done, 3105 s elapsed, 757 left
+625 done, 3295 s elapsed, 732 left
+650 done, 3474 s elapsed, 707 left
+675 done, 3652 s elapsed, 682 left
+700 done, 3825 s elapsed, 657 left
+725 done, 4007 s elapsed, 632 left
+750 done, 4136 s elapsed, 610 left
+775 done, 4165 s elapsed, 582 left
+800 done, 4221 s elapsed, 558 left
+825 done, 4229 s elapsed, 532 left
+850 done, 4307 s elapsed, 507 left
+875 done, 4365 s elapsed, 483 left
+900 done, 4415 s elapsed, 459 left
+925 done, 4425 s elapsed, 433 left
+950 done, 4936 s elapsed, 407 left
+975 done, 5194 s elapsed, 383 left
+1000 done, 5420 s elapsed, 357 left
+1025 done, 5645 s elapsed, 332 left
+1050 done, 5859 s elapsed, 307 left
+1075 done, 6131 s elapsed, 282 left
+1100 done, 6410 s elapsed, 258 left
+1125 done, 6640 s elapsed, 232 left
+1150 done, 6844 s elapsed, 207 left
+1175 done, 7541 s elapsed, 184 left
+1200 done, 7770 s elapsed, 157 left
+1225 done, 8033 s elapsed, 132 left
+1250 done, 8246 s elapsed, 108 left
+1275 done, 8526 s elapsed, 82 left
+1300 done, 8758 s elapsed, 57 left
+1325 done, 9047 s elapsed, 32 left
+1350 done, 9262 s elapsed, 7 left
+== all done 2026-11-04T12:32:30Z Model name: Intel(R) Xeon(R) Processor 4 cores

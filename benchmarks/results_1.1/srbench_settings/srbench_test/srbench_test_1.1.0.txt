@@ -1,0 +1,81 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.2.0, pluggy-1.7.0 -- /venv11p/bin/python
+rootdir: SCRATCH/srbench_test/run_11p
+collecting ... collected 6 items
+
+test_algorithm.py::test_clean_pred_model_preserves_x_named_features[gp-elite] PASSED [ 16%]
+test_algorithm.py::test_clean_pred_model_preserves_mixed_x_named_features[gp-elite] PASSED [ 33%]
+test_algorithm.py::test_clean_pred_model_still_normalizes_generic_placeholders[gp-elite] PASSED [ 50%]
+test_algorithm.py::test_import[gp-elite] PASSED                          [ 66%]
+test_algorithm.py::test_evaluate[gp-elite] PASSED                        [ 83%]
+test_algorithm.py::test_sympy[gp-elite] PASSED                           [100%]
+
+=============================== warnings summary ===============================
+test_algorithm.py:149
+  SCRATCH/srbench_test/run_11p/test_algorithm.py:149: PytestUnknownMarkWarning: Unknown pytest.mark.order - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.order(after="test_evaluate")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=================== 6 passed, 1 warning in 127.81s (0:02:07) ===================
+exit 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.2.0, pluggy-1.7.0 -- /venv11p/bin/python
+rootdir: SCRATCH/srbench_test/run_11p
+collecting ... collected 1 item
+
+test_evaluate_model.py::test_evaluate_model[gp-elite] running test_evaluate_model with ml= gp-elite
+algorithm imported: <module 'methods.gp-elite.regressor' from 'SCRATCH/srbench_test/run_11p/methods/gp-elite/regressor.py'>
+========================================
+Evaluating gp-elite on 
+test/192_vineyard_small.tsv.gz
+========================================
+compression: gzip
+filename: test/192_vineyard_small.tsv.gz
+feature_names: ['lugs_1989' 'lugs_1990']
+scaling X
+scaling y
+max time: 360
+X_train: <class 'pandas.DataFrame'> (15, 2)
+y_train: (15,)
+training GPEliteSRBench(random_state=42)
+max time set: 360
+Training time measure: 121.89253449440002
+fitted est: GPEliteSRBench(max_time=360, random_state=42)
+symbolic model: (0.7695974498038386*lugs_1989)
+results:
+{
+    "dataset": "192_vineyard_small",
+    "algorithm": "gp-elite",
+    "params": {
+        "generations": 60,
+        "max_time": 360,
+        "normalize": "auto",
+        "operators": "physical",
+        "parallel": null,
+        "random_state": 42,
+        "restarts": 10,
+        "robust": false,
+        "speed": "fast",
+        "validation_split": 0.2
+    },
+    "random_state": 42,
+    "time_time": 121.89253449440002,
+    "symbolic_model": "(0.7695974498038386*lugs_1989)",
+    "mse_train": 6.964759634485499,
+    "mae_train": 2.1863329360349626,
+    "r2_train": 0.5922802347445721,
+    "mse_test": 3.4295044472320044,
+    "mae_test": 1.7003575685339691,
+    "r2_test": 0.8213799767066664,
+    "simplicity": -0.7,
+    "complexity_function": "sympy",
+    "model_size": 3,
+    "target_noise": 0.0,
+    "feature_noise": 0.0
+}
+---
+save_file: tmp_results/192_vineyard_small_gp-elite_42
+PASSED
+
+======================== 1 passed in 123.73s (0:02:03) =========================
+exit 0

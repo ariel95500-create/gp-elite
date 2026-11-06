@@ -1,0 +1,23 @@
+# The Tests workflow (.github/workflows/tests.yml) on the branch claude/peaceful-knuth-4q7m4p,
+# read from the GitHub API on 5 November 2026: run number, run id, commit, conclusion.
+# From the candidate c3ea7fc on (its own commit was pushed together with e92f86d):
+222 41886744861 e92f86d success   1.2.0: M1 identical to 1.1.0; the bench checked; M2 ready
+223 41886897866 28b6147 success   M2 of 1.2.0: records at 2026-11-04T18:24:44Z
+224 41906398979 be1197d success   M2 of 1.2.0: records at 2026-11-04T20:24:59Z
+225 41925250690 b951d27 success   M2 of 1.2.0: records at 2026-11-04T22:25:14Z
+226 41941231270 fd55c0d success   M2 of 1.2.0: records at 2026-11-05T00:25:34Z
+227 41956048697 f7b51a9 success   M2 of 1.2.0: records at 2026-11-05T02:33:56Z
+228 41967065303 237a675 success   M2 of 1.2.0: records at 2026-11-05T04:19:10Z
+229 41967353141 784152d success   M2 of 1.2.0 done: the thirteen criteria are met
+230 41974147674 dc649cd success   M3 of 1.2.0: every public figure measured again
+231 41991086998 971bcec success   Documents of 1.2.0 from M2 and M3
+232 41991272646 81b73ee success   M4 of 1.2.0: the runner and the pins of its three environments
+233 41992301583 66ee1b9 success   M4 of 1.2.0: 169 tests pass against the wheel under Python 3.9, 3.11 and 3.14
+234 41994586014 45b8282 success   M5 of 1.2.0, first review: 19 findings, each corrected
+# Before the candidate, for the record: the two commits of the campaign C1 failed, on 6 and 5 of
+# their 8 jobs, all on one test of C1 (test_units_check_says_when_units_keep_the_formula_from_the_data): its fit
+# with generations=25 returned on GitHub's processors another formula than the exponential the test
+# expects. The test left with C1 (9f81415, run 221, success).
+219 41871900742 11e6818 failure   Campaign C1: records at 2026-11-04T16:52:32Z
+220 41872167977 7f14c9d failure   Campaign C1: not adopted, criterion 3 fails on one fit
+221 41884912383 9f81415 success   C1 withdrawn from 1.2, by the author's decision

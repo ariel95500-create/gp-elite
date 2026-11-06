@@ -1,0 +1,12 @@
+163 records, 0 crashes
+
+Mechanic 1, III.19.51 under units, time_limit=30, seed 0, corrected engine: EXACT, 1.2 s, 1 generations, units ok True, time limit reached False
+  -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²)
+  mechanic 1 HOLDS
+
+Mechanic 2, u41: 41 pairs, 40 the same, 1 different
+  III.19.51: wheel -0.00316629 * v0 / (v2 * v4 / (v1 / (v3 / v1)))² (430.0 s) | corrected -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²) (1.1 s)
+  mechanic 2 (u41) HOLDS
+
+Mechanic 2, tp: 40 pairs, 40 the same, 0 different
+  mechanic 2 (tp) HOLDS

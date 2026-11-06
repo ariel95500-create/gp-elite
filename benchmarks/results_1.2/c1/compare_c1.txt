@@ -1,0 +1,195 @@
+## Campaign C1 (400 TP fits, 615 fits of D); crashes: 0
+
+Criterion 1, same models: the model under units is the one of the candidate with H1 alone (formula without X1, and the error on the training rows for TP, on the test rows for D, both computed from the predictions): 1015 of 1015: HOLDS
+
+The check ran in 1015 of 1015 fits.
+
+Criterion 2, no message where units hold: the six laws within reach and Snell's law, draws 5 to 9: a message in 2 of 140 fits (at most 2); U41 without noise, a message on an exact fit: 0: HOLDS
+- ressort 10 pts 5 % draw 7: 0.0603 under units, 0.00809 without: 0.078307 + 0.534749 * (3.02164 * m)^((0.0214789 * k)^exp(k / 46.5573))
+- eclairement 10 pts 5 % draw 8: 0.00184 under units, 6.3e-05 without: -1.48579 + 1.71956 * (0.707107 * sqrt(d))^log(tanh(tanh(0.5 * d)))
+
+Criterion 3, a message where units limit: the capacitor, cooling and the lens, draws 5 to 9: a message in 56 of 60 fits (at least 45); the fit without units returns the law in 21, of which 1 without a message: FAILS
+- no message: refroidissement 10 pts 2 % draw 9: 0.00136 under units, 0.0014 without (law without units False): 80.4643 - 56.2084 * (0.000555556 * t - log(|0.000555556 * t|^(0.000555556 * t)))
+- no message: refroidissement 20 pts 2 % draw 5: 0.00407 under units, 0.00193 without (law without units True): 20.0278 + 58.7125 * exp(-t / 602.271)
+- no message: refroidissement 20 pts 5 % draw 5: 0.016 under units, 0.00928 without (law without units False): 83.7591 - 80.359 * tanh(tanh(0.00109146 * t))
+- no message: lentille 20 pts 5 % draw 5: 0.16 under units, 0.033 without (law without units False): 0.0328434 + 0.0955009 * (1.66667 * p)^(log(sqrt(p)) + 0.255413)
+
+Criterion 4, time: median of a units fit of TP with the check 15.7 s against 32.3 s for 1.1.0 (campaign H1, arm A, draws 0 to 9; ratio 0.49, at most 0.5): HOLDS
+- draws 0 to 4: 15.6 s against 32.2 s
+- draws 5 to 9: 15.8 s against 32.6 s
+- the candidate with H1 alone, same fits: 8.2 s
+
+## Beside the criteria
+
+Messages per experiment of TP (draws 0 to 4 | draws 5 to 9, of 20 each):
+
+| experiment | draws 0-4 | draws 5-9 | fit without units has the law (0-9) |
+|---|---|---|---|
+| chute | 0 | 0 | 38 of 40 |
+| pendule | 0 | 0 | 30 of 40 |
+| puissance | 0 | 0 | 39 of 40 |
+| gaz | 0 | 0 | 34 of 40 |
+| eclairement | 0 | 1 | 31 of 40 |
+| ressort | 0 | 1 | 29 of 40 |
+| snell | 0 | 0 | 0 of 40 |
+| rc | 20 | 20 | 30 of 40 |
+| refroidissement | 18 | 17 | 9 of 40 |
+| lentille | 18 | 19 | 2 of 40 |
+
+Messages on D:
+
+- ufeyn: 7 of 205
+- ufeyn_n1: 14 of 205
+- ufeyn_n10: 5 of 205
+
+Each message, with the formula without units it names:
+
+- eclairement 10 pts 5 % draw 8: 0.00184 under units, 6.3e-05 without; under units 0.912537 * (d / d²)² | without -1.48579 + 1.71956 * (0.707107 * sqrt(d))^log(tanh(tanh(0.5 * d)))
+- lentille 10 pts 2 % draw 0: 0.22 under units, 0.00637 without; under units 0.0467474 * p / p² | without 0.0942957 + 0.0313183 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 10 pts 2 % draw 1: 0.246 under units, 0.00274 without; under units 0.0460171 * p / p² | without 0.0928784 + 0.0288818 * (1.66667 * p)^log(tanh(tanh(1.66667 * p)))
+- lentille 10 pts 2 % draw 2: 0.205 under units, 0.00057 without; under units 0.0468401 * p / p² | without 0.0819915 + 0.020561 * exp(0.357204 / p)
+- lentille 10 pts 2 % draw 3: 0.225 under units, 0.000431 without; under units 0.0465908 * p / p² | without -0.0119846 + 0.182855 * p / (-0.162254 + 1.66667 * p)
+- lentille 10 pts 2 % draw 4: 0.234 under units, 0.0039 without; under units 0.0470554 * p / p² | without 0.105479 + 0.00663246 * exp(0.6 * tanh(exp(p / 0.6)) / p)
+- lentille 10 pts 2 % draw 5: 0.248 under units, 0.00194 without; under units 0.0462918 * p / p² | without 0.116836 + 0.00134374 * p^(-2.58496)
+- lentille 10 pts 2 % draw 6: 0.22 under units, 0.00707 without; under units 0.0469935 * p / p² | without 0.0934625 + 0.0320065 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 10 pts 2 % draw 7: 0.185 under units, 0.00123 without; under units 0.0915943 * sqrt(p / p²) | without 0.118298 - 0.0270657 * (1.66667 * p - (1.66667 * p)^(log(p) + 0.510826))
+- lentille 10 pts 2 % draw 8: 0.204 under units, 0.000772 without; under units 0.0467007 * p / p² | without 0.115418 + 0.00138039 * p^(-2.59607)
+- lentille 10 pts 2 % draw 9: 0.246 under units, 0.0146 without; under units 0.0460522 * p / p² | without 0.05219 + 0.00324011 * (exp(p / 0.6) / p)²
+- lentille 10 pts 5 % draw 1: 0.243 under units, 0.00977 without; under units 0.0472988 * p / p² | without 0.114865 + 0.00387543 * exp(0.6 * p / p²)
+- lentille 10 pts 5 % draw 2: 0.257 under units, 0.0163 without; under units 0.0455292 * p / p² | without 0.122188 - 0.002766 * (log(p) + 0.510826) / p²
+- lentille 10 pts 5 % draw 3: 0.203 under units, 0.00844 without; under units 0.0491228 * p / p² | without 0.0944184 + 0.0346685 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 10 pts 5 % draw 4: 0.285 under units, 0.0137 without; under units 0.0453863 * p / p² | without 0.0952298 + 0.0291426 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 10 pts 5 % draw 5: 0.225 under units, 0.0152 without; under units 0.0455576 * p / p² | without 0.0125485 + 0.105663 * (1.29099 * sqrt(p))^(log(p) + 0.510826)
+- lentille 10 pts 5 % draw 6: 0.106 under units, 0.0161 without; under units 0.0917345 * sqrt(p / p²) | without 2.168 - 2.04421 * tanh(exp(tanh(1.66667 * p))²)
+- lentille 10 pts 5 % draw 7: 0.243 under units, 0.0096 without; under units 0.0450463 * p / p² | without 0.0885786 + 0.0311603 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 10 pts 5 % draw 8: 0.216 under units, 0.0186 without; under units 0.0464491 * p / p² | without 0.0919117 + 0.0317708 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 10 pts 5 % draw 9: 0.299 under units, 0.0413 without; under units 0.0463972 * p / p² | without 0.0992786 + 0.0289877 * exp((log(p) + 0.510826)²)
+- lentille 20 pts 2 % draw 0: 0.171 under units, 0.00533 without; under units 0.0893857 * sqrt(p / p²) | without 0.122692 - 0.00285217 * (log(p) + 0.510826) / p²
+- lentille 20 pts 2 % draw 1: 0.271 under units, 0.00261 without; under units 0.0465926 * p / p² | without 0.0911439 + 0.0146242 * exp(0.407075 / p)
+- lentille 20 pts 2 % draw 2: 0.146 under units, 0.00468 without; under units 0.065767 * sqrt(sqrt(p)) / p | without 0.0208114 + 0.137442 * p / (1.66667 * p - 0.178363)
+- lentille 20 pts 2 % draw 3: 0.293 under units, 0.00269 without; under units 0.0464199 * p / p² | without 0.0884316 + 0.0166154 * exp(0.385564 / p)
+- lentille 20 pts 2 % draw 4: 0.108 under units, 0.00889 without; under units 0.0741128 * p^(-0.65398) | without 0.106196 + 0.00633287 * exp(0.6 * p * tanh(exp(p / 0.6)) / p²)
+- lentille 20 pts 2 % draw 5: 0.175 under units, 0.00717 without; under units 0.0902473 * sqrt(p / p²) | without 0.096473 + 0.0303885 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 20 pts 2 % draw 6: 0.108 under units, 0.00923 without; under units 0.0655466 * sqrt(sqrt(p) / p²) | without 0.106467 + 0.00404956 * 1 / p / p
+- lentille 20 pts 2 % draw 7: 0.36 under units, 0.00248 without; under units 0.0460698 * p / p² | without 0.101144 + 0.0196756 * (1.66667 * p)^(log(tanh(1.66667 * p)) - 1.66667 * p)
+- lentille 20 pts 2 % draw 8: 0.141 under units, 0.00388 without; under units 0.0898658 * sqrt(p) / p | without 0.102237 + 0.0109497 * (1.29099 * sqrt(p))^(log(p) + 0.510826) / p
+- lentille 20 pts 2 % draw 9: 0.172 under units, 0.00454 without; under units 0.0910087 * sqrt(1 / p) | without 0.119583 + 0.00116965 * p^(-2.66136)
+- lentille 20 pts 5 % draw 1: 0.117 under units, 0.00657 without; under units 0.0663344 * sqrt(sqrt(p)) / p | without 0.105155 + 0.00595221 * (1.66667 * p)^(1.66667 * p) / (p * p)
+- lentille 20 pts 5 % draw 2: 0.345 under units, 0.0229 without; under units 0.0460633 * p / p² | without 0.0184696 + 0.103028 * (1.66667 * p)^(log(sqrt(p)) + 0.255413)
+- lentille 20 pts 5 % draw 3: 0.239 under units, 0.0277 without; under units 0.0464414 * p / p² | without 0.0856872 + 0.0350847 * exp((log(p) + 0.510826)²)
+- lentille 20 pts 5 % draw 4: 0.403 under units, 0.0543 without; under units 0.0459664 * p / p² | without 111.899 - 111.768 * tanh(exp(exp(p / 0.6)))
+- lentille 20 pts 5 % draw 6: 0.33 under units, 0.0122 without; under units 0.0458753 * p / p² | without 0.101152 - 0.0377631 * log(|0.256974 - 1.66667 * p|)
+- lentille 20 pts 5 % draw 7: 0.341 under units, 0.0342 without; under units 0.0471299 * p / p² | without 0.0984841 + 0.0308192 * (1.66667 * p)^(log(p) + 0.510826)
+- lentille 20 pts 5 % draw 8: 0.17 under units, 0.0291 without; under units 0.0890664 * sqrt(p / p²) | without 0.123068 - 0.00277604 * (log(p) + 0.510826) / p²
+- lentille 20 pts 5 % draw 9: 0.405 under units, 0.0204 without; under units 0.045856 * p / p² | without 0.0971473 + 0.0295938 * (1.66667 * p)^(log(p) + 0.510826)
+- rc 10 pts 2 % draw 0: 1.55 under units, 2.23e-05 without; under units 0.0964394 * t | without -0.00664979 + 4.96444 * exp(-t / 1.01302)
+- rc 10 pts 2 % draw 1: 0.0226 under units, 0.000277 without; under units 1.62933 / t | without -0.0191118 + 5.01458 * exp(-t / 1.03105)
+- rc 10 pts 2 % draw 2: 0.02 under units, 1.14e-05 without; under units -0.911866 * (log(|t / t|) - 1.67853) / t | without 0.0068086 + 5.02886 * exp(-t / 0.98531)
+- rc 10 pts 2 % draw 3: 1.53 under units, 4.38e-05 without; under units 0.0956993 * t | without -0.318902 + 50028.4 * 6.24057e-06^tanh(exp(0.2 * t))
+- rc 10 pts 2 % draw 4: 1.54 under units, 0.000231 without; under units 0.0956911 * t | without 0.0114385 + 4.92472 * exp(-t / 0.987649)
+- rc 10 pts 2 % draw 5: 1.54 under units, 0.000126 without; under units 0.0964332 * t | without 0.00407487 + 5.03772 * exp(-t / 0.989319)
+- rc 10 pts 2 % draw 6: 0.0221 under units, 0.000148 without; under units 1.54728 / t | without -0.0166265 + 4.92003 * exp(-t / 1.03374)
+- rc 10 pts 2 % draw 7: 1.55 under units, 6.02e-05 without; under units 0.0971411 * t | without -0.00129106 + 5.02284 * exp(-t / 1.00372)
+- rc 10 pts 2 % draw 8: 1.54 under units, 0.000349 without; under units 0.0951723 * t | without 0.0173398 + 4.9431 * exp(-t / 0.975033)
+- rc 10 pts 2 % draw 9: 1.55 under units, 1.38e-05 without; under units 0.0961747 * t | without -0.0196032 + 4.88887 * (0.0107913 * |0.2 * t|^(0.2 * t))^(0.2 * t)
+- rc 10 pts 5 % draw 0: 0.0229 under units, 0.000311 without; under units -0.878285 * (log(|t / t|) - 1.77372) / t | without -0.0236091 + 4.88669 * exp(-t / 1.05806)
+- rc 10 pts 5 % draw 1: 1.54 under units, 0.00151 without; under units 0.0946276 * t | without -2.9553 + 2.90442 * exp(exp(-t / 1.33807))
+- rc 10 pts 5 % draw 2: 1.56 under units, 0.000104 without; under units 0.0965225 * t | without 0.0496218 + 295.684 * exp(-4.12831 * exp(t / 5))
+- rc 10 pts 5 % draw 3: 1.52 under units, 0.00019 without; under units 0.0926277 * t | without -3.4318 + 8.49885 * |0.0822112 * t|^(0.2 * t)
+- rc 10 pts 5 % draw 4: 1.56 under units, 0.00103 without; under units 0.0964601 * t | without -0.0151217 + 4.78905 * exp(-t / 1.04715)
+- rc 10 pts 5 % draw 5: 0.022 under units, 0.000215 without; under units 1.52227 / (sqrt(|sqrt(|t|)|)²)² | without -0.00785023 + 4.89375 * exp(-t / 1.01355)
+- rc 10 pts 5 % draw 6: 1.53 under units, 0.000304 without; under units 0.0948219 * t | without 5.14846 + (-3.68066 + 0.282518 * t) * sqrt(|t|)
+- rc 10 pts 5 % draw 7: 0.0235 under units, 0.000438 without; under units 1.43337 / t | without 0.0154384 + 5.12727 * exp(-t / 0.968884)
+- rc 10 pts 5 % draw 8: 1.53 under units, 0.000557 without; under units 0.0933883 * t | without 0.0179486 + 4.91605 * exp(-t / 0.965865)
+- rc 10 pts 5 % draw 9: 0.0231 under units, 0.000286 without; under units 1.55449 / t | without -0.0155701 + 4.96116 * exp(-t / 1.0394)
+- rc 20 pts 2 % draw 0: 0.0687 under units, 0.000446 without; under units -0.908704 * (log(|t / (t / sqrt(|t|))²|) - 1.3029) / t | without 0.00924128 + 4.95675 * exp(-t / 0.991018)
+- rc 20 pts 2 % draw 1: 0.065 under units, 0.000934 without; under units -0.867101 * log(|(t / (t + |t|))²|) / t | without -0.0146989 + 4.86249 * exp(-t / 1.03145)
+- rc 20 pts 2 % draw 2: 0.105 under units, 0.000307 without; under units 1.34221 / t | without -0.00634982 + 5.02092 * exp(-t / 1.00783)
+- rc 20 pts 2 % draw 3: 0.0728 under units, 0.000307 without; under units 1.25408 / t | without 0.00261021 + 5.0124 * exp(-t / 0.997002)
+- rc 20 pts 2 % draw 4: 0.0637 under units, 0.000191 without; under units 1.20953 / sqrt(|t|)² | without 0.00434308 + 5.02355 * exp(-t / 0.992934)
+- rc 20 pts 2 % draw 5: 0.0636 under units, 6.14e-05 without; under units 1.20508 / t | without 0.00410416 + 4.99873 * exp(-t / 0.990737)
+- rc 20 pts 2 % draw 6: 0.0671 under units, 6.42e-05 without; under units 24.776 * exp(-3.00849 * t / t) / t | without -2.96723 + 7.91442 * exp(tanh(-2.74065 * tanh(0.2 * t)))
+- rc 20 pts 2 % draw 7: 0.0673 under units, 0.000392 without; under units -0.938984 * (log(|t / t|) - 1.29224) / t | without 0.00995178 + 5.13281 * exp(-t / 0.972645)
+- rc 20 pts 2 % draw 8: 0.0734 under units, 0.000194 without; under units 24.6258 / t - 23.4304 * t / t² | without -0.00996756 + 4.93048 * exp(-t / 1.01951)
+- rc 20 pts 2 % draw 9: 0.723 under units, 0.000322 without; under units 1.20492 * t / t² | without -0.00869757 + 4.96791 * exp(-t / 1.01406)
+- rc 20 pts 5 % draw 0: 0.0666 under units, 0.00135 without; under units 1.21228 / t | without 0.00538504 + 5.05644 * exp(-t / 0.981975)
+- rc 20 pts 5 % draw 1: 0.063 under units, 0.000798 without; under units 25.3555 * exp(-3.03729 * t / t) / t | without 0.00579031 + 5.06879 * exp(-t / 0.982016)
+- rc 20 pts 5 % draw 2: 0.0741 under units, 0.00359 without; under units 1.23965 / t | without 19.2502 - 19.1658 * tanh(exp(tanh(0.2 * t))²)
+- rc 20 pts 5 % draw 3: 0.0548 under units, 0.000813 without; under units 1.20868 / t | without 0.015248 + 5.04577 * exp(-t / 0.962905)
+- rc 20 pts 5 % draw 4: 0.0577 under units, 0.00193 without; under units 1.16275 / t | without 0.026357 + 4.87722 * exp(-t / 0.964885)
+- rc 20 pts 5 % draw 5: 0.0723 under units, 0.00444 without; under units 1.16648 / t | without 0.0257349 + 4.97984 * exp(-t / 0.952757)
+- rc 20 pts 5 % draw 6: 0.0634 under units, 0.000884 without; under units 25.2891 * |1 / t| - 24.0859 * t / t² | without 32.0501 - 42.0444 * tanh(tanh(0.4 * t + sqrt(exp(t / 5))))
+- rc 20 pts 5 % draw 7: 0.0709 under units, 0.000617 without; under units 1.2194 / sqrt(|t|)² | without -0.00822742 + 5.0585 * exp(-t / 1.00341)
+- rc 20 pts 5 % draw 8: 0.0818 under units, 0.00292 without; under units 1.19692 / t | without 9.89558 - 5.08117 / |0.2 * t|^(0.2 * t) - 0.939006 * t
+- rc 20 pts 5 % draw 9: 0.0448 under units, 0.0034 without; under units -26.2266 / t + 27.5011 * t / t² | without 0.0200986 + 5.28726 * exp(-t / 0.950705)
+- refroidissement 10 pts 2 % draw 0: 4.29 under units, 0.000881 without; under units 0.0238355 * t | without 23.2203 + 71.3532 * tanh(exp(-t / 448.294))
+- refroidissement 10 pts 2 % draw 1: 4.08 under units, 0.00262 without; under units 0.02347 * t | without 22.4273 - 57.7594 * (0.000555556 * t - |0.000555556 * t|^(0.000555556 * t))
+- refroidissement 10 pts 2 % draw 2: 4.28 under units, 0.0135 without; under units 0.0239217 * t | without 81.1396 - 67.2968 * sqrt(|tanh(0.000555556 * t)|)
+- refroidissement 10 pts 2 % draw 3: 4.21 under units, 0.0016 without; under units 0.0236334 * t | without 3023.66 - 3028.07 * tanh(exp(tanh(exp(t / 1800))))
+- refroidissement 10 pts 2 % draw 4: 4.09 under units, 0.0284 without; under units 0.0237457 * t | without 256.468 - 237.838 * tanh(exp(t / 1800))
+- refroidissement 10 pts 2 % draw 5: 4.1 under units, 0.000623 without; under units 0.0233403 * t | without 20.2907 + 59.3519 * exp(-t / 583.461)
+- refroidissement 10 pts 2 % draw 6: 5.95 under units, 0.000657 without; under units 1 | without 19.0681 + 59.116 * exp(-t / 636.683)
+- refroidissement 10 pts 2 % draw 7: 4.14 under units, 0.00409 without; under units 0.023661 * t | without 78.8905 - 0.0831973 * t / exp(t / 1800)
+- refroidissement 10 pts 2 % draw 8: 3.99 under units, 0.00124 without; under units 0.0233342 * t | without 82.4159 - 0.0325114 * (t - (log(|t|) - 7.49554) * t)
+- refroidissement 10 pts 5 % draw 0: 3.82 under units, 0.00736 without; under units 0.0237017 * t | without 85.2487 - 62.2713 * sqrt(|tanh(0.000555556 * exp(t / 1800) * t)|)
+- refroidissement 10 pts 5 % draw 1: 3.97 under units, 0.00362 without; under units 0.0236575 * t | without 81.6916 - 77.1444 * tanh(tanh(0.00109743 * t))
+- refroidissement 10 pts 5 % draw 2: 4.38 under units, 0.00828 without; under units 0.0237264 * t | without 78.8135 - 64.7169 * sqrt(|tanh(0.000555556 * t)|)
+- refroidissement 10 pts 5 % draw 4: 4.23 under units, 0.0183 without; under units 0.0240056 * t | without 77.851 - 0.0808608 * t / exp(t / 1800)
+- refroidissement 10 pts 5 % draw 5: 4.17 under units, 0.0357 without; under units 0.0231814 * t | without 242.063 - 223.549 * tanh(exp(t / 1800))
+- refroidissement 10 pts 5 % draw 6: 5.45 under units, 0.0122 without; under units 1 | without 82.1522 - 0.0884799 * exp(-t / 1800) * t
+- refroidissement 10 pts 5 % draw 7: 3.89 under units, 0.00358 without; under units 0.0240191 * t | without 22.1533 + 63.245 * exp(-t / 521.845)
+- refroidissement 10 pts 5 % draw 8: 0.453 under units, 0.0168 without; under units 43.2531 * (1.83993 - t / |t|) | without 81.1232 - 67.3349 * sqrt(|tanh(0.000555556 * t)|)
+- refroidissement 10 pts 5 % draw 9: 5.59 under units, 0.015 without; under units 1 | without 86.7512 - 74.0201 * sqrt(|tanh(0.000555556 * t)|)
+- refroidissement 20 pts 2 % draw 0: 0.135 under units, 0.00196 without; under units 64.661 * exp(-t / 1800) | without 20.3163 + 61.7356 * exp(-t / 570.673)
+- refroidissement 20 pts 2 % draw 1: 0.123 under units, 0.00158 without; under units 64.5554 * exp(-t / (t - |t|)) | without 20.7886 + 60.0544 * exp(-t / 575.14)
+- refroidissement 20 pts 2 % draw 2: 0.105 under units, 0.0015 without; under units 892.192 / sqrt(|t|) | without -12.659 + 93.0486 * ((exp(t / 1800) - 0.000555556 * t) / exp(t / 1800))²
+- refroidissement 20 pts 2 % draw 3: 0.13 under units, 0.00238 without; under units 889.191 / sqrt(|t|) | without 20.4137 + 59.3447 * exp(-t / 603.392)
+- refroidissement 20 pts 2 % draw 4: 0.144 under units, 0.00205 without; under units 51.6749 * (1.26922 - t / sqrt(|t² - t * t|)) | without 84.6157 - 1.43344 * sqrt(|t / |0.000555556 * t|^(0.000555556 * t)|)
+- refroidissement 20 pts 2 % draw 6: 0.122 under units, 0.00103 without; under units 211.599 * exp(exp(exp(-t / t))) / sqrt(|t|) | without 3206.95 - 3216.15 * tanh(exp(tanh(exp(tanh(0.000555556 * t)))))
+- refroidissement 20 pts 2 % draw 7: 3.36 under units, 0.00132 without; under units 1.02531 * sqrt(|t|) | without 20.4217 + 58.5884 * exp(-t / 599.372)
+- refroidissement 20 pts 2 % draw 8: 0.748 under units, 0.000829 without; under units 96.4858 * exp(-t / t) | without 20.5207 + 61.048 * exp(-t / 574.956)
+- refroidissement 20 pts 2 % draw 9: 0.139 under units, 0.00486 without; under units 881.484 * (1 / sqrt(|sqrt(|t|)|))² | without 78.0973 - 0.0824624 * t / exp(t / 1800)
+- refroidissement 20 pts 5 % draw 0: 0.101 under units, 0.0115 without; under units 881.004 / sqrt(|t|) | without 88.6778 - 89.2299 * tanh(0.0235702 * sqrt(|t|))
+- refroidissement 20 pts 5 % draw 2: 0.635 under units, 0.0266 without; under units 95.4194 * exp(-t / t) | without 84.2419 - 81.8876 * tanh(0.0235702 * sqrt(|t|))
+- refroidissement 20 pts 5 % draw 3: 0.629 under units, 0.0104 without; under units 96.7861 * exp(-t / t) | without 85.7174 - 83.5766 * tanh(0.0235702 * sqrt(|t|))
+- refroidissement 20 pts 5 % draw 4: 0.189 under units, 0.0118 without; under units 206.839 / sqrt(|sqrt(|t|)|) | without 78.8126 - 0.0831813 * t / exp(t / 1800)
+- refroidissement 20 pts 5 % draw 6: 0.129 under units, 0.00697 without; under units 895.215 / sqrt(|t|) | without 77.1111 - 0.0801212 * t / exp(t / 1800)
+- refroidissement 20 pts 5 % draw 7: 0.172 under units, 0.0185 without; under units 202.382 / sqrt(|sqrt(|t|)|) | without 378.33 - 474.48 * tanh(tanh(exp(tanh(0.000555556 * t))))
+- refroidissement 20 pts 5 % draw 8: 0.148 under units, 0.00715 without; under units 49.7526 * (1.3006 - t / sqrt(|t * t - t²|)) | without 22.9442 - 57.1419 * (0.000555556 * t - |0.000555556 * t|^(0.000555556 * t))
+- refroidissement 20 pts 5 % draw 9: 0.0952 under units, 0.0137 without; under units 904.132 / sqrt(|t|) | without 79.0921 - 0.0842633 * t / exp(t / 1800)
+- ressort 10 pts 5 % draw 7: 0.0603 under units, 0.00809 without; under units 6.4391 * sqrt(m / k) | without 0.078307 + 0.534749 * (3.02164 * m)^((0.0214789 * k)^exp(k / 46.5573))
+- ufeyn I.11.19 seed 4: 0.0423 under units, 2.56e-31 without; under units 2.1913 * v3 * sqrt(v1 * (0.200068 * v4 + 0.153889 * |v1| / ( | without v5 * v4 + v3 * v2 + v1 * v0
+- ufeyn I.50.26 seed 0: 0.6 under units, 0.0503 without; under units -0.00899053 * ((v1 * v1 * v1 / |v1|)² / v1)² * v1 * (v1 * (0 | without 0.30293 - 0.152997 * (cos((0.33894 * v2 * |exp(v1 / 2.96376)| - 4.46519)²) * |ex
+- ufeyn I.50.26 seed 3: 0.788 under units, 0.0108 without; under units 0.469763 * v1 * v0 | without 77.4887 - 77.8013 * cos((tanh(cos(log(exp(0.212523 * v2 * v1)))) - 0.940999 + co
+- ufeyn I.6.20a seed 0: 0.00123 under units, 1.15e-27 without; under units -0.500428 * (|tanh(|tanh(0.297797 * |v0| * tanh(0.334575 * | | without 0.398942 * exp(-0.5 * v0²)
+- ufeyn III.17.37 seed 0: 0.1 under units, 0.0011 without; under units 6.50359 * (0.411077 * tanh(0.168278 * v2) * tanh(1.02976 * v | without 74.5207 + (-5.75866 + 0.0773136 * v0) * (11.941 + 0.207377 * v1 * sin(cos((0.618
+- ufeyn III.17.37 seed 2: 0.234 under units, 0.0183 without; under units 1.08232 * v0 - 0.748769 * v2 * sin(0.166916 * v2 / (1.02976  | without -0.252334 + 0.0149319 * (exp((0.202473 * v0 + 5.64085) * sqrt(|v1^0.367841 * (2.
+- ufeyn III.17.37 seed 3: 0.134 under units, 0.0162 without; under units -7.37354 * (0.00197592 * (v1 * v0 / (v0 / v2) * (log(v2) - 1 | without 2.52929 + 5.58625 * cos(-14.4897 + tanh((0.0776486 - 0.00816727 * v0) * v0 * v0)
+- ufeyn_n1 I.11.19 seed 4: 0.044 under units, 0.00807 without; under units (1.81093 * v5 + 1.80582 * v1 + 1.8027 * v3) * (0.200068 * v4 | without -13.5395 - 0.0409156 * (-0.462253 * v5 / sqrt(v5 * (0.322023 - 0.0402216 * v4) +
+- ufeyn_n1 I.16.6 seed 0: 0.00578 under units, 0.000112 without; under units 2.01824 * sqrt(v0) * sqrt(v1) / (1 + 1.015 * v0 * v1 / v2²) | without 0.000369013 + 1.99971 * (0.500368 * v0 + 0.505652 * v1) / (1.00574 + 1.00919 * v
+- ufeyn_n1 I.30.5 seed 0: 0.0018 under units, 0.000155 without; under units 1.02373 * v0 / (v1 * v2) | without 0.00436324 + 1.31085 * v0 / (v1 * v2) * sqrt(0.512664 + 0.23672 * v0 / (v1 * v2)
+- ufeyn_n1 I.30.5 seed 1: 0.0018 under units, 0.000148 without; under units 1.02373 * v0 / (v1 * v2) | without -1.12082 + 2.61106 * (0.656375 + 0.275091 * v0 / (v1 * v2))²
+- ufeyn_n1 I.30.5 seed 2: 0.0018 under units, 0.000148 without; under units 1.02373 * v0 / (v1 * v2) | without 0.00409896 + v0 / (v1 * v2) * (0.942921 + 0.197592 * v0 / (v1 * v2))
+- ufeyn_n1 I.30.5 seed 3: 0.0018 under units, 0.000131 without; under units 1.02373 * v0 / (v1 * v2) | without 0.00337998 + 0.714218 * v0 / (v1 * v2) / sqrt(0.560623 - 0.182774 * v0 / (v1 * v
+- ufeyn_n1 I.30.5 seed 4: 0.0018 under units, 0.000148 without; under units 1.02373 * v0 / (v1 * v2) | without 0.00409896 + v0 / (v1 * v2) * (0.942921 + 0.197592 * v0 / (v1 * v2))
+- ufeyn_n1 I.40.1 seed 1: 0.106 under units, 0.0207 without; under units 0.272452 * v5 / (v3 / (v4 / v1)) * v0 / v2 | without 0.0252926 + 517771 * (1.00041 - exp(v3 / 28321.5)) * v0 / v5 * exp(-3.97362 * |(
+- ufeyn_n1 I.50.26 seed 4: 0.961 under units, 0.074 without; under units 0.879828 * v0 | without -0.325671 - 0.00714682 * (0.337409 * v1 - cos(0.33894 * v2 * (0.33894 * v2 + 1.2
+- ufeyn_n1 I.6.20a seed 2: 0.00225 under units, 0.000105 without; under units 0.388743 * tanh(log(|v0|) - 1.09489)² | without 0.000350896 + 0.398659 * exp(-0.500583 * v0²)
+- ufeyn_n1 II.35.18 seed 3: 0.0913 under units, 0.0101 without; under units 0.282943 * v3 / v1 * v0 / v2 | without 4.11822 + 0.41231 * ((-0.00162373 * v2 - 0.0960345 - 0.894336 / (0.334373 * v3 -
+- ufeyn_n1 III.17.37 seed 0: 0.167 under units, 0.00694 without; under units -1.42266 * v0 * (0.193557 * sqrt(v2 * v2) - exp(0.000801886  | without 0.102077 + 0.311317 * (3.22215 * v0 - tanh(0.168278 * v2) + 2.89898 * v0 * v1 * 
+- ufeyn_n1 III.17.37 seed 2: 0.175 under units, 0.0176 without; under units 5.56706 * sqrt(|0.201384 * tanh(0.168278 * (exp(v0 * (0.2073 | without -0.400414 + 6.11162 * (sin(0.201384 * v0) - (0.168278 * v2 - 0.0229974 * (0.4487
+- ufeyn_n1 III.17.37 seed 3: 0.293 under units, 0.0198 without; under units 1.48495 * sqrt(sqrt(v0 * sqrt(|(0.168278 * v2 - tanh(0.20737 | without -2.57897 + 8.81258 * sin((0.168278 * v2)^((0.168278 * v2)^(3.19285 - exp(0.20138
+- ufeyn_n10 I.37.4 seed 1: 0.106 under units, 0.0161 without; under units 1.20543 * v1 * (0.171439 * |v2| + log(v2) - 1.76353)² * exp( | without 0.443003 + 20.2218 * tanh(tanh(6.99157 * sin(sin(0.171439 * v2 + 4.17197) + 4.14
+- ufeyn_n10 I.50.26 seed 0: 0.962 under units, 0.0451 without; under units 0.88525 * v0 | without -0.199262 - 2.19502 * (cos(2.07315 - 1.55918 * |v1| - 0.334212 * v0 * exp(v0 / 2
+- ufeyn_n10 I.50.26 seed 3: 0.741 under units, 0.0762 without; under units 0.207071 * v1² * v0 | without -0.523176 + 2.01374e-05 * (((3.43519 + 7.41067 * cos(0.337409 * v1)) * sin(0.337
+- ufeyn_n10 II.35.18 seed 1: 0.101 under units, 0.0101 without; under units 0.280927 * v3 / v2 * v0 / v1 | without 40484.5 - 40484.5 * |(0.579865^tanh(0.334373 * v3) * |0.102168 * v3 - 1.32295|^(
+- ufeyn_n10 III.17.37 seed 0: 0.18 under units, 0.0321 without; under units 1.50212 * v0 / exp(0.311508 * v2 * v0 / exp(0.127727 * v2 *  | without 0.969552 - 0.200096 * (2.26509 * v0 * sin(-3.11587 * sin(0.168278 * v2)) + sqrt(
+
+## Verdict
+
+- criterion 1: HOLDS
+- criterion 2: HOLDS
+- criterion 3: FAILS
+- criterion 4: HOLDS
+
+C1 NOT ADOPTED

@@ -1,0 +1,137 @@
+--- M2 bench of e92f86d, Model name: Intel(R) Xeon(R) Processor, 4 cores
+/home/user/gp-elite/benchmarks/results_1.2/release/m2/driver.sh: 22: cannot open /home/user/m2_records/campaignR_1.1.0.jsonl: No such file
+/home/user/gp-elite/benchmarks/results_1.2/release/m2/driver.sh: 23: cannot open /home/user/m2_records/campaignR_1.2.0.jsonl: No such file
+--- slice 2026-11-04T18:24 (0 and 0 done)
+2780 jobs to run with 2 engines
+25 jobs done, 16 s elapsed, 2754 left
+50 jobs done, 171 s elapsed, 2730 left
+75 jobs done, 188 s elapsed, 2704 left
+100 jobs done, 351 s elapsed, 2680 left
+125 jobs done, 465 s elapsed, 2655 left
+150 jobs done, 644 s elapsed, 2630 left
+175 jobs done, 664 s elapsed, 2604 left
+200 jobs done, 896 s elapsed, 2580 left
+225 jobs done, 1245 s elapsed, 2554 left
+250 jobs done, 1632 s elapsed, 2529 left
+275 jobs done, 2042 s elapsed, 2504 left
+300 jobs done, 2426 s elapsed, 2479 left
+325 jobs done, 2837 s elapsed, 2454 left
+350 jobs done, 3047 s elapsed, 2430 left
+375 jobs done, 3179 s elapsed, 2404 left
+400 jobs done, 3275 s elapsed, 2380 left
+425 jobs done, 3295 s elapsed, 2354 left
+450 jobs done, 3315 s elapsed, 2329 left
+475 jobs done, 3409 s elapsed, 2305 left
+500 jobs done, 3493 s elapsed, 2280 left
+525 jobs done, 3731 s elapsed, 2254 left
+550 jobs done, 3971 s elapsed, 2229 left
+575 jobs done, 4188 s elapsed, 2205 left
+600 jobs done, 4277 s elapsed, 2180 left
+625 jobs done, 4455 s elapsed, 2155 left
+650 jobs done, 4842 s elapsed, 2129 left
+675 jobs done, 5227 s elapsed, 2104 left
+700 jobs done, 5588 s elapsed, 2080 left
+725 jobs done, 5850 s elapsed, 2054 left
+750 jobs done, 6191 s elapsed, 2029 left
+time slice over: 2022 jobs left for the next call
+--- slice 2026-11-04T20:09 (758 and 758 done)
+2022 jobs to run with 2 engines
+25 jobs done, 393 s elapsed, 1996 left
+--- 2026-11-04T20:24 container restarted at about 20:22; 806 pairs whole. The copy of the bench lacked benchmarks/_pmlb_cache (ignored by git): the frozen test set was downloaded during the fits by both engines at once, and 18 pairs crashed on the download. Every file of the cache (117 of the test set, 7 of pmlb_frozen) fetched once and checked against its SHA-256; the 18 pairs removed (removed_for_the_data_cache.jsonl) and run again.
+--- M2 bench of e92f86d, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-04T20:24 (789 and 789 done)
+1991 jobs to run with 2 engines
+--- correction of the line above: 17 pairs (13 crashes of 1.1.0, 16 of 1.2.0, on 17 jobs), not 18.
+25 jobs done, 310 s elapsed, 1965 left
+50 jobs done, 716 s elapsed, 1940 left
+75 jobs done, 957 s elapsed, 1916 left
+100 jobs done, 1341 s elapsed, 1890 left
+125 jobs done, 1748 s elapsed, 1865 left
+150 jobs done, 2133 s elapsed, 1840 left
+175 jobs done, 2538 s elapsed, 1815 left
+200 jobs done, 2928 s elapsed, 1790 left
+225 jobs done, 3332 s elapsed, 1765 left
+250 jobs done, 3720 s elapsed, 1740 left
+275 jobs done, 4125 s elapsed, 1715 left
+300 jobs done, 4512 s elapsed, 1690 left
+325 jobs done, 4916 s elapsed, 1665 left
+350 jobs done, 5305 s elapsed, 1640 left
+375 jobs done, 5708 s elapsed, 1615 left
+400 jobs done, 6099 s elapsed, 1590 left
+time slice over: 1577 jobs left for the next call
+--- slice 2026-11-04T22:09 (1203 and 1203 done)
+1577 jobs to run with 2 engines
+25 jobs done, 415 s elapsed, 1551 left
+50 jobs done, 797 s elapsed, 1526 left
+75 jobs done, 1207 s elapsed, 1501 left
+100 jobs done, 1589 s elapsed, 1476 left
+125 jobs done, 1998 s elapsed, 1451 left
+150 jobs done, 2384 s elapsed, 1426 left
+175 jobs done, 2794 s elapsed, 1401 left
+200 jobs done, 3178 s elapsed, 1376 left
+225 jobs done, 3586 s elapsed, 1351 left
+250 jobs done, 3969 s elapsed, 1326 left
+275 jobs done, 4378 s elapsed, 1301 left
+300 jobs done, 4761 s elapsed, 1276 left
+325 jobs done, 5172 s elapsed, 1251 left
+350 jobs done, 5553 s elapsed, 1226 left
+375 jobs done, 5967 s elapsed, 1201 left
+time slice over: 1179 jobs left for the next call
+--- slice 2026-11-04T23:55 (1601 and 1601 done)
+1179 jobs to run with 2 engines
+25 jobs done, 411 s elapsed, 1153 left
+50 jobs done, 796 s elapsed, 1128 left
+75 jobs done, 1207 s elapsed, 1103 left
+100 jobs done, 1592 s elapsed, 1078 left
+125 jobs done, 2003 s elapsed, 1053 left
+150 jobs done, 2384 s elapsed, 1028 left
+175 jobs done, 2767 s elapsed, 1003 left
+200 jobs done, 2783 s elapsed, 979 left
+225 jobs done, 2936 s elapsed, 953 left
+250 jobs done, 2952 s elapsed, 928 left
+275 jobs done, 3100 s elapsed, 904 left
+300 jobs done, 3237 s elapsed, 879 left
+325 jobs done, 3349 s elapsed, 854 left
+350 jobs done, 3366 s elapsed, 828 left
+375 jobs done, 3944 s elapsed, 803 left
+400 jobs done, 4859 s elapsed, 778 left
+425 jobs done, 5244 s elapsed, 753 left
+450 jobs done, 5646 s elapsed, 728 left
+475 jobs done, 6033 s elapsed, 703 left
+time slice over: 686 jobs left for the next call
+--- slice 2026-11-05T01:40 (2094 and 2094 done)
+686 jobs to run with 2 engines
+25 jobs done, 412 s elapsed, 661 left
+50 jobs done, 793 s elapsed, 635 left
+75 jobs done, 1201 s elapsed, 610 left
+100 jobs done, 2460 s elapsed, 585 left
+125 jobs done, 2839 s elapsed, 560 left
+--- 2026-11-05T02:33 container restarted again (uptime 0 min at 02:33); 2229 pairs whole, same keys in both files, no crash; the same lscpu; the cache of m2_run holds its 124 files. Driver started again.
+--- M2 bench of e92f86d, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-05T02:33 (2229 and 2229 done)
+551 jobs to run with 2 engines
+25 jobs done, 421 s elapsed, 525 left
+50 jobs done, 801 s elapsed, 500 left
+75 jobs done, 1212 s elapsed, 475 left
+100 jobs done, 1591 s elapsed, 450 left
+125 jobs done, 2000 s elapsed, 425 left
+150 jobs done, 2380 s elapsed, 400 left
+175 jobs done, 3402 s elapsed, 376 left
+200 jobs done, 3633 s elapsed, 350 left
+225 jobs done, 3746 s elapsed, 326 left
+250 jobs done, 3768 s elapsed, 300 left
+275 jobs done, 3784 s elapsed, 276 left
+300 jobs done, 3872 s elapsed, 251 left
+325 jobs done, 3958 s elapsed, 225 left
+350 jobs done, 4097 s elapsed, 200 left
+375 jobs done, 4336 s elapsed, 175 left
+400 jobs done, 4596 s elapsed, 150 left
+425 jobs done, 4682 s elapsed, 126 left
+450 jobs done, 4860 s elapsed, 100 left
+475 jobs done, 5242 s elapsed, 75 left
+500 jobs done, 5605 s elapsed, 51 left
+525 jobs done, 6001 s elapsed, 25 left
+time slice over: 3 jobs left for the next call
+--- slice 2026-11-05T04:18 (2777 and 2777 done)
+3 jobs to run with 2 engines
+--- all done 2026-11-05T04:19

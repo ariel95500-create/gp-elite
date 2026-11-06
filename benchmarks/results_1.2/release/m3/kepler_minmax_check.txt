@@ -1,0 +1,4 @@
+generations 10, N1 off: exact law in 0 of 10
+generations 10, N1 on : exact law in 0 of 10
+generations 40, N1 off: exact law in 3 of 10
+generations 40, N1 on : exact law in 1 of 10

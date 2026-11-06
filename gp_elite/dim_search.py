@@ -278,12 +278,18 @@ def _build_ek(ek, depth, ctx, rng, budget):
     return Node(round(rng.uniform(-3, 3), 4)) if dimless else None
 
 
-def _monomial_tree(target, feats, rng, max_terms=8, ops=None):
+def _monomial_tree(target, feats, rng, max_terms=12, ops=None):
     """CHEMIN RAPIDE : resout directement les exposants entiers e_i tels que
     prod(dim_i ^ e_i) == target (moindres carres + arrondi + verification),
     puis construit l'arbre produit correspondant. Evite la recherche aveugle,
     qui coute ~0.65 s/arbre sur des unites composees.
-    Retourne None si aucune solution entiere courte n'est trouvee."""
+    Retourne None si aucune solution entiere courte n'est trouvee.
+
+    [v1.2-D0] max_terms passe de 8 a 12. Feynman III.19.51,
+    m·q^4/(eps^2·h^2), demande 9 facteurs : refuse ici, il tombait dans la
+    recherche aveugle, qui echouait 9 fois sur 10 et prenait ~440 a 735 s
+    au depart du fit (benchmarks/results_1.2/d0/D0.md). Sur les 81 fits de
+    D0, seul ce depart change."""
     try:
         import numpy as np
     except Exception:

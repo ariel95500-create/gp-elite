@@ -1,0 +1,102 @@
+| indicator | 1.1.0 | 1.2.0 |
+|---|---|---|
+| F41 exact | 163 | 163 |
+| F41N1 structure retrieved | 108 | 108 |
+| F41N10 structure retrieved | 85 | 85 |
+| TF78 exact | 214 | 214 |
+| TS14 test exact | 10 | 10 |
+| R6 folds median R² | 0.8095 | 0.8095 |
+| R6 out-of-domain collapses | 5 | 5 |
+| R6 worst out-of-domain R² | -1946.0 | -1946.0 |
+| R7raw folds median R² | 0.8787 | 0.8787 |
+| R7raw out-of-domain collapses | 5 | 5 |
+| R7raw worst out-of-domain R² | -232.5 | -232.5 |
+| TR25 folds median R² | 0.7692 | 0.7692 |
+| TR25 out-of-domain collapses | 38 | 38 |
+| TR25 worst out-of-domain R² | -1.275e+22 | -1.275e+22 |
+| TR25raw folds median R² | 0.7708 | 0.7708 |
+| TR25raw out-of-domain collapses | 28 | 28 |
+| TR25raw worst out-of-domain R² | -6.333e+17 | -6.333e+17 |
+| R6 + R7raw out-of-domain collapses | 10 | 10 |
+| formula_exact False, R6 + R7raw folds and test | 6 | 6 |
+| crashes | 0 | 0 |
+| fits | 2780 | 2780 |
+| U41 exact | 166 | 166 |
+| U41N1 structure retrieved | 113 | 113 |
+| U41N10 structure retrieved | 98 | 98 |
+| TF78 under units exact | 229 | 229 |
+| fits under units | 1005 | 1005 |
+| fits under units passing the audit | 1005 | 1005 |
+| crashes under units | 0 | 0 |
+| under units, median time of a fit (s) | 30.2 | 30.19 |
+| under units, longest fit (s) | 420.73 | 31.55 |
+
+Paired: 2780 jobs in both files, 2464 with the same returned expression (316 differ).
+Engines: [('1.1.0', '/venv11p/lib/python3.11/site-packages/gp_elite/__init__.py'), ('1.2.0', '/venv12b/lib/python3.11/site-packages/gp_elite/__init__.py')]
+
+X1 on the 1360 fits of 1.2.0 outside the frozen test set that did not crash:
+  formula without X1 computed and X1 giving back the expression: 1360 (missing or not given back: 0)
+  formula_exact differs from formula_exact_11: 0
+  neither version at its time budget (III.19.51 under units aside): 316; among them the formula without X1, the test error or formula_exact differs from 1.1.0: 0
+  beside, the frozen test set (1420 fits): missing 0, formula_exact differs 0, neither at its budget 471 of which differing from 1.1.0 0
+  every suite: formula without X1 differs from 1.1.0: 40, by suite:
+    F41: 2 (both at the time budget: 2; status changed: 0)
+    F41N1: 6 (both at the time budget: 6; status changed: 0)
+    F41N10: 3 (both at the time budget: 3; status changed: 0)
+    R7raw: 1 (both at the time budget: 1; status changed: 0)
+    TF78: 4 (both at the time budget: 4; status changed: 0)
+    TF78 under units: 2 (both at the time budget: 2; status changed: 0)
+    TR25: 1 (both at the time budget: 1; status changed: 0)
+    TR25raw: 2 (both at the time budget: 2; status changed: 0)
+    TS14: 3 (both at the time budget: 3; status changed: 0)
+    U41: 3 (both at the time budget: 1; status changed: 0)
+    U41N1: 6 (both at the time budget: 6; status changed: 0)
+    U41N10: 7 (both at the time budget: 7; status changed: 0)
+  X1 rewrites the formula: 287, by suite: F41 9, F41N1 19, F41N10 24, R6 21, R7raw 20, TF78 35, TF78 under units 5, TR25 61, TR25raw 45, TS14 33, U41 3, U41N1 4, U41N10 8
+    ('feyn', 'I.11.19', 'test', 1): -5.34905 - 1.50489 * (-0.774289 * sqrt(v0) - exp(0.0402216 * v5 * v4))  ->  -5.34905 - 1.50489 * (-0.774289 * sqrt(v0) - exp(0.0402216 * v5 * v4))
+    ('feyn', 'I.11.19', 'test', 2): -12.2186 + 1.04294 * ((0.200068 * v4 + 1.86391) * (0.200127 * |(3.2257  ->  -12.2186 + 1.04294 * ((0.200068 * v4 + 1.86391) * (0.200127 * |(3.2257
+    ('feyn', 'I.50.26', 'test', 2): 0.194918 - 0.0303789 * |(-0.809896 + 0.671491 * |cos(0.33894 * v2)|) *  ->  0.194918 - 0.0303789 * |(-0.809896 + 0.671491 * |cos(0.33894 * v2)|) *
+    ('feyn', 'I.50.26', 'test', 3): 77.4887 - 77.8013 * cos((tanh(cos(log(6.41312^(0.114361 * v2 * v1))))   ->  77.4887 - 77.8013 * cos((tanh(cos(log(exp(0.212523 * v2 * v1)))) - 0.9
+    ('feyn', 'I.50.26', 'test', 4): 10.519 + 10.76 * cos(-1.16914 / (-4.35065 + 5.55922 / v0 - 2.09791 / 3  ->  10.519 + 10.76 * cos(-1.16914 / (-4.35065 + 5.55922 / v0 - 2.09791 / e
+    ('feyn', 'I.6.20a', 'test', 1): 0.398942 * |0.0114856^(0.11194 * v0²)|  ->  0.398942 * |exp(-0.5 * v0²)|
+    ('feyn', 'III.17.37', 'test', 1): 0.023527 - 33.0561 * log(exp(0.201384 * v0)) * cos((6.35847 - 1.09144   ->  0.023527 - 33.0561 * log(exp(v0 / 4.96563)) * cos((6.35847 - 1.09144 *
+    ('feyn', 'III.9.52', 'test', 2): 0.0353195 - 6.54915 * (0.335117 * ((-0.0491687 + cos(exp(0.335117 * v2  ->  0.0353195 - 6.54915 * (0.335117 * ((-0.0491687 + cos(exp(v2 / 2.98403)
+    ('feyn', 'III.9.52', 'test', 4): -1.28025 - 10.8198 * (-0.560785 * v1 * v0 / v3 * tanh(-2.80038 * v2 *   ->  -1.28025 - 10.8198 * (-0.560785 * v1 * v0 / v3 * tanh(-2.80038 * v2 * 
+    ('feyn_n1', 'I.11.19', 'test', 0): 1.33535 + 0.323081 * (0.200068 * v4 * (0.20104 * v5 + 1.9423^(0.20104   ->  1.33535 + 0.323081 * (0.200068 * v4 * (0.20104 * v5 + exp(v5 / 7.49262
+    ('feyn_n1', 'I.11.19', 'test', 2): -29.0701 - 12.589 * (sqrt(exp(0.200127 * v3)) - |3.27196 - 0.200472 *   ->  -29.0701 - 12.589 * (sqrt(exp(v3 / 4.99684)) - |3.27196 - 0.200472 * v
+    ('feyn_n1', 'I.16.6', 'test', 2): -1.72166 + (14.5086 - 47.3782 * sqrt(v0) * sqrt(1.86956^(0.505652 * v1  ->  -1.72166 + (14.5086 - 47.3782 * sqrt(v0) * sqrt(exp(v1 / 3.16068)) * v
+
+III.19.51 under units:
+  ufeyn seed 0: 0.99 s, EXACT, units_ok True (1.1.0: 370.56 s, EXACT)
+  ufeyn seed 1: 0.99 s, EXACT, units_ok True (1.1.0: 387.2 s, EXACT)
+  ufeyn seed 2: 1.14 s, EXACT, units_ok True (1.1.0: 342.12 s, EXACT)
+  ufeyn seed 3: 1.12 s, EXACT, units_ok True (1.1.0: 374.47 s, EXACT)
+  ufeyn seed 4: 1.16 s, EXACT, units_ok True (1.1.0: 381.83 s, EXACT)
+  ufeyn_n1 seed 0: 30.2 s, NEAR, units_ok True (1.1.0: 374.03 s, NEAR)
+  ufeyn_n1 seed 1: 30.25 s, NEAR, units_ok True (1.1.0: 420.73 s, NEAR)
+  ufeyn_n1 seed 2: 30.3 s, NEAR, units_ok True (1.1.0: 334.17 s, NEAR)
+  ufeyn_n1 seed 3: 30.12 s, NEAR, units_ok True (1.1.0: 366.71 s, NEAR)
+  ufeyn_n1 seed 4: 30.46 s, NEAR, units_ok True (1.1.0: 389.03 s, NEAR)
+  ufeyn_n10 seed 0: 30.34 s, NEAR, units_ok True (1.1.0: 368.78 s, NEAR)
+  ufeyn_n10 seed 1: 30.05 s, NEAR, units_ok True (1.1.0: 384.09 s, NEAR)
+  ufeyn_n10 seed 2: 30.35 s, NEAR, units_ok True (1.1.0: 340.57 s, NEAR)
+  ufeyn_n10 seed 3: 30.4 s, NEAR, units_ok True (1.1.0: 367.9 s, NEAR)
+  ufeyn_n10 seed 4: 30.24 s, NEAR, units_ok True (1.1.0: 374.62 s, NEAR)
+
+Criteria written before the run (PLAN_RELEASE_1.2.md, M2):
+  [met] F41: not more than 3 fewer exact laws than 1.1.0
+  [met] F41N1: not more than 3 fewer structures than 1.1.0
+  [met] F41N10: not more than 3 fewer structures than 1.1.0
+  [met] R6 folds median R² not more than 0.005 below 1.1.0
+  [met] R6 + R7raw collapses out of domain not more than 1.1.0 plus 2
+  [met] U41: not more than 3 fewer exact laws than 1.1.0 (166 -> 166)
+  [met] U41N1: not more than 3 fewer structures than 1.1.0
+  [met] U41N10: not more than 3 fewer structures than 1.1.0
+  [met] every model returned under units passes check_dimensions (1005 of 1005)
+  [met] III.19.51 under units: 15 fits, each within 60 s (15 fits, longest 30.46 s)
+  [met] X1: the formula without X1 is computed on every fit (0 missing)
+  [met] X1: formula_exact is that of the formula without X1 on every fit
+  [met] X1: where neither version reached its time budget, the formula without X1, the test error and formula_exact are those of 1.1.0 (316 fits)
+ALL MET
+
+Frozen test set, published as measured, deciding nothing: TF78 exact 214 -> 214, TS14 test exact 10 -> 10, TR25 folds median R² 0.7692 -> 0.7692, TF78 under units exact 229 -> 229.

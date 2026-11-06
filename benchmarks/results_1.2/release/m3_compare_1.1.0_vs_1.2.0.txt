@@ -1,0 +1,425 @@
+same     bad_inputs.txt
+differs  battery_example.txt
+    first :   Equation: SOH = 0.428836 + 0.111661 * courant * exp(0.51573 * courant) - 0.0181691 * sqrt(cycle)
+    second:   Equation: SOH = 0.428836 + 0.111661 * courant * exp(courant / 1.939) - 0.0181691 * sqrt(cycle)
+same     case_hubble.txt
+same     case_kepler.txt
+differs  case_nikuradse/nikuradse_seed0.txt
+    first :   1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((3.05834^(0.166445 * log_Re) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)²) + exp(log(-8.08692 + 0.00197239 * r_k * tanh(0.
+    second:   1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((exp(log_Re / 5.3745) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)²) + exp(log(-8.08692 + 0.00197239 * r_k * tanh(0.0019723
+    first :       taille  46  biais +T s  R2=  0.3346   0.194829 - 0.0241328 * |log_Re| * (-39.8334 * |0
+    second:       taille  46  biais +T s  R2=  0.3346   0.194829 - 0.0241328 * |log_Re| * (-39.8334 * |e
+    first :       taille  69  biais +T s  R2=  0.0177   1.00291 + 84.213 * (0.00197239 * r_k * 0.116735^
+    second:       taille  69  biais +T s  R2=  0.0177   1.00291 + 84.213 * (0.00197239 * r_k * exp(-log_
+differs  case_nikuradse/nikuradse_seed1.txt
+    first : /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/workX/benchmarks/real_nikuradse.py:196: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 253 of 253 training rows (larges
+    second: /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/workX/benchmarks/real_nikuradse.py:196: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 253 of 253 training rows (larges
+    first :   taille  13  R2=  0.9399   0.294218 + 0.133266 * |exp(-0.00197239 * r_k) * (log(r_k) - 6.22851)|  <- bat le linéaire
+    second:   taille  13  R2=  0.9399   0.294218 + 0.133266 * |exp(-r_k / 507) * (log(r_k) - 6.22851)|  <- bat le linéaire
+    first :   taille  16  R2=  0.9562   1.03618 - 0.136745 * (log(r_k) - 2.45112 * sqrt(|(exp(0.166445 * log_R  <- bat le linéaire
+    second:   taille  16  R2=  0.9562   1.03618 - 0.136745 * (log(r_k) - 2.45112 * sqrt(|(exp(log_Re / 6.008)   <- bat le linéaire
+    first :   taille  17  R2=  0.9597   1.00824 - 0.136647 * (log(r_k) - 2.45112 * sqrt(sqrt(|exp(0.166445 * l  <- bat le linéaire
+    second:   taille  17  R2=  0.9597   1.00824 - 0.136647 * (log(r_k) - 2.45112 * sqrt(sqrt(|exp(log_Re / 6.0  <- bat le linéaire
+    first :   taille  41  R2=  0.9839   0.576043 - 2.26799 * (log(((2.93512 + 0.172005 * sqrt(r_k)) * 0.759269  <- bat le linéaire
+    second:   taille  41  R2=  0.9839   0.576043 - 2.26799 * (log(((2.93512 + 0.172005 * sqrt(r_k)) * exp(-r_k  <- bat le linéaire
+    first :       taille  26  biais -T s  R2= -0.8110   0.342581 - 0.760323 * (log(r_k) - 5.57699) * (0.
+    second:       taille  26  biais -T s  R2= -0.8110   0.342581 - 0.760323 * (log(r_k) - 5.57699) * (ex
+same     case_nikuradse/nikuradse_seed2.txt
+differs  case_nikuradse/nikuradse_seed3.txt
+    first :   -0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.27766 + exp
+    second:   -0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.27766 + exp
+    first :   taille  38  R2=  0.9775   -1.17286 - 5.65352 * 0.320758^(0.166445 * log_Re) * log_Re * (0.780226  <- bat le linéaire
+    second:   taille  38  R2=  0.9775   -1.17286 - 5.65352 * exp(-log_Re / 5.28376) * log_Re * (0.780226 + 0.0  <- bat le linéaire
+    first :   taille  48  R2=  0.9887   0.669539 + 0.734701 * ((3.2562 * r_k^(-0.189541) - 2.05692) * tanh(15^  <- bat le linéaire
+    second:   taille  48  R2=  0.9887   0.669539 + 0.734701 * ((3.2562 * r_k^(-0.189541) - 2.05692) * tanh(exp  <- bat le linéaire
+    first :   taille  49  R2=  0.9891   0.718886 + 0.598683 * ((3.90107 * r_k^(-0.218551) - 2.37966) * tanh(15  <- bat le linéaire
+    second:   taille  49  R2=  0.9891   0.718886 + 0.598683 * ((3.90107 * r_k^(-0.218551) - 2.37966) * tanh(ex  <- bat le linéaire
+same     case_nikuradse/nikuradse_seed4.txt
+differs  case_nikuradse/real_nikuradse_auto_seed0.json
+    first :   "expr": "1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((3.05834^(0.166445 * log_Re) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)\u00b2) + exp(log(-8.08692 + 0.00197239 *
+    second:   "expr": "1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((exp(log_Re / 5.3745) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)\u00b2) + exp(log(-8.08692 + 0.00197239 * r_k * 
+    first :    "expr": "-0.550597 - 3.35722 * (3.89031e-06 * r_k * r_k)^tanh(0.00197239 * r_k - 0.0265387) / (log(|-0.00196742 * r_k - 1.20858^(0.00197239 * r_k)|)^(-0.00445845 * r_k) + 3.82771e-05 * r_k * (2.12628e-05 * log_Re^6 - 1.02924 - 0.00197239
+    second:    "expr": "-0.550597 - 3.35722 * (3.89031e-06 * r_k * r_k)^tanh(0.00197239 * r_k - 0.0265387) / (log(|-0.00196742 * r_k - exp(r_k / 2676.23)|)^(-0.00445845 * r_k) + 3.82771e-05 * r_k * (2.12628e-05 * log_Re^6 - 1.02924 - 0.00197239 * r_k) 
+    first :    "expr": "0.565759 + (log(r_k) - 3.8584) * (0.000248273 * |log(r_k) - 4.90918 - 0.00197239 * r_k| * r_k - 0.0209512 * log_Re * ((0.0614516 * sqrt(r_k) - 1.06584)\u00b2 + 1.46583 - 1.80846 * ((exp(0.904568^(0.00197239 * r_k)) - 12.3256 / l
+    second:    "expr": "0.565759 + (log(r_k) - 3.8584) * (0.000248273 * |log(r_k) - 4.90918 - 0.00197239 * r_k| * r_k - 0.0209512 * log_Re * ((0.0614516 * sqrt(r_k) - 1.06584)\u00b2 + 1.46583 - 1.80846 * ((exp(exp(-r_k / 5054.97)) - 12.3256 / log_Re)\u
+    first :    "expr": "1.32518 - 0.178497 * (-5.08341 * (0.718765 + 0.000328293 * r_k * log_Re - 0.220129 * log_Re) / (sqrt((15^(0.166445 * log_Re) - tanh(0.00197239 * r_k + 0.640294) - 4.62277)\u00b2) + exp(log(|-3.19261 + 0.000328293 * r_k * log_Re 
+    second:    "expr": "1.32518 - 0.178497 * (-5.08341 * (0.718765 + 0.000328293 * r_k * log_Re - 0.220129 * log_Re) / (sqrt((exp(log_Re / 2.21857) - tanh(0.00197239 * r_k + 0.640294) - 4.62277)\u00b2) + exp(log(|-3.19261 + 0.000328293 * r_k * log_Re +
+    first :    "expr": "1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((3.05834^(0.166445 * log_Re) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)\u00b2) + exp(log(-8.08692 + 0.00197239 
+    second:    "expr": "1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((exp(log_Re / 5.3745) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)\u00b2) + exp(log(-8.08692 + 0.00197239 * r_k *
+    first :    "expr": "1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((3.05834^(0.166445 * log_Re) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)\u00b2) + exp(log(-8.08692 + 0.00197239 
+    second:    "expr": "1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((exp(log_Re / 5.3745) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)\u00b2) + exp(log(-8.08692 + 0.00197239 * r_k *
+    first :     "expr": "0.380184 + (0.407976 * |1.14382 - 0.166445 * log_Re| * sqrt(log_Re) / (exp(0.166445 * log_Re) * r_k) * r_k - 1.19385 - tanh(-0.0108464 * r_k)) * (0.0029038 * r_k - 0.465146)"
+    second:     "expr": "0.380184 + (0.407976 * |1.14382 - 0.166445 * log_Re| * sqrt(log_Re) / (exp(log_Re / 6.008) * r_k) * r_k - 1.19385 - tanh(-0.0108464 * r_k)) * (0.0029038 * r_k - 0.465146)"
+    first :     "expr": "0.194829 - 0.0241328 * |log_Re| * (-39.8334 * |0.86533^(0.00197239 * r_k) - 0.166445 * log_Re| * sqrt(log_Re) / r_k - log(log_Re / r_k) - 5.29848 + 0.210741 * sqrt(sqrt(r_k)) + 0.0804184 * sqrt(r_k) / (-1.32814 * log_Re + 0.210
+    second:     "expr": "0.194829 - 0.0241328 * |log_Re| * (-39.8334 * |exp(-r_k / 3505.14) - 0.166445 * log_Re| * sqrt(log_Re) / r_k - log(log_Re / r_k) - 5.29848 + 0.210741 * sqrt(sqrt(r_k)) + 0.0804184 * sqrt(r_k) / (-1.32814 * log_Re + 0.210741 * s
+    first :     "expr": "1.00291 + 84.213 * (0.00197239 * r_k * 0.116735^(0.166445 * log_Re) / (-0.0179827 * r_k - 0.662591) + |0.000328293 * 0.0265457^(0.166445 * log_Re) * 0.0425226^(0.166445 * log_Re) * r_k * (sqrt(|0.166445 * log_Re - 0.836623 - 3.
+    second:     "expr": "1.00291 + 84.213 * (0.00197239 * r_k * exp(-log_Re / 2.79721) / (-0.0179827 * r_k - 0.662591) + |0.000328293 * exp(-log_Re / 1.6556) * exp(-log_Re / 1.90264) * r_k * (sqrt(|0.166445 * log_Re - 0.836623 - 3.89031e-06 * r_k * r_k
+differs  case_nikuradse/real_nikuradse_auto_seed1.json
+    first :    "expr": "0.294218 + 0.133266 * |exp(-0.00197239 * r_k) * (log(r_k) - 6.22851)|"
+    second:    "expr": "0.294218 + 0.133266 * |exp(-r_k / 507) * (log(r_k) - 6.22851)|"
+    first :    "expr": "1.03618 - 0.136745 * (log(r_k) - 2.45112 * sqrt(|(exp(0.166445 * log_Re) - 0.00197239 * r_k - 1.87908) / log_Re|))"
+    second:    "expr": "1.03618 - 0.136745 * (log(r_k) - 2.45112 * sqrt(|(exp(log_Re / 6.008) - 0.00197239 * r_k - 1.87908) / log_Re|))"
+    first :    "expr": "1.00824 - 0.136647 * (log(r_k) - 2.45112 * sqrt(sqrt(|exp(0.166445 * log_Re) - 0.00197239 * r_k - 1.87908|) / log_Re))"
+    second:    "expr": "1.00824 - 0.136647 * (log(r_k) - 2.45112 * sqrt(sqrt(|exp(log_Re / 6.008) - 0.00197239 * r_k - 1.87908|) / log_Re))"
+    first :    "expr": "0.576043 - 2.26799 * (log(((2.93512 + 0.172005 * sqrt(r_k)) * 0.759269^(0.00197239 * r_k) - log(r_k) + 6.22851)^(0.166445 * log_Re)) - 1.07212) * (-3.96705 + log(r_k)) * (log(0.620403^(0.166445 * log_Re)) + 0.545466) - 0.0029831
+    second:    "expr": "0.576043 - 2.26799 * (log(((2.93512 + 0.172005 * sqrt(r_k)) * exp(-r_k / 1840.96) - log(r_k) + 6.22851)^(0.166445 * log_Re)) - 1.07212) * (-3.96705 + log(r_k)) * (log(exp(-log_Re / 12.5852)) + 0.545466) - 0.00298313 * sqrt(r_k)"
+    first :     "expr": "0.342581 - 0.760323 * (log(r_k) - 5.57699) * (0.409888^(0.00197239 * r_k - 0.572747) - 1.45627 + 0.166445 * log_Re * (0.00197239 * r_k)^(0.333762^(0.00197239 * r_k)))"
+    second:     "expr": "0.342581 - 0.760323 * (log(r_k) - 5.57699) * (exp(-0.00175911 * r_k + 0.510816) - 1.45627 + 0.166445 * log_Re * (0.00197239 * r_k)^exp(-r_k / 462.032))"
+    first :     "expr": "0.969099 + 0.204328 * (log(log_Re / r_k) + sqrt((0.166445 * log_Re)^(-2.11498 * (-0.0216301 * r_k + 15) / (log_Re * (log(log_Re / r_k) + 5.24237))) / 2.51444^(-0.651484 * (log(r_k * r_k) - 12.457))))"
+    second:     "expr": "0.969099 + 0.204328 * (log(log_Re / r_k) + sqrt((0.166445 * log_Re)^(-2.11498 * (-0.0216301 * r_k + 15) / (log_Re * (log(log_Re / r_k) + 5.24237))) / exp(-0.6007 * (log(r_k * r_k) - 12.457))))"
+    first :     "expr": "-0.308057 + 0.887541 * sqrt(5.28653 * 1 / log_Re / log_Re + 0.0554077 * log_Re * log_Re + 0.166445 * log_Re + 0.00197239 * r_k - 1.67252) * (0.853952^exp(0.0444116 * sqrt(r_k)))\u00b2 * sqrt(|log(sqrt(r_k)) - 3.11426 - exp(33.1
+    second:     "expr": "-0.308057 + 0.887541 * sqrt(5.28653 * 1 / log_Re / log_Re + 0.0554077 * log_Re * log_Re + 0.166445 * log_Re + 0.00197239 * r_k - 1.67252) * exp(-0.15788 * exp(0.0444116 * sqrt(r_k)))\u00b2 * sqrt(|log(sqrt(r_k)) - 3.11426 - exp
+same     case_nikuradse/real_nikuradse_auto_seed2.json
+differs  case_nikuradse/real_nikuradse_auto_seed3.json
+    first :   "expr": "-0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.27
+    second:   "expr": "-0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.27
+    first :    "expr": "-1.17286 - 5.65352 * 0.320758^(0.166445 * log_Re) * log_Re * (0.780226 + 0.0158542 * log(r_k) + 0.00197239 * r_k - |2.12628e-05 * log_Re^6 - 0.0128113 * r_k|^(-0.000302291)) + 0.0218769 * r_k"
+    second:    "expr": "-1.17286 - 5.65352 * exp(-log_Re / 5.28376) * log_Re * (0.780226 + 0.0158542 * log(r_k) + 0.00197239 * r_k - |2.12628e-05 * log_Re^6 - 0.0128113 * r_k|^(-0.000302291)) + 0.0218769 * r_k"
+    first :    "expr": "0.669539 + 0.734701 * ((3.2562 * r_k^(-0.189541) - 2.05692) * tanh(15^tanh(0.166445 * (558.083 * r_k^(-1.01541) - 15) * log_Re * exp(2.12628e-05 * log_Re^6 + 0.288029 + 0.166445 * log_Re)^(0.00197239 * r_k - 1.00794 * log_Re + (
+    second:    "expr": "0.669539 + 0.734701 * ((3.2562 * r_k^(-0.189541) - 2.05692) * tanh(exp(2.70805 * tanh(0.166445 * (558.083 * r_k^(-1.01541) - 15) * log_Re * exp(2.12628e-05 * log_Re^6 + 0.288029 + 0.166445 * log_Re)^(0.00197239 * r_k - 1.00794 *
+    first :    "expr": "0.718886 + 0.598683 * ((3.90107 * r_k^(-0.218551) - 2.37966) * tanh(15^tanh(0.166445 * (530.705 * r_k^(-1.00734) - 15) * log_Re * exp(2.12628e-05 * log_Re^6 + 0.545914 + 0.166445 * log_Re)^(0.00197239 * r_k - 1.01318 * log_Re + 
+    second:    "expr": "0.718886 + 0.598683 * ((3.90107 * r_k^(-0.218551) - 2.37966) * tanh(exp(2.70805 * tanh(0.166445 * (530.705 * r_k^(-1.00734) - 15) * log_Re * exp(2.12628e-05 * log_Re^6 + 0.545914 + 0.166445 * log_Re)^(0.00197239 * r_k - 1.01318 
+    first :    "expr": "-0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.2
+    second:    "expr": "-0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.2
+    first :    "expr": "-0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.2
+    second:    "expr": "-0.407666 + 0.0930227 * (0.29892 * sqrt(|84.3875 * log_Re / r_k + 2.23429 * log_Re - 12.9221|) - 0.878019 * log_Re - sqrt(sqrt(0.166445 * log_Re - log(tanh(0.0444116 * sqrt(r_k))))) * (-10.7236 + 0.00310025 * r_k * log(sqrt(-1.2
+    first :     "expr": "0.385026 + 0.00858188 * (((((0.166445 * log_Re)^(0.478499 * log_Re - 0.00567026 * r_k))^(0.166445 * log_Re) - 2.68526 + 0.00197239 * r_k) * (-0.468364 * log_Re - 0.00197239 * r_k))\u00b2 - |exp(0.00197239 * r_k)| - (0.120573^(0
+    second:     "expr": "0.385026 + 0.00858188 * (((((0.166445 * log_Re)^(0.478499 * log_Re - 0.00567026 * r_k))^(0.166445 * log_Re) - 2.68526 + 0.00197239 * r_k) * (-0.468364 * log_Re - 0.00197239 * r_k))\u00b2 - |exp(r_k / 507)| - exp(-0.00417258 * r
+differs  case_nikuradse/real_nikuradse_auto_seed4.json
+    first :    "expr": "0.221157 + 0.119237 * (2.81476 - log_Re * log_Re * (0.00461116 * log_Re - 0.00274299) + log((0.000328293 * r_k * log_Re)^(0.166445 * sqrt(log_Re)\u00b2 - 1.18108)) - exp(log(|((24806.5 - 7827.98 * log_Re - 92.7623 * r_k) * log_R
+    second:    "expr": "0.221157 + 0.119237 * (2.81476 - log_Re * log_Re * (0.00461116 * log_Re - 0.00274299) + log((0.000328293 * r_k * log_Re)^(0.166445 * sqrt(log_Re)\u00b2 - 1.18108)) - exp(log(|((24806.5 - 7827.98 * log_Re - 92.7623 * r_k) * log_R
+    first :    "expr": "0.195749 + 0.125329 * (2.71757 - log_Re * log_Re * (0.00461116 * log_Re - 0.00421131) + log((0.000328293 * r_k * log_Re)^(0.166445 * sqrt(log_Re)\u00b2 - 1.19614)) - exp(log(|((24477.8 - 7827.98 * log_Re - 92.7623 * r_k) * log_R
+    second:    "expr": "0.195749 + 0.125329 * (2.71757 - log_Re * log_Re * (0.00461116 * log_Re - 0.00421131) + log((0.000328293 * r_k * log_Re)^(0.166445 * sqrt(log_Re)\u00b2 - 1.19614)) - exp(log(|((24477.8 - 7827.98 * log_Re - 92.7623 * r_k) * log_R
+    first :     "expr": "0.33891 - 0.0558414 * (0.00197239 * r_k + log(r_k / log_Re) - 4.43542) / (-0.600794 + exp(0.00197239 * r_k))"
+    second:     "expr": "0.33891 - 0.0558414 * (0.00197239 * r_k + log(r_k / log_Re) - 4.43542) / (-0.600794 + exp(r_k / 507))"
+    first :     "expr": "0.393304 - 0.0400208 * (log(log_Re) - 0.994575 - 0.166445 * sqrt(log_Re)\u00b2 - 0.000140425 * (r_k / log_Re)\u00b2 - 0.166445 * log_Re + 2.92589 * (0.00197239 * r_k)^(0.00197239 * r_k)) * (0.538209 * log_Re^0.345497)^exp(0.044
+    second:     "expr": "0.393304 - 0.0400208 * (log(log_Re) - 0.994575 - 0.166445 * sqrt(log_Re)\u00b2 - 0.000140425 * (r_k / log_Re)\u00b2 - 0.166445 * log_Re + 2.92589 * (0.00197239 * r_k)^(0.00197239 * r_k)) * (0.538209 * log_Re^0.345497)^exp(0.044
+same     case_nikuradse_driver.txt
+differs  claims_queues.txt
+    first : queue1 == robustness DATE
+    second: queue2 == time_limit DATE
+    first : queue2 == time_limit DATE
+    second: queue1 == robustness DATE
+differs  console_hooke.txt
+    first :   [SMART-RESET gen=40] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    second: [GEN 0000|I2] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (T s)
+    first :   [SMART-RESET gen=80] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    second:   EXPR = (24.974004 * elongation)
+    first :   [SMART-RESET gen=120] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    second: 
+    first : 
+    second:   [SMART-RESET gen=40] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first : ──────────────────────────────────────────────────────────────────────
+    second:   [SMART-RESET gen=80] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first : [v21-VAL] GENERALIZATION REPORT (final champion)
+    second:   [SMART-RESET gen=120] 1 explorer island(s) — 0 semantic skeletons + 30% random (RAW=0.0000)
+    first :   MSE train      : 5.297422e-09
+    second: 
+    first :   Validation MSE : 6.696502e-09   (never seen by evolution)
+    second: ──────────────────────────────────────────────────────────────────────
+    first :   R² validation  : 1.0000
+    second: [v21-VAL] GENERALIZATION REPORT (final champion)
+    first :   Ratio val/train: 1.26
+    second:   MSE train      : 5.297422e-09
+    first :   ✓ Healthy generalization.
+    second:   Validation MSE : 6.696502e-09   (never seen by evolution)
+    first : ──────────────────────────────────────────────────────────────────────
+    second:   R² validation  : 1.0000
+    first : [LOG] History exported → /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3/gp_elite_log.csv
+    second:   Ratio val/train: 1.26
+    first : [STIGM] Fragments accumulated: 144
+    second:   ✓ Healthy generalization.
+    first : [STIGM] τ max : 6.0000  |  τ moyen : 0.8928
+    second: ──────────────────────────────────────────────────────────────────────
+    first : [STIGM] Dominant operators: [('*', 39), ('sqrt', 29), ('neg', 23), ('/', 22), ('sq', 12)]
+    second: [LOG] History exported → /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3/gp_elite_log.csv
+    first : [STIGM] Top 3 fragments :
+    second: [STIGM] Fragments accumulated: 48
+    first :   τ=6.000  freq=3295  (elongation)²
+    second: [STIGM] τ max : 3.7106  |  τ moyen : 0.2662
+    first :   τ=6.000  freq=3364  sqrt(elongation)
+    second: [STIGM] Dominant operators: [('/', 15), ('*', 9), ('neg', 8), ('sqrt', 4), ('sq', 4)]
+    first :   τ=6.000  freq=3331  (elongation / 1.898149)
+    second: [STIGM] Top 3 fragments :
+    first : 
+    second:   τ=3.711  freq=1609  (-elongation)
+    first : [COGRAPH] Co-occurrence edges: 1551
+    second:   τ=2.630  freq=2693  (elongation * 5.184905)
+    first : [COGRAPH] co max : 33.01882  |  co moyen : 1.35376
+    second:   τ=1.269  freq=2110  (elongation / -1.8801)
+    first : [COGRAPH] Top 5 paires co-occurrentes :
+    second: 
+    first :   co=33.0188  [((elongation / -1.659976) / 13.7550…]  ×  [(-((elongation / -3.1586) / 2.3209))]
+    second: [COGRAPH] Co-occurrence edges: 1287
+    first :   co=32.8067  [((-((elongation / 13.755069) / 5.27…]  ×  [(-((elongation / -3.1586) / 2.3209))]
+    second: [COGRAPH] co max : 21.43131  |  co moyen : 0.25795
+    first :   co=32.7824  [((elongation / -1.659976) / 13.7550…]  ×  [((-((elongation / 13.755069) / 5.27…]
+    second: [COGRAPH] Top 5 paires co-occurrentes :
+    first :   co=32.5819  [(elongation)²]  ×  [((elongation / -1.659976) / 13.7550…]
+    second:   co=21.4313  [(elongation * 5.184905)]  ×  [(elongation / -1.8801)]
+    first :   co=32.5301  [(elongation)²]  ×  [(-((elongation / -3.1586) / 2.3209))]
+    second:   co=17.0166  [(elongation / -1.8801)]  ×  [((elongation * 1.7587) / ((elongati…]
+    first : 
+    second:   co=17.0147  [(elongation * 5.184905)]  ×  [((elongation * 1.7587) / ((elongati…]
+    first : [SEQ_MEM] Transitions apprises : 433  (poids total : 18999.14)
+    second:   co=15.8774  [(elongation * 5.184905)]  ×  [(-elongation)]
+    first : [SEQ_MEM] Top 5 transitions :
+    second:   co=11.4935  [(elongation * 5.184905)]  ×  [(1.7587 * elongation)]
+    first :   root.root.unary           → X[0]
+    second: 
+    first :   *.root.unary              → X[0]
+    second: [SEQ_MEM] Transitions apprises : 461  (poids total : 9446.18)
+    first :   *./.right                 → const
+    second: [SEQ_MEM] Top 5 transitions :
+    first :   *./.left                  → X[0]
+    second:   root.root.unary           → X[0]
+    first :   *.-.unary                 → /
+    second:   *.root.unary              → X[0]
+    first : 
+    second:   *./.left                  → X[0]
+    first : ======================================================================
+    second:   *./.right                 → const
+    first : FINAL RESULT
+    second:   root./.right              → const
+    first : ======================================================================
+    second: 
+    first : 
+    second: ======================================================================
+    first : Target        : CSV: force = f(elongation)
+    second: FINAL RESULT
+    first : Expression    : (24.974004 * elongation′)
+    second: ======================================================================
+    first : True MSE      : 5.5764939618e-09
+    second: 
+    first : Hybrid score  : 0.0000000059   (5·(1-|r|) + mse/(1+mse))
+    second: Target        : CSV: force = f(elongation)
+    first : Fitness       : 0.0000000162
+    second: Expression    : (24.974004 * elongation′)
+    first : Size          : 3
+    second: True MSE      : 5.5764939618e-09
+    first : Depth         : 2
+    second: Hybrid score  : 0.0000000059   (5·(1-|r|) + mse/(1+mse))
+    first : 
+    second: Fitness       : 0.0000000162
+    first : Verification:
+    second: Size          : 3
+    first :   X[0]          target       predicted         error
+    second: Depth         : 2
+    first :   ----------------------------------------------------------
+    second: 
+    first :     0.5945     14.84830400     14.84825255      5.15e-05
+    second: Verification:
+    first :     0.7444     18.59176100     18.59175319      7.81e-06
+    second:   X[0]          target       predicted         error
+    first :     0.6432     16.06217600     16.06225276      7.68e-05
+    second:   ----------------------------------------------------------
+    first :     0.5910     14.75987200     14.75975253      1.19e-04
+    second:     0.5945     14.84830400     14.84825255      5.15e-05
+    first :     0.4818     12.03223300     12.03225206      1.91e-05
+    second:     0.7444     18.59176100     18.59175319      7.81e-06
+    first :     0.6820     17.03261800     17.03250292      1.15e-04
+    second:     0.6432     16.06217600     16.06225276      7.68e-05
+    first :     0.4943     12.34571200     12.34575212      4.01e-05
+    second:     0.5910     14.75987200     14.75975253      1.19e-04
+    first :     0.9035     22.56489300     22.56500387      1.11e-04
+    second:     0.4818     12.03223300     12.03225206      1.91e-05
+    first : 
+    second:     0.6820     17.03261800     17.03250292      1.15e-04
+    first : [SAVE] Meilleure solution → gp_elite_best.txt
+    second:     0.4943     12.34571200     12.34575212      4.01e-05
+    first : 
+    second:     0.9035     22.56489300     22.56500387      1.11e-04
+    first :   Note: 'Expression' above is the engine's internal form, on
+    second: 
+    first :   rescaled columns (a prime marks a rescaled column, e.g.
+    second: [SAVE] Meilleure solution → gp_elite_best.txt
+    first :   elongation′). Use the formula below.
+    second: 
+    first : 
+    second:   Note: 'Expression' above is the engine's internal form, on
+    first :   Formula in YOUR columns (checked on your data):
+    second:   rescaled columns (a prime marks a rescaled column, e.g.
+    first :     force = 250 * elongation
+    second:   elongation′). Use the formula below.
+    first :   Dimensional constraint was active: every candidate was
+    second:   Formula in YOUR columns (checked on your data):
+    first :   dimensionally consistent by construction.
+    second:     force = 250 * elongation
+    first :   Deduced constant units : [kg / s^2]
+    second: 
+    first :   Deduced constant value : 250
+    second:   Dimensional constraint was active: every candidate was
+    first : 
+    second:   dimensionally consistent by construction.
+    first : ──────────────────────────────────────────────────────────────────────
+    second:   Deduced constant units : [kg / s^2]
+    first :   Done. Press Enter to quit...
+    second:   Deduced constant value : 250
+    first : <none>
+    second: 
+    first : <none>
+    second: ──────────────────────────────────────────────────────────────────────
+    first : <none>
+    second:   Done. Press Enter to quit...
+new      deduced_constant_venv11p.txt
+new      deduced_constant_venv12bx.txt
+same     duel_gplearn.txt
+same     duel_results.jsonl
+same     feyn_results.jsonl
+same     feyn_results_normalize-none.jsonl
+same     feynman15.txt
+same     feynman15_units.jsonl
+same     feynman15_units.txt
+same     feynman_angles_normalize_none.txt
+same     formula_fuzz.txt
+new      gp_elite_best.txt
+new      gp_elite_log.csv
+same     hooke.csv
+differs  import_time.txt
+    first : 0.115 0.119 0.132 0.117 0.111 0.164 0.106
+    second: 0.082 0.072 0.073 0.073 0.070 0.073 0.070
+same     kepler_demo.txt
+same     kepler_minmax_check.txt
+same     kepler_plot.txt
+differs  m3_driver.log
+    first : all done DATE
+    second: notebook pair done DATE
+    first : <none>
+    second: all done DATE
+differs  m3_driver.sh
+    first : # M3 of PLAN_RELEASE_1.1.md for the second candidate, one step after the other,
+    second: # M3 of PLAN_RELEASE_1.2.md, one step after the other, nothing else on the
+    first : # nothing else on the machine (started after M2 ends).
+    second: # machine (started after M2 ended). W is a copy of benchmarks/, examples/ and
+    first : W=/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/work11c2
+    second: # the READMEs of commit 784152d without the package beside them; O is where the
+    first : O=/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3
+    second: # records go. The steps of the M3 of 1.1 (../../results_1.1/release/m3/), then
+    first : echo "start $(date '+%F %T')" >> $O/m3_driver.log
+    second: # the TP notebook run four times, 1.V.0 and 1.V.0 in turn, to compare its times
+    first : cd $O && /venvX/bin/python $W/benchmarks/release_claims/run_claims.py /venvX/bin/python $W $O
+    second: # on one day.
+    first : echo "run_claims done $(date '+%F %T')" >> $O/m3_driver.log
+    second: W=/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/work12
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py kepler > $O/case_kepler.txt 2>&1
+    second: O=/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py hubble > $O/case_hubble.txt 2>&1
+    second: echo "start $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py nikuradse $O/case_nikuradse > $O/case_nikuradse_driver.txt 2>&1
+    second: cd $O && /venvX/bin/python $W/benchmarks/release_claims/run_claims.py /venvX/bin/python $W $O
+    first : echo "case studies done $(date '+%F %T')" >> $O/m3_driver.log
+    second: echo "run_claims done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/results_0.9/phase5/mechanics/kepler_minmax_check.py > $O/kepler_minmax_check.txt 2>&1
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py kepler > $O/case_kepler.txt 2>&1
+    first : cd $O && PYTHONHASHSEED=0 /venv10x/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv10.txt 2>&1
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py hubble > $O/case_hubble.txt 2>&1
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv11.txt 2>&1
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py nikuradse $O/case_nikuradse > $O/case_nikuradse_driver.txt 2>&1
+    first : echo "checks done $(date '+%F %T')" >> $O/m3_driver.log
+    second: echo "case studies done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : mkdir -p $O/tp && cd $O/tp && PYTHONHASHSEED=0 /venvX/bin/python $O/tp_six_lois.py > $O/notebook_tp_six_lois_1.1.0.txt 2>&1
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/results_0.9/phase5/mechanics/kepler_minmax_check.py > $O/kepler_minmax_check.txt 2>&1
+    first : echo "notebook done $(date '+%F %T')" >> $O/m3_driver.log
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv11p.txt 2>&1
+    first : cd $O/tp_timing && for i in 1 2 3; do PYTHONHASHSEED=0 /venvX/bin/python -I gas.py >> $O/tp_timing/gas_1.1.0.txt 2>&1; done
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv12bx.txt 2>&1
+    first : echo "all done $(date '+%F %T')" >> $O/m3_driver.log
+    second: echo "checks done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : <none>
+    second: cd $O/tp && PYTHONHASHSEED=0 /venvX/bin/python $O/tp_six_lois.py > $O/notebook_tp_six_lois_1.2.0.txt 2>&1
+    first : <none>
+    second: echo "notebook done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : <none>
+    second: P=$O/tp_timing/notebook_pair
+    first : <none>
+    second: for run in 1 2; do
+    first : <none>
+    second:   cd $P && PYTHONHASHSEED=0 /venvX/bin/python -I $O/tp_six_lois.py > $P/run${run}_1.1.0.txt 2>&1
+    first : <none>
+    second:   cd $P && PYTHONHASHSEED=0 /venvX/bin/python -I $O/tp_six_lois.py > $P/run${run}_1.2.0.txt 2>&1
+    first : <none>
+    second: done
+    first : <none>
+    second: echo "notebook pair done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : <none>
+    second: echo "all done $(date -u '+%F %T')" >> $O/m3_driver.log
+same     m3_nohup.txt
+same     mystery_constant.txt
+differs  nikuradse_full.txt
+    first :   1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((3.05834^(0.166445 * log_Re) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)²) + exp(log(-8.08692 + 0.00197239 * r_k * tanh(0.
+    second:   1.73588 - 0.151954 * (-6.3498 * (5.09729 + 0.00197239 * r_k - 1.59039 * log_Re) / (sqrt((exp(log_Re / 5.3745) - tanh(0.00197239 * r_k + tanh(0.00197239 * r_k + 0.306053)) - 1.67347)²) + exp(log(-8.08692 + 0.00197239 * r_k * tanh(0.0019723
+    first :       taille  46  biais +T s  R2=  0.3346   0.194829 - 0.0241328 * |log_Re| * (-39.8334 * |0
+    second:       taille  46  biais +T s  R2=  0.3346   0.194829 - 0.0241328 * |log_Re| * (-39.8334 * |e
+    first :       taille  69  biais +T s  R2=  0.0177   1.00291 + 84.213 * (0.00197239 * r_k * 0.116735^
+    second:       taille  69  biais +T s  R2=  0.0177   1.00291 + 84.213 * (0.00197239 * r_k * exp(-log_
+same     notebook_snippet_coulomb.txt
+same     notebook_snippet_hooke.txt
+same     notebook_snippet_kepler30.txt
+same     notebook_snippet_nikuradse.txt
+same     notebook_snippet_optionB.txt
+same     notebook_snippet_torque.txt
+same     notebook_snippet_tp.txt
+new      notebook_tp_six_lois_1.2.0.txt
+same     pools_check.txt
+same     readme_kepler.py
+same     readme_kepler.txt
+same     robust_example.txt
+differs  robustness_check.jsonl
+    first : {"case": "integer_and_boolean_columns", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expected": "model", "expression": "15 + 15 * (0.2 * X0 - 0.866667^X1)", "finite": true, "formula_exact": true, "outcome": "model"
+    second: {"case": "integer_and_boolean_columns", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expected": "model", "expression": "15 + 15 * (0.2 * X0 - exp(-X1 / 6.98808))", "finite": true, "formula_exact": true, "outcome": 
+differs  robustness_check.txt
+    first : integer_and_boolean_columns    model  R2 train 1.000000  exact formula True  finite True  15 + 15 * (0.2 * X0 - 0.866667^X1)
+    second: integer_and_boolean_columns    model  R2 train 1.000000  exact formula True  finite True  15 + 15 * (0.2 * X0 - exp(-X1 / 6.98808))
+differs  robustness_check_run.txt
+    first : integer_and_boolean_columns    model  15 + 15 * (0.2 * X0 - 0.866667^X1)
+    second: integer_and_boolean_columns    model  15 + 15 * (0.2 * X0 - exp(-X1 / 6.98808))
+same     scale_check_release.txt
+differs  scaling.jsonl
+    first : {"X_hash": "d61f9a586a61", "arm": "none", "clean_recovery": false, "engine_version": "1.V.0", "expr_full": "-2.75569 + 1.86433 * (sqrt(v0) + sqrt(v1)) * sqrt(0.601084 + 0.203921^(v0 * v1 / v2\u00b2))", "formula": "(u+v)/(1+u*v/c^2)", "front
+    second: {"X_hash": "d61f9a586a61", "arm": "none", "clean_recovery": false, "engine_version": "1.V.0", "expr_full": "-2.75569 + 1.86433 * (sqrt(v0) + sqrt(v1)) * sqrt(0.601084 + exp(-1.59002 * v0 * v1 / v2\u00b2))", "formula": "(u+v)/(1+u*v/c^2)", "
+differs  scaling.txt
+    first :   N=50     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    second:   N=50     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    first :   N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    second:   N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    first :   N=1000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    second:   N=1000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    first :   N=2000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    second:   N=2000   rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    first :   N=10000  rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    second:   N=10000  rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    first :   N=10000  rep=0  EXACT  champ=4.0e-30 front=1.1e-30 size=16    T s  propre
+    second:   N=10000  rep=0  EXACT  champ=4.0e-30 front=1.1e-30 size=16     T s  propre
+differs  small_data_release.jsonl
+    first : {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 * exp(-0.7 * X0)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train": 1.0, "r2_train_rescaled": 1.0, "seed"
+    second: {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 * exp(-X0 / 1.42857)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train": 1.0, "r2_train_rescaled": 1.0, "s
+    first : {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 * 0.0436988^(0.223611 * X0)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train": 1.0, "r2_train_rescaled": 
+    second: {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 * exp(-X0 / 1.42857)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train": 1.0, "r2_train_rescaled": 1.0, "s
+    first : {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 / exp(0.7 * X0)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train": 1.0, "r2_train_rescaled": 1.0, "seed":
+    second: {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 / exp(X0 / 1.42857)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train": 1.0, "r2_train_rescaled": 1.0, "se
+    first : {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 * 1 / 3.46312^(0.223611 * X0) * 0.151334^(0.223611 * X0)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train
+    second: {"arm": "F", "engine": "/venvX/lib/python3.11/site-packages/gp_elite/__init__.py", "expr": "0.3 + 2.5 * 1 / exp(X0 / 3.60019) * exp(-X0 / 2.36834)", "law": "2.5 exp(-0.7x) + 0.3", "pythonhashseed": "0", "r2_test": 1.0, "r2_train": 1.0, "r2_
+same     small_data_release.txt
+same     small_data_run.txt
+differs  time_limit_check.txt
+    first :   [PASS] parallele : modele valide rendu              R2=0.9979
+    second:   [PASS] parallele : modele valide rendu              R2=1.0000
+    first :   [PASS] parallele : time_limit_reached = True        
+    second:   [FAIL] parallele : time_limit_reached = True        
+    first : /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/workX/benchmarks/time_limit_check.py:72: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 5 of 300 training rows (largest
+    second: /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/workX/benchmarks/time_limit_check.py:72: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 5 of 300 training rows (largest
+    first :   [PASS] GPEliteRegressor : diagnostic expose         
+    second:   [FAIL] GPEliteRegressor : diagnostic expose         
+    first : BILAN : 15/16
+    second: BILAN : 13/16
+same     tp_six_lois.py
+new      tp_timing/notebook_pair/run1_1.1.0.txt
+new      tp_timing/notebook_pair/run1_1.2.0.txt
+new      tp_timing/notebook_pair/run2_1.1.0.txt
+new      tp_timing/notebook_pair/run2_1.2.0.txt
+same     units_ab_ood.jsonl
+differs  units_ab_ood.txt
+    first : secondes / run                         1                 1                 1
+    second: secondes / run                         0                 1                 0
+same     usage_example.py
+same     usage_example.txt

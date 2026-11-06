@@ -1,0 +1,38 @@
+Campaign H1 (plan 1.2), environments, 2026-11-04T07:48:38Z
+repository commit: d05a33e50506286e8d9672ad91959b5ebb96871c
+
+/venv11p: 3.11.18
+gp_elite 1.1.0 /venv11p/lib/python3.11/site-packages/gp_elite/__init__.py
+gp-elite==1.1.0
+numpy==2.4.6
+scikit-learn==1.9.1
+scipy==1.17.1
+sympy==1.14.0
+14719fe61582978df7a4d258b5db58d438b8a2d41ddd64c7f958e37b3e5e2675  __init__.py
+e16f123ed31905a07d35fabaad6f115ae7880b04e3db20bb722bb3d0e73d04fe  __main__.py
+5d316214ae96e42f403df066b39a2a7c8191417da3ad9d1e94901623af75fac3  api.py
+63e5e7837baca40a01848d1f60f4ecf94fff7005716343a69c19cd2d23f11ec7  cli.py
+73c02e46771dd5b5c969efb46f5e8ae9aa09994a2cb32ddd38e91538318a9e64  core.py
+ae5ac78fb8128d2ab5148844ba2368a17877e3383d70a61ed6e68a8144551f37  dim_search.py
+ce99212d7fef47993a4625e01618af463d61ad89d5c03b20bd575e7ce62df7c0  dimensions.py
+3f27202c6432e45bf0cdedf766d8b934efdb916c1df0ca19c288c264a662b07c  formula.py
+22a83eed8f0e76112ff8f83753f387e4a125d254ef2a9de9a0e4da10cfdb79fe  sklearn_api.py
+400ffd9fa29def6e6bbda6325ba89a512607b422ddb3794c2c92ebfbd1b67e66  stability.py
+
+/venv12c: 3.11.18
+gp_elite 1.1.0 /venv12c/lib/python3.11/site-packages/gp_elite/__init__.py
+gp-elite @ file:///home/user/gp-elite
+numpy==2.4.6
+scikit-learn==1.9.1
+scipy==1.17.1
+sympy==1.14.0
+14719fe61582978df7a4d258b5db58d438b8a2d41ddd64c7f958e37b3e5e2675  __init__.py
+e16f123ed31905a07d35fabaad6f115ae7880b04e3db20bb722bb3d0e73d04fe  __main__.py
+9bb753a614f90216912c04ad887982a508891c0abf200ed1db4f732d94b18a46  api.py
+63e5e7837baca40a01848d1f60f4ecf94fff7005716343a69c19cd2d23f11ec7  cli.py
+9e4b057a0760ca1fe498696a7e0ee57677e98fb1095481237b0787fc31db0e35  core.py
+ea516fe0c9a2c57e2027dcaf018ac90602c11b80e6d52e69fd1129adcde14406  dim_search.py
+ce99212d7fef47993a4625e01618af463d61ad89d5c03b20bd575e7ce62df7c0  dimensions.py
+3f27202c6432e45bf0cdedf766d8b934efdb916c1df0ca19c288c264a662b07c  formula.py
+22a83eed8f0e76112ff8f83753f387e4a125d254ef2a9de9a0e4da10cfdb79fe  sklearn_api.py
+400ffd9fa29def6e6bbda6325ba89a512607b422ddb3794c2c92ebfbd1b67e66  stability.py

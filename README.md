@@ -10,7 +10,7 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 58 s in total at 1,000 points and 153 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.1.0).
+On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 38 s in total at 1,000 points and 103 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.2.0; the times depend on the machine).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -143,13 +143,25 @@ guarantee.
 - `speed`: `'ultrafast' | 'fast' (default) | 'normal' | 'thorough'`. `'thorough'`
   (population 400, four islands, 200 generations) is the regime for looking for an
   exact law; with twice the default number of generations, it is slower, and not
-  guaranteed to do better.
+  guaranteed to do better. Without `generations=` or `time_limit=`, since 1.2,
+  it too stops once it no longer improves (`patience=`, below).
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result; the
-  generation under way and the final selection add a little (17.0 s for a 15 s
-  budget on 3,000 rows in the measurement of 1.1.0, run alone, islands in
-  parallel; in sequence, the same fit stopped at 9.4 s with a model of R² 1.0000, before the
-  budget, as a search does only on an exact law).
+  generation under way and the final selection add a little (in the release
+  measurement of 1.2.0, the 1,987 fits stopped by a budget of 30 s took 30.5 s
+  at the median and 31.9 s at most). A search that finds an exact law ends
+  before its budget: with 15 s on 3,000 rows (`benchmarks/time_limit_check.py`),
+  the law came back at 6.3 s in sequence and 12.5 s with the islands in parallel.
+- `patience=` (since 1.2): when the call sets neither `generations` nor
+  `time_limit`, the search stops once its error on the hold-out rows (the
+  training rows when there are none) has not improved by 1 % in 30 generations, then polishes and selects as usual. A fit
+  of a ten-point lab table then takes seconds: the six of the French TP notebook
+  (`examples/tp_six_lois.ipynb`) take 48 s in all, against 194 to 198 s with 1.1.0 on the same machine, and
+  return the same formulas. A call that sets its budget (`generations=` or
+  `time_limit=`) gets all of it, as in
+  1.1. An integer k applies a patience of k generations whatever the budget, and
+  0 turns it off. `GPEliteRegressor` always sets its number of generations, so
+  the stop does not act there.
 - `restarts=`: independent evolutions whose candidates are merged before the final
   choice.
 
@@ -193,7 +205,11 @@ another model, an approximation of R² 0.99998. Notebooks need nothing.
   expression itself, with one symbol per column: use it when a column name is
   also a sympy constant or function (`sympify` reads `E` as 2.718..., `I` as
   √-1) or is not an identifier; `sympy()` warns in that case. (Before 0.7, the
-  displayed constants were those of the internal scaled space.) The formula is the plain mathematical
+  displayed constants were those of the internal scaled space.) Since 1.2, a
+  power of a number is written as an exponential, and an exponential of one
+  variable with its scale: `0.00538504 + 5.05644 * 0.00614708^(0.2 * t)` comes
+  back as `0.00538504 + 5.05644 * exp(-t / 0.981975)`. The rewritten formula is kept only if it
+  passes the same check, so the model and `formula_exact` do not change. The formula is the plain mathematical
   function: where one of the engine's numerical safety nets acts on your data
   (a power clipped because its base exceeds 100 or its exponent 6 in absolute
   value, or its value a million; a division by a denominator within 1e-8 of
@@ -285,7 +301,7 @@ per-name (`{"X0": "kg"}`) and per-index (`{0: "kg"}`) forms. A malformed string
 | median test R² | 1.00000 | 1.00000 | 1.00000 |
 | median out-of-domain R² | 1.00000 | 1.00000 | 1.00000 |
 | median model size | 20 nodes | 20 nodes | 20 nodes |
-| median seconds / run | 1 | 1 | 1 |
+| median seconds / run | 0 | 1 | 0 |
 
 Since 1.0 this law is one of the forms the engine fits directly, a monomial times
 a power of a binomial, and the fitted form is placed in the starting population.
@@ -299,9 +315,10 @@ generations: its models took the logarithm of a frequency, added kilograms or
 hertz to pure numbers, or raised a quantity to an exponent in coulombs, and the
 constraint was the only way to a valid answer. It still is for the laws the
 engine does not fit directly. (Since 0.9 a typed generation costs 1.4 times an
-untyped one, against 8.5 times with 0.8. A search stops early only on an exact
-law, so the runs that end on an approximation, and every run on noisy data, go
-through all their generations; `time_limit=` bounds them.)
+untyped one, against 8.5 times with 0.8. With a budget set, as here, a search
+stops early only on an exact law, so the runs that end on an approximation, and
+every run on noisy data, go through all their generations; `time_limit=` bounds
+them, and under the defaults, since 1.2, `patience=` does.)
 
 **What it does *not* do.** On a test set drawn *outside* the training domain (w/w0
 pushed from [0.20, 0.67] towards resonance at [0.70, 0.90]), the exact law holds
@@ -382,12 +399,13 @@ PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 14
   XGBoost (300 trees)     R² = -2.324
   GP_ELITE (one equation) R² = +0.162
 
-  Equation: SOH = 0.428836 + 0.111661 * courant * exp(0.51573 * courant) - 0.0181691 * sqrt(cycle)
+  Equation: SOH = 0.428836 + 0.111661 * courant * exp(courant / 1.939) - 0.0181691 * sqrt(cycle)
 ```
 
 A random split of sequential data is interpolation and flatters every method. On the
 forward split, the tree ensembles can only repeat values seen in training and fall far
-below the mean. The equation 1.0 and 1.1 return, in the current and the cycle, does better
+below the mean. The equation 1.0 to 1.2 return (1.2 writes its exponential with its
+scale), in the current and the cycle, does better
 than them, but not well (R² +0.16); 0.8 and 0.9 returned one at R² −0.31, below the
 mean too, and 0.7 one in the cycle and the current that kept following the trend
 (R² +0.594). A formula can extrapolate where a
@@ -444,7 +462,11 @@ Measured beside 1.0 for the release of 1.1, both versions give the same counts o
 exact laws without units on the frozen set (213 exact laws of 390 on its Feynman equations, 8
 of 70 on its Strogatz systems: under a time budget the counts move a little from
 one campaign to the next), and with their units 1.1 recovers 226 exact laws of 390
-against 169.
+against 169. The changes of 1.2 were decided the same way
+([`benchmarks/results_1.2/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.2));
+measured beside 1.1 for the release of 1.2, both versions give the same counts on
+the frozen set, with and without units (214 exact laws of 390 on its Feynman
+equations, 10 of 70 on its Strogatz systems, and 229 of 390 with units).
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
 
@@ -489,6 +511,13 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## Technical features
 
+- **Stop on patience** (v1.2): when the call sets neither `generations` nor
+  `time_limit`, the search stops once its hold-out error (its training error
+  when there is no hold-out) has not improved by 1 % in 30 generations
+  (`patience=`)
+- **Exponentials written as such** (v1.2): a power of a number is printed as an
+  exponential, and an exponential of one variable with its scale,
+  `exp(-t / τ)`, each kept only if it passes the check against `predict()`
 - **Forms fitted directly** (v1.0): a monomial times a power of a binomial,
   b·f·(1 + c·g)^p with p one of −1, −½, ½, 1 (rational laws, 1/√(1 − v²/c²), the
   root of a sum of two terms), and a monomial times a function of a monomial,
@@ -504,7 +533,7 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 - **Constants fitted for the judged form** (v0.8): Levenberg–Marquardt in variable projection (the scale and offset of the linear scaling solved inside the residual)
 - **Scale-free data** (v0.8): a target of any magnitude is divided internally by a power of ten, and the default normalisation divides each column by its largest absolute value
 - **Formula in your variables, checked** (v0.7): the internal rescaling is folded back into the constants; `formula_exact` reports whether the formula reproduces `predict()` on the training data
-- **Time budget** (v0.7): `time_limit=` stops cleanly and returns the best model found
+- **Time budget** (v0.7): `time_limit=` stops cleanly and returns the best model found; under `units=`, the typed start respects it too since v1.2
 - **Mystery-constant deduction** (v0.5): the leading constant may carry a dimension, inferred by homogeneity; units and raw value exposed on the estimator, the value read on the predictions when the model is a monomial (v1.0)
 - **Dimensionally-constrained search** (v0.4): constructive typed generation, dimension-preserving mutation and crossover, validity gate in `fitness()` — one semantics shared with the post-hoc auditor (v0.7)
 - **Scale-only linear scaling under `units=`** (v0.4.1): regression through the origin, so the form that is *scored* is the form that is *delivered*
@@ -526,7 +555,14 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**1.1 "Coherent"** — the forms 1.0 fits directly act under `units=` too, each placed only if
+**1.2 "Classroom"** — a fit under the defaults stops once it no longer improves
+(`patience=`): the six laws of the French TP notebook in 48 s, against 194 to
+198 s for 1.1.0 on the same machine, with the same formulas; an exponential
+comes back written as one, `exp(-t / τ)`, the model unchanged; under `units=`,
+Feynman III.19.51 without noise ends in about a second, where 1.1.0 took about
+six minutes with a budget of 30 s. With a budget set, the models of 1.1 at equal work,
+but for those whose typed start under `units=` the correction changes (III.19.51 on the
+bench): in the 2,780 fits of the release measurement, no fit changes status. **1.1 "Coherent"** — the forms 1.0 fits directly act under `units=` too, each placed only if
 it passes the gate of dimensions: on the 41 Feynman equations of the decision
 bench with their units, 165 exact laws of 205 against 108 for 1.0 measured beside
 it; every one of the 1,005 models returned under units in the release

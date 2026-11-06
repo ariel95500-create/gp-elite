@@ -10,6 +10,10 @@ one BLAS thread; the engine is the gp_elite package of the given Python.
     python benchmarks/tp_diagnostic.py run --python /venv10/bin/python \\
            --out benchmarks/results_1.1/tp/tp_1.0.0.jsonl --workers 4
     python benchmarks/tp_diagnostic.py summary benchmarks/results_1.1/tp/tp_1.0.0.jsonl
+
+[1.2] --draws 5,6,7,8,9 runs other draws (the confirmation of plan 1.2); the
+default is the draws 0 to 4 of the diagnostic. The record also gives the
+generations run, the stop on patience if any, and err_train.
 """
 import argparse
 import io
@@ -161,11 +165,22 @@ def worker(job):
         kw.update(units={nm: dict(u) for nm, _lo, _hi, u in e["inputs"]},
                   target_units=dict(e["target"]),
                   unknown_constant=e["unknown"])
+    # [1.2] the generations the sequential loop runs, counted from outside
+    import gp_elite.core as C
+    gens = [0]
+    orig_isl = C.evolve_island
+
+    def counted(*a, **k):
+        g = a[3] if len(a) > 3 else k.get("generation", 0)
+        gens[0] = max(gens[0], int(g) + 1)
+        return orig_isl(*a, **k)
+    C.evolve_island = counted
     t0 = time.time()
     with redirect_stdout(io.StringIO()), warnings.catch_warnings():
         warnings.simplefilter("ignore")
         r = symbolic_regression(X, y, **kw)
     dt = time.time() - t0
+    C.evolve_island = orig_isl
     rec = dict(job)
     try:
         rec["err_law"] = structure(r, r.scaler, X, y_clean, Xg, yg)
@@ -191,13 +206,23 @@ def worker(job):
         pythonhashseed=os.environ.get("PYTHONHASHSEED"),
         date=time.strftime("%Y-%m-%dT%H:%M:%S"))
     rec["useful"] = bool(rec["err_grid"] <= 0.01)
+    # [1.2] the generations run, the stop on patience if any (H1), and
+    # 1 - R² of the model on the training rows (for C1)
+    rec["generations"] = gens[0]
+    rec["patience_stop"] = getattr(C, "TRACE").value.get("patience")
+    with np.errstate(all="ignore"):
+        p_tr = np.asarray(r.predict(X), dtype=float)
+    e_tr = one_minus_r2(y, p_tr)
+    rec["err_train"] = float(e_tr) if np.isfinite(e_tr) else 1e30
     return rec
 
 
-def all_jobs():
+def all_jobs(draws=DRAWS):
+    """[1.2] `draws` replaces the draws 0 to 4 (--draws), for a confirmation
+    on new draws; the default gives the jobs of the diagnostic."""
     return [dict(exp=e["key"], n=n, noise=nz, draw=d, arm=a)
             for a in ARMS for e in EXPERIMENTS for n in SIZES
-            for nz in NOISES for d in DRAWS]
+            for nz in NOISES for d in draws]
 
 
 def key(j):
@@ -214,9 +239,9 @@ def _done(out):
     return done
 
 
-def run(python, out, workers, arm=None):
+def run(python, out, workers, arm=None, draws=DRAWS):
     done = _done(out)
-    jobs = [j for j in all_jobs() if key(j) not in done
+    jobs = [j for j in all_jobs(draws) if key(j) not in done
             and (arm is None or j["arm"] == arm)]
     print("%d jobs to run, %d already done" % (len(jobs), len(done)))
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
@@ -241,11 +266,11 @@ def run(python, out, workers, arm=None):
                 sys.stdout.flush()
 
 
-def run_paired(pythons, outs, workers, arm=None):
+def run_paired(pythons, outs, workers, arm=None, draws=DRAWS):
     """Each job with every engine at the same time (one process per fit), so
     that their times compare; `workers` jobs at a time."""
     dones = [_done(o) for o in outs]
-    jobs = [j for j in all_jobs() if (arm is None or j["arm"] == arm)
+    jobs = [j for j in all_jobs(draws) if (arm is None or j["arm"] == arm)
             and any(key(j) not in d for d in dones)]
     print("%d jobs to run with %d engines" % (len(jobs), len(pythons)))
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
@@ -366,23 +391,27 @@ def main():
     r.add_argument("--out", required=True)
     r.add_argument("--workers", type=int, default=4)
     r.add_argument("--arm", choices=ARMS)
+    r.add_argument("--draws", default=None)
     rp = sub.add_parser("run-paired")
     rp.add_argument("--python", action="append", required=True)
     rp.add_argument("--out", action="append", required=True)
     rp.add_argument("--workers", type=int, default=2)
     rp.add_argument("--arm", choices=ARMS)
+    rp.add_argument("--draws", default=None)
     w = sub.add_parser("worker")
     w.add_argument("job")
     s = sub.add_parser("summary")
     s.add_argument("path")
     a = ap.parse_args()
+    draws = (tuple(int(x) for x in a.draws.split(","))
+             if getattr(a, "draws", None) else DRAWS)
     if a.cmd == "run":
         os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
-        run(a.python, a.out, a.workers, a.arm)
+        run(a.python, a.out, a.workers, a.arm, draws)
     elif a.cmd == "run-paired":
         for o in a.out:
             os.makedirs(os.path.dirname(os.path.abspath(o)), exist_ok=True)
-        run_paired(a.python, a.out, a.workers, a.arm)
+        run_paired(a.python, a.out, a.workers, a.arm, draws)
     elif a.cmd == "worker":
         sys.path.insert(0, HERE)
         print(json.dumps(worker(json.loads(a.job))))

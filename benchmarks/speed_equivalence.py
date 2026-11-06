@@ -15,6 +15,9 @@ Usage (PYTHONPATH selects the engine; PYTHONHASHSEED=0):
     PYTHONHASHSEED=0 PYTHONPATH=<engine A> python benchmarks/speed_equivalence.py run <dirA>
     PYTHONHASHSEED=0 PYTHONPATH=<engine B> python benchmarks/speed_equivalence.py run <dirB>
     python benchmarks/speed_equivalence.py compare <dirA> <dirB>
+
+[1.2] EQUIV_EXTRA, a JSON object in the environment, adds arguments to every
+symbolic_regression call (not to the estimator), e.g. EQUIV_EXTRA='{"patience": 0}'.
 """
 import json
 import os
@@ -105,10 +108,11 @@ def hx(v):
 def one(name, out):
     kind, kw = CONFIGS[name]
     X, y = data(kind)
+    extra = json.loads(os.environ.get("EQUIV_EXTRA", "{}"))
     t0 = time.time()
     if kw == "twice":
         from gp_elite import symbolic_regression
-        kw2 = dict(generations=6, seed=12, robust=False)
+        kw2 = dict(generations=6, seed=12, robust=False, **extra)
         r0 = symbolic_regression(X, y, verbose=False, **kw2)
         r = symbolic_regression(X, y, verbose=False, **kw2)
         assert ser(r0.node) == ser(r.node), "two identical fits differ"
@@ -125,7 +129,7 @@ def one(name, out):
             eps0 = {"A": 2, "s": 4, "kg": -1, "m": -3}
             kw["units"] = [charge, charge, eps0, {"m": 1}]
             kw["target_units"] = {"kg": 1, "m": 1, "s": -2}
-        r = symbolic_regression(X, y, verbose=False, **kw)
+        r = symbolic_regression(X, y, verbose=False, **dict(kw, **extra))
     rec = dict(config=name, time_s=round(time.time() - t0, 3), node=ser(r.node),
                expression=r.expression, mse_validation=hx(r.mse_validation),
                mse_train=hx(r.mse_train), size=r.size,

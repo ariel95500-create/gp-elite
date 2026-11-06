@@ -1,0 +1,108 @@
+lines 2780 2780 keys equal True
+versions Counter({'1.1.0': 2780}) Counter({'1.2.0': 2780})
+crashes 0 0
+dates a 2026-11-04T18:24:04 2026-11-05T04:19:00
+dates b 2026-11-04T18:24:04 2026-11-05T04:19:00
+== 1.1.0
+ F41 exact 163
+ F41N1/N10 structure 108 85
+ U41 exact 166
+ U41N1/N10 structure 113 98
+ TF78 exact 214  utf exact 229
+ TS14 test exact 10
+  real folds 30 median R2 0.8095 ood 30 collapses 5 worst -1946.1207648484944
+  realraw folds 35 median R2 0.8787 ood 35 collapses 5 worst -232.53700317787002
+  tr folds 125 median R2 0.7692 ood 125 collapses 38 worst -1.2752993866396046e+22
+  trraw folds 125 median R2 0.7708 ood 125 collapses 28 worst -6.332599804569098e+17
+  ts folds 0 median R2 None ood 70 collapses 28 worst -1.8061453921245666e+20
+ units fits 1005 units_ok 1005 median 30.2 lower-median 30.2 max 420.73
+ units w/o III.19.51 longest 31.5
+ at budget 1993 median 30.5 max 420.73 min 30.02
+  at budget by kind max {'feyn': 31.26, 'feyn_n1': 31.35, 'feyn_n10': 31.71, 'real': 31.34, 'realraw': 31.65, 'tf': 31.79, 'tr': 31.6, 'trraw': 31.84, 'ts': 31.53, 'ufeyn': 387.2, 'ufeyn_n1': 420.73, 'ufeyn_n10': 384.09, 'utf': 31.29}
+ all fits max time 420.73
+ longest fit without units 31.84
+ formula_exact False real+realraw non-ood 6
+ formula_exact False real+realraw all 12
+ formula_exact False tr+trraw all 65
+ F41 never exact ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.10.19', 'III.17.37', 'III.9.52'] once ['I.11.19']
+ U41 never exact 6 ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+ TF78 never exact 33 of 78
+ utf never exact 30 of 78
+  median time ufeyn 0.36 max 387.2
+  median time ufeyn_n1 30.36 max 420.73
+  median time ufeyn_n10 30.35 max 384.09
+  median time utf 1.14 max 31.29
+  median time feyn 0.37 max 31.26
+  median time feyn_n1 30.57 max 31.35
+  median time feyn_n10 30.61 max 31.71
+  median time tf 0.455 max 31.79
+== 1.2.0
+ F41 exact 163
+ F41N1/N10 structure 108 85
+ U41 exact 166
+ U41N1/N10 structure 113 98
+ TF78 exact 214  utf exact 229
+ TS14 test exact 10
+  real folds 30 median R2 0.8095 ood 30 collapses 5 worst -1946.1207648484944
+  realraw folds 35 median R2 0.8787 ood 35 collapses 5 worst -232.53700317787002
+  tr folds 125 median R2 0.7692 ood 125 collapses 38 worst -1.2752993866396046e+22
+  trraw folds 125 median R2 0.7708 ood 125 collapses 28 worst -6.332599804569098e+17
+  ts folds 0 median R2 None ood 70 collapses 28 worst -1.8061453921245666e+20
+ units fits 1005 units_ok 1005 median 30.19 lower-median 30.19 max 31.55
+ units w/o III.19.51 longest 31.55
+ at budget 1987 median 30.5 max 31.94 min 30.02
+  at budget by kind max {'feyn': 31.17, 'feyn_n1': 31.36, 'feyn_n10': 31.61, 'real': 31.23, 'realraw': 31.94, 'tf': 31.78, 'tr': 31.49, 'trraw': 31.64, 'ts': 31.61, 'ufeyn': 31.36, 'ufeyn_n1': 31.55, 'ufeyn_n10': 31.27, 'utf': 31.45}
+ all fits max time 31.94
+ longest fit without units 31.94
+ formula_exact False real+realraw non-ood 6
+ formula_exact False real+realraw all 12
+ formula_exact False tr+trraw all 65
+ F41 never exact ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.10.19', 'III.17.37', 'III.9.52'] once ['I.11.19']
+ U41 never exact 6 ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+ TF78 never exact 33 of 78
+ utf never exact 30 of 78
+  median time ufeyn 0.35 max 31.36
+  median time ufeyn_n1 30.37 max 31.55
+  median time ufeyn_n10 30.34 max 31.27
+  median time utf 1.11 max 31.45
+  median time feyn 0.37 max 31.17
+  median time feyn_n1 30.56 max 31.36
+  median time feyn_n10 30.61 max 31.61
+  median time tf 0.45 max 31.78
+
+expr differ 316 without units 279 units 37
+x1 only 276 no units 257 units 19
+other model 40 no units 22 units 18
+ both at budget 38 others [(('ufeyn', 'III.19.51', 'test', 0), 370.56, 0.99, 'EXACT', 'EXACT'), (('ufeyn', 'III.19.51', 'test', 3), 374.47, 1.12, 'EXACT', 'EXACT')]
+ model-differ in frozen 12
+x1 rewrites 287 no units 267 units 20 frozen 179
+ rewrites by kind Counter({'tr': 61, 'trraw': 45, 'tf': 35, 'ts': 33, 'feyn_n10': 24, 'real': 21, 'realraw': 20, 'feyn_n1': 19, 'feyn': 9, 'ufeyn_n10': 8, 'utf': 5, 'ufeyn_n1': 4, 'ufeyn': 3})
+status changed 0
+structure changed 0
+formula_exact != formula_exact_11 0
+x1_again false 0
+neither at budget: deciding 316 frozen 471 differ 0
+III.19.51 units:
+   ('ufeyn', 'III.19.51', 'test', 0) 370.56 0.99 EXACT EXACT True False True -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²) | -0.00316629 * v0 / (v2 * v4 / (v1 / (v3 / v1)))²
+   ('ufeyn', 'III.19.51', 'test', 1) 387.2 0.99 EXACT EXACT True False True -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²) | -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²)
+   ('ufeyn', 'III.19.51', 'test', 2) 342.12 1.14 EXACT EXACT True False True -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²) | -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²)
+   ('ufeyn', 'III.19.51', 'test', 3) 374.47 1.12 EXACT EXACT True False True -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²) | -0.00316629 * v0 * (|v1 / v4| * v1 / (v2 * v3))²
+   ('ufeyn', 'III.19.51', 'test', 4) 381.83 1.16 EXACT EXACT True False True -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²) | -0.00316629 * v0 * (v1²)² / (v2² * v3² * v4²)
+   ('ufeyn_n1', 'III.19.51', 'test', 0) 374.03 30.2 NEAR NEAR True True True -0.00315989 * v0 / (v4 * v2 / v1²)² / v3 / v3 | -0.00315989 * v0 * (v1 / (v4 * v2 / (v1 / v3)))²
+   ('ufeyn_n1', 'III.19.51', 'test', 1) 420.73 30.25 NEAR NEAR True True True -0.00315989 * v0 / v4 * (v1²)² / v2 / v2 / (v4 * v3) / v3 | -0.00315989 * v0 * (sqrt(v1)² / (v2 * v4 * v3 / v1))²
+   ('ufeyn_n1', 'III.19.51', 'test', 2) 334.17 30.3 NEAR NEAR True True True -0.00315989 * v0 / (v4 * v2 / v1²)² / v3 / v3 | -0.00315989 * v0 / (|v3| * v4 * v2 / v1²)²
+   ('ufeyn_n1', 'III.19.51', 'test', 3) 366.71 30.12 NEAR NEAR True True True -0.00315989 * v0 * (v1 / v4 / (v2 / v1))² / v3 / v3 | -0.00315989 * v0 * |(v1 / (v4 * v2 * v3 / v1))²|
+   ('ufeyn_n1', 'III.19.51', 'test', 4) 389.03 30.46 NEAR NEAR True True True -0.00315989 * v0 / (v4 * v4) * (v1²)² / v2 / v2 / v3 / v3 | -0.00315989 * v0 / (v3 / (v1 / v4 / (v2 / v1)))²
+   ('ufeyn_n10', 'III.19.51', 'test', 0) 368.78 30.34 NEAR NEAR True True True -0.00310235 * v0 / (v4 * v2 / v1²)² / v3 / v3 | -0.00310235 * v0 / (v2 * v4 / (v1 / (v3 / v1)))²
+   ('ufeyn_n10', 'III.19.51', 'test', 1) 384.09 30.05 NEAR NEAR True True True -0.00310235 * v0 * (v1 / (v4 / v1))² / v2 / v2 / v3 / v3 | -0.00310235 * v0 * (sqrt(v1)² / (v2 * v4 * v3 / v1))²
+   ('ufeyn_n10', 'III.19.51', 'test', 2) 340.57 30.35 NEAR NEAR True True True -0.00310235 * v0 * (v1²)² / (v4² * v2) / v2 / v3 / v3 | -0.00310235 * v0 / (|v3| * v4 * v2 / v1²)²
+   ('ufeyn_n10', 'III.19.51', 'test', 3) 367.9 30.4 NEAR NEAR True True True -0.00310235 * v0 * (v1 / (v4 / v1))² / v2 / v2 / v3 / v3 | -0.00310235 * v0 * (|v1 / v4| * v1 / (v2 * v3))²
+   ('ufeyn_n10', 'III.19.51', 'test', 4) 374.62 30.24 NEAR NEAR True True True -0.00310235 * v0 / (v4² * v2 / (v1²)²) / v2 / v3 / v3 | -0.00310235 * v0 / (v3 / (v1 / v4 / (v2 / v1)))²
+at budget by kind 1.1/1.2 {'feyn': (48, 48), 'feyn_n1': (205, 205), 'feyn_n10': (205, 205), 'real': (60, 60), 'realraw': (70, 70), 'tf': (174, 173), 'tr': (250, 250), 'trraw': (250, 250), 'ts': (114, 114), 'ufeyn': (46, 41), 'ufeyn_n1': (205, 205), 'ufeyn_n10': (205, 205), 'utf': (161, 161)}
+at budget: deciding fits a/b 1044 1039
+top times 1.2 at budget [(31.94, ('realraw', 'nikuradse_1', 'fold1', 0)), (31.78, ('tf', 'feynman_test_4', 'test', 7)), (31.67, ('tf', 'feynman_I_9_18', 'test', 9)), (31.64, ('trraw', '529_pollen', 'ood', 6)), (31.61, ('ts', 'strogatz_bacres1', 'test', 9))]
+top times 1.1 at budget (no III.19.51) [(31.84, ('trraw', 'first_principles_supernovae_zr', 'fold2', 5)), (31.79, ('tf', 'feynman_test_10', 'test', 5)), (31.71, ('feyn_n10', 'I.15.10', 'test', 0)), (31.65, ('realraw', 'nikuradse_1', 'fold1', 0)), (31.64, ('trraw', '1027_ESL', 'ood', 9))]
+1.1 at budget median 30.5
+1.1 at budget (no III.19.51) median, max 30.5 31.84
+1.2 not at budget >30s [(('tf', 'feynman_III_8_54', 'test', 9), 29.72), (('ts', 'strogatz_vdp1', 'test', 7), 29.92), (('ts', 'strogatz_vdp1', 'test', 9), 29.27), (('ufeyn', 'I.11.19', 'test', 0), 30.3)]
+('feyn', 'I.6.20a', 'test', 1) 0.398942 * |0.0114856^(0.11194 * v0²)| || 0.398942 * |exp(-0.5 * v0²)| || 0.398942 * |0.0114856^(0.11194 * v0²)|

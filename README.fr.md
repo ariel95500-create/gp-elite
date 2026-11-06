@@ -13,7 +13,7 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 58 s au total à 1 000 points et 153 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.1.0).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 38 s au total à 1 000 points et 103 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.2.0 ; les temps dépendent de la machine).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -150,13 +150,30 @@ exacte, sans garantie.
 - `speed` : `'ultrafast' | 'fast' (défaut) | 'normal' | 'thorough'`. `'thorough'`
   (population 400, quatre îles, 200 générations) est le régime pour chercher une
   loi exacte ; avec deux fois plus de générations que par défaut, il est plus
-  lent, et ne garantit pas de faire mieux.
+  lent, et ne garantit pas de faire mieux. Sans `generations=` ni `time_limit=`,
+  depuis la 1.2, il s'arrête lui aussi dès qu'il ne progresse plus (`patience=`,
+  plus bas).
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  génération en cours et la sélection finale ajoutent un peu (17,0 s pour un
-  budget de 15 s sur 3 000 lignes dans la mesure de la 1.1.0, lancée seule, îles
-  en parallèle ; en séquence, le même ajustement s'est arrêté à 9,4 s avec un modèle de R²
-  1,0000, avant le budget, comme une recherche ne le fait que sur une loi exacte).
+  génération en cours et la sélection finale ajoutent un peu (dans la mesure de
+  sortie de la 1.2.0, les 1 987 ajustements arrêtés par un budget de 30 s ont
+  pris 30,5 s en médiane et 31,9 s au plus). Une recherche qui trouve une loi
+  exacte finit avant son budget : avec 15 s sur 3 000 lignes
+  (`benchmarks/time_limit_check.py`), la loi est revenue à 6,3 s en séquence et
+  à 12,5 s avec les îles en parallèle.
+- `patience=` (depuis la 1.2) : quand l'appel ne fixe ni `generations` ni
+  `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
+  côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
+  30 générations, puis polit et choisit comme
+  d'habitude. Un ajustement sur un tableau de TP de dix points prend alors
+  quelques secondes : les six du notebook de TP (`examples/tp_six_lois.ipynb`)
+  prennent 48 s en tout, contre
+  194 à 198 s avec la 1.1.0 sur la même machine, et rendent les mêmes formules.
+  Un appel qui fixe son budget (`generations=` ou `time_limit=`) le reçoit en
+  entier, comme en 1.1. Un entier k
+  applique une patience de k générations quel que soit le budget, et 0 la coupe.
+  `GPEliteRegressor` fixe toujours son nombre de générations, si bien que l'arrêt
+  n'y agit pas.
 - `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
   choix final.
 
@@ -206,7 +223,13 @@ Rien à faire dans un notebook.
   colonne : à utiliser quand un nom de colonne est aussi une constante ou une
   fonction de sympy (`sympify` lit `E` comme 2,718..., `I` comme √-1) ou n'est
   pas un identifiant ; `sympy()` le signale dans ce cas. (Avant la 0.7, les
-  constantes affichées étaient celles de l'espace normalisé interne.) La
+  constantes affichées étaient celles de l'espace normalisé interne.) Depuis la
+  1.2, une puissance d'un nombre s'écrit comme une exponentielle, et une
+  exponentielle d'une seule variable avec son échelle :
+  `0.00538504 + 5.05644 * 0.00614708^(0.2 * t)` revient sous la forme
+  `0.00538504 + 5.05644 * exp(-t / 0.981975)`. La formule réécrite n'est gardée que si elle
+  passe la même vérification, si bien que le modèle et `formula_exact` ne
+  changent pas. La
   formule est la fonction mathématique pure : là où l'un des garde-fous
   numériques du moteur agit sur vos données (une puissance bornée parce que sa
   base dépasse 100 ou son exposant 6 en valeur absolue, ou sa valeur un million ;
@@ -303,7 +326,7 @@ formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devi
 | R² test médian | 1.00000 | 1.00000 | 1.00000 |
 | R² hors domaine médian | 1.00000 | 1.00000 | 1.00000 |
 | taille médiane du modèle | 20 nœuds | 20 nœuds | 20 nœuds |
-| secondes / run (médiane) | 1 | 1 | 1 |
+| secondes / run (médiane) | 0 | 1 | 0 |
 
 Depuis la 1.0, cette loi fait partie des formes que le moteur ajuste directement,
 un monôme multiplié par une puissance d'un binôme, et la forme ajustée est placée
@@ -319,10 +342,11 @@ prenaient le logarithme d'une fréquence, additionnaient des kilogrammes ou des
 hertz à des nombres purs, ou élevaient une grandeur à un exposant en coulombs, et
 la contrainte était le seul chemin vers une réponse valide. Elle le reste pour les
 lois que le moteur n'ajuste pas directement. (Depuis la 0.9, une génération typée
-coûte 1,4 fois une génération non typée, contre 8,5 fois avec la 0.8. Une
-recherche ne s'arrête plus tôt que sur une loi exacte, si bien que les runs qui
-finissent sur une approximation, et chaque run sur des données bruitées,
-parcourent toutes leurs générations ; `time_limit=` les borne.)
+coûte 1,4 fois une génération non typée, contre 8,5 fois avec la 0.8. Avec un
+budget fixé, comme ici, une recherche ne s'arrête plus tôt que sur une loi
+exacte, si bien que les runs qui finissent sur une approximation, et chaque run
+sur des données bruitées, parcourent toutes leurs générations ; `time_limit=` les
+borne, et avec les réglages par défaut, depuis la 1.2, `patience=` aussi.)
 
 **Ce que ça ne fait *pas*.** Sur un jeu de test tiré *hors* du domaine
 d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), la
@@ -407,13 +431,14 @@ PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 14
   XGBoost (300 trees)     R² = -2.324
   GP_ELITE (one equation) R² = +0.162
 
-  Equation: SOH = 0.428836 + 0.111661 * courant * exp(0.51573 * courant) - 0.0181691 * sqrt(cycle)
+  Equation: SOH = 0.428836 + 0.111661 * courant * exp(courant / 1.939) - 0.0181691 * sqrt(cycle)
 ```
 
 Un découpage aléatoire de données séquentielles est de l'interpolation, qui flatte
 toutes les méthodes. Sur le découpage chronologique, les forêts d'arbres ne peuvent
 que répéter des valeurs vues à l'entraînement et passent loin sous la moyenne.
-L'équation que rendent la 1.0 et la 1.1, en fonction du courant et du cycle, fait mieux qu'elles,
+L'équation que rendent les versions 1.0 à 1.2 (la 1.2 écrit son exponentielle avec
+son échelle), en fonction du courant et du cycle, fait mieux qu'elles,
 mais pas bien (R² +0,16) ; la 0.8 et la 0.9 en rendaient une à R² −0,31, sous la
 moyenne elle aussi, et la 0.7 une en fonction du cycle et du courant qui continuait de
 suivre la tendance (R² +0,594). Une formule peut
@@ -472,7 +497,13 @@ Mesurées côte à côte pour la sortie de la 1.1, les deux versions donnent san
 unités les mêmes comptes de lois exactes sur le jeu figé (213 lois exactes sur 390 sur ses
 équations de Feynman, 8 sur 70 sur ses systèmes de Strogatz : sous un budget de
 temps, les comptes bougent un peu d'une campagne à l'autre), et avec leurs unités
-la 1.1 retrouve 226 lois exactes sur 390 contre 169.
+la 1.1 retrouve 226 lois exactes sur 390 contre 169. Les changements de la 1.2 ont
+été décidés de la même façon
+([`benchmarks/results_1.2/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.2)) ;
+mesurées côte à côte pour la sortie de la 1.2, les deux versions donnent les mêmes
+comptes sur le jeu figé, avec et sans unités (214 lois exactes sur 390 sur ses
+équations de Feynman, 10 sur 70 sur ses systèmes de Strogatz, et 229 sur 390 avec
+les unités).
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 
@@ -519,6 +550,14 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Caractéristiques techniques
 
+- **Arrêt sur patience** (v1.2) : quand l'appel ne fixe ni `generations` ni
+  `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
+  côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
+  30 générations (`patience=`)
+- **Exponentielles écrites comme telles** (v1.2) : une puissance d'un nombre
+  s'imprime comme une exponentielle, et une exponentielle d'une seule variable
+  avec son échelle, `exp(-t / τ)`, chacune gardée seulement si elle passe la
+  vérification contre `predict()`
 - **Formes ajustées directement** (v1.0) : un monôme multiplié par une puissance
   d'un binôme, b·f·(1 + c·g)^p avec p parmi −1, −½, ½, 1 (lois rationnelles,
   1/√(1 − v²/c²), la racine d'une somme de deux termes), et un monôme multiplié par
@@ -534,7 +573,7 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 - **Constantes ajustées pour la forme jugée** (v0.8) : Levenberg–Marquardt en projection variable (l'échelle et le décalage de la mise à l'échelle linéaire résolus dans le résidu)
 - **Données de toute échelle** (v0.8) : une cible de n'importe quel ordre de grandeur est divisée en interne par une puissance de dix, et la normalisation par défaut divise chaque colonne par sa plus grande valeur absolue
 - **Formule dans vos variables, vérifiée** (v0.7) : la mise à l'échelle interne est repliée dans les constantes ; `formula_exact` indique si la formule reproduit `predict()` sur les données d'entraînement
-- **Budget de temps** (v0.7) : `time_limit=` arrête proprement et rend le meilleur modèle trouvé
+- **Budget de temps** (v0.7) : `time_limit=` arrête proprement et rend le meilleur modèle trouvé ; avec `units=`, le départ typé le respecte aussi depuis la v1.2
 - **Déduction de la constante mystère** (v0.5) : la constante de tête peut porter une dimension, inférée par homogénéité ; unités et valeur brute exposées sur l'estimateur, la valeur lue sur les prédictions quand le modèle est un monôme (v1.0)
 - **Recherche sous contrainte dimensionnelle** (v0.4) : génération typée constructive, mutation et croisement préservant les dimensions, filtre de validité dans `fitness()` — une seule sémantique partagée avec l'auditeur (v0.7)
 - **Mise à l'échelle purement multiplicative sous `units=`** (v0.4.1) : régression par l'origine, pour que la forme *notée* soit la forme *livrée*
@@ -556,7 +595,15 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**1.1 « Coherent »** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
+**1.2 « Classroom »** — avec les réglages par défaut, un ajustement s'arrête dès qu'il ne
+progresse plus (`patience=`) : les six lois du notebook de TP en 48 s, contre 194
+à 198 s pour la 1.1.0 sur la même machine, avec les mêmes formules ; une
+exponentielle revient écrite comme telle, `exp(-t / τ)`, sans changer le modèle ;
+avec `units=`, Feynman III.19.51 sans bruit se termine en une seconde environ, là où la
+1.1.0 prenait environ six minutes avec un budget de 30 s. Avec un budget fixé,
+les modèles de la 1.1 à travail égal, sauf ceux dont la correction change le départ
+typé avec `units=` (III.19.51 sur le banc) : sur les 2 780 ajustements de la mesure
+de sortie, aucun ne change de statut. **1.1 « Coherent »** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
 chacune placée seulement si elle passe la porte des dimensions : sur les 41
 équations de Feynman du banc de décision avec leurs unités, 165 lois exactes sur
 205 contre 108 pour la 1.0 mesurée à côté ; chacun des 1 005 modèles rendus avec

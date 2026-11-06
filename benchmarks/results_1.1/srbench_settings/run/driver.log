@@ -1,0 +1,70 @@
+--- slice 2026-11-02T18:42
+745 jobs to run with 2 settings
+25 jobs done, 71 s elapsed, 719 left
+50 jobs done, 1277 s elapsed, 694 left
+75 jobs done, 2962 s elapsed, 670 left
+100 jobs done, 4242 s elapsed, 645 left
+125 jobs done, 5313 s elapsed, 620 left
+time slice over: 601 jobs left for the next call
+slice done
+--- slice 2026-11-02T20:31
+601 jobs to run with 2 settings
+25 jobs done, 836 s elapsed, 575 left
+50 jobs done, 2186 s elapsed, 550 left
+75 jobs done, 4232 s elapsed, 525 left
+time slice over: 505 jobs left for the next call
+slice done
+--- slice 2026-11-02T22:18
+505 jobs to run with 2 settings
+25 jobs done, 2615 s elapsed, 479 left
+50 jobs done, 5145 s elapsed, 454 left
+time slice over: 443 jobs left for the next call
+slice done
+--- slice 2026-11-03T00:06
+443 jobs to run with 2 settings
+25 jobs done, 2713 s elapsed, 417 left
+--- container restarted after the last records (2026-11-03T01:08:59 W0, 2026-11-03T01:08:54 W1); resumed 2026-11-03T01:11Z, machine in machine.txt
+--- slice 2026-11-03T01:11
+407 jobs to run with 2 settings
+25 jobs done, 3571 s elapsed, 382 left
+time slice over: 361 jobs left for the next call
+slice done
+--- slice 2026-11-03T02:56
+361 jobs to run with 2 settings
+25 jobs done, 3555 s elapsed, 335 left
+time slice over: 313 jobs left for the next call
+slice done
+--- slice 2026-11-03T04:46
+313 jobs to run with 2 settings
+25 jobs done, 3557 s elapsed, 287 left
+time slice over: 265 jobs left for the next call
+slice done
+--- slice 2026-11-03T06:35
+265 jobs to run with 2 settings
+25 jobs done, 3561 s elapsed, 239 left
+time slice over: 219 jobs left for the next call
+slice done
+--- slice 2026-11-03T08:21
+219 jobs to run with 2 settings
+25 jobs done, 3557 s elapsed, 193 left
+time slice over: 171 jobs left for the next call
+slice done
+--- slice 2026-11-03T10:10
+171 jobs to run with 2 settings
+25 jobs done, 3559 s elapsed, 145 left
+time slice over: 124 jobs left for the next call
+slice done
+--- slice 2026-11-03T12:00
+124 jobs to run with 2 settings
+25 jobs done, 3564 s elapsed, 98 left
+time slice over: 78 jobs left for the next call
+slice done
+--- slice 2026-11-03T13:45
+78 jobs to run with 2 settings
+25 jobs done, 3562 s elapsed, 52 left
+time slice over: 32 jobs left for the next call
+slice done
+--- slice 2026-11-03T15:30
+32 jobs to run with 2 settings
+25 jobs done, 3558 s elapsed, 6 left
+all done

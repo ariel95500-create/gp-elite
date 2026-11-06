@@ -16,7 +16,23 @@ structures under noise, 8 exact Strogatz fits of 70 and 10 collapses of 65, wher
 the points below say 105, 85, 7 and 11; on the printed formulas that depart from
 their model, point 6, 7 of 130 and 66 of 500 for 1.0.0 and 8 and 67 for 1.1.0,
 where it says 7 and 61). Point 8 is measured on the package of
-1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`).
+1.1.0, side by side with 1.0.0 (`benchmarks/results_1.1/release/`), but for the
+times of its first bullet, measured on 1.2.0 beside 1.1.0; point 10 on the
+campaign that decided the stop of 1.2.
+
+With a budget set and `patience=` left alone, version 1.2 leaves the models
+alone without units; under units, it changes only the fits whose typed start
+needs a product of 9 to 12 factors or reaches its deadline (on the bench,
+Feynman III.19.51). Measured
+beside 1.1.0 for the release of 1.2 (`benchmarks/results_1.2/release/`, the
+figures in `m2/limits_figures.txt`), both versions give the same figure on every
+point, and from one campaign to the next the figures move as above: 214 exact
+laws of 390 on the test set (204 of 290 and 10 of 100), 33 of its equations
+never recovered, 10 exact Strogatz fits of 70, 108 and 85 structures under
+noise, 10 collapses of 65 (the worst to −1,946) and 66 of 250 on the test set
+(38 standardised, 28 in their own units), 12 departing formulas of 130 and 65 of
+500, and under units 166 exact laws of 205. What 1.2 changes is the time of a
+fit under the defaults, and with it some of the models (points 8 and 10).
 
 ## 1. Laws it still misses
 
@@ -101,11 +117,13 @@ passes the gate of dimensions. On the 41 equations with their units, the engine
 returns the exact law in 165 fits of 205 (1.0.0: 108), and six equations are never
 recovered in five seeds (1.0.0: 13). What remains:
 
-- **noisy data run the whole budget.** A search stops early only on an exact law,
-  and with noise there is none, even when the seed placed at the start is the law.
-  The six fits of the French TP notebook (`examples/tp_six_lois.ipynb`, ten points
-  and 2 % noise each) take about 40 to 60 seconds each; the free fall takes 51 s
-  against 44 s with 1.0.0, the other five about the time of 1.0.0;
+- **noisy data run the whole budget the call sets.** With `generations=` or
+  `time_limit=`, a search stops early only on an exact law, and with noise there
+  is none, even when the seed placed at the start is the law. Under the
+  defaults, since 1.2, the stop of point 10 ends it: the six fits of the French
+  TP notebook (`examples/tp_six_lois.ipynb`, ten points and 2 % noise each) take
+  7 to 10 s each, against 28 to 37 s with 1.1.0 on the same machine, with the
+  same formulas;
 - **fitted exponents.** Under units, a seed with exponents fitted to the data is
   placed only if each exponent that is not a half-integer falls on a dimensionless
   input. Exponents such as 1.0041 on a quantity in moles cannot be dimensionally
@@ -122,3 +140,21 @@ most, in the size study); beyond, nothing is measured, and the search space grow
 quickly with the number of variables. It is not meant for chaotic sequences, nor for large datasets where
 raw accuracy matters more than a formula you can read: ensemble models or engines
 such as PySR and Operon serve those better.
+
+## 10. The stop under the defaults
+
+Since 1.2, a call that sets neither `generations` nor `time_limit` stops its
+search once the error on the hold-out rows (on the training rows when there
+are none) has not improved by 1 % in 30
+generations (`patience=`). The stop can end a search that would still have
+improved. On the decision bench run under the defaults, five seeds, against
+1.1.0 measured beside it (campaign H1 of `benchmarks/results_1.2/PLAN.md`, on
+the candidate with the stop): 161 exact laws of 205 against 163, and 166
+against 167 with units; with 10 % noise, the structure in 83 fits against 85,
+and 100 against 99 with units; with 1 % noise, a few fewer approximate laws (146
+against 153); on the six standardised real datasets, a median test R² of 0.802
+against 0.809, and on the 65 fits out of the training range of the seven real
+datasets, 9 collapses against 11. The median
+fit on noisy and real data took 7 to 9 s against 25 to 35 s. When the result
+matters more than the time, set `generations=` or `time_limit=`, or
+`patience=0`.

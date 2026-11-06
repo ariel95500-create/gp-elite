@@ -1,0 +1,407 @@
+## Prototype 1: when the champion reaches its final form (trace.jsonl)
+
+940 records, 0 crashes
+
+TP, plain arm, 200 fits, 100 generations each:
+- the first generation's champion has the final form in 77
+- generation from which the form is final: median 3.0, 90th percentile 43, largest 94
+- time of the fit: median 62.3 s; the final form is there at a median of 2.2 s
+
+| experiment | fits | law | gen. of final form (5 largest) | time, median | final form at, median |
+|---|---|---|---|---|---|
+| pendule | 20 | 17 | 1, 1, 1, 2, 2 | 64 s | 1.2 s |
+| ressort | 20 | 16 | 33, 34, 35, 41, 47 | 62 s | 11.4 s |
+| chute | 20 | 19 | 0, 0, 0, 0, 9 | 57 s | 0.9 s |
+| puissance | 20 | 19 | 0, 0, 0, 0, 59 | 64 s | 1.2 s |
+| gaz | 20 | 15 | 43, 44, 47, 49, 94 | 63 s | 1.4 s |
+| eclairement | 20 | 15 | 37, 44, 69, 74, 79 | 61 s | 6.4 s |
+| rc | 20 | 14 | 38, 42, 43, 51, 53 | 64 s | 13.3 s |
+| refroidissement | 20 | 3 | 28, 28, 37, 41, 50 | 61 s | 5.2 s |
+| lentille | 20 | 1 | 57, 73, 75, 84, 91 | 70 s | 20.4 s |
+| snell | 20 | 0 | 5, 5, 8, 19, 20 | 61 s | 2.0 s |
+
+TP, units arm, 200 fits, 100 generations each:
+- the first generation's champion has the final form in 85
+- generation from which the form is final: median 1.0, 90th percentile 52, largest 98
+- time of the fit: median 83.1 s; the final form is there at a median of 2.1 s
+
+| experiment | fits | law | gen. of final form (5 largest) | time, median | final form at, median |
+|---|---|---|---|---|---|
+| pendule | 20 | 20 | 4, 5, 5, 7, 12 | 82 s | 1.2 s |
+| ressort | 20 | 20 | 0, 0, 0, 0, 0 | 88 s | 2.2 s |
+| chute | 20 | 20 | 0, 0, 0, 0, 0 | 83 s | 0.8 s |
+| puissance | 20 | 20 | 0, 0, 0, 0, 0 | 78 s | 1.0 s |
+| gaz | 20 | 20 | 3, 4, 4, 5, 6 | 79 s | 1.6 s |
+| eclairement | 20 | 20 | 12, 13, 15, 23, 98 | 69 s | 5.2 s |
+| rc | 20 | 0 | 39, 39, 42, 43, 44 | 112 s | 13.5 s |
+| refroidissement | 20 | 0 | 72, 72, 82, 91, 91 | 89 s | 47.3 s |
+| lentille | 20 | 0 | 59, 67, 67, 67, 69 | 105 s | 21.8 s |
+| snell | 20 | 0 | 2, 15, 27, 38, 84 | 40 s | 1.0 s |
+
+Replay of a stop on patience on the TP traces (error gain of more than 1 %, approximate):
+
+| P | generations run, median fraction | fits where a later gain of error is cut | of which the final model has the law |
+|---|---|---|---|
+| 10 | 0.11 | 71 | 4 |
+| 20 | 0.21 | 52 | 3 |
+| 30 | 0.31 | 36 | 2 |
+
+Decision bench kinds (30 s and 1,000 generations per fit):
+
+| kind | fits | generations run, median | time limit reached | gen. of final form, median | 90th pct | final form at, median fraction of the generations run |
+|---|---|---|---|---|---|---|
+| feyn_n1 | 205 | 49 | 205 | 8 | 39 | 0.16 |
+| feyn_n10 | 205 | 47 | 205 | 13 | 41 | 0.27 |
+| real | 60 | 51.0 | 60 | 8.0 | 48 | 0.16 |
+| realraw | 70 | 47.0 | 70 | 19.5 | 39 | 0.42 |
+
+Replay of a stop on patience on these traces (as above; structure: the structure retrieved at the end of the fit):
+
+| P | kind | generations run, median fraction | fits where a later gain is cut | of which with the structure retrieved |
+|---|---|---|---|---|
+| 10 | feyn_n1 | 0.23 | 34 | 2 |
+| 10 | feyn_n10 | 0.26 | 50 | 5 |
+| 10 | real | 0.25 | 16 | - |
+| 10 | realraw | 0.27 | 25 | - |
+| 20 | feyn_n1 | 0.45 | 17 | 1 |
+| 20 | feyn_n10 | 0.50 | 23 | 3 |
+| 20 | real | 0.46 | 7 | - |
+| 20 | realraw | 0.50 | 15 | - |
+| 30 | feyn_n1 | 0.66 | 6 | 0 |
+| 30 | feyn_n10 | 0.74 | 3 | 0 |
+| 30 | real | 0.65 | 5 | - |
+| 30 | realraw | 0.84 | 3 | - |
+
+## Prototype 2: under units, the seeds the gate of dimensions sets aside (units_rejected.jsonl)
+
+815 records, 0 crashes
+
+TP, units arm (err: 1 - R² on the training rows; a rejected seed is scored on the rows its finder saw):
+
+| experiment | fits | law | err of the model returned, median | largest | fits with a rejected seed | best rejected seed, median err | fits where a rejected seed fits better |
+|---|---|---|---|---|---|---|---|
+| pendule | 20 | 20 | 0.013 | 0.0591 | 20 | 3.09 | 0 |
+| ressort | 20 | 20 | 0.00983 | 0.053 | 20 | 3.51 | 0 |
+| chute | 20 | 20 | 0.00149 | 0.00722 | 20 | 0.186 | 0 |
+| puissance | 20 | 20 | 0.000725 | 0.00578 | 20 | 0.162 | 0 |
+| gaz | 20 | 20 | 0.00177 | 0.00988 | 20 | 0.882 | 0 |
+| eclairement | 20 | 20 | 0.000182 | 0.00158 | 20 | 1.01 | 0 |
+| rc | 20 | 0 | 0.0658 | 1.55 | 0 | - | 0 |
+| refroidissement | 20 | 0 | 0.114 | 4.38 | 0 | - | 0 |
+| lentille | 20 | 0 | 0.183 | 0.293 | 20 | 555 | 0 |
+| snell | 20 | 0 | 0.00464 | 0.0203 | 0 | - | 0 |
+
+Decision bench, units kinds (30 s per fit):
+
+| kind | fits | EXACT | NEAR | MISS | fits with a rejected seed | a rejected seed fits better | ten times better |
+|---|---|---|---|---|---|---|---|
+| ufeyn | 205 | 165 | 6 | 34 | 35 | 0 | 0 |
+| ufeyn_n1 | 205 | 0 | 157 | 48 | 140 | 10 | 0 |
+| ufeyn_n10 | 205 | 0 | 139 | 66 | 110 | 5 | 0 |
+
+## Prototype 3: the plateaus before the exact laws of F41 (plateau.jsonl)
+
+205 fits (30 s and 1,000 generations each), 156 EXACT. err: 1 - R² of the champion in the loop (the error the early stop reads, over the variance of the target).
+
+- the law is the champion in the loop in 150 EXACT fits; in 6 it comes only after the loop (polishing and final selection)
+- generation of the law in the loop: median 0.0, 90th percentile 0, largest 28
+
+| P | EXACT fits whose law, in the loop, comes after a run of P generations or more without a gain | EXACT fits after the loop whose loop has such a run |
+|---|---|---|
+| 10 | 1 (I.16.6 s4) | 6 |
+| 20 | 0 (-) | 5 |
+| 30 | 0 (-) | 2 |
+| 40 | 0 (-) | 0 |
+
+Replay of the stop on every fit (the error of every generation is recorded, so the replay is exact up to the loop; what the fit would return after an earlier stop is not):
+
+| P | fits stopped | generations run when stopped, median fraction | stopped before the final form: EXACT | NEAR | MISS | EXACT fits concerned |
+|---|---|---|---|---|---|---|
+| 10 | 55 | 0.27 | 6 | 8 | 21 | I.8.14 s4, I.16.6 s2, I.16.6 s4, II.2.42 s0, II.2.42 s3, II.2.42 s4 |
+| 20 | 49 | 0.55 | 3 | 2 | 12 | I.8.14 s4, I.16.6 s2, II.2.42 s0 |
+| 30 | 34 | 0.66 | 1 | 1 | 4 | II.2.42 s0 |
+| 40 | 22 | 0.82 | 0 | 0 | 2 | - |
+
+## Prototype 4: the stop on patience on the TP fits (patience.jsonl)
+
+1200 records, 0 crashes. Baseline: the same fits in prototype 1 (1.1.0, 100 generations).
+
+| arm | P | fits | law | useful | reading 10 pts | reading 20 pts | time, median (fits on the first machine) | baseline time, median, same fits | law lost | law gained | stop generation, median |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | none (1.1.0) | 200 | 119 | 175 | 7 | 8 | 62.3 s | - | - | - | - |
+| plain | 10 | 200 | 126 | 167 | 7 | 7 | 5.5 s (200 fits) | 62.3 s | 5 | 12 | 10.0 |
+| plain | 20 | 200 | 125 | 169 | 7 | 8 | 11.0 s (200 fits) | 62.3 s | 4 | 10 | 20.0 |
+| plain | 30 | 200 | 126 | 174 | 7 | 8 | 15.1 s (73 fits) | 61.5 s | 2 | 9 | 30.0 |
+| units | none (1.1.0) | 200 | 120 | 140 | 6 | 6 | 83.1 s | - | - | - | - |
+| units | 10 | 200 | 119 | 138 | 6 | 6 | 5.4 s (200 fits) | 83.1 s | 1 | 0 | 10.0 |
+| units | 20 | 200 | 120 | 140 | 6 | 6 | 11.6 s (200 fits) | 83.1 s | 0 | 0 | 20.0 |
+| units | 30 | 200 | 120 | 139 | 6 | 6 | - | - | 0 | 0 | 30.0 |
+
+The six laws within reach under units (all but rc, refroidissement, lentille and snell), law returned:
+
+- plain: none (1.1.0): 101 of 120; P 10: 106 of 120; P 20: 105 of 120; P 30: 106 of 120
+- units: none (1.1.0): 120 of 120; P 10: 119 of 120; P 20: 120 of 120; P 30: 120 of 120
+
+Times after the restart (second machine, faster; not compared):
+
+- plain, P 30: 127 fits, median 9.3 s
+- units, P 30: 200 fits, median 10.3 s
+
+Fits where 'useful' changes against the baseline:
+
+- P 10, plain, ressort, 10 pts, 2 %, draw 1: lost (0.323472 + 29.9527 * m / k) against 0.00616454 + 6.27635 * sqrt(m / k)
+- P 10, plain, ressort, 10 pts, 5 %, draw 3: lost (1.92571 + 0.266787 * log(m / k)) against 0.0407077 + 5.9106 * sqrt(m / k)
+- P 10, plain, ressort, 10 pts, 5 %, draw 4: lost (0.272256 + 33.8613 * m / k) against 0.00609718 + 6.2788 * sqrt(m / k)
+- P 10, plain, ressort, 20 pts, 5 %, draw 3: lost (0.195187 + 25.3617 * m / k + 0.522374 * m) against -0.0126217 + 6.37932 * sqrt(m / k)
+- P 10, plain, puissance, 20 pts, 5 %, draw 1: useful (-0.0552065 + 1.04336 * U² / R) against 0.0456565 + 1.76791 * (exp(0.0844788 * U) * sqrt(U))² / R
+- P 10, plain, refroidissement, 10 pts, 2 %, draw 0: lost (77.7748 - 1.37001 * sqrt(|t|)) against 23.2203 + 71.3532 * tanh(0.0180389^(0.000555556 * t))
+- P 10, plain, refroidissement, 10 pts, 5 %, draw 0: lost (87.9084 - 86.5891 * tanh(0.0235702 * sqrt(|t|))) against 85.2487 - 62.2713 * sqrt(|tanh(0.000555556 * exp(0.000555556
+- P 10, plain, lentille, 10 pts, 2 %, draw 1: lost (0.0938095 + 0.0305351 * (1.66667 * p)^(log(p) + 0.510826)) against 0.0928784 + 0.0288818 * (1.66667 * p)^log(tanh(tanh(1.66667 
+- P 10, plain, lentille, 10 pts, 2 %, draw 2: lost (0.104105 + 0.00435619 / p²) against 0.0819915 + 0.020561 * exp(0.357204 / p)
+- P 10, plain, lentille, 20 pts, 2 %, draw 3: lost (0.104907 + 0.00420724 / p²) against 0.0884316 + 0.0166154 * exp(0.385564 / p)
+- P 10, units, pendule, 10 pts, 5 %, draw 1: lost (2.31727 * L) against 1.98363 * sqrt(L)
+- P 10, units, refroidissement, 10 pts, 2 %, draw 2: lost (0.0239217 * t) against 1428.82 * |t²|^(-0.274113)
+- P 10, units, refroidissement, 20 pts, 5 %, draw 1: lost (96.8596 * exp(-t / t)) against 5.397 * exp(exp(exp(-t / sqrt(|t * t - t²|))))
+- P 10, units, snell, 10 pts, 5 %, draw 2: useful (1.03803 * tanh(sin(0.714286 * i1))) against 0.694668 * tanh(0.714286 * i1 * exp(0.714286 * i1))
+- P 20, plain, ressort, 10 pts, 2 %, draw 1: lost (0.323472 + 29.9527 * m / k) against 0.00616454 + 6.27635 * sqrt(m / k)
+- P 20, plain, ressort, 10 pts, 5 %, draw 3: lost (1.92571 + 0.266787 * log(m / k)) against 0.0407077 + 5.9106 * sqrt(m / k)
+- P 20, plain, ressort, 10 pts, 5 %, draw 4: lost (0.272256 + 33.8613 * m / k) against 0.00609718 + 6.2788 * sqrt(m / k)
+- P 20, plain, ressort, 20 pts, 5 %, draw 3: lost (0.195187 + 25.3617 * m / k + 0.522374 * m) against -0.0126217 + 6.37932 * sqrt(m / k)
+- P 20, plain, puissance, 20 pts, 5 %, draw 1: useful (-0.0552065 + 1.04336 * U² / R) against 0.0456565 + 1.76791 * (exp(0.0844788 * U) * sqrt(U))² / R
+- P 20, plain, refroidissement, 10 pts, 2 %, draw 0: lost (77.7748 - 1.37001 * sqrt(|t|)) against 23.2203 + 71.3532 * tanh(0.0180389^(0.000555556 * t))
+- P 20, plain, lentille, 10 pts, 2 %, draw 1: lost (0.0931751 + 0.0297072 * (1.66667 * p)^log(tanh(1.66667 * p))) against 0.0928784 + 0.0288818 * (1.66667 * p)^log(tanh(tanh(1.66667 
+- P 20, plain, lentille, 20 pts, 2 %, draw 3: lost (0.104907 + 0.00420724 / p²) against 0.0884316 + 0.0166154 * exp(0.385564 / p)
+- P 20, units, refroidissement, 10 pts, 2 %, draw 2: lost (0.0239217 * t) against 1428.82 * |t²|^(-0.274113)
+- P 20, units, snell, 10 pts, 5 %, draw 2: useful (1.03803 * tanh(sin(0.714286 * i1))) against 0.694668 * tanh(0.714286 * i1 * exp(0.714286 * i1))
+- P 30, plain, ressort, 10 pts, 2 %, draw 1: lost (0.323472 + 29.9527 * m / k) against 0.00616454 + 6.27635 * sqrt(m / k)
+- P 30, plain, ressort, 10 pts, 5 %, draw 3: lost (1.92571 + 0.266787 * log(m / k)) against 0.0407077 + 5.9106 * sqrt(m / k)
+- P 30, plain, puissance, 20 pts, 5 %, draw 1: useful (-0.0552065 + 1.04336 * U² / R) against 0.0456565 + 1.76791 * (exp(0.0844788 * U) * sqrt(U))² / R
+- P 30, units, refroidissement, 10 pts, 2 %, draw 2: lost (0.0239217 * t) against 1428.82 * |t²|^(-0.274113)
+
+Fits where the law is lost or gained against the baseline:
+
+- P 10, plain, ressort, 10 pts, 2 %, draw 1: lost (0.323472 + 29.9527 * m / k) against 0.00616454 + 6.27635 * sqrt(m / k)
+- P 10, plain, ressort, 10 pts, 5 %, draw 3: lost (1.92571 + 0.266787 * log(m / k)) against 0.0407077 + 5.9106 * sqrt(m / k)
+- P 10, plain, ressort, 10 pts, 5 %, draw 4: lost (0.272256 + 33.8613 * m / k) against 0.00609718 + 6.2788 * sqrt(m / k)
+- P 10, plain, ressort, 20 pts, 5 %, draw 3: lost (0.195187 + 25.3617 * m / k + 0.522374 * m) against -0.0126217 + 6.37932 * sqrt(m / k)
+- P 10, plain, puissance, 20 pts, 5 %, draw 1: law (-0.0552065 + 1.04336 * U² / R) against 0.0456565 + 1.76791 * (exp(0.0844788 * U) * sqrt(U))² / R
+- P 10, plain, gaz, 10 pts, 2 %, draw 0: law (-1148.8 + 8.53948 * n * T / V) against -1720.21 + 1167.09 * n * exp(0.002698 * T) / V
+- P 10, plain, gaz, 10 pts, 2 %, draw 1: law (417.567 + 8.15719 * n * T / V) against 407.247 + 1095.1 * n * exp(0.00271948 * T) / V
+- P 10, plain, gaz, 10 pts, 5 %, draw 3: law (1129.71 + 8.19856 * n * T / V) against -3522.02 + 357.594 * tanh(0.0279215 * T * n) / V
+- P 10, plain, gaz, 20 pts, 5 %, draw 0: law (1344.17 + 8.2286 * n * T / V) against 1907.63 + 3744.39 * n * tanh(0.00268691 * T) / V
+- P 10, plain, eclairement, 10 pts, 2 %, draw 0: law (-0.0124314 + 0.797641 / d²) against 0.0013005 + 0.815446 * tanh(exp(0.5 * d))^(0.5 * d) / d²
+- P 10, plain, eclairement, 10 pts, 5 %, draw 2: law (-0.110697 + 0.899559 / d²) against -0.305035 + 0.148806 * d + 0.90747 / d²
+- P 10, plain, eclairement, 10 pts, 5 %, draw 4: law (0.0503383 + 0.779436 / d²) against -0.121355 + 0.746575 * sqrt(exp(0.5 * d)) / d²
+- P 10, plain, eclairement, 20 pts, 2 %, draw 2: law (0.00590645 + 0.800563 / d²) against -0.6498 + 0.184736 * exp(0.5 * d) / tanh(0.5 * d)²
+- P 10, plain, rc, 10 pts, 5 %, draw 2: law (-0.0618099 + 4.91659 * exp(0.2 * t)^(-4.56081)) against 0.0496218 + 295.684 * 0.0161101^exp(0.2 * t)
+- P 10, plain, rc, 20 pts, 2 %, draw 0: law (0.00924128 + 4.95675 * exp(-1.00906 * t)) against -0.0590712 + 0.0060293 * exp((0.2 * t - 2.59441)²)
+- P 10, plain, refroidissement, 20 pts, 2 %, draw 0: lost (83.6218 + 57.8426 * log(|0.000195589 * t|^(0.000555556 * t))) against 20.3163 + 61.7356 * 0.0426738^(0.000555556 * t)
+- P 10, plain, lentille, 10 pts, 2 %, draw 3: law (-0.0119846 + 0.182855 * p / (-0.162254 + 1.66667 * p)) against 0.116207 + 0.0139995 * sqrt(|log(p) + 0.510826|) / (-0.160672 + 1.6666
+- P 10, units, pendule, 10 pts, 5 %, draw 1: lost (2.31727 * L) against 1.98363 * sqrt(L)
+- P 20, plain, ressort, 10 pts, 2 %, draw 1: lost (0.323472 + 29.9527 * m / k) against 0.00616454 + 6.27635 * sqrt(m / k)
+- P 20, plain, ressort, 10 pts, 5 %, draw 3: lost (1.92571 + 0.266787 * log(m / k)) against 0.0407077 + 5.9106 * sqrt(m / k)
+- P 20, plain, ressort, 10 pts, 5 %, draw 4: lost (0.272256 + 33.8613 * m / k) against 0.00609718 + 6.2788 * sqrt(m / k)
+- P 20, plain, ressort, 20 pts, 5 %, draw 3: lost (0.195187 + 25.3617 * m / k + 0.522374 * m) against -0.0126217 + 6.37932 * sqrt(m / k)
+- P 20, plain, puissance, 20 pts, 5 %, draw 1: law (-0.0552065 + 1.04336 * U² / R) against 0.0456565 + 1.76791 * (exp(0.0844788 * U) * sqrt(U))² / R
+- P 20, plain, gaz, 10 pts, 2 %, draw 0: law (-1148.8 + 8.53948 * n * T / V) against -1720.21 + 1167.09 * n * exp(0.002698 * T) / V
+- P 20, plain, gaz, 10 pts, 2 %, draw 1: law (417.567 + 8.15719 * n * T / V) against 407.247 + 1095.1 * n * exp(0.00271948 * T) / V
+- P 20, plain, gaz, 10 pts, 5 %, draw 3: law (1129.71 + 8.19856 * n * T / V) against -3522.02 + 357.594 * tanh(0.0279215 * T * n) / V
+- P 20, plain, gaz, 20 pts, 5 %, draw 0: law (1344.17 + 8.2286 * n * T / V) against 1907.63 + 3744.39 * n * tanh(0.00268691 * T) / V
+- P 20, plain, eclairement, 10 pts, 2 %, draw 0: law (-0.0124314 + 0.797641 / d²) against 0.0013005 + 0.815446 * tanh(exp(0.5 * d))^(0.5 * d) / d²
+- P 20, plain, eclairement, 10 pts, 5 %, draw 2: law (-0.110697 + 0.899559 / d²) against -0.305035 + 0.148806 * d + 0.90747 / d²
+- P 20, plain, eclairement, 20 pts, 2 %, draw 2: law (0.00590645 + 0.800563 / d²) against -0.6498 + 0.184736 * exp(0.5 * d) / tanh(0.5 * d)²
+- P 20, plain, rc, 20 pts, 2 %, draw 0: law (0.00924128 + 4.95675 * exp(-1.00906 * t)) against -0.0590712 + 0.0060293 * exp((0.2 * t - 2.59441)²)
+- P 20, plain, lentille, 10 pts, 2 %, draw 3: law (-0.0119846 + 0.182855 * p / (-0.162254 + 1.66667 * p)) against 0.116207 + 0.0139995 * sqrt(|log(p) + 0.510826|) / (-0.160672 + 1.6666
+- P 30, plain, ressort, 10 pts, 2 %, draw 1: lost (0.323472 + 29.9527 * m / k) against 0.00616454 + 6.27635 * sqrt(m / k)
+- P 30, plain, ressort, 10 pts, 5 %, draw 3: lost (1.92571 + 0.266787 * log(m / k)) against 0.0407077 + 5.9106 * sqrt(m / k)
+- P 30, plain, puissance, 20 pts, 5 %, draw 1: law (-0.0552065 + 1.04336 * U² / R) against 0.0456565 + 1.76791 * (exp(0.0844788 * U) * sqrt(U))² / R
+- P 30, plain, gaz, 10 pts, 2 %, draw 0: law (-1148.8 + 8.53948 * n * T / V) against -1720.21 + 1167.09 * n * exp(0.002698 * T) / V
+- P 30, plain, gaz, 10 pts, 2 %, draw 1: law (417.567 + 8.15719 * n * T / V) against 407.247 + 1095.1 * n * exp(0.00271948 * T) / V
+- P 30, plain, gaz, 20 pts, 5 %, draw 0: law (1344.17 + 8.2286 * n * T / V) against 1907.63 + 3744.39 * n * tanh(0.00268691 * T) / V
+- P 30, plain, eclairement, 10 pts, 2 %, draw 0: law (-0.0124314 + 0.797641 / d²) against 0.0013005 + 0.815446 * tanh(exp(0.5 * d))^(0.5 * d) / d²
+- P 30, plain, eclairement, 10 pts, 5 %, draw 2: law (-0.110697 + 0.899559 / d²) against -0.305035 + 0.148806 * d + 0.90747 / d²
+- P 30, plain, eclairement, 20 pts, 2 %, draw 2: law (0.00590645 + 0.800563 / d²) against -0.6498 + 0.184736 * exp(0.5 * d) / tanh(0.5 * d)²
+- P 30, plain, rc, 20 pts, 2 %, draw 0: law (0.00924128 + 4.95675 * exp(-1.00906 * t)) against -0.0590712 + 0.0060293 * exp((0.2 * t - 2.59441)²)
+- P 30, plain, lentille, 10 pts, 2 %, draw 3: law (-0.0119846 + 0.182855 * p / (-0.162254 + 1.66667 * p)) against 0.116207 + 0.0139995 * sqrt(|log(p) + 0.510826|) / (-0.160672 + 1.6666
+
+## Units arm against the plain arm, same rows (prototypes 2 and 4)
+
+ratio: err under units / err of the plain fit with the stop on patience (training rows). Groups: within reach under units (the six laws), limited by units (rc, refroidissement, lentille), snell (dimensionless).
+
+P = 10, 200 pairs:
+
+| group | fits | ratio, min | 10th pct | median | 90th pct | max |
+|---|---|---|---|---|---|---|
+| reach | 120 | 0.602 | 1 | 1.05 | 1.42 | 3.69 |
+| limited | 60 | 0.184 | 3.19 | 29 | 1.1e+03 | 6.95e+04 |
+| snell | 20 | 0.417 | 0.972 | 1.02 | 1.22 | 1.27 |
+
+| threshold k (message when ratio >= k) | reach | limited | snell | limited, plain fit with the law |
+|---|---|---|---|---|
+| 2 | 5 | 54 | 0 | 20 |
+| 3 | 2 | 54 | 0 | 20 |
+| 5 | 0 | 49 | 0 | 20 |
+| 10 | 0 | 42 | 0 | 20 |
+
+| experiment | fits | ratio, min | median | max |
+|---|---|---|---|---|
+| pendule | 20 | 0.969 | 1.07 | 1.42 |
+| ressort | 20 | 0.602 | 1.03 | 3.38 |
+| chute | 20 | 1 | 1.02 | 3.69 |
+| puissance | 20 | 1 | 1.03 | 1.72 |
+| gaz | 20 | 1.01 | 1.11 | 3 |
+| eclairement | 20 | 1 | 1.1 | 2.27 |
+| rc | 20 | 24.1 | 136 | 6.95e+04 |
+| refroidissement | 20 | 0.184 | 10.9 | 1.1e+03 |
+| lentille | 20 | 0.519 | 12.8 | 522 |
+| snell | 20 | 0.417 | 1.02 | 1.27 |
+
+P = 20, 200 pairs:
+
+| group | fits | ratio, min | 10th pct | median | 90th pct | max |
+|---|---|---|---|---|---|---|
+| reach | 120 | 0.602 | 1 | 1.05 | 1.44 | 3.95 |
+| limited | 60 | 0.184 | 3.49 | 34.7 | 1.1e+03 | 6.95e+04 |
+| snell | 20 | 0.417 | 0.972 | 1.02 | 1.22 | 1.27 |
+
+| threshold k (message when ratio >= k) | reach | limited | snell | limited, plain fit with the law |
+|---|---|---|---|---|
+| 2 | 6 | 56 | 0 | 20 |
+| 3 | 3 | 55 | 0 | 20 |
+| 5 | 0 | 49 | 0 | 20 |
+| 10 | 0 | 43 | 0 | 20 |
+
+| experiment | fits | ratio, min | median | max |
+|---|---|---|---|---|
+| pendule | 20 | 0.969 | 1.07 | 1.42 |
+| ressort | 20 | 0.602 | 1.04 | 3.38 |
+| chute | 20 | 1 | 1.02 | 3.69 |
+| puissance | 20 | 1 | 1.03 | 1.72 |
+| gaz | 20 | 1.01 | 1.11 | 3 |
+| eclairement | 20 | 1 | 1.1 | 3.95 |
+| rc | 20 | 16.1 | 188 | 6.95e+04 |
+| refroidissement | 20 | 0.184 | 10.9 | 1.1e+03 |
+| lentille | 20 | 1.4 | 17.2 | 522 |
+| snell | 20 | 0.417 | 1.02 | 1.27 |
+
+P = 30, 200 pairs:
+
+| group | fits | ratio, min | 10th pct | median | 90th pct | max |
+|---|---|---|---|---|---|---|
+| reach | 120 | 0.686 | 1 | 1.05 | 1.47 | 3.95 |
+| limited | 60 | 0.184 | 3.93 | 44.5 | 1.74e+03 | 6.95e+04 |
+| snell | 20 | 0.417 | 0.972 | 1.02 | 1.22 | 1.27 |
+
+| threshold k (message when ratio >= k) | reach | limited | snell | limited, plain fit with the law |
+|---|---|---|---|---|
+| 2 | 7 | 57 | 0 | 20 |
+| 3 | 4 | 56 | 0 | 20 |
+| 5 | 0 | 51 | 0 | 20 |
+| 10 | 0 | 45 | 0 | 20 |
+
+| experiment | fits | ratio, min | median | max |
+|---|---|---|---|---|
+| pendule | 20 | 0.969 | 1.07 | 1.42 |
+| ressort | 20 | 0.686 | 1.03 | 3.38 |
+| chute | 20 | 1 | 1.02 | 3.69 |
+| puissance | 20 | 1 | 1.03 | 1.72 |
+| gaz | 20 | 1.01 | 1.13 | 3.53 |
+| eclairement | 20 | 1 | 1.1 | 3.95 |
+| rc | 20 | 20.6 | 188 | 6.95e+04 |
+| refroidissement | 20 | 0.184 | 10.9 | 4.87e+03 |
+| lentille | 20 | 3.49 | 21.9 | 522 |
+| snell | 20 | 0.417 | 1.02 | 1.27 |
+
+## Both arms with the stop on patience, same rows (prototype 4)
+
+ratio: err of the units fit / err of the plain fit, both with the stop on patience at the same P. A message when the err under units is above 0.001 and the ratio at least k.
+
+P = 10, 200 pairs:
+
+| group | fits | ratio, min | 10th pct | median | 90th pct | max |
+|---|---|---|---|---|---|---|
+| reach | 120 | 0.602 | 1 | 1.05 | 1.44 | 28.6 |
+| limited | 60 | 0.519 | 15.8 | 115 | 2.64e+03 | 6.95e+04 |
+| snell | 20 | 0.972 | 1 | 1.02 | 1.67 | 2.77 |
+
+| k | reach | limited | snell | limited, plain fit with the law |
+|---|---|---|---|---|
+| 2 | 4 of 120 | 58 of 60 | 1 of 20 | 20 of 20 |
+| 3 | 3 of 120 | 58 of 60 | 0 of 20 | 20 of 20 |
+| 5 | 1 of 120 | 57 of 60 | 0 of 20 | 20 of 20 |
+| 10 | 1 of 120 | 55 of 60 | 0 of 20 | 20 of 20 |
+
+Limited fits without a message at k = 5:
+
+- lentille, 10 pts, 5 %, draw 0: ratio 4.17, units 0.293 (0.0469474 * p / p²), plain 0.0704 (0.118669 + 0.0846289 * (log(p) + 0.510826)²)
+- lentille, 10 pts, 5 %, draw 3: ratio 0.52, units 0.203 (0.0491228 * p / p²), plain 0.391 (0.288976 - 0.328475 * p)
+- lentille, 10 pts, 5 %, draw 4: ratio 1.40, units 0.285 (0.0453863 * p / p²), plain 0.204 (1.14094 - 1.04702 * tanh(exp(1.66667 * p)))
+
+Highest ratios outside the limited laws:
+
+- pendule, 10 pts, 5 %, draw 1: ratio 28.57, units 0.602
+- chute, 20 pts, 2 %, draw 1: ratio 3.69, units 0.0014
+- ressort, 10 pts, 2 %, draw 0: ratio 3.38, units 0.00702
+- gaz, 20 pts, 5 %, draw 3: ratio 3.00, units 0.00692
+- snell, 10 pts, 5 %, draw 2: ratio 2.77, units 0.0204
+
+P = 20, 200 pairs:
+
+| group | fits | ratio, min | 10th pct | median | 90th pct | max |
+|---|---|---|---|---|---|---|
+| reach | 120 | 0.602 | 1 | 1.05 | 1.44 | 3.95 |
+| limited | 60 | 1.4 | 8.81 | 80.3 | 2.64e+03 | 6.95e+04 |
+| snell | 20 | 0.972 | 1 | 1.02 | 1.27 | 2.77 |
+
+| k | reach | limited | snell | limited, plain fit with the law |
+|---|---|---|---|---|
+| 2 | 3 of 120 | 58 of 60 | 1 of 20 | 20 of 20 |
+| 3 | 2 of 120 | 58 of 60 | 0 of 20 | 20 of 20 |
+| 5 | 0 of 120 | 56 of 60 | 0 of 20 | 20 of 20 |
+| 10 | 0 of 120 | 53 of 60 | 0 of 20 | 20 of 20 |
+
+Limited fits without a message at k = 5:
+
+- lentille, 10 pts, 5 %, draw 0: ratio 4.17, units 0.293 (0.0469474 * p / p²), plain 0.0704 (0.118669 + 0.0846289 * (log(p) + 0.510826)²)
+- lentille, 10 pts, 5 %, draw 4: ratio 1.40, units 0.285 (0.0453863 * p / p²), plain 0.204 (1.14094 - 1.04702 * tanh(exp(1.66667 * p)))
+- lentille, 20 pts, 5 %, draw 0: ratio 4.90, units 0.184 (0.0904888 * sqrt(p / p²)), plain 0.0375 (0.126393 + 0.0129891 * (log(p) + 0.510826)² / p)
+- refroidissement, 20 pts, 5 %, draw 1: ratio 1.61, units 0.0121 (5.397 * exp(exp(exp(-t / sqrt(|t * t - t²|))))), plain 0.00748 (83.6783 - 71.1617 * sqrt(|tanh(0.000555556 * t)|))
+
+Highest ratios outside the limited laws:
+
+- eclairement, 10 pts, 5 %, draw 4: ratio 3.95, units 0.000192
+- chute, 20 pts, 2 %, draw 1: ratio 3.69, units 0.0014
+- ressort, 10 pts, 2 %, draw 0: ratio 3.38, units 0.00702
+- gaz, 20 pts, 5 %, draw 3: ratio 3.00, units 0.00692
+- snell, 10 pts, 5 %, draw 2: ratio 2.77, units 0.0204
+
+P = 30, 200 pairs:
+
+| group | fits | ratio, min | 10th pct | median | 90th pct | max |
+|---|---|---|---|---|---|---|
+| reach | 120 | 0.686 | 1 | 1.05 | 1.47 | 3.95 |
+| limited | 60 | 1.61 | 8.81 | 72 | 4.87e+03 | 6.95e+04 |
+| snell | 20 | 0.492 | 1 | 1.02 | 1.22 | 1.27 |
+
+| k | reach | limited | snell | limited, plain fit with the law |
+|---|---|---|---|---|
+| 2 | 4 of 120 | 59 of 60 | 0 of 20 | 20 of 20 |
+| 3 | 3 of 120 | 59 of 60 | 0 of 20 | 20 of 20 |
+| 5 | 0 of 120 | 56 of 60 | 0 of 20 | 20 of 20 |
+| 10 | 0 of 120 | 53 of 60 | 0 of 20 | 20 of 20 |
+
+Limited fits without a message at k = 5:
+
+- lentille, 10 pts, 5 %, draw 0: ratio 4.17, units 0.293 (0.0469474 * p / p²), plain 0.0704 (0.118669 + 0.0846289 * (log(p) + 0.510826)²)
+- lentille, 20 pts, 5 %, draw 0: ratio 4.90, units 0.184 (0.0904888 * sqrt(p / p²)), plain 0.0375 (0.126393 + 0.0129891 * (log(p) + 0.510826)² / p)
+- refroidissement, 10 pts, 5 %, draw 3: ratio 3.93, units 0.0316 (966.541 / sqrt(|t|)), plain 0.00805 (229.277 - 209.383 * tanh(exp(0.000555556 * t)))
+- refroidissement, 20 pts, 5 %, draw 1: ratio 1.61, units 0.0121 (5.397 * exp(exp(exp(-t / sqrt(|t * t - t²|))))), plain 0.00748 (83.6783 - 71.1617 * sqrt(|tanh(0.000555556 * t)|))
+
+Highest ratios outside the limited laws:
+
+- eclairement, 10 pts, 5 %, draw 4: ratio 3.95, units 0.000192
+- chute, 20 pts, 2 %, draw 1: ratio 3.69, units 0.0014
+- gaz, 10 pts, 5 %, draw 3: ratio 3.53, units 0.00251
+- ressort, 10 pts, 2 %, draw 0: ratio 3.38, units 0.00702
+- gaz, 20 pts, 5 %, draw 3: ratio 3.00, units 0.00692
+

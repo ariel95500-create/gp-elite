@@ -1,0 +1,55 @@
+=== D 1360 1360 Counter({'1.1.0': 1360}) Counter({'1.1.0': 1360})
+  feyn A 205 EXACT 163 NEAR 12 struct 0 med t 0.37 max 30.05 gen med 1 units_ok 0
+  feyn H1 205 EXACT 161 NEAR 11 struct 0 med t 0.37 max 27.15 gen med 1 units_ok 0
+  feyn_n1 A 205 EXACT 0 NEAR 153 struct 108 med t 26.34 max 35.73 gen med 100 units_ok 0
+  feyn_n1 H1 205 EXACT 0 NEAR 146 struct 107 med t 7.80 max 30.32 gen med 31 units_ok 0
+  feyn_n10 A 205 EXACT 0 NEAR 102 struct 85 med t 27.49 max 36.15 gen med 100 units_ok 0
+  feyn_n10 H1 205 EXACT 0 NEAR 101 struct 83 med t 8.65 max 29.70 gen med 33 units_ok 0
+  real A 60 EXACT 0 NEAR 0 struct 0 med t 24.73 max 33.17 gen med 100.0 units_ok 0
+  real H1 60 EXACT 0 NEAR 0 struct 0 med t 7.38 max 30.76 gen med 34.0 units_ok 0
+  realraw A 70 EXACT 0 NEAR 0 struct 0 med t 26.36 max 36.85 gen med 100.0 units_ok 0
+  realraw H1 70 EXACT 0 NEAR 0 struct 0 med t 9.45 max 29.56 gen med 36.0 units_ok 0
+  ufeyn A 205 EXACT 167 NEAR 6 struct 0 med t 0.36 max 418.92 gen med 1 units_ok 205
+  ufeyn H1 205 EXACT 166 NEAR 6 struct 0 med t 0.36 max 25.61 gen med 1 units_ok 205
+  ufeyn_n1 A 205 EXACT 0 NEAR 161 struct 113 med t 32.50 max 464.51 gen med 100 units_ok 205
+  ufeyn_n1 H1 205 EXACT 0 NEAR 157 struct 112 med t 8.98 max 43.68 gen med 31 units_ok 205
+  ufeyn_n10 A 205 EXACT 0 NEAR 142 struct 99 med t 34.94 max 459.48 gen med 100 units_ok 205
+  ufeyn_n10 H1 205 EXACT 0 NEAR 142 struct 100 med t 9.01 max 33.64 gen med 31 units_ok 205
+  A R6 folds 30 median 0.809459
+    real ood 30 collapses 4
+    realraw ood 35 collapses 7
+   R7raw folds median 0.878665
+  H1 R6 folds 30 median 0.802117
+    real ood 30 collapses 3
+    realraw ood 35 collapses 6
+   R7raw folds median 0.878665
+  feyn changes {'I.16.6': (4, 3), 'II.2.42': (4, 3)}
+  ufeyn changes {'I.11.19': (3, 2)}
+  A longest under units (464.51, ('ufeyn_n1', 'III.19.51', 'test', 1))
+  H1 longest under units (43.68, ('ufeyn_n1', 'II.35.18', 'test', 4))
+=== D_conf 615 615 Counter({'1.1.0': 615}) Counter({'1.1.0': 615})
+  feyn A 205 EXACT 159 NEAR 9 struct 0 med t 0.38 max 32.60 gen med 1 units_ok 0
+  feyn H1 205 EXACT 158 NEAR 9 struct 0 med t 0.39 max 25.82 gen med 1 units_ok 0
+  feyn_n1 A 205 EXACT 0 NEAR 152 struct 103 med t 26.93 max 33.95 gen med 100 units_ok 0
+  feyn_n1 H1 205 EXACT 0 NEAR 147 struct 102 med t 8.36 max 29.17 gen med 31 units_ok 0
+  feyn_n10 A 205 EXACT 0 NEAR 109 struct 82 med t 27.34 max 36.87 gen med 100 units_ok 0
+  feyn_n10 H1 205 EXACT 0 NEAR 106 struct 82 med t 8.59 max 29.21 gen med 32 units_ok 0
+  feyn changes {'I.50.26': (1, 0)}
+=== TP 400 400 [0, 1, 2, 3, 4]
+  plain A 200 med t 22.82 law 119 useful 175 gen med 100.0
+  plain H1 200 med t 6.82 law 126 useful 174 gen med 31.0
+  units A 200 med t 32.20 law 120 useful 140 gen med 100.0
+  units H1 200 med t 8.06 law 120 useful 139 gen med 31.0
+  plain 10 points: 100 same expr 89 law differs 7
+  plain all: 200 same expr 171 law differs 11
+  units 10 points: 100 same expr 86 law differs 0
+  units all: 200 same expr 174 law differs 0
+=== TP_conf 400 400 [5, 6, 7, 8, 9]
+  plain A 200 med t 24.30 law 112 useful 170 gen med 100.0
+  plain H1 200 med t 6.92 law 116 useful 169 gen med 32.0
+  units A 200 med t 32.64 law 119 useful 138 gen med 100.0
+  units H1 200 med t 8.39 law 119 useful 138 gen med 31.0
+  plain 10 points: 100 same expr 85 law differs 3
+  plain all: 200 same expr 172 law differs 6
+  units 10 points: 100 same expr 89 law differs 0
+  units all: 200 same expr 174 law differs 0

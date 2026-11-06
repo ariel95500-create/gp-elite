@@ -197,3 +197,22 @@ the recommended order:
 3. meanwhile, without any change to the engine, a French notebook of the
    six lab laws that work today is written, with the figures of this
    diagnostic, and the launch texts of 1.0 are turned towards teachers.
+
+## Note added for version 1.2 (5 November 2026)
+
+This diagnostic is left as written; it measured 1.0.0. Version 1.2 took
+points 2 and 4 of the list above (`../results_1.2/PLAN.md`):
+- **the time of a fit** (H1): when the call sets neither `generations` nor
+  `time_limit`, the search stops once its error on the hold-out rows (the
+  training rows when there are none) has not improved by 1 % in 30
+  generations. Run on the diagnostic, draws 0 to 4, the
+  median fit takes 6.8 s against 22.8 s for 1.1.0 without units, and 8.1 s
+  against 32.2 s with them, on the same machine (`../results_1.2/h1/`);
+- **the exponential written as such** (X1): the capacitor discharge quoted
+  above, `-0.0146989 + 4.86249 * 0.00784758^(0.2 * t)` (20 points, 2 %, draw
+  1), now comes back as `-0.0146989 + 4.86249 * exp(-t / 1.03145)`
+  (`../results_1.2/x1/x1_tp_check.txt`).
+
+Point 1 was measured as C1, an honest message under units, and not adopted
+(`../results_1.2/c1/`); points 3 and 5 are not in 1.2. The six laws of the
+notebook come back as before.

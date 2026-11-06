@@ -1,0 +1,25 @@
+== bench D 1360 1360
+ engines Counter({('1.1.0', '/venv11p/lib/python3.11/site-p'): 1360}) Counter({('1.1.0', '/venv12c/lib/python3.11/site-p'): 1360})
+  A {'feyn exact': 163, 'ufeyn exact': 167, 'feyn_n1 struct': 108, 'feyn_n1 NEAR': 153, 'feyn_n10 struct': 85, 'feyn_n10 NEAR': 102, 'ufeyn_n1 struct': 113, 'ufeyn_n1 NEAR': 161, 'ufeyn_n10 struct': 99, 'ufeyn_n10 NEAR': 142, 'real fold median': 0.8095, 'real ood collapses': 4, 'real n ood': 30, 'realraw fold median': 0.8787, 'realraw ood collapses': 7, 'realraw n ood': 35, 'feyn_n1 median time': 26.34, 'feyn_n1 max time': 35.73, 'feyn_n10 median time': 27.49, 'feyn_n10 max time': 36.15, 'ufeyn_n1 median time': 32.5, 'ufeyn_n1 max time': 464.51, 'ufeyn_n10 median time': 34.94, 'ufeyn_n10 max time': 459.48, 'real median time': 24.73, 'real max time': 33.17, 'realraw median time': 26.36, 'realraw max time': 36.85, 'feyn median time': 0.37, 'feyn max time': 30.05, 'ufeyn median time': 0.36, 'ufeyn max time': 418.92, 'units_ok': '615 of 615'}
+  H1 {'feyn exact': 161, 'ufeyn exact': 166, 'feyn_n1 struct': 107, 'feyn_n1 NEAR': 146, 'feyn_n10 struct': 83, 'feyn_n10 NEAR': 101, 'ufeyn_n1 struct': 112, 'ufeyn_n1 NEAR': 157, 'ufeyn_n10 struct': 100, 'ufeyn_n10 NEAR': 142, 'real fold median': 0.8021, 'real ood collapses': 3, 'real n ood': 30, 'realraw fold median': 0.8787, 'realraw ood collapses': 6, 'realraw n ood': 35, 'feyn_n1 median time': 7.8, 'feyn_n1 max time': 30.32, 'feyn_n10 median time': 8.65, 'feyn_n10 max time': 29.7, 'ufeyn_n1 median time': 8.98, 'ufeyn_n1 max time': 43.68, 'ufeyn_n10 median time': 9.01, 'ufeyn_n10 max time': 33.64, 'real median time': 7.38, 'real max time': 30.76, 'realraw median time': 9.45, 'realraw max time': 29.56, 'feyn median time': 0.37, 'feyn max time': 27.15, 'ufeyn median time': 0.36, 'ufeyn max time': 25.61, 'units_ok': '615 of 615'}
+== bench D_conf 615 615
+ engines Counter({('1.1.0', '/venv11p/lib/python3.11/site-p'): 615}) Counter({('1.1.0', '/venv12c/lib/python3.11/site-p'): 615})
+  A {'feyn exact': 159, 'ufeyn exact': 0, 'feyn_n1 struct': 103, 'feyn_n1 NEAR': 152, 'feyn_n10 struct': 82, 'feyn_n10 NEAR': 109, 'ufeyn_n1 struct': 0, 'ufeyn_n1 NEAR': 0, 'ufeyn_n10 struct': 0, 'ufeyn_n10 NEAR': 0, 'feyn_n1 median time': 26.93, 'feyn_n1 max time': 33.95, 'feyn_n10 median time': 27.34, 'feyn_n10 max time': 36.87, 'feyn median time': 0.38, 'feyn max time': 32.6, 'units_ok': '0 of 0'}
+  H1 {'feyn exact': 158, 'ufeyn exact': 0, 'feyn_n1 struct': 102, 'feyn_n1 NEAR': 147, 'feyn_n10 struct': 82, 'feyn_n10 NEAR': 106, 'ufeyn_n1 struct': 0, 'ufeyn_n1 NEAR': 0, 'ufeyn_n10 struct': 0, 'ufeyn_n10 NEAR': 0, 'feyn_n1 median time': 8.36, 'feyn_n1 max time': 29.17, 'feyn_n10 median time': 8.59, 'feyn_n10 max time': 29.21, 'feyn median time': 0.39, 'feyn max time': 25.82, 'units_ok': '0 of 0'}
+
+== TP 400 400 ['arm', 'date', 'draw', 'engine_file', 'engine_version', 'err_grid', 'err_law', 'err_train', 'exp', 'expr', 'front', 'front_law', 'front_law_size', 'generations', 'law', 'n', 'noise', 'patience_stop', 'pythonhashseed', 'size', 'time', 'useful']
+  A plain 200 median time 22.82 law 119
+  A units 200 median time 32.2 law 120
+  H1 plain 200 median time 6.82 law 126
+  H1 units 200 median time 8.06 law 120
+  same formula A vs H1: 345 of 400 ; law differs: 11
+    plain same formula 171 of 200 law differs 11
+    units same formula 174 of 200 law differs 0
+== TP_conf 400 400 ['arm', 'date', 'draw', 'engine_file', 'engine_version', 'err_grid', 'err_law', 'err_train', 'exp', 'expr', 'front', 'front_law', 'front_law_size', 'generations', 'law', 'n', 'noise', 'patience_stop', 'pythonhashseed', 'size', 'time', 'useful']
+  A plain 200 median time 24.3 law 112
+  A units 200 median time 32.64 law 119
+  H1 plain 200 median time 6.92 law 116
+  H1 units 200 median time 8.39 law 119
+  same formula A vs H1: 346 of 400 ; law differs: 6
+    plain same formula 172 of 200 law differs 6
+    units same formula 174 of 200 law differs 0

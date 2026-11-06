@@ -3,13 +3,20 @@
 Kept apart from the plans of 1.1, which this file does not change.
 
 1. **Version 1.1** is released as `PLAN_RELEASE_1.1.md` says (decided on
-   26 October 2026).
+   26 October 2026). Done: 1.1.0 "Coherent" was published on 2 November 2026
+   (`release/README.md`).
 2. **Two actions for SRBench** (decided on 28 October 2026), described
    below: asking its maintainers for the calendar of the next update, and,
    once the measurements of 1.1 leave the machine free, a study of the
    settings SRBench runs GP_ELITE with.
 3. **A plan for a version 1.2 for teaching** is written after gate 6, from
-   the list of `DIAGNOSTIC_TP.md` (decided on 26 October 2026).
+   the list of `DIAGNOSTIC_TP.md` (decided on 26 October 2026). Its content,
+   chosen by the author on 3 November 2026: a stop when the law holds to the
+   noise of the data; the exponential written as such; under units, an honest
+   message where a constant with units would have to sit inside a function or
+   a sum. The full treatment of such constants, a front of candidate laws on
+   small tables, the arcsine, and the retrieval of structure under noise come
+   after 1.2. The plan is written in `../results_1.2/`.
 4. **After 1.2, a measurement of what speed would bring** (decided on
    27 October 2026), described below.
 
@@ -34,7 +41,8 @@ the files and lines are recorded in `srbench_2aabbb6/`):
 
 The two actions:
 1. **The calendar.** Claude drafts a short question to the maintainers, in
-   English; the author decides whether and where to send it.
+   English; the author decides whether and where to send it. Done: the author
+   sent it in the week of 26 October 2026 (he said so on 3 November).
 2. **The settings.** After M4 of 1.1, when no measurement of the release
    runs on the machine:
    - the SRBench test of the GP_ELITE wrapper is run with 1.0.0 and 1.1.0;
@@ -54,6 +62,13 @@ The two actions:
    If one setting is better, a small change of the wrapper is put to the
    author with the final check beside it. The author decides whether to
    propose it to SRBench.
+
+   Done on 3 November 2026 (`srbench_settings/README.md`), with 1.1.0 rather
+   than 1.0.0 as `srbench_settings/PLAN.md` says: the wrapper as published
+   stays, the other setting measured not being better by the criteria of the
+   plan, and the final check is therefore not run. The author chose the same
+   day not to propose the correction of the grid for now. The question on
+   the calendar had already been sent, without it; nothing more is sent.
 
 When the plan of 1.2 is written, its items that also act without units
 (for instance an earlier stop when the law is found, which SRBench would

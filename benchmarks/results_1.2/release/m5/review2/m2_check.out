@@ -1,0 +1,103 @@
+records 2780 2780 dups 0 0 same keys True
+kinds a Counter({'tf': 390, 'utf': 390, 'tr': 250, 'trraw': 250, 'feyn': 205, 'feyn_n1': 205, 'feyn_n10': 205, 'ufeyn': 205, 'ufeyn_n1': 205, 'ufeyn_n10': 205, 'ts': 140, 'realraw': 70, 'real': 60})
+phase1 1775 U41* 615 utf 390
+utf seeds [5, 6, 7, 8, 9]
+crash 0 0
+versions Counter({'1.1.0': 2780}) Counter({'1.2.0': 2780})
+== 1.1.0
+ F41 exact 163 205
+  feyn_n1 structure 108 205 NEAR 154
+  feyn_n10 structure 85 205 NEAR 101
+  ufeyn_n1 structure 113 205 NEAR 162
+  ufeyn_n10 structure 98 205 NEAR 143
+ U41 exact 166
+ TF78 exact 214 390
+ TS14 test exact 10 70 ts all 140
+ utf exact 229 390
+  real folds 30 median 0.809459 ood 30 collapses 5 all 60 Counter({'fold': 30, 'ood': 30})
+  realraw folds 35 median 0.878665 ood 35 collapses 5 all 70 Counter({'fold': 35, 'ood': 35})
+  tr folds 125 median 0.769151 ood 125 collapses 38 all 250 Counter({'fold': 125, 'ood': 125})
+  trraw folds 125 median 0.770775 ood 125 collapses 28 all 250 Counter({'fold': 125, 'ood': 125})
+  ts folds 0 None ood 70 collapses 28 all 140 Counter({'test': 70, 'ood': 70})
+ units fits 1005 audit ok 1005
+ units median time 30.2 30.2 max 420.73
+ units w/o III.19.51 max 31.5
+ time_limit_reached 1993 median 30.5 max 420.73
+ tlr under units 617 max 420.73
+ tlr no units 1376 max (31.84, ('trraw', 'first_principles_supernovae_zr', 'fold2', 5))
+== 1.2.0
+ F41 exact 163 205
+  feyn_n1 structure 108 205 NEAR 154
+  feyn_n10 structure 85 205 NEAR 101
+  ufeyn_n1 structure 113 205 NEAR 162
+  ufeyn_n10 structure 98 205 NEAR 143
+ U41 exact 166
+ TF78 exact 214 390
+ TS14 test exact 10 70 ts all 140
+ utf exact 229 390
+  real folds 30 median 0.809459 ood 30 collapses 5 all 60 Counter({'fold': 30, 'ood': 30})
+  realraw folds 35 median 0.878665 ood 35 collapses 5 all 70 Counter({'fold': 35, 'ood': 35})
+  tr folds 125 median 0.769151 ood 125 collapses 38 all 250 Counter({'fold': 125, 'ood': 125})
+  trraw folds 125 median 0.770775 ood 125 collapses 28 all 250 Counter({'fold': 125, 'ood': 125})
+  ts folds 0 None ood 70 collapses 28 all 140 Counter({'test': 70, 'ood': 70})
+ units fits 1005 audit ok 1005
+ units median time 30.19 30.19 max 31.55
+ units w/o III.19.51 max 31.55
+ time_limit_reached 1987 median 30.5 max 31.94
+ tlr under units 612 max 31.55
+ tlr no units 1375 max (31.94, ('realraw', 'nikuradse_1', 'fold1', 0))
+status changes 0 [] structure changes 0
+status set Counter({'EXACT': 787, 'NEAR': 697, 'MISS': 666, None: 630})
+ collapses real 5 5 same set True
+ collapses realraw 5 5 same set True
+ collapses tr 38 38 same set True
+ collapses trraw 28 28 same set True
+ collapses ts 28 28 same set True
+expr differs 316 no units 279 units 37
+X1 alone 276 no units 257 units 19
+other model 40 no units 22 units 18
+same expr but expr_11 differs 0 []
+other: both at budget 38 III.19.51 units 12 both-at-budget & not III 28
+  other not both at budget: ('ufeyn', 'III.19.51', 'test', 0) True False 370.56 0.99 1 1
+  other not both at budget: ('ufeyn', 'III.19.51', 'test', 3) True False 374.47 1.12 1 1
+  III: ('ufeyn', 'III.19.51', 'test', 0) gen 1 1 t 370.56 0.99 EXACT EXACT
+  III: ('ufeyn', 'III.19.51', 'test', 3) gen 1 1 t 374.47 1.12 EXACT EXACT
+  III: ('ufeyn_n1', 'III.19.51', 'test', 0) gen 1 38 t 374.03 30.2 NEAR NEAR
+  III: ('ufeyn_n1', 'III.19.51', 'test', 1) gen 1 37 t 420.73 30.25 NEAR NEAR
+  III: ('ufeyn_n1', 'III.19.51', 'test', 2) gen 1 35 t 334.17 30.3 NEAR NEAR
+  III: ('ufeyn_n1', 'III.19.51', 'test', 3) gen 1 35 t 366.71 30.12 NEAR NEAR
+  III: ('ufeyn_n1', 'III.19.51', 'test', 4) gen 1 37 t 389.03 30.46 NEAR NEAR
+  III: ('ufeyn_n10', 'III.19.51', 'test', 0) gen 1 36 t 368.78 30.34 NEAR NEAR
+  III: ('ufeyn_n10', 'III.19.51', 'test', 1) gen 1 40 t 384.09 30.05 NEAR NEAR
+  III: ('ufeyn_n10', 'III.19.51', 'test', 2) gen 1 38 t 340.57 30.35 NEAR NEAR
+  III: ('ufeyn_n10', 'III.19.51', 'test', 3) gen 1 36 t 367.9 30.4 NEAR NEAR
+  III: ('ufeyn_n10', 'III.19.51', 'test', 4) gen 1 35 t 374.62 30.24 NEAR NEAR
+X1 rewrites 287 no units 267 units 20
+  rewrites among other-model 11 among x1alone 276 among same expr 0
+missing expr_11 0 outside frozen n 1360
+formula_exact != formula_exact_11 0
+neither at budget (III aside): outside frozen 316 frozen 471
+  among them differing 0
+I.6.20a s1: 0.398942 * |0.0114856^(0.11194 * v0²)| | 0.398942 * |exp(-0.5 * v0²)| | 0.398942 * |0.0114856^(0.11194 * v0²)|
+ III.19.51 ufeyn 5 1.1.0 342.12-387.20 1.2.0 0.99-1.16 Counter({'EXACT': 5}) Counter({'EXACT': 5}) ratio a/30 11.40-12.91
+     0 370.56 0.99 1 1 True False
+     1 387.2 0.99 1 1 True False
+     2 342.12 1.14 1 1 True False
+     3 374.47 1.12 1 1 True False
+     4 381.83 1.16 1 1 True False
+ III.19.51 ufeyn_n1 5 1.1.0 334.17-420.73 1.2.0 30.12-30.46 Counter({'NEAR': 5}) Counter({'NEAR': 5}) ratio a/30 11.14-14.02
+     0 374.03 30.2 1 38 True True
+     1 420.73 30.25 1 37 True True
+     2 334.17 30.3 1 35 True True
+     3 366.71 30.12 1 35 True True
+     4 389.03 30.46 1 37 True True
+ III.19.51 ufeyn_n10 5 1.1.0 340.57-384.09 1.2.0 30.05-30.40 Counter({'NEAR': 5}) Counter({'NEAR': 5}) ratio a/30 11.35-12.80
+     0 368.78 30.34 1 36 True True
+     1 384.09 30.05 1 40 True True
+     2 340.57 30.35 1 38 True True
+     3 367.9 30.4 1 36 True True
+     4 374.62 30.24 1 35 True True
+time budget reached both: 1987
+a U41 median time 0.36 utf median 1.14
+b U41 median time 0.35 utf median 1.1099999999999999
+units other both-at-budget 16

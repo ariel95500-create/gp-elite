@@ -1,0 +1,47 @@
+== TP C1 2026-11-04T15:34:21Z Model name: Intel(R) Xeon(R) Processor 4 cores 203a1ee
+400 jobs to run, 0 already done
+25 done, 98 s elapsed, 375 left
+50 done, 198 s elapsed, 350 left
+75 done, 313 s elapsed, 325 left
+100 done, 407 s elapsed, 300 left
+125 done, 499 s elapsed, 275 left
+150 done, 591 s elapsed, 250 left
+175 done, 692 s elapsed, 225 left
+200 done, 798 s elapsed, 200 left
+225 done, 886 s elapsed, 175 left
+250 done, 999 s elapsed, 150 left
+275 done, 1145 s elapsed, 125 left
+300 done, 1271 s elapsed, 100 left
+325 done, 1462 s elapsed, 75 left
+350 done, 1619 s elapsed, 50 left
+375 done, 1727 s elapsed, 25 left
+400 done, 1810 s elapsed, 0 left
+all done
+== D C1 2026-11-04T16:04:32Z Model name: Intel(R) Xeon(R) Processor 4 cores 203a1ee
+615 jobs to run, 0 already done
+25 done, 8 s elapsed, 590 left
+50 done, 76 s elapsed, 565 left
+75 done, 90 s elapsed, 540 left
+100 done, 156 s elapsed, 515 left
+125 done, 228 s elapsed, 490 left
+150 done, 284 s elapsed, 465 left
+175 done, 297 s elapsed, 440 left
+200 done, 393 s elapsed, 415 left
+225 done, 489 s elapsed, 390 left
+250 done, 611 s elapsed, 365 left
+275 done, 743 s elapsed, 340 left
+300 done, 868 s elapsed, 315 left
+325 done, 1023 s elapsed, 290 left
+350 done, 1175 s elapsed, 265 left
+375 done, 1323 s elapsed, 240 left
+400 done, 1493 s elapsed, 215 left
+425 done, 1632 s elapsed, 190 left
+450 done, 1770 s elapsed, 165 left
+475 done, 1913 s elapsed, 140 left
+500 done, 2073 s elapsed, 115 left
+525 done, 2216 s elapsed, 90 left
+550 done, 2365 s elapsed, 65 left
+575 done, 2537 s elapsed, 40 left
+600 done, 2663 s elapsed, 15 left
+all done
+== all done 2026-11-04T16:51:28Z Model name: Intel(R) Xeon(R) Processor 4 cores 203a1ee

@@ -1,0 +1,4 @@
+The two new tests of tests/test_guarantees.py run on the 1.1.0 wheel (/venv11p, no PYTHONPATH), capped at 240 s, 2026-11-04T05:14:00Z:
+Frc=124 elapsed=240 s
+
+F = test_fast_path_builds_products_of_nine_to_twelve_factors failed; test_typed_start_stops_at_the_deadline_with_no_empty_island was still running when the cap (rc=124) stopped it. On the corrected engine both pass in 10 s (tests_fix.txt: 156 passed).

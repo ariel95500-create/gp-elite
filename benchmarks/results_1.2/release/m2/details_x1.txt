@@ -1,0 +1,16 @@
+Without units: 1775 jobs, 279 return another expression:
+  257 where X1 alone rewrites the printed formula (without X1, that of 1.1.0)
+  22 whose formula without X1 differs: 22 with both versions at the budget, 0 with one of them
+  status changed: 0; X1 rewrites the formula on 267 fits of 1.2.0
+Under units: 1005 jobs, 37 return another expression:
+  19 where X1 alone rewrites the printed formula (without X1, that of 1.1.0)
+  18 whose formula without X1 differs: 16 with both versions at the budget, 2 with one of them
+    ('ufeyn', 'III.19.51', 'test', 0): 370.6 s with 1.1.0, 1.0 s with 1.2.0, EXACT and EXACT
+    ('ufeyn', 'III.19.51', 'test', 3): 374.5 s with 1.1.0, 1.1 s with 1.2.0, EXACT and EXACT
+  status changed: 0; X1 rewrites the formula on 20 fits of 1.2.0
+
+Fits at the time budget: 1993 with 1.1.0, 1987 with 1.2.0, of 2780.
+ufeyn: median time 0.36 s -> 0.35 s; without III.19.51, longest 31.2 s -> 31.4 s
+ufeyn_n1: median time 30.36 s -> 30.37 s; without III.19.51, longest 31.5 s -> 31.6 s
+ufeyn_n10: median time 30.35 s -> 30.34 s; without III.19.51, longest 31.2 s -> 31.3 s
+utf: median time 1.14 s -> 1.11 s; without III.19.51, longest 31.3 s -> 31.4 s

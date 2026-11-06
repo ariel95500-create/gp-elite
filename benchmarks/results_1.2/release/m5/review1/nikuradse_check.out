@@ -1,0 +1,129 @@
+== seed 0 champion size 53 53 r2 0.9886 0.9886
+  front size   6 r2 0.9357/0.9357 same    loglog False/False 1.10108 - 0.133625 * log(r_k)
+  front size   8 r2 0.9366/0.9366 same    loglog False/False 1.2289 + 0.17456 * (0.00197239 * r_k - log(r_k))
+  front size   9 r2 0.9447/0.9447 same    loglog False/False -0.0282244 + 1.55909 * sqrt(1 / sqrt(r_k))
+  front size  11 r2 0.9362/0.9362 same    loglog False/False 
+  front size  25 r2 0.9462/0.9462 same    loglog False/False 
+  front size  26 r2 0.9648/0.9648 same    loglog False/False 
+  front size  43 r2 0.9712/0.9712 CHANGED loglog False/False 
+  front size  48 r2 0.9869/0.9869 CHANGED loglog False/False 
+  front size  49 r2 0.9829/0.9829 CHANGED loglog False/False 
+  front size  53 r2 0.9886/0.9886 CHANGED loglog False/False 
+  front size  53 r2 0.9886/0.9886 CHANGED loglog False/False 
+  holdout size   6 same    loglog False/False bias 0.225
+  holdout size   8 same    loglog False/False bias -0.617
+  holdout size  13 same    loglog False/False bias -0.272
+  holdout size  14 same    loglog False/False bias -0.823
+  holdout size  31 CHANGED loglog False/False bias -1.122
+  holdout size  34 same    loglog False/False bias -0.266
+  holdout size  43 same    loglog False/False bias -0.28
+  holdout size  46 CHANGED loglog False/False bias 0.104
+  holdout size  52 same    loglog False/False bias 0.014
+  holdout size  59 same    loglog False/False bias -0.037
+  holdout size  62 same    loglog False/False bias -0.339
+  holdout size  69 CHANGED loglog False/False bias 0.883
+  holdout size  72 same    loglog False/False bias -0.341
+  seconds 52.3 35.6
+== seed 1 champion size 55 55 r2 0.9923 0.9923
+  front size   6 r2 0.9357/0.9357 same    loglog False/False 1.10108 - 0.133625 * log(r_k)
+  front size   7 r2 0.9357/0.9357 same    loglog False/False 0.268793 + 0.133625 * |log(r_k) - 6.22851|
+  front size   8 r2 0.9426/0.9426 same    loglog False/False 0.203162 - 0.309316 * log(tanh(0.0444116 * sqrt(r_k)))
+  front size  13 r2 0.9399/0.9399 CHANGED loglog False/False 
+  front size  16 r2 0.9562/0.9562 CHANGED loglog False/False 
+  front size  17 r2 0.9597/0.9597 CHANGED loglog False/False 
+  front size  30 r2 0.9769/0.9769 same    loglog True/True 
+  front size  38 r2 0.9844/0.9844 same    loglog False/False 
+  front size  41 r2 0.9839/0.9839 CHANGED loglog True/True 
+  front size  49 r2 0.9849/0.9849 same    loglog False/False 
+  front size  55 r2 0.9923/0.9923 same    loglog False/False 
+  front size  55 r2 0.9923/0.9923 same    loglog False/False 
+  front size  62 r2 0.9947/0.9947 same    loglog False/False 
+  holdout size   6 same    loglog False/False bias 0.225
+  holdout size   7 same    loglog False/False bias -0.329
+  holdout size   8 same    loglog False/False bias -0.617
+  holdout size   9 same    loglog False/False bias -0.135
+  holdout size  10 same    loglog False/False bias -0.65
+  holdout size  12 same    loglog True/True bias -1.203
+  holdout size  14 same    loglog True/True bias -0.418
+  holdout size  26 CHANGED loglog False/False bias -0.29
+  holdout size  40 CHANGED loglog False/False bias -0.368
+  holdout size  46 same    loglog False/False bias -0.327
+  holdout size  49 same    loglog False/False bias -0.348
+  holdout size  64 CHANGED loglog False/False bias -0.179
+  holdout size  69 same    loglog True/True bias -0.197
+  seconds 53.7 34.1
+== seed 2 champion size 48 48 r2 0.9802 0.9802
+  front size   6 r2 0.9357/0.9357 same    loglog False/False 1.10108 - 0.133625 * log(r_k)
+  front size   7 r2 0.9441/0.9441 same    loglog False/False 0.00351323 + 1.56459 * r_k^(-0.265753)
+  front size   9 r2 0.9422/0.9422 same    loglog False/False 1.16039 + 0.076157 * (0.00197239 * r_k - log(r_k²))
+  front size  10 r2 0.9409/0.9409 same    loglog False/False 
+  front size  12 r2 0.9488/0.9488 same    loglog False/False 
+  front size  31 r2 0.9567/0.9567 same    loglog False/False 
+  front size  32 r2 0.9662/0.9662 same    loglog False/False 
+  front size  40 r2 0.9738/0.9738 same    loglog False/False 
+  front size  47 r2 0.9771/0.9771 same    loglog False/False 
+  front size  48 r2 0.9802/0.9802 same    loglog False/False 
+  front size  48 r2 0.9802/0.9802 same    loglog False/False 
+  holdout size   6 same    loglog False/False bias 0.225
+  holdout size   7 same    loglog False/False bias -0.329
+  holdout size   8 same    loglog False/False bias -0.617
+  holdout size  10 same    loglog False/False bias -0.791
+  holdout size  11 same    loglog False/False bias -0.34
+  holdout size  14 same    loglog False/False bias -0.352
+  holdout size  15 same    loglog False/False bias -0.827
+  holdout size  28 same    loglog False/False bias -0.626
+  holdout size  32 same    loglog False/False bias -0.471
+  holdout size  51 same    loglog False/False bias -0.253
+  seconds 51.2 32.2
+== seed 3 champion size 56 56 r2 0.9952 0.9952
+  front size   6 r2 0.9357/0.9357 same    loglog False/False 1.10108 - 0.133625 * log(r_k)
+  front size   7 r2 0.9404/0.9404 same    loglog False/False 0.244436 - 0.142565 * log(tanh(0.00197239 * r_k))
+  front size   8 r2 0.9412/0.9412 same    loglog False/False 0.226932 - 0.148772 * log(tanh(tanh(0.00197239 * r_k)))
+  front size  11 r2 0.9599/0.9599 same    loglog False/False 
+  front size  35 r2 0.9686/0.9686 same    loglog False/False 
+  front size  38 r2 0.9775/0.9775 CHANGED loglog False/False 
+  front size  46 r2 0.9865/0.9865 same    loglog False/False 
+  front size  48 r2 0.9887/0.9887 CHANGED loglog False/False 
+  front size  49 r2 0.9891/0.9891 CHANGED loglog False/False 
+  front size  56 r2 0.9952/0.9952 CHANGED loglog False/False 
+  front size  56 r2 0.9952/0.9952 CHANGED loglog False/False 
+  holdout size   6 same    loglog False/False bias 0.225
+  holdout size   7 same    loglog False/False bias 0.225
+  holdout size   8 same    loglog False/False bias -0.617
+  holdout size  10 same    loglog False/False bias -0.791
+  holdout size  11 same    loglog False/False bias -0.457
+  holdout size  12 same    loglog False/False bias -0.542
+  holdout size  20 same    loglog False/False bias -0.338
+  holdout size  30 same    loglog False/False bias -0.469
+  holdout size  35 same    loglog False/False bias 0.047
+  holdout size  37 same    loglog True/True bias -0.48
+  holdout size  39 same    loglog True/True bias -0.632
+  holdout size  58 same    loglog True/True bias -0.557
+  holdout size  72 CHANGED loglog False/False bias 0.086
+  seconds 50.9 32.8
+== seed 4 champion size 70 70 r2 0.98 0.98
+  front size   6 r2 0.9357/0.9357 same    loglog False/False 1.10108 - 0.133625 * log(r_k)
+  front size   8 r2 0.9366/0.9366 same    loglog False/False 1.2289 - 0.17456 * (log(r_k) - 0.00197239 * r_k)
+  front size   9 r2 0.9447/0.9447 same    loglog False/False -0.0282244 + 1.55909 * sqrt(sqrt(r_k) / r_k)
+  front size  13 r2 0.9435/0.9435 same    loglog False/False 
+  front size  21 r2 0.9585/0.9585 same    loglog False/False 
+  front size  25 r2 0.9546/0.9546 same    loglog False/False 
+  front size  26 r2 0.9654/0.9654 same    loglog False/False 
+  front size  38 r2 0.9816/0.9816 same    loglog False/False 
+  front size  40 r2 0.9825/0.9825 same    loglog False/False 
+  front size  63 r2 0.9939/0.9939 CHANGED loglog False/False 
+  front size  66 r2 0.9940/0.9940 CHANGED loglog False/False 
+  front size  70 r2 0.9800/0.9800 same    loglog True/True 
+  front size  70 r2 0.9800/0.9800 same    loglog True/True 
+  holdout size   6 same    loglog False/False bias 0.225
+  holdout size   8 same    loglog False/False bias -0.617
+  holdout size  12 same    loglog False/False bias -0.528
+  holdout size  15 CHANGED loglog False/False bias -0.733
+  holdout size  26 same    loglog False/False bias -0.426
+  holdout size  28 same    loglog False/False bias -0.551
+  holdout size  38 same    loglog False/False bias -0.385
+  holdout size  46 same    loglog False/False bias -0.532
+  holdout size  52 same    loglog False/False bias -0.21
+  holdout size  56 CHANGED loglog False/False bias -0.59
+  holdout size  73 same    loglog False/False bias -0.707
+  seconds 50.4 32.6

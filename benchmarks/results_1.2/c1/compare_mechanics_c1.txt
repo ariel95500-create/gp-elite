@@ -1,0 +1,29 @@
+164 records, 0 crashes
+
+Mechanic 1, on 81 jobs (TP units arm draw 0, U41 seed 0):
+  units_check=True returns the model of units_check=False alone (formula, sympy, predictions on the training rows, check_dimensions): 81 of 81
+  units_check=False run after it in the same process returns the same as alone: 81 of 81
+  the check runs with True and not with False: 81 of 81
+  mechanic 1 HOLDS
+
+Beside: the warnings of units_check=True on these fits:
+  TP lentille 10 pts 2 %: 0.22 under units, 0.00637 without: 0.0942957 + 0.0313183 * (1.66667 * p)^(log(p) + 0.510826)
+  TP lentille 20 pts 2 %: 0.171 under units, 0.00533 without: 0.122692 - 0.00285217 * (log(p) + 0.510826) / p²
+  TP rc 10 pts 2 %: 1.55 under units, 2.23e-05 without: -0.00664979 + 4.96444 * exp(-t / 1.01302)
+  TP rc 10 pts 5 %: 0.0229 under units, 0.000311 without: -0.0236091 + 4.88669 * exp(-t / 1.05806)
+  TP rc 20 pts 2 %: 0.0687 under units, 0.000446 without: 0.00924128 + 4.95675 * exp(-t / 0.991018)
+  TP rc 20 pts 5 %: 0.0666 under units, 0.00135 without: 0.00538504 + 5.05644 * exp(-t / 0.981975)
+  TP refroidissement 10 pts 2 %: 4.29 under units, 0.000881 without: 23.2203 + 71.3532 * tanh(exp(-t / 448.294))
+  TP refroidissement 10 pts 5 %: 3.82 under units, 0.00736 without: 85.2487 - 62.2713 * sqrt(|tanh(0.000555556 * exp(t / 1800) * t)|)
+  TP refroidissement 20 pts 2 %: 0.135 under units, 0.00196 without: 20.3163 + 61.7356 * exp(-t / 570.673)
+  TP refroidissement 20 pts 5 %: 0.101 under units, 0.0115 without: 88.6778 - 89.2299 * tanh(0.0235702 * sqrt(|t|))
+  U41 I.50.26: 0.6 under units, 0.0503 without: 0.30293 - 0.152997 * (cos((0.33894 * v2 * |exp(v1 / 2.96376)| - 4.46519)²) * |exp(v2 / 2.9
+  U41 I.6.20a: 0.00123 under units, 1.15e-27 without: 0.398942 * exp(-0.5 * v0²)
+  U41 III.17.37: 0.1 under units, 0.0011 without: 74.5207 + (-5.75866 + 0.0773136 * v0) * (11.941 + 0.207377 * v1 * sin(cos((0.618586 + 0.17
+  (13 of 81 fits)
+
+Mechanic 3, default calls, units arm, 10 points, 2 %, draw 0:
+  capacitor: model 0.0964394 * t; check ran True, warned True (1.55 under units, 2.23e-05 without); formula without units -0.00664979 + 4.96444 * exp(-t / 1.01302)
+  pendulum: model 1.99895 * sqrt(L); check ran True, warned False (0.00391 under units, 0.00354 without); formula without units -0.0290401 + 2.03646 * sqrt(L)
+  the warning: GP_ELITE: under units, the formula found fits these data less well than a formula found without units (1 - R² on the training rows: 1.55 under units, 2.23e-05 without): -0.00664979 + 4.96444 * exp(-t / 1.01302). Under units a constant that carries units cannot sit inside a function or a sum (a time constant, an offset, a focal length): if the law you expect has one, the formula without units may be the closer one. The model returned is the one found under units; the other is in result.units_check.
+  mechanic 3 HOLDS
