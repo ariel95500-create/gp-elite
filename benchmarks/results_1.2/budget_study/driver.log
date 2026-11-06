@@ -78,3 +78,13 @@ time slice over: 2525 jobs left for the next call
 --- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
 --- slice 2026-11-06T20:01 (1532 done), Model name: Intel(R) Xeon(R) Processor
 2488 jobs to run, 1532 already done
+25 done, 450 s elapsed, 2463 left
+50 done, 1342 s elapsed, 2435 left
+75 done, 1680 s elapsed, 2412 left
+100 done, 2092 s elapsed, 2387 left
+125 done, 2944 s elapsed, 2361 left
+150 done, 3575 s elapsed, 2335 left
+--- container restart noticed at 2026-11-06T21:05: the last record was written at 21:04:59, the 1691 records are whole (no broken line, no key twice); the fits running at the restart left no record and run again; lscpu identical to the first slice, but the kernel of the container is now 6.18.44-fc-v260 (6.18.44-fc-v242 before); driver restarted
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-06T21:05 (1691 done), Model name: Intel(R) Xeon(R) Processor
+2329 jobs to run, 1691 already done
