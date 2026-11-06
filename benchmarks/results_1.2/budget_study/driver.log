@@ -46,3 +46,31 @@ time slice over: 3178 jobs left for the next call
 --- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
 --- slice 2026-11-06T17:51 (890 done), Model name: Intel(R) Xeon(R) Processor
 3130 jobs to run, 890 already done
+25 done, 1009 s elapsed, 3104 left
+50 done, 1885 s elapsed, 3077 left
+75 done, 2743 s elapsed, 3054 left
+100 done, 3679 s elapsed, 3029 left
+125 done, 4113 s elapsed, 3005 left
+150 done, 4354 s elapsed, 2979 left
+175 done, 4660 s elapsed, 2954 left
+200 done, 4675 s elapsed, 2929 left
+225 done, 5114 s elapsed, 2905 left
+250 done, 5187 s elapsed, 2878 left
+275 done, 5386 s elapsed, 2854 left
+300 done, 5399 s elapsed, 2828 left
+325 done, 5411 s elapsed, 2803 left
+350 done, 5422 s elapsed, 2779 left
+375 done, 5433 s elapsed, 2755 left
+400 done, 5445 s elapsed, 2728 left
+425 done, 5455 s elapsed, 2703 left
+450 done, 5465 s elapsed, 2680 left
+475 done, 5509 s elapsed, 2653 left
+500 done, 5955 s elapsed, 2630 left
+525 done, 5975 s elapsed, 2604 left
+550 done, 5992 s elapsed, 2579 left
+575 done, 6009 s elapsed, 2554 left
+600 done, 6204 s elapsed, 2529 left
+time slice over: 2525 jobs left for the next call
+--- slice 2026-11-06T19:39 (1495 done), Model name: Intel(R) Xeon(R) Processor
+2525 jobs to run, 1495 already done
+25 done, 349 s elapsed, 2499 left
