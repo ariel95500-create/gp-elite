@@ -31,3 +31,18 @@
 time slice over: 3359 jobs left for the next call
 --- slice 2026-11-06T13:42 (661 done), Model name: Intel(R) Xeon(R) Processor
 3359 jobs to run, 661 already done
+25 done, 905 s elapsed, 3331 left
+50 done, 1822 s elapsed, 3308 left
+75 done, 2673 s elapsed, 3281 left
+100 done, 3553 s elapsed, 3258 left
+125 done, 4465 s elapsed, 3233 left
+150 done, 5332 s elapsed, 3206 left
+175 done, 6193 s elapsed, 3183 left
+time slice over: 3178 jobs left for the next call
+--- slice 2026-11-06T15:30 (842 done), Model name: Intel(R) Xeon(R) Processor
+3178 jobs to run, 842 already done
+25 done, 941 s elapsed, 3152 left
+--- container restart noticed at 2026-11-06T17:51: the last record was written at 15:59:45, the 890 records are whole (no broken line, no key twice); the fits running at the restart left no record and run again; driver restarted
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-06T17:51 (890 done), Model name: Intel(R) Xeon(R) Processor
+3130 jobs to run, 890 already done
