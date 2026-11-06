@@ -35,6 +35,12 @@ time_limit=), the regime where the stop on patience of plan 1.2 acts (bench
 D, benchmarks/results_1.2/PLAN.md); each job then carries "defaults": true.
 Without it the jobs and the fits are those of before.
 
+[budget study] --budget-factors 1,3,10 runs every job once per factor k, with
+time_limit=30 k and generations=1000 k, the factors of a job one after the
+other (benchmarks/results_1.2/budget_study/PLAN.md); each job and record then
+carries "budget_factor": k. Without it the jobs and the fits are those of
+before.
+
 Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
   python benchmarks/phase1_bench.py run-paired --python A/bin/python --out a.jsonl \\
@@ -63,6 +69,7 @@ ORDER = ["feyn", "real", "realraw", "tf", "ts", "tr", "trraw",
          "feyn_n1", "feyn_n10"]
 UNIT_KINDS = ["ufeyn", "ufeyn_n1", "ufeyn_n10", "utf"]   # phase 7, on request only
 DEFAULTS = False                    # [1.2] --defaults
+BUDGET_FACTORS = None               # [budget study] --budget-factors
 FEYN_KINDS = ("feyn", "feyn_n1", "feyn_n10", "ufeyn", "ufeyn_n1", "ufeyn_n10")
 
 
@@ -109,7 +116,8 @@ def all_jobs(with_units=False):
 
 
 def key(j):
-    return (j["kind"], j["problem"], j["split"], j["seed"])
+    k = (j["kind"], j["problem"], j["split"], j["seed"])
+    return k + (j["budget_factor"],) if "budget_factor" in j else k
 
 
 # ───────────────────────────────────────────────────────────── worker ──
@@ -205,6 +213,9 @@ def run_one(job):
               seed=job["seed"], parallel=False, verbose=False, operators=pool)
     if job.get("defaults"):             # [1.2] bench D: the API defaults
         del kw["generations"], kw["time_limit"]
+    if job.get("budget_factor"):        # [budget study] k times the budget
+        kw.update(time_limit=TIME_LIMIT * job["budget_factor"],
+                  generations=GENERATIONS * job["budget_factor"])
     if names is not None:
         kw["feature_names"] = names
     units = None
@@ -312,8 +323,11 @@ def drive(python, out, workers, kinds=None, max_seconds=None):
                 if line.strip():
                     done.add(key(json.loads(line)))
     todo = [dict(j, defaults=True) if DEFAULTS else j
-            for j in all_jobs(_with_units(kinds)) if key(j) not in done
-            and (kinds is None or j["kind"] in kinds)]
+            for j in all_jobs(_with_units(kinds))
+            if kinds is None or j["kind"] in kinds]
+    if BUDGET_FACTORS:                  # [budget study] a job, then its factors
+        todo = [dict(j, budget_factor=f) for j in todo for f in BUDGET_FACTORS]
+    todo = [j for j in todo if key(j) not in done]
     print("%d jobs to run, %d already done" % (len(todo), len(done)),
           flush=True)
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
@@ -487,6 +501,7 @@ def main():
     r.add_argument("--max-seconds", type=float, default=None)
     r.add_argument("--seeds", default=None)
     r.add_argument("--defaults", action="store_true")
+    r.add_argument("--budget-factors", default=None)
     r2 = sub.add_parser("run-paired")
     r2.add_argument("--python", action="append", required=True)
     r2.add_argument("--out", action="append", required=True)
@@ -506,6 +521,11 @@ def main():
     if getattr(a, "defaults", False):
         global DEFAULTS
         DEFAULTS = True
+    if getattr(a, "budget_factors", None):
+        if DEFAULTS:
+            raise SystemExit("--budget-factors sets the budget: not with --defaults")
+        global BUDGET_FACTORS
+        BUDGET_FACTORS = [int(x) for x in a.budget_factors.split(",")]
     if a.cmd == "run":
         drive(a.python, a.out, a.workers,
               a.kinds.split(",") if a.kinds else None, a.max_seconds)
