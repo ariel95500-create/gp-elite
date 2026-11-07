@@ -161,3 +161,9 @@ time slice over: 1040 jobs left for the next call
 1040 jobs to run, 2980 already done
 25 done, 905 s elapsed, 1012 left
 50 done, 1825 s elapsed, 989 left
+75 done, 2680 s elapsed, 962 left
+100 done, 3562 s elapsed, 939 left
+125 done, 4475 s elapsed, 914 left
+150 done, 5346 s elapsed, 887 left
+175 done, 6211 s elapsed, 864 left
+time slice over: 860 jobs left for the next call
