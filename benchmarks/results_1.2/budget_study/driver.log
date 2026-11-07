@@ -144,3 +144,9 @@ time slice over: 1401 jobs left for the next call
 75 done, 2676 s elapsed, 1325 left
 100 done, 3531 s elapsed, 1298 left
 125 done, 4411 s elapsed, 1275 left
+150 done, 5329 s elapsed, 1250 left
+175 done, 6201 s elapsed, 1223 left
+time slice over: 1220 jobs left for the next call
+--- slice 2026-11-07T06:30 (2800 done), Model name: Intel(R) Xeon(R) Processor
+1220 jobs to run, 2800 already done
+25 done, 906 s elapsed, 1192 left
