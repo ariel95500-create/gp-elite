@@ -1,0 +1,53 @@
+Jobs per arm: [1340, 1340, 1340]; the same jobs in every arm: True
+Engines: [('1.2.0', '/venv12p/lib/python3.11/site-packages/gp_elite/__init__.py')]
+AVX-512 and NumPy recorded: [(True, '2.4.6')]
+
+| indicator | T | 3T | 10T |
+|---|---|---|---|
+| F41 exact | 163 | 160 | 164 |
+| U41 exact | 165 | 167 | 169 |
+| TF78 exact | 214 | 227 | 233 |
+| F41N1 structure retrieved | 108 | 110 | 111 |
+| F41N10 structure retrieved | 85 | 87 | 90 |
+| R6 folds median R² | 0.8126 | 0.8126 | 0.8126 |
+| R6 + R7raw out-of-domain collapses | 10 | 16 | 22 |
+| crashes | 0 | 0 | 0 |
+| fits | 1340 | 1340 | 1340 |
+| fits at the time budget | 803 | 780 | 758 |
+| feyn_n1, median generations | 115 | 320 | 1020 |
+| feyn_n10, median generations | 103 | 287 | 907 |
+| real, median generations | 128.0 | 356.5 | 1138.0 |
+| median time of a fit (s) | 30.3 | 90.3 | 300.3 |
+| noisy and real fits, median size | 15.0 | 16.0 | 16.0 |
+
+F41, T to 10T: 3 equations gain exact fits, 1 lose some
+  gains: I.11.19 1 -> 3
+  gains: II.2.42 4 -> 5
+  gains: III.17.37 0 -> 3
+  loses: I.8.14 5 -> 0
+
+U41, T to 10T: 3 equations gain exact fits, 0 lose some
+  gains: I.11.19 1 -> 3
+  gains: I.16.6 4 -> 5
+  gains: I.37.4 0 -> 1
+
+TF78, T to 10T: 9 equations gain exact fits, 0 lose some
+  gains: feynman_III_4_32 2 -> 4
+  gains: feynman_III_4_33 2 -> 4
+  gains: feynman_III_8_54 1 -> 4
+  gains: feynman_I_13_12 0 -> 1
+  gains: feynman_I_32_17 0 -> 2
+  gains: feynman_I_34_14 0 -> 3
+  gains: feynman_test_1 0 -> 4
+  gains: feynman_test_18 0 -> 1
+  gains: feynman_test_7 0 -> 1
+
+Criteria written before the run (PLAN.md): more time adds much if any holds.
+  [does not hold] F41: at least 10 more exact laws at 10T (163 -> 164)
+  [does not hold] U41: at least 10 more exact laws at 10T (165 -> 169)
+  [does not hold] F41N1: at least 10 more structures at 10T (108 -> 111)
+  [does not hold] F41N10: at least 10 more structures at 10T (85 -> 90)
+  [does not hold] R6 folds: median test R² at least 0.01 higher at 10T (0.8126 -> 0.8126)
+MORE TIME ADDS LITTLE
+
+Beside, deciding nothing: collapses out of domain 10, 16, 22; TF78 exact 214, 227, 233.

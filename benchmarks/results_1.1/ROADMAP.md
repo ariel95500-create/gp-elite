@@ -23,7 +23,9 @@ Kept apart from the plans of 1.1, which this file does not change.
    27 October 2026), described below. Its plan is
    `../results_1.2/budget_study/PLAN.md`, committed on 6 November 2026
    before the first fit; the campaign started the same day, once 1.2.0 was
-   on PyPI.
+   on PyPI. Done on 7 November 2026: more time adds little, none of the
+   criteria holds (`../results_1.2/budget_study/README.md`); what follows is
+   the author's to decide.
 
 ## SRBench
 
