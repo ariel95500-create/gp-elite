@@ -57,7 +57,11 @@ def main(path):
         d = r["diag"]
         same = r["status"] == r["study_status"]
         k = klass(r) if r["status"] != "EXACT" else None
-        if k is not None and same and r["study_status"] == "NEAR":
+        # PLAN.md counts the near fits of T and 10T; those of 3T (I.8.14
+        # only) are read apart below. [Corrected after the run: the first
+        # version counted the four of 3T as well, giving 9 of 44.]
+        if (k is not None and same and r["study_status"] == "NEAR"
+                and r["budget_factor"] in (1, 10)):
             counted[k] += 1
         print("| %s seed %d | %s | %s, %s%s | %s, %s | %d | %d | %s |" % (
             r["problem"], r["seed"], arm(r), r["study_status"], r["status"],
@@ -65,7 +69,7 @@ def main(path):
             r["generations"], d["n_distinct"], len(d["within_reach"]),
             "%d %s" % (k, NAMES[k]) if k else "exact"))
     n = sum(counted.values())
-    print("\nNear fits of the budget study that kept their status: %d" % n)
+    print("\nNear fits of the budget study at T and 10T that kept their status: %d" % n)
     for k in sorted(NAMES):
         print("  class %d, %s: %d" % (k, NAMES[k], counted[k]))
     lost = sum(counted[k] for k in (2, 3, 4, 5))

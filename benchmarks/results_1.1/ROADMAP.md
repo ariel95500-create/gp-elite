@@ -30,7 +30,11 @@ Kept apart from the plans of 1.1, which this file does not change.
    left the choice to Claude). The budget study saw I.8.14 lost with more
    time, and the code shows two ways the end of the search could lose a law
    it had found. Its plan is `../results_1.2/end_of_search/PLAN.md`,
-   committed before any measurement.
+   committed before any measurement. Done on 8 November 2026: the end of
+   the search is not the main cause. In 35 of the 40 near fits, the search
+   never offered the structure of the law. 15 of those 35 are the two
+   arcsine laws, which no operator pool of 1.2.0 can write. I.8.14 is lost
+   by the pool of 64 candidates (`../results_1.2/end_of_search/README.md`).
 
 ## SRBench
 

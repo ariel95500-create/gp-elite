@@ -1,0 +1,219 @@
+Fits: 53; crashes: 0
+
+| fit | arm | status (study, now) | generations (study, now) | offered | within reach | class |
+|---|---|---|---|---|---|---|
+| I.16.6 seed 0 | T | NEAR, NEAR | 135, 123 | 61 | 0 | 1 no candidate within reach |
+| I.30.5 seed 0 | T | NEAR, NEAR | 105, 95 | 36 | 0 | 1 no candidate within reach |
+| I.30.5 seed 1 | T | NEAR, NEAR | 25, 25 | 14 | 0 | 1 no candidate within reach |
+| I.30.5 seed 2 | T | NEAR, NEAR | 33, 33 | 12 | 0 | 1 no candidate within reach |
+| I.30.5 seed 3 | T | NEAR, NEAR | 61, 61 | 24 | 0 | 1 no candidate within reach |
+| I.30.5 seed 4 | T | NEAR, NEAR | 6, 6 | 6 | 0 | 1 no candidate within reach |
+| I.37.4 seed 0 | T | NEAR, MISS (changed) | 122, 108 | 60 | 0 | 1 no candidate within reach |
+| I.37.4 seed 1 | T | NEAR, NEAR | 115, 104 | 83 | 0 | 1 no candidate within reach |
+| I.37.4 seed 3 | T | NEAR, NEAR | 125, 117 | 62 | 0 | 1 no candidate within reach |
+| I.37.4 seed 4 | T | NEAR, NEAR | 123, 109 | 91 | 0 | 1 no candidate within reach |
+| I.8.14 seed 0 | T | EXACT, EXACT | 145, 132 | 70 | 6 | exact |
+| I.8.14 seed 1 | T | EXACT, EXACT | 133, 116 | 71 | 8 | exact |
+| I.8.14 seed 2 | T | EXACT, EXACT | 148, 133 | 68 | 3 | exact |
+| I.8.14 seed 3 | T | EXACT, EXACT | 134, 121 | 58 | 5 | exact |
+| I.8.14 seed 4 | T | EXACT, EXACT | 149, 133 | 57 | 22 | exact |
+| II.2.42 seed 1 | T | NEAR, NEAR | 120, 108 | 101 | 0 | 1 no candidate within reach |
+| III.10.19 seed 2 | T | NEAR, NEAR | 114, 104 | 86 | 0 | 1 no candidate within reach |
+| III.17.37 seed 3 | T | NEAR, MISS (changed) | 126, 112 | 82 | 0 | 1 no candidate within reach |
+| I.8.14 seed 0 | 3T | NEAR, NEAR | 404, 356 | 123 | 6 | 3 lost by the pool |
+| I.8.14 seed 1 | 3T | EXACT, EXACT | 373, 334 | 118 | 10 | exact |
+| I.8.14 seed 2 | 3T | NEAR, NEAR | 420, 378 | 92 | 3 | 3 lost by the pool |
+| I.8.14 seed 3 | 3T | NEAR, NEAR | 378, 339 | 127 | 5 | 3 lost by the pool |
+| I.8.14 seed 4 | 3T | NEAR, NEAR | 406, 366 | 120 | 22 | 3 lost by the pool |
+| I.11.19 seed 2 | 10T | NEAR, NEAR | 1051, 926 | 466 | 0 | 1 no candidate within reach |
+| I.16.6 seed 0 | 10T | NEAR, NEAR | 1037, 891 | 380 | 0 | 1 no candidate within reach |
+| I.26.2 seed 0 | 10T | NEAR, NEAR | 1171, 1062 | 260 | 0 | 1 no candidate within reach |
+| I.26.2 seed 1 | 10T | NEAR, NEAR | 1283, 1130 | 315 | 0 | 1 no candidate within reach |
+| I.26.2 seed 2 | 10T | NEAR, NEAR | 1397, 1254 | 95 | 0 | 1 no candidate within reach |
+| I.26.2 seed 3 | 10T | NEAR, NEAR | 1111, 972 | 477 | 0 | 1 no candidate within reach |
+| I.26.2 seed 4 | 10T | NEAR, NEAR | 1109, 957 | 356 | 0 | 1 no candidate within reach |
+| I.30.5 seed 0 | 10T | NEAR, NEAR | 324, 324 | 173 | 0 | 1 no candidate within reach |
+| I.30.5 seed 1 | 10T | NEAR, NEAR | 25, 25 | 14 | 0 | 1 no candidate within reach |
+| I.30.5 seed 2 | 10T | NEAR, NEAR | 33, 33 | 12 | 0 | 1 no candidate within reach |
+| I.30.5 seed 3 | 10T | NEAR, NEAR | 61, 61 | 24 | 0 | 1 no candidate within reach |
+| I.30.5 seed 4 | 10T | NEAR, NEAR | 6, 6 | 6 | 0 | 1 no candidate within reach |
+| I.37.4 seed 0 | 10T | NEAR, NEAR | 1113, 985 | 550 | 0 | 1 no candidate within reach |
+| I.37.4 seed 1 | 10T | NEAR, NEAR | 1210, 1041 | 357 | 0 | 1 no candidate within reach |
+| I.37.4 seed 2 | 10T | NEAR, NEAR | 1151, 1015 | 536 | 0 | 1 no candidate within reach |
+| I.37.4 seed 3 | 10T | NEAR, NEAR | 1258, 1095 | 336 | 0 | 1 no candidate within reach |
+| I.37.4 seed 4 | 10T | NEAR, NEAR | 1123, 996 | 570 | 0 | 1 no candidate within reach |
+| I.8.14 seed 0 | 10T | NEAR, NEAR | 1255, 1113 | 287 | 6 | 3 lost by the pool |
+| I.8.14 seed 1 | 10T | NEAR, NEAR | 1151, 970 | 267 | 10 | 3 lost by the pool |
+| I.8.14 seed 2 | 10T | NEAR, NEAR | 1335, 1169 | 140 | 3 | 3 lost by the pool |
+| I.8.14 seed 3 | 10T | NEAR, NEAR | 1221, 1063 | 334 | 5 | 3 lost by the pool |
+| I.8.14 seed 4 | 10T | NEAR, NEAR | 1274, 1118 | 208 | 22 | 3 lost by the pool |
+| III.10.19 seed 0 | 10T | NEAR, NEAR | 1024, 906 | 539 | 0 | 1 no candidate within reach |
+| III.10.19 seed 1 | 10T | NEAR, NEAR | 1090, 979 | 425 | 0 | 1 no candidate within reach |
+| III.10.19 seed 2 | 10T | NEAR, NEAR | 1079, 986 | 590 | 0 | 1 no candidate within reach |
+| III.10.19 seed 4 | 10T | NEAR, NEAR | 1169, 1064 | 434 | 0 | 1 no candidate within reach |
+| III.17.37 seed 0 | 10T | NEAR, NEAR | 1020, 920 | 519 | 0 | 1 no candidate within reach |
+| III.17.37 seed 1 | 10T | NEAR, NEAR | 1199, 1082 | 333 | 0 | 1 no candidate within reach |
+| III.9.52 seed 1 | 10T | NEAR, MISS (changed) | 1144, 998 | 461 | 0 | 1 no candidate within reach |
+| III.9.52 seed 2 | 10T | NEAR, NEAR | 1052, 928 | 525 | 0 | 1 no candidate within reach |
+
+Near fits of the budget study at T and 10T that kept their status: 40
+  class 1, no candidate within reach: 35
+  class 2, turned away by a guard: 0
+  class 3, lost by the pool: 5
+  class 4, not a finalist: 0
+  class 5, cut by the grace: 0
+  class 6, polished and still not exact: 0
+Classes 2 to 5 together: 5 (PLAN.md: at least 10 means the end of the search loses laws the search had found)
+
+I.8.14, read apart:
+  seed 0 T: EXACT; 70 offered, 6 within reach; pool 64; polish began 0.02 s after the deadline and took 0.12 s; fitted to convergence: 16 of 16 finalists; selected size 22
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[2] - X[3]))² + ((X[1] - X[0]))²))))
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[2] - X[3]))² + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (0.001102 + (4.978564 * sqrt(((1.000174 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (0.001169 + (4.981324 * sqrt(((0.997956 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (0.001169 + (4.981324 * sqrt(((0.997956 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 18: in the pool True, finalist None, fitted to convergence False, stable True: (-12.637338 + (5.285716 * (sqrt(((0.727178 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²)) + 2.399101)))
+  seed 1 T: EXACT; 71 offered, 8 within reach; pool 64; polish began 0.13 s after the deadline and took 0.16 s; fitted to convergence: 16 of 16 finalists; selected size 22
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²))))
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²))))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (-0.33575 * (sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -14.828815)))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (5.655488 * (sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * 0.880345)))
+    within reach, size 22: in the pool True, finalist small, fitted to convergence True, stable True: (0.00181 + (0.331784 * sqrt((((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -15.0))² + (X[0] - X[1]
+    within reach, size 29: in the pool True, finalist small, fitted to convergence True, stable True: (-11.505203 + (-0.537462 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X
+    within reach, size 29: in the pool True, finalist None, fitted to convergence False, stable True: (11.479239 + (-0.537461 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X[
+    within reach, size 29: in the pool True, finalist None, fitted to convergence False, stable True: (11.479239 + (-0.537462 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X[
+  seed 2 T: EXACT; 68 offered, 3 within reach; pool 64; polish began 0.27 s after the deadline and took 0.25 s; fitted to convergence: 16 of 16 finalists; selected size 22
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))))
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))))
+    within reach, size 20: in the pool True, finalist small, fitted to convergence True, stable True: (-75.879667 + (-0.331919 * (-3.612512 - ((15.0 + sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))) * 15.0
+  seed 3 T: EXACT; 58 offered, 5 within reach; pool 64; polish began 0.15 s after the deadline and took 0.72 s; fitted to convergence: 16 of 16 finalists; selected size 22
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²))))
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²))))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (-17.62663 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 3.540573)))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (-74.680606 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 15.0)))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (-72.749156 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 14.612064)))
+  seed 4 T: EXACT; 57 offered, 22 within reach; pool 64; polish began 0.05 s after the deadline and took 0.23 s; fitted to convergence: 16 of 16 finalists; selected size 22
+    within reach, size 14: in the pool True, finalist small, fitted to convergence True, stable True: (0.001107 + (4.978781 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (-14.978267 + (4.978781 * (3.008643 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²)))))
+    within reach, size 16: in the pool True, finalist small, fitted to convergence True, stable True: (-74.680606 + (4.978781 * (15.0 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²)))))
+    within reach, size 18: in the pool True, finalist small, fitted to convergence True, stable True: (-89.65998 + (4.978781 * (15.0 + (3.008643 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))))
+    within reach, size 18: in the pool True, finalist small, fitted to convergence True, stable True: (89.662194 + (-4.978781 * (15.0 + (3.008643 - sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))))
+    within reach, size 20: in the pool True, finalist small, fitted to convergence True, stable True: (-4.956442 + (4.980418 * (sqrt(pow(0.984844, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool True, finalist small, fitted to convergence True, stable True: (-4.958818 + (4.980276 * (sqrt(pow(0.986494, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool True, finalist small, fitted to convergence True, stable True: (-4.958818 + (4.980276 * (sqrt(pow(0.986494, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool True, finalist None, fitted to convergence False, stable True: (-4.967613 + (4.982191 * (sqrt(pow(0.986494, (X[3])²)) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))
+    within reach, size 21: in the pool True, finalist None, fitted to convergence False, stable True: (-4.983464 + (4.983531 * (sqrt(pow(0.986494, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2
+    within reach, size 21: in the pool True, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 21: in the pool True, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 21: in the pool True, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 22: in the pool True, finalist None, fitted to convergence False, stable True: (0.0006 + (0.44848 * sqrt((X[2] + (((11.109662 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² - X[
+    within reach, size 22: in the pool True, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool True, finalist None, fitted to convergence False, stable True: (0.000591 + (0.421014 * sqrt((X[2] + (((11.833698 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool True, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool True, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 23: in the pool True, finalist None, fitted to convergence False, stable True: (-4.968085 + (4.970405 * (sqrt(pow(pow(0.977977, (X[3] - X[2])), X[2])) + sqrt((((X[1] - X[0]))² + (
+    within reach, size 24: in the pool True, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(sqrt(pow(0.979687, (X[3] - X[2]))), 1.27445)) + sqrt((((X[1] - X[0
+    within reach, size 24: in the pool True, finalist None, fitted to convergence False, stable True: (-4.968085 + (4.970405 * (sqrt(pow(sqrt(pow(0.956438, X[2])), (X[3] - X[2]))) + sqrt((((X[1] - X[0])
+    within reach, size 25: in the pool True, finalist None, fitted to convergence False, stable True: (0.00231 + (4.97046 * (log(sqrt(pow(sqrt(pow(0.956438, X[2])), (X[3] - X[2])))) + sqrt((((X[1] - X[0
+  seed 0 3T: NEAR; 123 offered, 6 within reach; pool 64; polish began 0.05 s after the deadline and took 0.30 s; fitted to convergence: 16 of 16 finalists; selected size 14
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[2] - X[3]))² + ((X[1] - X[0]))²))))
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[2] - X[3]))² + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001102 + (4.978564 * sqrt(((1.000174 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001169 + (4.981324 * sqrt(((0.997956 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001169 + (4.981324 * sqrt(((0.997956 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 18: in the pool False, finalist None, fitted to convergence False, stable True: (-12.637338 + (5.285716 * (sqrt(((0.727178 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²)) + 2.399101)))
+  seed 1 3T: EXACT; 118 offered, 10 within reach; pool 64; polish began 0.18 s after the deadline and took 0.36 s; fitted to convergence: 16 of 16 finalists; selected size 42
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (-0.33575 * (sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -14.828815)))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (5.655488 * (sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * 0.880345)))
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.00181 + (0.331784 * sqrt((((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -15.0))² + (X[0] - X[1]
+    within reach, size 22: in the pool True, finalist small, fitted to convergence True, stable True: (0.000591 + (0.424216 * sqrt((((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -11.744477))² + (X[2] 
+    within reach, size 22: in the pool True, finalist small, fitted to convergence True, stable True: (0.000591 + (0.424216 * sqrt((((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -11.744477))² + (X[2] 
+    within reach, size 23: in the pool False, finalist None, fitted to convergence False, stable True: (0.000667 + (0.332074 * sqrt((((sqrt((abs(((X[0] - X[1]))²) + ((X[2] - X[3]))²)) * -15.0))² + (X[2] 
+    within reach, size 29: in the pool False, finalist None, fitted to convergence False, stable True: (-11.505203 + (-0.537462 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X
+    within reach, size 29: in the pool False, finalist None, fitted to convergence False, stable True: (11.479239 + (-0.537461 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X[
+    within reach, size 29: in the pool False, finalist None, fitted to convergence False, stable True: (11.479239 + (-0.537462 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X[
+  seed 2 3T: NEAR; 92 offered, 3 within reach; pool 64; polish began 0.12 s after the deadline and took 0.33 s; fitted to convergence: 16 of 16 finalists; selected size 14
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))))
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))))
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-75.879667 + (-0.331919 * (-3.612512 - ((15.0 + sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))) * 15.0
+  seed 3 3T: NEAR; 127 offered, 5 within reach; pool 64; polish began 0.23 s after the deadline and took 0.57 s; fitted to convergence: 16 of 16 finalists; selected size 14
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²))))
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-17.62663 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 3.540573)))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-74.680606 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 15.0)))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-72.749156 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 14.612064)))
+  seed 4 3T: NEAR; 120 offered, 22 within reach; pool 64; polish began 0.00 s after the deadline and took 0.12 s; fitted to convergence: 15 of 15 finalists; selected size 22
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-14.978267 + (4.978781 * (3.008643 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²)))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-74.680606 + (4.978781 * (15.0 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²)))))
+    within reach, size 18: in the pool False, finalist None, fitted to convergence False, stable True: (-89.65998 + (4.978781 * (15.0 + (3.008643 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))))
+    within reach, size 18: in the pool False, finalist None, fitted to convergence False, stable True: (89.662194 + (-4.978781 * (15.0 + (3.008643 - sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))))
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.956442 + (4.980418 * (sqrt(pow(0.984844, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.958818 + (4.980276 * (sqrt(pow(0.986494, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.958818 + (4.980276 * (sqrt(pow(0.986494, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.967613 + (4.982191 * (sqrt(pow(0.986494, (X[3])²)) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.983464 + (4.983531 * (sqrt(pow(0.986494, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.0006 + (0.44848 * sqrt((X[2] + (((11.109662 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² - X[
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.421014 * sqrt((X[2] + (((11.833698 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 23: in the pool False, finalist None, fitted to convergence False, stable True: (-4.968085 + (4.970405 * (sqrt(pow(pow(0.977977, (X[3] - X[2])), X[2])) + sqrt((((X[1] - X[0]))² + (
+    within reach, size 24: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(sqrt(pow(0.979687, (X[3] - X[2]))), 1.27445)) + sqrt((((X[1] - X[0
+    within reach, size 24: in the pool False, finalist None, fitted to convergence False, stable True: (-4.968085 + (4.970405 * (sqrt(pow(sqrt(pow(0.956438, X[2])), (X[3] - X[2]))) + sqrt((((X[1] - X[0])
+    within reach, size 25: in the pool False, finalist None, fitted to convergence False, stable True: (0.00231 + (4.97046 * (log(sqrt(pow(sqrt(pow(0.956438, X[2])), (X[3] - X[2])))) + sqrt((((X[1] - X[0
+  seed 0 10T: NEAR; 287 offered, 6 within reach; pool 64; polish began 0.02 s after the deadline and took 0.27 s; fitted to convergence: 15 of 15 finalists; selected size 14
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[2] - X[3]))² + ((X[1] - X[0]))²))))
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[2] - X[3]))² + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001102 + (4.978564 * sqrt(((1.000174 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001169 + (4.981324 * sqrt(((0.997956 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001169 + (4.981324 * sqrt(((0.997956 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²))))
+    within reach, size 18: in the pool False, finalist None, fitted to convergence False, stable True: (-12.637338 + (5.285716 * (sqrt(((0.727178 * ((X[2] - X[3]))²) + ((X[1] - X[0]))²)) + 2.399101)))
+  seed 1 10T: NEAR; 267 offered, 10 within reach; pool 64; polish began 0.10 s after the deadline and took 0.66 s; fitted to convergence: 15 of 15 finalists; selected size 22
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (-0.33575 * (sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -14.828815)))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (5.655488 * (sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * 0.880345)))
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.00181 + (0.331784 * sqrt((((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -15.0))² + (X[0] - X[1]
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -11.744477))² + (X[2] 
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -11.744477))² + (X[2] 
+    within reach, size 23: in the pool False, finalist None, fitted to convergence False, stable True: (0.000667 + (0.332074 * sqrt((((sqrt((abs(((X[0] - X[1]))²) + ((X[2] - X[3]))²)) * -15.0))² + (X[2] 
+    within reach, size 29: in the pool False, finalist None, fitted to convergence False, stable True: (-11.505203 + (-0.537462 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X
+    within reach, size 29: in the pool False, finalist None, fitted to convergence False, stable True: (11.479239 + (-0.537461 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X[
+    within reach, size 29: in the pool False, finalist None, fitted to convergence False, stable True: (11.479239 + (-0.537462 * ((sqrt((((X[1] - X[0]))² + ((X[2] - X[3]))²)) * -9.267185) + ((((sqrt(((X[
+  seed 2 10T: NEAR; 140 offered, 3 within reach; pool 64; polish began 0.14 s after the deadline and took 0.23 s; fitted to convergence: 16 of 16 finalists; selected size 14
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))))
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))))
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-75.879667 + (-0.331919 * (-3.612512 - ((15.0 + sqrt((((X[3] - X[2]))² + ((X[1] - X[0]))²))) * 15.0
+  seed 3 10T: NEAR; 334 offered, 5 within reach; pool 64; polish began 0.21 s after the deadline and took 0.58 s; fitted to convergence: 16 of 16 finalists; selected size 14
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²))))
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-17.62663 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 3.540573)))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-74.680606 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 15.0)))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-72.749156 + (4.978781 * (sqrt((((X[0] - X[1]))² + ((X[3] - X[2]))²)) + 14.612064)))
+  seed 4 10T: NEAR; 208 offered, 22 within reach; pool 64; polish began 0.15 s after the deadline and took 0.08 s; fitted to convergence: 16 of 16 finalists; selected size 22
+    within reach, size 14: in the pool False, finalist None, fitted to convergence False, stable True: (0.001107 + (4.978781 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-14.978267 + (4.978781 * (3.008643 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²)))))
+    within reach, size 16: in the pool False, finalist None, fitted to convergence False, stable True: (-74.680606 + (4.978781 * (15.0 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²)))))
+    within reach, size 18: in the pool False, finalist None, fitted to convergence False, stable True: (-89.65998 + (4.978781 * (15.0 + (3.008643 + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))))
+    within reach, size 18: in the pool False, finalist None, fitted to convergence False, stable True: (89.662194 + (-4.978781 * (15.0 + (3.008643 - sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))))
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.956442 + (4.980418 * (sqrt(pow(0.984844, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.958818 + (4.980276 * (sqrt(pow(0.986494, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.958818 + (4.980276 * (sqrt(pow(0.986494, abs(X[3]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²
+    within reach, size 20: in the pool False, finalist None, fitted to convergence False, stable True: (-4.967613 + (4.982191 * (sqrt(pow(0.986494, (X[3])²)) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.983464 + (4.983531 * (sqrt(pow(0.986494, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 21: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(0.987008, (X[3] - X[2]))) + sqrt((((X[1] - X[0]))² + ((X[3] - X[2]
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.0006 + (0.44848 * sqrt((X[2] + (((11.109662 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² - X[
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.421014 * sqrt((X[2] + (((11.833698 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 22: in the pool False, finalist None, fitted to convergence False, stable True: (0.000591 + (0.424216 * sqrt((X[2] + (((11.744477 * sqrt((((X[1] - X[0]))² + ((X[3] - X[2]))²))))² -
+    within reach, size 23: in the pool False, finalist None, fitted to convergence False, stable True: (-4.968085 + (4.970405 * (sqrt(pow(pow(0.977977, (X[3] - X[2])), X[2])) + sqrt((((X[1] - X[0]))² + (
+    within reach, size 24: in the pool False, finalist None, fitted to convergence False, stable True: (-4.98328 + (4.983375 * (sqrt(pow(sqrt(pow(0.979687, (X[3] - X[2]))), 1.27445)) + sqrt((((X[1] - X[0
+    within reach, size 24: in the pool False, finalist None, fitted to convergence False, stable True: (-4.968085 + (4.970405 * (sqrt(pow(sqrt(pow(0.956438, X[2])), (X[3] - X[2]))) + sqrt((((X[1] - X[0])
+    within reach, size 25: in the pool False, finalist None, fitted to convergence False, stable True: (0.00231 + (4.97046 * (log(sqrt(pow(sqrt(pow(0.956438, X[2])), (X[3] - X[2])))) + sqrt((((X[1] - X[0
