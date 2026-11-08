@@ -10,5 +10,7 @@ TP --experiments snell (TPsnell), draws [0, 1, 2, 3, 4]: 40 jobs, both arms ['pl
 TP jobs, draws [5, 6, 7, 8, 9]: old 400, new 400, the same: True
 TP without --experiments, every arm: as before: True
 TP --experiments snell (TPsnell), draws [5, 6, 7, 8, 9]: 40 jobs, both arms ['plain', 'units']
+TP worker {'exp': 'gaz', 'n': 10, 'noise': 0.02, 'draw': 0, 'arm': 'units'}: fields of the old record that differ: none; new fields ['units_msg', 'units_ok']
+TP worker {'exp': 'snell', 'n': 20, 'noise': 0.05, 'draw': 1, 'arm': 'plain'}: fields of the old record that differ: none; new fields []
 
 ALL CHECKS HOLD
