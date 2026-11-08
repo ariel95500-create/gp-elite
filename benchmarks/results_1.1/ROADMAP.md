@@ -26,6 +26,11 @@ Kept apart from the plans of 1.1, which this file does not change.
    on PyPI. Done on 7 November 2026: more time adds little, none of the
    criteria holds (`../results_1.2/budget_study/README.md`); what follows is
    the author's to decide.
+5. **A diagnostic of the end of the search** (8 November 2026; the author
+   left the choice to Claude). The budget study saw I.8.14 lost with more
+   time, and the code shows two ways the end of the search could lose a law
+   it had found. Its plan is `../results_1.2/end_of_search/PLAN.md`,
+   committed before any measurement.
 
 ## SRBench
 
