@@ -1,0 +1,14 @@
+phase1 jobs (units False): old 1775, new 1775, the same: True
+phase1 jobs (units True): old 2780, new 2780, the same: True
+phase1 without --problems, kinds None: 2780 jobs, as before: True
+phase1 without --problems, kinds ['feyn', 'real']: 265 jobs, as before: True
+phase1 without --problems, kinds ['feyn', 'ufeyn', 'feyn_n1', 'feyn_n10']: 820 jobs, as before: True
+phase1 --problems (Dtrig): 200 jobs {'feyn': 50, 'ufeyn': 50, 'feyn_n1': 50, 'feyn_n10': 50}, 10 problems, seeds [0, 1, 2, 3, 4]
+TP jobs, draws [0, 1, 2, 3, 4]: old 400, new 400, the same: True
+TP without --experiments, every arm: as before: True
+TP --experiments snell (TPsnell), draws [0, 1, 2, 3, 4]: 40 jobs, both arms ['plain', 'units']
+TP jobs, draws [5, 6, 7, 8, 9]: old 400, new 400, the same: True
+TP without --experiments, every arm: as before: True
+TP --experiments snell (TPsnell), draws [5, 6, 7, 8, 9]: 40 jobs, both arms ['plain', 'units']
+
+ALL CHECKS HOLD

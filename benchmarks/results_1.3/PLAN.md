@@ -121,6 +121,25 @@ the arcsine. The author is told before the publication (gate 10).
    - the units;
    - its absence from the pool `physical`.
 
+**Mechanics held on 8 November 2026** (commit 496704b, `a1/README.md`):
+1. **The pools without the arcsine are untouched.** The eleven reference
+   configurations of the pool `physical` are identical to the 1.2.0 wheel.
+   E_minmax and L_standard change, with no arcsine in their formulas. The
+   147 fits are identical in every field.
+2. **The operator holds**, with one deviation from the wording above. The
+   scalar path, used only for display, already computes a power with a
+   variable exponent otherwise than the other paths in 1.2.0. So it is
+   compared on the 174 trees of 200 without a power. The other paths are
+   compared on all 200, bit for bit.
+3. **The fit of I.30.5 draws the arcsine** in 26 of its 109 candidates. It
+   returns an approximation with tanh, with 1 − R² of 2.1e-11, which counts
+   as exact by the bench's threshold. So the campaign reports, for each
+   exact fit of the two arcsine laws, whether its formula has the arcsine.
+4. **The tests:** 177 pass. 7 of the 8 new tests fail on the 1.2.0 wheel.
+
+The options of the benches leave their other runs unchanged
+(`a1/bench_options_check.txt`).
+
 ## The benches
 
 - **Dtrig.** The kinds feyn, ufeyn, feyn_n1 and feyn_n10 of
