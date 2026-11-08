@@ -12,6 +12,8 @@ measurement of this phase. Method as for 1.2:
 The author validates this plan before any change (gate 9). He decides the
 publication of 1.3 after its measurement (gate 10).
 
+Gate 9: the author validated this plan in full on 8 November 2026.
+
 ## What 1.3 has to do
 
 On 8 November 2026 the author left the choice of what follows the budget

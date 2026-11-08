@@ -523,6 +523,8 @@ def symbolic_regression(
     y : ndarray (n_samples,)             — cible
     feature_names : noms des colonnes (sinon X0, X1, …) — apparaissent dans la formule
     operators : 'physical' | 'trig' | 'full' | 'poly'  — pool d'opérateurs
+                [1.3] 'trig' et 'full' ont l'arc sinus, arcsin (argument
+                ramené à [-1, 1] sur les données) ; 'physical' ne l'a pas.
     normalize : 'auto' | 'divmax' | 'grouped' | 'minmax' | 'standard' | 'none'
                 'grouped' [v0.8] : un facteur commun aux colonnes d'échelles
                 comparables, pour les lois qui additionnent ou soustraient

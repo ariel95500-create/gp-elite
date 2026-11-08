@@ -34,7 +34,7 @@ from .core import Node
 from .dimensions import (_infer, _mul, _inv, _pow, _eq, _is_dimensionless,
                          _DimError, DIMENSIONLESS, _leaf_dim, _combine)
 
-_TRANSCENDENTAL = ("exp", "log", "sin", "cos", "tanh")
+_TRANSCENDENTAL = ("exp", "log", "sin", "cos", "tanh", "arcsin")   # [1.3-A1]
 
 
 def _ok(op, ops):
@@ -149,8 +149,9 @@ def _context(feats, ops):
             p.append(("*", _ek(A)))
             p.append(("/", _ek(A)))
         # cube n'etait pas produit historiquement : seulement si le pool le demande
+        # [1.3-A1] arcsin non plus : seulement dans un pool qui l'a
         prods[dimless] = tuple(q for q in p if _ok(q[0], ops) and
-                               (q[0] != "cube" or ops is not None))
+                               (q[0] not in ("cube", "arcsin") or ops is not None))
     ctx.prods = prods
     _CTX[sig] = ctx
     return ctx

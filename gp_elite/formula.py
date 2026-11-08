@@ -41,7 +41,7 @@ except ImportError:                     # loose modules next to each other
 Node = core.Node
 
 _UNARY = ("neg", "abs", "sq", "cube", "sqrt", "log", "exp", "sin", "cos",
-          "tan", "tanh", "step", "is_even")
+          "tan", "tanh", "step", "is_even", "arcsin")
 _BINARY = ("+", "-", "*", "/", "pow", "max2", "min2")
 
 
@@ -210,6 +210,7 @@ def _const_eval(op, *vals):
         elif op == "sin": r = np.sin(arr[0])
         elif op == "cos": r = np.cos(arr[0])
         elif op == "tan": r = core._np_safe_tan(arr[0])
+        elif op == "arcsin": r = core._np_safe_arcsin(arr[0])   # [1.3-A1]
         elif op == "tanh": r = np.tanh(arr[0])
         elif op == "step": r = core._np_step(arr[0])
         elif op == "is_even": r = core._np_is_even(arr[0])
@@ -592,6 +593,7 @@ def evaluate(node, X, positive=None):
                 if v == "sin":   return np.sin(u)
                 if v == "cos":   return np.cos(u)
                 if v == "tan":   return np.tan(u)
+                if v == "arcsin": return np.arcsin(u)       # [1.3-A1] no clip
                 if v == "tanh":  return np.tanh(u)
                 if v == "step":  return (u > 0).astype(float)
                 if v == "is_even":
@@ -667,6 +669,8 @@ def to_sympy_string(node, names=None, positive=None):
             if v == "log":   return "log(%s)" % A if pos else "log(Abs(%s))" % A
             if v in ("exp", "sin", "cos", "tan", "tanh"):
                 return "%s(%s)" % (v, A)
+            if v == "arcsin":                                # [1.3-A1]
+                return "asin(%s)" % A
             if v == "step":  return "Heaviside(%s, 0)" % A
             if v == "is_even":
                 return "(1 - 2*Mod(floor(Abs(%s) + 1/2), 2))" % A
@@ -755,6 +759,8 @@ def to_text(node, names=None, positive=None, _parsable=False):
             if v in ("sqrt", "log"):
                 return ("%s(%s)" % (v, A[0]) if pos
                         else "%s(%s)" % (v, ABS % A[0])), _ATOM
+            if v == "arcsin" and _parsable:              # [1.3-A1] sympy's name
+                return "asin(%s)" % A[0], _ATOM
             return "%s(%s)" % (v, A[0]), _ATOM               # exp, sin, step...
         A, B = f(nd.left), f(nd.right)
         if v in ("+", "-"):
