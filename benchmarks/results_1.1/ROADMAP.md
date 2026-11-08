@@ -35,6 +35,10 @@ Kept apart from the plans of 1.1, which this file does not change.
    never offered the structure of the law. 15 of those 35 are the two
    arcsine laws, which no operator pool of 1.2.0 can write. I.8.14 is lost
    by the pool of 64 candidates (`../results_1.2/end_of_search/README.md`).
+6. **A version 1.3 with the arcsine** (chosen by Claude on 8 November 2026,
+   the author having left the choice to him; the author asked for its plan
+   the same day). Its plan is `../results_1.3/PLAN.md`, written before any
+   change; the author validates it at gate 9.
 
 ## SRBench
 
