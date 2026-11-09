@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.3.0
+
+The arcsine. The pools `trig` and `full` have a new operator, `arcsin`, the
+arcsine of its argument clipped to [-1, 1]; the pool `physical`, the default,
+and `poly` and `conserve` are left as they are, so every fit run with them
+returns what it returned with 1.2.0. Each arcsine carries a constant factor
+in its argument, which the fit of constants adjusts, and the seeds that hold
+a function of a monomial exactly gain the arcsine of a monomial. On the ten
+trigonometric laws of the 41-equation bench, the two arcsine laws, I.26.2
+and I.30.5, come back exact with the arcsine in 8 and 7 fits of 10, on two
+sets of seeds, where 1.2.0 had none; the other eight lose nothing.
+
+### Added
+- The operator `arcsin` in the pools `trig` and `full`, printed `arcsin(...)`
+  and `asin(...)` in the sympy forms. Under `units=` its argument must be
+  dimensionless, and so is its result.
+- The seed y = b·f·arcsin(c·g), f and g monomials, found when it holds to
+  numerical precision, where the pool has the arcsine.
+
+### Known limits
+- Snell's law on a few noisy points: with 10 or 20 points at 2 % or 5 %
+  noise, the curves returned differ from the law by less than the noise, and
+  the law does not come back (benchmarks/results_1.3/a1/examine).
+- Where the clip of the arcsine acts on the data, the printed formula departs
+  from the model, and `formula_exact` is False.
+
 ## 1.2.0 — "Classroom"
 
 A fit of a lab table under the defaults now ends in seconds, and an
