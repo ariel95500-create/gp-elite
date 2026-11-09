@@ -354,6 +354,67 @@ Beside, deciding nothing:
 The author decides what follows. As this plan says, the code of A1 and A2 is
 withdrawn before the release unless a later version is adopted.
 
+**Decided by the author on 9 November 2026:** a third version, A3, the
+arcsine among the seeds of phase 4a, with A1 and A2 kept.
+
+## Change A3: the arcsine of a monomial among the seeds
+
+Written on 9 November 2026, before any change for A3 and before any of its
+measurements.
+
+**What is missing.** With A2, I.26.2 comes back with the arcsine in 3
+fits of 5. I.30.5, arcsin(λ/(n·d)), comes back in none: the search finds
+algebraic curves within 1e-6 to 1e-13 of it first. Its argument is a
+monomial, a product of powers of the inputs. The engine already offers, at
+the start of the search, laws of the form y = b·f·φ(c·g), with f and g
+monomials, for φ in exp, log, tanh and 1/cosh: these are the seeds of
+phase 4a (`_make_elementary_seeds`, adopted on 12 October 2026, measured in
+`../results_0.9/PLAN_PHASE4.md`). Each is found by inverting φ, which turns
+the law into a power law of the inputs.
+
+**The change.** The arcsine joins those forms: y = b·f·arcsin(c·g).
+- **How it is found:** inverting it, sin(y/(b·f)) = c·g is a power law. b
+  is searched as the amplitude of tanh is, on the same grid. Since the
+  arcsine is at most π/2, b runs from 2/π times the largest |y/f|, up.
+- **The rest is as for the other forms:** the exponents of g are rounded
+  to half-integers; the form must hold to numerical precision; the same
+  guards apply, those of units among them; there is no random draw. The
+  seed is f · arcsin(c · g), which the linear scaling of the engine
+  multiplies by b.
+- **Where it applies:** only where the pool has the arcsine, `trig` and
+  `full`. The seeds that tolerate noise (phase 5), which call the same
+  finders with their thresholds lifted, offer it too.
+- **What it cannot reach:** I.26.2 and Snell's law, whose arguments n·sin θ
+  and sin(i1)/n are not monomials.
+
+**Mechanics, before any fit of campaign A3:**
+1. **The pools without the arcsine are untouched:** as for A1 and A2.
+2. **The finder:**
+   - on y = 2·arcsin(0.7·x0/(x1·x2)), with positive inputs, it returns the
+     form, with the exponents of g (1, −1, −1);
+   - on y = arcsin(x0·sin(x1)), and on data with no such form, it returns
+     no arcsine;
+   - the forms it returned before (exp, log, tanh, 1/cosh, trig) are
+     unchanged on the tests of phase 4a.
+3. **I.30.5 on the bench rows,** pool `trig`, seed 0: the seed is placed
+   and the fit returns the law with the arcsine.
+4. **Tests:** the suite passes, with new tests of the form.
+
+**Campaign A3 (decides).** The benches, engines and pairing of A2, with B
+now the candidate with A1, A2 and A3. A3 is adopted when the six criteria
+of A2 hold, unchanged: the arcsine laws on F41 exact with the arcsine in at
+least 5 of 10, and criteria 2 to 6 as written for A2. Reported beside: what
+A2 reported, and in how many fits the arcsine seed was placed, by kind.
+
+**Confirmation,** if the campaign adopts A3: as for A2, seeds 5 to 9 on
+Dtrig's kinds feyn, feyn_n1 and feyn_n10, and draws 5 to 9 on TPsnell. A3
+is kept when criteria 1 to 4 hold there. After three versions measured on
+seeds 0 to 4, the confirmation on seeds the versions were never measured on
+is what says the gain holds.
+
+If A3 is not adopted or not kept, the code of A1, A2 and A3 is withdrawn
+before the release, and the cause goes to the author.
+
 ## The release of 1.3
 
 As for 1.2 (`../results_1.2/release/README.md`): M1 to M5, then gate 10.
