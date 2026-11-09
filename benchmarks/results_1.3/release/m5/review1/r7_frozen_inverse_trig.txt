@@ -1,0 +1,5 @@
+feynman_test_10 TF78 trig theta1 = arccos((cos(theta2)-v/c)/(1-v/c*cos(theta2)))
+    [('tf', 5, 'NEAR', 'MISS'), ('tf', 6, 'MISS', 'MISS'), ('tf', 7, 'MISS', 'MISS'), ('tf', 8, 'MISS', 'MISS'), ('tf', 9, 'MISS', 'MISS'), ('utf', 5, 'MISS', 'MISS'), ('utf', 6, 'MISS', 'MISS'), ('utf', 7, 'MISS', 'MISS'), ('utf', 8, 'MISS', 'MISS'), ('utf', 9, 'MISS', 'MISS')]
+TF78 equations of the pool trig: 17
+TS14 systems of the pool trig: ['strogatz_barmag1', 'strogatz_barmag2', 'strogatz_glider1', 'strogatz_glider2', 'strogatz_shearflow1', 'strogatz_shearflow2']
+F41 equations of the pool trig: ['II.15.4', 'I.18.12', 'III.15.12', 'I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'II.6.15b', 'III.9.52', 'III.17.37']

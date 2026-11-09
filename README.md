@@ -333,8 +333,8 @@ meaningful, and to deduce the units and value of a constant (below, and the
 where the units also rule out a term the data alone would add). Since 1.1 the
 forms the engine fits directly act under `units=` as well: on the 41 Feynman
 equations of the decision bench with their units, five seeds at 30 s per fit,
-165 exact laws of 205 against 108 with 1.0, and 163 without units (with the
-arcsine of 1.3, 174 and 171).
+165 exact laws of 205 against 108 with 1.0, and 163 without units. With the
+arcsine of 1.3, 174 and 171, against 166 and 163 for 1.2 measured beside it.
 **Not** for black-box prediction: the constraint rules out
 dimensionally wrong but numerically good approximations, so it can *lower* R²
 when fitting is the goal rather than finding a law.
@@ -473,6 +473,8 @@ change of 1.3 was decided the same way
 Measured beside 1.2 for the release of 1.3, on the frozen set, 1.3 recovers
 214 exact laws of 390 on its Feynman equations against 213, 8 of 70 on its
 Strogatz systems with both versions, and 228 of 390 with units against 229.
+The 213 and 8 of 1.2 in this campaign, against 214 and 10 in its own release,
+are the time budget moving the counts from one campaign to the next.
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
 

@@ -363,7 +363,8 @@ où les unités écartent aussi un terme que les données seules ajouteraient).
 Depuis la 1.1, les formes que le moteur ajuste directement agissent aussi avec
 `units=` : sur les 41 équations de Feynman du banc de décision avec leurs unités,
 cinq seeds à 30 s par ajustement, 165 lois exactes sur 205 contre 108 avec la 1.0,
-et 163 sans unités (avec l'arc sinus de la 1.3, 174 et 171). **Pas** pour de la
+et 163 sans unités. Avec l'arc sinus de la 1.3, 174 et 171, contre 166 et 163
+pour la 1.2 mesurée à côté. **Pas** pour de la
 prédiction en
 boîte noire : la contrainte écarte les approximations dimensionnellement fausses
 mais numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif
@@ -509,7 +510,9 @@ les unités). Le changement de la 1.3 a été décidé de la même façon
 Mesurée à côté de la 1.2 pour la sortie de la 1.3, sur le jeu figé, la 1.3
 retrouve 214 lois exactes sur 390 sur ses équations de Feynman contre 213, 8 sur
 70 sur ses systèmes de Strogatz avec les deux versions, et 228 sur 390 avec les
-unités contre 229.
+unités contre 229. Les 213 et 8 de la 1.2 dans cette campagne, contre 214 et 10
+lors de sa propre sortie, viennent du budget de temps, qui fait bouger les comptes
+d'une campagne à l'autre.
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 

@@ -77,9 +77,12 @@ limits.
 
 **Criteria of the plan:** the eleven are met (`m2/compare.txt`).
 - **The pool `physical`:** on the 706 fits where neither version reached its
-  budget, the formula, the error on the test rows and `formula_exact` are
-  those of 1.2.0, to the bit. The same formula comes back in 2,234 of its
-  2,250 fits. Two fits change status, both at the budget:
+  budget, the recorded formula, the error on the test rows and
+  `formula_exact` are those of 1.2.0, to the bit. The bench records the first
+  160 characters of a formula, so for the 5 of the 706 whose formula is
+  longer, a prefix is compared; every other field of their records is
+  identical too. The same recorded formula comes back in 2,234 of the 2,250
+  fits. Two fits change status, each where 1.2.0 reached its budget:
   - Strogatz vdp1, seed 9, goes from missed to exact, where 1.2.0 reached its
     budget and 1.3.0 did not;
   - U41 I.6.20a, seed 4, goes from missed to near, where both reached it.
@@ -106,17 +109,37 @@ limits.
 - U41N10 loses 3: I.18.12 loses 4, II.6.15b loses 1, and III.15.12 gains 2.
 
 **I.18.12 with 10 % noise under units** was examined after M2
-(`m2/examine/`, plan committed before its fits). On twenty seeds never run
-in M2, each version keeps the structure in 12 fits of 20. 1.2.0 returns
-there the same parabola in θ that 1.3.0 returned at seeds 0 to 3 of M2. By
+(`m2/examine/`). Its plan was committed at 14:47:08, and the first record
+is dated 14:47:51. On twenty seeds never run in M2, each version keeps the
+structure in 12 fits of 20. In 7 of its 8 other fits, 1.2.0 returns the same
+parabola in θ that 1.3.0 returned at seeds 0 to 3 of M2. By
 the reading written before, the fall of M2 is the draw of its five seeds.
 
 **The printed formula.** `formula_exact` is False:
 - with the pool `physical`, in 102 fits with each version;
 - with the pool `trig`, in 82 of the 530 fits with 1.3.0, against 27 with
-  1.2.0. 47 of the 82 have an arcsine.
+  1.2.0. At least 47 of the 82 have an arcsine. 77 of the 82 recorded
+  formulas are cut at 160 characters, among them the 35 without an arcsine
+  in their visible part.
 
-The plan expected this, and the pages of the limits say it (point 6).
+The plan expected the printed formula to depart more often where the clip
+of the arcsine acts. Whether the clip acts in a given fit is not recorded.
+The pages of the limits say so (point 6).
+
+**The formulas with the arcsine** are listed by suite in
+`m2/arcsine_formulas.txt` (`m2/arcsine_formulas.py`, written after the first
+review of M5, which found that `m2/compare.txt` gives their count only). The
+recorded text has an arcsine in 105 fits of 1.3.0, a lower bound for the
+same reason:
+- 11 in F41, 18 in U41;
+- 12 in F41N1, 17 in U41N1, 12 in F41N10, 8 in U41N10;
+- 3 in TF78, 16 in TF78 under units, and 8 in TS14.
+
+**The seeds of the arcsine** (`elementary_seed` and `tolerant_seed` in the
+records). The exact seed was placed in the 10 fits of I.30.5 without noise,
+in F41 and U41. The noise-tolerant seed was placed in 25 fits: I.30.5 in
+F41N1, F41N10, U41N1 and U41N10, and feynman_test_1 of TF78, five seeds
+each.
 
 **The frozen test set** decides nothing and is published as measured:
 - TF78: 213 and 214 exact laws, of which 15 and 16 on its 17 equations of
@@ -152,17 +175,27 @@ records are the same: every law, formula, error, size and count. Among them:
 - the duel with gplearn (15 of 15 against 6 of 15);
 - the mystery constant, the examples of the README and the snippets of the
   notebooks but one;
-- the deduced constant with 1.2.0, and with 1.3.0
-  (`m3/deduced_constant_venv13rx.txt`), whose record differs from that of
-  1.2.0 only by the line of the version.
+- the deduced constant with 1.2.0.
 
-What differs has three causes.
+The comparison lists five records as new. Among them is the deduced constant
+with 1.3.0 (`m3/deduced_constant_venv13rx.txt`), which differs from the one
+of 1.2.0 only by the line of the version. The other four are the machine and
+the runs of the TP notebook with 1.3.0, below.
+
+Nine records differ, for three causes:
+- the pool `full`, two records;
+- timing, five records;
+- the driver itself, `m3_driver.sh` and its log, whose steps and dates
+  differ.
 
 **The pool `full`, which has the arcsine.** Two records use it:
-- `kepler_minmax_check.txt`, Kepler's law normalised by min-max, ten seeds:
-  exact in 2, 4 and 2 fits of 10 with 1.3.0, against 0, 3 and 1 with 1.2.0,
-  at 10 generations, 40 generations without N1, and 40 generations with
-  N1. Point 5 of the pages of the limits quotes it;
+- `kepler_minmax_check.txt`, Kepler's law normalised by min-max, ten seeds.
+  Exact fits of 10, 1.3.0 then 1.2.0, without the noise-tolerant seeds (N1)
+  and with them:
+  - at 10 generations, 2 and 0 without N1, 0 and 0 with N1;
+  - at 40 generations, 4 and 3 without N1, 2 and 1 with N1.
+
+  Point 5 of the pages of the limits quotes it;
 - `notebook_snippet_tp.txt`, parts 1 and 2 of
   `examples/tp_regression_symbolique.ipynb`, seed 0. With 1.3.0, the fit of
   part 1 returns a formula with the arcsine, which departs from `predict()`
@@ -171,17 +204,23 @@ What differs has three causes.
   1.784e-04.
 
 The plan did not expect the second. It was examined after M3
-(`m3/examine/`, plan committed before its fits), on ten seeds:
-- at each budget, 1.3.0 has the higher MSE in 6, 8 and 7 seeds of 10. By the
+(`m3/examine/`), on ten seeds. Its plan and scripts were committed at
+16:21:31 (7fe0665). The run was started by the same command, after the push.
+Its records carry no time, so they cannot show that order themselves.
+- **The MSE:**
+  at each budget, 1.3.0 has the higher MSE in 6, 8 and 7 seeds of 10. By the
   sign test of the notebook (p of 0.75, 0.11 and 0.34), no difference is
-  shown;
-- the printed formula departs in 1, 4 and 2 fits of 10 with 1.3.0, and 1, 1
-  and 1 with 1.2.0. 6 of the 7 of 1.3.0 have an arcsine. The search can use
-  the clip, which makes the arcsine of the model flat at ±π/2 where its
-  argument leaves [−1, 1], and the printed formula has no clip.
+  shown.
+- **The printed formula:** it departs in 1, 4 and 2 fits of 10 with 1.3.0,
+  and 1, 1 and 1 with 1.2.0. 6 of the 7 of 1.3.0 have an arcsine. The search
+  can use the clip, which makes the arcsine of the model flat at ±π/2 where
+  its argument leaves [−1, 1], and the printed formula has no clip. Whether
+  the clip is the cause in each of the six is not recorded.
 
 The text of question 2 of the notebook ("from 30 to 60, nothing changes")
-was brought to what 1.3.0 gives at seed 0.
+was brought to what 1.3.0 gives at seed 0. After the first review of M5,
+question 1 also says what the warning means, since with 1.3.0 the formula of
+part 1 departs from `predict()` on 15 of 200 rows.
 
 **Timing:**
 - the console example, run on three parallel islands: the order of the
@@ -226,8 +265,9 @@ reads it. The study of 1.1 (`../../results_1.1/srbench_settings/PLAN.md` and
 `README.md`) found that `optimize_model.py` of SRBench 2025 reads the grid of
 GP_ELITE as one configuration. So it tunes nothing and fits the default
 estimator, `operators="physical"`, which 1.3.0 leaves as it was. With the
-code of SRBench as read on 2 November 2026, 1.3.0 changes nothing there. If the grid were written as
-intended, its configurations with `"full"` would have the arcsine.
+code of SRBench as read on 2 November 2026, 1.3.0 changes nothing there.
+If the grid were written as intended, its configurations with `"full"`
+would have the arcsine.
 
 ## M4, tests (9 November 2026)
 
@@ -239,6 +279,8 @@ pass under the three versions, 13 of them new with the arcsine
 (`tests/test_arcsin.py`). `twine check --strict` passes for the wheel and
 the source archive (`m4/twine_check.txt`), whose SHA-256 are those of
 `environments.txt`. The **Tests** workflow of the repository is green on
-every commit of the branch since the candidate (`m4/ci_runs.txt`). It is
-checked again on the commit of the release, and the files handed over for
-PyPI, built again from that commit, are checked again too.
+every commit of the branch since the candidate that it ran on
+(`m4/ci_runs.txt`). It does not run on commits that change documents only,
+three of them here. It is checked again on the commit of the release, and
+the files handed over for PyPI, built again from that commit, are checked
+again too.

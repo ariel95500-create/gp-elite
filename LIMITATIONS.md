@@ -74,9 +74,10 @@ equations of the test set, 34 are never recovered.
 and the seeds hold the arcsine of a monomial. In the release measurement of
 1.3, `I.30.5` comes back exact in 5 fits of 5, and `I.26.2` in 3 of 5. The
 engine then returns 171 exact laws of 205, and five equations are never
-recovered. Two things the arcsine does not reach:
+recovered. Two things the arcsine does not settle:
 - **an arcsine whose argument is not a monomial,** such as the n·sin θ of
-  `I.26.2`. The search must build it, and at 30 s it did so in 3 fits of 5;
+  `I.26.2`. No seed holds it, so the search must build it: at 30 s it did so
+  in 3 fits of 5 at seeds 0 to 4, and in 2 of 5 at seeds 5 to 9;
 - **Snell's law on a few noisy points,** i2 = arcsin(sin(i1)/n). With 10 or
   20 points at 2 % or 5 % noise, the curves returned stand closer to the law
   than the noise added (measured on a first version of the arcsine,
@@ -136,11 +137,13 @@ warning that names the exact formulas of the Pareto front). On the real data thi
 happened in 7 fits of 130 on the bench and 61 of 500 on the test set.
 
 Since 1.3, the arcsine is one of these guards: in the model its argument is
-clipped to [−1, 1], and in the printed formula it is not. In the pools with
-the arcsine, in the release measurement of 1.3, the formula departs in 82
-fits of 530, against 27 for 1.2.0. 47 of the 82 have an arcsine. The
-search can use the clip: where the argument leaves [−1, 1], the arcsine of
-the model is flat at ±π/2. On the problem of the French TP notebook of the
+clipped to [−1, 1], and in the printed formula it is not. In the pool
+`trig`, in the release measurement of 1.3, the formula departs in 82 fits of
+530, against 27 for 1.2.0. At least 47 of the 82 have an arcsine (the records
+keep the first 160 characters of a formula). How many depart because the
+clip acts is not recorded. The search can use the clip: where the argument
+leaves [−1, 1], the arcsine of the model is flat at ±π/2. On the problem of
+the French TP notebook of the
 pool `full` (`examples/tp_regression_symbolique.ipynb`, ten seeds), 1.3.0
 had the higher error in 6 to 8 seeds of 10 at each budget. Ten seeds do not
 show that difference, by the sign test of the notebook

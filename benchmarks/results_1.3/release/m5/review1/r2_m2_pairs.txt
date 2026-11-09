@@ -1,0 +1,164 @@
+== pool physical: 2250 fits
+neither at budget 706, differ 0
+on those, any result field differing: {}
+on those, expr at the truncation length 160: 5
+expr length >=160 among all fits A 587 B 590
+same expr in 2234 of 2250 physical
+physical, (A at budget, B at budget): {(False, False): 706, (True, True): 1541, (False, True): 2, (True, False): 1}
+physical fits with a different expr: 16
+    ('feyn_n1', 'II.2.42', 'test', 3) True True NEAR NEAR False False
+    ('feyn_n10', 'I.40.1', 'test', 2) True True MISS MISS False False
+    ('feyn_n10', 'III.10.19', 'test', 1) True True MISS MISS False False
+    ('realraw', '690_visualizing_galaxy', 'fold2', 0) True True None None None None
+    ('tf', 'feynman_II_36_38', 'test', 9) True True MISS MISS None None
+    ('tf', 'feynman_I_18_4', 'test', 7) True True MISS MISS None None
+    ('tr', '1028_SWD', 'ood', 6) True True None None None None
+    ('tr', '529_pollen', 'ood', 5) True True None None None None
+    ('tr', 'first_principles_rydberg', 'fold2', 5) True True None None None None
+    ('trraw', 'first_principles_supernovae_zr', 'fold0', 5) True True None None None None
+    ('ts', 'strogatz_bacres1', 'ood', 6) True True MISS MISS None None
+    ('ts', 'strogatz_lv2', 'test', 8) True True NEAR NEAR None None
+    ('ts', 'strogatz_vdp1', 'test', 9) True False MISS EXACT None None
+    ('ufeyn', 'I.6.20a', 'test', 4) True True MISS NEAR None None
+    ('utf', 'feynman_I_6_2b', 'test', 5) True True MISS MISS None None
+    ('utf', 'feynman_test_18', 'test', 8) True True EXACT EXACT None None
+physical status or structure changed: [('ts', 'strogatz_vdp1', 'test', 9), ('ufeyn', 'I.6.20a', 'test', 4)]
+    ('ts', 'strogatz_vdp1', 'test', 9) MISS EXACT True False 31.36 30.38
+    ('ufeyn', 'I.6.20a', 'test', 4) MISS NEAR True True 30.8 30.85
+physical formula_exact differs: 2
+    ('tr', '1028_SWD', 'ood', 6) True False
+    ('ts', 'strogatz_vdp1', 'test', 9) False True
+
+== pool trig: 530 fits
+  F41 {'fits': 50, 'status changed': 11, 'A exact': 20, 'B exact': 28, 'gain exact': 8, 'lose exact': 0, 'arcsin in B': 11, 'arcsin in A': 0, 'fe False A': 1, 'fe False B': 6, 'fe False B arcsin': 1}
+  F41N1 {'fits': 50, 'status changed': 7, 'A exact': 0, 'B exact': 0, 'gain exact': 0, 'lose exact': 0, 'A struct': 15, 'B struct': 23, 'gain struct': 8, 'lose struct': 0, 'arcsin in B': 12, 'arcsin in A': 0, 'fe False A': 3, 'fe False B': 5, 'fe False B arcsin': 2}
+  F41N10 {'fits': 50, 'status changed': 3, 'A exact': 0, 'B exact': 0, 'gain exact': 0, 'lose exact': 0, 'A struct': 14, 'B struct': 16, 'gain struct': 2, 'lose struct': 0, 'arcsin in B': 12, 'arcsin in A': 0, 'fe False A': 3, 'fe False B': 9, 'fe False B arcsin': 8}
+  TF78 {'fits': 85, 'status changed': 4, 'A exact': 15, 'B exact': 16, 'gain exact': 1, 'lose exact': 0, 'arcsin in B': 3, 'arcsin in A': 0, 'fe False A': 4, 'fe False B': 11, 'fe False B arcsin': 2}
+  TF78u {'fits': 85, 'status changed': 3, 'A exact': 17, 'B exact': 16, 'gain exact': 1, 'lose exact': 2, 'arcsin in B': 16, 'arcsin in A': 0, 'fe False A': 2, 'fe False B': 11, 'fe False B arcsin': 8}
+  TS14 {'fits': 60, 'status changed': 8, 'A exact': 1, 'B exact': 0, 'gain exact': 0, 'lose exact': 1, 'arcsin in B': 8, 'arcsin in A': 0, 'fe False A': 10, 'fe False B': 16, 'fe False B arcsin': 6}
+  U41 {'fits': 50, 'status changed': 11, 'A exact': 20, 'B exact': 28, 'gain exact': 8, 'lose exact': 0, 'arcsin in B': 18, 'arcsin in A': 0, 'fe False A': 1, 'fe False B': 9, 'fe False B arcsin': 7}
+  U41N1 {'fits': 50, 'status changed': 9, 'A exact': 0, 'B exact': 0, 'gain exact': 0, 'lose exact': 0, 'A struct': 15, 'B struct': 23, 'gain struct': 8, 'lose struct': 0, 'arcsin in B': 17, 'arcsin in A': 0, 'fe False A': 2, 'fe False B': 8, 'fe False B arcsin': 8}
+  U41N10 {'fits': 50, 'status changed': 7, 'A exact': 0, 'B exact': 0, 'gain exact': 0, 'lose exact': 0, 'A struct': 14, 'B struct': 11, 'gain struct': 2, 'lose struct': 5, 'arcsin in B': 8, 'arcsin in A': 0, 'fe False A': 1, 'fe False B': 7, 'fe False B arcsin': 5}
+
+-- structure changes, pool trig, by problem
+  F41N1 gains {'I.26.2': 3, 'I.30.5': 5} loses {} (net +8)
+     I.26.2 0 -> 3
+     I.30.5 0 -> 5
+  F41N10 gains {'I.26.2': 1, 'III.15.12': 1} loses {} (net +2)
+     I.26.2 0 -> 1
+     I.30.5 0 -> 0
+     III.15.12 4 -> 5
+  U41N1 gains {'I.26.2': 3, 'I.30.5': 5} loses {} (net +8)
+     I.26.2 0 -> 3
+     I.30.5 0 -> 5
+  U41N10 gains {'III.15.12': 2} loses {'I.18.12': 4, 'II.6.15b': 1} (net -3)
+     I.18.12 5 -> 1
+     I.26.2 0 -> 0
+     I.30.5 0 -> 0
+     II.6.15b 1 -> 0
+     III.15.12 3 -> 5
+
+-- exact changes, pool trig, F41/U41/TF78/TF78u/TS14, by problem
+  F41 I.26.2 exact 0 -> 3, status changed 3: [('test', 1, 'MISS', 'EXACT'), ('test', 2, 'MISS', 'EXACT'), ('test', 4, 'MISS', 'EXACT')]
+  F41 I.30.5 exact 0 -> 5, status changed 5: [('test', 0, 'NEAR', 'EXACT'), ('test', 1, 'NEAR', 'EXACT'), ('test', 2, 'NEAR', 'EXACT'), ('test', 3, 'NEAR', 'EXACT'), ('test', 4, 'NEAR', 'EXACT')]
+  F41 I.37.4 exact 0 -> 0, status changed 2: [('test', 0, 'MISS', 'NEAR'), ('test', 3, 'NEAR', 'MISS')]
+  F41 III.17.37 exact 0 -> 0, status changed 1: [('test', 4, 'MISS', 'NEAR')]
+  U41 I.26.2 exact 0 -> 3, status changed 4: [('test', 0, 'MISS', 'NEAR'), ('test', 2, 'MISS', 'EXACT'), ('test', 3, 'MISS', 'EXACT'), ('test', 4, 'MISS', 'EXACT')]
+  U41 I.30.5 exact 0 -> 5, status changed 5: [('test', 0, 'NEAR', 'EXACT'), ('test', 1, 'NEAR', 'EXACT'), ('test', 2, 'NEAR', 'EXACT'), ('test', 3, 'NEAR', 'EXACT'), ('test', 4, 'NEAR', 'EXACT')]
+  U41 I.37.4 exact 0 -> 0, status changed 2: [('test', 0, 'MISS', 'NEAR'), ('test', 3, 'MISS', 'NEAR')]
+  TF78 feynman_III_8_54 exact 0 -> 1, status changed 1: [('test', 7, 'MISS', 'EXACT')]
+  TF78 feynman_test_10 exact 0 -> 0, status changed 1: [('test', 5, 'NEAR', 'MISS')]
+  TF78 feynman_test_11 exact 0 -> 0, status changed 2: [('test', 6, 'NEAR', 'MISS'), ('test', 9, 'MISS', 'NEAR')]
+  TF78u feynman_III_8_54 exact 2 -> 0, status changed 2: [('test', 8, 'EXACT', 'MISS'), ('test', 9, 'EXACT', 'MISS')]
+  TF78u feynman_test_8 exact 0 -> 1, status changed 1: [('test', 6, 'NEAR', 'EXACT')]
+  TS14 strogatz_barmag1 exact 0 -> 0, status changed 2: [('test', 8, 'MISS', 'NEAR'), ('test', 9, 'NEAR', 'MISS')]
+  TS14 strogatz_barmag2 exact 0 -> 0, status changed 2: [('test', 6, 'NEAR', 'MISS'), ('test', 9, 'NEAR', 'MISS')]
+  TS14 strogatz_glider1 exact 1 -> 0, status changed 4: [('ood', 6, 'MISS', 'NEAR'), ('ood', 7, 'MISS', 'NEAR'), ('test', 7, 'MISS', 'NEAR'), ('test', 9, 'EXACT', 'MISS')]
+
+-- the arcsine laws
+  F41 I.26.2 s0 A:MISS/None B:MISS/None arcsin=False seed=None | 0.00231952 + 1.20586 * v0^1.20095 * sin(0.999716 * v1)
+  F41 I.26.2 s1 A:MISS/None B:EXACT/None arcsin=True seed=None | -arcsin(sin(-v1) * v0)
+  F41 I.26.2 s2 A:MISS/None B:EXACT/None arcsin=True seed=None | arcsin(v0 * sin(v1))
+  F41 I.26.2 s3 A:MISS/None B:MISS/None arcsin=False seed=None | 0.00331471 + 1.11002 * v0 * (-0.0846667 + sin(0.903603 * v1) + 0.24592
+  F41 I.26.2 s4 A:MISS/None B:EXACT/None arcsin=True seed=None | arcsin(sin(v1) * v0)
+  F41 I.30.5 s0 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s1 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s2 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s3 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s4 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  U41 I.26.2 s0 A:MISS/None B:NEAR/None arcsin=True seed=None | 1.0021 * arcsin(10.3786 * arcsin(0.0961111 * v0) * sin(0.999992 * v1))
+  U41 I.26.2 s1 A:MISS/None B:MISS/None arcsin=True seed=None | 1.05974 * arcsin(0.937745 * v0) * sin(0.999102 * v1)
+  U41 I.26.2 s2 A:MISS/None B:EXACT/None arcsin=True seed=None | arcsin(v0 * sin(v1))
+  U41 I.26.2 s3 A:MISS/None B:EXACT/None arcsin=True seed=None | arcsin(sin(v1) * v0)
+  U41 I.26.2 s4 A:MISS/None B:EXACT/None arcsin=True seed=None | arcsin(v0 * sin(v1))
+  U41 I.30.5 s0 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s1 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s2 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s3 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s4 A:NEAR/None B:EXACT/None arcsin=True seed=arcsin((0.080928 * (v0 / (v1 * v2)))) | arcsin(v0 / (v1 * v2))
+  F41N1 I.26.2 s0 A:MISS/False B:NEAR/True arcsin=True seed=None | -2.53628e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  F41N1 I.26.2 s1 A:MISS/False B:MISS/False arcsin=False seed=None | 0.000423639 + 0.324923 * v0 * (2.96924 + 1.02394 * (v0 * sin(1.00762 *
+  F41N1 I.26.2 s2 A:MISS/False B:NEAR/True arcsin=True seed=None | -2.53638e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  F41N1 I.26.2 s3 A:MISS/False B:NEAR/True arcsin=True seed=None | -2.53637e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  F41N1 I.26.2 s4 A:MISS/False B:MISS/False arcsin=False seed=None | 0.000838514 + (0.372436 * v0 + 0.852368) * v0 * sin(0.999398 * v1)
+  F41N1 I.30.5 s0 A:NEAR/False B:NEAR/True arcsin=True seed=None | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s1 A:NEAR/False B:NEAR/True arcsin=True seed=None | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s2 A:NEAR/False B:NEAR/True arcsin=True seed=None | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s3 A:NEAR/False B:NEAR/True arcsin=True seed=None | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s4 A:NEAR/False B:NEAR/True arcsin=True seed=None | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N10 I.26.2 s0 A:MISS/False B:MISS/False arcsin=False seed=None | -0.0312083 - 0.355126 * (0.354446 * v1 - 1.12755) * exp(1.0119 * v0 + 
+  F41N10 I.26.2 s1 A:MISS/False B:MISS/False arcsin=True seed=None | -0.00209096 - 1.08087 * sin(-0.999183 * v1) * arcsin(0.929329 * v0)
+  F41N10 I.26.2 s2 A:MISS/False B:MISS/False arcsin=False seed=None | 0.576583 - 0.560618 * (|-0.133684 * v1 * v1|^(1.0119 * v0) - ((-9.9637
+  F41N10 I.26.2 s3 A:MISS/False B:MISS/True arcsin=True seed=None | 0.000763159 - 0.98737 * arcsin(1.0119 * v0 * sin(-1.00376 * v1))
+  F41N10 I.26.2 s4 A:MISS/False B:MISS/False arcsin=False seed=None | -0.090017 + 5.87397 * (0.201383 * v1 + (0.201383 * v1)^(0.20378 * v1 *
+  F41N10 I.30.5 s0 A:MISS/False B:MISS/False arcsin=True seed=None | 0.000267908 + 3.50499 * arcsin(0.677852 * v0 / (v1 * v2)) / sqrt(sqrt(
+  F41N10 I.30.5 s1 A:MISS/False B:MISS/False arcsin=False seed=None | -0.00290331 + 1.67719 * v0 / (v1 * v2) / sqrt(2.39519 - 0.021813 * (-0
+  F41N10 I.30.5 s2 A:MISS/False B:NEAR/False arcsin=False seed=None | 0.00962009 + 1.08824 * v0^1.08586 * v1^(-1.09812) * v2^(-1.0607)
+  F41N10 I.30.5 s3 A:MISS/False B:MISS/False arcsin=False seed=None | -0.00427406 + 1.03434 * v0 / (v1 * v2)
+  F41N10 I.30.5 s4 A:MISS/False B:MISS/False arcsin=False seed=None | -0.00427406 + 1.03434 * v0 / v2 / v1
+  U41N1 I.26.2 s0 A:MISS/False B:MISS/False arcsin=False seed=None | 0.835334 * sqrt(|-1.08382 - 1.0119 * v0|) * v0 * sin(0.9973 * v1)
+  U41N1 I.26.2 s1 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.00281 * arcsin(0.998458 * v0 * sin(1.00013 * v1))
+  U41N1 I.26.2 s2 A:MISS/False B:MISS/False arcsin=True seed=None | 1.05368 * v0 * (4.79122 + sin(1.00762 * v1) - 4.83024 * cos(-1.03584 *
+  U41N1 I.26.2 s3 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.00281 * arcsin(0.998458 * sin(1.00013 * v1) * v0)
+  U41N1 I.26.2 s4 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.00281 * arcsin(0.998458 * sin(1.00013 * v1) * v0)
+  U41N1 I.30.5 s0 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.01514 * arcsin(0.985218 * v0 / v1 / v2)
+  U41N1 I.30.5 s1 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.01514 * arcsin(0.985218 * v0 / (v1 * v2))
+  U41N1 I.30.5 s2 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.01514 * arcsin(0.985218 * v0 / (v2 * v1))
+  U41N1 I.30.5 s3 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.01514 * arcsin(0.985218 * v0 / v1 / v2)
+  U41N1 I.30.5 s4 A:MISS/False B:NEAR/True arcsin=True seed=None | 1.01514 * arcsin(0.985218 * v0 / v2 / v1)
+  U41N10 I.26.2 s0 A:MISS/False B:MISS/False arcsin=False seed=None | 0.178982 * v0 * sin(-5.61258 * (sin(0.201383 * v1) - 0.0543466) * (sin
+  U41N10 I.26.2 s1 A:MISS/False B:MISS/False arcsin=True seed=None | 1.86944 * tanh(tanh(1.0119 * v0 - 1.00872 * sqrt(v0²) * tanh(0.201383 
+  U41N10 I.26.2 s2 A:MISS/False B:MISS/False arcsin=False seed=None | tanh(-|sqrt(|-0.63124 * v0 - |cos(1.0119 * v0)| + 0.654019 * v1|)| - 0
+  U41N10 I.26.2 s3 A:MISS/False B:MISS/False arcsin=True seed=None | -1.08397 * arcsin(0.927107 * v0) * sin(-1.00029 * v1)
+  U41N10 I.26.2 s4 A:MISS/False B:MISS/False arcsin=False seed=None | -6.70033 * tanh(1.0119 * v0) * (0.402767 * v1 + tanh(0.20378 * v1 * v0
+  U41N10 I.30.5 s0 A:MISS/False B:MISS/False arcsin=False seed=None | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s1 A:MISS/False B:MISS/False arcsin=False seed=None | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s2 A:MISS/False B:MISS/False arcsin=False seed=None | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s3 A:MISS/False B:MISS/False arcsin=False seed=None | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s4 A:MISS/False B:MISS/False arcsin=False seed=None | 1.01761 * v0 / (v1 * v2)
+exact with arcsin: {'feyn': 8, 'ufeyn': 8}
+
+-- frozen test set, pool trig
+TF78 trig problems: 17 fits 85 exact A 15 B 16
+TF78u trig exact A 17 B 16
+   tf 5 NEAR MISS 0.0009250634742577163 0.0011155757802960397
+   tf 6 MISS MISS 0.003234191672805426 0.0019084523831159538
+   tf 7 MISS MISS 0.0018474124064524627 0.0028862649980000562
+   tf 8 MISS MISS 0.002571116725362733 0.0032141602806985167
+   tf 9 MISS MISS 0.001680943475329062 0.003798071234195493
+   utf 5 MISS MISS 0.0028800232171387625 0.006856884248683655
+   utf 6 MISS MISS 0.006805104290289178 0.010578288434284048
+   utf 7 MISS MISS 0.0064888954532189205 0.0019339571656355383
+   utf 8 MISS MISS 0.004759486816150162 0.0017650044795534201
+   utf 9 MISS MISS 0.004392471411114148 0.006856884248683655
+TS14 trig systems: ['strogatz_barmag1', 'strogatz_barmag2', 'strogatz_glider1', 'strogatz_glider2', 'strogatz_shearflow1', 'strogatz_shearflow2'] fits 60
+TS14 trig test fits: 30
+TS14 trig status changed: [(('ts', 'strogatz_barmag1', 'test', 8), 'MISS', 'NEAR'), (('ts', 'strogatz_barmag1', 'test', 9), 'NEAR', 'MISS'), (('ts', 'strogatz_barmag2', 'test', 6), 'NEAR', 'MISS'), (('ts', 'strogatz_barmag2', 'test', 9), 'NEAR', 'MISS'), (('ts', 'strogatz_glider1', 'ood', 6), 'MISS', 'NEAR'), (('ts', 'strogatz_glider1', 'ood', 7), 'MISS', 'NEAR'), (('ts', 'strogatz_glider1', 'test', 7), 'MISS', 'NEAR'), (('ts', 'strogatz_glider1', 'test', 9), 'EXACT', 'MISS')]
+TS14 trig exact A: [('ts', 'strogatz_glider1', 'test', 9)] B: []
+TS14 all exact test A: [('ts', 'strogatz_glider1', 'test', 9), ('ts', 'strogatz_lv1', 'test', 5), ('ts', 'strogatz_lv1', 'test', 6), ('ts', 'strogatz_vdp2', 'test', 5), ('ts', 'strogatz_vdp2', 'test', 6), ('ts', 'strogatz_vdp2', 'test', 7), ('ts', 'strogatz_vdp2', 'test', 8), ('ts', 'strogatz_vdp2', 'test', 9)]
+TS14 all exact test B: [('ts', 'strogatz_lv1', 'test', 5), ('ts', 'strogatz_lv1', 'test', 6), ('ts', 'strogatz_vdp1', 'test', 9), ('ts', 'strogatz_vdp2', 'test', 5), ('ts', 'strogatz_vdp2', 'test', 6), ('ts', 'strogatz_vdp2', 'test', 7), ('ts', 'strogatz_vdp2', 'test', 8), ('ts', 'strogatz_vdp2', 'test', 9)]
+TS14 pools: Counter({'physical': 8, 'trig': 6})
+TS14 exact_scorable: {'strogatz_bacres1': True, 'strogatz_bacres2': True, 'strogatz_barmag1': True, 'strogatz_barmag2': True, 'strogatz_glider1': True, 'strogatz_glider2': True, 'strogatz_lv1': True, 'strogatz_lv2': True, 'strogatz_predprey1': True, 'strogatz_predprey2': True, 'strogatz_shearflow1': True, 'strogatz_shearflow2': True, 'strogatz_vdp1': True, 'strogatz_vdp2': True}
+  III_8_54 tf [(5, 'MISS', 'MISS'), (6, 'MISS', 'MISS'), (7, 'MISS', 'EXACT'), (8, 'MISS', 'MISS'), (9, 'MISS', 'MISS')] trig
+  III_8_54 utf [(5, 'MISS', 'MISS'), (6, 'MISS', 'MISS'), (7, 'MISS', 'MISS'), (8, 'EXACT', 'MISS'), (9, 'EXACT', 'MISS')] trig
+feynman_test_10 manifest: {'columns': ['c', 'v', 'theta2'], 'family': 'bonus', 'features': 3, 'formula': 'theta1 = arccos((cos(theta2)-v/c)/(1-v/c*cos(theta2)))', 'group': 'TF78', 'pool': 'trig', 'rows': 100000}

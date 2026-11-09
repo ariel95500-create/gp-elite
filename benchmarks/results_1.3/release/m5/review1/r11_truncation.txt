@@ -1,0 +1,4 @@
+pool trig, 1.3.0, formula_exact False: 82; with 'arcsin' in the recorded text: 47; recorded text cut at 160 characters: 77, of which without 'arcsin' in the visible part: 35
+pool trig, 1.3.0, all fits with the text cut at 160: 236 of 530
+pool physical, neither at budget: 706; text cut at 160 in either version: [('tf', 'feynman_III_4_33', 'test', 8), ('ts', 'strogatz_bacres2', 'ood', 6), ('utf', 'feynman_II_11_28', 'test', 7), ('utf', 'feynman_II_11_28', 'test', 8), ('utf', 'feynman_I_13_4', 'test', 7)]
+pool trig: departing with 1.2.0 27, with 1.3.0 82, in both 9; 1.3.0 departing without 'arcsin' in the text 35

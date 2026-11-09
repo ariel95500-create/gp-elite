@@ -243,7 +243,9 @@ gives the same counts on every suite of the frozen set: 214 exact laws in 390
 fits without units, 10 in 70 on the Strogatz systems and 229 in 390 with
 units. Version 1.3.0, measured beside 1.2.0, recovers 214 exact laws in 390
 fits without units against 213, 8 in 70 on the Strogatz systems with both
-versions, and 228 in 390 with units against 229. Three case studies
+versions, and 228 in 390 with units against 229; the 213 and 8 of 1.2.0 in
+this campaign, against 214 and 10 in its own, are the time budget moving the
+counts from one campaign to the next. Three case studies
 on public data accompany it: Kepler's third law with units, where the four
 inner planets give the product of the gravitational constant and the mass of
 the Sun within 0.002 % of its nominal value; Hubble's measurements of 1929; and

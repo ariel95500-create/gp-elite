@@ -80,10 +80,11 @@ Une somme de trois produits, `I.11.19`, revient une fois sur cinq. Sur les 78
 les graines contiennent l'arc sinus d'un monôme. Dans la mesure de sortie de la
 1.3, `I.30.5` revient exacte dans 5 ajustements sur 5, et `I.26.2` dans 3 sur
 5. Le moteur rend alors 171 lois exactes sur 205, et cinq équations ne sont
-jamais retrouvées. Deux choses que l'arc sinus n'atteint pas :
+jamais retrouvées. Deux choses que l'arc sinus ne règle pas :
 - **un arc sinus dont l'argument n'est pas un monôme,** comme le n·sin θ de
-  `I.26.2`. La recherche doit le construire, et à 30 s elle l'a fait dans 3
-  ajustements sur 5 ;
+  `I.26.2`. Aucune graine ne le contient, donc la recherche doit le
+  construire : à 30 s, elle l'a fait dans 3 ajustements sur 5 aux graines 0 à
+  4, et dans 2 sur 5 aux graines 5 à 9 ;
 - **la loi de Snell sur quelques points bruités,** i2 = arcsin(sin(i1)/n).
   Avec 10 ou 20 points et 2 % ou 5 % de bruit, les courbes rendues sont plus
   proches de la loi que le bruit ajouté (mesuré sur une première version de
@@ -151,9 +152,11 @@ du front de Pareto). Sur les données réelles, c'est arrivé dans 7 ajustements
 
 Depuis la 1.3, l'arc sinus est l'une de ces protections : dans le modèle, son
 argument est ramené dans [−1, 1], et dans la formule imprimée il ne l'est pas.
-Dans les jeux qui ont l'arc sinus, dans la mesure de sortie de la 1.3, la
-formule s'écarte dans 82 ajustements sur 530, contre 27 pour la 1.2.0. 47 des
-82 ont un arc sinus. La recherche peut se servir de cette protection : là où
+Dans le jeu `trig`, dans la mesure de sortie de la 1.3, la formule s'écarte
+dans 82 ajustements sur 530, contre 27 pour la 1.2.0. Au moins 47 des 82 ont
+un arc sinus (les fiches gardent les 160 premiers caractères d'une formule).
+Combien s'écartent parce que la protection agit, les fiches ne le disent pas.
+La recherche peut se servir de cette protection : là où
 l'argument sort de [−1, 1], l'arc sinus du modèle est plat, à ±π/2. Sur le
 problème du notebook de TP du jeu `full` (`examples/tp_regression_symbolique.ipynb`,
 dix graines), la 1.3.0 a eu l'erreur la plus grande dans 6 à 8 graines sur 10 à

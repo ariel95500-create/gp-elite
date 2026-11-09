@@ -232,12 +232,13 @@ have it. It does not bring Snell's law back on the TP.
   the law than the noise added, a median of 0.2 of the noise and at most
   0.99 (`../results_1.3/a1/examine/README.md`, E2b). The data cannot
   tell the law from the smaller curve, and the selection keeps the smaller.
-- **On clean data,** under the defaults, the law came back in none of 10
-  fits with each of the first two versions of the arcsine, A1 and A2 (E2a of
-  the same page, and `../results_1.3/a2/campaign/e2a_B.jsonl`). With A1 the
-  search stopped after 20 to 59 generations, within 2.4e-10 to 8.4e-6 of the
-  law. This was not measured again with the third version, A3, which 1.3
-  ships.
+- **On clean data,** under the defaults, no formula with the arcsine came
+  back in the 10 fits of each of the first two versions of the arcsine, A1
+  and A2 (E2a of the same page, and `../results_1.3/a2/campaign/e2a_B.jsonl`).
+  By the test of the law, A2 has none of 10, and A1 has one, an approximation
+  without the arcsine within 2.4e-10 of the law. With A1 the search stopped
+  after 20 to 59 generations, within 2.4e-10 to 8.4e-6 of the law. This was
+  not measured again with the third version, A3, which 1.3 ships.
 
 The argument of Snell's law, sin(i1)/n, is not a monomial, so the seeds of
 the arcsine of 1.3 do not reach it either. The six laws of the notebook use

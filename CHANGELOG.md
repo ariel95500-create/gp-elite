@@ -3,14 +3,16 @@
 ## 1.3.0
 
 The arcsine. The pools `trig` and `full` have a new operator, `arcsin`, the
-arcsine of its argument clipped to [-1, 1]; the pool `physical`, the default,
-and `poly` and `conserve` are left as they are, so every fit run with them
-returns what it returned with 1.2.0. Each arcsine carries a constant factor
-in its argument, which the fit of constants adjusts, and the seeds that hold
-a function of a monomial exactly gain the arcsine of a monomial. On the ten
-trigonometric laws of the 41-equation bench, the two arcsine laws, I.26.2
-and I.30.5, come back exact with the arcsine in 8 and 7 fits of 10, on two
-sets of seeds, where 1.2.0 had none; the other eight lose nothing.
+arcsine of its argument clipped to [-1, 1]. The pool `physical`, the
+default, and `poly` and `conserve` are left as they are: with them, the
+models of 1.2.0 at equal work. Each arcsine carries a constant factor in its
+argument, which the fit of constants adjusts. The seeds that hold a function
+of a monomial gain the arcsine of a monomial, both the exact seeds and the
+noise-tolerant ones. On the ten trigonometric laws of the 41-equation bench,
+the two arcsine laws, I.26.2 and I.30.5, come back exact with the arcsine in
+8 and 7 fits of 10, on two sets of seeds, where 1.2.0 had none. The other
+eight keep their count of exact fits on both sets (20 and 21). On the
+second set, I.50.26 loses its one exact fit and III.17.37 gains one.
 Measured on the package, side by side with 1.2.0 installed from PyPI
 (`benchmarks/results_1.3/release/`), at 30 s per fit, on the 2,780 fits of
 the bench, of its noisy and units kinds and of the frozen test set:
@@ -23,11 +25,13 @@ the bench, of its noisy and units kinds and of the frozen test set:
   10 %) against 108 and 85, and with units in 121 and 95 against 113 and 98.
   The last is a draw of five seeds: on twenty other seeds, Feynman I.18.12,
   which makes the difference, keeps its structure in 12 fits of 20 with
-  both versions (`m2/examine/`);
+  both versions (`benchmarks/results_1.3/release/m2/examine/`);
 - with the pool `physical`, on the 706 fits where neither version reached
-  its budget, the formula, the error on the test rows and `formula_exact`
-  are those of 1.2.0, to the bit. The real data give the same medians and
-  the same collapses out of the training range;
+  its budget, the recorded formula (its first 160 characters), the error on
+  the test rows and `formula_exact` are those of 1.2.0, to the bit. Where a
+  budget was reached, 16 of its 2,250 fits return another formula and 2
+  change status, as from one campaign to the next. The real data give the
+  same medians and the same collapses out of the training range;
 - every one of the 1,005 models returned under units passed the audit of
   units;
 - on the frozen test set, which decides nothing: 214 exact laws of 390
@@ -36,36 +40,45 @@ the bench, of its noisy and units kinds and of the frozen test set:
 
 The change was decided by a comparison written before it ran
 (`benchmarks/results_1.3/PLAN.md`). Two simpler versions were measured
-first and not adopted: the operator alone (A1), which brought the arcsine
-laws back in 2 fits of 10, and the operator with its constant (A2), in 3.
+first and not adopted. With the operator alone (A1), the arcsine laws came
+back exact with the arcsine in 1 fit of 10. With the operator and its
+constant (A2), they did in 3.
 
 ### Added
 - The operator `arcsin` in the pools `trig` and `full`, printed `arcsin(...)`
   and `asin(...)` in the sympy forms. Under `units=` its argument must be
   dimensionless, and so is its result.
-- The seed y = b·f·arcsin(c·g), f and g monomials, found when it holds to
-  numerical precision, where the pool has the arcsine.
+- The seed y = b·f·arcsin(c·g), f and g monomials, where the pool has the
+  arcsine: placed when it holds to numerical precision, and among the
+  noise-tolerant seeds as the other forms. In the release measurement, the
+  exact seed was placed in the 10 fits of I.30.5 without noise, and the
+  noise-tolerant one in 25 noisy fits.
 
 ### Known limits
 - The seed reaches an arcsine of a monomial only. An arcsine of anything
-  else, such as I.26.2, arcsin(n·sin θ), must be built by the search, which
-  returns it in 3 fits of 5 at 30 s.
+  else, such as I.26.2, arcsin(n·sin θ), must be built by the search. At
+  30 s it did so in 3 fits of 5 at seeds 0 to 4, and in 2 of 5 at seeds 5
+  to 9.
 - Snell's law on a few noisy points: with 10 or 20 points at 2 % or 5 %
-  noise, the curves returned differ from the law by less than the noise, and
-  the law does not come back (`benchmarks/results_1.3/a1/examine/`).
-- The printed formula departs from the model more often in the pools with
-  the arcsine, and `formula_exact` says so: in 82 fits of 530 in the release
-  measurement against 27 for 1.2.0, 47 of the 82 with an arcsine. The
-  printed arcsine has no clip, so where the argument leaves [-1, 1] on the
-  data, the formula and `predict()` part.
-- The pool `full` is measured on two problems only, both of the release
+  noise, the law does not come back, with 1.2.0 or 1.3.0. Measured on the
+  first version of the arcsine, the curves returned differ from the law by
+  less than the noise (`benchmarks/results_1.3/a1/examine/`).
+- The printed formula departs from the model more often in the pool `trig`,
+  and `formula_exact` says so: in 82 fits of 530 in the release measurement
+  against 27 for 1.2.0. At least 47 of the 82 have an arcsine (the records
+  keep the first 160 characters of a formula). Where the argument of an
+  arcsine leaves [-1, 1] on the data, the clip acts in the model and not in
+  the printed formula, which then departs. How many of the 82 depart that
+  way is not recorded.
+- The pool `full` is measured on two problems only, both in the release
   measurement (`benchmarks/results_1.3/release/m3/`). On Kepler's law
   normalised by min-max, at 40 generations, 1.3.0 is exact in 2 fits of 10
-  against 1 for 1.2.0.
-  On the law of the French TP notebook of the pool `full`, 1.3.0 had the
-  higher error in 6 to 8 seeds of 10 at each budget, which ten seeds do not
-  show to be a difference. The text of that notebook's question 2 now
-  follows what 1.3.0 gives.
+  against 1 for 1.2.0 with the noise-tolerant seeds, as by default, and in
+  4 against 3 without them. On the law of the French TP notebook of the
+  pool `full`, 1.3.0 had the higher error in 6 to 8 seeds of 10 at each
+  budget, which ten seeds do not show to be a difference. With 1.3.0 that
+  notebook prints a warning that the formula departs from `predict()`; its
+  questions 1 and 2 now follow what 1.3.0 gives.
 
 ## 1.2.0 — "Classroom"
 
