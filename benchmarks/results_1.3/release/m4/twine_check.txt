@@ -1,0 +1,3 @@
+# twine check --strict (uvx twine), 9 November 2026, on the files of environments.txt:
+Checking gp_elite-1.3.0-py3-none-any.whl: PASSED
+Checking gp_elite-1.3.0.tar.gz: PASSED

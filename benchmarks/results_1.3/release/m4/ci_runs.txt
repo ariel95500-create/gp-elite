@@ -1,0 +1,23 @@
+# The workflows of the repository on the branch claude/peaceful-knuth-4q7m4p,
+# from the candidate 5492296 on, read on 9 November 2026 (GitHub Actions).
+# The Tests workflow does not run on commits that change only documents
+# (ea4cec7, 5e5f13e, 73fb518); Draft PDF runs on those that touch the paper.
+# 131b6d5 was pushed with a0935be, and the run of a0935be holds it.
+# workflow  run  commit   conclusion  created (UTC)
+Tests       283  5492296  success     2026-11-09T04:31:37Z
+Tests       284  7a09425  success     2026-11-09T04:35:23Z
+Tests       285  b724372  success     2026-11-09T04:36:55Z
+Tests       286  fdcc202  success     2026-11-09T06:36:14Z
+Tests       287  c6dcade  success     2026-11-09T08:36:37Z
+Tests       288  5e9bff4  success     2026-11-09T10:36:49Z
+Tests       289  c96c816  success     2026-11-09T12:37:28Z
+Tests       290  a814e3c  success     2026-11-09T13:44:48Z
+Tests       291  fcfd4ca  success     2026-11-09T13:46:19Z
+Tests       292  fd3973c  success     2026-11-09T14:47:12Z
+Tests       293  a0935be  success     2026-11-09T14:58:35Z
+Draft PDF    35  5e5f13e  success     2026-11-09T15:02:43Z
+Tests       294  7fe0665  success     2026-11-09T16:21:35Z
+Tests       295  6b44873  success     2026-11-09T16:22:31Z
+Tests       296  695d2ff  success     2026-11-09T16:30:18Z
+Draft PDF    36  73fb518  success     2026-11-09T16:34:08Z
+Tests       297  6bf3804  success     2026-11-09T16:34:42Z

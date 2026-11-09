@@ -228,3 +228,17 @@ GP_ELITE as one configuration. So it tunes nothing and fits the default
 estimator, `operators="physical"`, which 1.3.0 leaves as it was. With the
 code of SRBench as read on 2 November 2026, 1.3.0 changes nothing there. If the grid were written as
 intended, its configurations with `"full"` would have the arcsine.
+
+## M4, tests (9 November 2026)
+
+`m4/summary.txt` gives the test suite of 695d2ff, run against the wheel of
+5492296 by `m4/run.sh`. The wheel was installed in a fresh environment for
+each of Python 3.9.25, 3.11.18 and 3.14.6, with the pins of the M4 of 1.2
+(`m4/requirements_*.txt`), each importing the installed package. 182 tests
+pass under the three versions, 13 of them new with the arcsine
+(`tests/test_arcsin.py`). `twine check --strict` passes for the wheel and
+the source archive (`m4/twine_check.txt`), whose SHA-256 are those of
+`environments.txt`. The **Tests** workflow of the repository is green on
+every commit of the branch since the candidate (`m4/ci_runs.txt`). It is
+checked again on the commit of the release, and the files handed over for
+PyPI, built again from that commit, are checked again too.
