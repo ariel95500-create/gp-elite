@@ -240,6 +240,80 @@ fits, A in none.
 
 The author decides what follows. Nothing changes in the engine before.
 
+**Decided by the author on 9 November 2026: (a),** a second version, the
+arcsine with its own constant (`a1/examine/README.md`, *What could follow*).
+A1 stays in the engine as the base of A2; if A2 is not adopted either, the
+code of both is withdrawn before the release, and the author is told.
+
+## Change A2: the arcsine with its own constant
+
+Written on 9 November 2026, before any change for A2 and before any of its
+measurements.
+
+**The rule.** The simplifier of the engine, which every mutation and most
+new trees go through, writes the argument of each arcsine with a constant
+factor. The arcsine of an argument with no constant factor of its own,
+arcsin(u), becomes arcsin(1 · u). "A constant factor of its own" means a
+product or a quotient whose left operand is a number, or a product whose
+right operand is one. The fit of constants then adjusts that factor like
+any other. The rule writes nothing else: no other operator, and no new seed
+or template. Under units the factor is a number with no dimension, so the
+argument keeps its dimension. The rule acts only on trees that have an
+arcsine, so only in the pools `trig` and `full`.
+
+Why this rule: the examination of A1 found the arcsine laws one constant
+short. For example, I.26.2 came back as arcsin(X0 · sin(4.96 · X1)), and
+with that constant the engine's own polish makes it exact. A2 writes that
+constant into every arcsine the search draws.
+
+**Mechanics, before any fit of campaign A2,** as for A1:
+1. **The pools without the arcsine are untouched.** The eleven reference
+   configurations of the pool `physical` and the 147 fits of A1's mechanics
+   are identical to the 1.2.0 wheel.
+2. **The rule:**
+   - `simplify` writes arcsin(X0) as arcsin(1 · X0) and leaves
+     arcsin(2 · X0) and arcsin(2 / X0) as they are;
+   - simplifying twice gives the same tree;
+   - the folding of a constant argument is unchanged;
+   - the tests of A1 still pass.
+3. **The form of the examination:** the tree of I.26.2 seed 2,
+   −0.000573 + 0.982939 · arcsin(X0 · sin(4.964236 · X1)), once simplified,
+   comes back exact through the engine's polish on its training rows. With
+   A1 alone it does not.
+4. **Tests:** the suite passes, with new tests of the rule.
+
+**Campaign A2 (decides).** It runs the same benches as A1, Dtrig and
+TPsnell, seeds 0 to 4 and draws 0 to 4. A is the 1.2.0 wheel, and B the
+candidate with A1 and A2, paired. A2 is adopted when all of these hold:
+1. **The arcsine laws on F41:** I.26.2 and I.30.5 are exact, with a formula
+   that writes the arcsine, in at least 5 of their 10 fits. A1's criterion
+   counted every exact fit; this one does not count an approximation that
+   meets the bench's threshold.
+2. **No loss on the other laws of the pool `trig`:** as criterion 3 of A1.
+3. **Structure under noise:** as criterion 4 of A1.
+4. **Snell's law on TP:** no fewer fits within 1 % of the law than A minus 2,
+   in each arm. A1's criterion on the law itself is not carried over: the
+   examination showed that with 10 or 20 noisy points, the data cannot tell
+   the law from the curves returned. The law on TP is reported, and decides
+   nothing.
+5. **The units guarantee:** as criterion 6 of A1.
+6. **Time on TP:** as criterion 7 of A1.
+
+Reported beside, deciding nothing:
+- the arcsine laws under units, and how many of their exact fits write the
+  arcsine;
+- Snell's law on TP: the law by the diagnostic's test, and whether the
+  formula has an arcsine;
+- Snell's law on clean data (E2a of the examination, run again with B);
+- the other items reported by A1.
+
+**Confirmation,** if the campaign adopts A2: seeds 5 to 9 on Dtrig's kinds
+feyn, feyn_n1 and feyn_n10, and draws 5 to 9 on TPsnell. A2 is kept when
+criteria 1 to 4 hold there.
+
+If A2 is not adopted or not kept, the code of A1 and A2 is withdrawn before
+the release, and the cause goes to the author.
+
 ## The release of 1.3
 
 As for 1.2 (`../results_1.2/release/README.md`): M1 to M5, then gate 10.
