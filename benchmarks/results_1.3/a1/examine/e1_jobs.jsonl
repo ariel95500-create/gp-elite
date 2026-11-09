@@ -1,0 +1,10 @@
+{"kind": "feyn", "problem": "I.26.2", "index": 19, "split": "test", "seed": 0, "budget_factor": 1, "study_status": "MISS", "study_generations": 113}
+{"kind": "feyn", "problem": "I.26.2", "index": 19, "split": "test", "seed": 1, "budget_factor": 1, "study_status": "MISS", "study_generations": 114}
+{"kind": "feyn", "problem": "I.26.2", "index": 19, "split": "test", "seed": 2, "budget_factor": 1, "study_status": "NEAR", "study_generations": 114}
+{"kind": "feyn", "problem": "I.26.2", "index": 19, "split": "test", "seed": 3, "budget_factor": 1, "study_status": "MISS", "study_generations": 106}
+{"kind": "feyn", "problem": "I.26.2", "index": 19, "split": "test", "seed": 4, "budget_factor": 1, "study_status": "EXACT", "study_generations": 39}
+{"kind": "feyn", "problem": "I.30.5", "index": 21, "split": "test", "seed": 0, "budget_factor": 1, "study_status": "EXACT", "study_generations": 118}
+{"kind": "feyn", "problem": "I.30.5", "index": 21, "split": "test", "seed": 1, "budget_factor": 1, "study_status": "NEAR", "study_generations": 39}
+{"kind": "feyn", "problem": "I.30.5", "index": 21, "split": "test", "seed": 2, "budget_factor": 1, "study_status": "NEAR", "study_generations": 31}
+{"kind": "feyn", "problem": "I.30.5", "index": 21, "split": "test", "seed": 3, "budget_factor": 1, "study_status": "NEAR", "study_generations": 121}
+{"kind": "feyn", "problem": "I.30.5", "index": 21, "split": "test", "seed": 4, "budget_factor": 1, "study_status": "NEAR", "study_generations": 70}

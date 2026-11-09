@@ -208,6 +208,38 @@ If A1 is not adopted, or not kept, the cause is examined and reported to
 the author before any second version: another weight, a seed of the search
 for the arcsine, or anything else.
 
+**Campaign held on 8 November 2026** (`a1/campaign/compare_a1.txt`; the
+candidate is commit 496704b in `/venv13a`, A the 1.2.0 wheel in `/venv12p`,
+paired on one 4-core machine, no crash in 480 fits). **A1 is not adopted:
+criteria 1 and 2 fail.**
+
+| criterion | measure | result |
+|---|---|---|
+| 1 | arcsine laws exact on F41 | 2 of 10 (at least 5); only I.26.2 seed 4 writes the arcsine |
+| 2 | Snell's law on TP | 0 of 40 (at least 10) |
+| 3 | the eight other laws | F41 20 against 20, U41 20 against 20; no equation falls |
+| 4 | structure under noise | F41N1 15 against 15, F41N10 15 against 14 |
+| 5 | useful on TP | 18 against 18, 19 against 19 |
+| 6 | units | 70 of 70 models pass |
+| 7 | time on TP | 0.98 and 0.92 of A's |
+
+The exact fit of I.30.5 (seed 0) is an approximation with tanh, at 1 − R² of
+3.4e-11 on the test rows. Under units, B has the two arcsine laws in 2 of 10
+fits, A in none.
+
+**The cause, examined on 9 November 2026** (`a1/examine/README.md`).
+- **On the bench:** the engine divides each variable by its largest value,
+  so the laws need constants inside the arcsine, and the search rarely
+  builds them. The polish cannot add a constant a formula lacks. I.26.2
+  seed 2 comes back as arcsin(X0 · sin(4.96 · X1)), one constant short of
+  the law. Eight of the ten fits never offered a candidate the polish makes
+  exact.
+- **On the TP:** in all 40 fits the curve returned differs from the law by
+  less than the noise added (a median of 0.2 of it). Even on clean data, B
+  returns no arcsine in 10 fits.
+
+The author decides what follows. Nothing changes in the engine before.
+
 ## The release of 1.3
 
 As for 1.2 (`../results_1.2/release/README.md`): M1 to M5, then gate 10.
