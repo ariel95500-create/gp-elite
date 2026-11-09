@@ -10,7 +10,7 @@ points it needs, how its runtime grows, and where it fails.
 
 GP_ELITE searches for a **mathematical formula** linking your variables to a target, instead of a black box. It is built for small experimental datasets (≤10 variables) where you want to *understand* the relationship: degradation laws, sensor calibration, engineering correlations, dose-response curves, physical laws.
 
-On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 38 s in total at 1,000 points and 103 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.2.0; the times depend on the machine).
+On five Feynman equations (without normalisation), the returned model recovers the exact law of four of them at every size from 25 to 10,000 points, in every run; the fifth, the nested rational form I.16.6, comes back exact at 1,000 points and more (at 2,000 in a form other than the textbook one), and in 5 of the 13 runs below. The five fits take 41 s in total at 1,000 points and 113 s at 10,000 on one core of our 4-core machine (`benchmarks/feynman_scaling.py`, version 1.3.0; the times depend on the machine).
 
 Since **0.4 "Lawful"** you can also declare the physical units of your columns — the search itself then only ever builds dimensionally sound expressions, instead of formulas that fit the numbers while breaking the physics (see *Dimensional constraints* below).
 
@@ -148,10 +148,10 @@ guarantee.
 - `time_limit=` (seconds): the search stops cleanly at the deadline and returns the
   best model found so far, instead of being killed without a result; the
   generation under way and the final selection add a little (in the release
-  measurement of 1.2.0, the 1,987 fits stopped by a budget of 30 s took 30.5 s
-  at the median and 31.9 s at most). A search that finds an exact law ends
+  measurement of 1.3.0, the 1,983 fits stopped by a budget of 30 s took 30.5 s
+  at the median and 31.7 s at most). A search that finds an exact law ends
   before its budget: with 15 s on 3,000 rows (`benchmarks/time_limit_check.py`),
-  the law came back at 6.3 s in sequence and 12.5 s with the islands in parallel.
+  the law came back at 6.3 s in sequence and 13.2 s with the islands in parallel.
 - `patience=` (since 1.2): when the call sets neither `generations` nor
   `time_limit`, the search stops once its error on the hold-out rows (the
   training rows when there are none) has not improved by 1 % in 30 generations, then polishes and selects as usual. A fit

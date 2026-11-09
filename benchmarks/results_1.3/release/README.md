@@ -191,6 +191,11 @@ was brought to what 1.3.0 gives at seed 0.
   The check of `GPEliteRegressor` with a budget of 6 s, which varied
   between runs of the same version in the M3 of 1.2, passes this time;
 - the times of `import_time.txt`, `scaling.txt` and the log of the console.
+  The five fits of `feynman_scaling.py`, with the same models, take 41 s at
+  1,000 points and 113 s at 10,000, against 38 s and 103 s on 5 November.
+  The exact law of `time_limit_check.py` comes back at 6.3 s in sequence and
+  13.2 s in parallel, against 6.3 s and 12.5 s. These are two days, on
+  hosts that may differ, so the times do not compare the versions.
 
 **The TP notebook of the six laws.** The six fits return the formulas and
 the deduced constants of 1.2.0, in the same times. The same day, one version
@@ -211,3 +216,15 @@ pool `physical`, which 1.3.0 leaves as it was.
 
 The figures of the pages of the limits read from the records of M2 are
 given with the documents.
+
+## SRBench, a correction of the plan
+
+The plan says, for gate 10, that the SRBench wrapper tries
+`operators="full"`, so that once 1.3.0 is on PyPI, those runs would have the
+arcsine. That holds for the grid as written, not for the grid as SRBench
+reads it. The study of 1.1 (`../../results_1.1/srbench_settings/PLAN.md` and
+`README.md`) found that `optimize_model.py` of SRBench 2025 reads the grid of
+GP_ELITE as one configuration. So it tunes nothing and fits the default
+estimator, `operators="physical"`, which 1.3.0 leaves as it was. With the
+code of SRBench as read on 2 November 2026, 1.3.0 changes nothing there. If the grid were written as
+intended, its configurations with `"full"` would have the arcsine.

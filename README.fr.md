@@ -13,7 +13,7 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 38 s au total à 1 000 points et 103 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.2.0 ; les temps dépendent de la machine).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 41 s au total à 1 000 points et 113 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.3.0 ; les temps dépendent de la machine).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -156,11 +156,11 @@ exacte, sans garantie.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
   génération en cours et la sélection finale ajoutent un peu (dans la mesure de
-  sortie de la 1.2.0, les 1 987 ajustements arrêtés par un budget de 30 s ont
-  pris 30,5 s en médiane et 31,9 s au plus). Une recherche qui trouve une loi
+  sortie de la 1.3.0, les 1 983 ajustements arrêtés par un budget de 30 s ont
+  pris 30,5 s en médiane et 31,7 s au plus). Une recherche qui trouve une loi
   exacte finit avant son budget : avec 15 s sur 3 000 lignes
   (`benchmarks/time_limit_check.py`), la loi est revenue à 6,3 s en séquence et
-  à 12,5 s avec les îles en parallèle.
+  à 13,2 s avec les îles en parallèle.
 - `patience=` (depuis la 1.2) : quand l'appel ne fixe ni `generations` ni
   `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
   côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en

@@ -120,7 +120,7 @@ baseline (2000 programs over 30 generations, against 400 over 30 generations
 and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
 before any measurement,
 and each method judged on the model it returns, it recovers 15/15 exactly
-($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (versions 1.0.0 to 1.2.0,
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (versions 1.0.0 to 1.3.0,
 `benchmarks/duel.py`; 12/15 for version 0.9.0). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
