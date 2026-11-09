@@ -1,0 +1,58 @@
+Without units: 1775 jobs, 258 return another expression, 254 of them reached the budget in one version or both, 34 change status.
+  status MISS -> EXACT: ('feyn', 'I.26.2', 'test', 1)
+  status MISS -> EXACT: ('feyn', 'I.26.2', 'test', 2)
+  status MISS -> EXACT: ('feyn', 'I.26.2', 'test', 4)
+  status NEAR -> EXACT: ('feyn', 'I.30.5', 'test', 1)
+  status NEAR -> EXACT: ('feyn', 'I.30.5', 'test', 2)
+  status NEAR -> EXACT: ('feyn', 'I.30.5', 'test', 0)
+  status NEAR -> EXACT: ('feyn', 'I.30.5', 'test', 4)
+  status NEAR -> EXACT: ('feyn', 'I.30.5', 'test', 3)
+  status MISS -> NEAR: ('feyn', 'I.37.4', 'test', 0)
+  status NEAR -> MISS: ('feyn', 'I.37.4', 'test', 3)
+  status MISS -> NEAR: ('feyn', 'III.17.37', 'test', 4)
+  status MISS -> EXACT: ('tf', 'feynman_III_8_54', 'test', 7)
+  status NEAR -> MISS: ('tf', 'feynman_test_10', 'test', 5)
+  status NEAR -> MISS: ('tf', 'feynman_test_11', 'test', 6)
+  status MISS -> NEAR: ('tf', 'feynman_test_11', 'test', 9)
+  status MISS -> NEAR: ('ts', 'strogatz_barmag1', 'test', 8)
+  status NEAR -> MISS: ('ts', 'strogatz_barmag1', 'test', 9)
+  status NEAR -> MISS: ('ts', 'strogatz_barmag2', 'test', 6)
+  status NEAR -> MISS: ('ts', 'strogatz_barmag2', 'test', 9)
+  status MISS -> NEAR: ('ts', 'strogatz_glider1', 'test', 7)
+  status EXACT -> MISS: ('ts', 'strogatz_glider1', 'test', 9)
+  status MISS -> NEAR: ('ts', 'strogatz_glider1', 'ood', 6)
+  status MISS -> NEAR: ('ts', 'strogatz_glider1', 'ood', 7)
+  status MISS -> EXACT: ('ts', 'strogatz_vdp1', 'test', 9)
+  status MISS -> NEAR: ('feyn_n1', 'I.26.2', 'test', 0)
+  status MISS -> NEAR: ('feyn_n1', 'I.26.2', 'test', 2)
+  status MISS -> NEAR: ('feyn_n1', 'I.26.2', 'test', 3)
+  status NEAR -> MISS: ('feyn_n1', 'I.37.4', 'test', 3)
+  status MISS -> NEAR: ('feyn_n1', 'I.37.4', 'test', 4)
+  status NEAR -> MISS: ('feyn_n1', 'III.17.37', 'test', 1)
+  status MISS -> NEAR: ('feyn_n1', 'III.17.37', 'test', 4)
+  status MISS -> NEAR: ('feyn_n10', 'III.15.12', 'test', 0)
+  status MISS -> NEAR: ('feyn_n10', 'I.30.5', 'test', 2)
+  status MISS -> NEAR: ('feyn_n10', 'III.17.37', 'test', 0)
+  differs without reaching the budget: ('feyn', 'I.30.5', 'test', 1)
+  differs without reaching the budget: ('feyn', 'I.30.5', 'test', 2)
+  differs without reaching the budget: ('feyn', 'I.30.5', 'test', 4)
+  differs without reaching the budget: ('feyn', 'I.30.5', 'test', 3)
+
+U41: 205 fits, exact 166 -> 174; 2 equations gain exact fits, 0 lose some.
+  equations never exact in any seed: 6 -> 4 of 41
+  median time of a fit: 0.4 s -> 0.4 s
+  the five families of 1.0: 90 fits, exact 57 -> 65
+
+TF78 under units: 390 fits, exact 229 -> 228; 1 equations gain exact fits, 1 lose some.
+  loses: feynman_III_8_54 2 -> 0
+  fit exact with 1.2.0, not with 1.3.0: feynman_III_8_54 seed 8 (MISS)
+  fit exact with 1.2.0, not with 1.3.0: feynman_III_8_54 seed 9 (MISS)
+  equations never exact in any seed: 30 -> 30 of 78
+  median time of a fit: 1.2 s -> 1.2 s
+
+Out of domain, collapses by version:
+  real: 30 fits out of domain, collapses 5 -> 5, 5 in both
+  realraw: 35 fits out of domain, collapses 5 -> 5, 5 in both
+  tr: 125 fits out of domain, collapses 37 -> 37, 37 in both
+  trraw: 125 fits out of domain, collapses 28 -> 28, 28 in both
+  ts: 70 fits out of domain, collapses 30 -> 27, 24 in both
