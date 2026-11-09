@@ -387,6 +387,14 @@ the law into a power law of the inputs.
 - **What it cannot reach:** I.26.2 and Snell's law, whose arguments n·sin θ
   and sin(i1)/n are not monomials.
 
+**Precision, found while writing the change, before any measurement of A3.**
+Phase 4a tries, for each form, the six factors f that its coarse first grid
+ranks best. On y = 2·arcsin(0.7·x0/(x1·x2)), the plain form f = 1 ranks
+seventh: arcsin(x) is close to x for a small argument, so on that grid
+other factors look almost as good. So for the arcsine only, the plain form
+y = b·arcsin(c·g) is always tried, first, before the six. The other forms
+keep the six of phase 4a.
+
 **Mechanics, before any fit of campaign A3:**
 1. **The pools without the arcsine are untouched:** as for A1 and A2.
 2. **The finder:**

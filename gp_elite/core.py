@@ -4602,6 +4602,8 @@ def _make_binomial_seeds(xs, ys, cfg, tol=None) -> list:
 # Même principe que les graines binomiales, pour les fonctions élémentaires :
 #   y = b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g)
 #   y = f·(a + β·sin(ω·g) + γ·cos(ω·g))
+#   [1.3-A3] y = b·f·arcsin(c·g), là où le pool a l'arc sinus (trig, full) ;
+#   inversée comme tanh, b au moins 2/π fois le plus grand |y/f|
 # f et g des monômes. Pour les quatre premières, la fonction inversée rend
 # une loi de puissance des entrées (une constante cherchée sur une dimension,
 # aucune pour le logarithme) ; pour la forme trigonométrique, ω se cherche
@@ -4669,6 +4671,8 @@ def _elem_transform(kind, R, s):
     mx = A.max(axis=0)
     if kind == "tanh":
         return np.log(np.arctanh(A / (mx * (1.0 + 10.0 ** s))))
+    if kind == "arcsin":                  # [1.3-A3] |arcsin| <= pi/2 : b >= (2/pi) max
+        return np.log(np.sin(A / (mx * (2.0 / math.pi) * (1.0 + 10.0 ** s))))
     return np.log(np.arccosh(mx * (1.0 + 10.0 ** s) / A))      # "sech"
 
 
@@ -4719,7 +4723,7 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6, tol=_BINOM_TOL) -> list
                 continue
             out.append(("log", lib[idx[m]], g, float(math.exp(a0 / s0))))
             break
-    for kind in [k for k in ("exp-", "exp+", "tanh", "sech")
+    for kind in [k for k in ("exp-", "exp+", "tanh", "sech", "arcsin")
                  if k.rstrip("+-") in kinds]:
         best = np.full(R.shape[1], np.inf)
         with np.errstate(all="ignore"):
@@ -4729,7 +4733,16 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6, tol=_BINOM_TOL) -> list
                 v = _elem_rel(np.where(np.isfinite(T), T, 0.0), Qs)
                 v[~fin] = np.inf
                 best = np.minimum(best, v)
-        for m in np.argsort(best, kind="stable")[:top]:
+        order = [int(m) for m in np.argsort(best, kind="stable")[:top]]
+        if kind == "arcsin":
+            # [1.3-A3] La forme simple y = b·arcsin(c·g) (f = 1) est toujours
+            # essayée, la première : arcsin(x) est proche de x pour un petit
+            # argument, et sur la grille grossière d'autres f peuvent la
+            # devancer (7e sur une loi arcsin(0,7·x0/(x1·x2))).
+            j0 = np.where(idx == 0)[0]
+            if j0.size and np.isfinite(best[j0[0]]):
+                order = [int(j0[0])] + [m for m in order if m != j0[0]]
+        for m in order:
             if not np.isfinite(best[m]):
                 break
             r = R[:, [m]]
@@ -4926,7 +4939,8 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
         return []
     kinds = [k for k, need in (("exp", {"exp"}), ("log", {"log"}),
                                ("tanh", {"tanh"}), ("sech", {"exp"}),
-                               ("trig", {"sin", "cos"})) if need <= uops]
+                               ("trig", {"sin", "cos"}),
+                               ("arcsin", {"arcsin"})) if need <= uops]   # [1.3-A3]
     if not kinds:
         return []
     t0 = time.time()
@@ -4963,6 +4977,8 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
             h = Node("log", cg(c))
         elif kind == "tanh":
             h = Node("tanh", cg(c))
+        elif kind == "arcsin":            # [1.3-A3]
+            h = Node("arcsin", cg(c))
         else:                             # 1/cosh(c·g) = 2/(exp(c·g) + exp(-c·g))
             den = Node("+", Node("exp", cg(c)), Node("exp", cg(-c)))
             seeds.append(Node("/", f if f is not None else Node(1.0), den))

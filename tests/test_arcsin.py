@@ -223,3 +223,68 @@ def test_the_form_of_the_examination_comes_back_exact(monkeypatch):
         core._clear_simplify_caches()
         e1 = _polished_error(core.simplify(tree), xs[:140], y[:140], xs[140:], y[140:])
         assert e1 > 1e-6
+
+
+# ── 1.3, A3: the arcsine of a monomial among the seeds of phase 4a ─────────
+
+def _pool(monkeypatch, pool):
+    b_ops, _bw, u_ops, _uw = core._GENCSV_POOLS[pool]
+    monkeypatch.setattr(core, "_LS_SCALE_ONLY", False)
+    monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
+    monkeypatch.setattr(core, "_GENERIC_BINARY_OPS", list(b_ops))
+    monkeypatch.setattr(core, "_GENERIC_UNARY_OPS", list(u_ops))
+
+
+def _cfg(n):
+    cfg = core.Config()
+    cfg.TERMINALS = ["X[%d]" % i for i in range(n)]
+    return cfg
+
+
+_KINDS = ["exp", "log", "tanh", "sech", "trig", "arcsin"]
+
+
+def test_finder_returns_the_arcsine_of_a_monomial():
+    r = np.random.RandomState(0)
+    X = np.c_[r.uniform(1, 2, 140), r.uniform(2, 5, 140), r.uniform(1, 5, 140)]
+    y = 2 * np.arcsin(0.7 * X[:, 0] / (X[:, 1] * X[:, 2]))
+    forms = core._elementary_forms(X, y, _KINDS)
+    assert forms and forms[0][0] == "arcsin"
+    kind, f, g, c = forms[0]
+    assert f == () and g == ((0, 1.0), (1, -1.0), (2, -1.0))
+    assert abs(c - 0.7) < 1e-9
+    # without the arcsine among the kinds, nothing
+    assert core._elementary_forms(X, y, _KINDS[:-1]) == []
+
+
+def test_finder_returns_no_arcsine_where_none_holds():
+    r = np.random.RandomState(1)
+    X = np.c_[r.uniform(0.05, 1, 140), r.uniform(1, 5, 140)]
+    assert core._elementary_forms(X, np.arcsin(X[:, 0] * np.sin(X[:, 1])), _KINDS) == []
+    X3 = np.c_[r.uniform(1, 5, 140), r.uniform(1, 5, 140), r.uniform(1, 5, 140)]
+    assert core._elementary_forms(X3, X3[:, 0] + np.sin(3 * X3[:, 1]) * X3[:, 2],
+                                  _KINDS) == []
+    # 1 % noise: no form holds to numerical precision
+    y = np.arcsin(0.3 * X3[:, 0] / (X3[:, 1] * X3[:, 2]))
+    assert core._elementary_forms(X3, y * (1 + 0.01 * r.randn(140)), _KINDS) == []
+    # the forms of phase 4a are found as before
+    r0 = np.random.RandomState(0)
+    X0 = np.c_[r0.uniform(1, 2, 140), r0.uniform(2, 5, 140), r0.uniform(1, 5, 140)]
+    assert core._elementary_forms(X0, np.tanh(0.3 * X0[:, 0] * X0[:, 1]), _KINDS)[0][0] == "tanh"
+    assert core._elementary_forms(X0, np.exp(-0.5 * X0[:, 0] / X0[:, 1]), _KINDS)[0][0] == "exp"
+
+
+def test_arcsine_seed_only_where_the_pool_has_it(monkeypatch):
+    r = np.random.RandomState(2)
+    X = np.c_[r.uniform(1, 2, 140), r.uniform(2, 5, 140), r.uniform(1, 5, 140)]
+    Xs = X / np.abs(X).max(axis=0)
+    y = np.arcsin(X[:, 0] / (X[:, 1] * X[:, 2]))
+    _pool(monkeypatch, "trig")
+    seeds = core._make_elementary_seeds(Xs, y, _cfg(3))
+    assert seeds and "arcsin" in core.to_string(seeds[0])
+    p = core.evaluate_vector(seeds[0], Xs)
+    a, b, ok = core._linear_scale_params(p, y)
+    assert ok and float(np.mean((y - (a + b * p)) ** 2) / np.var(y)) < 1e-20
+    _pool(monkeypatch, "physical")
+    assert all("arcsin" not in core.to_string(t)
+               for t in core._make_elementary_seeds(Xs, y, _cfg(3)))
