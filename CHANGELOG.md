@@ -58,6 +58,14 @@ laws back in 2 fits of 10, and the operator with its constant (A2), in 3.
   measurement against 27 for 1.2.0, 47 of the 82 with an arcsine. The
   printed arcsine has no clip, so where the argument leaves [-1, 1] on the
   data, the formula and `predict()` part.
+- The pool `full` is measured on two problems only, both of the release
+  measurement (`benchmarks/results_1.3/release/m3/`). On Kepler's law
+  normalised by min-max, at 40 generations, 1.3.0 is exact in 2 fits of 10
+  against 1 for 1.2.0.
+  On the law of the French TP notebook of the pool `full`, 1.3.0 had the
+  higher error in 6 to 8 seeds of 10 at each budget, which ten seeds do not
+  show to be a difference. The text of that notebook's question 2 now
+  follows what 1.3.0 gives.
 
 ## 1.2.0 — "Classroom"
 

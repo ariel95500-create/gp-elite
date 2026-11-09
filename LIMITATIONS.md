@@ -121,7 +121,9 @@ the returned champion.
 When data follow a law exactly but no exact seed covers it, a seed that only
 approximates the data can draw the search away from the law. Seen on Kepler's law
 normalised by min-max (`normalize="minmax"`): exact in 1 fit of 10 instead of 3 at
-40 generations (`release_1.0/m3/kepler_minmax_check.txt`). With the default
+40 generations (`release_1.0/m3/kepler_minmax_check.txt`). The check uses the pool
+`full`; with its arcsine, 1.3.0 gives 2 of 10 instead of 4
+(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`). With the default
 normalisation, on the bench, no law was lost this way: no equation has fewer exact
 fits than with 0.9.0. `PLAN_PHASE5.md`, mechanics of N1.
 
@@ -136,7 +138,13 @@ happened in 7 fits of 130 on the bench and 61 of 500 on the test set.
 Since 1.3, the arcsine is one of these guards: in the model its argument is
 clipped to [−1, 1], and in the printed formula it is not. In the pools with
 the arcsine, in the release measurement of 1.3, the formula departs in 82
-fits of 530, against 27 for 1.2.0. 47 of the 82 have an arcsine.
+fits of 530, against 27 for 1.2.0. 47 of the 82 have an arcsine. The
+search can use the clip: where the argument leaves [−1, 1], the arcsine of
+the model is flat at ±π/2. On the problem of the French TP notebook of the
+pool `full` (`examples/tp_regression_symbolique.ipynb`, ten seeds), 1.3.0
+had the higher error in 6 to 8 seeds of 10 at each budget. Ten seeds do not
+show that difference, by the sign test of the notebook
+(`benchmarks/results_1.3/release/m3/examine/`).
 
 ## 7. The same seed on another machine
 

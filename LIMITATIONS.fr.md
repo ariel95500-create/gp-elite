@@ -133,7 +133,10 @@ Quand des données suivent exactement une loi qu'aucune graine exacte ne couvre,
 une graine qui ne fait qu'approcher les données peut détourner la recherche de la
 loi. Vu sur la loi de Kepler normalisée par min-max (`normalize="minmax"`) : exacte
 dans 1 ajustement sur 10 au lieu de 3, à 40 générations
-(`release_1.0/m3/kepler_minmax_check.txt`). Avec la normalisation par défaut, sur le
+(`release_1.0/m3/kepler_minmax_check.txt`). Le contrôle utilise le jeu `full` ;
+avec son arc sinus, la 1.3.0 donne 2 sur 10 au lieu de 4
+(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`). Avec la
+normalisation par défaut, sur le
 banc, aucune loi n'a été perdue ainsi : aucune équation n'a moins d'ajustements
 exacts qu'avec la 0.9.0. `PLAN_PHASE5.md`, mécanique de N1.
 
@@ -150,7 +153,12 @@ Depuis la 1.3, l'arc sinus est l'une de ces protections : dans le modèle, son
 argument est ramené dans [−1, 1], et dans la formule imprimée il ne l'est pas.
 Dans les jeux qui ont l'arc sinus, dans la mesure de sortie de la 1.3, la
 formule s'écarte dans 82 ajustements sur 530, contre 27 pour la 1.2.0. 47 des
-82 ont un arc sinus.
+82 ont un arc sinus. La recherche peut se servir de cette protection : là où
+l'argument sort de [−1, 1], l'arc sinus du modèle est plat, à ±π/2. Sur le
+problème du notebook de TP du jeu `full` (`examples/tp_regression_symbolique.ipynb`,
+dix graines), la 1.3.0 a eu l'erreur la plus grande dans 6 à 8 graines sur 10 à
+chaque budget. Dix graines ne montrent pas cet écart, au test des signes du
+notebook (`benchmarks/results_1.3/release/m3/examine/`).
 
 ## 7. La même graine sur une autre machine
 
