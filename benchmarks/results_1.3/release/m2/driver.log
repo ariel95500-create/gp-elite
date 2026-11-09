@@ -1,0 +1,39 @@
+--- M2 bench of 7a09425, Model name: Intel(R) Xeon(R) Processor, kernel 6.18.44-fc-v310, 4 cores
+/home/user/gp-elite/benchmarks/results_1.3/release/m2/driver.sh: 26: cannot open /home/user/m2_13_records/campaignR_1.2.0.jsonl: No such file
+/home/user/gp-elite/benchmarks/results_1.3/release/m2/driver.sh: 27: cannot open /home/user/m2_13_records/campaignR_1.3.0.jsonl: No such file
+--- slice 2026-11-09T04:35 (0 and 0 done)
+2780 jobs to run with 2 engines
+25 jobs done, 17 s elapsed, 2754 left
+50 jobs done, 175 s elapsed, 2729 left
+75 jobs done, 193 s elapsed, 2704 left
+100 jobs done, 357 s elapsed, 2680 left
+125 jobs done, 474 s elapsed, 2655 left
+150 jobs done, 654 s elapsed, 2630 left
+175 jobs done, 675 s elapsed, 2605 left
+200 jobs done, 909 s elapsed, 2580 left
+225 jobs done, 1258 s elapsed, 2554 left
+250 jobs done, 1644 s elapsed, 2529 left
+275 jobs done, 2056 s elapsed, 2504 left
+300 jobs done, 2440 s elapsed, 2480 left
+325 jobs done, 2854 s elapsed, 2455 left
+350 jobs done, 3080 s elapsed, 2430 left
+375 jobs done, 3213 s elapsed, 2404 left
+400 jobs done, 3306 s elapsed, 2380 left
+425 jobs done, 3326 s elapsed, 2355 left
+450 jobs done, 3345 s elapsed, 2329 left
+475 jobs done, 3438 s elapsed, 2305 left
+500 jobs done, 3522 s elapsed, 2280 left
+525 jobs done, 3789 s elapsed, 2254 left
+550 jobs done, 4042 s elapsed, 2229 left
+575 jobs done, 4265 s elapsed, 2204 left
+600 jobs done, 4353 s elapsed, 2180 left
+625 jobs done, 4533 s elapsed, 2154 left
+650 jobs done, 4951 s elapsed, 2129 left
+675 jobs done, 5337 s elapsed, 2104 left
+700 jobs done, 5726 s elapsed, 2080 left
+725 jobs done, 5990 s elapsed, 2054 left
+time slice over: 2031 jobs left for the next call
+--- slice 2026-11-09T06:20 (749 and 749 done)
+2031 jobs to run with 2 engines
+25 jobs done, 420 s elapsed, 2005 left
+50 jobs done, 800 s elapsed, 1980 left
