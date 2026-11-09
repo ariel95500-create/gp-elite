@@ -115,7 +115,8 @@ structure in 12 fits of 20. In 7 of its 8 other fits, 1.2.0 returns the same
 parabola in θ that 1.3.0 returned at seeds 0 to 3 of M2. By
 the reading written before, the fall of M2 is the draw of its five seeds.
 
-**The printed formula.** `formula_exact` is False:
+**The printed formula** (`m2/pool_counts.txt`, from `m2/pool_counts.py`,
+written after the second review of M5). `formula_exact` is False:
 - with the pool `physical`, in 102 fits with each version;
 - with the pool `trig`, in 82 of the 530 fits with 1.3.0, against 27 with
   1.2.0. At least 47 of the 82 have an arcsine. 77 of the 82 recorded
@@ -129,14 +130,15 @@ The pages of the limits say so (point 6).
 **The formulas with the arcsine** are listed by suite in
 `m2/arcsine_formulas.txt` (`m2/arcsine_formulas.py`, written after the first
 review of M5, which found that `m2/compare.txt` gives their count only). The
-recorded text has an arcsine in 105 fits of 1.3.0, a lower bound for the
-same reason:
+recorded text has an arcsine in 105 fits of 1.3.0. That is a lower bound:
+in 180 of the 530 fits of the pool `trig`, the recorded text is cut with no
+arcsine visible. By suite:
 - 11 in F41, 18 in U41;
 - 12 in F41N1, 17 in U41N1, 12 in F41N10, 8 in U41N10;
 - 3 in TF78, 16 in TF78 under units, and 8 in TS14.
 
 **The seeds of the arcsine** (`elementary_seed` and `tolerant_seed` in the
-records). The exact seed was placed in the 10 fits of I.30.5 without noise,
+records, counted in `m2/pool_counts.txt`). The exact seed was placed in the 10 fits of I.30.5 without noise,
 in F41 and U41. The noise-tolerant seed was placed in 25 fits: I.30.5 in
 F41N1, F41N10, U41N1 and U41N10, and feynman_test_1 of TF78, five seeds
 each.
@@ -187,6 +189,17 @@ Nine records differ, for three causes:
 - timing, five records;
 - the driver itself, `m3_driver.sh` and its log, whose steps and dates
   differ.
+
+Two of the five records of timing, `gp_elite_best.txt` and
+`gp_elite_log.csv`, are written by the console example. `.gitignore` keeps
+them out of the repository, as in the M3 of 1.2, so they were compared here
+and are not published. `m3_compare.py` lists the records of the folder of
+1.3. Five records of 1.2 have no counterpart there:
+- the runs of 1.1.0: the deduced constant and the two runs of the TP
+  notebook;
+- `notebook_tp_six_lois_1.2.0.txt`, whose run of 1.3.0 is compared with it
+  below;
+- `m3_nohup.txt`, the console output of the driver of 1.2.
 
 **The pool `full`, which has the arcsine.** Two records use it:
 - `kepler_minmax_check.txt`, Kepler's law normalised by min-max, ten seeds.
@@ -284,3 +297,15 @@ every commit of the branch since the candidate that it ran on
 three of them here. It is checked again on the commit of the release, and
 the files handed over for PyPI, built again from that commit, are checked
 again too.
+
+## M5, two independent reviews (9 November 2026)
+
+`M5_review1.md` and `M5_review2.md`: two agents, one after the other, each
+without having seen the work, the second without the first review either.
+They checked about 300 and 230 claims of the documents against the records
+and the code, and recomputed about 190 and 150 of them. Neither found an
+error in a figure that decides the release, or in a criterion of the plan.
+The first reported 22 findings and the second 10. They are wrong or partial
+sentences, figures without a committed source, a lower bound given as a
+count, and two stale sentences of the notebooks. Each is corrected or
+answered there; the reports and scripts are in `m5/`.

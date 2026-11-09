@@ -1,7 +1,10 @@
 # The TP notebook of the pool `full`: the result
 
-Run on 9 November 2026, from 16:21 to 16:26 (UTC), as `PLAN.md` says, after
-M3, with nothing else on the machine (`e2.log`). The records are
+Run on 9 November 2026 as `PLAN.md` says, after M3, with nothing else on
+the machine. Neither `e2.log` nor the records carry times. The run was
+started by the command that committed and pushed the plan and the scripts
+(7fe0665, 16:21:31 UTC), after the push. The two record files were last
+written at 16:25:52 (their file times). The records are
 `e2_1.2.0.jsonl` and `e2_1.3.0.jsonl`, and the reading is `e2.txt`, from
 `e2_read.py`. There are 30 fits per version, the same fits in both, and no
 crash.

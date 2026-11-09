@@ -1,7 +1,7 @@
 # I.18.12 with 10 % noise under units: the result
 
 Run on 9 November 2026, from 14:47 to 14:57 (UTC), as `PLAN.md` says, after
-M2. The machine was the same as M2's: `machine_20261109T1447.txt` is
+M2. The processor was the same as M2's: `machine_20261109T1447.txt` is
 identical to `../machine_20261109T0435.txt`. The log
 is `run_e1.log`, the records are `e1_1.2.0.jsonl` and `e1_1.3.0.jsonl`, and
 the reading is `e1.txt`, from `examine.py`. There are 40 jobs per version,

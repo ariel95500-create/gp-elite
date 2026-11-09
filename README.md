@@ -213,7 +213,7 @@ another model, an approximation of R² 0.99998. Notebooks need nothing.
   function: where one of the engine's numerical safety nets acts on your data
   (a power clipped because its base exceeds 100 or its exponent 6 in absolute
   value, or its value a million; a division by a denominator within 1e-8 of
-  zero), or, rarely, where rounding ruins an ill-conditioned expression, it
+  zero; since 1.3, the argument of an arcsine clipped to [−1, 1]), or, rarely, where rounding ruins an ill-conditioned expression, it
   departs from `predict()` on those rows, `formula_exact` is False and the fit
   warns. In the measurements of 0.8
   ([`benchmarks/results_0.8/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.8)),

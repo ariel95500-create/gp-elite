@@ -1,0 +1,7 @@
+1.3.0 formulas of 160 characters: 590 (of which pool trig 236, physical 354)
+pool trig, cut, no arcsine in the visible part: 180 [('F41', 13), ('F41N1', 13), ('F41N10', 18), ('TF78', 48), ('TF78 under units', 20), ('TS14', 43), ('U41', 7), ('U41N1', 4), ('U41N10', 14)]
+pool trig fits with a visible arcsine: 105; trig fits cut: 236
+F41N1 arcsine formulas 12, of which structure retrieved 8
+F41N10 arcsine formulas 12, of which structure retrieved 1
+U41N1 arcsine formulas 17, of which structure retrieved 8
+U41N10 arcsine formulas 8, of which structure retrieved 0

@@ -1,0 +1,14 @@
+A_feyn      pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+B_cpu       pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+C_big       pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+D_units     pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+E_minmax    pool full     1.2.0 == 1.3.0: False  A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+F_robust    pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+G_restarts  pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+H_parallel  pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+I_sklearn   pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+J_extrap    pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+K_thorough  pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+L_standard  pool trig     1.2.0 == 1.3.0: False  A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+M_twice     pool physical 1.2.0 == 1.3.0: True   A3 candidate == 1.3.0: True  arcsine in 1.3.0: False
+total time 22.0 s -> 22.4 s

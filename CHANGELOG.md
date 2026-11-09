@@ -3,9 +3,10 @@
 ## 1.3.0
 
 The arcsine. The pools `trig` and `full` have a new operator, `arcsin`, the
-arcsine of its argument clipped to [-1, 1]. The pool `physical`, the
-default, and `poly` and `conserve` are left as they are: with them, the
-models of 1.2.0 at equal work. Each arcsine carries a constant factor in its
+arcsine of its argument clipped to [-1, 1]. The pools `physical`, the
+default, `poly` and `conserve` are left as they are: the change does not
+reach them in the code, and with the pool `physical`, the one measured, the
+models are those of 1.2.0 at equal work. Each arcsine carries a constant factor in its
 argument, which the fit of constants adjusts. The seeds that hold a function
 of a monomial gain the arcsine of a monomial, both the exact seeds and the
 noise-tolerant ones. On the ten trigonometric laws of the 41-equation bench,
@@ -51,8 +52,9 @@ constant (A2), they did in 3.
 - The seed y = b·f·arcsin(c·g), f and g monomials, where the pool has the
   arcsine: placed when it holds to numerical precision, and among the
   noise-tolerant seeds as the other forms. In the release measurement, the
-  exact seed was placed in the 10 fits of I.30.5 without noise, and the
-  noise-tolerant one in 25 noisy fits.
+  exact seed was placed in the 10 fits of I.30.5 without noise. The
+  noise-tolerant one was placed in 25 fits: the 20 of I.30.5 with noise, and
+  5 of feynman_test_1 of the frozen test set, which has none.
 
 ### Known limits
 - The seed reaches an arcsine of a monomial only. An arcsine of anything

@@ -233,7 +233,8 @@ Rien à faire dans un notebook.
   formule est la fonction mathématique pure : là où l'un des garde-fous
   numériques du moteur agit sur vos données (une puissance bornée parce que sa
   base dépasse 100 ou son exposant 6 en valeur absolue, ou sa valeur un million ;
-  une division par un dénominateur à moins de 1e-8 de zéro), ou, rarement, là où
+  une division par un dénominateur à moins de 1e-8 de zéro ; depuis la 1.3,
+  l'argument d'un arc sinus ramené dans [−1, 1]), ou, rarement, là où
   l'arrondi ruine une expression mal conditionnée, elle s'écarte de `predict()` sur
   ces lignes, `formula_exact` vaut False et l'ajustement le signale. Dans les
   mesures de la 0.8

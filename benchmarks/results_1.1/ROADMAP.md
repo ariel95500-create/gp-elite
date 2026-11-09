@@ -43,9 +43,13 @@ Kept apart from the plans of 1.1, which this file does not change.
    a monomial among the seeds, was adopted and kept on 9 November 2026:
    - the two arcsine laws of F41 are exact with the arcsine in 8 and 7 fits
      of 10 (none in 1.2.0);
-   - nothing is lost on the other laws.
+   - the other eight laws keep their count of exact fits on both sets of
+     seeds. On the second set, I.50.26 loses its one exact fit and III.17.37
+     gains one, within the criteria.
 
-   The release of 1.3 follows.
+   The measurements of its release, M1 to M5, were done on 9 November 2026
+   (`../results_1.3/release/README.md`); the author decides the publication
+   at gate 10.
 
 ## SRBench
 

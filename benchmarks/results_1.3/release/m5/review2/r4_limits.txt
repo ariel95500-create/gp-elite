@@ -1,0 +1,32 @@
+== 1.2.0
+  feyn: 41 problems, exact 163, never exact 7 ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.10.19', 'III.17.37', 'III.9.52']
+     once in five: ['I.11.19']
+  ufeyn: 41 problems, exact 166, never exact 6 ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+     once in five: []
+  tf: 78 problems, exact 213, never exact 34 
+  utf: 78 problems, exact 229, never exact 30 
+  TF78 by family: {'main': 203, 'bonus': 10} {'main': 290, 'bonus': 100}
+  formula_exact False, real+realraw (all splits): (11, 130)
+  formula_exact False, tr+trraw (all splits): (64, 500)
+  formula_exact False, real+realraw folds only: 5
+  bench collapses 10 of 65, worst -1946.1
+  tr collapses 37, top six 28
+  trraw collapses 28, top six 25
+== 1.3.0
+  feyn: 41 problems, exact 171, never exact 5 ['I.37.4', 'I.50.26', 'III.10.19', 'III.17.37', 'III.9.52']
+     once in five: ['I.11.19']
+  ufeyn: 41 problems, exact 174, never exact 4 ['I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+     once in five: []
+  tf: 78 problems, exact 214, never exact 33 
+  utf: 78 problems, exact 228, never exact 30 
+  TF78 by family: {'main': 204, 'bonus': 10} {'main': 290, 'bonus': 100}
+  formula_exact False, real+realraw (all splits): (11, 130)
+  formula_exact False, tr+trraw (all splits): (65, 500)
+  formula_exact False, real+realraw folds only: 5
+  bench collapses 10 of 65, worst -1946.1
+  tr collapses 37, top six 28
+  trraw collapses 28, top six 25
+1.2.0 U41 never: ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+1.3.0 U41 never: ['I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+feyn I.26.2 exact with arcsin seeds: [1, 2, 4]
+ufeyn I.26.2 exact with arcsin seeds: [2, 3, 4]
