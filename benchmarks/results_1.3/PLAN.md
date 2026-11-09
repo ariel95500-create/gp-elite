@@ -432,6 +432,31 @@ is what says the gain holds.
 If A3 is not adopted or not kept, the code of A1, A2 and A3 is withdrawn
 before the release, and the cause goes to the author.
 
+**Campaign held on 9 November 2026** (`a3/campaign/compare_a3.txt`; the
+candidate is commit 492863e in `/venv13c`, A the 1.2.0 wheel, paired on one
+4-core machine, no crash in 480 fits). **A3 is adopted: the six criteria
+hold.**
+
+| criterion | measure | result |
+|---|---|---|
+| 1 | arcsine laws on F41, exact with the arcsine | 8 of 10 (at least 5): I.30.5 in all five seeds, I.26.2 in seeds 1, 2 and 4 |
+| 2 | the eight other laws | F41 20 against 20, U41 20 against 20; no equation falls |
+| 3 | structure under noise | F41N1 23 against 15, F41N10 16 against 14 |
+| 4 | Snell's law on TP within 1 % | 18 against 18, 19 against 19 |
+| 5 | units | 70 of 70 models pass |
+| 6 | time on TP | 1.03 and 1.01 of A's |
+
+Beside, deciding nothing:
+- **Under units,** the two laws are exact with the arcsine in 8 fits of 10.
+- **The arcsine seed was placed in the 20 fits of I.30.5** (F41, U41, F41N1,
+  F41N10), and in no other fit.
+- **I.30.5 returns arcsin(v0 / (v1 · v2))** in all ten exact fits.
+- **Under noise,** I.30.5 has its structure retrieved in 5 fits of F41N1 and
+  none of F41N10.
+- **Snell's law on TP:** 0 of 40 in A and B, as the examination said.
+- **`formula_exact` is False** in 28 fits of B against 8 for A, as with A2.
+- **The median size** of the formulas is 16.5 against 19.0.
+
 ## The release of 1.3
 
 As for 1.2 (`../results_1.2/release/README.md`): M1 to M5, then gate 10.
