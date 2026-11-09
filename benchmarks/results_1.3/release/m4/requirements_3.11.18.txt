@@ -1,0 +1,18 @@
+cloudpickle==3.1.2
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel13/dist/gp_elite-1.3.0-py3-none-any.whl
+iniconfig==2.3.1
+joblib==1.6.0
+mpmath==1.3.0
+narwhals==2.27.1
+numpy==2.4.6
+packaging==26.3
+pandas==3.0.6
+pluggy==1.6.0
+pygments==2.21.0
+pytest==9.1.1
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+six==1.17.0
+sympy==1.14.0
+threadpoolctl==3.7.0
