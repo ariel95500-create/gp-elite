@@ -408,6 +408,15 @@ keep the six of phase 4a.
    and the fit returns the law with the arcsine.
 4. **Tests:** the suite passes, with new tests of the form.
 
+**Mechanics held on 9 November 2026** (commit 492863e, `a3/README.md`):
+1. **The pools without the arcsine are untouched:** the eleven reference
+   configurations and the 147 fits are identical to the 1.2.0 wheel.
+2. **The finder returns the form,** exponents (1, −1, −1) and c = 0.7. It
+   returns no arcsine where none holds, and finds tanh and exp as before.
+3. **I.30.5 on the bench rows,** seed 0: the seed is placed, and the fit
+   returns arcsin(v0 / (v1 · v2)), with 1 − R² of 3.9e-27.
+4. **The tests:** 182 pass.
+
 **Campaign A3 (decides).** The benches, engines and pairing of A2, with B
 now the candidate with A1, A2 and A3. A3 is adopted when the six criteria
 of A2 hold, unchanged: the arcsine laws on F41 exact with the arcsine in at

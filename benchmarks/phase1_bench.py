@@ -43,7 +43,8 @@ before.
 
 [1.3] --problems II.15.4,I.26.2,... keeps only the jobs of those problems
 (the bench Dtrig of benchmarks/results_1.3/PLAN.md). Without it the jobs are
-those of before.
+those of before. Every record also carries the seeds of phases 4a and 5 the
+fit placed (elementary_seed, tolerant_seed); the fits are unchanged.
 
 Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
@@ -250,6 +251,9 @@ def run_one(job):
         rec["seeds_under_units"] = bool(C._SEEDS_UNDER_UNITS)
     if job.get("defaults"):             # [1.2] the stop on patience, if any
         rec["patience_stop"] = C.TRACE.value.get("patience")
+    # [1.3] the seeds of phases 4a and 5 the fit placed (campaign A3)
+    rec["elementary_seed"] = C.TRACE.value.get("elementary_seed")
+    rec["tolerant_seed"] = C.TRACE.value.get("tolerant_seed")
     if x1:                              # [1.2] X1 checked in M2
         mine = [a for a, text in fcalls if text == r.expression]
         rec["x1_calls"] = len(fcalls)
