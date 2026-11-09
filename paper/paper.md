@@ -61,7 +61,9 @@ budget, so a fit of a ten-point laboratory table takes seconds instead of
 about half a minute (with the same formulas on the six laws of its French lab
 notebook); it prints an exponential law as
 one, $\exp(-t/\tau)$; and its time limit now bounds the start of the
-dimensional search as well.
+dimensional search as well. Version 1.3 adds the arcsine to its trigonometric
+operator sets, with the arcsine of a monomial among the forms fitted
+directly; the default operator set is left as it was.
 
 # Statement of need
 
@@ -218,7 +220,10 @@ returned under units in the release measurement (these equations with and
 without noise, and the frozen test set) passes the dimensional audit
 (`benchmarks/results_1.1/release/`). Measured beside 1.1.0 for the release of
 1.2.0, both versions recover 166 of 205 on these equations, and each of the
-1,005 models passes the audit again (`benchmarks/results_1.2/release/`). The
+1,005 models passes the audit again (`benchmarks/results_1.2/release/`).
+Measured beside 1.2.0 for the release of 1.3.0, whose arcsine brings back the
+two arcsine laws of the bench, 1.3.0 recovers 174 against 166, and each of
+the 1,005 models passes the audit (`benchmarks/results_1.3/release/`). The
 constraint guarantees that whatever is returned is physically coherent.
 
 Each release is also measured once on a test set frozen before any decision of
@@ -236,7 +241,9 @@ next), and on the frozen Feynman equations with their units 1.1.0 recovers 226
 exact laws in 390 fits against 169. Version 1.2.0, measured beside 1.1.0,
 gives the same counts on every suite of the frozen set: 214 exact laws in 390
 fits without units, 10 in 70 on the Strogatz systems and 229 in 390 with
-units. Three case studies
+units. Version 1.3.0, measured beside 1.2.0, recovers 214 exact laws in 390
+fits without units against 213, 8 in 70 on the Strogatz systems with both
+versions, and 228 in 390 with units against 229. Three case studies
 on public data accompany it: Kepler's third law with units, where the four
 inner planets give the product of the gravitational constant and the mass of
 the Sun within 0.002 % of its nominal value; Hubble's measurements of 1929; and
@@ -292,7 +299,9 @@ noise-tolerant seeds, the correction of the deduced constant and the case
 studies; for version 1.1, the seeds placed under declared units and the
 restriction of fitted exponents under units; for version 1.2, the stop on
 patience, the exponential printed as such and with its scale, and the
-correction of the typed start under declared units; the benchmark and
+correction of the typed start under declared units; for version 1.3, the
+arcsine operator, the constant factor of its argument and the seeds of the
+arcsine of a monomial; the benchmark and
 non-regression scripts distributed in the repository; and the drafting of the
 documentation and of this paper.
 
@@ -306,8 +315,9 @@ fixed set of seeds. The benchmark figures quoted in this paper were produced
 with the scripts in the repository, whose raw results, machine and dates are
 recorded in `benchmarks/results_0.8/`, for the figures of versions 0.9.0
 and 1.0.0 in `benchmarks/results_0.9/` (`phase3/`, `release/` and
-`release_1.0/`), for version 1.1.0 in `benchmarks/results_1.1/`, and for
-version 1.2.0 in `benchmarks/results_1.2/`, and the
+`release_1.0/`), for version 1.1.0 in `benchmarks/results_1.1/`, for
+version 1.2.0 in `benchmarks/results_1.2/`, and for version 1.3.0 in
+`benchmarks/results_1.3/`, and the
 project's test
 suite passes on
 the released version. The scientific claims and

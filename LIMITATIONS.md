@@ -34,13 +34,33 @@ noise, 10 collapses of 65 (the worst to −1,946) and 66 of 250 on the test set
 500, and under units 166 exact laws of 205. What 1.2 changes is the time of a
 fit under the defaults, and with it some of the models (points 8 and 10).
 
+Version 1.3 adds the arcsine to the pools `trig` and `full`, and leaves the
+pool `physical`, the default, as it was: with it, the models of 1.2 at equal
+work. Measured beside 1.2.0 for the release of 1.3
+(`benchmarks/results_1.3/release/`, the figures in `m2/limits_figures.txt`),
+1.3.0 gives:
+- 171 exact laws of 205 on the decision bench against 163, with five
+  equations never recovered against seven (point 1);
+- 116 and 87 structures under noise against 108 and 85;
+- under units, 174 exact laws of 205 against 166, with four equations never
+  recovered against six.
+
+Elsewhere the two versions give the same figures, or figures that move as
+they do from one campaign to the next. The figures of 1.3.0 are given first:
+- on the test set, 214 exact laws of 390 against 213 (204 and 203 of 290, 10
+  and 10 of 100), with 33 of its equations never recovered against 34;
+- 8 exact Strogatz fits of 70 with both;
+- 10 collapses of 65 with both (the worst to −1,946), and 65 of 250 on the
+  test set with both (37 standardised, 28 in their own units);
+- 11 departing formulas of 130 with both, and 65 of 500 against 64.
+
 ## 1. Laws it still misses
 
 On the 41 equations, the engine returns the exact law in 163 fits of 205 (0.9.0:
 88). Seven equations are never recovered:
 
 - **an arcsine**, `I.26.2` arcsin(n·sin θ) and `I.30.5` arcsin(λ/(n·d)): no
-  operator pool of the engine has the arcsine;
+  operator pool of 1.0 had the arcsine. Since 1.3, both come back (below);
 - **a sum of terms, one of them trigonometric**, `I.37.4`
   I1 + I2 + 2·√(I1·I2)·cos δ and `III.17.37` B·(1 + α·cos θ);
 - **nested or shifted arguments**, `I.50.26` x1·(cos ωt + α·cos² ωt) and
@@ -49,6 +69,19 @@ On the 41 equations, the engine returns the exact law in 163 fits of 205 (0.9.0:
 
 A sum of three products, `I.11.19`, comes back once in five fits. On the 78
 equations of the test set, 34 are never recovered.
+
+**Since 1.3, the arcsine.** The pools `trig` and `full` have the operator,
+and the seeds hold the arcsine of a monomial. In the release measurement of
+1.3, `I.30.5` comes back exact in 5 fits of 5, and `I.26.2` in 3 of 5. The
+engine then returns 171 exact laws of 205, and five equations are never
+recovered. Two things the arcsine does not reach:
+- **an arcsine whose argument is not a monomial,** such as the n·sin θ of
+  `I.26.2`. The search must build it, and at 30 s it did so in 3 fits of 5;
+- **Snell's law on a few noisy points,** i2 = arcsin(sin(i1)/n). With 10 or
+  20 points at 2 % or 5 % noise, the curves returned stand closer to the law
+  than the noise added (measured on a first version of the arcsine,
+  `benchmarks/results_1.3/a1/examine/`). The law comes back in none of the
+  40 fits of the TP diagnostic, with 1.2.0 or 1.3.0, on two sets of draws.
 
 ## 2. The gains are smaller away from the bench they were built for
 
@@ -99,6 +132,11 @@ the predictions finite; when one of them acts on your data, the printed formula
 departs from `predict()`. The engine then says so (`formula_exact` is False, with a
 warning that names the exact formulas of the Pareto front). On the real data this
 happened in 7 fits of 130 on the bench and 61 of 500 on the test set.
+
+Since 1.3, the arcsine is one of these guards: in the model its argument is
+clipped to [−1, 1], and in the printed formula it is not. In the pools with
+the arcsine, in the release measurement of 1.3, the formula departs in 82
+fits of 530, against 27 for 1.2.0. 47 of the 82 have an arcsine.
 
 ## 7. The same seed on another machine
 

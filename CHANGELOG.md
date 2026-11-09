@@ -11,6 +11,33 @@ a function of a monomial exactly gain the arcsine of a monomial. On the ten
 trigonometric laws of the 41-equation bench, the two arcsine laws, I.26.2
 and I.30.5, come back exact with the arcsine in 8 and 7 fits of 10, on two
 sets of seeds, where 1.2.0 had none; the other eight lose nothing.
+Measured on the package, side by side with 1.2.0 installed from PyPI
+(`benchmarks/results_1.3/release/`), at 30 s per fit, on the 2,780 fits of
+the bench, of its noisy and units kinds and of the frozen test set:
+
+- the two arcsine laws come back exact with the arcsine in 8 fits of 10,
+  with and without units: 171 exact laws of 205 on the decision bench against
+  163, and 174 against 166 with units. I.26.2 and I.30.5 leave the list of
+  the equations never recovered;
+- with noise, the structure comes back in 116 and 87 fits of 205 (1 % and
+  10 %) against 108 and 85, and with units in 121 and 95 against 113 and 98.
+  The last is a draw of five seeds: on twenty other seeds, Feynman I.18.12,
+  which makes the difference, keeps its structure in 12 fits of 20 with
+  both versions (`m2/examine/`);
+- with the pool `physical`, on the 706 fits where neither version reached
+  its budget, the formula, the error on the test rows and `formula_exact`
+  are those of 1.2.0, to the bit. The real data give the same medians and
+  the same collapses out of the training range;
+- every one of the 1,005 models returned under units passed the audit of
+  units;
+- on the frozen test set, which decides nothing: 214 exact laws of 390
+  against 213, 8 of 70 on its Strogatz systems with both versions, and 228
+  of 390 with units against 229.
+
+The change was decided by a comparison written before it ran
+(`benchmarks/results_1.3/PLAN.md`). Two simpler versions were measured
+first and not adopted: the operator alone (A1), which brought the arcsine
+laws back in 2 fits of 10, and the operator with its constant (A2), in 3.
 
 ### Added
 - The operator `arcsin` in the pools `trig` and `full`, printed `arcsin(...)`
@@ -20,11 +47,17 @@ sets of seeds, where 1.2.0 had none; the other eight lose nothing.
   numerical precision, where the pool has the arcsine.
 
 ### Known limits
+- The seed reaches an arcsine of a monomial only. An arcsine of anything
+  else, such as I.26.2, arcsin(n·sin θ), must be built by the search, which
+  returns it in 3 fits of 5 at 30 s.
 - Snell's law on a few noisy points: with 10 or 20 points at 2 % or 5 %
   noise, the curves returned differ from the law by less than the noise, and
-  the law does not come back (benchmarks/results_1.3/a1/examine).
-- Where the clip of the arcsine acts on the data, the printed formula departs
-  from the model, and `formula_exact` is False.
+  the law does not come back (`benchmarks/results_1.3/a1/examine/`).
+- The printed formula departs from the model more often in the pools with
+  the arcsine, and `formula_exact` says so: in 82 fits of 530 in the release
+  measurement against 27 for 1.2.0, 47 of the 82 with an arcsine. The
+  printed arcsine has no clip, so where the argument leaves [-1, 1] on the
+  data, the formula and `predict()` part.
 
 ## 1.2.0 — "Classroom"
 

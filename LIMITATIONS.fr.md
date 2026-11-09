@@ -37,13 +37,36 @@ unités), 12 formules qui s'écartent sur 130 et 65 sur 500, et avec les unités
 lois exactes sur 205. Ce que la 1.2 change, c'est le temps d'un ajustement avec
 les réglages par défaut, et avec lui une partie des modèles (points 8 et 10).
 
+La version 1.3 ajoute l'arc sinus aux jeux d'opérateurs `trig` et `full`, et
+laisse le jeu `physical`, celui par défaut, tel qu'il était : avec lui, les
+modèles de la 1.2 à travail égal. Mesurée à côté de la 1.2.0 pour la sortie de
+la 1.3 (`benchmarks/results_1.3/release/`, les chiffres dans
+`m2/limits_figures.txt`), la 1.3.0 donne :
+- 171 lois exactes sur 205 sur le banc de décision contre 163, et cinq
+  équations jamais retrouvées contre sept (point 1) ;
+- 116 et 87 structures sous bruit contre 108 et 85 ;
+- avec les unités, 174 lois exactes sur 205 contre 166, et quatre équations
+  jamais retrouvées contre six.
+
+Ailleurs, les deux versions donnent les mêmes chiffres, ou des chiffres qui
+bougent comme d'une campagne à l'autre. Les chiffres de la 1.3.0 viennent en
+premier :
+- sur le jeu de test, 214 lois exactes sur 390 contre 213 (204 et 203 sur 290,
+  10 et 10 sur 100), et 33 de ses équations jamais retrouvées contre 34 ;
+- 8 ajustements de Strogatz exacts sur 70 avec les deux ;
+- 10 effondrements sur 65 avec les deux (le pire à −1 946), et 65 sur 250 sur
+  le jeu de test avec les deux (37 standardisés, 28 dans leurs propres
+  unités) ;
+- 11 formules qui s'écartent sur 130 avec les deux, et 65 sur 500 contre 64.
+
 ## 1. Les lois qu'il manque encore
 
 Sur les 41 équations, le moteur rend la loi exacte dans 163 ajustements sur 205
 (0.9.0 : 88). Sept équations ne sont jamais retrouvées :
 
 - **un arc sinus**, `I.26.2` arcsin(n·sin θ) et `I.30.5` arcsin(λ/(n·d)) : aucun
-  jeu d'opérateurs du moteur n'a l'arc sinus ;
+  jeu d'opérateurs de la 1.0 n'avait l'arc sinus. Depuis la 1.3, les deux
+  reviennent (plus bas) ;
 - **une somme de termes dont l'un est trigonométrique**, `I.37.4`
   I1 + I2 + 2·√(I1·I2)·cos δ et `III.17.37` B·(1 + α·cos θ) ;
 - **des arguments imbriqués ou décalés**, `I.50.26` x1·(cos ωt + α·cos² ωt) et
@@ -52,6 +75,21 @@ Sur les 41 équations, le moteur rend la loi exacte dans 163 ajustements sur 205
 
 Une somme de trois produits, `I.11.19`, revient une fois sur cinq. Sur les 78
 équations du jeu de test, 34 ne sont jamais retrouvées.
+
+**Depuis la 1.3, l'arc sinus.** Les jeux `trig` et `full` ont l'opérateur, et
+les graines contiennent l'arc sinus d'un monôme. Dans la mesure de sortie de la
+1.3, `I.30.5` revient exacte dans 5 ajustements sur 5, et `I.26.2` dans 3 sur
+5. Le moteur rend alors 171 lois exactes sur 205, et cinq équations ne sont
+jamais retrouvées. Deux choses que l'arc sinus n'atteint pas :
+- **un arc sinus dont l'argument n'est pas un monôme,** comme le n·sin θ de
+  `I.26.2`. La recherche doit le construire, et à 30 s elle l'a fait dans 3
+  ajustements sur 5 ;
+- **la loi de Snell sur quelques points bruités,** i2 = arcsin(sin(i1)/n).
+  Avec 10 ou 20 points et 2 % ou 5 % de bruit, les courbes rendues sont plus
+  proches de la loi que le bruit ajouté (mesuré sur une première version de
+  l'arc sinus, `benchmarks/results_1.3/a1/examine/`). La loi ne revient dans
+  aucun des 40 ajustements du diagnostic des TP, avec la 1.2.0 comme avec la
+  1.3.0, sur deux séries de tirages.
 
 ## 2. Les gains sont moindres loin du banc pour lequel ils ont été conçus
 
@@ -107,6 +145,12 @@ données, la formule imprimée s'écarte de `predict()`. Le moteur le dit alors
 (`formula_exact` vaut False, avec un avertissement qui nomme les formules exactes
 du front de Pareto). Sur les données réelles, c'est arrivé dans 7 ajustements sur
 130 sur le banc et 61 sur 500 sur le jeu de test.
+
+Depuis la 1.3, l'arc sinus est l'une de ces protections : dans le modèle, son
+argument est ramené dans [−1, 1], et dans la formule imprimée il ne l'est pas.
+Dans les jeux qui ont l'arc sinus, dans la mesure de sortie de la 1.3, la
+formule s'écarte dans 82 ajustements sur 530, contre 27 pour la 1.2.0. 47 des
+82 ont un arc sinus.
 
 ## 7. La même graine sur une autre machine
 

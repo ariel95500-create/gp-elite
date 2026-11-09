@@ -333,7 +333,8 @@ meaningful, and to deduce the units and value of a constant (below, and the
 where the units also rule out a term the data alone would add). Since 1.1 the
 forms the engine fits directly act under `units=` as well: on the 41 Feynman
 equations of the decision bench with their units, five seeds at 30 s per fit,
-165 exact laws of 205 against 108 with 1.0, and 163 without units.
+165 exact laws of 205 against 108 with 1.0, and 163 without units (with the
+arcsine of 1.3, 174 and 171).
 **Not** for black-box prediction: the constraint rules out
 dimensionally wrong but numerically good approximations, so it can *lower* R²
 when fitting is the goal rather than finding a law.
@@ -466,7 +467,12 @@ against 169. The changes of 1.2 were decided the same way
 ([`benchmarks/results_1.2/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.2));
 measured beside 1.1 for the release of 1.2, both versions give the same counts on
 the frozen set, with and without units (214 exact laws of 390 on its Feynman
-equations, 10 of 70 on its Strogatz systems, and 229 of 390 with units).
+equations, 10 of 70 on its Strogatz systems, and 229 of 390 with units). The
+change of 1.3 was decided the same way
+([`benchmarks/results_1.3/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.3)).
+Measured beside 1.2 for the release of 1.3, on the frozen set, 1.3 recovers
+214 exact laws of 390 on its Feynman equations against 213, 8 of 70 on its
+Strogatz systems with both versions, and 228 of 390 with units against 229.
 
 GP_ELITE's niche: **zero barrier to entry**. A lab engineer, a student, or a technician points at a CSV file and gets a validated law back — without becoming a developer. `PySR` and `Operon` are faster and more accurate on large or hard problems; GP_ELITE does not claim otherwise.
 
@@ -511,6 +517,10 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## Technical features
 
+- **The arcsine** (v1.3): `arcsin` in the pools `'trig'` and `'full'`, its
+  argument clipped to [−1, 1] and given a constant factor that the fit of
+  constants adjusts, and among the forms fitted directly the arcsine of a
+  monomial, b·f·arcsin(c·g)
 - **Stop on patience** (v1.2): when the call sets neither `generations` nor
   `time_limit`, the search stops once its hold-out error (its training error
   when there is no hold-out) has not improved by 1 % in 30 generations
@@ -555,7 +565,12 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**1.2 "Classroom"** — a fit under the defaults stops once it no longer improves
+**1.3** — the arcsine, in the pools `trig` and `full`: on the 41 Feynman
+equations of the decision bench, its two arcsine laws come back exact in 8
+fits of 10, with and without units, where 1.2 had none. That makes 171 exact
+laws of 205 against 163, and 174 against 166 with units. The pool
+`physical`, the default, is left as it was: with it, the models of 1.2 at
+equal work. **1.2 "Classroom"** — a fit under the defaults stops once it no longer improves
 (`patience=`): the six laws of the French TP notebook in 48 s, against 194 to
 198 s for 1.1.0 on the same machine, with the same formulas; an exponential
 comes back written as one, `exp(-t / τ)`, the model unchanged; under `units=`,
