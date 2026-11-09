@@ -173,3 +173,53 @@ def test_typed_start_draws_arcsin_only_where_the_pool_has_it():
 
 def X_(i):
     return N("X[%d]" % i)
+
+
+# ── 1.3, A2: the arcsine with its own constant ────────────────────────────
+
+def test_arcsin_carries_its_own_constant():
+    cases = [
+        (N("arcsin", X_(0)), "arcsin((1.0 * X[0]))"),
+        (N("arcsin", N("*", N(2.0), X_(0))), "arcsin((2.0 * X[0]))"),
+        (N("arcsin", N("*", X_(0), N(3.0))), "arcsin((X[0] * 3.0))"),
+        (N("arcsin", N("/", N(2.0), X_(0))), "arcsin((2.0 / X[0]))"),
+        (N("arcsin", N("*", X_(0), N("sin", X_(1)))),
+         "arcsin((1.0 * (X[0] * sin(X[1]))))"),
+    ]
+    for t, want in cases:
+        once = core.simplify(t)
+        assert core.to_string(once) == want
+        twice = core.simplify(once)
+        assert twice.exact_hash() == once.exact_hash()
+    assert core.simplify(N("arcsin", N(0.5))).value == 0.5235987755982989
+    assert core.to_string(core.simplify(N("sin", X_(0)))) == "sin(X[0])"
+
+
+def _polished_error(tree, xs, ys, xt, yt):
+    cfg = core.make_cfg_nd(n_features=xs.shape[1])
+    pol = core._refit_scaling(core.optimize_constants_adam(tree.copy(), xs, ys, cfg),
+                              xs, ys)
+    conv = core._lm_to_convergence(pol, xs, ys, cfg)
+    out = core._refit_scaling(conv, xs, ys) if conv is not None else pol
+    p = core.evaluate_vector(out, xt)
+    return float(np.mean((p - yt) ** 2) / np.var(yt))
+
+
+def test_the_form_of_the_examination_comes_back_exact(monkeypatch):
+    """I.26.2 seed 2 of campaign A1 returned, in the engine's variables
+    (each divided by its largest value), arcsin(X0 * sin(4.964 * X1)), one
+    constant short of the law. With the arcsine's own constant, the
+    engine's polish makes it exact; without it, it cannot."""
+    r = np.random.RandomState(3)
+    X = np.c_[r.uniform(0, 1, 200), r.uniform(1, 5, 200)]
+    y = np.arcsin(X[:, 0] * np.sin(X[:, 1]))
+    xs = X / np.abs(X).max(axis=0)
+    inner = N("*", X_(0), N("sin", N("*", N(4.964236), X_(1))))
+    tree = N("+", N(-0.000573), N("*", N(0.982939), N("arcsin", inner)))
+    with np.errstate(all="ignore"):
+        e = _polished_error(core.simplify(tree), xs[:140], y[:140], xs[140:], y[140:])
+        assert e < 1e-20
+        monkeypatch.setattr(core, "_has_own_factor", lambda n: True)   # A1 alone
+        core._clear_simplify_caches()
+        e1 = _polished_error(core.simplify(tree), xs[:140], y[:140], xs[140:], y[140:])
+        assert e1 > 1e-6

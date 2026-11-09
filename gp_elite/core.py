@@ -5760,7 +5760,25 @@ def _simplify_node(v, left, right) -> Node:
     if v == "neg" and left is not None and left.value == "neg":
         return left.left
 
+    # [1.3-A2] L'arc sinus porte sa propre constante : arcsin(u) devient
+    # arcsin(1 * u), que l'ajustement des constantes règle comme les autres.
+    # Les variables sont divisées par leur maximum avant la recherche ; une
+    # loi en arcsin a donc besoin d'un facteur dans son argument, que le
+    # polissage ne sait pas ajouter (benchmarks/results_1.3/a1/examine).
+    if v == "arcsin" and left is not None and not _has_own_factor(left):
+        return Node("arcsin", Node("*", Node(1.0), left))
+
     return Node(v, left, right)
+
+
+def _has_own_factor(n) -> bool:
+    """[1.3-A2] Vrai si n est un produit ou un quotient dont l'opérande de
+    gauche est un nombre, ou un produit dont l'opérande de droite en est un."""
+    if n.value == "*":
+        return _is_float(n.left) or _is_float(n.right)
+    if n.value == "/":
+        return _is_float(n.left)
+    return False
 
 # ============================================================
 # OPTIMISATION DES CONSTANTES — Adam gradient numérique
