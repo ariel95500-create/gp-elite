@@ -323,6 +323,36 @@ criteria 1 to 4 hold there.
 If A2 is not adopted or not kept, the code of A1 and A2 is withdrawn before
 the release, and the cause goes to the author.
 
+**Campaign held on 9 November 2026** (`a2/campaign/compare_a2.txt`; the
+candidate is commit c6f8668 in `/venv13b`, A the 1.2.0 wheel, paired on one
+4-core machine, no crash in 480 fits). **A2 is not adopted: criterion 1
+fails.**
+
+| criterion | measure | result |
+|---|---|---|
+| 1 | arcsine laws on F41, exact with the arcsine | 3 of 10 (at least 5): I.26.2 seeds 1, 2 and 4; I.30.5 none |
+| 2 | the eight other laws | F41 20 against 20, U41 20 against 20; no equation falls |
+| 3 | structure under noise | F41N1 18 against 15, F41N10 16 against 14 |
+| 4 | Snell's law on TP within 1 % | 18 against 18, 19 against 19 |
+| 5 | units | 70 of 70 models pass |
+| 6 | time on TP | 1.01 and 1.01 of A's |
+
+Beside, deciding nothing:
+- **I.30.5** is exact in two fits, seeds 0 and 3, both with tanh and no
+  arcsine (1 − R² of 9e-14 and 2e-12).
+- **Under units,** I.26.2 is exact with the arcsine in 3 fits of 5, and
+  I.30.5 in none.
+- **Under noise,** the structure of I.26.2 is retrieved in 3 fits on F41N1
+  and 1 on F41N10.
+- **Snell's law on TP:** 0 of 40 by the diagnostic's test in A and in B, and
+  no formula of B has the arcsine. On clean data, 0 of 10 with B
+  (`a2/campaign/e2a_B.jsonl`).
+- **`formula_exact` is False** in 28 of the 200 fits of B on Dtrig, against
+  8 for A. 18 of those 28 have an arcsine whose clip acts on the data.
+
+The author decides what follows. As this plan says, the code of A1 and A2 is
+withdrawn before the release unless a later version is adopted.
+
 ## The release of 1.3
 
 As for 1.2 (`../results_1.2/release/README.md`): M1 to M5, then gate 10.
