@@ -348,7 +348,8 @@ Beside, deciding nothing:
   no formula of B has the arcsine. On clean data, 0 of 10 with B
   (`a2/campaign/e2a_B.jsonl`).
 - **`formula_exact` is False** in 28 of the 200 fits of B on Dtrig, against
-  8 for A. 18 of those 28 have an arcsine whose clip acts on the data.
+  8 for A. 18 of those 28 have an arcsine; whether its clip or another
+  guard makes the printed formula depart from the model is not recorded.
 
 The author decides what follows. As this plan says, the code of A1 and A2 is
 withdrawn before the release unless a later version is adopted.
