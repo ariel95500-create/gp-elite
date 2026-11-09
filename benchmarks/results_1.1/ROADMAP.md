@@ -38,7 +38,14 @@ Kept apart from the plans of 1.1, which this file does not change.
 6. **A version 1.3 with the arcsine** (chosen by Claude on 8 November 2026,
    the author having left the choice to him; the author asked for its plan
    the same day). Its plan is `../results_1.3/PLAN.md`, written before any
-   change; the author validates it at gate 9.
+   change; the author validated it at gate 9 on 8 November 2026. Its first
+   two versions, A1 and A2, were not adopted. The third, A3, the arcsine of
+   a monomial among the seeds, was adopted and kept on 9 November 2026:
+   - the two arcsine laws of F41 are exact with the arcsine in 8 and 7 fits
+     of 10 (none in 1.2.0);
+   - nothing is lost on the other laws.
+
+   The release of 1.3 follows.
 
 ## SRBench
 

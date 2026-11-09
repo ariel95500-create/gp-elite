@@ -457,6 +457,28 @@ Beside, deciding nothing:
 - **`formula_exact` is False** in 28 fits of B against 8 for A, as with A2.
 - **The median size** of the formulas is 16.5 against 19.0.
 
+**Confirmation held on 9 November 2026** (`a3/campaign/compare_a3_conf.txt`).
+Seeds 5 to 9 and draws 5 to 9, the same engines and machine, no crash in
+380 fits. The container restarted once during the run: the 33 paired
+records were whole, and the run resumed (`a3/campaign/driver_conf.log`).
+**A3 is kept: criteria 1 to 4 hold.**
+
+| criterion | measure | result |
+|---|---|---|
+| 1 | arcsine laws on F41, exact with the arcsine | 7 of 10 (at least 5): I.30.5 in all five seeds, I.26.2 in seeds 7 and 9 |
+| 2 | the eight other laws | F41 21 against 21; no equation falls |
+| 3 | structure under noise | F41N1 21 against 16, F41N10 14 against 12 |
+| 4 | Snell's law on TP within 1 % | 20 against 20, 20 against 20 |
+
+Beside, deciding nothing:
+- **The other laws:** I.50.26 goes from 1 exact fit to 0, and III.17.37 from
+  0 to 1.
+- **Snell's law on TP:** 0 of 40 in A and B.
+- **`formula_exact` is False** in 11 fits of B against 6 for A.
+
+So 1.3 has the arcsine: A1, A2 and A3, commit 492863e. The release follows,
+as below.
+
 ## The release of 1.3
 
 As for 1.2 (`../results_1.2/release/README.md`): M1 to M5, then gate 10.
