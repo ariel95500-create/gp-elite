@@ -282,6 +282,15 @@ constant into every arcsine the search draws.
    A1 alone it does not.
 4. **Tests:** the suite passes, with new tests of the rule.
 
+**Mechanics held on 9 November 2026** (commit c6f8668, `a2/README.md`):
+1. **The pools without the arcsine are untouched:** the eleven reference
+   configurations and the 147 fits are identical to the 1.2.0 wheel.
+2. **The rule holds**, and simplifying twice gives the same tree.
+3. **The form of the examination comes back exact:** on the training rows of
+   I.26.2, 1 − R² of 4.3e-31 on the test rows, against 8.1e-4 with A1 alone.
+   The fitted factor, 0.988241, is the scale of n.
+4. **The tests:** 179 pass.
+
 **Campaign A2 (decides).** It runs the same benches as A1, Dtrig and
 TPsnell, seeds 0 to 4 and draws 0 to 4. A is the 1.2.0 wheel, and B the
 candidate with A1 and A2, paired. A2 is adopted when all of these hold:
