@@ -8,6 +8,17 @@
 # /venv13rx gp_elite files 11 identical to commit 5492296: True
 # /venv12p: 11 gp_elite files of the published 1.2.0 wheel; differ: none
 
+# SHA-256 of the files to publish, built again from commit 36d65bb after the decision of gate 10
+# (python -m build from a clean export of the commit, git archive), 10 November 2026:
+38bcdcd589d571f1bf07341294d56ffcf006a8525f15719ef1254633195007a0  gp_elite-1.3.0-py3-none-any.whl
+3c065ac6229c266603f31e19010583f3533644f30d70382c21aabbc8f85c0f91  gp_elite-1.3.0.tar.gz
+# Every gp_elite/ file of the wheel (11, py.typed included) and of the source archive is identical
+# to those of the files measured above; the wheel differs in gp_elite-1.3.0.dist-info/METADATA (the
+# description, from the README; the headers are identical) and in the line of METADATA in RECORD,
+# the source archive in PKG-INFO, gp_elite.egg-info/PKG-INFO and README.md. twine check --strict
+# passes for both. Installed in a fresh environment with the packages of /venv13r, the wheel
+# imports as 1.3.0 and fits 2 * X0 * X1.
+
 # /venv13r (3.11.18) — uv pip freeze
 cloudpickle==3.1.2
 gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel13/dist/gp_elite-1.3.0-py3-none-any.whl#sha256=84b22ac3f3328ba68438782956eaa62a62da9595b0c6b5e6b855672bed122ffe
