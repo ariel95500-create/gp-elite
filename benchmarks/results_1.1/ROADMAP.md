@@ -54,6 +54,14 @@ Kept apart from the plans of 1.1, which this file does not change.
    name the arcsine among its safety nets, and a printed formula that would
    show the clip of the arcsine. Done: 1.3.0 "Arc" was published on
    10 November 2026 (`../results_1.3/release/README.md`).
+7. **A version 1.4 on noise and small tables** (10 November 2026). The
+   author asked for a review of the weaknesses of the engine
+   (`../results_1.4/analysis/README.md`): the first is noise, and under
+   noise the seeds decide. He then asked for the plan of 1.4,
+   `../results_1.4/PLAN.md`, written before any change: the noise-tolerant
+   seed finders, the choice of the model on tables below 30 rows, a seed for
+   a constant plus an exponential, and a frozen test set for teaching. The
+   plan waits for his validation (gate 11).
 
 ## SRBench
 

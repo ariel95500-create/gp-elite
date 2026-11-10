@@ -1,0 +1,16 @@
+gp-elite 1.3.0, /venv13p/lib/python3.11/site-packages/gp_elite/__init__.py
+
+1. III.15.12, columns (U, k, d) = (0, 1, 2): the true form has f = U and g = k*d
+  feyn_n1, 112 training rows after the hold-out: the finder returns f = ((0, 1.0), (2, 1.5)), g = ((1, 1),)
+      best of its library: g = ((1, 1), (2, 1)), exponents of f (1,), unexplained share 1.10e-04
+      seeds placed: (((v0 * (v1)²) * (v2)²) * (1.0 + (-0.803253 * (v1 * v2)))) (0.002) | (((v0 * (v1)²) * (v2)²) * sqrt((1.0 + (-1.022173 * (v1 * v2))))) (0.0053) | ((v0 / (v1 * v2)) * tanh((3.65076 * ((v1 * (v1)²) * (v2 * (v2)²))))) (0.0054) | ((v0 
+  feyn_n10, 112 training rows after the hold-out: the finder returns f = ((0, 1.0),), g = ((1, 1), (2, 1))
+      best of its library: g = ((1, 1), (2, 1)), exponents of f (1,), unexplained share 1.07e-02
+      seeds placed: (v0 * ((1.0 + (-0.07348 * sin((4.037457 * (v1 * v2))))) + (-0.952237 * cos((4.037457 * (v1 * v2)))))) (0.011)
+
+2. tables of the TP diagnostic, plain arm: the seeds placed
+  pendule          10 points, 5 %, draw 3: exact seeds []; noise-tolerant: None
+  pendule          10 points, 2 %, draw 0: exact seeds []; noise-tolerant: (sqrt(L) / sqrt((1.0 + (-0.045903 * (L)²)))) (0.0028) | (sqrt(L) / (1.0 + (-0.023084 * (L)²))) (0.0028) | (sqrt(L) * (1.0 + (0.023351 * (L)²))) (0.002
+  ressort          10 points, 5 %, draw 0: exact seeds []; noise-tolerant: None
+  lentille         20 points, 2 %, draw 0: exact seeds []; noise-tolerant: (1.0 / (1.0 + (-0.168165 * (1.0 / p)))) (0.0032) | ((p)² * exp((3.697792 * (1.0 / sqrt(p))))) (0.0088) | (1.0 + (0.137545 * (1.0 / (p)²))) (0.013)
+  refroidissement  20 points, 2 %, draw 2: exact seeds []; noise-tolerant: None

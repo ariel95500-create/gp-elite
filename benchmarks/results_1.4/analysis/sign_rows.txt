@@ -1,0 +1,19 @@
+equations whose clean training target has one sign and whose noisy target has not (rows of the other sign, of the training rows)
+equation   law                                      1 % noise      10 % noise    
+I.6.20a    exp(-th^2/2)/sqrt(2*pi)                  one sign       6 of 140      
+I.34.8     q*v*B/p                                  one sign       1 of 140      
+I.18.12    r*F*sin(th)                              one sign       2 of 140      
+III.15.12  2*U*(1-cos(k*d))                         one sign       2 of 140      
+I.29.4     om/c                                     one sign       1 of 140      
+I.32.5     q^2*a^2/(6*pi*eps*c^3)                   14 of 140      32 of 140     
+I.37.4     I1+I2+2*sqrt(I1*I2)*cos(d)               1 of 140       5 of 140      
+I.40.1     n0*exp(-m*g*x/(kb*T))                    15 of 140      24 of 140     
+I.44.4     n*kb*T*log(V2/V1)                        one sign       3 of 140      
+II.11.27   n*al*eps*Ef/(1-n*al/3)                   3 of 140       9 of 140      
+II.35.18   n0/(exp(mom*B/(kb*T))+exp(-mom*B/(kb*T)) 2 of 140       4 of 140      
+III.9.52   pd*Ef*t/h*sin((w-w0)*t/2)^2              3 of 140       12 of 140     
+III.17.37  B*(1+al*cos(th))                         one sign       1 of 140      
+III.19.51  -m*q^4/(2*(4*pi*eps)^2*h^2*n^2)          5 of 140       22 of 140     
+
+7 equations of 41 at 1 % noise and 14 at 10 % lose the single sign of their target.
+equations whose clean target already has two signs (no such seed, with or without noise): II.15.4, I.26.2, I.50.26, II.2.42, II.6.15b
