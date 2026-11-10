@@ -1,0 +1,90 @@
+Dtrig: 150 fits in A, 150 in B, the same jobs: True; crashes A 0, B 0
+TPsnell: 40 fits in A, 40 in B, the same jobs: True; crashes A 0, B 0
+Engines: A ['/venv12p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv13c/lib/python3.11/site-packages/gp_elite/__init__.py']
+
+| kind | A, ten equations | B | A, the two arcsine laws | B |
+|---|---|---|---|---|
+| F41 | 21 | 28 | 0 | 7 |
+| F41N1 | 16 | 21 | 0 | 6 |
+| F41N10 | 12 | 14 | 0 | 0 |
+
+Per equation, F41, F41N1, F41N10:
+  II.15.4    F41 5 -> 5  F41N1 5 -> 5  F41N10 5 -> 5
+  I.18.12    F41 5 -> 5  F41N1 5 -> 5  F41N10 5 -> 5
+  III.15.12  F41 5 -> 5  F41N1 0 -> 0  F41N10 2 -> 4
+  I.26.2     F41 0 -> 2  F41N1 0 -> 1  F41N10 0 -> 0
+  I.30.5     F41 0 -> 5  F41N1 0 -> 5  F41N10 0 -> 0
+  I.37.4     F41 0 -> 0  F41N1 0 -> 0  F41N10 0 -> 0
+  I.50.26    F41 1 -> 0  F41N1 0 -> 0  F41N10 0 -> 0
+  II.6.15b   F41 5 -> 5  F41N1 5 -> 5  F41N10 0 -> 0
+  III.9.52   F41 0 -> 0  F41N1 0 -> 0  F41N10 0 -> 0
+  III.17.37  F41 0 -> 1  F41N1 1 -> 0  F41N10 0 -> 0
+
+The fits of the arcsine laws in B (F41):
+  feyn I.26.2 seed 5: MISS, arcsine in the formula False, 1 - R² 0.00185: -0.00127948 + 0.682871 * (exp(1.0119 * v0 - 1.12155) + cos(0.750796 * (log(v0) + 1.37291) * cos(1.01184 * v1))
+  feyn I.26.2 seed 6: MISS, arcsine in the formula False, 1 - R² 0.00545: -0.0307172 + 1.01542 * v0 * (-0.0507687 + sin(0.999161 * v1) + 0.412973 * cos(5.51544 * cos(sin(tanh((1.0119 *
+  feyn I.26.2 seed 7: EXACT, arcsine in the formula True, 1 - R² 1.24e-30: arcsin(sin(v1) * v0)
+  feyn I.26.2 seed 8: MISS, arcsine in the formula False, 1 - R² 0.00441: -0.000438867 + 1.23533 * sqrt((1.0119 * v0)^(1.0119 * v0)) * sin(0.998685 * v1) * v0
+  feyn I.26.2 seed 9: EXACT, arcsine in the formula True, 1 - R² 1.67e-31: arcsin(sin(v1) * v0)
+  feyn I.30.5 seed 5: EXACT, arcsine in the formula True, 1 - R² 3.89e-27: arcsin(v0 / (v1 * v2))
+  feyn I.30.5 seed 6: EXACT, arcsine in the formula True, 1 - R² 3.89e-27: arcsin(v0 / (v1 * v2))
+  feyn I.30.5 seed 7: EXACT, arcsine in the formula True, 1 - R² 3.89e-27: arcsin(v0 / (v1 * v2))
+  feyn I.30.5 seed 8: EXACT, arcsine in the formula True, 1 - R² 3.89e-27: arcsin(v0 / (v1 * v2))
+  feyn I.30.5 seed 9: EXACT, arcsine in the formula True, 1 - R² 3.89e-27: arcsin(v0 / (v1 * v2))
+
+TPsnell: | arm | law A | law B | useful A | useful B | median time A | B |
+  | plain | 0 | 0 | 20 | 20 | 6.9 s | 6.5 s |
+  | units | 0 | 0 | 20 | 20 | 4.8 s | 5.2 s |
+
+Criteria of change A2, kept for A3, written before the run (PLAN.md), confirmation:
+  [holds] 1. the arcsine laws on F41: at least 5 of 10 exact with a formula that writes the arcsine, in B (7; exact in all 7)
+  [holds] 2. F41, the eight other equations: B no fewer than A - 2 (21, 21)
+  [holds] 2. F41: no equation from three seeds or more to one or none (none)
+  [holds] 3. F41N1: B no fewer than A - 2 (16, 21)
+  [holds] 3. F41N10: B no fewer than A - 2 (12, 14)
+  [holds] 4. Snell's law on TP within 1 %, plain: B no fewer than A - 2 (20, 20)
+  [holds] 4. Snell's law on TP within 1 %, units: B no fewer than A - 2 (20, 20)
+A3 KEPT
+
+Beside, deciding nothing:
+  Snell's law on TP by the diagnostic's test: A 0, B 0 of 40; formulas of B with the arcsine 0
+  A: median size 22.0; formula_exact False in 6 of 150; formulas with the arcsine 0 (formula_exact False among them 0); median time 30.5 s
+  B: median size 19.0; formula_exact False in 11 of 150; formulas with the arcsine 23 (formula_exact False among them 7); median time 30.5 s
+  fits of B where an arcsine seed was placed, by kind: {'feyn': 5, 'feyn_n1': 5, 'feyn_n10': 5}
+    feyn I.30.5 seed 5: arcsin((0.080928 * (v0 / (v1 * v2)))) -> EXACT
+    feyn I.30.5 seed 6: arcsin((0.080928 * (v0 / (v1 * v2)))) -> EXACT
+    feyn I.30.5 seed 7: arcsin((0.080928 * (v0 / (v1 * v2)))) -> EXACT
+    feyn I.30.5 seed 8: arcsin((0.080928 * (v0 / (v1 * v2)))) -> EXACT
+    feyn I.30.5 seed 9: arcsin((0.080928 * (v0 / (v1 * v2)))) -> EXACT
+    feyn_n1 I.30.5 seed 5: arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 * v2)) /  -> NEAR
+    feyn_n1 I.30.5 seed 6: arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 * v2)) /  -> NEAR
+    feyn_n1 I.30.5 seed 7: arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 * v2)) /  -> NEAR
+    feyn_n1 I.30.5 seed 8: arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 * v2)) /  -> NEAR
+    feyn_n1 I.30.5 seed 9: arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 * v2)) /  -> NEAR
+    feyn_n10 I.30.5 seed 5: arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v2)) (0.01) -> MISS
+    feyn_n10 I.30.5 seed 6: arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v2)) (0.01) -> MISS
+    feyn_n10 I.30.5 seed 7: arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v2)) (0.01) -> MISS
+    feyn_n10 I.30.5 seed 8: arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v2)) (0.01) -> MISS
+    feyn_n10 I.30.5 seed 9: arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v2)) (0.01) -> MISS
+  fits of Dtrig whose status changes: 21
+    feyn I.26.2 seed 7: MISS -> EXACT
+    feyn I.26.2 seed 9: MISS -> EXACT
+    feyn I.30.5 seed 5: NEAR -> EXACT
+    feyn I.30.5 seed 6: NEAR -> EXACT
+    feyn I.30.5 seed 7: NEAR -> EXACT
+    feyn I.30.5 seed 8: NEAR -> EXACT
+    feyn I.30.5 seed 9: NEAR -> EXACT
+    feyn I.37.4 seed 5: MISS -> NEAR
+    feyn I.37.4 seed 7: NEAR -> MISS
+    feyn I.50.26 seed 7: EXACT -> MISS
+    feyn I.50.26 seed 8: NEAR -> MISS
+    feyn III.17.37 seed 5: MISS -> EXACT
+    feyn_n1 I.26.2 seed 9: MISS -> NEAR
+    feyn_n1 I.37.4 seed 7: MISS -> NEAR
+    feyn_n1 III.17.37 seed 6: NEAR -> MISS
+    feyn_n1 III.17.37 seed 9: NEAR -> MISS
+    feyn_n10 III.15.12 seed 6: MISS -> NEAR
+    feyn_n10 III.15.12 seed 7: MISS -> NEAR
+    feyn_n10 III.15.12 seed 8: NEAR -> MISS
+    feyn_n10 III.15.12 seed 9: MISS -> NEAR
+    feyn_n10 III.17.37 seed 8: NEAR -> MISS

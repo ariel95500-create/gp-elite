@@ -11,6 +11,11 @@ one BLAS thread; the engine is the gp_elite package of the given Python.
            --out benchmarks/results_1.1/tp/tp_1.0.0.jsonl --workers 4
     python benchmarks/tp_diagnostic.py summary benchmarks/results_1.1/tp/tp_1.0.0.jsonl
 
+[1.3] --experiments snell keeps only the jobs of those experiments (the
+bench TPsnell of benchmarks/results_1.3/PLAN.md); without it the jobs are
+those of before. The units arm also records units_ok, the check of
+dimensions of the model returned.
+
 [1.2] --draws 5,6,7,8,9 runs other draws (the confirmation of plan 1.2); the
 default is the draws 0 to 4 of the diagnostic. The record also gives the
 generations run, the stop on patience if any, and err_train.
@@ -214,6 +219,14 @@ def worker(job):
         p_tr = np.asarray(r.predict(X), dtype=float)
     e_tr = one_minus_r2(y, p_tr)
     rec["err_train"] = float(e_tr) if np.isfinite(e_tr) else 1e30
+    # [1.3] the guarantee of units= on the model returned (campaign A1,
+    # benchmarks/results_1.3/PLAN.md), as phase1_bench.py records it
+    if job["arm"] == "units":
+        from gp_elite.dimensions import check_dimensions
+        ok, msg = check_dimensions(
+            r.node, {i: dict(u) for i, (_nm, _lo, _hi, u) in enumerate(e["inputs"])},
+            dict(e["target"]))
+        rec["units_ok"], rec["units_msg"] = bool(ok), msg[:120]
     return rec
 
 
@@ -239,10 +252,16 @@ def _done(out):
     return done
 
 
-def run(python, out, workers, arm=None, draws=DRAWS):
+def _keep(j, arm, exps):
+    """The jobs a run keeps: its arm, and [1.3] its experiments."""
+    return ((arm is None or j["arm"] == arm)
+            and (exps is None or j["exp"] in exps))
+
+
+def run(python, out, workers, arm=None, draws=DRAWS, exps=None):
     done = _done(out)
     jobs = [j for j in all_jobs(draws) if key(j) not in done
-            and (arm is None or j["arm"] == arm)]
+            and _keep(j, arm, exps)]
     print("%d jobs to run, %d already done" % (len(jobs), len(done)))
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
                OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
@@ -266,11 +285,11 @@ def run(python, out, workers, arm=None, draws=DRAWS):
                 sys.stdout.flush()
 
 
-def run_paired(pythons, outs, workers, arm=None, draws=DRAWS):
+def run_paired(pythons, outs, workers, arm=None, draws=DRAWS, exps=None):
     """Each job with every engine at the same time (one process per fit), so
     that their times compare; `workers` jobs at a time."""
     dones = [_done(o) for o in outs]
-    jobs = [j for j in all_jobs(draws) if (arm is None or j["arm"] == arm)
+    jobs = [j for j in all_jobs(draws) if _keep(j, arm, exps)
             and any(key(j) not in d for d in dones)]
     print("%d jobs to run with %d engines" % (len(jobs), len(pythons)))
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
@@ -392,12 +411,14 @@ def main():
     r.add_argument("--workers", type=int, default=4)
     r.add_argument("--arm", choices=ARMS)
     r.add_argument("--draws", default=None)
+    r.add_argument("--experiments", default=None)
     rp = sub.add_parser("run-paired")
     rp.add_argument("--python", action="append", required=True)
     rp.add_argument("--out", action="append", required=True)
     rp.add_argument("--workers", type=int, default=2)
     rp.add_argument("--arm", choices=ARMS)
     rp.add_argument("--draws", default=None)
+    rp.add_argument("--experiments", default=None)
     w = sub.add_parser("worker")
     w.add_argument("job")
     s = sub.add_parser("summary")
@@ -405,13 +426,15 @@ def main():
     a = ap.parse_args()
     draws = (tuple(int(x) for x in a.draws.split(","))
              if getattr(a, "draws", None) else DRAWS)
+    exps = (a.experiments.split(",") if getattr(a, "experiments", None)
+            else None)
     if a.cmd == "run":
         os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
-        run(a.python, a.out, a.workers, a.arm, draws)
+        run(a.python, a.out, a.workers, a.arm, draws, exps)
     elif a.cmd == "run-paired":
         for o in a.out:
             os.makedirs(os.path.dirname(os.path.abspath(o)), exist_ok=True)
-        run_paired(a.python, a.out, a.workers, a.arm, draws)
+        run_paired(a.python, a.out, a.workers, a.arm, draws, exps)
     elif a.cmd == "worker":
         sys.path.insert(0, HERE)
         print(json.dumps(worker(json.loads(a.job))))

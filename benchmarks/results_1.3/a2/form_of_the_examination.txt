@@ -1,0 +1,2 @@
+venv13a simplified: (-0.000573 + (0.982939 * arcsin((X[0] * sin((4.964236 * X[1])))))) | polished 1-R2 on the test rows: 0.000806 | (-0.000605 + (0.982891 * arcsin((X[0] * sin((4.964442 * X[1]))))))
+venv13b simplified: (-0.000573 + (0.982939 * arcsin((1.0 * (X[0] * sin((4.964236 * X[1]))))))) | polished 1-R2 on the test rows: 4.3e-31 | (-0.0 + (1.0 * arcsin((0.988241 * (X[0] * sin((4.965655 * X[1])))))))

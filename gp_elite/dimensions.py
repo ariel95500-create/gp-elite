@@ -67,7 +67,8 @@ class _DimError(Exception):
 
 
 # functions whose argument MUST be dimensionless, and whose result is too
-_TRANSCENDENTAL = {"exp", "log", "sin", "cos", "tan", "tanh", "sinh", "cosh"}
+_TRANSCENDENTAL = {"exp", "log", "sin", "cos", "tan", "tanh", "sinh", "cosh",
+                   "arcsin"}                       # [1.3-A1]
 
 
 def _infer(node, feat_dims):

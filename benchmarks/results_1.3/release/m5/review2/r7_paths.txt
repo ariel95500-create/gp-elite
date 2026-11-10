@@ -1,0 +1,89 @@
+ok    README.md                                     benchmarks/feynman_scaling.py
+ok    README.md                                     benchmarks/results_1.3/
+ok    README.md                                     benchmarks/results_1.3
+ok    README.fr.md                                  benchmarks/feynman_scaling.py
+ok    README.fr.md                                  benchmarks/results_1.3/
+ok    README.fr.md                                  benchmarks/results_1.3
+ok    CHANGELOG.md                                  benchmarks/results_1.3/release/
+ok    CHANGELOG.md                                  benchmarks/results_1.3/release/m2/examine/
+ok    CHANGELOG.md                                  benchmarks/results_1.3/PLAN.md
+ok    CHANGELOG.md                                  benchmarks/results_1.3/a1/examine/
+ok    CHANGELOG.md                                  benchmarks/results_1.3/release/m3/
+ok    LIMITATIONS.md                                benchmarks/results_1.3/release/
+ok    LIMITATIONS.md                                m2/limits_figures.txt   (not relative to the document; found at benchmarks/results_1.3/release/m2/limits_figures.txt)
+ok    LIMITATIONS.md                                benchmarks/results_1.3/a1/examine/
+MISS  LIMITATIONS.md                                release_1.0/m3/kepler_minmax_check.txt
+ok    LIMITATIONS.md                                benchmarks/results_1.3/release/m3/kepler_minmax_check.txt
+ok    LIMITATIONS.md                                examples/tp_regression_symbolique.ipynb
+ok    LIMITATIONS.md                                benchmarks/results_1.3/release/m3/examine/
+ok    LIMITATIONS.fr.md                             benchmarks/results_1.3/release/
+ok    LIMITATIONS.fr.md                             m2/limits_figures.txt   (not relative to the document; found at benchmarks/results_1.3/release/m2/limits_figures.txt)
+ok    LIMITATIONS.fr.md                             benchmarks/results_1.3/a1/examine/
+MISS  LIMITATIONS.fr.md                             release_1.0/m3/kepler_minmax_check.txt
+ok    LIMITATIONS.fr.md                             benchmarks/results_1.3/release/m3/kepler_minmax_check.txt
+ok    LIMITATIONS.fr.md                             examples/tp_regression_symbolique.ipynb
+ok    LIMITATIONS.fr.md                             benchmarks/results_1.3/release/m3/examine/
+ok    paper/paper.md                                benchmarks/results_1.2/release/   (not relative to the document; found at benchmarks/results_1.2/release)
+ok    paper/paper.md                                benchmarks/results_1.3/release/   (not relative to the document; found at benchmarks/results_1.3/release)
+MISS  paper/paper.md                                release_1.0/
+ok    paper/paper.md                                benchmarks/results_1.1/   (not relative to the document; found at benchmarks/results_1.1)
+ok    paper/paper.md                                benchmarks/results_1.2/   (not relative to the document; found at benchmarks/results_1.2)
+ok    paper/paper.md                                benchmarks/results_1.3/   (not relative to the document; found at benchmarks/results_1.3)
+ok    benchmarks/results_1.1/DIAGNOSTIC_TP.md       ../results_1.3/PLAN.md
+ok    benchmarks/results_1.1/DIAGNOSTIC_TP.md       ../results_1.3/a1/examine/README.md
+ok    benchmarks/results_1.1/DIAGNOSTIC_TP.md       ../results_1.3/a2/campaign/e2a_B.jsonl
+ok    benchmarks/results_1.1/ROADMAP.md             release/README.md
+ok    benchmarks/results_1.1/ROADMAP.md             ../results_1.2/
+ok    benchmarks/results_1.1/ROADMAP.md             ../results_1.2/release/README.md
+ok    benchmarks/results_1.1/ROADMAP.md             ../results_1.2/budget_study/PLAN.md
+ok    benchmarks/results_1.1/ROADMAP.md             ../results_1.2/budget_study/README.md
+ok    benchmarks/results_1.1/ROADMAP.md             ../results_1.2/end_of_search/PLAN.md
+ok    benchmarks/results_1.1/ROADMAP.md             ../results_1.2/end_of_search/README.md
+ok    benchmarks/results_1.1/ROADMAP.md             ../results_1.3/PLAN.md
+MISS  benchmarks/results_1.1/ROADMAP.md             cavalab/srbench
+ok    benchmarks/results_1.1/ROADMAP.md             srbench_2aabbb6/
+MISS  benchmarks/results_1.1/ROADMAP.md             algorithms/gp-elite/requirements.txt
+MISS  benchmarks/results_1.1/ROADMAP.md             experiment/methods/gp-elite/regressor.py
+ok    benchmarks/results_1.1/ROADMAP.md             srbench_settings/README.md
+ok    benchmarks/results_1.1/ROADMAP.md             srbench_settings/PLAN.md
+ok    benchmarks/results_1.3/release/README.md      ../PLAN_RELEASE_1.3.md
+ok    benchmarks/results_1.3/release/README.md      m2/machine_20261109T0435.txt
+ok    benchmarks/results_1.3/release/README.md      /venv13r
+ok    benchmarks/results_1.3/release/README.md      /venv13rx
+ok    benchmarks/results_1.3/release/README.md      /venv12p
+ok    benchmarks/results_1.3/release/README.md      gp_elite/   (not relative to the document; found at gp_elite)
+ok    benchmarks/results_1.3/release/README.md      M1_equiv_1.2.0/
+ok    benchmarks/results_1.3/release/README.md      M1_equiv_1.3.0/
+ok    benchmarks/results_1.3/release/README.md      benchmarks/speed_equivalence.py   (not relative to the document; found at benchmarks/speed_equivalence.py)
+ok    benchmarks/results_1.3/release/README.md      m2/campaignR_1.2.0.jsonl
+ok    benchmarks/results_1.3/release/README.md      m2/campaignR_1.3.0.jsonl
+ok    benchmarks/results_1.3/release/README.md      m2/driver.sh
+ok    benchmarks/results_1.3/release/README.md      benchmarks/   (not relative to the document; found at benchmarks)
+ok    benchmarks/results_1.3/release/README.md      m2/driver.log
+MISS  benchmarks/results_1.3/release/README.md      m2/tables_*.md
+ok    benchmarks/results_1.3/release/README.md      benchmarks/phase1_report.py   (not relative to the document; found at benchmarks/phase1_report.py)
+ok    benchmarks/results_1.3/release/README.md      m2/compare.txt
+ok    benchmarks/results_1.3/release/README.md      benchmarks/release_claims/compare_m2_1.3.py   (not relative to the document; found at benchmarks/release_claims/compare_m2_1.3.py)
+ok    benchmarks/results_1.3/release/README.md      m2/details.txt
+ok    benchmarks/results_1.3/release/README.md      m2/limits_figures.txt
+ok    benchmarks/results_1.3/release/README.md      m2/examine/
+ok    benchmarks/results_1.3/release/README.md      m2/arcsine_formulas.txt
+ok    benchmarks/results_1.3/release/README.md      m2/arcsine_formulas.py
+ok    benchmarks/results_1.3/release/README.md      m3/
+ok    benchmarks/results_1.3/release/README.md      m3/m3_driver.sh
+ok    benchmarks/results_1.3/release/README.md      examples/   (not relative to the document; found at examples)
+ok    benchmarks/results_1.3/release/README.md      /venv12bx
+ok    benchmarks/results_1.3/release/README.md      m3/tp_timing/notebook_pair/
+ok    benchmarks/results_1.3/release/README.md      m3/tp_six_lois.py
+ok    benchmarks/results_1.3/release/README.md      m3/deduced_constant_venv13rx.txt
+ok    benchmarks/results_1.3/release/README.md      examples/tp_regression_symbolique.ipynb   (not relative to the document; found at examples/tp_regression_symbolique.ipynb)
+ok    benchmarks/results_1.3/release/README.md      m3/examine/
+ok    benchmarks/results_1.3/release/README.md      ../../results_1.1/srbench_settings/PLAN.md
+ok    benchmarks/results_1.3/release/README.md      m4/summary.txt
+ok    benchmarks/results_1.3/release/README.md      m4/run.sh
+MISS  benchmarks/results_1.3/release/README.md      m4/requirements_*.txt
+ok    benchmarks/results_1.3/release/README.md      tests/test_arcsin.py   (not relative to the document; found at tests/test_arcsin.py)
+ok    benchmarks/results_1.3/release/README.md      m4/twine_check.txt
+ok    benchmarks/results_1.3/release/README.md      m4/ci_runs.txt
+ok    benchmarks/results_1.3/release/m2/examine/README.md ../machine_20261109T0435.txt
+ok    benchmarks/results_1.3/release/m3/examine/README.md ../notebook_snippet_tp.txt

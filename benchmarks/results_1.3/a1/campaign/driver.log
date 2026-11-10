@@ -1,0 +1,16 @@
+--- campaign A1, bench of bc5166b, Model name: Intel(R) Xeon(R) Processor, kernel 6.18.44-fc-v310, 2026-11-08T23:13
+200 jobs to run with 2 engines
+25 jobs done, 146 s elapsed, 174 left
+50 jobs done, 466 s elapsed, 149 left
+75 jobs done, 873 s elapsed, 124 left
+100 jobs done, 1264 s elapsed, 99 left
+125 jobs done, 1669 s elapsed, 74 left
+150 jobs done, 2056 s elapsed, 50 left
+175 jobs done, 2215 s elapsed, 24 left
+200 jobs done, 2531 s elapsed, 0 left
+40 jobs to run with 2 engines
+10/40 23:56:23
+20/40 23:57:04
+30/40 23:57:30
+40/40 23:58:01
+--- all done 2026-11-08T23:58

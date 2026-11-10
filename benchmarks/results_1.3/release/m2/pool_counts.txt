@@ -1,0 +1,15 @@
+fits by pool: {'physical': 2250, 'trig': 530}
+
+pool physical, 2250 fits: formula_exact False in 102 with 1.2.0 and 102 with 1.3.0 (101 in both)
+  of the 102 of 1.3.0: an arcsine in the recorded text 0; text cut at 160 characters 70, of which with no arcsine visible 70
+
+pool trig, 530 fits: formula_exact False in 27 with 1.2.0 and 82 with 1.3.0 (9 in both)
+  of the 82 of 1.3.0: an arcsine in the recorded text 47; text cut at 160 characters 77, of which with no arcsine visible 35
+
+1.2.0: exact arcsine seed placed in 0 fits: {}
+
+1.3.0: exact arcsine seed placed in 10 fits: {('feyn', 'I.30.5'): 5, ('ufeyn', 'I.30.5'): 5}
+
+1.2.0: noise-tolerant arcsine seed placed in 0 fits: {}
+
+1.3.0: noise-tolerant arcsine seed placed in 25 fits: {('feyn_n1', 'I.30.5'): 5, ('feyn_n10', 'I.30.5'): 5, ('tf', 'feynman_test_1'): 5, ('ufeyn_n1', 'I.30.5'): 5, ('ufeyn_n10', 'I.30.5'): 5}

@@ -1,0 +1,10 @@
+venv13a 10 points seed 0: law False, err_law 3.04e-06, -0.0011189 + 0.674769 * i1 * sqrt(0.992036 - 0.211327 * i1²)
+venv13a 10 points seed 1: law False, err_law 3.04e-06, -0.0011189 + 0.674769 * i1 * sqrt(0.992036 - 0.211327 * i1²)
+venv13a 10 points seed 2: law False, err_law 3.04e-06, -0.0011189 + 0.673427 * i1 * sqrt(0.995995 - 0.21217 * i1²)
+venv13a 10 points seed 3: law False, err_law 2.05e-07, -0.000164146 + 0.775397 * i1 * sin(2.1045 + 0.161115 * i1²)
+venv13a 10 points seed 4: law False, err_law 3.04e-06, -0.0011189 + 0.434271 * i1 * sqrt(2.39506 - 0.510204 * i1²)
+venv13a 20 points seed 0: law False, err_law 5.51e-08, 0.000259511 + i1 * (-0.0483549 * i1² + 0.664867 - 0.0212517 * i1 * i1²)
+venv13a 20 points seed 1: law True, err_law 2.38e-10, -3.20873e-05 + 0.162401 * (0.714286 * (i1 * sqrt(3.87917 - 0.0559057 * i1) + i1) + sin(1.2
+venv13a 20 points seed 2: law False, err_law 2.2e-08, 0.000124072 + (tanh(0.714286 * i1) - 2.71689 * i1) * (-0.332513 + 0.049457 * i1²)
+venv13a 20 points seed 3: law False, err_law 8.4e-06, -0.00120212 + 0.669422 * i1 * sqrt(|sin(-1.62962 + 0.714286 * i1)|)
+venv13a 20 points seed 4: law False, err_law 2.47e-07, -1.78924 + 2.3029 * exp(-0.25204 * (exp(i1 / 1.4) - 2.18134 * i1))

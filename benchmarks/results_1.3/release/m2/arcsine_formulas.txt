@@ -1,0 +1,124 @@
+fits of 1.3.0 whose recorded formula has an arcsine: 105 of 2780. Fits of the pool trig whose recorded formula is cut at 160 characters with no arcsine in its visible part: 180 of 530, the most that could hide one
+
+F41: 11
+  I.26.2 test seed 1 (1.2.0 MISS, structure None, 1.3.0 EXACT, structure None, formula_exact True): -arcsin(sin(-v1) * v0)
+  I.26.2 test seed 2 (1.2.0 MISS, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 * sin(v1))
+  I.26.2 test seed 4 (1.2.0 MISS, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(sin(v1) * v0)
+  I.30.5 test seed 0 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 1 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 2 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 3 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 4 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.50.26 test seed 2 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -0.980127 + sqrt(|arcsin(-0.0412473 * v0 * v2) * sin(0.817183 * arcsin(0.389511 * v1)² * arcsin(0.374577 * v2)) * (0.225482 + arcsin(-0.0491883 * v1 * v2)) * v1
+  III.17.37 test seed 0 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): -0.0130728 + 1.16491 * v1 * v0 * (3.94422 * tanh(|(-2.14018 - 1.02976 * v1) * v0 / v2| * (0.539949 * v2 - 0.790608))²)^(0.168278 * v2) * arcsin(-15 * (sin(4.839
+  III.17.37 test seed 1 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): -2.10776 + 51.7108 * (1.0957 - cos((0.071445 - cos(4.25296 + 0.168278 * v2)) * (1.02976 * v1 + arcsin(0.755509 * tanh(0.201384 * v0)^(0.0291789 * v2) * cos(-0.9
+
+F41N1: 12
+  I.26.2 test seed 0 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): -2.53628e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  I.26.2 test seed 2 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): -2.53638e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  I.26.2 test seed 3 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): -2.53637e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  I.30.5 test seed 0 (1.2.0 NEAR, structure False, 1.3.0 NEAR, structure True, formula_exact True): -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  I.30.5 test seed 1 (1.2.0 NEAR, structure False, 1.3.0 NEAR, structure True, formula_exact True): -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  I.30.5 test seed 2 (1.2.0 NEAR, structure False, 1.3.0 NEAR, structure True, formula_exact True): -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  I.30.5 test seed 3 (1.2.0 NEAR, structure False, 1.3.0 NEAR, structure True, formula_exact True): -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  I.30.5 test seed 4 (1.2.0 NEAR, structure False, 1.3.0 NEAR, structure True, formula_exact True): -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  I.37.4 test seed 1 (1.2.0 NEAR, structure False, 1.3.0 NEAR, structure False, formula_exact True): 0.3096 + 0.543578 * sqrt(v0) * sqrt(v1) * (cos(-3.72301 + 0.200093 * v1) + 15 + 10.511 * sin(-1.56547 + 0.0969188 * v1 - arcsin(0.0969846 * v0)) + (-0.0412345 *
+  I.50.26 test seed 1 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 3.58673 - 3.6369 * cos(0.0347335 * (arcsin(-0.186754 * v2 * v1) + |cos(log(0.334212 * v0 + 0.337409 * v1))| * (sin(cos(0.33894 * v2) - 0.591973) + 1.07731)) * v
+  III.17.37 test seed 0 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): -0.347535 + 2.57103 * (1.07224 * arcsin(v0 * (0.117788 * v1 + 0.13176)) + sin(0.201384 * ((1.02976 * v1)^(1.02976 * v1) + 0.415347) * v0) - (0.562257 * v1 + 0.1
+  III.17.37 test seed 1 (1.2.0 NEAR, structure False, 1.3.0 MISS, structure False, formula_exact True): 56.9869 + 4.0481 * cos(arcsin(-0.858958) * (sin(0.168278 * v2 + 3.91076) + 1.188 * cos(tanh(-3.0358 - 1.02976 * v1))) * |1.02976 * v1 + 0.202972 * v0| * (log(v2
+
+F41N10: 12
+  I.26.2 test seed 1 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact True): -0.00209096 - 1.08087 * sin(-0.999183 * v1) * arcsin(0.929329 * v0)
+  I.26.2 test seed 3 (1.2.0 MISS, structure False, 1.3.0 MISS, structure True, formula_exact True): 0.000763159 - 0.98737 * arcsin(1.0119 * v0 * sin(-1.00376 * v1))
+  I.30.5 test seed 0 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact True): 0.000267908 + 3.50499 * arcsin(0.677852 * v0 / (v1 * v2)) / sqrt(sqrt(|1.08269 - 0.059061 * 1 / (tanh(0.20231 * v1) - 0.302881) * v0|) + 4.78665)
+  I.50.26 test seed 0 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 9.27831 + 11.7391 * (||arcsin(-7.66931 * sin((2.08406 * v1)^tanh(0.33894 * v2))) / (0.33894 * v2 + 1.28169) * cos(cos((0.114361 * v1 * v2 - 5.83414)²))| / (0.33
+  I.50.26 test seed 1 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): -0.993154 + (1.73142 - 0.949099 * v0 * arcsin(1.22667 * log(|log(1 / (v2 * v1)) + 1.53532|))) * |arcsin(1.50024 * 1 / (v2 * v1) * log(|log(|log(1 / (v2 * v1)) +
+  I.50.26 test seed 3 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): -0.398242 + 10.3481 * sin(sin((-0.268767 * v2 * v1 + 1.34638 - 0.0224645 * v2 * sqrt(v2) * v1) * v1))² * arcsin(0.0856355 * |-0.428968 * v2 * v1|^|(10.5787 * v2
+  II.6.15b test seed 4 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact True): 0.000520087 - 0.153431 * (|2.3261 * cos((0.336117 * v1 + 4.68036) * tanh(0.336117 * v1)) * arcsin(0.320149 * v1)|^(exp(-7.59485 * v3 / ((0.336117 * v1 - 0.34641
+  III.17.37 test seed 1 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): -13.6763 - 13.8479 * cos(tanh(1.55019^(-0.956194 * v2 - 1.02976 * v1))) * (arcsin(0.157901 * sin(4.48849^(0.168278 * v2))) - arcsin(2.38586 * v0) + 0.149784 * v
+  III.17.37 test seed 3 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 0.276636 + 6.45356 * (-0.084399 * arcsin(sqrt(|-0.403482 * v1 / v0 + 2.38498 - 2.49768^(0.168278 * v2)|) * (0.63387 + 1.23987 * |tanh(0.168278 * v2) * v1|))² * 
+  III.9.52 test seed 1 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): -0.040719 + 0.433841 * (-0.551862 - sin(-1.19287 * v2 - 1.00759 * v0 / v4 - (0.333795 * v4 - 129.469 * cos(-4.06234 - 0.333795 * v4)) * (-1.46414 + arcsin(0.001
+  III.9.52 test seed 3 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): -0.126197 + 1510.83 * (sin(4.32716 + (0.335117 * v2 - 2.17976 + 0.333795 * v4) * (-1.1044 * v2 - tanh(arcsin(0.0824188 * v4))^(-0.465832))) + 0.841866) * v2 * v
+  III.9.52 test seed 4 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 5.74944 - 0.0965569 * (cos(-3.23504 + 0.335117 * v2) - arcsin(0.200037 * v3 - 3.62805) - 0.569079) * v1 / (0.161581 * cos(0.335117 * v2 - 2.48129) - 0.200037 * 
+
+TF78: 3
+  feynman_III_8_54 test seed 5 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): 0.498694 - 0.499144 * sin(1.87816 + arcsin(0.460056 * v0) / (0.30446 * v2 + 0.185992) - (1.43578 - 0.30446 * v2) * sin(0.568013 * v0) + 0.700414 * v0 * v1 * (0.
+  feynman_test_13 test seed 7 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -2.43117e-05 + (arcsin(0.414159 * v3) - 0.395095 * v1 + 11.1628 * cos(0.21788 * v3) - arcsin(10.8377 * tanh(0.0860832 * v1 * v3)) + (0.395095 * v1 - 3.5098) * c
+  feynman_test_20 test seed 7 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -48.573 + 78.7497 * sin(cos(sin(cos(4.71957e-06 * (0.247143 * v3 - 0.087682) / (0.245316 * v5 + 0.245404 * v0) * |arcsin(-0.0760641 * v2 * v1) / sin(9.41052e-07
+
+TF78 under units: 16
+  feynman_I_12_11 test seed 5 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): (4.81789 - 0.121629 * v4²) * (-722.036 * arcsin(-0.00162752 * cos(0.246481 * v4)) - 0.0607527 * v4²) * (0.349092 * sqrt(|v1| * v2 / (sqrt(v4) / (v4 / v3))) + 0.
+  feynman_I_12_11 test seed 6 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): -4.9965 * log(arcsin(0.23548 * v4)) * v3 * v0 * tanh(0.246481 * v4) * sqrt(v2 / sqrt(v3 / (v2 * v1)))
+  feynman_I_12_11 test seed 8 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): (0.687314 * v4² - 23.2083) * v0 * (0.00127775 * v4 * v4 * v4 * |v2| * arcsin(0.389673 * v4) * v3 - 0.245645 * sqrt(v4 / (v4 / v2) * v3 * (0.060633 * v0 * v4 / (
+  feynman_I_29_16 test seed 8 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): 5.69522 * sqrt(|(0.245713 * v2 - 0.247017 * v3) * (0.197665 * v1 * sqrt(|(0.245713 * v2 - arcsin(0.219378 * v3)) * v0²|) + v3 * (0.247062 * v1 + 0.249662 * v0) 
+  feynman_I_30_3 test seed 5 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 6.30031 * sqrt(|(cos(0.246472 * v2) - arcsin(0.198493 * v2 * v1 * sqrt(|0.0149926 * v1² * v2 - sin(0.246635 * v1)|))) * arcsin(0.110365 * v2 * v2)|) * sqrt(|arc
+  feynman_I_30_3 test seed 9 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 2.35412 * sqrt(|0.0036589 * (v2 / (exp(0.246635 * v1) / v0))² + (1.16146 * arcsin(0.273336 * v2 * exp(-0.803913 * v2 + 1.44478) / (log(v1 / (1 / v2)) - 1.24727)
+  feynman_test_11 test seed 8 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): 1.31469 * v0 * v3² / sqrt(exp(arcsin(0.389461 * v1))) * (cos(-0.108617 + tanh(cos(-1.11809 + tanh(-0.223693 * v3 * |v2|)) + 0.13649 * (log(v2) - 0.92729) * (arc
+  feynman_test_11 test seed 9 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): v0 * v3² / sqrt(|arcsin(0.647242 * sqrt(v1))|) * (2.4658 - 0.460789 * v2 * v3) * (1.24837 - 0.0828288 * v2 * v3²) * (-1.27919 + 0.634292 * v2 * cos(1.92431 + 0.
+  feynman_test_13 test seed 6 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 0.00798998 * v0 / sqrt(|(-0.344274 * sqrt(v2 * v1) + 0.395095 * v1)² + 0.0715426 * (0.21788 * v3 + 0.0977684) * v2 * (2.04006 - arcsin(0.0678725 * v3 * v3)) * v
+  feynman_test_14 test seed 8 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): 0.540106 * sin(0.219696 * v1) * ||v1| / (exp(arcsin(0.219696 * v1)) / v2) * v0|
+  feynman_test_15 test seed 5 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): -1.37218 * tanh(1.59079 * v1 / v0 - 0.394925 * v1 / ((arcsin(0.220669 * v3) + sqrt(|tanh(log(v3) - 1.17647)|)) / (2.53213 * v2 / (cos(0.220669 * v3 * sin(0.2206
+  feynman_test_15 test seed 8 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 0.831124 * exp(0.220669 * cos(arcsin(exp(0.220669 * v3)) + 0.220669 * v3 - 0.724478 - sqrt(sin(0.0697611 * |v1| * v3 * v3 * v3 / v0))) * cos(0.619831 * v3 - 1.5
+  feynman_test_15 test seed 9 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): 0.13723 * v3 * v3 / (sqrt(sqrt(sqrt(v0)² * v3 / v1)) / (v3 * cos(0.220669 * v3) / (v3 / v2))) + 0.172013 * cos(0.048695 * v3 * v3) / (1 / (v3 / (arcsin(0.207566
+  feynman_test_2 test seed 5 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -5.17358 * cos(0.218526 * arcsin(0.545943 * sqrt(v5)) * v5 - arcsin(0.371237 * v4) - 2.54293) / v4 * v0 * (cos(0.216899 * v4 - cos(0.216899 * v4) * arcsin(0.227
+  feynman_test_2 test seed 9 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -0.0459274 * v0 * v3 / (v1 * v0) + 1.68398 * |v0 * v0 * v5 / v0 * v1 / (v0 * v4 / v0) * sqrt(v4) / sqrt(v0 * |v0|) / (v4 * v0 / (arcsin(1.17319 * |v4 / v5|) / (
+  feynman_test_8 test seed 7 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): 0.97611 * v2 * sqrt((1.08965 * v0 - 0.395829 * arcsin(0.970831 * sqrt(sin(0.563661 * v3))) * v0 - 0.157058 * v0 * v3) * v1) - 0.246165 * sqrt(sin(exp(v3 / 2.520
+
+TS14: 8
+  strogatz_barmag1 ood seed 7 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -1.01647 + 1.33414 * (0.188061 * v0 - (arcsin(0.0247228 * v0 * v1) * cos(0.266125 * v1))²)^(-89.4043 * (0.38779 * sqrt(v1) - 0.0715681) / v0 * sqrt(4.25696^arcs
+  strogatz_barmag2 ood seed 9 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -0.354242 + 0.881989 * cos(5.91591^(0.150381 * v1) + 0.167777 * v0 - 1.02318 + arcsin(0.287857 * v1))
+  strogatz_barmag2 test seed 6 (1.2.0 NEAR, structure None, 1.3.0 MISS, structure None, formula_exact False): 1.94972 + 8.0578 * ((|v0| * (-0.0279177 * v0 + 0.287025) - 0.697415) * |arcsin(-0.0734521 * v0) / (log(v1) - 0.813084)|^(-0.106624 * v1) - 0.227352) * |arcsin(-
+  strogatz_glider1 ood seed 8 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): -(cos(v1 + 10.9956) + 0.185971 * sin(arcsin(0.268859 * v0)) * v0)
+  strogatz_glider1 test seed 6 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): -0.295262 - 1.02758 * sin(-2.23471 * ((-1239.09 / v1 + 39.0018 + 0.521463 * v1) * arcsin(0.00703828 * v1) + cos(0.00498625 * v1 * (|0.0347642 * v1 + 1.67377| + 
+  strogatz_glider1 test seed 8 (1.2.0 NEAR, structure None, 1.3.0 NEAR, structure None, formula_exact False): 0.00183299 - 1.00071 * (0.0500604 * v0 * v0 - sin(-5.38234 * v1 * (0.184926 * v0 + 0.00241275 * arcsin(0.280502 * v0)) / v0))
+  strogatz_glider2 ood seed 5 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 3.34803 - 0.180845 * (|(6.29585 * sin(-28.4098 / v1) + 0.48928) * arcsin(21.7996 / v1) * (-0.587881 + sin(0.268866 * v0))|^((-0.00011864 * v1 + 0.000397603 * v0
+  strogatz_shearflow1 ood seed 6 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -0.00311126 - 0.121415 * arcsin(0.754118 * v1 + 1.19175) * (cos(-0.872134 * v1 - 35.9361) - 1.28623 * |v0|^1.07566 + 3.5141 / |0.364035 * v1|^(0.262543 * ((0.32
+
+U41: 18
+  I.26.2 test seed 0 (1.2.0 MISS, structure None, 1.3.0 NEAR, structure None, formula_exact True): 1.0021 * arcsin(10.3786 * arcsin(0.0961111 * v0) * sin(0.999992 * v1))
+  I.26.2 test seed 1 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact True): 1.05974 * arcsin(0.937745 * v0) * sin(0.999102 * v1)
+  I.26.2 test seed 2 (1.2.0 MISS, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 * sin(v1))
+  I.26.2 test seed 3 (1.2.0 MISS, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(sin(v1) * v0)
+  I.26.2 test seed 4 (1.2.0 MISS, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 * sin(v1))
+  I.30.5 test seed 0 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 1 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 2 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 3 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.30.5 test seed 4 (1.2.0 NEAR, structure None, 1.3.0 EXACT, structure None, formula_exact True): arcsin(v0 / (v1 * v2))
+  I.37.4 test seed 3 (1.2.0 MISS, structure None, 1.3.0 NEAR, structure None, formula_exact True): (0.996816 * v0 + 0.994818 * v1) * (1.00412 + cos(arcsin(2.13493 * (0.200495 * v0 - 0.200093 * v2 / (v2 / v1)) / sqrt(|v0| * v1))) * cos(0.999982 * v2))
+  I.50.26 test seed 0 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 0.434637 * v1² * v2 * sin(0.384705 * v1 * v0 * (0.337409 * v1 * (log(v2) + 0.368103) + cos(0.337409 * v1))² * sqrt(v2 / (v0 * v0))) * (1.03838 + arcsin(-0.29606
+  I.50.26 test seed 3 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 0.323316 * |arcsin(2.17196 * v1 * arcsin((-0.14203 * v2 + 0.0957978) * v1 * v1²) * cos(0.337409 * v1) * (0.0130785 * v2² * v1 * v1 - 0.25446))| * |arcsin(v2 * (
+  III.17.37 test seed 1 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 5.95047 * (0.201384 * v0 - (-0.0111639 + 0.201384 * v0 * sin(2.43773 * sqrt(|arcsin(-3.62452 * v2 * v1)|) * sqrt(|v2| * exp(1.02976 * v1)) * cos(-0.826796 * v1)
+  III.17.37 test seed 2 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -0.095653 * (-0.467551 - (0.541228 - 0.168278 * v2)²) * v0 * (1.0604 * (v1 * (1.00367 - 0.336557 * v2))² * arcsin(-3.14528 * v1) - (2.11542 - (arcsin(0.560136 *
+  III.17.37 test seed 3 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -2.78129 * v1 * arcsin(0.964872 * exp(0.201384 * v0) * (0.336557 * v2 - cos(cos(0.201384 * v0)) + 0.0338886 * v2 * v0)) + 0.938935 * v0 + 4.80114 * v1 * arcsin(
+  III.9.52 test seed 0 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): -1.05864 * tanh(arcsin(-0.0972242 * v4 * v2 * v3 * v4 / v3)) / (1 / v0) * sin(0.128567 * v2 * v3 * v4² / v3) * v2 * v1 / v3
+  III.9.52 test seed 2 (1.2.0 MISS, structure None, 1.3.0 MISS, structure None, formula_exact False): 3.25125 * sin(arcsin(0.136419 * v2 * v4) + 0.333795 * v4) / (v3 / v2 / (arcsin(-0.0459755 * v4 * v2 * v4) + arcsin(0.225564 * v2 * v4) + 0.333795 * v4) / (cos(0
+
+U41N1: 17
+  I.26.2 test seed 1 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.00281 * arcsin(0.998458 * v0 * sin(1.00013 * v1))
+  I.26.2 test seed 2 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact True): 1.05368 * v0 * (4.79122 + sin(1.00762 * v1) - 4.83024 * cos(-1.03584 * sin(arcsin(0.152714 * v1)) * v0 * (log(v1) - 1.60255)))
+  I.26.2 test seed 3 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.00281 * arcsin(0.998458 * sin(1.00013 * v1) * v0)
+  I.26.2 test seed 4 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.00281 * arcsin(0.998458 * sin(1.00013 * v1) * v0)
+  I.30.5 test seed 0 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.01514 * arcsin(0.985218 * v0 / v1 / v2)
+  I.30.5 test seed 1 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.01514 * arcsin(0.985218 * v0 / (v1 * v2))
+  I.30.5 test seed 2 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.01514 * arcsin(0.985218 * v0 / (v2 * v1))
+  I.30.5 test seed 3 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.01514 * arcsin(0.985218 * v0 / v1 / v2)
+  I.30.5 test seed 4 (1.2.0 MISS, structure False, 1.3.0 NEAR, structure True, formula_exact True): 1.01514 * arcsin(0.985218 * v0 / v2 / v1)
+  I.50.26 test seed 0 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 6.53596 * arcsin(-0.43473 * v1) / (v1 / (v2 / (v2 * v2) * (arcsin(-0.0097813 * v2) * v0 + v0))) * arcsin(0.650558 * arcsin(-0.17919 * v1 * v2)) * (arcsin(0.6937
+  I.50.26 test seed 2 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 1.17526 * arcsin(0.0849527 * v1 * v2 * v1) * v0 * (0.337409 * v1 - cos(4.38688 * v2 + 4.36707 * v1))
+  I.50.26 test seed 3 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 0.530591 * v2 * v1² * (arcsin(-0.0321991 * v2 * exp(arcsin(0.194462 * v2)²) * v2 * v1 * v1 * tanh(0.337409 * v1)) * sqrt(|tanh(0.893782 - 0.114361 * v1 * v2) * 
+  III.17.37 test seed 1 (1.2.0 NEAR, structure False, 1.3.0 MISS, structure False, formula_exact False): 34.9383 * (-0.0471709 - 0.201384 * v0) * (arcsin(0.0917322 * v2)² + (0.168278 * v2 - 0.743736)²) * v2 / arcsin(0.388669 * v2) / (exp(0.201384 * v0) - 0.201384 *
+  III.17.37 test seed 2 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 6267.58 * (arcsin(0.000418353 * sqrt(v0)) - arcsin(0.000377168 * cos(0.168278 * v2) * v1 * (0.0178303 - cos(-0.946553 * v2))) - arcsin(-0.00050901 * cos(log(v0)
+  III.17.37 test seed 3 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 6.83653 * (arcsin(0.00155086 * v2 * v2 * v1 / (v1 / v2 / v0)) + 0.201384 * v0) / (1.18269 + arcsin((0.0268811 * v2 - 1.38408 * (cos(1.15506 * sqrt(v2)) - 0.1682
+  III.17.37 test seed 4 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 1.015 * v0 * (exp(sin(1.02976 * v1)) - 39.072 * cos(0.168278 * v2) * tanh(v2 * arcsin(0.243299 * v2) / v2) * arcsin(6.73138 * v0 / v2 / sqrt(v0) * v2) * v1 * ex
+  III.9.52 test seed 4 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 0.588283 / (v3 / (arcsin(0.446096 * arcsin(0.393831 * v2) * v4) * arcsin(2.89917 * v3 / (sqrt(v4) / (v0 / v3)) / (arcsin(0.3668 * v4) * |v0|) * cos(0.112304 * v
+
+U41N10: 8
+  I.26.2 test seed 1 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact True): 1.86944 * tanh(tanh(1.0119 * v0 - 1.00872 * sqrt(v0²) * tanh(0.201383 * v1) * sqrt(v1))) * sqrt(sqrt(|cos(arcsin(0.199635 * v1))|² * |v1 * v1 * v0|))
+  I.26.2 test seed 3 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact True): -1.08397 * arcsin(0.927107 * v0) * sin(-1.00029 * v1)
+  I.37.4 test seed 0 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact True): 6.80403 * sqrt(((0.00033602 + 0.00129254 * v2²) * sqrt(v2 * v0 * v2 * v1 * v2) - 70.4111 * sqrt(|arcsin(0.000524709 * v2) / v2 / (|v2|² * v2 / v1) / (v2 * sqrt(
+  I.50.26 test seed 4 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): -0.347503 * sqrt(v0) * arcsin(3.55656 * v2 * v2 * (0.0380483 * v1² * v0 - 0.0519619 * v0) / v0) * sin(1.8918 / v2 - cos(1.46203 * v2 * v1)) * (-0.729879 * sqrt(
+  II.6.15b test seed 1 (1.2.0 MISS, structure True, 1.3.0 MISS, structure False, formula_exact False): 0.482017 * v1 * v3 / (v3 / v0) / (v1 / (cos(0.336117 * v1) - 0.549662 * v1) * v1 / (sin(exp(0.336117 * v1)) / v3) * v3 / (v1 / v2)) / (exp(arcsin(0.267243 * v1)
+  II.6.15b test seed 3 (1.2.0 NEAR, structure False, 1.3.0 MISS, structure False, formula_exact False): -0.0190861 * (0.990855 * v0 / v2 - 0.632671 * v1 * v0 / v2) / (sqrt(v3)² / (v2 / arcsin(1.98516 * v1) * (-0.696866 / v2 + 0.998238 * v3 / (v2 * v3 / v1)))) / (v
+  III.17.37 test seed 0 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 0.664204 * (arcsin(4.8857 * arcsin(1.01396 * cos(arcsin(1.13508 * v1 * v1)) * arcsin(0.193619 * cos(1.02976 * v1))) * cos(arcsin(0.940078 * v1))) - (0.648146 - 
+  III.9.52 test seed 4 (1.2.0 MISS, structure False, 1.3.0 MISS, structure False, formula_exact False): 0.0314925 * v4 * v0 * v4 * cos(0.0232606 * v2 * v4 * v4 * v4) * v4 * v2 * cos(arcsin(0.0424768 * v2 * v4 * v4)) * v4 * v2 * cos(0.333795 * v4) / (v3 / v1)

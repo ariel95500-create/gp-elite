@@ -1,0 +1,357 @@
+same     bad_inputs.txt
+same     battery_example.txt
+same     case_hubble.txt
+same     case_kepler.txt
+same     case_nikuradse/nikuradse_seed0.txt
+same     case_nikuradse/nikuradse_seed1.txt
+same     case_nikuradse/nikuradse_seed2.txt
+same     case_nikuradse/nikuradse_seed3.txt
+same     case_nikuradse/nikuradse_seed4.txt
+same     case_nikuradse/real_nikuradse_auto_seed0.json
+same     case_nikuradse/real_nikuradse_auto_seed1.json
+same     case_nikuradse/real_nikuradse_auto_seed2.json
+same     case_nikuradse/real_nikuradse_auto_seed3.json
+same     case_nikuradse/real_nikuradse_auto_seed4.json
+same     case_nikuradse_driver.txt
+same     claims_queues.txt
+differs  console_hooke.txt
+    first : [GEN 0000|I2] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (T s)
+    second:   [SMART-RESET gen=40] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first :   EXPR = (24.974004 * elongation)
+    second:   [SMART-RESET gen=80] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first : 
+    second:   [SMART-RESET gen=120] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first :   [SMART-RESET gen=40] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    second: 
+    first :   [SMART-RESET gen=80] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    second: ──────────────────────────────────────────────────────────────────────
+    first :   [SMART-RESET gen=120] 1 explorer island(s) — 0 semantic skeletons + 30% random (RAW=0.0000)
+    second: [v21-VAL] GENERALIZATION REPORT (final champion)
+    first : 
+    second:   MSE train      : 5.297422e-09
+    first : ──────────────────────────────────────────────────────────────────────
+    second:   Validation MSE : 6.696502e-09   (never seen by evolution)
+    first : [v21-VAL] GENERALIZATION REPORT (final champion)
+    second:   R² validation  : 1.0000
+    first :   MSE train      : 5.297422e-09
+    second:   Ratio val/train: 1.26
+    first :   Validation MSE : 6.696502e-09   (never seen by evolution)
+    second:   ✓ Healthy generalization.
+    first :   R² validation  : 1.0000
+    second: ──────────────────────────────────────────────────────────────────────
+    first :   Ratio val/train: 1.26
+    second: [LOG] History exported → /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3/gp_elite_log.csv
+    first :   ✓ Healthy generalization.
+    second: [STIGM] Fragments accumulated: 168
+    first : ──────────────────────────────────────────────────────────────────────
+    second: [STIGM] τ max : 4.3350  |  τ moyen : 0.4659
+    first : [LOG] History exported → /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3/gp_elite_log.csv
+    second: [STIGM] Dominant operators: [('*', 30), ('/', 28), ('sqrt', 24), ('-', 19), ('sq', 16)]
+    first : [STIGM] Fragments accumulated: 48
+    second: [STIGM] Top 3 fragments :
+    first : [STIGM] τ max : 3.7106  |  τ moyen : 0.2662
+    second:   τ=4.335  freq=1586  sqrt(elongation)
+    first : [STIGM] Dominant operators: [('/', 15), ('*', 9), ('neg', 8), ('sqrt', 4), ('sq', 4)]
+    second:   τ=4.275  freq=2124  (-0.5898 / elongation)
+    first : [STIGM] Top 3 fragments :
+    second:   τ=4.219  freq=1994  abs(elongation)
+    first :   τ=3.711  freq=1609  (-elongation)
+    second: 
+    first :   τ=2.630  freq=2693  (elongation * 5.184905)
+    second: [COGRAPH] Co-occurrence edges: 1312
+    first :   τ=1.269  freq=2110  (elongation / -1.8801)
+    second: [COGRAPH] co max : 17.42036  |  co moyen : 1.67403
+    first : 
+    second: [COGRAPH] Top 5 paires co-occurrentes :
+    first : [COGRAPH] Co-occurrence edges: 1287
+    second:   co=17.4204  [(-elongation)]  ×  [abs(elongation)]
+    first : [COGRAPH] co max : 21.43131  |  co moyen : 0.25795
+    second:   co=17.4078  [(0.818207 / (12.559734 / (-elongati…]  ×  [(12.559734 / (-elongation))]
+    first : [COGRAPH] Top 5 paires co-occurrentes :
+    second:   co=17.4078  [(-elongation)]  ×  [(12.559734 / (-elongation))]
+    first :   co=21.4313  [(elongation * 5.184905)]  ×  [(elongation / -1.8801)]
+    second:   co=17.4078  [(-elongation)]  ×  [(0.818207 / (12.559734 / (-elongati…]
+    first :   co=17.0166  [(elongation / -1.8801)]  ×  [((elongation * 1.7587) / ((elongati…]
+    second:   co=17.4061  [(0.818207 / (12.559734 / (-elongati…]  ×  [abs(elongation)]
+    first :   co=17.0147  [(elongation * 5.184905)]  ×  [((elongation * 1.7587) / ((elongati…]
+    second: 
+    first :   co=15.8774  [(elongation * 5.184905)]  ×  [(-elongation)]
+    second: [SEQ_MEM] Transitions apprises : 460  (poids total : 23085.13)
+    first :   co=11.4935  [(elongation * 5.184905)]  ×  [(1.7587 * elongation)]
+    second: [SEQ_MEM] Top 5 transitions :
+    first : 
+    second:   root.root.unary           → -
+    first : [SEQ_MEM] Transitions apprises : 461  (poids total : 9446.18)
+    second:   *.root.unary              → -
+    first : [SEQ_MEM] Top 5 transitions :
+    second:   *.-.right                 → sqrt
+    first :   root.root.unary           → X[0]
+    second:   *.-.left                  → const
+    first :   *.root.unary              → X[0]
+    second:   *./.left                  → const
+    first :   *./.left                  → X[0]
+    second: 
+    first :   *./.right                 → const
+    second: ======================================================================
+    first :   root./.right              → const
+    second: FINAL RESULT
+    first : 
+    second: ======================================================================
+    first : ======================================================================
+    second: 
+    first : FINAL RESULT
+    second: Target        : CSV: force = f(elongation)
+    first : ======================================================================
+    second: Expression    : (24.974004 * elongation′)
+    first : 
+    second: True MSE      : 5.5764939618e-09
+    first : Target        : CSV: force = f(elongation)
+    second: Hybrid score  : 0.0000000059   (5·(1-|r|) + mse/(1+mse))
+    first : Expression    : (24.974004 * elongation′)
+    second: Fitness       : 0.0000000162
+    first : True MSE      : 5.5764939618e-09
+    second: Size          : 3
+    first : Hybrid score  : 0.0000000059   (5·(1-|r|) + mse/(1+mse))
+    second: Depth         : 2
+    first : Fitness       : 0.0000000162
+    second: 
+    first : Size          : 3
+    second: Verification:
+    first : Depth         : 2
+    second:   X[0]          target       predicted         error
+    first : 
+    second:   ----------------------------------------------------------
+    first : Verification:
+    second:     0.5945     14.84830400     14.84825255      5.15e-05
+    first :   X[0]          target       predicted         error
+    second:     0.7444     18.59176100     18.59175319      7.81e-06
+    first :   ----------------------------------------------------------
+    second:     0.6432     16.06217600     16.06225276      7.68e-05
+    first :     0.5945     14.84830400     14.84825255      5.15e-05
+    second:     0.5910     14.75987200     14.75975253      1.19e-04
+    first :     0.7444     18.59176100     18.59175319      7.81e-06
+    second:     0.4818     12.03223300     12.03225206      1.91e-05
+    first :     0.6432     16.06217600     16.06225276      7.68e-05
+    second:     0.6820     17.03261800     17.03250292      1.15e-04
+    first :     0.5910     14.75987200     14.75975253      1.19e-04
+    second:     0.4943     12.34571200     12.34575212      4.01e-05
+    first :     0.4818     12.03223300     12.03225206      1.91e-05
+    second:     0.9035     22.56489300     22.56500387      1.11e-04
+    first :     0.6820     17.03261800     17.03250292      1.15e-04
+    second: 
+    first :     0.4943     12.34571200     12.34575212      4.01e-05
+    second: [SAVE] Meilleure solution → gp_elite_best.txt
+    first :     0.9035     22.56489300     22.56500387      1.11e-04
+    second: 
+    first : 
+    second:   Note: 'Expression' above is the engine's internal form, on
+    first : [SAVE] Meilleure solution → gp_elite_best.txt
+    second:   rescaled columns (a prime marks a rescaled column, e.g.
+    first : 
+    second:   elongation′). Use the formula below.
+    first :   Note: 'Expression' above is the engine's internal form, on
+    second: 
+    first :   rescaled columns (a prime marks a rescaled column, e.g.
+    second:   Formula in YOUR columns (checked on your data):
+    first :   elongation′). Use the formula below.
+    second:     force = 250 * elongation
+    first :   Formula in YOUR columns (checked on your data):
+    second:   Dimensional constraint was active: every candidate was
+    first :     force = 250 * elongation
+    second:   dimensionally consistent by construction.
+    first : 
+    second:   Deduced constant units : [kg / s^2]
+    first :   Dimensional constraint was active: every candidate was
+    second:   Deduced constant value : 250
+    first :   dimensionally consistent by construction.
+    second: 
+    first :   Deduced constant units : [kg / s^2]
+    second: ──────────────────────────────────────────────────────────────────────
+    first :   Deduced constant value : 250
+    second:   Done. Press Enter to quit...
+    first : 
+    second: <none>
+    first : ──────────────────────────────────────────────────────────────────────
+    second: <none>
+    first :   Done. Press Enter to quit...
+    second: <none>
+same     deduced_constant_venv12bx.txt
+new      deduced_constant_venv13rx.txt
+same     duel_gplearn.txt
+same     duel_results.jsonl
+same     feyn_results.jsonl
+same     feyn_results_normalize-none.jsonl
+same     feynman15.txt
+same     feynman15_units.jsonl
+same     feynman15_units.txt
+same     feynman_angles_normalize_none.txt
+same     formula_fuzz.txt
+same     gp_elite_best.txt
+differs  gp_elite_log.csv
+    first : 0,0,-2234.0630654237093,5.6417544871208786e-09,3,2,(24.974004 * elongation),0.04741525650024414
+    second: 0,0,-2234.0630654237093,5.641755042232403e-09,3,2,(24.974004 * elongation),0.0460968017578125
+    first : 0,2,-2234.0630654237566,5.641755042230299e-09,3,2,(24.974004 * elongation),0.11517930030822754
+    second: <none>
+same     hooke.csv
+differs  import_time.txt
+    first : 0.082 0.072 0.073 0.073 0.070 0.073 0.070
+    second: 0.086 0.078 0.082 0.078 0.084 0.077 0.082
+same     kepler_demo.txt
+differs  kepler_minmax_check.txt
+    first : generations 10, N1 off: exact law in 0 of 10
+    second: generations 10, N1 off: exact law in 2 of 10
+    first : generations 40, N1 off: exact law in 3 of 10
+    second: generations 40, N1 off: exact law in 4 of 10
+    first : generations 40, N1 on : exact law in 1 of 10
+    second: generations 40, N1 on : exact law in 2 of 10
+same     kepler_plot.txt
+differs  m3_driver.log
+    first : start DATE
+    second: start DATE, copy of a0935be, kernel 6.18.44-fc-v310
+differs  m3_driver.sh
+    first : # M3 of PLAN_RELEASE_1.2.md, one step after the other, nothing else on the
+    second: # M3 of PLAN_RELEASE_1.3.md, one step after the other, nothing else on the
+    first : # machine (started after M2 ended). W is a copy of benchmarks/, examples/ and
+    second: # machine (started after M2 and its examination ended). W is a copy of
+    first : # the READMEs of commit 784152d without the package beside them; O is where the
+    second: # benchmarks/, examples/ and the READMEs of the commit given, without the
+    first : # records go. The steps of the M3 of 1.1 (../../results_1.1/release/m3/), then
+    second: # package beside them; O is where the records go. The steps of the M3 of 1.2
+    first : # the TP notebook run four times, 1.1.0 and 1.V.0 in turn, to compare its times
+    second: # (../../../results_1.2/release/m3/m3_driver.sh) with 1.V.0 (/venv13rx), the
+    first : # on one day.
+    second: # deduced constant with 1.V.0 (/venv12bx) beside it, and the TP notebook run
+    first : W=/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/work12
+    second: # four times, 1.V.0 and 1.V.0 in turn, to compare its times on one day. The
+    first : O=/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3
+    second: # notebook is run as the script of its code cells without the pip line, which
+    first : echo "start $(date -u '+%F %T')" >> $O/m3_driver.log
+    second: # is the script of the M3 of 1.2 to the byte (tp_six_lois.py).
+    first : cd $O && /venvX/bin/python $W/benchmarks/release_claims/run_claims.py /venvX/bin/python $W $O
+    second: C=$1
+    first : echo "run_claims done $(date -u '+%F %T')" >> $O/m3_driver.log
+    second: S=/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py kepler > $O/case_kepler.txt 2>&1
+    second: W=$S/work13
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py hubble > $O/case_hubble.txt 2>&1
+    second: O=$S/relX/m3
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py nikuradse $O/case_nikuradse > $O/case_nikuradse_driver.txt 2>&1
+    second: if [ ! -d $W ]; then
+    first : echo "case studies done $(date -u '+%F %T')" >> $O/m3_driver.log
+    second:   mkdir -p $W && (cd /home/user/gp-elite && git archive $C benchmarks examples README.md README.fr.md) | tar -x -C $W
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/results_0.9/phase5/mechanics/kepler_minmax_check.py > $O/kepler_minmax_check.txt 2>&1
+    second:   echo "$C" > $W/COMMIT
+    first : cd $O && PYTHONHASHSEED=0 /venv11p/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv11p.txt 2>&1
+    second: fi
+    first : cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv12bx.txt 2>&1
+    second: [ -e $W/gp_elite ] && { echo "a package beside the scripts: stop"; exit 1; }
+    first : echo "checks done $(date -u '+%F %T')" >> $O/m3_driver.log
+    second: mkdir -p $O/tp $O/tp_timing/notebook_pair
+    first : cd $O/tp && PYTHONHASHSEED=0 /venvX/bin/python $O/tp_six_lois.py > $O/notebook_tp_six_lois_1.2.0.txt 2>&1
+    second: cp /home/user/gp-elite/benchmarks/results_1.2/release/m3/tp_six_lois.py $O/tp_six_lois.py
+    first : echo "notebook done $(date -u '+%F %T')" >> $O/m3_driver.log
+    second: lscpu > $O/machine.txt
+    first : P=$O/tp_timing/notebook_pair
+    second: echo "start $(date -u '+%F %T'), copy of $(cat $W/COMMIT), kernel $(uname -r)" >> $O/m3_driver.log
+    first : for run in 1 2; do
+    second: cd $O && /venvX/bin/python $W/benchmarks/release_claims/run_claims.py /venvX/bin/python $W $O
+    first :   cd $P && PYTHONHASHSEED=0 /venv11p/bin/python -I $O/tp_six_lois.py > $P/run${run}_1.1.0.txt 2>&1
+    second: echo "run_claims done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first :   cd $P && PYTHONHASHSEED=0 /venvX/bin/python -I $O/tp_six_lois.py > $P/run${run}_1.2.0.txt 2>&1
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py kepler > $O/case_kepler.txt 2>&1
+    first : done
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py hubble > $O/case_hubble.txt 2>&1
+    first : echo "notebook pair done $(date -u '+%F %T')" >> $O/m3_driver.log
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/case_studies.py nikuradse $O/case_nikuradse > $O/case_nikuradse_driver.txt 2>&1
+    first : echo "all done $(date -u '+%F %T')" >> $O/m3_driver.log
+    second: echo "case studies done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : <none>
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/results_0.9/phase5/mechanics/kepler_minmax_check.py > $O/kepler_minmax_check.txt 2>&1
+    first : <none>
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv12bx.txt 2>&1
+    first : <none>
+    second: cd $O && PYTHONHASHSEED=0 /venvX/bin/python $W/benchmarks/release_claims/deduced_constant_check.py > $O/deduced_constant_venv13rx.txt 2>&1
+    first : <none>
+    second: echo "checks done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : <none>
+    second: cd $O/tp && PYTHONHASHSEED=0 /venvX/bin/python $O/tp_six_lois.py > $O/notebook_tp_six_lois_1.3.0.txt 2>&1
+    first : <none>
+    second: echo "notebook done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : <none>
+    second: P=$O/tp_timing/notebook_pair
+    first : <none>
+    second: for run in 1 2; do
+    first : <none>
+    second:   cd $P && PYTHONHASHSEED=0 /venvX/bin/python -I $O/tp_six_lois.py > $P/run${run}_1.2.0.txt 2>&1
+    first : <none>
+    second:   cd $P && PYTHONHASHSEED=0 /venvX/bin/python -I $O/tp_six_lois.py > $P/run${run}_1.3.0.txt 2>&1
+    first : <none>
+    second: done
+    first : <none>
+    second: echo "notebook pair done $(date -u '+%F %T')" >> $O/m3_driver.log
+    first : <none>
+    second: echo "all done $(date -u '+%F %T')" >> $O/m3_driver.log
+new      machine.txt
+same     mystery_constant.txt
+same     nikuradse_full.txt
+same     notebook_snippet_coulomb.txt
+same     notebook_snippet_hooke.txt
+same     notebook_snippet_kepler30.txt
+same     notebook_snippet_nikuradse.txt
+same     notebook_snippet_optionB.txt
+same     notebook_snippet_torque.txt
+differs  notebook_snippet_tp.txt
+    first : TP loi : -0.00141869 - 1.73061 * sin(0.999339 * x * x) / ((6.12752 + 0.136482 * x) / (-3.81258 * x + 14.1956 * tanh(0.00139088 * sign(x) * |x|^6)) + 0.0423522 - 0.334104 * x)
+    second: /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/workX/benchmarks/notebook_claims.py:76: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 15 of 200 training rows (largest
+    first :  10 generations : MSE = 9.706e-03   taille = 34  (T s)
+    second:   res = symbolic_regression(X, y, feature_names=['x'], operators='full', generations=40, speed='fast', seed=0, parallel=False)
+    first :  30 generations : MSE = 1.784e-04   taille = 41  (T s)
+    second: TP loi : 0.000832052 - 0.460306 * (arcsin(0.0231131 * x * sin(2.98904 * x + 3.14304)² * x² * x) - |-0.268896 * cos(0.334104 * x)²|^sin(1.8626 * x - 10.9945)) * sin(1.77773 * x)
+    first :  60 generations : MSE = 1.784e-04   taille = 41  (T s)
+    second:  10 generations : MSE = 5.654e-02   taille = 38  (T s)
+    first : <none>
+    second: /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/workX/benchmarks/notebook_claims.py:80: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 184 of 200 training rows (larges
+    first : <none>
+    second:   r = symbolic_regression(X, y, feature_names=['x'], operators='full', generations=g, speed='fast', seed=0, parallel=False)
+    first : <none>
+    second:  30 generations : MSE = 1.628e-02   taille = 46  (T s)
+    first : <none>
+    second: /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/workX/benchmarks/notebook_claims.py:80: RuntimeWarning: GP_ELITE: the formula printed for the returned model departs from predict() on 15 of 200 training rows (largest
+    first : <none>
+    second:   r = symbolic_regression(X, y, feature_names=['x'], operators='full', generations=g, speed='fast', seed=0, parallel=False)
+    first : <none>
+    second:  60 generations : MSE = 1.281e-03   taille = 43  (T s)
+new      notebook_tp_six_lois_1.3.0.txt
+same     pools_check.txt
+same     readme_kepler.py
+same     readme_kepler.txt
+same     robust_example.txt
+same     robustness_check.jsonl
+same     robustness_check.txt
+same     robustness_check_run.txt
+same     scale_check_release.txt
+same     scaling.jsonl
+differs  scaling.txt
+    first :   N=50     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    second:   N=50     rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    first :   N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    second:   N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    first :   N=10000  rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+    second:   N=10000  rep=0  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+same     small_data_release.jsonl
+same     small_data_release.txt
+same     small_data_run.txt
+differs  time_limit_check.txt
+    first :   [FAIL] GPEliteRegressor : diagnostic expose         
+    second:   [PASS] GPEliteRegressor : diagnostic expose         
+    first : BILAN : 13/16
+    second: BILAN : 14/16
+same     tp_six_lois.py
+same     tp_timing/notebook_pair/run1_1.2.0.txt
+new      tp_timing/notebook_pair/run1_1.3.0.txt
+same     tp_timing/notebook_pair/run2_1.2.0.txt
+new      tp_timing/notebook_pair/run2_1.3.0.txt
+same     units_ab_ood.jsonl
+same     units_ab_ood.txt
+same     usage_example.py
+same     usage_example.txt

@@ -1,0 +1,58 @@
+lines A 2780, B 2780; keys A 2780, B 2780; same keys True
+kinds: {'feyn': 205, 'real': 60, 'realraw': 70, 'tf': 390, 'ts': 140, 'tr': 250, 'trraw': 250, 'feyn_n1': 205, 'feyn_n10': 205, 'ufeyn': 205, 'ufeyn_n1': 205, 'ufeyn_n10': 205, 'utf': 390}
+versions A: Counter({'1.2.0': 2780}) B: Counter({'1.3.0': 2780})
+status A: Counter({'EXACT': 784, 'NEAR': 696, 'MISS': 670, None: 630})
+status B: Counter({'EXACT': 800, 'NEAR': 698, 'MISS': 652, None: 630})
+seeds by kind: {'feyn': [0, 1, 2, 3, 4], 'feyn_n1': [0, 1, 2, 3, 4], 'feyn_n10': [0, 1, 2, 3, 4], 'real': [0, 1, 2, 3, 4], 'realraw': [0, 1, 2, 3, 4], 'tf': [5, 6, 7, 8, 9], 'ts': [5, 6, 7, 8, 9], 'tr': [5, 6, 7, 8, 9], 'trraw': [5, 6, 7, 8, 9], 'ufeyn': [0, 1, 2, 3, 4], 'ufeyn_n1': [0, 1, 2, 3, 4], 'ufeyn_n10': [0, 1, 2, 3, 4], 'utf': [5, 6, 7, 8, 9]}
+pools: {'physical': 2250, 'trig': 530}
+first and last record date: 2026-11-09T04:35:30 2026-11-09T13:43:37
+
+== 1.2.0
+  F41 exact 163 of 205, near 11, miss 31
+  U41 exact 166 of 205, near 6, miss 33
+  TF78 exact 213 of 390, near 54, miss 123
+  TF78u exact 229 of 390, near 42, miss 119
+  F41N1 structure 108 of 205
+  F41N10 structure 85 of 205
+  U41N1 structure 113 of 205
+  U41N10 structure 98 of 205
+  TS14 test exact 8 of 70 (with status 70)
+  TS14 splits: Counter({'test': 70, 'ood': 70})
+  TS14 ood collapses (r2<0): 30 of 70
+  R6 folds 30 median 0.809459; ood 30 collapses 5 worst -1946
+  R7raw folds 35 median 0.878665; ood 35 collapses 5 worst -232.5
+  TR25 folds 125 median 0.769151; ood 125 collapses 37 worst -1.275e+22
+  TR25raw folds 125 median 0.780727; ood 125 collapses 28 worst -6.333e+17
+  under units: 1005 fits, units_ok True 1005, median time 30.220 (statistics.median 30.220), max 31.53
+  formula_exact False by suite: {'F41': 1, 'F41N1': 7, 'F41N10': 6, 'R6': 2, 'R7raw': 9, 'TF78': 10, 'TF78u': 2, 'TR25': 32, 'TR25raw': 32, 'TS14': 23, 'U41': 1, 'U41N1': 2, 'U41N10': 2}
+  formula_exact False by pool: {'trig': 27, 'physical': 102}
+  formula_exact None by pool: {}
+  trig, formula_exact False with arcsin in expr: 0
+  R6+R7raw folds and test formula_exact False: 5
+  time_limit_reached: 1991
+  crashes: 0
+
+== 1.3.0
+  F41 exact 171 of 205, near 7, miss 27
+  U41 exact 174 of 205, near 5, miss 26
+  TF78 exact 214 of 390, near 53, miss 123
+  TF78u exact 228 of 390, near 41, miss 121
+  F41N1 structure 116 of 205
+  F41N10 structure 87 of 205
+  U41N1 structure 121 of 205
+  U41N10 structure 95 of 205
+  TS14 test exact 8 of 70 (with status 70)
+  TS14 splits: Counter({'test': 70, 'ood': 70})
+  TS14 ood collapses (r2<0): 27 of 70
+  R6 folds 30 median 0.809459; ood 30 collapses 5 worst -1946
+  R7raw folds 35 median 0.878665; ood 35 collapses 5 worst -232.5
+  TR25 folds 125 median 0.769151; ood 125 collapses 37 worst -1.275e+22
+  TR25raw folds 125 median 0.780727; ood 125 collapses 28 worst -6.333e+17
+  under units: 1005 fits, units_ok True 1005, median time 30.190 (statistics.median 30.190), max 31.60
+  formula_exact False by suite: {'F41': 6, 'F41N1': 9, 'F41N10': 12, 'R6': 2, 'R7raw': 9, 'TF78': 17, 'TF78u': 11, 'TR25': 33, 'TR25raw': 32, 'TS14': 28, 'U41': 9, 'U41N1': 8, 'U41N10': 8}
+  formula_exact False by pool: {'trig': 82, 'physical': 102}
+  formula_exact None by pool: {}
+  trig, formula_exact False with arcsin in expr: 47
+  R6+R7raw folds and test formula_exact False: 5
+  time_limit_reached: 1983
+  crashes: 0

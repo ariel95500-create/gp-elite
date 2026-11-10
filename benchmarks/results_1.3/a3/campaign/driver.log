@@ -1,0 +1,16 @@
+--- campaign A3, bench of 3f0f00d, Model name: Intel(R) Xeon(R) Processor, kernel 6.18.44-fc-v310, 2026-11-09T02:22
+200 jobs to run with 2 engines
+25 jobs done, 131 s elapsed, 174 left
+50 jobs done, 451 s elapsed, 149 left
+75 jobs done, 860 s elapsed, 124 left
+100 jobs done, 1248 s elapsed, 99 left
+125 jobs done, 1655 s elapsed, 74 left
+150 jobs done, 2040 s elapsed, 50 left
+175 jobs done, 2186 s elapsed, 24 left
+200 jobs done, 2504 s elapsed, 0 left
+40 jobs to run with 2 engines
+10/40 03:04:57
+20/40 03:05:36
+30/40 03:06:06
+40/40 03:06:36
+--- all done 2026-11-09T03:06

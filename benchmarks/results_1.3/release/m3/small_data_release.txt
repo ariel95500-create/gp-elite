@@ -1,0 +1,1 @@
+F    20 fits  train R2 median 1.0000 worst 1   test R2 median 1.0000 worst 1   below 0 on test: 0   stale scale/offset: 0

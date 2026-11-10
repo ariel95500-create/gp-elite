@@ -1,0 +1,22 @@
+1.2.0: fits at budget 1991, median 30.530, max 31.77, min 30.02
+    all fits: median 30.38, max 31.77
+    U41 median time 0.390
+    TF78u median time 1.245
+    U41 never exact: ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+    F41 never exact: ['I.26.2', 'I.30.5', 'I.37.4', 'I.50.26', 'III.10.19', 'III.17.37', 'III.9.52']
+    F41 exact once: ['I.11.19']
+    F41 exact per problem (not 5): {'I.11.19': 1, 'I.16.6': 4, 'I.26.2': 0, 'I.30.5': 0, 'I.37.4': 0, 'I.50.26': 0, 'I.6.20a': 4, 'II.2.42': 4, 'III.10.19': 0, 'III.17.37': 0, 'III.9.52': 0}
+    TF78 never exact: 34 of 78
+    TF78u never exact: 30 of 78
+    dates 2026-11-09T04:35:30 2026-11-09T13:43:37
+1.3.0: fits at budget 1983, median 30.540, max 31.71, min 30.03
+    all fits: median 30.37, max 31.71
+    U41 median time 0.390
+    TF78u median time 1.200
+    U41 never exact: ['I.37.4', 'I.50.26', 'III.17.37', 'III.9.52']
+    F41 never exact: ['I.37.4', 'I.50.26', 'III.10.19', 'III.17.37', 'III.9.52']
+    F41 exact once: ['I.11.19']
+    F41 exact per problem (not 5): {'I.11.19': 1, 'I.16.6': 4, 'I.26.2': 3, 'I.37.4': 0, 'I.50.26': 0, 'I.6.20a': 4, 'II.2.42': 4, 'III.10.19': 0, 'III.17.37': 0, 'III.9.52': 0}
+    TF78 never exact: 33 of 78
+    TF78u never exact: 30 of 78
+    dates 2026-11-09T04:35:30 2026-11-09T13:43:37

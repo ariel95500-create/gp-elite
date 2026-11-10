@@ -1,0 +1,7 @@
+Fits compared: 147; identical in every field: 147; different: 0; missing or crashed: 0
+  feyn: 31 of 31 identical
+  real: 6 of 6 identical
+  realraw: 7 of 7 identical
+  tp: 72 of 72 identical
+  ufeyn: 31 of 31 identical
+ALL IDENTICAL

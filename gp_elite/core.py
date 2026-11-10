@@ -2054,7 +2054,8 @@ ALL_OPS     = BINARY_OPS + UNARY_OPS
 # is_even) et Batterie (tanh/exp). Tester l'appartenance contre les pools
 # de tirage gelait ces opérateurs en mutation et tronquait leur affichage
 # (ex: "tanh" imprimé SANS son argument).
-ALL_UNARY_OPS  = UNARY_OPS  + ["tanh", "exp", "tan", "is_even", "step"]
+ALL_UNARY_OPS  = UNARY_OPS  + ["tanh", "exp", "tan", "is_even", "step",
+                               "arcsin"]   # [1.3-A1]
 ALL_BINARY_OPS = BINARY_OPS + ["max2", "min2"]
 
 # Poids standard — problèmes classiques 1-D/N-D
@@ -2079,19 +2080,23 @@ _BATTERY_UNARY_WEIGHTS  = [4, 3, 3, 2, 3, 1]
 # L'utilisateur choisit la "physique" de son problème au chargement :
 #   physical : exp/log/sqrt/tanh/pow — lois de décroissance, saturation,
 #              Arrhenius, diffusion (default pour données expérimentales)
-#   trig     : + sin/cos — phénomènes périodiques/oscillants
-#   full     : tout — quand on ne sait pas a priori
+#   trig     : + sin/cos — phénomènes périodiques/oscillants ; [1.3-A1] et
+#              arcsin (réfraction, diffraction)
+#   full     : tout — quand on ne sait pas a priori (avec arcsin depuis 1.3)
 #   poly     : uniquement +,-,*,/,sq,cube,sqrt — relations algébriques pures
 _GENCSV_POOLS = {
     "physical": (["+", "-", "*", "/", "pow"],          [4, 4, 5, 2, 3],
                  ["exp", "log", "sqrt", "tanh", "sq", "neg", "abs"],
                                                         [4, 3, 3, 2, 3, 1, 2]),
+    # [1.3-A1] arcsin (argument clipped to [-1, 1]) in trig and full, weight 2
     "trig":     (["+", "-", "*", "/", "pow"],          [3, 3, 4, 2, 1],
-                 ["sin", "cos", "exp", "log", "sqrt", "tanh", "sq", "neg", "abs"],
-                                                        [3, 3, 2, 2, 2, 2, 2, 1, 1]),
+                 ["sin", "cos", "exp", "log", "sqrt", "tanh", "sq", "neg", "abs",
+                  "arcsin"],
+                                                        [3, 3, 2, 2, 2, 2, 2, 1, 1, 2]),
     "full":     (["+", "-", "*", "/", "pow"],          [3, 3, 4, 2, 1],
-                 ["sin", "cos", "log", "exp", "sqrt", "tanh", "abs", "neg", "sq", "cube"],
-                                                        [2, 2, 2, 2, 2, 2, 1, 1, 3, 1]),
+                 ["sin", "cos", "log", "exp", "sqrt", "tanh", "abs", "neg", "sq", "cube",
+                  "arcsin"],
+                                                        [2, 2, 2, 2, 2, 2, 1, 1, 3, 1, 2]),
     "poly":     (["+", "-", "*", "/"],                 [4, 4, 5, 2],
                  ["sqrt", "neg", "sq", "cube", "abs"],  [2, 1, 3, 2, 1]),
     # [CONSERVATION] Pool minimal pour la découverte de lois physiques : pas
@@ -2465,6 +2470,7 @@ _SYMPY_UNARY = {
     "cos":     lambda a: "cos(%s)" % a,
     "tan":     lambda a: "tan(%s)" % a,
     "tanh":    lambda a: "tanh(%s)" % a,
+    "arcsin":  lambda a: "asin(%s)" % a,        # [1.3-A1]
     "step":    lambda a: "Heaviside(%s)" % a,
     "is_even": lambda a: "(1 - Mod(floor(%s), 2))" % a,
 }
@@ -2682,6 +2688,13 @@ def safe_tan(x: float) -> float:
     except Exception:
         return 0.0
 
+def safe_arcsin(x: float) -> float:
+    """[1.3-A1] Arcsine of the argument clipped to [-1, 1] (its guard)."""
+    try:
+        return math.asin(min(max(x, -1.0), 1.0))
+    except Exception:
+        return 0.0
+
 def safe_log(x: float) -> float:
     return math.log(abs(x) + 1e-12)
 
@@ -2800,6 +2813,11 @@ def _np_safe_tan(a):
         r = np.tan(a)
     return np.where(np.isfinite(r) & (np.abs(r) < _SAFE_LIMIT), r, 0.0)
 
+def _np_safe_arcsin(a):
+    """[1.3-A1] Arcsine of the argument clipped to [-1, 1] (its guard); NaN
+    stays NaN, as through the other clipped operators."""
+    return np.arcsin(_np_minimum(_np_maximum(a, -1.0), 1.0))
+
 def _np_safe_exp(a):
     """
     [v16-FIX] clip symétrique [-88, 88] : exp(88) ≈ 1.6e38 < float64 max.
@@ -2866,6 +2884,7 @@ _NP_GLOBALS = {
     "_safe_pow":   _np_safe_pow,
     "_safe_powv":  _np_safe_pow_var,   # [v0.7] exposant variable
     "_safe_tan":   _np_safe_tan,
+    "_safe_arcsin": _np_safe_arcsin,  # [1.3-A1]
     "_safe_exp":   _np_safe_exp,
     "_safe_log":   _np_safe_log,
     "_safe_sqrt":  _np_safe_sqrt,
@@ -2933,6 +2952,8 @@ def _to_np_code(node) -> str:
         return f"np.cos({_to_np_code(node.left)})"
     if v == "tan":
         return f"_safe_tan({_to_np_code(node.left)})"
+    if v == "arcsin":                                    # [1.3-A1]
+        return f"_safe_arcsin({_to_np_code(node.left)})"
     if v == "tanh":
         return f"np.tanh({_to_np_code(node.left)})"
     if v == "exp":
@@ -3006,6 +3027,7 @@ def _to_np_code_parametric(node, const_list: list) -> str:
         if v == "sin":  return f"np.sin({_code(n.left)})"
         if v == "cos":  return f"np.cos({_code(n.left)})"
         if v == "tan":  return f"_safe_tan({_code(n.left)})"
+        if v == "arcsin": return f"_safe_arcsin({_code(n.left)})"   # [1.3-A1]
         if v == "tanh": return f"np.tanh({_code(n.left)})"
         if v == "exp":  return f"_safe_exp({_code(n.left)})"
         if v == "log":  return f"_safe_log({_code(n.left)})"
@@ -3045,11 +3067,13 @@ _LM_UNARY_FN = {
     "sin":  np.sin, "cos": np.cos, "tan": _np_safe_tan, "tanh": np.tanh,
     "exp":  _np_safe_exp, "log": _np_safe_log, "sqrt": _np_safe_sqrt,
     "abs":  np.abs, "is_even": _np_is_even, "step": _np_step,
+    "arcsin": _np_safe_arcsin,                       # [1.3-A1]
 }
 _LM_UNARY_SRC = {
     "sin": "np.sin", "cos": "np.cos", "tan": "_safe_tan", "tanh": "np.tanh",
     "exp": "_safe_exp", "log": "_safe_log", "sqrt": "_safe_sqrt",
     "abs": "np.abs", "is_even": "_is_even", "step": "_step",
+    "arcsin": "_safe_arcsin",                        # [1.3-A1]
 }
 _LM_BINARY_SRC = {"/": "_safe_div", "max2": "_max2", "min2": "_min2"}
 _LM_BINARY_FN = {"/": _np_safe_div, "max2": _np_max2, "min2": _np_min2}
@@ -3336,6 +3360,8 @@ def evaluate(node, x) -> float:
             return math.cos(evaluate(node.left, x))
         if v == "tan":
             return safe_tan(evaluate(node.left, x))
+        if v == "arcsin":                                # [1.3-A1]
+            return safe_arcsin(evaluate(node.left, x))
         if v == "tanh":
             return math.tanh(evaluate(node.left, x))
         if v == "exp":
@@ -3388,6 +3414,7 @@ def _cube(a):
 _INTERP_BINARY = {"+": operator.add, "-": operator.sub, "*": operator.mul,
                   "/": _np_safe_div, "max2": _np_max2, "min2": _np_min2}
 _INTERP_UNARY = {"sin": np.sin, "cos": np.cos, "tan": _np_safe_tan,
+                 "arcsin": _np_safe_arcsin,                  # [1.3-A1]
                  "tanh": np.tanh, "exp": _np_safe_exp, "log": _np_safe_log,
                  "sqrt": _np_safe_sqrt, "abs": np.abs, "neg": operator.neg,
                  "sq": _sq, "cube": _cube, "is_even": _np_is_even,
@@ -4575,6 +4602,8 @@ def _make_binomial_seeds(xs, ys, cfg, tol=None) -> list:
 # Même principe que les graines binomiales, pour les fonctions élémentaires :
 #   y = b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g)
 #   y = f·(a + β·sin(ω·g) + γ·cos(ω·g))
+#   [1.3-A3] y = b·f·arcsin(c·g), là où le pool a l'arc sinus (trig, full) ;
+#   inversée comme tanh, b au moins 2/π fois le plus grand |y/f|
 # f et g des monômes. Pour les quatre premières, la fonction inversée rend
 # une loi de puissance des entrées (une constante cherchée sur une dimension,
 # aucune pour le logarithme) ; pour la forme trigonométrique, ω se cherche
@@ -4642,6 +4671,8 @@ def _elem_transform(kind, R, s):
     mx = A.max(axis=0)
     if kind == "tanh":
         return np.log(np.arctanh(A / (mx * (1.0 + 10.0 ** s))))
+    if kind == "arcsin":                  # [1.3-A3] |arcsin| <= pi/2 : b >= (2/pi) max
+        return np.log(np.sin(A / (mx * (2.0 / math.pi) * (1.0 + 10.0 ** s))))
     return np.log(np.arccosh(mx * (1.0 + 10.0 ** s) / A))      # "sech"
 
 
@@ -4692,7 +4723,7 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6, tol=_BINOM_TOL) -> list
                 continue
             out.append(("log", lib[idx[m]], g, float(math.exp(a0 / s0))))
             break
-    for kind in [k for k in ("exp-", "exp+", "tanh", "sech")
+    for kind in [k for k in ("exp-", "exp+", "tanh", "sech", "arcsin")
                  if k.rstrip("+-") in kinds]:
         best = np.full(R.shape[1], np.inf)
         with np.errstate(all="ignore"):
@@ -4702,7 +4733,16 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6, tol=_BINOM_TOL) -> list
                 v = _elem_rel(np.where(np.isfinite(T), T, 0.0), Qs)
                 v[~fin] = np.inf
                 best = np.minimum(best, v)
-        for m in np.argsort(best, kind="stable")[:top]:
+        order = [int(m) for m in np.argsort(best, kind="stable")[:top]]
+        if kind == "arcsin":
+            # [1.3-A3] La forme simple y = b·arcsin(c·g) (f = 1) est toujours
+            # essayée, la première : arcsin(x) est proche de x pour un petit
+            # argument, et sur la grille grossière d'autres f peuvent la
+            # devancer (7e sur une loi arcsin(0,7·x0/(x1·x2))).
+            j0 = np.where(idx == 0)[0]
+            if j0.size and np.isfinite(best[j0[0]]):
+                order = [int(j0[0])] + [m for m in order if m != j0[0]]
+        for m in order:
             if not np.isfinite(best[m]):
                 break
             r = R[:, [m]]
@@ -4899,7 +4939,8 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
         return []
     kinds = [k for k, need in (("exp", {"exp"}), ("log", {"log"}),
                                ("tanh", {"tanh"}), ("sech", {"exp"}),
-                               ("trig", {"sin", "cos"})) if need <= uops]
+                               ("trig", {"sin", "cos"}),
+                               ("arcsin", {"arcsin"})) if need <= uops]   # [1.3-A3]
     if not kinds:
         return []
     t0 = time.time()
@@ -4936,6 +4977,8 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
             h = Node("log", cg(c))
         elif kind == "tanh":
             h = Node("tanh", cg(c))
+        elif kind == "arcsin":            # [1.3-A3]
+            h = Node("arcsin", cg(c))
         else:                             # 1/cosh(c·g) = 2/(exp(c·g) + exp(-c·g))
             den = Node("+", Node("exp", cg(c)), Node("exp", cg(-c)))
             seeds.append(Node("/", f if f is not None else Node(1.0), den))
@@ -5645,7 +5688,7 @@ def _simplify_tree(root: Node) -> Node:
 
 
 _UNARY_FOLD = frozenset(("sin", "cos", "tan", "tanh", "exp", "log", "sqrt",
-                         "abs", "neg", "sq", "cube"))
+                         "abs", "neg", "sq", "cube", "arcsin"))   # [1.3-A1]
 
 
 def _simplify_node(v, left, right) -> Node:
@@ -5663,6 +5706,7 @@ def _simplify_node(v, left, right) -> Node:
             if v == "sin":   return Node(float(math.sin(c)))
             if v == "cos":   return Node(float(math.cos(c)))
             if v == "tan":   return Node(float(safe_tan(c)))
+            if v == "arcsin": return Node(float(safe_arcsin(c)))   # [1.3-A1]
             if v == "tanh":  return Node(float(math.tanh(c)))
             if v == "exp":   return Node(float(safe_exp(c)))
             if v == "log":   return Node(float(safe_log(c)))
@@ -5732,7 +5776,25 @@ def _simplify_node(v, left, right) -> Node:
     if v == "neg" and left is not None and left.value == "neg":
         return left.left
 
+    # [1.3-A2] L'arc sinus porte sa propre constante : arcsin(u) devient
+    # arcsin(1 * u), que l'ajustement des constantes règle comme les autres.
+    # Les variables sont divisées par leur maximum avant la recherche ; une
+    # loi en arcsin a donc besoin d'un facteur dans son argument, que le
+    # polissage ne sait pas ajouter (benchmarks/results_1.3/a1/examine).
+    if v == "arcsin" and left is not None and not _has_own_factor(left):
+        return Node("arcsin", Node("*", Node(1.0), left))
+
     return Node(v, left, right)
+
+
+def _has_own_factor(n) -> bool:
+    """[1.3-A2] Vrai si n est un produit ou un quotient dont l'opérande de
+    gauche est un nombre, ou un produit dont l'opérande de droite en est un."""
+    if n.value == "*":
+        return _is_float(n.left) or _is_float(n.right)
+    if n.value == "/":
+        return _is_float(n.left)
+    return False
 
 # ============================================================
 # OPTIMISATION DES CONSTANTES — Adam gradient numérique

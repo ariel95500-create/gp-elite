@@ -1,0 +1,12 @@
+10 jobs to run, 0 already done
+1 done: feyn I.26.2 seed 1 k=1 -> MISS (34 s)
+2 done: feyn I.26.2 seed 2 k=1 -> NEAR (34 s)
+3 done: feyn I.26.2 seed 3 k=1 -> MISS (35 s)
+4 done: feyn I.26.2 seed 0 k=1 -> MISS (36 s)
+5 done: feyn I.30.5 seed 2 k=1 -> NEAR (8 s)
+6 done: feyn I.26.2 seed 4 k=1 -> EXACT (12 s)
+7 done: feyn I.30.5 seed 1 k=1 -> NEAR (13 s)
+8 done: feyn I.30.5 seed 4 k=1 -> NEAR (18 s)
+9 done: feyn I.30.5 seed 0 k=1 -> EXACT (35 s)
+10 done: feyn I.30.5 seed 3 k=1 -> NEAR (34 s)
+e1-done

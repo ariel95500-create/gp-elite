@@ -1,0 +1,24 @@
+Records per kernel and arm:
+  6.18.44-fc-v242: 1T 565, 3T 564, 10T 562
+  6.18.44-fc-v260: 1T 250, 3T 250, 10T 250
+  6.18.44-fc-v310: 1T 525, 3T 526, 10T 528
+Triples complete: 1340; within one kernel: 1334; across a change: 6
+  across: feyn_n1 I.15.10 test 2: 1T v260, 3T v260, 10T v310
+  across: feyn_n1 I.15.10 test 3: 1T v260, 3T v260, 10T v310
+  across: feyn_n1 I.15.10 test 4: 1T v260, 3T v310, 10T v310
+  across: tf feynman_I_34_14 test 6: 1T v242, 3T v242, 10T v260
+  across: tf feynman_I_34_14 test 8: 1T v242, 3T v242, 10T v260
+  across: tf feynman_I_34_14 test 9: 1T v242, 3T v260, 10T v260
+
+T -> 10T on all complete triples:
+  F41 exact 163 -> 164 (of 205)
+  U41 exact 165 -> 169 (of 205)
+  F41N1 structure 108 -> 111 (of 205)
+  F41N10 structure 85 -> 90 (of 205)
+  R6 folds median R² 0.8126 -> 0.8126
+T -> 10T on the triples within one kernel:
+  F41 exact 163 -> 164 (of 205)
+  U41 exact 165 -> 169 (of 205)
+  F41N1 structure 108 -> 111 (of 202)
+  F41N10 structure 85 -> 90 (of 205)
+  R6 folds median R² 0.8126 -> 0.8126

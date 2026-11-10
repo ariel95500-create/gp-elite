@@ -1,0 +1,211 @@
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+/home/user/gp-elite/benchmarks/results_1.2/budget_study/driver.sh: 25: cannot open /home/user/budget_records/campaign.jsonl: No such file
+--- slice 2026-11-06T11:53 (0 done), Model name: Intel(R) Xeon(R) Processor
+4020 jobs to run, 0 already done
+25 done, 8 s elapsed, 3992 left
+50 done, 14 s elapsed, 3968 left
+75 done, 21 s elapsed, 3942 left
+100 done, 374 s elapsed, 3917 left
+125 done, 764 s elapsed, 3894 left
+150 done, 777 s elapsed, 3869 left
+175 done, 790 s elapsed, 3844 left
+200 done, 801 s elapsed, 3818 left
+225 done, 812 s elapsed, 3793 left
+250 done, 1187 s elapsed, 3770 left
+275 done, 1269 s elapsed, 3744 left
+300 done, 1716 s elapsed, 3720 left
+325 done, 1880 s elapsed, 3695 left
+350 done, 1893 s elapsed, 3669 left
+375 done, 2343 s elapsed, 3645 left
+400 done, 2363 s elapsed, 3619 left
+425 done, 3121 s elapsed, 3592 left
+450 done, 3226 s elapsed, 3570 left
+475 done, 3250 s elapsed, 3543 left
+500 done, 3260 s elapsed, 3519 left
+525 done, 3269 s elapsed, 3493 left
+550 done, 3279 s elapsed, 3468 left
+575 done, 3982 s elapsed, 3444 left
+600 done, 4732 s elapsed, 3420 left
+625 done, 5145 s elapsed, 3395 left
+650 done, 6017 s elapsed, 3369 left
+time slice over: 3359 jobs left for the next call
+--- slice 2026-11-06T13:42 (661 done), Model name: Intel(R) Xeon(R) Processor
+3359 jobs to run, 661 already done
+25 done, 905 s elapsed, 3331 left
+50 done, 1822 s elapsed, 3308 left
+75 done, 2673 s elapsed, 3281 left
+100 done, 3553 s elapsed, 3258 left
+125 done, 4465 s elapsed, 3233 left
+150 done, 5332 s elapsed, 3206 left
+175 done, 6193 s elapsed, 3183 left
+time slice over: 3178 jobs left for the next call
+--- slice 2026-11-06T15:30 (842 done), Model name: Intel(R) Xeon(R) Processor
+3178 jobs to run, 842 already done
+25 done, 941 s elapsed, 3152 left
+--- container restart noticed at 2026-11-06T17:51: the last record was written at 15:59:45, the 890 records are whole (no broken line, no key twice); the fits running at the restart left no record and run again; driver restarted
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-06T17:51 (890 done), Model name: Intel(R) Xeon(R) Processor
+3130 jobs to run, 890 already done
+25 done, 1009 s elapsed, 3104 left
+50 done, 1885 s elapsed, 3077 left
+75 done, 2743 s elapsed, 3054 left
+100 done, 3679 s elapsed, 3029 left
+125 done, 4113 s elapsed, 3005 left
+150 done, 4354 s elapsed, 2979 left
+175 done, 4660 s elapsed, 2954 left
+200 done, 4675 s elapsed, 2929 left
+225 done, 5114 s elapsed, 2905 left
+250 done, 5187 s elapsed, 2878 left
+275 done, 5386 s elapsed, 2854 left
+300 done, 5399 s elapsed, 2828 left
+325 done, 5411 s elapsed, 2803 left
+350 done, 5422 s elapsed, 2779 left
+375 done, 5433 s elapsed, 2755 left
+400 done, 5445 s elapsed, 2728 left
+425 done, 5455 s elapsed, 2703 left
+450 done, 5465 s elapsed, 2680 left
+475 done, 5509 s elapsed, 2653 left
+500 done, 5955 s elapsed, 2630 left
+525 done, 5975 s elapsed, 2604 left
+550 done, 5992 s elapsed, 2579 left
+575 done, 6009 s elapsed, 2554 left
+600 done, 6204 s elapsed, 2529 left
+time slice over: 2525 jobs left for the next call
+--- slice 2026-11-06T19:39 (1495 done), Model name: Intel(R) Xeon(R) Processor
+2525 jobs to run, 1495 already done
+25 done, 349 s elapsed, 2499 left
+--- container restart noticed at 2026-11-06T20:01: the last record was written at 19:52:47, the 1532 records are whole (no broken line, no key twice); the fits running at the restart left no record and run again; driver restarted
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-06T20:01 (1532 done), Model name: Intel(R) Xeon(R) Processor
+2488 jobs to run, 1532 already done
+25 done, 450 s elapsed, 2463 left
+50 done, 1342 s elapsed, 2435 left
+75 done, 1680 s elapsed, 2412 left
+100 done, 2092 s elapsed, 2387 left
+125 done, 2944 s elapsed, 2361 left
+150 done, 3575 s elapsed, 2335 left
+--- container restart noticed at 2026-11-06T21:05: the last record was written at 21:04:59, the 1691 records are whole (no broken line, no key twice); the fits running at the restart left no record and run again; lscpu identical to the first slice, but the kernel of the container is now 6.18.44-fc-v260 (6.18.44-fc-v242 before); driver restarted
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-06T21:05 (1691 done), Model name: Intel(R) Xeon(R) Processor
+2329 jobs to run, 1691 already done
+25 done, 127 s elapsed, 2304 left
+50 done, 162 s elapsed, 2279 left
+75 done, 606 s elapsed, 2251 left
+100 done, 701 s elapsed, 2228 left
+125 done, 718 s elapsed, 2203 left
+150 done, 734 s elapsed, 2178 left
+175 done, 1562 s elapsed, 2153 left
+200 done, 2098 s elapsed, 2126 left
+225 done, 2981 s elapsed, 2101 left
+250 done, 3900 s elapsed, 2078 left
+275 done, 4771 s elapsed, 2051 left
+300 done, 5636 s elapsed, 2028 left
+time slice over: 2007 jobs left for the next call
+--- slice 2026-11-06T22:55 (2013 done), Model name: Intel(R) Xeon(R) Processor
+2007 jobs to run, 2013 already done
+25 done, 802 s elapsed, 1980 left
+50 done, 1681 s elapsed, 1956 left
+75 done, 2612 s elapsed, 1931 left
+100 done, 2950 s elapsed, 1906 left
+125 done, 3832 s elapsed, 1881 left
+150 done, 4464 s elapsed, 1857 left
+175 done, 5003 s elapsed, 1829 left
+200 done, 5884 s elapsed, 1806 left
+time slice over: 1792 jobs left for the next call
+--- slice 2026-11-07T00:43 (2228 done), Model name: Intel(R) Xeon(R) Processor
+1792 jobs to run, 2228 already done
+25 done, 942 s elapsed, 1766 left
+50 done, 1793 s elapsed, 1739 left
+75 done, 2673 s elapsed, 1716 left
+100 done, 3588 s elapsed, 1691 left
+125 done, 4465 s elapsed, 1664 left
+150 done, 5318 s elapsed, 1641 left
+175 done, 6254 s elapsed, 1616 left
+time slice over: 1611 jobs left for the next call
+--- slice 2026-11-07T02:33 (2409 done), Model name: Intel(R) Xeon(R) Processor
+1611 jobs to run, 2409 already done
+25 done, 882 s elapsed, 1586 left
+--- container restart noticed at 2026-11-07T02:52: the last record was written at 02:52:02, the 2441 records are whole (no broken line, no key twice); the fits running at the restart left no record and run again; lscpu identical to the first slice, the kernel of the container is now 6.18.44-fc-v310 (6.18.44-fc-v260 since 21:05 on 6 November, 6.18.44-fc-v242 before); driver restarted
+--- budget study, bench of b09d293, Model name: Intel(R) Xeon(R) Processor, 4 cores
+--- slice 2026-11-07T02:52 (2441 done), Model name: Intel(R) Xeon(R) Processor
+1579 jobs to run, 2441 already done
+25 done, 1007 s elapsed, 1553 left
+50 done, 1881 s elapsed, 1526 left
+75 done, 2741 s elapsed, 1503 left
+100 done, 3674 s elapsed, 1478 left
+125 done, 4533 s elapsed, 1451 left
+150 done, 5408 s elapsed, 1428 left
+time slice over: 1401 jobs left for the next call
+175 done, 6326 s elapsed, 2 left
+--- slice 2026-11-07T04:41 (2619 done), Model name: Intel(R) Xeon(R) Processor
+1401 jobs to run, 2619 already done
+25 done, 884 s elapsed, 1376 left
+50 done, 1758 s elapsed, 1350 left
+75 done, 2676 s elapsed, 1325 left
+100 done, 3531 s elapsed, 1298 left
+125 done, 4411 s elapsed, 1275 left
+150 done, 5329 s elapsed, 1250 left
+175 done, 6201 s elapsed, 1223 left
+time slice over: 1220 jobs left for the next call
+--- slice 2026-11-07T06:30 (2800 done), Model name: Intel(R) Xeon(R) Processor
+1220 jobs to run, 2800 already done
+25 done, 906 s elapsed, 1192 left
+50 done, 1827 s elapsed, 1167 left
+75 done, 2679 s elapsed, 1142 left
+100 done, 3559 s elapsed, 1119 left
+125 done, 4472 s elapsed, 1094 left
+150 done, 5342 s elapsed, 1067 left
+175 done, 6205 s elapsed, 1044 left
+time slice over: 1040 jobs left for the next call
+--- slice 2026-11-07T08:18 (2980 done), Model name: Intel(R) Xeon(R) Processor
+1040 jobs to run, 2980 already done
+25 done, 905 s elapsed, 1012 left
+50 done, 1825 s elapsed, 989 left
+75 done, 2680 s elapsed, 962 left
+100 done, 3562 s elapsed, 939 left
+125 done, 4475 s elapsed, 914 left
+150 done, 5346 s elapsed, 887 left
+175 done, 6211 s elapsed, 864 left
+time slice over: 860 jobs left for the next call
+--- slice 2026-11-07T10:07 (3160 done), Model name: Intel(R) Xeon(R) Processor
+860 jobs to run, 3160 already done
+25 done, 906 s elapsed, 832 left
+50 done, 1828 s elapsed, 809 left
+75 done, 2680 s elapsed, 782 left
+100 done, 3562 s elapsed, 759 left
+125 done, 4476 s elapsed, 734 left
+150 done, 5342 s elapsed, 707 left
+175 done, 6208 s elapsed, 684 left
+time slice over: 680 jobs left for the next call
+--- slice 2026-11-07T11:55 (3340 done), Model name: Intel(R) Xeon(R) Processor
+680 jobs to run, 3340 already done
+25 done, 907 s elapsed, 652 left
+50 done, 1826 s elapsed, 629 left
+75 done, 2261 s elapsed, 604 left
+100 done, 2275 s elapsed, 579 left
+125 done, 2291 s elapsed, 554 left
+150 done, 2318 s elapsed, 529 left
+175 done, 2867 s elapsed, 504 left
+200 done, 2914 s elapsed, 478 left
+225 done, 2923 s elapsed, 452 left
+250 done, 2933 s elapsed, 427 left
+275 done, 2940 s elapsed, 402 left
+300 done, 2948 s elapsed, 377 left
+325 done, 3118 s elapsed, 355 left
+350 done, 3231 s elapsed, 329 left
+375 done, 3695 s elapsed, 304 left
+400 done, 3861 s elapsed, 280 left
+425 done, 3926 s elapsed, 253 left
+450 done, 4308 s elapsed, 230 left
+475 done, 4537 s elapsed, 204 left
+500 done, 4873 s elapsed, 179 left
+525 done, 4898 s elapsed, 154 left
+550 done, 4919 s elapsed, 129 left
+575 done, 4938 s elapsed, 104 left
+600 done, 4955 s elapsed, 79 left
+625 done, 5120 s elapsed, 53 left
+650 done, 5870 s elapsed, 29 left
+time slice over: 13 jobs left for the next call
+--- slice 2026-11-07T13:44 (4007 done), Model name: Intel(R) Xeon(R) Processor
+13 jobs to run, 4007 already done
+--- all done 2026-11-07T13:44

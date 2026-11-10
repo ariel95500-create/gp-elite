@@ -1,0 +1,4 @@
+feyn I.30.5 seed 0: fields of the old record that differ: none; new fields ['elementary_seed', 'tolerant_seed']; elementary_seed arcsin((0.080928 * (v0 / (v1 * v2))))
+feyn_n1 II.15.4 seed 1: fields of the old record that differ: none; new fields ['elementary_seed', 'tolerant_seed']; elementary_seed None
+
+ALL CHECKS HOLD

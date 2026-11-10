@@ -1,0 +1,25 @@
+Fits: 10; crashes: 0
+
+| fit | arm | status (study, now) | generations (study, now) | offered | within reach | class |
+|---|---|---|---|---|---|---|
+| I.26.2 seed 0 | T | MISS, MISS | 113, 112 | 82 | 0 | 1 no candidate within reach |
+| I.26.2 seed 1 | T | MISS, MISS | 114, 110 | 72 | 0 | 1 no candidate within reach |
+| I.26.2 seed 2 | T | NEAR, NEAR | 114, 114 | 82 | 0 | 1 no candidate within reach |
+| I.26.2 seed 3 | T | MISS, MISS | 106, 105 | 67 | 0 | 1 no candidate within reach |
+| I.26.2 seed 4 | T | EXACT, EXACT | 39, 39 | 42 | 1 | exact |
+| I.30.5 seed 0 | T | EXACT, EXACT | 118, 115 | 46 | 2 | exact |
+| I.30.5 seed 1 | T | NEAR, NEAR | 39, 39 | 17 | 0 | 1 no candidate within reach |
+| I.30.5 seed 2 | T | NEAR, NEAR | 31, 31 | 10 | 0 | 1 no candidate within reach |
+| I.30.5 seed 3 | T | NEAR, NEAR | 121, 119 | 33 | 0 | 1 no candidate within reach |
+| I.30.5 seed 4 | T | NEAR, NEAR | 70, 70 | 24 | 0 | 1 no candidate within reach |
+
+Near fits of the budget study at T and 10T that kept their status: 5
+  class 1, no candidate within reach: 5
+  class 2, turned away by a guard: 0
+  class 3, lost by the pool: 0
+  class 4, not a finalist: 0
+  class 5, cut by the grace: 0
+  class 6, polished and still not exact: 0
+Classes 2 to 5 together: 0 (PLAN.md: at least 10 means the end of the search loses laws the search had found)
+
+I.8.14, read apart:

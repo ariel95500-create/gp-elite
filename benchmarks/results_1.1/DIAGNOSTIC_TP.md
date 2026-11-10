@@ -216,3 +216,30 @@ points 2 and 4 of the list above (`../results_1.2/PLAN.md`):
 Point 1 was measured as C1, an honest message under units, and not adopted
 (`../results_1.2/c1/`); points 3 and 5 are not in 1.2. The six laws of the
 notebook come back as before.
+
+## Note added for version 1.3 (9 November 2026)
+
+This diagnostic is left as written. Version 1.3 took point 5 of the list
+above, the arcsine (`../results_1.3/PLAN.md`): the pools `trig` and `full`
+have it. It does not bring Snell's law back on the TP.
+- **On the noisy data of the diagnostic,** the law comes back by its test in
+  none of the 40 fits of Snell's law, with 1.3 as with 1.2.0: both arms, 10
+  and 20 points, 2 % and 5 % noise, draws 0 to 4, and again at draws 5 to 9.
+  The approximations stay as useful: 18 and 19 of 20 within 1 % of the law
+  at draws 0 to 4, 20 and 20 at draws 5 to 9, the same as 1.2.0.
+- **The noise hides the law.** Measured on the 40 fits of the first version,
+  A1, at draws 0 to 4: in all of them, the curve returned stands closer to
+  the law than the noise added, a median of 0.2 of the noise and at most
+  0.99 (`../results_1.3/a1/examine/README.md`, E2b). The data cannot
+  tell the law from the smaller curve, and the selection keeps the smaller.
+- **On clean data,** under the defaults, no formula with the arcsine came
+  back in the 10 fits of each of the first two versions of the arcsine, A1
+  and A2 (E2a of the same page, and `../results_1.3/a2/campaign/e2a_B.jsonl`).
+  By the test of the law, A2 has none of 10, and A1 has one, an approximation
+  without the arcsine within 2.4e-10 of the law. With A1 the search stopped
+  after 20 to 59 generations, within 2.4e-10 to 8.4e-6 of the law. This was
+  not measured again with the third version, A3, which 1.3 ships.
+
+The argument of Snell's law, sin(i1)/n, is not a monomial, so the seeds of
+the arcsine of 1.3 do not reach it either. The six laws of the notebook use
+the pool `physical`, which 1.3 leaves as it was.

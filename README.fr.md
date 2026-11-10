@@ -13,7 +13,7 @@ il faut, comment le temps de calcul augmente, et où elle échoue.
 
 GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
 
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 38 s au total à 1 000 points et 103 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.2.0 ; les temps dépendent de la machine).
+Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 41 s au total à 1 000 points et 113 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.3.0 ; les temps dépendent de la machine).
 
 Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
 
@@ -156,11 +156,11 @@ exacte, sans garantie.
 - `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
   le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
   génération en cours et la sélection finale ajoutent un peu (dans la mesure de
-  sortie de la 1.2.0, les 1 987 ajustements arrêtés par un budget de 30 s ont
-  pris 30,5 s en médiane et 31,9 s au plus). Une recherche qui trouve une loi
+  sortie de la 1.3.0, les 1 983 ajustements arrêtés par un budget de 30 s ont
+  pris 30,5 s en médiane et 31,7 s au plus). Une recherche qui trouve une loi
   exacte finit avant son budget : avec 15 s sur 3 000 lignes
   (`benchmarks/time_limit_check.py`), la loi est revenue à 6,3 s en séquence et
-  à 12,5 s avec les îles en parallèle.
+  à 13,2 s avec les îles en parallèle.
 - `patience=` (depuis la 1.2) : quand l'appel ne fixe ni `generations` ni
   `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
   côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
@@ -233,7 +233,8 @@ Rien à faire dans un notebook.
   formule est la fonction mathématique pure : là où l'un des garde-fous
   numériques du moteur agit sur vos données (une puissance bornée parce que sa
   base dépasse 100 ou son exposant 6 en valeur absolue, ou sa valeur un million ;
-  une division par un dénominateur à moins de 1e-8 de zéro), ou, rarement, là où
+  une division par un dénominateur à moins de 1e-8 de zéro ; depuis la 1.3,
+  l'argument d'un arc sinus ramené dans [−1, 1]), ou, rarement, là où
   l'arrondi ruine une expression mal conditionnée, elle s'écarte de `predict()` sur
   ces lignes, `formula_exact` vaut False et l'ajustement le signale. Dans les
   mesures de la 0.8
@@ -363,7 +364,9 @@ où les unités écartent aussi un terme que les données seules ajouteraient).
 Depuis la 1.1, les formes que le moteur ajuste directement agissent aussi avec
 `units=` : sur les 41 équations de Feynman du banc de décision avec leurs unités,
 cinq seeds à 30 s par ajustement, 165 lois exactes sur 205 contre 108 avec la 1.0,
-et 163 sans unités. **Pas** pour de la prédiction en
+et 163 sans unités. Avec l'arc sinus de la 1.3, 174 et 171, contre 166 et 163
+pour la 1.2 mesurée à côté. **Pas** pour de la
+prédiction en
 boîte noire : la contrainte écarte les approximations dimensionnellement fausses
 mais numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif
 est d'ajuster plutôt que de trouver une loi.
@@ -503,7 +506,14 @@ la 1.1 retrouve 226 lois exactes sur 390 contre 169. Les changements de la 1.2 o
 mesurées côte à côte pour la sortie de la 1.2, les deux versions donnent les mêmes
 comptes sur le jeu figé, avec et sans unités (214 lois exactes sur 390 sur ses
 équations de Feynman, 10 sur 70 sur ses systèmes de Strogatz, et 229 sur 390 avec
-les unités).
+les unités). Le changement de la 1.3 a été décidé de la même façon
+([`benchmarks/results_1.3/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.3)).
+Mesurée à côté de la 1.2 pour la sortie de la 1.3, sur le jeu figé, la 1.3
+retrouve 214 lois exactes sur 390 sur ses équations de Feynman contre 213, 8 sur
+70 sur ses systèmes de Strogatz avec les deux versions, et 228 sur 390 avec les
+unités contre 229. Les 213 et 8 de la 1.2 dans cette campagne, contre 214 et 10
+lors de sa propre sortie, viennent du budget de temps, qui fait bouger les comptes
+d'une campagne à l'autre.
 
 La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 
@@ -550,6 +560,10 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Caractéristiques techniques
 
+- **L'arc sinus** (v1.3) : `arcsin` dans les jeux `'trig'` et `'full'`, son
+  argument ramené dans [−1, 1] et doté d'un facteur constant que l'ajustement
+  des constantes règle, et parmi les formes ajustées directement l'arc sinus
+  d'un monôme, b·f·arcsin(c·g)
 - **Arrêt sur patience** (v1.2) : quand l'appel ne fixe ni `generations` ni
   `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
   côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
@@ -595,7 +609,12 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**1.2 « Classroom »** — avec les réglages par défaut, un ajustement s'arrête dès qu'il ne
+**1.3 « Arc »** — l'arc sinus, dans les jeux `trig` et `full` : sur les 41 équations
+de Feynman du banc de décision, ses deux lois à arc sinus reviennent exactes
+dans 8 ajustements sur 10, avec et sans unités, là où la 1.2 n'en avait aucune.
+Cela fait 171 lois exactes sur 205 contre 163, et 174 contre 166 avec les
+unités. Le jeu `physical`, celui par défaut, reste tel qu'il était : avec lui,
+les modèles de la 1.2 à travail égal. **1.2 « Classroom »** — avec les réglages par défaut, un ajustement s'arrête dès qu'il ne
 progresse plus (`patience=`) : les six lois du notebook de TP en 48 s, contre 194
 à 198 s pour la 1.1.0 sur la même machine, avec les mêmes formules ; une
 exponentielle revient écrite comme telle, `exp(-t / τ)`, sans changer le modèle ;

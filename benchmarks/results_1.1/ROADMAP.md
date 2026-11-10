@@ -16,9 +16,43 @@ Kept apart from the plans of 1.1, which this file does not change.
    message where a constant with units would have to sit inside a function or
    a sum. The full treatment of such constants, a front of candidate laws on
    small tables, the arcsine, and the retrieval of structure under noise come
-   after 1.2. The plan is written in `../results_1.2/`.
+   after 1.2. The plan is written in `../results_1.2/`. Done: 1.2.0
+   "Classroom" was published on 6 November 2026
+   (`../results_1.2/release/README.md`).
 4. **After 1.2, a measurement of what speed would bring** (decided on
-   27 October 2026), described below.
+   27 October 2026), described below. Its plan is
+   `../results_1.2/budget_study/PLAN.md`, committed on 6 November 2026
+   before the first fit; the campaign started the same day, once 1.2.0 was
+   on PyPI. Done on 7 November 2026: more time adds little, none of the
+   criteria holds (`../results_1.2/budget_study/README.md`); what follows is
+   the author's to decide.
+5. **A diagnostic of the end of the search** (8 November 2026; the author
+   left the choice to Claude). The budget study saw I.8.14 lost with more
+   time, and the code shows two ways the end of the search could lose a law
+   it had found. Its plan is `../results_1.2/end_of_search/PLAN.md`,
+   committed before any measurement. Done on 8 November 2026: the end of
+   the search is not the main cause. In 35 of the 40 near fits, the search
+   never offered the structure of the law. 15 of those 35 are the two
+   arcsine laws, which no operator pool of 1.2.0 can write. I.8.14 is lost
+   by the pool of 64 candidates (`../results_1.2/end_of_search/README.md`).
+6. **A version 1.3 with the arcsine** (chosen by Claude on 8 November 2026,
+   the author having left the choice to him; the author asked for its plan
+   the same day). Its plan is `../results_1.3/PLAN.md`, written before any
+   change; the author validated it at gate 9 on 8 November 2026. Its first
+   two versions, A1 and A2, were not adopted. The third, A3, the arcsine of
+   a monomial among the seeds, was adopted and kept on 9 November 2026:
+   - the two arcsine laws of F41 are exact with the arcsine in 8 and 7 fits
+     of 10 (none in 1.2.0);
+   - the other eight laws keep their count of exact fits on both sets of
+     seeds. On the second set, I.50.26 loses its one exact fit and III.17.37
+     gains one, within the criteria.
+
+   The measurements of its release, M1 to M5, were done on 9 November 2026
+   (`../results_1.3/release/README.md`). At gate 10, on 10 November 2026,
+   the author decided to publish 1.3.0 under the name "Arc". Two points were
+   proposed for a later version: the warning of the engine, which does not
+   name the arcsine among its safety nets, and a printed formula that would
+   show the clip of the arcsine.
 
 ## SRBench
 

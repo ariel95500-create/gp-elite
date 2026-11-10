@@ -1,0 +1,10 @@
+venv12p 10 points seed 0: law False, err_law 2.05e-07, -0.000164146 - 0.775397 * sin(-8.38769 - 0.161115 * i1²) * i1
+venv12p 10 points seed 1: law False, err_law 6.19e-08, -0.981187 + 0.978867 * (sin(sqrt((0.714286 * i1)^(0.714286 * i1)) + tanh(0.720106 - 0.3139
+venv12p 10 points seed 2: law False, err_law 2.75e-07, 0.000839404 + 2.01808 * i1 * sqrt(cos(0.714286 * i1) / (9.41644 - 0.714286 * i1))
+venv12p 10 points seed 3: law False, err_law 2.67e-08, 0.000118743 + 0.718789 * i1 * sin(2.80986 - 0.853025 * cos(0.714286 * i1))
+venv12p 10 points seed 4: law False, err_law 3.04e-06, -0.0011189 + 0.674769 * i1 * sqrt(0.992036 - 0.211327 * i1²)
+venv12p 20 points seed 0: law False, err_law 3.05e-08, 7.74766e-05 + 1.30845 * i1 / (exp(0.510204 * i1 / (3.15198 - 0.714286 * i1) * i1) + 0.9646
+venv12p 20 points seed 1: law False, err_law 8.4e-06, -0.00120212 + 0.669422 * i1 * sqrt(|sin(-1.51197 - 0.714286 * i1)|)
+venv12p 20 points seed 2: law False, err_law 3.53e-07, 0.000870524 + 0.181129 * (i1 * (2.93638 - 0.308001 * i1² * sqrt(i1)) + sin(0.714286 * i1))
+venv12p 20 points seed 3: law False, err_law 1.14e-08, -0.000187811 + 1.35502 * sin(0.714286 * i1 * sin(tanh(cos(0.714286 * i1 * sqrt(cos(cos((1.
+venv12p 20 points seed 4: law False, err_law 5.84e-06, -0.000845692 - 0.922955 * tanh(tanh(-1.73248 + 0.714286 * i1)) * i1

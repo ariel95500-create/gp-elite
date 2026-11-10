@@ -1,0 +1,16 @@
+--- campaign A3_conf, bench of 3f0f00d, Model name: Intel(R) Xeon(R) Processor, kernel 6.18.44-fc-v310, 2026-11-09T03:07
+150 jobs to run with 2 engines
+25 jobs done, 150 s elapsed, 124 left
+--- container restart noticed at 2026-11-09T03:45: the 33 paired records of A and B are whole (no broken line, no key twice, the same keys); the fits running at the restart left no record and run again; lscpu identical, kernel 6.18.44-fc-v310 as before; driver restarted
+--- campaign A3_conf, bench of 3f0f00d, Model name: Intel(R) Xeon(R) Processor, kernel 6.18.44-fc-v310, 2026-11-09T03:45
+117 jobs to run with 2 engines
+25 jobs done, 329 s elapsed, 91 left
+50 jobs done, 741 s elapsed, 66 left
+75 jobs done, 1128 s elapsed, 41 left
+100 jobs done, 1542 s elapsed, 16 left
+40 jobs to run with 2 engines
+10/40 04:15:50
+20/40 04:16:26
+30/40 04:16:54
+40/40 04:17:21
+--- all done_conf 2026-11-09T04:17

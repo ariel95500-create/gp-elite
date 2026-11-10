@@ -1,0 +1,506 @@
+records: A 2780 (dup 0), B 2780 (dup 0), same keys True
+pools in P: Counter({'physical': 100, 'trig': 33})
+crashes: 0 0
+engine versions: Counter({'1.2.0': 2780}) Counter({'1.3.0': 2780})
+pools of jobs: Counter({'physical': 2250, 'trig': 530})
+pools of jobs by kind: {'F41': {'physical': 155, 'trig': 50}, 'F41N1': {'physical': 155, 'trig': 50}, 'F41N10': {'physical': 155, 'trig': 50}, 'R6': {'physical': 60}, 'R7raw': {'physical': 70}, 'TF78': {'physical': 305, 'trig': 85}, 'TS14': {'physical': 80, 'trig': 60}, 'TR25': {'physical': 250}, 'TR25raw': {'physical': 250}, 'U41': {'physical': 155, 'trig': 50}, 'U41N1': {'physical': 155, 'trig': 50}, 'U41N10': {'physical': 155, 'trig': 50}, 'TF78 under units': {'physical': 305, 'trig': 85}}
+  F41 exact                                     163 | 171
+  U41 exact                                     166 | 174
+  F41N1 struct                                  108 | 116
+  F41N10 struct                                 85 | 87
+  U41N1 struct                                  113 | 121
+  U41N10 struct                                 98 | 95
+  TF78 exact                                    213 | 214
+  UTF exact                                     229 | 228
+  TS14 test exact                               8 | 8
+  TS14 ood collapses                            30 | 27
+  TS14 ood n                                    70 | 70
+  R6 folds median R2                            (0.8095, 30) | (0.8095, 30)
+  R6 ood collapses                              (5, 30) | (5, 30)
+  R7raw folds median R2                         (0.8787, 35) | (0.8787, 35)
+  R7raw ood collapses                           (5, 35) | (5, 35)
+  TR25 folds median R2                          (0.7692, 125) | (0.7692, 125)
+  TR25 ood collapses                            (37, 125) | (37, 125)
+  TR25raw folds median R2                       (0.7807, 125) | (0.7807, 125)
+  TR25raw ood collapses                         (28, 125) | (28, 125)
+  units fits                                    1005 | 1005
+  units audit ok                                1005 | 1005
+  units median time (upper median as compare)   30.22 | 30.19
+  units median time (true)                      30.22 | 30.19
+  units longest                                 31.53 | 31.6
+all fits median time: 30.38 30.37 max 31.77 31.71
+dates: A 2026-11-09T04:35:30 .. 2026-11-09T13:43:37, B 2026-11-09T04:35:30 .. 2026-11-09T13:43:37
+
+physical: 2250, det 706, differing 0
+  det with expr of 160 chars (cut): 5 Counter({160: 5})
+  det differing in any field but time/date/engine: 0 []
+   long: ('tf', 'feynman_III_4_33', 'test', 8) fields differ: []
+   long: ('ts', 'strogatz_bacres2', 'ood', 6) fields differ: []
+   long: ('utf', 'feynman_II_11_28', 'test', 7) fields differ: []
+   long: ('utf', 'feynman_II_11_28', 'test', 8) fields differ: []
+   long: ('utf', 'feynman_I_13_4', 'test', 7) fields differ: []
+  same recorded formula in physical: 2234 of 2250
+  budget reached (A,B) in physical: Counter({(True, True): 1541, (False, False): 706, (False, True): 2, (True, False): 1})
+  status/structure change: ('ts', 'strogatz_vdp1', 'test', 9) MISS -> EXACT False -> False budget True False
+  status/structure change: ('ufeyn', 'I.6.20a', 'test', 4) MISS -> NEAR False -> False budget True True
+
+trig fits: 530 Counter({'TF78': 85, 'TF78 under units': 85, 'TS14': 60, 'F41': 50, 'F41N1': 50, 'F41N10': 50, 'U41': 50, 'U41N1': 50, 'U41N10': 50})
+  F41               n  50 exact 20->28 struct  0-> 0 status changed 11 arcsin B 11 (A 0) fe False 1->6
+  F41N1             n  50 exact  0-> 0 struct 15->23 status changed 7 arcsin B 12 (A 0) fe False 3->5
+  F41N10            n  50 exact  0-> 0 struct 14->16 status changed 3 arcsin B 12 (A 0) fe False 3->9
+  TF78              n  85 exact 15->16 struct  0-> 0 status changed 4 arcsin B 3 (A 0) fe False 4->11
+  TS14              n  60 exact  1-> 0 struct  0-> 0 status changed 8 arcsin B 8 (A 0) fe False 10->16
+  U41               n  50 exact 20->28 struct  0-> 0 status changed 11 arcsin B 18 (A 0) fe False 1->9
+  U41N1             n  50 exact  0-> 0 struct 15->23 status changed 9 arcsin B 17 (A 0) fe False 2->8
+  U41N10            n  50 exact  0-> 0 struct 14->11 status changed 7 arcsin B 8 (A 0) fe False 1->7
+  TF78 under units  n  85 exact 17->16 struct  0-> 0 status changed 3 arcsin B 16 (A 0) fe False 2->11
+
+structure gains/losses by problem (trig):
+  F41N1: {'I.26.2': (0, 3), 'I.30.5': (0, 5)} total 15 -> 23
+  F41N10: {'I.26.2': (0, 1), 'III.15.12': (4, 5)} total 14 -> 16
+  U41N1: {'I.26.2': (0, 3), 'I.30.5': (0, 5)} total 15 -> 23
+  U41N10: {'I.18.12': (5, 1), 'II.6.15b': (1, 0), 'III.15.12': (3, 5)} total 14 -> 11
+exact gains/losses by problem (trig):
+  F41: {'I.26.2': (0, 3), 'I.30.5': (0, 5)}
+  U41: {'I.26.2': (0, 3), 'I.30.5': (0, 5)}
+  TF78: {'feynman_III_8_54': (0, 1)}
+  TF78 under units: {'feynman_III_8_54': (2, 0), 'feynman_test_8': (0, 1)}
+  TS14: {'strogatz_glider1': (1, 0)}
+
+arcsine laws:
+  F41 I.26.2 s0: A MISS/None B MISS/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | 0.00231952 + 1.20586 * v0^1.20095 * sin(0.999716 * v1)
+  F41 I.26.2 s1: A MISS/None B EXACT/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | -arcsin(sin(-v1) * v0)
+  F41 I.26.2 s2: A MISS/None B EXACT/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | arcsin(v0 * sin(v1))
+  F41 I.26.2 s3: A MISS/None B MISS/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | 0.00331471 + 1.11002 * v0 * (-0.0846667 + sin(0.903603 * v1) + 0.245922 * cos(1.
+  F41 I.26.2 s4: A MISS/None B EXACT/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | arcsin(sin(v1) * v0)
+  F41 I.30.5 s0: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s1: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s2: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s3: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  F41 I.30.5 s4: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  U41 I.26.2 s0: A MISS/None B NEAR/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | 1.0021 * arcsin(10.3786 * arcsin(0.0961111 * v0) * sin(0.999992 * v1))
+  U41 I.26.2 s1: A MISS/None B MISS/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | 1.05974 * arcsin(0.937745 * v0) * sin(0.999102 * v1)
+  U41 I.26.2 s2: A MISS/None B EXACT/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | arcsin(v0 * sin(v1))
+  U41 I.26.2 s3: A MISS/None B EXACT/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | arcsin(sin(v1) * v0)
+  U41 I.26.2 s4: A MISS/None B EXACT/None fe True es None ts (v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 | arcsin(v0 * sin(v1))
+  U41 I.30.5 s0: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s1: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s2: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s3: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  U41 I.30.5 s4: A NEAR/None B EXACT/None fe True es arcsin((0.080928 * (v0 / (v1 * v2)))) ts None | arcsin(v0 / (v1 * v2))
+  F41N1 I.26.2 s0: A MISS/False B NEAR/True fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | -2.53628e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  F41N1 I.26.2 s1: A MISS/False B MISS/False fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | 0.000423639 + 0.324923 * v0 * (2.96924 + 1.02394 * (v0 * sin(1.00762 * v1))²) * 
+  F41N1 I.26.2 s2: A MISS/False B NEAR/True fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | -2.53638e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  F41N1 I.26.2 s3: A MISS/False B NEAR/True fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | -2.53637e-05 + 1.00279 * arcsin(0.998477 * sin(1.00012 * v1) * v0)
+  F41N1 I.26.2 s4: A MISS/False B MISS/False fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | 0.000838514 + (0.372436 * v0 + 0.852368) * v0 * sin(0.999398 * v1)
+  F41N1 I.30.5 s0: A NEAR/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s1: A NEAR/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s2: A NEAR/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s3: A NEAR/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N1 I.30.5 s4: A NEAR/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 | -0.000175844 + 1.02914 * arcsin(0.973093 * v0 / (v1 * v2))
+  F41N10 I.26.2 s0: A MISS/False B MISS/False fe True es None ts None | -0.0312083 - 0.355126 * (0.354446 * v1 - 1.12755) * exp(1.0119 * v0 + 1.14389 * 
+  F41N10 I.26.2 s1: A MISS/False B MISS/False fe True es None ts None | -0.00209096 - 1.08087 * sin(-0.999183 * v1) * arcsin(0.929329 * v0)
+  F41N10 I.26.2 s2: A MISS/False B MISS/False fe True es None ts None | 0.576583 - 0.560618 * (|-0.133684 * v1 * v1|^(1.0119 * v0) - ((-9.96378 + 0.2013
+  F41N10 I.26.2 s3: A MISS/False B MISS/True fe True es None ts None | 0.000763159 - 0.98737 * arcsin(1.0119 * v0 * sin(-1.00376 * v1))
+  F41N10 I.26.2 s4: A MISS/False B MISS/False fe True es None ts None | -0.090017 + 5.87397 * (0.201383 * v1 + (0.201383 * v1)^(0.20378 * v1 * (-0.50818
+  F41N10 I.30.5 s0: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | 0.000267908 + 3.50499 * arcsin(0.677852 * v0 / (v1 * v2)) / sqrt(sqrt(|1.08269 -
+  F41N10 I.30.5 s1: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | -0.00290331 + 1.67719 * v0 / (v1 * v2) / sqrt(2.39519 - 0.021813 * (-0.41781 - 0
+  F41N10 I.30.5 s2: A MISS/False B NEAR/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | 0.00962009 + 1.08824 * v0^1.08586 * v1^(-1.09812) * v2^(-1.0607)
+  F41N10 I.30.5 s3: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | -0.00427406 + 1.03434 * v0 / (v1 * v2)
+  F41N10 I.30.5 s4: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | -0.00427406 + 1.03434 * v0 / v2 / v1
+  U41N1 I.26.2 s0: A MISS/False B MISS/False fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | 0.835334 * sqrt(|-1.08382 - 1.0119 * v0|) * v0 * sin(0.9973 * v1)
+  U41N1 I.26.2 s1: A MISS/False B NEAR/True fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | 1.00281 * arcsin(0.998458 * v0 * sin(1.00013 * v1))
+  U41N1 I.26.2 s2: A MISS/False B MISS/False fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | 1.05368 * v0 * (4.79122 + sin(1.00762 * v1) - 4.83024 * cos(-1.03584 * sin(arcsi
+  U41N1 I.26.2 s3: A MISS/False B NEAR/True fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | 1.00281 * arcsin(0.998458 * sin(1.00013 * v1) * v0)
+  U41N1 I.26.2 s4: A MISS/False B NEAR/True fe True es None ts (v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172  | 1.00281 * arcsin(0.998458 * sin(1.00013 * v1) * v0)
+  U41N1 I.30.5 s0: A MISS/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | 1.01514 * arcsin(0.985218 * v0 / v1 / v2)
+  U41N1 I.30.5 s1: A MISS/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | 1.01514 * arcsin(0.985218 * v0 / (v1 * v2))
+  U41N1 I.30.5 s2: A MISS/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | 1.01514 * arcsin(0.985218 * v0 / (v2 * v1))
+  U41N1 I.30.5 s3: A MISS/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | 1.01514 * arcsin(0.985218 * v0 / v1 / v2)
+  U41N1 I.30.5 s4: A MISS/False B NEAR/True fe True es None ts arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | 1.01514 * arcsin(0.985218 * v0 / v2 / v1)
+  U41N10 I.26.2 s0: A MISS/False B MISS/False fe True es None ts None | 0.178982 * v0 * sin(-5.61258 * (sin(0.201383 * v1) - 0.0543466) * (sin(0.201383 
+  U41N10 I.26.2 s1: A MISS/False B MISS/False fe True es None ts None | 1.86944 * tanh(tanh(1.0119 * v0 - 1.00872 * sqrt(v0²) * tanh(0.201383 * v1) * sq
+  U41N10 I.26.2 s2: A MISS/False B MISS/False fe True es None ts None | tanh(-|sqrt(|-0.63124 * v0 - |cos(1.0119 * v0)| + 0.654019 * v1|)| - 0.632197 * 
+  U41N10 I.26.2 s3: A MISS/False B MISS/False fe True es None ts None | -1.08397 * arcsin(0.927107 * v0) * sin(-1.00029 * v1)
+  U41N10 I.26.2 s4: A MISS/False B MISS/False fe True es None ts None | -6.70033 * tanh(1.0119 * v0) * (0.402767 * v1 + tanh(0.20378 * v1 * v0) - 0.0132
+  U41N10 I.30.5 s0: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s1: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s2: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s3: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | 1.01761 * v0 / (v1 * v2)
+  U41N10 I.30.5 s4: A MISS/False B MISS/False fe True es None ts arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v | 1.01761 * v0 / (v1 * v2)
+
+formula_exact False by pool:
+  physical: A 102, B 102 (of 2250)
+    by suite A: [('F41N1', 4), ('F41N10', 3), ('R6', 2), ('R7raw', 9), ('TF78', 6), ('TR25', 32), ('TR25raw', 32), ('TS14', 13), ('U41N10', 1)]
+    by suite B: [('F41N1', 4), ('F41N10', 3), ('R6', 2), ('R7raw', 9), ('TF78', 6), ('TR25', 33), ('TR25raw', 32), ('TS14', 12), ('U41N10', 1)]
+  trig: A 27, B 82 (of 530)
+    B with arcsin visible: 47; cut at 160: 77; cut and no arcsin: 35; no arcsin: 35; no arcsin and not cut: 0
+    lengths of expr: [(160, 77), (101, 1), (125, 1), (123, 1), (100, 1)]
+    by suite B: Counter({'TS14': 16, 'TF78': 11, 'TF78 under units': 11, 'F41N10': 9, 'U41': 9, 'U41N1': 8, 'U41N10': 7, 'F41': 6, 'F41N1': 5})
+    by suite A: Counter({'TS14': 10, 'TF78': 4, 'F41N1': 3, 'F41N10': 3, 'U41N1': 2, 'TF78 under units': 2, 'F41': 1, 'U41': 1, 'U41N10': 1})
+    by suite A: [('F41', 1), ('F41N1', 3), ('F41N10', 3), ('TF78', 4), ('TF78 under units', 2), ('TS14', 10), ('U41', 1), ('U41N1', 2), ('U41N10', 1)]
+    by suite B: [('F41', 6), ('F41N1', 5), ('F41N10', 9), ('TF78', 11), ('TF78 under units', 11), ('TS14', 16), ('U41', 9), ('U41N1', 8), ('U41N10', 7)]
+formula_exact False all: A 129 B 184
+formula_exact None: 0 0
+
+arcsin in B text: 105 [('F41', 11), ('F41N1', 12), ('F41N10', 12), ('TF78', 3), ('TF78 under units', 16), ('TS14', 8), ('U41', 18), ('U41N1', 17), ('U41N10', 8)]
+arcsin in A text: 0
+arcsin in B text, pool: Counter({'trig': 105})
+arcsin in B text, ts split: Counter({'ood': 5, 'test': 3})
+arcsin in B, problems: [(('F41', 'I.26.2'), 3), (('F41', 'I.30.5'), 5), (('F41', 'I.50.26'), 1), (('F41', 'III.17.37'), 2), (('F41N1', 'I.26.2'), 3), (('F41N1', 'I.30.5'), 5), (('F41N1', 'I.37.4'), 1), (('F41N1', 'I.50.26'), 1), (('F41N1', 'III.17.37'), 2), (('F41N10', 'I.26.2'), 2), (('F41N10', 'I.30.5'), 1), (('F41N10', 'I.50.26'), 3), (('F41N10', 'II.6.15b'), 1), (('F41N10', 'III.17.37'), 2), (('F41N10', 'III.9.52'), 3), (('TF78', 'feynman_III_8_54'), 1), (('TF78', 'feynman_test_13'), 1), (('TF78', 'feynman_test_20'), 1), (('TF78 under units', 'feynman_I_12_11'), 3), (('TF78 under units', 'feynman_I_29_16'), 1), (('TF78 under units', 'feynman_I_30_3'), 2), (('TF78 under units', 'feynman_test_11'), 2), (('TF78 under units', 'feynman_test_13'), 1), (('TF78 under units', 'feynman_test_14'), 1), (('TF78 under units', 'feynman_test_15'), 3), (('TF78 under units', 'feynman_test_2'), 2), (('TF78 under units', 'feynman_test_8'), 1), (('TS14', 'strogatz_barmag1'), 1), (('TS14', 'strogatz_barmag2'), 2), (('TS14', 'strogatz_glider1'), 3), (('TS14', 'strogatz_glider2'), 1), (('TS14', 'strogatz_shearflow1'), 1), (('U41', 'I.26.2'), 5), (('U41', 'I.30.5'), 5), (('U41', 'I.37.4'), 1), (('U41', 'I.50.26'), 2), (('U41', 'III.17.37'), 3), (('U41', 'III.9.52'), 2), (('U41N1', 'I.26.2'), 4), (('U41N1', 'I.30.5'), 5), (('U41N1', 'I.50.26'), 3), (('U41N1', 'III.17.37'), 4), (('U41N1', 'III.9.52'), 1), (('U41N10', 'I.26.2'), 2), (('U41N10', 'I.37.4'), 1), (('U41N10', 'I.50.26'), 1), (('U41N10', 'II.6.15b'), 2), (('U41N10', 'III.17.37'), 1), (('U41N10', 'III.9.52'), 1)]
+
+elementary_seed: A non-null 120, B non-null 130
+    ('F41', 'I.18.12', '((v0 * v1) * (1.0 * sin((3.133946 * v2))))') 5
+    ('F41', 'I.30.5', 'arcsin((0.080928 * (v0 / (v1 * v2))))') 5
+    ('F41', 'I.40.1', '(v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))') 5
+    ('F41', 'I.44.4', '(((v0 * v1) * v2) * log((4.943794 * v3)))') 5
+    ('F41', 'II.15.4', '((v0 * v1) * (-1.0 * cos((6.226701 * v2))))') 5
+    ('F41', 'II.35.18', '(v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2') 5
+    ('F41', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * (1.0 * sin((5.950302 * v1))))') 5
+    ('F41', 'III.15.12', '(v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))') 5
+    ('TF78', 'feynman_II_15_5', '((v0 * v1) * (-1.0 * cos((4.066141 * v2))))') 5
+    ('TF78', 'feynman_II_35_21', '((v0 * v1) * tanh((0.99859 * ((v1 * v2) / (v3 * v4)))))') 5
+    ('TF78', 'feynman_II_6_11', '((v1 / (v0 * (v3)²)) * (1.0 * cos((2.525722 * v2))))') 5
+    ('TF78', 'feynman_I_18_14', '(((v0 * v1) * v2) * (1.0 * sin((4.067596 * v3))))') 5
+    ('TF78', 'feynman_I_6_2', '((1.0 / v0) * exp((-0.488547 * ((v1)² / (v0)²))))') 5
+    ('TF78 under units', 'feynman_II_15_5', '((v0 * v1) * (-1.0 * cos((4.066141 * v2))))') 5
+    ('TF78 under units', 'feynman_II_35_21', '((v0 * v1) * tanh((0.99859 * ((v1 * v2) / (v3 * v4)))))') 5
+    ('TF78 under units', 'feynman_II_6_11', '((v1 / (v0 * (v3)²)) * (1.0 * cos((2.525722 * v2))))') 5
+    ('TF78 under units', 'feynman_I_18_14', '(((v0 * v1) * v2) * (1.0 * sin((4.067596 * v3))))') 5
+    ('TF78 under units', 'feynman_I_6_2', '((1.0 / v0) * exp((-0.488547 * ((v1)² / (v0)²))))') 5
+    ('U41', 'I.18.12', '((v0 * v1) * (1.0 * sin((3.133946 * v2))))') 5
+    ('U41', 'I.30.5', 'arcsin((0.080928 * (v0 / (v1 * v2))))') 5
+    ('U41', 'I.40.1', '(v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))') 5
+    ('U41', 'I.44.4', '(((v0 * v1) * v2) * log((4.943794 * v3)))') 5
+    ('U41', 'II.15.4', '((v0 * v1) * (-1.0 * cos((6.226701 * v2))))') 5
+    ('U41', 'II.35.18', '(v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2') 5
+    ('U41', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * (1.0 * sin((5.950302 * v1))))') 5
+    ('U41', 'III.15.12', '(v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))') 5
+   A ('F41', 'I.18.12', '((v0 * v1) * (1.0 * sin((3.133946 * v2))))') 5
+   A ('F41', 'I.40.1', '(v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))') 5
+   A ('F41', 'I.44.4', '(((v0 * v1) * v2) * log((4.943794 * v3)))') 5
+   A ('F41', 'II.15.4', '((v0 * v1) * (-1.0 * cos((6.226701 * v2))))') 5
+   A ('F41', 'II.35.18', '(v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2') 5
+   A ('F41', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * (1.0 * sin((5.950302 * v1))))') 5
+   A ('F41', 'III.15.12', '(v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))') 5
+   A ('TF78', 'feynman_II_15_5', '((v0 * v1) * (-1.0 * cos((4.066141 * v2))))') 5
+   A ('TF78', 'feynman_II_35_21', '((v0 * v1) * tanh((0.99859 * ((v1 * v2) / (v3 * v4)))))') 5
+   A ('TF78', 'feynman_II_6_11', '((v1 / (v0 * (v3)²)) * (1.0 * cos((2.525722 * v2))))') 5
+   A ('TF78', 'feynman_I_18_14', '(((v0 * v1) * v2) * (1.0 * sin((4.067596 * v3))))') 5
+   A ('TF78', 'feynman_I_6_2', '((1.0 / v0) * exp((-0.488547 * ((v1)² / (v0)²))))') 5
+   A ('TF78 under units', 'feynman_II_15_5', '((v0 * v1) * (-1.0 * cos((4.066141 * v2))))') 5
+   A ('TF78 under units', 'feynman_II_35_21', '((v0 * v1) * tanh((0.99859 * ((v1 * v2) / (v3 * v4)))))') 5
+   A ('TF78 under units', 'feynman_II_6_11', '((v1 / (v0 * (v3)²)) * (1.0 * cos((2.525722 * v2))))') 5
+   A ('TF78 under units', 'feynman_I_18_14', '(((v0 * v1) * v2) * (1.0 * sin((4.067596 * v3))))') 5
+   A ('TF78 under units', 'feynman_I_6_2', '((1.0 / v0) * exp((-0.488547 * ((v1)² / (v0)²))))') 5
+   A ('U41', 'I.18.12', '((v0 * v1) * (1.0 * sin((3.133946 * v2))))') 5
+   A ('U41', 'I.40.1', '(v0 * exp((-5.004509 * (((v1 * v2) * v3) / (v4 * v5)))))') 5
+   A ('U41', 'I.44.4', '(((v0 * v1) * v2) * log((4.943794 * v3)))') 5
+   A ('U41', 'II.15.4', '((v0 * v1) * (-1.0 * cos((6.226701 * v2))))') 5
+   A ('U41', 'II.35.18', '(v0 / (exp((2.998093 * ((v1 * v2) / v3))) + exp((-2.998093 * ((v1 * v2') 5
+   A ('U41', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * (1.0 * sin((5.950302 * v1))))') 5
+   A ('U41', 'III.15.12', '(v0 * (1.0 + (-1.0 * cos((3.939235 * (v1 * v2))))))') 5
+
+tolerant_seed: A non-null 632, B non-null 627
+    ('F41', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2)²)))) (0.') 5
+    ('F41', 'I.26.2', '(v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 * cos((4.') 5
+    ('F41', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 * v2)))) + ') 5
+    ('F41N1', 'I.10.7', '(v0 / sqrt((1.0 + (-0.040165 * ((v1)² / (v2)²))))) (8.8e-05) | (v0 / (') 5
+    ('F41N1', 'I.12.1', '((v0 * v1) / sqrt((1.0 + (-7.7e-05 * (1.0 / ((v0)² * (v1)²)))))) (9.7e') 5
+    ('F41N1', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (9e-05) | (((v0 * v1) / (v2 * (v3)²)) * (1.') 5
+    ('F41N1', 'I.12.5', '((1.0 / (v1)²) * tanh((0.041561 * (v0 * (v1 * (v1)²))))) (8.5e-05) | (') 5
+    ('F41N1', 'I.14.4', '((1.0 / (v0)²) * tanh((0.022275 * ((v0 * (v0)²) * (v1)²)))) (7.5e-05) ') 5
+    ('F41N1', 'I.15.10', '((v0 * v1) / sqrt((1.0 + (-0.040184 * ((v1)² / (v2)²))))) (9.3e-05) | ') 5
+    ('F41N1', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041566 * ((v0 * v1) / (v2)²)))) (0.') 5
+    ('F41N1', 'I.18.12', '((v0 * v1) * ((0.04636 + (1.0 * sin((3.219961 * v2)))) + (-0.044835 * ') 5
+    ('F41N1', 'I.25.13', '((v0 / v1) * sqrt((1.0 + (0.001803 * (v1 / (v0)²))))) (0.00011) | ((v0') 5
+    ('F41N1', 'I.26.2', '(v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172 * cos((4.8') 5
+    ('F41N1', 'I.27.6', '(v0 / (1.0 + (2.004357 * ((v0 * v2) / v1)))) (9.4e-05) | (v0 * exp((-1') 5
+    ('F41N1', 'I.29.4', '((v0 / v1) / (1.0 + (-0.001122 * (v1 / (v0)²)))) (0.0001) | ((v0 / v1)') 5
+    ('F41N1', 'I.30.5', 'arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05) | ((v0 / (v1 * v2)) / ') 5
+    ('F41N1', 'I.34.1', '(v0 / (1.0 + (-0.201043 * (v1 / v2)))) (0.0001) | (((v0 * (v1)²) / (v2') 5
+    ('F41N1', 'I.34.8', '((v3 / (v1 * v2)) * tanh((0.024918 * (((v0 * (v1)²) * (v2)²) / (v3)²))') 5
+    ('F41N1', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.110638 * sin((6.048124 * v2)))) + ') 5
+    ('F41N1', 'I.39.1', '((v0 * v1) / sqrt((1.0 + (0.000394 * (1.0 / ((v0)² * v1)))))) (8.6e-05') 5
+    ('F41N1', 'I.43.16', '(((v0 * v1) * v2) / v3) (0.00018) | ((((v0 * v1) * v2) / v3) * (1.0 + ') 5
+    ('F41N1', 'I.44.4', '((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.20178 * (1.0 / v3)))) (0.0') 5
+    ('F41N1', 'II.11.3', '(((v0 * v1) / (v2 * (v3)²)) / sqrt((1.0 + (-0.435986 * (v4 / v3))))) (') 5
+    ('F41N1', 'II.13.23', '(v0 / sqrt((1.0 + (-0.040071 * ((v1)² / (v2)²))))) (0.00012) | (v0 / (') 5
+    ('F41N1', 'II.15.4', '((v0 * v1) * ((-0.001189 + (0.004025 * sin((6.21892 * v2)))) + (-1.0 *') 5
+    ('F41N1', 'II.24.17', '((v0 / v1) * sqrt((1.0 + (-0.068263 * ((v1)² / ((v0)² * (v2)²)))))) (9') 5
+    ('F41N1', 'II.3.24', '((1.0 / (v0)²) * tanh((0.010372 * ((v0 * (v0)²) / (v1)²)))) (0.00012) ') 5
+    ('F41N1', 'II.34.2', '(((v0 * v1) * v2) * (1.0 + (0.000671 * ((v1)² / (v0)²)))) (8.4e-05) | ') 5
+    ('F41N1', 'II.38.3', '((v3 / (v0 * v1)) * tanh((0.009423 * ((((v0)² * (v1)²) * v2) / (v3)²))') 5
+    ('F41N1', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * ((-0.008475 + (1.0 * sin((6.0 * v1)))) +') 5
+    ('F41N1', 'III.15.12', '(((v0 * (v1)²) * (v2)²) * (1.0 + (-0.803253 * (v1 * v2)))) (0.002) | (') 5
+    ('F41N10', 'I.10.7', '((pow(v0, 1.0123) * pow(v1, 0.0965)) * pow(v2, -0.0947)) (0.011)') 5
+    ('F41N10', 'I.12.1', '((1.0 / (v1)²) * tanh((0.179037 * (v0 * (v1 * (v1)²))))) (0.0095) | (v') 5
+    ('F41N10', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (0.0088) | (((v0 * v1) / (v2 * (v3)²)) * sq') 5
+    ('F41N10', 'I.12.5', '((1.0 / (v1)²) * tanh((0.311832 * (v0 * (v1 * (v1)²))))) (0.0084) | (v') 5
+    ('F41N10', 'I.14.4', '(v0 * (v1)²) (0.0075) | (pow(v0, 1.0878) * pow(v1, 2.147)) (0.0079) | ') 5
+    ('F41N10', 'I.15.10', '((pow(v0, 1.0017) * pow(v1, 1.0637)) * pow(v2, -0.0861)) (0.01) | (v0 ') 5
+    ('F41N10', 'I.18.12', '((v0 * v1) * ((0.641182 + (1.0 * sin((4.15 * v2)))) + (-0.590458 * cos') 5
+    ('F41N10', 'I.25.13', '((v0 / v1) * sqrt((1.0 + (0.016879 * (v1 / (v0)²))))) (0.011) | ((v0 /') 5
+    ('F41N10', 'I.30.5', 'arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v2)) (0.01)') 5
+    ('F41N10', 'I.34.1', '(v0 / (1.0 + (-0.196428 * (v1 / v2)))) (0.011) | (v0 / sqrt((1.0 + (-0') 5
+    ('F41N10', 'I.39.1', '((v0 * v1) / sqrt((1.0 + (0.006731 * (1.0 / ((v0)² * v1)))))) (0.0084)') 5
+    ('F41N10', 'II.11.3', '(((v0 * v1) * sqrt(v4)) / (v2 * ((v3)² * sqrt(v3)))) (0.012) | ((v2 / ') 5
+    ('F41N10', 'II.13.23', '(v0 / sqrt((1.0 + (-0.122243 * ((v1)² / v2))))) (0.013) | (v0 / (1.0 +') 5
+    ('F41N10', 'II.15.4', '((v0 * v1) * ((-0.011857 + (0.039781 * sin((6.15 * v2)))) + (-1.0 * co') 5
+    ('F41N10', 'II.24.17', '((v0 / v1) / (1.0 + (0.055896 * ((v1)² / ((v0)² * (v2)²))))) (0.0097) ') 5
+    ('F41N10', 'II.3.24', '(v0 / (v1)²) (0.012) | (pow(v0, 1.0901) * pow(v1, -2.0933)) (0.012) | ') 5
+    ('F41N10', 'II.34.2', '((v0 * v1) * v2) (0.0083) | ((1.0 / (v0)²) * tanh((0.63447 * (((v0 * (') 5
+    ('F41N10', 'II.38.3', '(((v0 * v1) * v2) / v3) (0.0084) | ((((v0 * v1) * v2) / v3) / sqrt((1.') 5
+    ('F41N10', 'III.15.12', '(v0 * ((1.0 + (-0.07348 * sin((4.037457 * (v1 * v2))))) + (-0.952237 *') 5
+    ('TF78', 'feynman_III_14_14', '(v0 * exp((3.24725 * ((sqrt(v1) * sqrt(v2)) / (sqrt(v3) * sqrt(v4)))))') 5
+    ('TF78', 'feynman_III_4_32', '((v2 * v3) / (v0 * v1)) (1.9e-06) | (((v0 * v1) / v2) * tanh((0.008272') 5
+    ('TF78', 'feynman_III_4_33', '((v2 * v3) * exp((-0.08211 * ((v0 * v1) / (v2 * v3))))) (5.4e-06) | ((') 5
+    ('TF78', 'feynman_II_11_28', 'exp((0.56044 * (v0 * v1))) (0.00035) | (1.0 + (0.65829 * (v0 * v1))) (') 5
+    ('TF78', 'feynman_I_15_3t', '(v3 / (1.0 + (0.005472 * (v0 / ((v1)² * (v3)²))))) (0.0011) | (v3 / sq') 5
+    ('TF78', 'feynman_I_15_3x', '(v0 * (1.0 + (-0.345082 * ((v1 * v3) / v0)))) (0.0061) | (v0 / (1.0 + ') 5
+    ('TF78', 'feynman_I_32_17', '((((((v0 * v1) * (v2)²) * (v3)²) * ((v4)²)²) / ((v5)²)²) / (1.0 + (-0.') 5
+    ('TF78', 'feynman_I_34_14', '(v2 / (1.0 + (-0.174575 * (v1 / v0)))) (6.6e-05) | (v2 / sqrt((1.0 + (') 5
+    ('TF78', 'feynman_I_41_16', '(((((v0)² * (v1)²) * (v3)²) / (v2 * (v4)²)) / (1.0 + (12.475529 * ((v1') 5
+    ('TF78', 'feynman_I_9_18', '(((((((v0 * v1) * v2) * sqrt(v4)) * sqrt(v6)) * sqrt(v8)) / (((v3 * sq') 5
+    ('TF78', 'feynman_test_1', '(((((((v0)² * (v1)²) * (v2)²) * (v3)²) * (v4)²) / ((v5)² * ((v6)²)²)) ') 5
+    ('TF78', 'feynman_test_10', 'log((4430.845301 * ((v1 * (((v2)²)² * sqrt(v2))) / v0))) (0.0058) | ((') 5
+    ('TF78', 'feynman_test_11', '(((v0 * (v3)²) / sqrt(v1)) * (1.0 + (-0.82729 * (v2 * (v3)²)))) (0.015') 5
+    ('TF78', 'feynman_test_12', '((((v0 * v2) * v3) / (v1)²) * (1.0 + (-0.002751 * (v1 / (v3)²)))) (6.2') 5
+    ('TF78', 'feynman_test_17', '(((((v0 * (v1)²) * (v4 * (v4)²)) * v5) / v3) * (1.0 + (0.078528 * (v3 ') 5
+    ('TF78', 'feynman_test_3', '((((v0 * (v1 * sqrt(v1))) * ((v2)² * sqrt(v2))) / ((v3)² * sqrt(v3))) ') 5
+    ('TF78', 'feynman_test_4', '((((pow(v0, -0.4723) * pow(v1, 0.6734)) * pow(v2, -0.1155)) * pow(v3, ') 5
+    ('TF78', 'feynman_test_7', '((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.020768 * ((v3)² / (v1 * (v4)²') 5
+    ('TF78 under units', 'feynman_III_14_14', '(v0 * exp((3.24725 * ((sqrt(v1) * sqrt(v2)) / (sqrt(v3) * sqrt(v4)))))') 5
+    ('TF78 under units', 'feynman_III_4_32', '((v2 * v3) / (v0 * v1)) (0.0019)') 5
+    ('TF78 under units', 'feynman_III_4_33', '((v2 * v3) * exp((-0.08211 * ((v0 * v1) / (v2 * v3))))) (6.3e-06) | ((') 5
+    ('TF78 under units', 'feynman_II_11_28', 'exp((0.56044 * (v0 * v1))) (0.0017) | (1.0 + (0.65829 * (v0 * v1))) (0') 5
+    ('TF78 under units', 'feynman_I_15_3t', 'v3 (0.0043)') 5
+    ('TF78 under units', 'feynman_I_15_3x', '(v0 * (1.0 + (-0.345082 * ((v1 * v3) / v0)))) (0.0061) | (v0 / (1.0 + ') 5
+    ('TF78 under units', 'feynman_I_32_17', '((((((v0 * v1) * (v2)²) * (v3)²) * ((v4)²)²) / ((v5)²)²) / sqrt((1.0 +') 5
+    ('TF78 under units', 'feynman_I_34_14', '(v2 / (1.0 + (-0.174575 * (v1 / v0)))) (6.6e-05) | (v2 / sqrt((1.0 + (') 5
+    ('TF78 under units', 'feynman_I_41_16', '((((v0)² * v1) * v3) / (v4)²) (0.0044)') 5
+    ('TF78 under units', 'feynman_test_1', '(((((((v0)² * (v1)²) * (v2)²) * (v3)²) * (v4)²) / ((v5)² * ((v6)²)²)) ') 5
+    ('TF78 under units', 'feynman_test_10', 'log((4430.845301 * ((v1 * (((v2)²)² * sqrt(v2))) / v0))) (0.0058)') 5
+    ('TF78 under units', 'feynman_test_11', '(((v0 * (v3)²) / sqrt(v1)) * (1.0 + (-0.82729 * (v2 * (v3)²)))) (0.015') 5
+    ('TF78 under units', 'feynman_test_17', '(((((v0 * (v1)²) * (v4 * (v4)²)) * v5) / v3) * sqrt((1.0 + (0.082532 *') 5
+    ('TF78 under units', 'feynman_test_3', '((((v0 * (v1 * sqrt(v1))) * ((v2 * (v2)²) * sqrt(v2))) / (v3 * (v3)²))') 5
+    ('TF78 under units', 'feynman_test_7', '(sqrt(v0) * sqrt(v1)) (0.0092)') 5
+    ('TR25raw', '1096_FacultySalaries', '((((X2 * (X2)²) * ((X3)²)²) / ((X1 * (X1)²))²) * sqrt((1.0 + (-0.95759') 1
+    ('TR25raw', '1096_FacultySalaries', '(((X1 * ((X1)²)²) / ((X2 * sqrt(X2)) * ((X3)² * sqrt(X3)))) / (1.0 + (') 1
+    ('TR25raw', 'first_principles_planck', '(1.0 + (2.824949 * (X0 / X1))) (0.0027)') 1
+    ('TR25raw', 'first_principles_planck', '(1.0 + (4.485247 * (X0 / X1))) (0.0044)') 1
+    ('TR25raw', 'first_principles_planck', '(1.0 + (4.733688 * (X0 / X1))) (0.0017)') 1
+    ('TR25raw', 'first_principles_planck', '(1.0 + (4.79023 * (X0 / X1))) (0.0019)') 1
+    ('TR25raw', 'first_principles_planck', '(1.0 + (4.847221 * (X0 / X1))) (0.0017)') 1
+    ('TS14', 'strogatz_bacres2', '(1.0 + (-0.650534 * (v1 / v0))) (1.6e-05) | ((1.0 / v0) * exp((-0.9889') 5
+    ('TS14', 'strogatz_bacres2', '(1.0 + (-0.656593 * (v1 / v0))) (0.0013) | ((v1 / v0) * exp((-2.319428') 5
+    ('U41', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2)²)))) (0.') 5
+    ('U41', 'I.26.2', '(v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 * cos((4.') 5
+    ('U41', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 * v2)))) + ') 5
+    ('U41N1', 'I.10.7', '(v0 / sqrt((1.0 + (-0.040165 * ((v1)² / (v2)²))))) (8.8e-05) | (v0 / (') 5
+    ('U41N1', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (9e-05)') 5
+    ('U41N1', 'I.15.10', '((v0 * v1) / sqrt((1.0 + (-0.040184 * ((v1)² / (v2)²))))) (9.4e-05) | ') 5
+    ('U41N1', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041566 * ((v0 * v1) / (v2)²)))) (0.') 5
+    ('U41N1', 'I.18.12', '((v0 * v1) * ((0.04636 + (1.0 * sin((3.219961 * v2)))) + (-0.044835 * ') 5
+    ('U41N1', 'I.26.2', '(v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172 * cos((4.8') 5
+    ('U41N1', 'I.27.6', '(v0 / (1.0 + (2.004357 * ((v0 * v2) / v1)))) (9.5e-05) | (v0 * exp((-1') 5
+    ('U41N1', 'I.30.5', 'arcsin((0.078751 * (v0 / (v1 * v2)))) (9.6e-05)') 5
+    ('U41N1', 'I.34.1', '(v0 / (1.0 + (-0.201043 * (v1 / v2)))) (0.0001) | (((v0 * (v1)²) / (v2') 5
+    ('U41N1', 'I.34.8', '(((v0 * v1) * v2) / v3) (9.1e-05)') 5
+    ('U41N1', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.110638 * sin((6.048124 * v2)))) + ') 5
+    ('U41N1', 'I.43.16', '(((v0 * v1) * v2) / v3) (0.00018)') 5
+    ('U41N1', 'I.44.4', '((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.20178 * (1.0 / v3)))) (0.0') 5
+    ('U41N1', 'II.11.3', '(((v0 * v1) / (v2 * (v3)²)) / sqrt((1.0 + (-0.435986 * (v4 / v3))))) (') 5
+    ('U41N1', 'II.13.23', '(v0 / sqrt((1.0 + (-0.040071 * ((v1)² / (v2)²))))) (0.00012) | (v0 / (') 5
+    ('U41N1', 'II.15.4', '((v0 * v1) * ((-0.001189 + (0.004025 * sin((6.21892 * v2)))) + (-1.0 *') 5
+    ('U41N1', 'II.24.17', '((v0 / v1) * sqrt((1.0 + (-0.068263 * ((v1)² / ((v0)² * (v2)²)))))) (9') 5
+    ('U41N1', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * ((-0.008475 + (1.0 * sin((6.0 * v1)))) +') 5
+    ('U41N1', 'III.15.12', '(((v0 * (v1)²) * (v2)²) * (1.0 + (-0.803253 * (v1 * v2)))) (0.002) | (') 5
+    ('U41N10', 'I.12.1', '(v0 * v1) (0.0096)') 5
+    ('U41N10', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (0.0088)') 5
+    ('U41N10', 'I.12.5', '(v0 * v1) (0.0084)') 5
+    ('U41N10', 'I.14.4', '(v0 * (v1)²) (0.0075)') 5
+    ('U41N10', 'I.15.10', '(v0 * v1) (0.014)') 5
+    ('U41N10', 'I.18.12', '((v0 * v1) * ((0.641182 + (1.0 * sin((4.15 * v2)))) + (-0.590458 * cos') 5
+    ('U41N10', 'I.25.13', '(v0 / v1) (0.012)') 5
+    ('U41N10', 'I.30.5', 'arcsin((0.010419 * (v0 / (v1 * v2)))) (0.01) | (v0 / (v1 * v2)) (0.01)') 5
+    ('U41N10', 'I.34.1', '(v0 / (1.0 + (-0.196428 * (v1 / v2)))) (0.011) | (v0 / sqrt((1.0 + (-0') 5
+    ('U41N10', 'I.39.1', '(v0 * v1) (0.0088)') 5
+    ('U41N10', 'II.11.3', '(((v0 * v1) * sqrt(v4)) / (v2 * ((v3)² * sqrt(v3)))) (0.012)') 5
+    ('U41N10', 'II.15.4', '((v0 * v1) * ((-0.011857 + (0.039781 * sin((6.15 * v2)))) + (-1.0 * co') 5
+    ('U41N10', 'II.24.17', '((v0 / v1) / (1.0 + (0.055896 * ((v1)² / ((v0)² * (v2)²))))) (0.01)') 5
+    ('U41N10', 'II.3.24', '(v0 / (v1)²) (0.012)') 5
+    ('U41N10', 'II.34.2', '((v0 * v1) * v2) (0.0085)') 5
+    ('U41N10', 'II.38.3', '(((v0 * v1) * v2) / v3) (0.0084)') 5
+    ('U41N10', 'III.15.12', '(v0 * ((1.0 + (-0.07348 * sin((4.037457 * (v1 * v2))))) + (-0.952237 *') 5
+   A ('F41', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2)²)))) (0.') 5
+   A ('F41', 'I.26.2', '(v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 * cos((4.') 5
+   A ('F41', 'I.30.5', '((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)² / ((v1)² * (v2)²))') 5
+   A ('F41', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 * v2)))) + ') 5
+   A ('F41N1', 'I.10.7', '(v0 / sqrt((1.0 + (-0.040165 * ((v1)² / (v2)²))))) (8.8e-05) | (v0 / (') 5
+   A ('F41N1', 'I.12.1', '((v0 * v1) / sqrt((1.0 + (-7.7e-05 * (1.0 / ((v0)² * (v1)²)))))) (9.7e') 5
+   A ('F41N1', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (9e-05) | (((v0 * v1) / (v2 * (v3)²)) * (1.') 5
+   A ('F41N1', 'I.12.5', '((1.0 / (v1)²) * tanh((0.041561 * (v0 * (v1 * (v1)²))))) (8.5e-05) | (') 5
+   A ('F41N1', 'I.14.4', '((1.0 / (v0)²) * tanh((0.022275 * ((v0 * (v0)²) * (v1)²)))) (7.5e-05) ') 5
+   A ('F41N1', 'I.15.10', '((v0 * v1) / sqrt((1.0 + (-0.040184 * ((v1)² / (v2)²))))) (9.3e-05) | ') 5
+   A ('F41N1', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041566 * ((v0 * v1) / (v2)²)))) (0.') 5
+   A ('F41N1', 'I.18.12', '((v0 * v1) * ((0.04636 + (1.0 * sin((3.219961 * v2)))) + (-0.044835 * ') 5
+   A ('F41N1', 'I.25.13', '((v0 / v1) * sqrt((1.0 + (0.001803 * (v1 / (v0)²))))) (0.00011) | ((v0') 5
+   A ('F41N1', 'I.26.2', '(v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172 * cos((4.8') 5
+   A ('F41N1', 'I.27.6', '(v0 / (1.0 + (2.004357 * ((v0 * v2) / v1)))) (9.4e-05) | (v0 * exp((-1') 5
+   A ('F41N1', 'I.29.4', '((v0 / v1) / (1.0 + (-0.001122 * (v1 / (v0)²)))) (0.0001) | ((v0 / v1)') 5
+   A ('F41N1', 'I.30.5', '((v0 / (v1 * v2)) / sqrt((1.0 + (-0.010771 * ((v0)² / ((v1)² * v2)))))') 5
+   A ('F41N1', 'I.34.1', '(v0 / (1.0 + (-0.201043 * (v1 / v2)))) (0.0001) | (((v0 * (v1)²) / (v2') 5
+   A ('F41N1', 'I.34.8', '((v3 / (v1 * v2)) * tanh((0.024918 * (((v0 * (v1)²) * (v2)²) / (v3)²))') 5
+   A ('F41N1', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.110638 * sin((6.048124 * v2)))) + ') 5
+   A ('F41N1', 'I.39.1', '((v0 * v1) / sqrt((1.0 + (0.000394 * (1.0 / ((v0)² * v1)))))) (8.6e-05') 5
+   A ('F41N1', 'I.43.16', '(((v0 * v1) * v2) / v3) (0.00018) | ((((v0 * v1) * v2) / v3) * (1.0 + ') 5
+   A ('F41N1', 'I.44.4', '((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.20178 * (1.0 / v3)))) (0.0') 5
+   A ('F41N1', 'II.11.3', '(((v0 * v1) / (v2 * (v3)²)) / sqrt((1.0 + (-0.435986 * (v4 / v3))))) (') 5
+   A ('F41N1', 'II.13.23', '(v0 / sqrt((1.0 + (-0.040071 * ((v1)² / (v2)²))))) (0.00012) | (v0 / (') 5
+   A ('F41N1', 'II.15.4', '((v0 * v1) * ((-0.001189 + (0.004025 * sin((6.21892 * v2)))) + (-1.0 *') 5
+   A ('F41N1', 'II.24.17', '((v0 / v1) * sqrt((1.0 + (-0.068263 * ((v1)² / ((v0)² * (v2)²)))))) (9') 5
+   A ('F41N1', 'II.3.24', '((1.0 / (v0)²) * tanh((0.010372 * ((v0 * (v0)²) / (v1)²)))) (0.00012) ') 5
+   A ('F41N1', 'II.34.2', '(((v0 * v1) * v2) * (1.0 + (0.000671 * ((v1)² / (v0)²)))) (8.4e-05) | ') 5
+   A ('F41N1', 'II.38.3', '((v3 / (v0 * v1)) * tanh((0.009423 * ((((v0)² * (v1)²) * v2) / (v3)²))') 5
+   A ('F41N1', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * ((-0.008475 + (1.0 * sin((6.0 * v1)))) +') 5
+   A ('F41N1', 'III.15.12', '(((v0 * (v1)²) * (v2)²) * (1.0 + (-0.803253 * (v1 * v2)))) (0.002) | (') 5
+   A ('F41N10', 'I.10.7', '((pow(v0, 1.0123) * pow(v1, 0.0965)) * pow(v2, -0.0947)) (0.011)') 5
+   A ('F41N10', 'I.12.1', '((1.0 / (v1)²) * tanh((0.179037 * (v0 * (v1 * (v1)²))))) (0.0095) | (v') 5
+   A ('F41N10', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (0.0088) | (((v0 * v1) / (v2 * (v3)²)) * sq') 5
+   A ('F41N10', 'I.12.5', '((1.0 / (v1)²) * tanh((0.311832 * (v0 * (v1 * (v1)²))))) (0.0084) | (v') 5
+   A ('F41N10', 'I.14.4', '(v0 * (v1)²) (0.0075) | (pow(v0, 1.0878) * pow(v1, 2.147)) (0.0079) | ') 5
+   A ('F41N10', 'I.15.10', '((pow(v0, 1.0017) * pow(v1, 1.0637)) * pow(v2, -0.0861)) (0.01) | (v0 ') 5
+   A ('F41N10', 'I.18.12', '((v0 * v1) * ((0.641182 + (1.0 * sin((4.15 * v2)))) + (-0.590458 * cos') 5
+   A ('F41N10', 'I.25.13', '((v0 / v1) * sqrt((1.0 + (0.016879 * (v1 / (v0)²))))) (0.011) | ((v0 /') 5
+   A ('F41N10', 'I.30.5', '(v0 / (v1 * v2)) (0.01) | ((v2 / (v0 * v1)) * tanh((0.003189 * ((v0)² ') 5
+   A ('F41N10', 'I.34.1', '(v0 / (1.0 + (-0.196428 * (v1 / v2)))) (0.011) | (v0 / sqrt((1.0 + (-0') 5
+   A ('F41N10', 'I.39.1', '((v0 * v1) / sqrt((1.0 + (0.006731 * (1.0 / ((v0)² * v1)))))) (0.0084)') 5
+   A ('F41N10', 'II.11.3', '(((v0 * v1) * sqrt(v4)) / (v2 * ((v3)² * sqrt(v3)))) (0.012) | ((v2 / ') 5
+   A ('F41N10', 'II.13.23', '(v0 / sqrt((1.0 + (-0.122243 * ((v1)² / v2))))) (0.013) | (v0 / (1.0 +') 5
+   A ('F41N10', 'II.15.4', '((v0 * v1) * ((-0.011857 + (0.039781 * sin((6.15 * v2)))) + (-1.0 * co') 5
+   A ('F41N10', 'II.24.17', '((v0 / v1) / (1.0 + (0.055896 * ((v1)² / ((v0)² * (v2)²))))) (0.0097) ') 5
+   A ('F41N10', 'II.3.24', '(v0 / (v1)²) (0.012) | (pow(v0, 1.0901) * pow(v1, -2.0933)) (0.012) | ') 5
+   A ('F41N10', 'II.34.2', '((v0 * v1) * v2) (0.0083) | ((1.0 / (v0)²) * tanh((0.63447 * (((v0 * (') 5
+   A ('F41N10', 'II.38.3', '(((v0 * v1) * v2) / v3) (0.0084) | ((((v0 * v1) * v2) / v3) / sqrt((1.') 5
+   A ('F41N10', 'III.15.12', '(v0 * ((1.0 + (-0.07348 * sin((4.037457 * (v1 * v2))))) + (-0.952237 *') 5
+   A ('TF78', 'feynman_III_14_14', '(v0 * exp((3.24725 * ((sqrt(v1) * sqrt(v2)) / (sqrt(v3) * sqrt(v4)))))') 5
+   A ('TF78', 'feynman_III_4_32', '((v2 * v3) / (v0 * v1)) (1.9e-06) | (((v0 * v1) / v2) * tanh((0.008272') 5
+   A ('TF78', 'feynman_III_4_33', '((v2 * v3) * exp((-0.08211 * ((v0 * v1) / (v2 * v3))))) (5.4e-06) | ((') 5
+   A ('TF78', 'feynman_II_11_28', 'exp((0.56044 * (v0 * v1))) (0.00035) | (1.0 + (0.65829 * (v0 * v1))) (') 5
+   A ('TF78', 'feynman_I_15_3t', '(v3 / (1.0 + (0.005472 * (v0 / ((v1)² * (v3)²))))) (0.0011) | (v3 / sq') 5
+   A ('TF78', 'feynman_I_15_3x', '(v0 * (1.0 + (-0.345082 * ((v1 * v3) / v0)))) (0.0061) | (v0 / (1.0 + ') 5
+   A ('TF78', 'feynman_I_32_17', '((((((v0 * v1) * (v2)²) * (v3)²) * ((v4)²)²) / ((v5)²)²) / (1.0 + (-0.') 5
+   A ('TF78', 'feynman_I_34_14', '(v2 / (1.0 + (-0.174575 * (v1 / v0)))) (6.6e-05) | (v2 / sqrt((1.0 + (') 5
+   A ('TF78', 'feynman_I_41_16', '(((((v0)² * (v1)²) * (v3)²) / (v2 * (v4)²)) / (1.0 + (12.475529 * ((v1') 5
+   A ('TF78', 'feynman_I_9_18', '(((((((v0 * v1) * v2) * sqrt(v4)) * sqrt(v6)) * sqrt(v8)) / (((v3 * sq') 5
+   A ('TF78', 'feynman_test_1', '(((((((v0)² * (v1)²) * (v2)²) * (v3)²) * (v4)²) / ((v5)² * ((v6)²)²)) ') 5
+   A ('TF78', 'feynman_test_10', 'log((4430.845301 * ((v1 * (((v2)²)² * sqrt(v2))) / v0))) (0.0058) | ((') 5
+   A ('TF78', 'feynman_test_11', '(((v0 * (v3)²) / sqrt(v1)) * (1.0 + (-0.82729 * (v2 * (v3)²)))) (0.015') 5
+   A ('TF78', 'feynman_test_12', '((((v0 * v2) * v3) / (v1)²) * (1.0 + (-0.002751 * (v1 / (v3)²)))) (6.2') 5
+   A ('TF78', 'feynman_test_17', '(((((v0 * (v1)²) * (v4 * (v4)²)) * v5) / v3) * (1.0 + (0.078528 * (v3 ') 5
+   A ('TF78', 'feynman_test_3', '((((v0 * (v1 * sqrt(v1))) * ((v2)² * sqrt(v2))) / ((v3)² * sqrt(v3))) ') 5
+   A ('TF78', 'feynman_test_4', '((((pow(v0, -0.4723) * pow(v1, 0.6734)) * pow(v2, -0.1155)) * pow(v3, ') 5
+   A ('TF78', 'feynman_test_7', '((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.020768 * ((v3)² / (v1 * (v4)²') 5
+   A ('TF78 under units', 'feynman_III_14_14', '(v0 * exp((3.24725 * ((sqrt(v1) * sqrt(v2)) / (sqrt(v3) * sqrt(v4)))))') 5
+   A ('TF78 under units', 'feynman_III_4_32', '((v2 * v3) / (v0 * v1)) (0.0019)') 5
+   A ('TF78 under units', 'feynman_III_4_33', '((v2 * v3) * exp((-0.08211 * ((v0 * v1) / (v2 * v3))))) (6.3e-06) | ((') 5
+   A ('TF78 under units', 'feynman_II_11_28', 'exp((0.56044 * (v0 * v1))) (0.0017) | (1.0 + (0.65829 * (v0 * v1))) (0') 5
+   A ('TF78 under units', 'feynman_I_15_3t', 'v3 (0.0043)') 5
+   A ('TF78 under units', 'feynman_I_15_3x', '(v0 * (1.0 + (-0.345082 * ((v1 * v3) / v0)))) (0.0061) | (v0 / (1.0 + ') 5
+   A ('TF78 under units', 'feynman_I_32_17', '((((((v0 * v1) * (v2)²) * (v3)²) * ((v4)²)²) / ((v5)²)²) / sqrt((1.0 +') 5
+   A ('TF78 under units', 'feynman_I_34_14', '(v2 / (1.0 + (-0.174575 * (v1 / v0)))) (6.6e-05) | (v2 / sqrt((1.0 + (') 5
+   A ('TF78 under units', 'feynman_I_41_16', '((((v0)² * v1) * v3) / (v4)²) (0.0044)') 5
+   A ('TF78 under units', 'feynman_test_1', '(((((((v0)² * (v1)²) * (v2)²) * (v3)²) * (v4)²) / ((v5)² * ((v6)²)²)) ') 5
+   A ('TF78 under units', 'feynman_test_10', 'log((4430.845301 * ((v1 * (((v2)²)² * sqrt(v2))) / v0))) (0.0058)') 5
+   A ('TF78 under units', 'feynman_test_11', '(((v0 * (v3)²) / sqrt(v1)) * (1.0 + (-0.82729 * (v2 * (v3)²)))) (0.015') 5
+   A ('TF78 under units', 'feynman_test_17', '(((((v0 * (v1)²) * (v4 * (v4)²)) * v5) / v3) * sqrt((1.0 + (0.082532 *') 5
+   A ('TF78 under units', 'feynman_test_3', '((((v0 * (v1 * sqrt(v1))) * ((v2 * (v2)²) * sqrt(v2))) / (v3 * (v3)²))') 5
+   A ('TF78 under units', 'feynman_test_7', '(sqrt(v0) * sqrt(v1)) (0.0092)') 5
+   A ('TR25raw', '1096_FacultySalaries', '((((X2 * (X2)²) * ((X3)²)²) / ((X1 * (X1)²))²) * sqrt((1.0 + (-0.95759') 1
+   A ('TR25raw', '1096_FacultySalaries', '(((X1 * ((X1)²)²) / ((X2 * sqrt(X2)) * ((X3)² * sqrt(X3)))) / (1.0 + (') 1
+   A ('TR25raw', 'first_principles_planck', '(1.0 + (2.824949 * (X0 / X1))) (0.0027)') 1
+   A ('TR25raw', 'first_principles_planck', '(1.0 + (4.485247 * (X0 / X1))) (0.0044)') 1
+   A ('TR25raw', 'first_principles_planck', '(1.0 + (4.733688 * (X0 / X1))) (0.0017)') 1
+   A ('TR25raw', 'first_principles_planck', '(1.0 + (4.79023 * (X0 / X1))) (0.0019)') 1
+   A ('TR25raw', 'first_principles_planck', '(1.0 + (4.847221 * (X0 / X1))) (0.0017)') 1
+   A ('TS14', 'strogatz_bacres2', '(1.0 + (-0.650534 * (v1 / v0))) (1.6e-05) | ((1.0 / v0) * exp((-0.9889') 5
+   A ('TS14', 'strogatz_bacres2', '(1.0 + (-0.656593 * (v1 / v0))) (0.0013) | ((v1 / v0) * exp((-2.319428') 5
+   A ('U41', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041491 * ((v0 * v1) / (v2)²)))) (0.') 5
+   A ('U41', 'I.26.2', '(v0 * ((0.014186 + (1.0 * sin((4.889472 * v1)))) + (0.062792 * cos((4.') 5
+   A ('U41', 'I.30.5', '((v0 / (v1 * v2)) / sqrt((1.0 + (-0.002343 * ((v0)² / ((v1)² * (v2)²))') 5
+   A ('U41', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.113617 * sin((6.054448 * v2)))) + ') 5
+   A ('U41N1', 'I.10.7', '(v0 / sqrt((1.0 + (-0.040165 * ((v1)² / (v2)²))))) (8.8e-05) | (v0 / (') 5
+   A ('U41N1', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (9e-05)') 5
+   A ('U41N1', 'I.15.10', '((v0 * v1) / sqrt((1.0 + (-0.040184 * ((v1)² / (v2)²))))) (9.4e-05) | ') 5
+   A ('U41N1', 'I.16.6', '((sqrt(v0) * sqrt(v1)) / (1.0 + (0.041566 * ((v0 * v1) / (v2)²)))) (0.') 5
+   A ('U41N1', 'I.18.12', '((v0 * v1) * ((0.04636 + (1.0 * sin((3.219961 * v2)))) + (-0.044835 * ') 5
+   A ('U41N1', 'I.26.2', '(v0 * ((0.01084 + (1.0 * sin((4.861902 * v1)))) + (0.076172 * cos((4.8') 5
+   A ('U41N1', 'I.27.6', '(v0 / (1.0 + (2.004357 * ((v0 * v2) / v1)))) (9.5e-05) | (v0 * exp((-1') 5
+   A ('U41N1', 'I.34.1', '(v0 / (1.0 + (-0.201043 * (v1 / v2)))) (0.0001) | (((v0 * (v1)²) / (v2') 5
+   A ('U41N1', 'I.34.8', '(((v0 * v1) * v2) / v3) (9.1e-05)') 5
+   A ('U41N1', 'I.37.4', '((sqrt(v0) * sqrt(v1)) * ((1.0 + (0.110638 * sin((6.048124 * v2)))) + ') 5
+   A ('U41N1', 'I.43.16', '(((v0 * v1) * v2) / v3) (0.00018)') 5
+   A ('U41N1', 'I.44.4', '((((v0 * v1) * v2) * sqrt(v3)) * (1.0 + (-0.20178 * (1.0 / v3)))) (0.0') 5
+   A ('U41N1', 'II.11.3', '(((v0 * v1) / (v2 * (v3)²)) / sqrt((1.0 + (-0.435986 * (v4 / v3))))) (') 5
+   A ('U41N1', 'II.13.23', '(v0 / sqrt((1.0 + (-0.040071 * ((v1)² / (v2)²))))) (0.00012) | (v0 / (') 5
+   A ('U41N1', 'II.15.4', '((v0 * v1) * ((-0.001189 + (0.004025 * sin((6.21892 * v2)))) + (-1.0 *') 5
+   A ('U41N1', 'II.24.17', '((v0 / v1) * sqrt((1.0 + (-0.068263 * ((v1)² / ((v0)² * (v2)²)))))) (9') 5
+   A ('U41N1', 'II.6.15b', '((v0 / (v2 * (v3 * (v3)²))) * ((-0.008475 + (1.0 * sin((6.0 * v1)))) +') 5
+   A ('U41N1', 'III.15.12', '(((v0 * (v1)²) * (v2)²) * (1.0 + (-0.803253 * (v1 * v2)))) (0.002) | (') 5
+   A ('U41N10', 'I.12.1', '(v0 * v1) (0.0096)') 5
+   A ('U41N10', 'I.12.2', '((v0 * v1) / (v2 * (v3)²)) (0.0088)') 5
+   A ('U41N10', 'I.12.5', '(v0 * v1) (0.0084)') 5
+   A ('U41N10', 'I.14.4', '(v0 * (v1)²) (0.0075)') 5
+   A ('U41N10', 'I.15.10', '(v0 * v1) (0.014)') 5
+   A ('U41N10', 'I.18.12', '((v0 * v1) * ((0.641182 + (1.0 * sin((4.15 * v2)))) + (-0.590458 * cos') 5
+   A ('U41N10', 'I.25.13', '(v0 / v1) (0.012)') 5
+   A ('U41N10', 'I.30.5', '(v0 / (v1 * v2)) (0.01) | ((v2 / (v0 * v1)) * tanh((0.003189 * ((v0)² ') 5
+   A ('U41N10', 'I.34.1', '(v0 / (1.0 + (-0.196428 * (v1 / v2)))) (0.011) | (v0 / sqrt((1.0 + (-0') 5
+   A ('U41N10', 'I.39.1', '(v0 * v1) (0.0088)') 5
+   A ('U41N10', 'II.11.3', '(((v0 * v1) * sqrt(v4)) / (v2 * ((v3)² * sqrt(v3)))) (0.012)') 5
+   A ('U41N10', 'II.15.4', '((v0 * v1) * ((-0.011857 + (0.039781 * sin((6.15 * v2)))) + (-1.0 * co') 5
+   A ('U41N10', 'II.24.17', '((v0 / v1) / (1.0 + (0.055896 * ((v1)² / ((v0)² * (v2)²))))) (0.01)') 5
+   A ('U41N10', 'II.3.24', '(v0 / (v1)²) (0.012)') 5
+   A ('U41N10', 'II.34.2', '((v0 * v1) * v2) (0.0085)') 5
+   A ('U41N10', 'II.38.3', '(((v0 * v1) * v2) / v3) (0.0084)') 5
+   A ('U41N10', 'III.15.12', '(v0 * ((1.0 + (-0.07348 * sin((4.037457 * (v1 * v2))))) + (-0.952237 *') 5
+
+feynman_test_10:
+   ('tf', 'feynman_test_10', 'test', 5) NEAR MISS
+   ('tf', 'feynman_test_10', 'test', 6) MISS MISS
+   ('tf', 'feynman_test_10', 'test', 7) MISS MISS
+   ('tf', 'feynman_test_10', 'test', 8) MISS MISS
+   ('tf', 'feynman_test_10', 'test', 9) MISS MISS
+   ('utf', 'feynman_test_10', 'test', 5) MISS MISS
+   ('utf', 'feynman_test_10', 'test', 6) MISS MISS
+   ('utf', 'feynman_test_10', 'test', 7) MISS MISS
+   ('utf', 'feynman_test_10', 'test', 8) MISS MISS
+   ('utf', 'feynman_test_10', 'test', 9) MISS MISS
+TS14 trig fits:
+  n 60 Counter({'ood': 30, 'test': 30}) systems ['strogatz_barmag1', 'strogatz_barmag2', 'strogatz_glider1', 'strogatz_glider2', 'strogatz_shearflow1', 'strogatz_shearflow2']
+  status changed: 8
+     ('ts', 'strogatz_barmag1', 'test', 8) MISS -> NEAR
+     ('ts', 'strogatz_barmag1', 'test', 9) NEAR -> MISS
+     ('ts', 'strogatz_barmag2', 'test', 6) NEAR -> MISS
+     ('ts', 'strogatz_barmag2', 'test', 9) NEAR -> MISS
+     ('ts', 'strogatz_glider1', 'ood', 6) MISS -> NEAR
+     ('ts', 'strogatz_glider1', 'ood', 7) MISS -> NEAR
+     ('ts', 'strogatz_glider1', 'test', 7) MISS -> NEAR
+     ('ts', 'strogatz_glider1', 'test', 9) EXACT -> MISS
+  exact A: [('ts', 'strogatz_glider1', 'test', 9)]
+  exact B: []
+TS14 seeds: [5, 6, 7, 8, 9]
+III_8_54:
+   ('tf', 'feynman_III_8_54', 'test', 5) MISS MISS
+   ('tf', 'feynman_III_8_54', 'test', 6) MISS MISS
+   ('tf', 'feynman_III_8_54', 'test', 7) MISS EXACT
+   ('tf', 'feynman_III_8_54', 'test', 8) MISS MISS
+   ('tf', 'feynman_III_8_54', 'test', 9) MISS MISS
+   ('utf', 'feynman_III_8_54', 'test', 5) MISS MISS
+   ('utf', 'feynman_III_8_54', 'test', 6) MISS MISS
+   ('utf', 'feynman_III_8_54', 'test', 7) MISS MISS
+   ('utf', 'feynman_III_8_54', 'test', 8) EXACT MISS
+   ('utf', 'feynman_III_8_54', 'test', 9) EXACT MISS
+TF78 seeds: [5, 6, 7, 8, 9] UTF seeds: [5, 6, 7, 8, 9]
+TF78 trig problems: 17

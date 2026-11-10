@@ -1,0 +1,21 @@
+A1: seeds [0, 1, 2, 3, 4]; arcsine laws on F41: exact 2, exact with arcsin 1 (1.2.0: 0 exact)
+    other eight, F41 exact 20 -> 20; equations losing exact fits {}; gaining {}
+    U41 arcsine laws: exact 2, with arcsin 1
+    I.26.2 exact with arcsin at seeds [4]
+A2: seeds [0, 1, 2, 3, 4]; arcsine laws on F41: exact 5, exact with arcsin 3 (1.2.0: 0 exact)
+    other eight, F41 exact 20 -> 20; equations losing exact fits {}; gaining {}
+    U41 arcsine laws: exact 3, with arcsin 3
+    I.26.2 exact with arcsin at seeds [1, 2, 4]
+A3: seeds [0, 1, 2, 3, 4]; arcsine laws on F41: exact 8, exact with arcsin 8 (1.2.0: 0 exact)
+    other eight, F41 exact 20 -> 20; equations losing exact fits {}; gaining {}
+    U41 arcsine laws: exact 8, with arcsin 8
+    I.26.2 exact with arcsin at seeds [1, 2, 4]
+A3 conf: seeds [5, 6, 7, 8, 9]; arcsine laws on F41: exact 7, exact with arcsin 7 (1.2.0: 0 exact)
+    other eight, F41 exact 21 -> 21; equations losing exact fits {'I.50.26': [1, 0]}; gaining {'III.17.37': [0, 1]}
+      exact with 1.2.0, not with the candidate: ('feyn', 'I.50.26', 7) MISS
+    I.26.2 exact with arcsin at seeds [7, 9]
+
+Snell on clean data (E2a), the law by the TP test:
+  a1/examine/e2a_A.jsonl: 10 fits, law 0, arcsin in formula 0; []
+  a1/examine/e2a_B.jsonl: 10 fits, law 1, arcsin in formula 0; [(20, 1, '2.4e-10')]
+  a2/campaign/e2a_B.jsonl: 10 fits, law 0, arcsin in formula 0; []

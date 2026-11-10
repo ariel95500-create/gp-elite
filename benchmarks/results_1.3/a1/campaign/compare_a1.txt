@@ -1,0 +1,87 @@
+Dtrig: 200 fits in A, 200 in B, the same jobs: True; crashes A 0, B 0
+TPsnell: 40 fits in A, 40 in B, the same jobs: True; crashes A 0, B 0
+Engines: A ['/venv12p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv13a/lib/python3.11/site-packages/gp_elite/__init__.py']
+
+| kind | A, ten equations | B | A, the two arcsine laws | B |
+|---|---|---|---|---|
+| F41 | 20 | 22 | 0 | 2 |
+| U41 | 20 | 22 | 0 | 2 |
+| F41N1 | 15 | 15 | 0 | 0 |
+| F41N10 | 14 | 15 | 0 | 0 |
+
+Per equation, F41, U41, F41N1, F41N10:
+  II.15.4    F41 5 -> 5  U41 5 -> 5  F41N1 5 -> 5  F41N10 5 -> 5
+  I.18.12    F41 5 -> 5  U41 5 -> 5  F41N1 5 -> 5  F41N10 5 -> 5
+  III.15.12  F41 5 -> 5  U41 5 -> 5  F41N1 0 -> 0  F41N10 4 -> 5
+  I.26.2     F41 0 -> 1  U41 0 -> 1  F41N1 0 -> 0  F41N10 0 -> 0
+  I.30.5     F41 0 -> 1  U41 0 -> 1  F41N1 0 -> 0  F41N10 0 -> 0
+  I.37.4     F41 0 -> 0  U41 0 -> 0  F41N1 0 -> 0  F41N10 0 -> 0
+  I.50.26    F41 0 -> 0  U41 0 -> 0  F41N1 0 -> 0  F41N10 0 -> 0
+  II.6.15b   F41 5 -> 5  U41 5 -> 5  F41N1 5 -> 5  F41N10 0 -> 0
+  III.9.52   F41 0 -> 0  U41 0 -> 0  F41N1 0 -> 0  F41N10 0 -> 0
+  III.17.37  F41 0 -> 0  U41 0 -> 0  F41N1 0 -> 0  F41N10 0 -> 0
+
+The fits of the arcsine laws in B (F41, U41):
+  feyn I.26.2 seed 0: MISS, arcsine in the formula False, 1 - R² 0.00323: 0.00187167 + 0.438595 * (0.000487 + sin(1.00072 * v1)) * cos(0.54123 * cos(1.0142 * v1)) * (3.30736 + sin(log(
+  feyn I.26.2 seed 1: MISS, arcsine in the formula False, 1 - R² 0.00398: -0.00242794 + 1.00029 * v0 * (exp(-v0 / 0.731034) + 1.0119 * v0) * sin(0.998101 * v1)
+  feyn I.26.2 seed 2: NEAR, arcsine in the formula True, 1 - R² 0.000801: -0.000573021 + 0.982939 * arcsin(1.0119 * v0 * sin(0.999714 * v1))
+  feyn I.26.2 seed 3: MISS, arcsine in the formula False, 1 - R² 0.0046: 0.00192147 + 0.0758206 * v0 * (-0.00900786 + sin(1.00962 * v1) + 0.0480554 * cos(0.760904 * v1 - 3.82335 * v0)
+  feyn I.26.2 seed 4: EXACT, arcsine in the formula True, 1 - R² 6.97e-30: arcsin(sin(v1) * v0)
+  feyn I.30.5 seed 0: EXACT, arcsine in the formula False, 1 - R² 3.39e-11: 7.80707e-07 + 0.419358 * v0 / (v1 * v2) / tanh(1.04619 - 0.329756 * v0² / (v1² * v2²)) * (1.86071 + v0 / (v1 *
+  feyn I.30.5 seed 1: NEAR, arcsine in the formula False, 1 - R² 7.61e-06: -5.32017e-05 + 0.999841 * v0 / (v1 * v2) / sqrt(1 - 0.357804 * v0² / (v1² * v2²))
+  feyn I.30.5 seed 2: NEAR, arcsine in the formula False, 1 - R² 3.57e-06: 0.000412483 + 0.949035 * v0 / (v1 * v2) / (0.952729 - 0.187546 * v0² / (v1² * v2²))
+  feyn I.30.5 seed 3: NEAR, arcsine in the formula False, 1 - R² 3.57e-06: 0.000412483 + 0.949035 * v0 / (v1 * v2) / (0.952729 - 0.187546 * v0² / (v1² * v2²))
+  feyn I.30.5 seed 4: NEAR, arcsine in the formula False, 1 - R² 4.84e-08: -3.39232e-05 + 0.921994 * v0 / (v1 * v2) / cos(-0.39849 - 0.383284 * (v0 / (v1 * v2))²)
+  ufeyn I.26.2 seed 0: MISS, arcsine in the formula True, 1 - R² 0.00507: 1.07566 * arcsin(tanh(arcsin(1.0119 * v0))) * sin(0.99816 * v1)
+  ufeyn I.26.2 seed 1: MISS, arcsine in the formula False, 1 - R² 0.00516: 0.336558 * v0 * exp(sqrt(sqrt(exp(v0 / 0.988241)))) * sin(0.998822 * v1)
+  ufeyn I.26.2 seed 2: EXACT, arcsine in the formula True, 1 - R² 9.01e-32: arcsin(-sin(-v1) * v0)
+  ufeyn I.26.2 seed 3: MISS, arcsine in the formula False, 1 - R² 0.0107: 1.52914 * v0 * (-0.0764124 + sin(-0.0742935 + sin(0.938932 * v1) + 0.493257 * cos(1.72195 * v1)) - 0.403479 * 
+  ufeyn I.26.2 seed 4: MISS, arcsine in the formula False, 1 - R² 0.00569: 0.472392 * (1.71943 + sin(1.0119 * v0)) * v0 * sin(0.998663 * v1)
+  ufeyn I.30.5 seed 0: NEAR, arcsine in the formula False, 1 - R² 5.93e-06: 0.962266 * v0 / (v1 * v2) / (0.963804 - 0.184789 * v0² / (v1² * v2²))
+  ufeyn I.30.5 seed 1: NEAR, arcsine in the formula False, 1 - R² 3.16e-06: 0.98736 * v0 / (v1 * v2) / sqrt(0.977118 - 0.359994 * v0² / (v1 * v2)²)
+  ufeyn I.30.5 seed 2: EXACT, arcsine in the formula False, 1 - R² 2.65e-14: 1.14792 * v0 / (v1 * v2) / sqrt(0.600905 + sqrt(0.513815 - 0.508524 * v0² / (v1² * v2²)) - 0.0845327 * v0² / (
+  ufeyn I.30.5 seed 3: NEAR, arcsine in the formula False, 1 - R² 5.93e-06: 0.962266 * v0 / (v1 * v2) / (0.963804 - 0.184789 * v0² / (v1² * v2²))
+  ufeyn I.30.5 seed 4: NEAR, arcsine in the formula False, 1 - R² 7.97e-06: 0.99964 * v0 / (v1 * v2) / sqrt(1 - 0.357804 * v0² / (v1² * v2²))
+
+TPsnell: | arm | law A | law B | useful A | useful B | median time A | B |
+  | plain | 0 | 0 | 18 | 18 | 6.6 s | 6.5 s |
+  | units | 0 | 0 | 19 | 19 | 5.0 s | 4.6 s |
+
+Criteria written before the run (PLAN.md):
+  [FAILS] 1. the arcsine laws on F41: at least 5 of 10 exact in B (2)
+  [FAILS] 2. Snell's law on TP: at least 10 of 40 in B (0)
+  [holds] 3. F41, the eight other equations: B no fewer than A - 2 (20, 20)
+  [holds] 3. F41: no equation from three seeds or more to one or none (none)
+  [holds] 3. U41, the eight other equations: B no fewer than A - 2 (20, 20)
+  [holds] 3. U41: no equation from three seeds or more to one or none (none)
+  [holds] 4. F41N1: B no fewer than A - 2 (15, 15)
+  [holds] 4. F41N10: B no fewer than A - 2 (14, 15)
+  [holds] 5. useful on TP, plain: B no fewer than A - 2 (18, 18)
+  [holds] 5. useful on TP, units: B no fewer than A - 2 (19, 19)
+  [holds] 6. the units guarantee: every model under units of B passes (70 of 70)
+  [holds] 7. time on TP, plain: B at most 1.5 times A (6.6 s, 6.5 s, ratio 0.98)
+  [holds] 7. time on TP, units: B at most 1.5 times A (5.0 s, 4.6 s, ratio 0.92)
+A1 NOT ADOPTED
+
+Beside, deciding nothing:
+  the arcsine laws under units: A 0, B 2 of 10
+  A: median size 19.5; formula_exact False in 8 of 200; formulas with the arcsine 0 (formula_exact False among them 0); median time 30.4 s
+  B: median size 19.0; formula_exact False in 15 of 200; formulas with the arcsine 24 (formula_exact False among them 8); median time 30.5 s
+  fits of Dtrig whose status changes: 17
+    feyn I.26.2 seed 2: MISS -> NEAR
+    feyn I.26.2 seed 4: MISS -> EXACT
+    feyn I.30.5 seed 0: NEAR -> EXACT
+    feyn I.37.4 seed 0: MISS -> NEAR
+    feyn I.37.4 seed 1: NEAR -> MISS
+    feyn I.37.4 seed 2: MISS -> NEAR
+    feyn III.17.37 seed 2: MISS -> NEAR
+    feyn_n1 I.26.2 seed 1: MISS -> NEAR
+    feyn_n1 I.37.4 seed 3: NEAR -> MISS
+    feyn_n1 III.17.37 seed 1: NEAR -> MISS
+    feyn_n10 III.15.12 seed 0: MISS -> NEAR
+    feyn_n10 III.15.12 seed 4: NEAR -> MISS
+    ufeyn I.26.2 seed 2: MISS -> EXACT
+    ufeyn I.30.5 seed 2: NEAR -> EXACT
+    ufeyn I.37.4 seed 1: MISS -> NEAR
+    ufeyn I.37.4 seed 3: MISS -> NEAR
+    ufeyn III.17.37 seed 4: MISS -> NEAR
