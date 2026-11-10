@@ -52,7 +52,8 @@ Kept apart from the plans of 1.1, which this file does not change.
    the author decided to publish 1.3.0 under the name "Arc". Two points were
    proposed for a later version: the warning of the engine, which does not
    name the arcsine among its safety nets, and a printed formula that would
-   show the clip of the arcsine.
+   show the clip of the arcsine. Done: 1.3.0 "Arc" was published on
+   10 November 2026 (`../results_1.3/release/README.md`).
 
 ## SRBench
 

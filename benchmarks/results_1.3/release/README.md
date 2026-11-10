@@ -332,3 +332,22 @@ He decided:
 can publish. The files to publish are built again from the commit of this
 decision, since the description of the PyPI page is the README
 (`environments.txt`).
+
+## Publication (10 November 2026)
+
+- **The merge.** The pull request of the release (#9) was merged into
+  `main` by a merge commit, e500ca7, whose tree is that of dd7c4c8. The
+  **Tests** workflow is green on every row for dd7c4c8 (runs 303 and 304),
+  for that merge commit on `main` (run 305) and for the tag (run 306)
+  (`m4/ci_runs.txt`).
+- **PyPI.** The author published the two files on 10 November 2026, at
+  08:04 UTC. Their SHA-256 on PyPI are those of the files built from
+  36d65bb (`environments.txt`). gp-elite 1.3.0, installed from PyPI in a
+  fresh environment here (`/venv13p`, with the packages of `/venv13r`),
+  prints 1.3.0. Its 11 `gp_elite/` files are identical to those of the
+  measured wheel and to those of `main`.
+- **The release page.** v1.3.0 on GitHub, tag on e500ca7, was published at
+  08:18 UTC with the two files, whose SHA-256 are those of
+  `environments.txt`. Its title first carried two stray backticks, and its
+  text had been pasted without its markup. The author corrected both at
+  08:52 UTC.

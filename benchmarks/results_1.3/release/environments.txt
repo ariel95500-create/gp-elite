@@ -19,6 +19,12 @@
 # passes for both. Installed in a fresh environment with the packages of /venv13r, the wheel
 # imports as 1.3.0 and fits 2 * X0 * X1.
 
+# After the publication, 10 November 2026: on PyPI, the two files have the SHA-256 above (those built
+# from 36d65bb), uploaded at 08:04 UTC. /venv13p: gp-elite 1.3.0 installed from PyPI (uv pip install
+# --no-deps gp-elite==1.3.0) in a fresh environment with the packages of /venv13r (its freeze below
+# but for the line of gp-elite, which reads gp-elite==1.3.0); its 11 gp_elite/ files are identical to
+# those of /venv13r and to those of main (e500ca7).
+
 # /venv13r (3.11.18) — uv pip freeze
 cloudpickle==3.1.2
 gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel13/dist/gp_elite-1.3.0-py3-none-any.whl#sha256=84b22ac3f3328ba68438782956eaa62a62da9595b0c6b5e6b855672bed122ffe

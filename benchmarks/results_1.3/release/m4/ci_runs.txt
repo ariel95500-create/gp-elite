@@ -21,3 +21,14 @@ Tests       295  6b44873  success     2026-11-09T16:22:31Z
 Tests       296  695d2ff  success     2026-11-09T16:30:18Z
 Draft PDF    36  73fb518  success     2026-11-09T16:34:08Z
 Tests       297  6bf3804  success     2026-11-09T16:34:42Z
+# Added on 10 November 2026, after the publication: the runs since e598e4d,
+# through the commit of the release, the merge into main and the tag.
+Tests       298  e598e4d  success     2026-11-09T16:41:34Z
+Tests       299  80e804c  success     2026-11-09T16:44:22Z
+Tests       300  16eda39  success     2026-11-09T17:12:59Z
+Tests       301  b96dd15  success     2026-11-09T17:44:29Z
+Tests       302  36d65bb  success     2026-11-10T00:11:09Z
+Tests       303  dd7c4c8  success     2026-11-10T00:13:04Z  (push)
+Tests       304  dd7c4c8  success     2026-11-10T00:13:33Z  (pull request #9)
+Tests       305  e500ca7  success     2026-11-10T07:56:22Z  (main, the merge of #9)
+Tests       306  e500ca7  success     2026-11-10T08:18:42Z  (tag v1.3.0)
