@@ -309,3 +309,26 @@ The first reported 22 findings and the second 10. They are wrong or partial
 sentences, figures without a committed source, a lower bound given as a
 count, and two stale sentences of the notebooks. Each is corrected or
 answered there; the reports and scripts are in `m5/`.
+
+## Gate 10 (9 and 10 November 2026)
+
+The author received:
+- the figures measured and the differences with 1.2.0;
+- the two reviews;
+- the correction of the plan on SRBench;
+- two points proposed for a later version: the warning of the engine, which
+  does not name the arcsine among its safety nets, and a printed formula that
+  would show the clip of the arcsine.
+
+He decided:
+- 1.3.0 is published;
+- its name is "Arc";
+- the AI disclosure of the paper is kept short, without the technical detail
+  of each version. It was rewritten so: the author's work before any AI
+  involvement, the fields where the assistant collaborated, and the review
+  and the checks by the author.
+
+`CITATION.cff` and the paper are dated 10 November 2026, the day the author
+can publish. The files to publish are built again from the commit of this
+decision, since the description of the PyPI page is the README
+(`environments.txt`).

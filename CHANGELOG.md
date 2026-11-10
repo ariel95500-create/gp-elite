@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0
+## 1.3.0 — "Arc"
 
 The arcsine. The pools `trig` and `full` have a new operator, `arcsin`, the
 arcsine of its argument clipped to [-1, 1]. The pools `physical`, the

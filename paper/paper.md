@@ -14,7 +14,7 @@ authors:
 affiliations:
   - index: 1
     name: Independent Researcher, France
-date: 5 November 2026
+date: 10 November 2026
 bibliography: paper.bib
 ---
 
@@ -278,51 +278,19 @@ using Adam, the seeding mechanism, the interactive console interface and the
 benchmark problem suite all predate that phase and, in modified form, remain in
 the released version.
 
-From that point onward the assistant acted as a development collaborator. Its
-contributions were: co-design and implementation of the stigmergic layer — the
-pheromone-weighted fragment library, its evaporation and pruning dynamics, the
-fragment co-occurrence graph, the sequence memory, and the stigmergic island;
-the refactor from single-variable to multi-variable regression; the subsequent
-numerical and statistical layers, namely Levenberg–Marquardt constant
-refinement replacing Adam, linear scaling, the Pareto front, $\epsilon$-lexicase
-selection, the robust loss, the dimensionally-constrained search and the
-deduction of dimensioned constants; diagnosis and correction of specific
-defects, including a float64 overflow in the Levenberg–Marquardt optimizer,
-two defects in the dimensional mode, an exported formula left in the internal
-scaled space, and a cache that could evaluate a model with the constants of
-another;
-packaging and release engineering; for version 0.8, the speed-ups of the
-engine, the fit of constants by variable projection, the final polish of the
-finalists, the power-law seeds, the handling of data far from unit scale, and
-the protocol of comparisons with criteria written before each measurement,
-under which the changes to the search and the final selection were accepted
-or rejected; for version 1.0, the families of forms fitted directly, the
-noise-tolerant seeds, the correction of the deduced constant and the case
-studies; for version 1.1, the seeds placed under declared units and the
-restriction of fitted exponents under units; for version 1.2, the stop on
-patience, the exponential printed as such and with its scale, and the
-correction of the typed start under declared units; for version 1.3, the
-arcsine operator, the constant factor of its argument and the seeds of the
-arcsine of a monomial; the benchmark and
-non-regression scripts distributed in the repository; and the drafting of the
-documentation and of this paper.
+From that point onward the assistant acted as a development collaborator: on
+the design and implementation of the engine, the correction of defects, the
+benchmark scripts and the protocol of their comparisons, the packaging, and
+the drafting of the documentation and of this paper.
 
 All AI-assisted output was reviewed and validated by the author before
 inclusion, and the direction of the work — which mechanisms to pursue, which
 results to trust, which claims to make — remained the author's throughout.
-Every correction was accompanied by an executable check: the overflow was
-reproduced before being fixed and re-tested afterwards, and the absence of
-regression was verified by comparing fits before and after each change on a
-fixed set of seeds. The benchmark figures quoted in this paper were produced
-with the scripts in the repository, whose raw results, machine and dates are
-recorded in `benchmarks/results_0.8/`, for the figures of versions 0.9.0
-and 1.0.0 in `benchmarks/results_0.9/` (`phase3/`, `release/` and
-`release_1.0/`), for version 1.1.0 in `benchmarks/results_1.1/`, for
-version 1.2.0 in `benchmarks/results_1.2/`, and for version 1.3.0 in
-`benchmarks/results_1.3/`, and the
-project's test
-suite passes on
-the released version. The scientific claims and
+Every correction was accompanied by an executable check, and since version
+0.8 the changes to the search were accepted or rejected by comparisons whose
+criteria were written before the measurement. The benchmark figures quoted in this
+paper were produced with the scripts in the repository, whose raw results,
+machine and dates are recorded in `benchmarks/`. The scientific claims and
 their stated limits are the author's own, as is responsibility for the whole.
 
 # Acknowledgements

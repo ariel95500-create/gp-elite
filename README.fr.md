@@ -609,7 +609,7 @@ Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/due
 
 ## Nouveautés
 
-**1.3** — l'arc sinus, dans les jeux `trig` et `full` : sur les 41 équations
+**1.3 « Arc »** — l'arc sinus, dans les jeux `trig` et `full` : sur les 41 équations
 de Feynman du banc de décision, ses deux lois à arc sinus reviennent exactes
 dans 8 ajustements sur 10, avec et sans unités, là où la 1.2 n'en avait aucune.
 Cela fait 171 lois exactes sur 205 contre 163, et 174 contre 166 avec les

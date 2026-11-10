@@ -567,7 +567,7 @@ Reproduce: `python benchmarks/feynman_bench.py 0 15` and `python benchmarks/duel
 
 ## What's new
 
-**1.3** — the arcsine, in the pools `trig` and `full`: on the 41 Feynman
+**1.3 "Arc"** — the arcsine, in the pools `trig` and `full`: on the 41 Feynman
 equations of the decision bench, its two arcsine laws come back exact in 8
 fits of 10, with and without units, where 1.2 had none. That makes 171 exact
 laws of 205 against 163, and 174 against 166 with units. The pool

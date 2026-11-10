@@ -48,8 +48,11 @@ Kept apart from the plans of 1.1, which this file does not change.
      gains one, within the criteria.
 
    The measurements of its release, M1 to M5, were done on 9 November 2026
-   (`../results_1.3/release/README.md`); the author decides the publication
-   at gate 10.
+   (`../results_1.3/release/README.md`). At gate 10, on 10 November 2026,
+   the author decided to publish 1.3.0 under the name "Arc". Two points were
+   proposed for a later version: the warning of the engine, which does not
+   name the arcsine among its safety nets, and a printed formula that would
+   show the clip of the arcsine.
 
 ## SRBench
 
