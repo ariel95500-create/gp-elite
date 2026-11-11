@@ -46,6 +46,16 @@ before.
 those of before. Every record also carries the seeds of phases 4a and 5 the
 fit placed (elementary_seed, tolerant_seed); the fits are unchanged.
 
+[1.4] --noise-draws 1,2,3,4 gives every job of a noisy kind once per draw of
+the noise (benchmarks/results_1.4/PLAN.md): the noisy kinds draw their noise
+once per equation, so new seeds would fit the same noisy targets again. A
+job of draw d > 0 carries "noise_draw": d; draw 0 is the job of before.
+Without the option the jobs and the data are those of before.
+
+[1.4] TF78N, the frozen noisy test set (kinds tf_n1, tf_n10, utf_n1 and
+utf_n10; amendment of 11 November 2026 to that plan): TF78 with 1 % and 10 %
+noise drawn as for F41, seed 5, never used to decide; on request only.
+
 Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
   python benchmarks/phase1_bench.py run-paired --python A/bin/python --out a.jsonl \\
@@ -69,7 +79,9 @@ TIME_LIMIT, GENERATIONS = 30.0, 1000
 BENCH_SEEDS = [0, 1, 2, 3, 4]
 TEST_SEEDS = [5, 6, 7, 8, 9]
 NOISE = {"feyn_n1": 0.01, "feyn_n10": 0.10,
-         "ufeyn_n1": 0.01, "ufeyn_n10": 0.10}
+         "ufeyn_n1": 0.01, "ufeyn_n10": 0.10,
+         "tf_n1": 0.01, "tf_n10": 0.10,            # [1.4] TF78N
+         "utf_n1": 0.01, "utf_n10": 0.10}
 ORDER = ["feyn", "real", "realraw", "tf", "ts", "tr", "trraw",
          "feyn_n1", "feyn_n10"]
 UNIT_KINDS = ["ufeyn", "ufeyn_n1", "ufeyn_n10", "utf"]   # phase 7, on request only
@@ -77,16 +89,21 @@ DEFAULTS = False                    # [1.2] --defaults
 BUDGET_FACTORS = None               # [budget study] --budget-factors
 PROBLEMS = None                     # [1.3] --problems
 FEYN_KINDS = ("feyn", "feyn_n1", "feyn_n10", "ufeyn", "ufeyn_n1", "ufeyn_n10")
+TESTN_KINDS = ["tf_n1", "tf_n10", "utf_n1", "utf_n10"]   # [1.4] on request only
+TF_KINDS = ("tf", "utf") + tuple(TESTN_KINDS)
+UNITS_ON = tuple(UNIT_KINDS) + ("utf_n1", "utf_n10")     # fits with units=
+NOISE_DRAWS = None                  # [1.4] --noise-draws
 
 
 # ─────────────────────────────────────────────────────────────── jobs ──
 
-def all_jobs(with_units=False):
+def all_jobs(with_units=False, with_testn=False):
     import feynman_bench as F
     import decision_bench as D
     import test_set as T
     out = []
-    for kind in ORDER + (UNIT_KINDS if with_units else []):
+    for kind in (ORDER + (UNIT_KINDS if with_units else [])
+                 + (TESTN_KINDS if with_testn else [])):
         if kind in FEYN_KINDS:
             for i, p in enumerate(F.PROBS):
                 for s in BENCH_SEEDS:
@@ -118,15 +135,34 @@ def all_jobs(with_units=False):
             for n in T.names("TR25"):
                 for s in TEST_SEEDS:
                     out.append(dict(kind=kind, problem=n, split="ood", seed=s))
+        elif kind in TESTN_KINDS:           # [1.4] TF78N: one seed
+            for n in T.names("TF78"):
+                out.append(dict(kind=kind, problem=n, split="test",
+                                seed=TEST_SEEDS[0]))
+    if NOISE_DRAWS:                         # [1.4] other draws of the noise
+        out = [dict(j, noise_draw=d) if d else j for j in out
+               for d in (NOISE_DRAWS if j["kind"] in NOISE else [0])]
     return out
 
 
 def key(j):
     k = (j["kind"], j["problem"], j["split"], j["seed"])
+    if "noise_draw" in j:                   # [1.4]
+        k += ("noise", j["noise_draw"])
     return k + (j["budget_factor"],) if "budget_factor" in j else k
 
 
 # ───────────────────────────────────────────────────────────── worker ──
+
+def _noisy(job, ytr, number):
+    """The training targets with the noise of the job's kind. `number` is
+    that of the equation: its index in F41, 500 plus its rank in TF78. [1.4]
+    The draw of the noise is that of the job (0 without --noise-draws)."""
+    rng = np.random.RandomState(7000 + number
+                                + 100003 * job.get("noise_draw", 0))
+    return ytr + rng.normal(0.0, NOISE[job["kind"]] * float(np.std(ytr)),
+                            len(ytr))
+
 
 def _data(job):
     """(Xtr, ytr, Xte, yte, Xo, yo, names, pool, ytr_clean)."""
@@ -137,17 +173,19 @@ def _data(job):
         Xtr, ytr, Xte, yte, Xo, yo, names, pool = D.feyn_data(job["index"])
         clean = ytr
         if kind in NOISE:
-            rng = np.random.RandomState(7000 + job["index"])
-            ytr = ytr + rng.normal(0.0, NOISE[kind] * float(np.std(ytr)),
-                                   len(ytr))
+            ytr = _noisy(job, ytr, job["index"])
         return Xtr, ytr, Xte, yte, Xo, yo, names, pool, clean
     if kind in ("real", "realraw"):
         Xtr, ytr, Xte, yte = D.real_data(job["problem"], job["split"],
                                          raw=kind == "realraw")
         return Xtr, ytr, Xte, yte, None, None, None, "physical", ytr
-    if kind in ("tf", "utf"):
+    if kind in TF_KINDS:
         Xtr, ytr, Xte, yte, Xo, yo, names, pool = T.tf_data(job["problem"])
-        return Xtr, ytr, Xte, yte, Xo, yo, names, pool, ytr
+        clean = ytr
+        if kind in NOISE:                   # [1.4] TF78N
+            ytr = _noisy(job, ytr,
+                         500 + T.names("TF78").index(job["problem"]))
+        return Xtr, ytr, Xte, yte, Xo, yo, names, pool, clean
     if kind == "ts":
         Xtr, ytr, Xte, yte, names, pool = T.ts_data(job["problem"],
                                                     job["split"])
@@ -225,10 +263,10 @@ def run_one(job):
     if names is not None:
         kw["feature_names"] = names
     units = None
-    if job["kind"] in UNIT_KINDS:
+    if job["kind"] in UNITS_ON:
         import units_table as U
         units, tunits = (U.units_of_tf(job["problem"], names)
-                         if job["kind"] == "utf"
+                         if job["kind"] in TF_KINDS
                          else U.units_of(job["problem"], names))
         kw.update(units=units, target_units=tunits)
     t0 = time.time()
@@ -274,7 +312,7 @@ def run_one(job):
             rec.update(expr_11=s11[:160],
                        formula_exact_11=None if rf11 is None else bool(rf11.exact),
                        x1_again=bool(s == r.expression))
-    exact_kind = job["kind"] in FEYN_KINDS + ("tf", "utf") or (
+    exact_kind = job["kind"] in FEYN_KINDS + TF_KINDS or (
         job["kind"] == "ts"
         and T.manifest()["datasets"][job["problem"]]["exact_scorable"])
     if exact_kind:
@@ -290,7 +328,7 @@ def run_one(job):
             se, rec["structure_error"] = 1e30, repr(exc)[:200]
         rec["err_structure"] = se
         rec["structure"] = bool(se < 1e-9)
-    if job["kind"] in ("tf", "utf"):
+    if job["kind"] in TF_KINDS:
         rec["family"] = T.manifest()["datasets"][job["problem"]]["family"]
     if units is not None:                   # the guarantee of units=
         from gp_elite.dimensions import check_dimensions
@@ -321,6 +359,10 @@ def _with_units(kinds):
     return bool(kinds) and any(k in UNIT_KINDS for k in kinds)
 
 
+def _with_testn(kinds):
+    return bool(kinds) and any(k in TESTN_KINDS for k in kinds)
+
+
 def _keep(j, kinds):
     """The jobs a run keeps: its kinds, and [1.3] its problems (--problems)."""
     return ((kinds is None or j["kind"] in kinds)
@@ -338,7 +380,8 @@ def drive(python, out, workers, kinds=None, max_seconds=None):
                 if line.strip():
                     done.add(key(json.loads(line)))
     todo = [dict(j, defaults=True) if DEFAULTS else j
-            for j in all_jobs(_with_units(kinds)) if _keep(j, kinds)]
+            for j in all_jobs(_with_units(kinds), _with_testn(kinds))
+            if _keep(j, kinds)]
     if BUDGET_FACTORS:                  # [budget study] a job, then its factors
         todo = [dict(j, budget_factor=f) for j in todo for f in BUDGET_FACTORS]
     todo = [j for j in todo if key(j) not in done]
@@ -412,7 +455,7 @@ def drive_paired(pythons, outs, pairs, kinds=None, max_seconds=None):
                         d.add(key(json.loads(line)))
         done.append(d)
     todo = [dict(j, defaults=True) if DEFAULTS else j
-            for j in all_jobs(_with_units(kinds))
+            for j in all_jobs(_with_units(kinds), _with_testn(kinds))
             if _keep(j, kinds) and any(key(j) not in d for d in done)]
     print("%d jobs to run with %d engines" % (len(todo), len(pythons)),
           flush=True)
@@ -465,7 +508,7 @@ def summary(path):
     by = {}
     for r in recs:
         by.setdefault(r["kind"], []).append(r)
-    for kind in ORDER + UNIT_KINDS:
+    for kind in ORDER + UNIT_KINDS + TESTN_KINDS:
         rr = by.get(kind, [])
         if not rr:
             continue
@@ -486,7 +529,8 @@ def summary(path):
                                  ("ood", lambda s: s == "ood"),
                                  ("test", lambda s: s == "test")):
             sub = [r for r in rr if pred(r["split"])]
-            if not sub or kind in ("feyn", "feyn_n1", "feyn_n10", "tf"):
+            if not sub or kind in ("feyn", "feyn_n1", "feyn_n10", "tf",
+                                   "tf_n1", "tf_n10"):
                 continue
             r2 = np.array([r["r2"] for r in sub], dtype=float)
             print("   %-5s n=%3d  R² median %.3f, worst %.3g, collapses (R²<0) %d,"
@@ -516,6 +560,7 @@ def main():
     r.add_argument("--defaults", action="store_true")
     r.add_argument("--budget-factors", default=None)
     r.add_argument("--problems", default=None)
+    r.add_argument("--noise-draws", default=None)
     r2 = sub.add_parser("run-paired")
     r2.add_argument("--python", action="append", required=True)
     r2.add_argument("--out", action="append", required=True)
@@ -525,6 +570,7 @@ def main():
     r2.add_argument("--seeds", default=None)
     r2.add_argument("--defaults", action="store_true")
     r2.add_argument("--problems", default=None)
+    r2.add_argument("--noise-draws", default=None)
     o = sub.add_parser("one")
     o.add_argument("job")
     s = sub.add_parser("summary")
@@ -536,6 +582,9 @@ def main():
     if getattr(a, "problems", None):
         global PROBLEMS
         PROBLEMS = a.problems.split(",")
+    if getattr(a, "noise_draws", None):
+        global NOISE_DRAWS
+        NOISE_DRAWS = [int(x) for x in a.noise_draws.split(",")]
     if getattr(a, "defaults", False):
         global DEFAULTS
         DEFAULTS = True

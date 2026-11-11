@@ -19,6 +19,11 @@ dimensions of the model returned.
 [1.2] --draws 5,6,7,8,9 runs other draws (the confirmation of plan 1.2); the
 default is the draws 0 to 4 of the diagnostic. The record also gives the
 generations run, the stop on patience if any, and err_train.
+
+[1.4] --set tpt10 runs TPT10, the frozen test set for teaching
+(benchmarks/results_1.4/PLAN.md): ten other experiments under the same
+protocol, numbered 10 to 19 in the generator of the data, never used to
+decide. Without the option the jobs and the data are those of before.
 """
 import argparse
 import io
@@ -91,6 +96,59 @@ EXPERIMENTS = [
          pool="trig", f=lambda X: np.arcsin(np.sin(X[:, 0]) / 1.5)),
 ]
 REACHABLE_PLAIN = [e["key"] for e in EXPERIMENTS if e["key"] != "snell"]
+
+# ── [1.4] TPT10, the frozen test set for teaching ──────────────────────────
+# Frozen in benchmarks/results_1.4/PLAN.md before any change of 1.4; measured
+# with 1.3.0 first. It never decides, and its records are not read to choose
+# a direction: only its table of counts is.
+AMPERE = {"A": 1}
+SPEED = {"m": 1, "s": -1}
+CONCENTRATION = {"mol": 1, "m": -3}
+RATE = {"mol": 1, "m": -3, "s": -1}
+EXPERIMENTS_T = [
+    dict(key="ohm", name="Ohm's law", law="U = R*I",
+         inputs=[("I", 0.01, 0.20, AMPERE)], target=VOLT, unknown=True,
+         pool="physical", f=lambda X: 47.0 * X[:, 0]),
+    dict(key="torricelli", name="draining tank", law="v = sqrt(2*g*h)",
+         inputs=[("h", 0.05, 0.50, M)], target=SPEED, unknown=True,
+         pool="physical", f=lambda X: np.sqrt(2 * 9.81 * X[:, 0])),
+    dict(key="boyle", name="Boyle's law", law="P = k/V",
+         inputs=[("V", 2e-5, 6e-5, M3)], target=PASCAL, unknown=True,
+         pool="physical", f=lambda X: 6.0 / X[:, 0]),
+    dict(key="kepler3", name="Kepler's third law",
+         law="T = 2*pi*sqrt(a^3/GM)",
+         inputs=[("a", 5.8e10, 1.43e12, M)], target=S, unknown=True,
+         pool="physical",
+         f=lambda X: 2 * PI * np.sqrt(X[:, 0] ** 3 / 1.32712e20)),
+    dict(key="interfrange", name="Young's fringes", law="i = lambda*D/a",
+         inputs=[("lam", 4.5e-7, 6.5e-7, M), ("D", 1.0, 2.0, M),
+                 ("a", 1e-4, 5e-4, M)],
+         target=M, unknown=False, pool="physical",
+         f=lambda X: X[:, 0] * X[:, 1] / X[:, 2]),
+    dict(key="malus", name="Malus's law", law="I = I0*cos(theta)^2",
+         inputs=[("theta", 0.0, 1.5, NODIM)], target=IRRADIANCE,
+         unknown=True, pool="trig",
+         f=lambda X: 800.0 * np.cos(X[:, 0]) ** 2),
+    dict(key="charge", name="capacitor charge",
+         law="u = E*(1 - exp(-t/tau))",
+         inputs=[("t", 0.0, 5.0, S)], target=VOLT, unknown=True,
+         pool="physical", f=lambda X: 5.0 * (1.0 - np.exp(-X[:, 0] / 1.0))),
+    dict(key="michaelis", name="enzyme kinetics", law="v = Vmax*S/(Km + S)",
+         inputs=[("S", 0.5, 10.0, CONCENTRATION)], target=RATE, unknown=True,
+         pool="physical", f=lambda X: 0.01 * X[:, 0] / (2.0 + X[:, 0])),
+    dict(key="ph", name="pH of a strong acid", law="pH = -log10(c)",
+         inputs=[("c", 0.001, 0.1, CONCENTRATION)], target=NODIM,
+         unknown=True, pool="physical", f=lambda X: -np.log10(X[:, 0])),
+    dict(key="thermistance", name="thermistor",
+         law="R = R0*exp(B*(1/T - 1/T0))",
+         inputs=[("T", 283.15, 353.15, KELVIN)], target=OHM, unknown=True,
+         pool="physical",
+         f=lambda X: 1e4 * np.exp(3950.0 * (1.0 / X[:, 0] - 1.0 / 298.15))),
+]
+# under units, the laws with no constant inside a function or a sum
+REACHABLE_UNITS_T = ["ohm", "torricelli", "boyle", "kepler3", "interfrange",
+                     "malus"]
+SETS = {"tp": EXPERIMENTS, "tpt10": EXPERIMENTS_T}
 SIZES = (10, 20)
 NOISES = (0.02, 0.05)
 DRAWS = (0, 1, 2, 3, 4)
@@ -98,7 +156,9 @@ ARMS = ("plain", "units")
 
 
 def experiment(key):
-    for k, e in enumerate(EXPERIMENTS):
+    """The number of an experiment in the generator of the data, and its
+    entry: 0 to 9 for the diagnostic, [1.4] 10 to 19 for TPT10."""
+    for k, e in enumerate(EXPERIMENTS + EXPERIMENTS_T):
         if e["key"] == key:
             return k, e
     raise KeyError(key)
@@ -230,11 +290,12 @@ def worker(job):
     return rec
 
 
-def all_jobs(draws=DRAWS):
+def all_jobs(draws=DRAWS, exp_set="tp"):
     """[1.2] `draws` replaces the draws 0 to 4 (--draws), for a confirmation
-    on new draws; the default gives the jobs of the diagnostic."""
+    on new draws; the default gives the jobs of the diagnostic. [1.4]
+    `exp_set` "tpt10" gives those of the frozen test set (--set)."""
     return [dict(exp=e["key"], n=n, noise=nz, draw=d, arm=a)
-            for a in ARMS for e in EXPERIMENTS for n in SIZES
+            for a in ARMS for e in SETS[exp_set] for n in SIZES
             for nz in NOISES for d in draws]
 
 
@@ -258,9 +319,10 @@ def _keep(j, arm, exps):
             and (exps is None or j["exp"] in exps))
 
 
-def run(python, out, workers, arm=None, draws=DRAWS, exps=None):
+def run(python, out, workers, arm=None, draws=DRAWS, exps=None,
+        exp_set="tp"):
     done = _done(out)
-    jobs = [j for j in all_jobs(draws) if key(j) not in done
+    jobs = [j for j in all_jobs(draws, exp_set) if key(j) not in done
             and _keep(j, arm, exps)]
     print("%d jobs to run, %d already done" % (len(jobs), len(done)))
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
@@ -285,11 +347,12 @@ def run(python, out, workers, arm=None, draws=DRAWS, exps=None):
                 sys.stdout.flush()
 
 
-def run_paired(pythons, outs, workers, arm=None, draws=DRAWS, exps=None):
+def run_paired(pythons, outs, workers, arm=None, draws=DRAWS, exps=None,
+               exp_set="tp"):
     """Each job with every engine at the same time (one process per fit), so
     that their times compare; `workers` jobs at a time."""
     dones = [_done(o) for o in outs]
-    jobs = [j for j in all_jobs(draws) if _keep(j, arm, exps)
+    jobs = [j for j in all_jobs(draws, exp_set) if _keep(j, arm, exps)
             and any(key(j) not in d for d in dones)]
     print("%d jobs to run with %d engines" % (len(jobs), len(pythons)))
     env = dict(os.environ, PYTHONHASHSEED="0", OMP_NUM_THREADS="1",
@@ -332,6 +395,8 @@ def summary(path):
     crashes = sum(1 for r in recs if r.get("crash"))
     print("%d fits, %d crashes, engine %s" % (len(recs), crashes, sorted(
         {r.get("engine_version") for r in recs if not r.get("crash")})))
+    if recs and recs[0]["exp"] in [e["key"] for e in EXPERIMENTS_T]:
+        return summary_t(recs, by)          # [1.4] the frozen test set
     for arm in ARMS:
         for n in SIZES:
             for nz in NOISES:
@@ -369,6 +434,57 @@ def summary(path):
                   if not r.get("crash")]
             c += sum(r["front_law"] for r in rr) >= 3
         print("\nreading, plain arm, 2 %% noise, %d points: %d of 9" % (n, c))
+
+
+def summary_t(recs, by):
+    """[1.4] The table of counts of TPT10: by arm, number of points and
+    noise, the fits of each experiment with the law / with the law on the
+    front / with a useful model; then the law by experiment, and in all."""
+    for arm in ARMS:
+        for n in SIZES:
+            for nz in NOISES:
+                print("\n== TPT10, arm %s, %d points, %d %% noise  (law / "
+                      "front / useful, of the draws; median size; median "
+                      "time)" % (arm, n, round(100 * nz)))
+                for e in EXPERIMENTS_T:
+                    rr = [r for r in by.get((arm, n, nz, e["key"]), [])
+                          if not r.get("crash")]
+                    if not rr:
+                        continue
+                    print("  %-13s %d / %d / %d  of %d   size %4.0f  %5.1f s"
+                          % (e["key"], sum(r["law"] for r in rr),
+                             sum(r["front_law"] for r in rr),
+                             sum(r["useful"] for r in rr), len(rr),
+                             np.median([r["size"] for r in rr]),
+                             np.median([r["time"] for r in rr])))
+    ok = [r for r in recs if not r.get("crash")]
+    print("\n== TPT10, the law by experiment (fits with the law, of the "
+          "fits run)")
+    print("  %-13s %-9s %-9s" % ("experiment", "plain", "units"))
+    for e in EXPERIMENTS_T:
+        cells = []
+        for arm in ARMS:
+            rr = [r for r in ok if r["arm"] == arm and r["exp"] == e["key"]]
+            cells.append("%d of %d" % (sum(r["law"] for r in rr), len(rr)))
+        print("  %-13s %-9s %-9s%s" % (
+            e["key"], cells[0], cells[1],
+            "" if e["key"] in REACHABLE_UNITS_T
+            else "  (not within reach under units)"))
+    for arm in ARMS:
+        rr = [r for r in ok if r["arm"] == arm]
+        t = np.array([r["time"] for r in rr], dtype=float)
+        line = "  arm %-5s: law %d, front %d, useful %d, of %d fits" % (
+            arm, sum(r["law"] for r in rr), sum(r["front_law"] for r in rr),
+            sum(r["useful"] for r in rr), len(rr))
+        if len(t):
+            line += "; median time %.1f s" % float(np.median(t))
+        if arm == "units":
+            wr = [r for r in rr if r["exp"] in REACHABLE_UNITS_T]
+            line += "; within reach: law %d of %d; units ok %d of %d" % (
+                sum(r["law"] for r in wr), len(wr),
+                sum(1 for r in rr if r.get("units_ok")),
+                sum(1 for r in rr if "units_ok" in r))
+        print(line)
 
 
 def constants(path):
@@ -412,6 +528,8 @@ def main():
     r.add_argument("--arm", choices=ARMS)
     r.add_argument("--draws", default=None)
     r.add_argument("--experiments", default=None)
+    r.add_argument("--set", dest="exp_set", choices=sorted(SETS),
+                   default="tp")
     rp = sub.add_parser("run-paired")
     rp.add_argument("--python", action="append", required=True)
     rp.add_argument("--out", action="append", required=True)
@@ -419,6 +537,8 @@ def main():
     rp.add_argument("--arm", choices=ARMS)
     rp.add_argument("--draws", default=None)
     rp.add_argument("--experiments", default=None)
+    rp.add_argument("--set", dest="exp_set", choices=sorted(SETS),
+                    default="tp")
     w = sub.add_parser("worker")
     w.add_argument("job")
     s = sub.add_parser("summary")
@@ -430,17 +550,21 @@ def main():
             else None)
     if a.cmd == "run":
         os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
-        run(a.python, a.out, a.workers, a.arm, draws, exps)
+        run(a.python, a.out, a.workers, a.arm, draws, exps, a.exp_set)
     elif a.cmd == "run-paired":
         for o in a.out:
             os.makedirs(os.path.dirname(os.path.abspath(o)), exist_ok=True)
-        run_paired(a.python, a.out, a.workers, a.arm, draws, exps)
+        run_paired(a.python, a.out, a.workers, a.arm, draws, exps,
+                   a.exp_set)
     elif a.cmd == "worker":
         sys.path.insert(0, HERE)
         print(json.dumps(worker(json.loads(a.job))))
     else:
         summary(a.path)
-        constants(a.path)
+        with open(a.path, encoding="utf-8") as fh:
+            first = json.loads(fh.readline())
+        if first["exp"] in [e["key"] for e in EXPERIMENTS]:
+            constants(a.path)
 
 
 if __name__ == "__main__":
