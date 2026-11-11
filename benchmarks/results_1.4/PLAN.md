@@ -12,6 +12,14 @@ measurement of this phase. Method as for 1.3:
 The author validates this plan before any change (gate 11). He decides the
 publication of 1.4 after its measurement (gate 12).
 
+Gate 11: the author validated this plan in full on 11 November 2026. He
+could not gather tables measured by students, so 1.4 is measured without
+them.
+
+Amendment of 11 November 2026, after gate 11 and before any change: a frozen
+noisy test set, TF78N, is added to the benches (its section is below). The
+rest of the plan is as validated.
+
 ## What 1.4 has to do
 
 On 10 November 2026, the day 1.3.0 was published, the author asked for a
@@ -110,6 +118,35 @@ and 20 points, 2 % and 5 % noise, draws 0 to 4, two arms, 400 fits.
 - **Real tables.** If the author gives tables measured by students before
   the campaign of S1, they form a third set. It is frozen the day it is
   received, measured the same way, and decides nothing.
+
+### A frozen noisy test set, TF78N (amendment of 11 November 2026)
+
+At gate 11 the author proposed the noisy files of the AI Feynman repository
+in the place of real tables. That repository holds no such file: its 61
+files were listed on 11 November 2026, and none has a noise suffix. The
+bench draws its own noise anyway. His proposal points to something the plan
+lacks, though:
+- N2 was designed on the noisy records of the 41 equations of F41;
+- its confirmation draws new noises on those same 41 equations;
+- so nothing measures N2 on equations it was not designed on.
+
+The 78 equations of the frozen test set TF78 therefore get the noise of the
+decision kinds:
+- **Kinds:** tf_n1 and tf_n10 without units, utf_n1 and utf_n10 under
+  units. They have 1 % and 10 % Gaussian noise on the training targets,
+  drawn once per equation as for F41, and one seed, 5, the first of the test
+  seeds. That makes 156 fits without units and 156 under units, at 30 s.
+  They run on request only.
+- **Baseline:** measured with 1.3.0 from PyPI before any change of the
+  engine. Only its counts by kind are read.
+- **It never decides.** At the release, M2 measures it again, paired with
+  1.3.0, and it is published as measured.
+- **It does not stand for real tables.** It holds laws of the Feynman
+  lectures with a Gaussian noise on exact inputs, as the decision bench
+  does. That every result on teaching comes from simulated tables stays a
+  limit, written in the documents of 1.4.
+- **Cost:** about 40 minutes for the baseline, and about 80 minutes in the
+  M2 of the release.
 
 ## Change N2: the noise-tolerant finders see through the noise
 

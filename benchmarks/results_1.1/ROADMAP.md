@@ -60,8 +60,12 @@ Kept apart from the plans of 1.1, which this file does not change.
    noise the seeds decide. He then asked for the plan of 1.4,
    `../results_1.4/PLAN.md`, written before any change: the noise-tolerant
    seed finders, the choice of the model on tables below 30 rows, a seed for
-   a constant plus an exponential, and a frozen test set for teaching. The
-   plan waits for his validation (gate 11).
+   a constant plus an exponential, and a frozen test set for teaching. At
+   gate 11, on 11 November 2026, the author validated the plan in full. He
+   could not gather tables measured by students, and proposed noisy files of
+   the AI Feynman repository in their place. That repository holds none. An
+   amendment of the same day, written before any change, adds a frozen noisy
+   test set instead: the 78 equations of TF78 with 1 % and 10 % noise.
 
 ## SRBench
 
