@@ -9228,13 +9228,15 @@ _SMALL_FRONT: list = []           # [(mse_cv, se_cv, taille, arbre, n_par, origi
 
 
 def _small_setup(cfg, ys) -> None:
-    """[1.4-S1] Au début d'un ajustement : S1 est-il actif ?"""
+    """[1.4-S1] Au début d'un ajustement, après _split_holdout : S1 est-il
+    actif ? Seulement sans hold-out : une table de 30 à 37 lignes en garde
+    un, et son reste d'entraînement, sous 30 lignes, n'est pas concerné."""
     global _SMALL_ON
     _SMALL_CANDS.clear()
     _SMALL_FAMILY.clear()
     _SMALL_FRONT.clear()
     n = len(ys)
-    _SMALL_ON = bool(_SMALL_CV and _GENERIC_CSV_MODE
+    _SMALL_ON = bool(_SMALL_CV and _GENERIC_CSV_MODE and _VAL_XS is None
                      and _SMALL_MIN_ROWS <= n < _SMALL_ROWS
                      and _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
                      and not bool(getattr(cfg, "EXTRAPOLATION_MODE", False)))

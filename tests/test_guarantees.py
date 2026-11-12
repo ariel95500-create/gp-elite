@@ -1886,11 +1886,17 @@ def _s1_select(monkeypatch, pool, X, y, trees):
 
 def test_s1_is_off_from_30_rows(monkeypatch):
     rng = np.random.RandomState(0)
+    monkeypatch.setattr(core, "_VAL_XS", None)
     for n, on in ((5, False), (6, True), (29, True), (30, False), (140, False)):
         monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
         core._small_setup(core.Config(), np.zeros(n))
         assert core._SMALL_ON is on, n
-    core._small_setup(core.Config(), np.zeros(10))
+    # a table of 30 rows keeps a hold-out of 8: its 22 training rows are not
+    # a small table
+    monkeypatch.setattr(core, "_VAL_XS", np.zeros((8, 1)))
+    core._small_setup(core.Config(), np.zeros(22))
+    assert core._SMALL_ON is False
+    monkeypatch.setattr(core, "_VAL_XS", None)
     monkeypatch.setattr(core, "_GENERIC_CSV_MODE", False)
     core._small_setup(core.Config(), np.zeros(10))
     assert core._SMALL_ON is False          # outside the API: as before
