@@ -5217,6 +5217,111 @@ def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL, weighted=False,
     return []
 
 
+# [1.4-E2] UNE GRAINE POUR UNE CONSTANTE PLUS UNE EXPONENTIELLE
+# Constat (benchmarks/results_1.4/analysis/README.md) : la loi de Newton,
+# θ = θa + (θ0 − θa)·exp(−t/τ), n'avait pas de graine. Le chercheur de
+# l'exponentielle (phase 4a) passe par log|y/f|, qu'une constante additive
+# rend non linéaire, et la loi revenait dans 9 ajustements de TP sur 40. E2
+# (benchmarks/results_1.4/PLAN.md) cherche y = a + b·exp(c·g) dans les
+# données, sans logarithme de la cible (elle n'a donc pas à garder un
+# signe) : g est une colonne à la puissance 1 ou −1, ou, jusqu'à huit
+# colonnes, le produit ou le rapport de deux colonnes (la bibliothèque du
+# sinus et du cosinus) ; c se cherche sur une grille puis par la section
+# dorée, sur le résidu des moindres carrés en (a, b). La graine est exp(c·g),
+# la mise à l'échelle linéaire de la recherche portant a et b. Graine exacte
+# quand la forme tient à la précision numérique et que a n'est pas nul (sinon
+# c'est l'exponentielle que la phase 4a ajuste déjà) ; dans l'étage tolérant,
+# un candidat comme les autres (ses trois meilleures formes). Une forme dont
+# l'exponentielle varie de moins d'un facteur e^0,5 sur les données n'est pas
+# rendue : elle imiterait une droite. Éteinte jusqu'à sa campagne : le plan
+# mesure N2, S1 et E2 l'un après l'autre.
+_E2_SEEDS = False
+_E2_C_GRID = np.concatenate([-np.geomspace(50.0, 0.01, 40), np.geomspace(0.01, 50.0, 40)])
+_E2_GATE = 0.05                       # résidu de grille sous lequel on affine
+_E2_CURVE = 0.5                       # |c|·étendue de g au moins : l'exponentielle
+                                      # varie d'un facteur e^0,5 sur les données,
+                                      # sinon elle imite une droite
+
+
+def _e2_residuals(gn, y, cs):
+    """Résidu relatif de y ≈ a + b·exp(c·gn) pour chaque c de cs."""
+    with np.errstate(all="ignore"):
+        U = np.exp(np.outer(gn, cs))
+        Uc = U - U.mean(axis=0)
+        yc = y - y.mean()
+        vu = np.einsum("ij,ij->j", Uc, Uc)
+        cov = Uc.T @ yc
+        vy = float(yc @ yc)
+        r = 1.0 - cov * cov / (vu * vy)
+    return np.where(np.isfinite(r) & (vu > 0), np.maximum(r, 0.0), np.inf)
+
+
+def _elem_aexp_forms(X, y, tol=_BINOM_TOL) -> list:
+    """[1.4-E2] Formes y = a + b·exp(c·g) : au plus _SCAN_KEEP, rendues comme
+    des formes ("exp", (), g, c) de la phase 4a (f = 1, c rapporté à g). Une
+    forme n'est rendue sous un tol exact (sous 1e-3) que si a n'est pas nul."""
+    n = y.shape[0]
+    out = []
+    if n < 7 or not np.var(y) > 0:
+        return out
+    cols = [j for j in range(X.shape[1]) if np.all(X[:, j] != 0)]
+    glib = []
+    for j in range(X.shape[1]):
+        glib.append(((j, 1),))
+        if j in cols:
+            glib.append(((j, -1),))
+    if X.shape[1] <= 8:
+        for j, k in itertools.combinations(range(X.shape[1]), 2):
+            glib.append(((j, 1), (k, 1)))
+            if k in cols:
+                glib.append(((j, 1), (k, -1)))
+            if j in cols:
+                glib.append(((j, -1), (k, 1)))
+    found = []
+    with np.errstate(all="ignore"):
+        for g in glib:
+            gv = _elem_mono(X, g)
+            gmax = float(np.max(np.abs(gv)))
+            if not (np.all(np.isfinite(gv)) and gmax > 0) or not np.var(gv) > 0:
+                continue
+            gn = gv / gmax
+            v = _e2_residuals(gn, y, _E2_C_GRID)
+            i = int(np.argmin(v))
+            if not v[i] < _E2_GATE:
+                continue
+            lo = float(_E2_C_GRID[max(i - 1, 0)])
+            hi = float(_E2_C_GRID[min(i + 1, len(_E2_C_GRID) - 1)])
+            if lo < 0 < hi:                       # pas de c nul
+                lo, hi = (lo, -1e-3) if _E2_C_GRID[i] < 0 else (1e-3, hi)
+            c, _r = _golden_min(lambda cc: float(_e2_residuals(gn, y, np.array([cc]))[0]),
+                                lo, hi)
+            # quelques pas de Gauss-Newton sur (a, b, c) : la section dorée sur
+            # un résidu calculé par différence s'arrête vers 1e-7 en c
+            u = np.exp(c * gn)
+            a, b = np.linalg.lstsq(np.column_stack([np.ones(n), u]), y, rcond=None)[0]
+            e = y - a - b * u
+            sse = float(e @ e)
+            for _ in range(8):
+                J = np.column_stack([np.ones(n), u, b * gn * u])
+                d = np.linalg.lstsq(J, e, rcond=None)[0]
+                c2 = c + float(d[2])
+                u2 = np.exp(c2 * gn)
+                ab = np.linalg.lstsq(np.column_stack([np.ones(n), u2]), y, rcond=None)[0]
+                e2 = y - ab[0] - ab[1] * u2
+                s2 = float(e2 @ e2)
+                if not (np.isfinite(s2) and s2 < sse):
+                    break
+                c, u, (a, b), e, sse = c2, u2, ab, e2, s2
+            r = sse / (n * float(np.var(y)))
+            if not r < tol or abs(c) * float(np.ptp(gn)) < _E2_CURVE:
+                continue                          # pas une droite déguisée
+            if tol < 1e-3 and not abs(a) > 1e-9 * float(np.max(np.abs(y))):
+                continue                          # a nul : la phase 4a
+            found.append((r, len(found), ("exp", (), g, float(c) / gmax)))
+    found.sort(key=lambda t: (t[0], t[1]))
+    return [f for _r, _i, f in found[:_SCAN_KEEP]]
+
+
 def _elementary_forms(X, y, kinds, tol=None, weighted=False, scan=False) -> list:
     """Formes de la phase 4a qui tiennent à la précision numérique (à tol
     près, graines tolérantes au bruit de la phase 5).
@@ -5255,6 +5360,8 @@ def _elementary_forms(X, y, kinds, tol=None, weighted=False, scan=False) -> list
             out += _elem_inverse_forms(X, y, cols, inv, tol=tol)
         if "trig" in kinds and n > 10 and np.var(y) > 0:
             out += _elem_trig_forms(X, y, cols, tol=tol)
+        if "aexp" in kinds:                       # [1.4-E2]
+            out += _elem_aexp_forms(X, y, tol=tol)
     return out
 
 
@@ -5318,6 +5425,8 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None, weighted=False,
                                ("tanh", {"tanh"}), ("sech", {"exp"}),
                                ("trig", {"sin", "cos"}),
                                ("arcsin", {"arcsin"})) if need <= uops]   # [1.3-A3]
+    if _E2_SEEDS and "exp" in uops:               # [1.4-E2]
+        kinds.append("aexp")
     if not kinds:
         return []
     t0 = time.time()

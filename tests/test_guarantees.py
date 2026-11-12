@@ -1976,3 +1976,62 @@ def test_s1_candidates_pass_the_gate_of_dimensions():
         assert DS.is_typed_valid(t[3], {0: {"m": 1}}, {"s": 1}, True)
     ok, _msg = GD.check_dimensions(r.node, {0: {"m": 1}})
     assert ok
+
+
+# ── 1.4, E2: a seed for a constant plus an exponential ───────────────────────
+# Change E2 of benchmarks/results_1.4/PLAN.md. Newton's cooling,
+# θ = θa + (θ0 − θa)·exp(−t/τ), had no seed: the finder of the exponential
+# works on log|y/f|, which an additive constant makes non-linear. E2 looks
+# for y = a + b·exp(c·g) in the data, c on a grid then by golden section and
+# a few Gauss-Newton steps; an exact seed when the form holds to numerical
+# precision and a is not zero, a noise-tolerant candidate otherwise.
+
+def test_e2_finds_newtons_cooling(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    monkeypatch.setattr(core, "_E2_SEEDS", True)
+    t = np.linspace(0, 1800, 20).reshape(-1, 1)
+    theta = 20 + 60 * np.exp(-t[:, 0] / 600)
+    ts = t / t.max()
+    forms = core._elem_aexp_forms(ts, theta)
+    assert len(forms) == 1 and forms[0][:3] == ("exp", (), ((0, 1),))
+    c = forms[0][3]
+    u = np.exp(c * ts[:, 0])
+    a, b = np.linalg.lstsq(np.column_stack([np.ones(20), u]), theta, rcond=None)[0]
+    assert abs(a - 20) < 1e-9 and abs(b - 60) < 1e-9
+    assert abs(c / 1800 + 1 / 600) < 1e-14
+    seeds = core._make_elementary_seeds(ts, theta, _binom_cfg(1))
+    assert any(_scaled_residual(s, ts, theta) < 1e-20 for s in seeds)
+    monkeypatch.setattr(core, "_E2_SEEDS", False)            # 1.3.0: no seed
+    assert not core._make_elementary_seeds(ts, theta, _binom_cfg(1))
+
+
+def test_e2_places_nothing_on_other_exact_laws(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+    Xs = Xr / Xr.max(axis=0)
+    for y in (Xr[:, 0] * Xr[:, 1],                          # a product
+              Xr[:, 0] ** 2 / Xr[:, 1],                     # a monomial
+              np.exp(-Xr[:, 1]),                            # a = 0: phase 4a
+              3.0 * Xr[:, 0] + 1.0,                         # a line
+              np.sin(Xr[:, 0]) * Xr[:, 1]):
+        assert core._elem_aexp_forms(Xs, y) == []
+    # nor, as a noise-tolerant candidate, on a product: an exponential that
+    # varies by less than e^0.5 over the data is not returned (it would
+    # mimic a line). On a line it can be (exp(-1.04/x) leaves 0.2 %), but
+    # there the binomial seed is exact and the noise-tolerant stage does not
+    # run.
+    assert core._elem_aexp_forms(Xs, Xr[:, 0] * Xr[:, 1], tol=1.0) == []
+    assert core._make_binomial_seeds(Xs, 3.0 * Xr[:, 0] + 1.0, _binom_cfg(2))
+
+
+def test_e2_a_short_fit_returns_newtons_law(monkeypatch):
+    monkeypatch.setattr(core, "_E2_SEEDS", True)
+    t = np.linspace(0, 1800, 20).reshape(-1, 1)
+    theta = 20 + 60 * np.exp(-t[:, 0] / 600)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(t, theta, feature_names=["t"], generations=5,
+                                seed=0, parallel=False)
+    assert np.allclose(r.predict(t), theta, rtol=1e-9)
+    assert r.formula_exact and "exp" in r.expression
