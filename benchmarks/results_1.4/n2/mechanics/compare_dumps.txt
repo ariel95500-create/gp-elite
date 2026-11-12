@@ -1,0 +1,4 @@
+3960 calls written to /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/n2/finders_1.3.0.txt
+3960 calls written to /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/n2/finders_candidate.txt
+the two dumps are identical: 3961 lines
+00470c5e736c4a56f598648ae8cfc7b1b485aad4f4389f87c08fd40b7d04e2f0
