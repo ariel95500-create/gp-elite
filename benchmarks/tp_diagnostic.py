@@ -24,6 +24,11 @@ generations run, the stop on patience if any, and err_train.
 (benchmarks/results_1.4/PLAN.md): ten other experiments under the same
 protocol, numbered 10 to 19 in the generator of the data, never used to
 decide. Without the option the jobs and the data are those of before.
+The units arm also records units_gate, the guarantee the engine gives under
+units=: the check of dimensions against the target where the experiment has
+no unknown constant, the internal consistency of the model where it has one
+(unknown_constant=True, where the constant in front carries the gap).
+units_ok stays the strict check against the target, in every experiment.
 """
 import argparse
 import io
@@ -287,6 +292,12 @@ def worker(job):
             r.node, {i: dict(u) for i, (_nm, _lo, _hi, u) in enumerate(e["inputs"])},
             dict(e["target"]))
         rec["units_ok"], rec["units_msg"] = bool(ok), msg[:120]
+        # [1.4] the guarantee of units= itself: with an unknown constant,
+        # the model has to be consistent, not to have the target's units
+        gate, _msg = check_dimensions(
+            r.node, {i: dict(u) for i, (_nm, _lo, _hi, u) in enumerate(e["inputs"])},
+            None if e["unknown"] else dict(e["target"]))
+        rec["units_gate"] = bool(gate)
     return rec
 
 
@@ -480,10 +491,19 @@ def summary_t(recs, by):
             line += "; median time %.1f s" % float(np.median(t))
         if arm == "units":
             wr = [r for r in rr if r["exp"] in REACHABLE_UNITS_T]
-            line += "; within reach: law %d of %d; units ok %d of %d" % (
-                sum(r["law"] for r in wr), len(wr),
-                sum(1 for r in rr if r.get("units_ok")),
-                sum(1 for r in rr if "units_ok" in r))
+            line += "; within reach: law %d of %d" % (
+                sum(r["law"] for r in wr), len(wr))
+            if any("units_gate" in r for r in rr):
+                line += "; units guarantee %d of %d" % (
+                    sum(1 for r in rr if r.get("units_gate")),
+                    sum(1 for r in rr if "units_gate" in r))
+            else:               # records of before the field: the strict
+                strict = [r for r in rr       # check, where it applies
+                          if not experiment(r["exp"])[1]["unknown"]]
+                line += ("; strict check, experiments with no unknown "
+                         "constant: %d of %d" % (
+                             sum(1 for r in strict if r.get("units_ok")),
+                             len(strict)))
         print(line)
 
 
