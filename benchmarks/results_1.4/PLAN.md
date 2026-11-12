@@ -201,6 +201,25 @@ still placed.
 6. **The time of the stage** is reported on these fits.
 7. **Tests:** the test suite passes, with new tests of items 2 to 4.
 
+Note of 12 November 2026, after the mechanics of N2 and before any fit of
+its campaign (`n2/mechanics/README.md`):
+- **One rule beyond the letter of N2.** The mechanics found a fourth rule of
+  the finders that fails under noise: the finder of the logarithm took the
+  smallest coefficient above 1e-6 as the unit of the exponents of g, and an
+  exponent that is zero has, under noise, a coefficient of the order of the
+  noise (on I.44.4 with 1 % noise, the exponents 564 and −566 instead of 1
+  and −1). In the noise-tolerant stage only, a coefficient below a twelfth
+  of the largest now counts as zero. The exact finders are unchanged.
+- **Item 3 holds at 1 % noise, not at 10 %** for I.40.1, II.35.18 and
+  II.11.27: there the law is within the threshold, but no candidate has its
+  form. With 10 % noise the least squares on logarithms still give the
+  wrong exponents. Choosing by the score in every finder was tried on the
+  same targets and is not kept: three more targets at 10 % of 41, none of
+  these three, for twice the time of the stage.
+- **The other items hold.**
+
+The criteria of the campaign are unchanged.
+
 ### Campaign N2 (decides)
 
 A is 1.3.0 from PyPI (`/venv13p`). B is the wheel of the candidate, in a
