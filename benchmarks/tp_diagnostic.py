@@ -29,6 +29,11 @@ units=: the check of dimensions against the target where the experiment has
 no unknown constant, the internal consistency of the model where it has one
 (unknown_constant=True, where the constant in front carries the gap).
 units_ok stays the strict check against the target, in every experiment.
+
+[1.4] The record also gives, for the campaign of S1, additive_constant (the
+model returned is a sum whose one term is a constant) and small_cv (the
+trace of S1: the candidates scored and the origin of the model chosen;
+None for an engine without S1). The fits are unchanged.
 """
 import argparse
 import io
@@ -298,6 +303,14 @@ def worker(job):
             r.node, {i: dict(u) for i, (_nm, _lo, _hi, u) in enumerate(e["inputs"])},
             None if e["unknown"] else dict(e["target"]))
         rec["units_gate"] = bool(gate)
+    # [1.4] for the campaign of S1 (recorded, deciding nothing)
+    nd = r.node
+    const = lambda t: (t is not None and t.left is None and t.right is None
+                       and not isinstance(t.value, str))
+    rec["additive_constant"] = bool(
+        nd is not None and nd.value in ("+", "-")
+        and (const(nd.left) or const(nd.right)))
+    rec["small_cv"] = C.TRACE.value.get("small_cv")
     return rec
 
 
