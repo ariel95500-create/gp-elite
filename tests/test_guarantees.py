@@ -646,9 +646,15 @@ def test_inexact_formula_triggers_a_warning(monkeypatch):
 
     monkeypatch.setattr(API._formula, "raw_formula", inexact)
     Xd = np.random.RandomState(0).uniform(1, 3, (40, 1))
-    with pytest.warns(RuntimeWarning, match="departs from predict"):
+    with pytest.warns(RuntimeWarning, match="departs from predict") as rec:
         res = symbolic_regression(Xd, 2 * Xd[:, 0], generations=2, parallel=False, seed=0)
     assert res.formula_exact is False
+    # [1.4-W1] the text names every safety net that can act, the clip of
+    # the arcsine of 1.3 among them
+    text = " ".join(str(w.message) for w in rec)
+    for net in ("power capped", "near-zero denominator",
+                "arcsine whose argument is clipped to [-1, 1]"):
+        assert net in text
 
 
 def test_inexact_formula_warning_names_the_exact_alternatives(monkeypatch):

@@ -993,14 +993,16 @@ def symbolic_regression(
         # Pareto : imposer l'egalite formule = modele coute de la precision
         # (phase 2, benchmarks/results_0.9/PLAN_PHASE2.md) ; le choix revient
         # a l'utilisateur, qui a besoin de savoir qu'il existe.
+        # [1.4-W1] Depuis 1.3, l'arc sinus borne son argument à [-1, 1] : le
+        # texte le nomme parmi les garde-fous (benchmarks/results_1.4/PLAN.md).
         import warnings
         warnings.warn(
             "GP_ELITE: the formula printed for the returned model departs from "
             "predict() on %d of %d training rows (largest gap %.3g), most "
             "often because a numerical safety net of the engine acts there (a "
             "power capped at 1e6 or clipped, a division by a near-zero "
-            "denominator...). predict() is the model; result.formula_exact is "
-            "False. %s"
+            "denominator, an arcsine whose argument is clipped to [-1, 1]...). "
+            "predict() is the model; result.formula_exact is False. %s"
             % (raw_formula.rows_off, len(y), raw_formula.max_error,
                _exact_alternatives(pareto_entries)),
             RuntimeWarning, stacklevel=2)
