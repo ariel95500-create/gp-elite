@@ -1468,8 +1468,15 @@ def test_tolerant_seed_carries_a_noisy_law(monkeypatch):
     monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)        # the default
     seeds = core._make_tolerant_seeds(Xs, y, cfg)
     assert seeds and core._seed_rel_error(seeds[0], Xs, y) < 1e-3
-    # the first seed has the structure: refitted on the clean target, exact
-    assert _scaled_residual(seeds[0], Xs, clean) < 1e-6
+    # the first seed has the structure: refitted on the clean target, exact.
+    # [1.4-N2] Its constants are now fitted on the noisy rows before it is
+    # scored, so they are those of the noisy optimum (1.0 and -0.2025 become
+    # 0.99994 and -0.2027), and its residual on the clean target as it
+    # stands, 1.6e-7 in 1.3.0, is 1.4e-6: the structure is checked by
+    # refitting it, as this comment always said.
+    fitted = core._lm_to_convergence(seeds[0].copy(), Xs, clean, cfg)
+    assert _scaled_residual(fitted if fitted is not None else seeds[0],
+                            Xs, clean) < 1e-9
 
 
 def test_tolerant_seed_only_under_its_threshold(monkeypatch):
@@ -1715,3 +1722,132 @@ def test_patience_refuses_what_is_not_a_count(bad):
     Xr, y = _noisy_product()
     with pytest.raises(ValueError):
         symbolic_regression(Xr, y, generations=2, patience=bad)
+
+
+# ── 1.4, N2: the noise-tolerant finders see through the noise ───────────────
+# Change N2 of benchmarks/results_1.4/PLAN.md. Under noise, three rules of
+# the seed finders, written for exact data, defeated the noise-tolerant
+# seeds: the target had to keep one sign, the trigonometric (and logarithm)
+# finder returned the first form that passed, and the inner constant came
+# from the transformed space. A fourth was found by the mechanics: the
+# logarithm normalised its exponents by a coefficient that only noise made
+# non-zero. The stage now runs every finder a second time (least squares on
+# logarithms weighted by y², no condition of sign), scans the whole library
+# of the trigonometric and logarithm finders for their three best forms, fits
+# the constants of every candidate with the engine's finishing step before
+# the score, and places at most twelve, those of 1.3.0 always.
+
+def _n2_case(monkeypatch, pool, Xr, clean, seed=1):
+    _set_pool(monkeypatch, pool)
+    y = clean + 0.01 * np.std(clean) * np.random.RandomState(seed).randn(len(clean))
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    return Xs, y, _binom_cfg(Xr.shape[1])
+
+
+def _n2_stage(monkeypatch, Xs, y, cfg, on):
+    monkeypatch.setattr(core, "_TOLERANT_N2", on)
+    return core._make_tolerant_seeds(Xs, y, cfg)
+
+
+def _has_structure(tree, Xs, clean, cfg):
+    """Refitted on the noiseless target with the engine's finishing step,
+    the candidate is exact (the test of structure of the benches)."""
+    fitted = core._lm_to_convergence(tree.copy(), Xs, clean, cfg)
+    t = fitted if fitted is not None else tree
+    return core._seed_rel_error(t, Xs, clean) < 1e-9
+
+
+def _forms(seeds):
+    return {t.canonical_hash() for t in seeds}
+
+
+@pytest.mark.parametrize("law", ["monomial", "exp", "sech"])
+def test_n2_second_pass_sees_a_law_whose_noise_changes_the_sign(monkeypatch, law):
+    rng = np.random.RandomState(0)
+    if law == "monomial":
+        Xr = np.c_[rng.uniform(0.1, 2, 140), rng.uniform(0.1, 2, 140),
+                   rng.uniform(1, 5, 140)]
+        clean = Xr[:, 0] ** 2 * Xr[:, 1] / Xr[:, 2] ** 3
+    else:
+        Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140),
+                   rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+        u = Xr[:, 1] * Xr[:, 2] / Xr[:, 3]
+        clean = (Xr[:, 0] * np.exp(-u) if law == "exp"
+                 else Xr[:, 0] / (np.exp(u) + np.exp(-u)))
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean)
+    assert not (np.all(y > 0) or np.all(y < 0))      # 1 % noise: both signs
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    assert not any(_has_structure(t, Xs, clean, cfg) for t in old)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert any(_has_structure(t, Xs, clean, cfg) for t in new)
+    assert _forms(old) <= _forms(new)
+
+
+def test_n2_trigonometric_finder_keeps_the_best_form(monkeypatch):
+    """III.15.12, 2U(1 - cos(kd)), with 1 % noise: the first argument of the
+    library whose coarse fit passes is not k·d; the scan of the library
+    puts the law first, and the stage places it."""
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 112), rng.uniform(0.5, 2, 112),
+               rng.uniform(0.5, 2, 112)]
+    clean = 2 * Xr[:, 0] * (1 - np.cos(Xr[:, 1] * Xr[:, 2]))
+    _set_pool(monkeypatch, "trig")
+    y = clean + 0.01 * np.std(clean) * rng.randn(112)
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    cfg = _binom_cfg(3)
+    law = ((1, 1), (2, 1))
+    with np.errstate(all="ignore"):
+        first = core._elem_trig_forms(Xs, y, [0, 1, 2], tol=1.0)
+        scan = core._elem_trig_forms(Xs, y, [0, 1, 2], tol=1.0, scan=True)
+    assert first and first[0][2] != law
+    assert scan and scan[0][2] == law and len(scan) <= core._SCAN_KEEP
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert not any(_has_structure(t, Xs, clean, cfg) for t in old)
+    assert any(_has_structure(t, Xs, clean, cfg) for t in new)
+    assert _forms(old) <= _forms(new)
+
+
+def test_n2_logarithm_found_under_noise(monkeypatch):
+    """I.44.4, n·kb·T·log(V), with 1 % noise: a noise coefficient no longer
+    sets the exponents of g, and the law with its logarithm is placed."""
+    assert list(core._log_g_exponents(np.array([-0.00876, 4.93914, -4.9547]))) \
+        == [0.0, 1.0, -1.0]
+    assert core._log_g_exponents(np.array([1e-9, 0.0, 0.0])) is None
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+    clean = Xr[:, 0] * Xr[:, 1] * np.log(Xr[:, 2])
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean)
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert not any(_has_structure(t, Xs, clean, cfg) for t in old)
+    logs = [t for t in new if "log" in _ops_in(t, set())]
+    assert any(_has_structure(t, Xs, clean, cfg) for t in logs)
+    assert _forms(old) <= _forms(new)
+
+
+def test_n2_scores_better_places_at_most_twelve_and_keeps_1_3(monkeypatch):
+    """The noisy binomial of section 23: every form 1.3.0 places is placed,
+    at most twelve seeds, each within the threshold, the best first; the
+    fit of the constants never makes a candidate worse."""
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140), rng.uniform(3, 10, 140)]
+    clean = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean, seed=0)
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    seen = []
+    orig = core._refit_inner
+
+    def noted(tree, X, yy, c):
+        out = orig(tree, X, yy, c)
+        seen.append((core._seed_rel_error(tree, X, yy), core._seed_rel_error(out, X, yy)))
+        return out
+    monkeypatch.setattr(core, "_refit_inner", noted)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert old and _forms(old) <= _forms(new)
+    assert len(new) <= core._TOLERANT_MAX
+    scores = [core._seed_rel_error(t, Xs, y) for t in new]
+    assert all(s <= core._TOLERANT_REL for s in scores)
+    assert scores == sorted(scores)
+    assert seen and all(after <= before for before, after in seen)
+    assert len(_forms(new)) == len(new)                 # one seed per form
