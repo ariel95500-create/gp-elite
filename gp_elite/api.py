@@ -778,6 +778,7 @@ def symbolic_regression(
         # EXACTEMENT les mêmes points de validation, leurs MSE sont comparables.
         champions = []          # (champ_node, mse_val)
         merged = {}             # expr_str -> (mse, se, size, node)  (dédup)
+        small = {}              # [1.4-S1] expr_str -> entrée notée en validation croisée
         X_full = y_full = None
         for k in range(n_restarts):
             if _hard_deadline is not None:
@@ -804,10 +805,19 @@ def symbolic_regression(
                 key = core.to_string(nd)
                 if key not in merged or m < merged[key][0]:
                     merged[key] = (m, se, sz, nd.copy())
+            for t in list(getattr(core, "_SMALL_FRONT", [])):     # [1.4-S1]
+                key = core.to_string(t[3])
+                if key not in small or t[0] < small[key][0]:
+                    small[key] = (t[0], t[1], t[2], t[3].copy(), t[4], t[5])
 
         best, champ_val = min(champions, key=lambda t: t[1])
         val_xs = getattr(core, "_VAL_XS", None)
         val_ys = getattr(core, "_VAL_YS", None)
+        if val_xs is None and small and n_restarts > 1:
+            # [1.4-S1] Plusieurs redémarrages sur une table de moins de 30
+            # lignes : le choix de la validation croisée sur l'union de leurs
+            # candidats (les mêmes lignes, donc des erreurs comparables).
+            best = core._small_choose(list(small.values()), X_full, y_full)[3].copy()
 
         if n_restarts > 1 and val_xs is not None and merged:
             # Réinstalle le pool GLOBAL puis rejoue la sélection finale dessus :
@@ -894,6 +904,21 @@ def symbolic_regression(
         # Escalier des non-dominés : trié par taille croissante, un candidat
         # entre au front s'il bat strictement la meilleure MSE vue jusque-là.
         pareto_entries = []
+        if val_xs is None and small and y_full is not None and len(y_full) > 1:
+            # [1.4-S1] Sous 30 lignes : le front des candidats notés en
+            # validation croisée ; mse_validation et r2_validation y sont
+            # l'erreur croisée et son R².
+            var_v = float(np.var(y_full))
+            _best_mse = float("inf")
+            for (m, _se, sz, nd, _np, _o) in sorted(small.values(),
+                                                    key=lambda t: (t[2], t[0])):
+                if m < _best_mse * (1.0 - 1e-12):
+                    _best_mse = m
+                    _r2 = (1.0 - m / var_v) if var_v > 1e-15 else None
+                    pareto_entries.append(ParetoEntry(
+                        expression=core.to_string(nd), size=int(sz),
+                        mse_validation=float(m), r2_validation=_r2,
+                        node=nd.copy(), scaler=scaler, n_features=n_feat))
         if val_xs is not None and val_ys is not None and len(val_ys) > 1:
             var_v = float(np.var(val_ys))
             _all = list(merged.values()) if merged else []

@@ -5441,6 +5441,31 @@ def _seed_rel_error(tree, X, y) -> float:
         return float("inf")
 
 
+def _small_family(scored, cfg, t0) -> list:
+    """[1.4-S1] Sous 30 lignes, l'étage tolérant place ses huit meilleures
+    formes, une par forme, qui laissent au plus la moitié de la variance (le
+    seuil de 1,5 % n'y sert pas), et les garde pour la sélection finale."""
+    seen, fam = set(), []
+    for r, _i, t in scored:
+        if not r <= _SMALL_FAMILY_SHARE:
+            break
+        h = t.canonical_hash()
+        if h in seen:
+            continue
+        seen.add(h)
+        fam.append((r, t))
+        if len(fam) >= _SMALL_FAMILY_KEEP:
+            break
+    seeds = _typed_seeds([t for _r, t in fam], cfg)
+    kept = {id(t) for t in seeds}
+    _SMALL_FAMILY[:] = [t.copy() for t in seeds]
+    TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
+    if seeds:
+        TRACE.set("tolerant_seed", " | ".join(
+            "%s (%.2g)" % (to_string(t), r) for r, t in fam if id(t) in kept))
+    return seeds
+
+
 def _refit_inner(tree, X, y, cfg):
     """[1.4-N2] Les constantes d'un candidat ajustées sur les lignes
     d'entraînement par l'étape de finition du moteur (_lm_to_convergence).
@@ -5510,6 +5535,8 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
     if not _TOLERANT_N2:                          # 1.3.0
         scored = sorted(((_seed_rel_error(t, X, y), i, t) for i, t in enumerate(cands)),
                         key=lambda r: (r[0], r[1]))
+        if _SMALL_ON:                             # [1.4-S1] les formes de famille
+            return _small_family(scored, cfg, t0)
         seeds = _typed_seeds([t for r, _, t in scored if r <= _TOLERANT_REL], cfg)
         TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
         if seeds:
@@ -5532,6 +5559,9 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
             first.add(h)
         if h not in forms:
             forms[h] = (r, i, t)
+    if _SMALL_ON:                                 # [1.4-S1] les formes de famille
+        return _small_family(sorted(forms.values(), key=lambda r: (r[0], r[1])),
+                             cfg, t0)
     within = sorted((v for v in forms.values() if v[0] <= _TOLERANT_REL),
                     key=lambda r: (r[0], r[1]))
     old = [v for v in within if v[2].canonical_hash() in first]
@@ -8350,6 +8380,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                         continue
                     cand = wrap_linear_scaling(best_local, xs, ys)
                     _track_val_candidate(cand)        # [v21-VAL]
+                    _track_small_candidate(cand, xs, ys)   # [1.4-S1]
                     s = fitness(cand, xs, ys, cfg, role="cleaner")
                     if s < global_score:
                         global_score = s
@@ -9033,6 +9064,417 @@ def _select_one_se(champion, champ_val):
     m, _, _, node = eligible[0]
     return node, m
 
+# ════════════════════════════════════════════════════════════════
+# [1.4-S1] SOUS 30 LIGNES, LES CANDIDATS EN VALIDATION CROISÉE
+# ════════════════════════════════════════════════════════════════
+# Constat (benchmarks/results_1.4/analysis/README.md) : sous 30 lignes le
+# moteur ne garde pas de hold-out (_split_holdout). Il ne suivait alors aucun
+# candidat, ne polissait aucun finaliste, n'appliquait aucune règle de
+# parcimonie : il rendait le meilleur individu de la recherche sur les
+# lignes d'entraînement. Sur les tables de TP (10 et 20 points), la lentille
+# revenait dans 2 ajustements sur 40 alors que sa graine était placée, et
+# toute loi rendue sans unités portait une constante additive que seule la
+# loi de Newton a. S1 (benchmarks/results_1.4/PLAN.md) :
+# - les candidats : les huit meilleures formes de famille de l'étage
+#   tolérant qui expliquent au moins la moitié de la variance (sans le seuil
+#   de 1,5 %), placées au départ et gardées pour la fin ; les champions de
+#   la recherche sur les lignes d'entraînement (64 au plus) ; et des
+#   variantes de chaque finaliste, sans la constante additive de la mise à
+#   l'échelle finale, et avec chaque exposant ajusté mis au demi-entier le
+#   plus proche (écrit dans la structure) ;
+# - 40 finalistes au plus : le champion, les formes de famille, les 8
+#   meilleurs de la recherche, les 8 plus petits de la bande de tolérance,
+#   et leurs variantes ;
+# - la validation croisée : K = min(n, 10) plis, la ligne i dans le pli
+#   i mod K (aucun tirage) ; pour chaque pli, les constantes du candidat
+#   sont ajustées de nouveau sur les autres lignes, et ses erreurs au carré
+#   sur les lignes du pli gardées ; son erreur est leur moyenne sur la table ;
+# - le choix : parmi les candidats à une erreur type du meilleur, ou dans la
+#   tolérance de 0,003 en R², celui qui a le moins de constantes ajustées
+#   (le rang de la jacobienne de ses prédictions : une constante que
+#   l'ajustement ne peut pas bouger seule ne compte pas), puis le plus
+#   petit, puis le plus précis ; la priorité à une loi exacte et les
+#   départages d'aujourd'hui (formule fidèle, stable près du domaine) sont
+#   gardés ;
+# - result.pareto tient le front de ces candidats par taille et erreur
+#   croisée ;
+# - la validation croisée s'arrête une seconde après l'échéance de
+#   time_limit=, comme le polissage ; elle ne tourne pas avec une perte
+#   personnalisée, en mode extrapolation, ni sous 6 lignes.
+# Rien ne change pour une table de 30 lignes ou plus.
+
+_SMALL_CV = True
+_SMALL_ROWS = 30                  # en dessous : pas de hold-out, S1
+_SMALL_MIN_ROWS = 6
+_SMALL_FAMILY_KEEP = 8
+_SMALL_FAMILY_SHARE = 0.5         # part de variance laissée au plus
+_SMALL_SEARCH = 8                 # meilleurs, et plus petits de la bande
+_SMALL_FINALISTS = 40
+_SMALL_FOLDS = 10
+_SMALL_CANDS_MAX = 64
+_SMALL_ON = False                 # actif pour l'ajustement en cours
+_SMALL_CANDS: list = []           # [(mse_train, se, taille, arbre)]
+_SMALL_FAMILY: list = []          # formes de famille (arbres sans échelle)
+_SMALL_FRONT: list = []           # [(mse_cv, se_cv, taille, arbre, n_par, origine)]
+
+
+def _small_setup(cfg, ys) -> None:
+    """[1.4-S1] Au début d'un ajustement : S1 est-il actif ?"""
+    global _SMALL_ON
+    _SMALL_CANDS.clear()
+    _SMALL_FAMILY.clear()
+    _SMALL_FRONT.clear()
+    n = len(ys)
+    _SMALL_ON = bool(_SMALL_CV and _GENERIC_CSV_MODE
+                     and _SMALL_MIN_ROWS <= n < _SMALL_ROWS
+                     and _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
+                     and not bool(getattr(cfg, "EXTRAPOLATION_MODE", False)))
+
+
+def _track_small_candidate(cand, xs, ys) -> None:
+    """[1.4-S1] Un champion de la recherche, noté sur les lignes
+    d'entraînement (sous units=, seulement s'il passe la porte)."""
+    if not _SMALL_ON or cand is None:
+        return
+    if _DIM_GATE_DIMS is not None:
+        try:
+            if not _ds().is_typed_valid(cand, _DIM_GATE_DIMS, _DIM_GATE_TARGET,
+                                        _DIM_UNKNOWN_CONST):
+                return
+        except Exception:
+            return
+    try:
+        h = cand.exact_hash()
+        if any(t[3].exact_hash() == h for t in _SMALL_CANDS):
+            return
+        X = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
+        y = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+        with np.errstate(all="ignore"):
+            e = (np.asarray(evaluate_vector(cand, X), dtype=float) - y) ** 2
+        m = float(np.mean(e))
+        if not math.isfinite(m):
+            return
+        se = float(np.std(e, ddof=1) / math.sqrt(len(e))) if len(e) > 1 else 0.0
+        _SMALL_CANDS.append((m, se, tree_size(cand), cand.copy()))
+        if len(_SMALL_CANDS) > _SMALL_CANDS_MAX:
+            _SMALL_CANDS.sort(key=lambda t: (t[0], t[2]))
+            del _SMALL_CANDS[_SMALL_CANDS_MAX:]
+    except Exception:
+        pass
+
+
+def _small_is_const(n) -> bool:
+    return (n is not None and n.left is None and n.right is None
+            and not isinstance(n.value, str))
+
+
+def _small_strip(t):
+    """[1.4-S1] L'arbre sans la mise à l'échelle que la recherche a
+    matérialisée (a + b·f, b·f, a + f) : f. L'arbre lui-même sinon."""
+    if t is None or t.left is None or t.right is None:
+        return t
+    if t.value == "+":
+        for c, o in ((t.left, t.right), (t.right, t.left)):
+            if _small_is_const(c):
+                if o.value == "*" and o.left is not None and o.right is not None:
+                    if _small_is_const(o.left):
+                        return o.right
+                    if _small_is_const(o.right):
+                        return o.left
+                return o
+    if t.value == "*":
+        if _small_is_const(t.left):
+            return t.right
+        if _small_is_const(t.right):
+            return t.left
+    return t
+
+
+def _small_round_powers(f):
+    """[1.4-S1] Copie de f où chaque pow(B, c) d'exposant constant c reçoit
+    le demi-entier le plus proche, écrit dans la structure (carrés, cubes,
+    racines, produits, 1/…) pour que l'ajustement ne le déplace plus. None si
+    rien ne change ou si le pool n'a pas les opérateurs nécessaires."""
+    uops, bops = set(_GENERIC_UNARY_OPS), set(_GENERIC_BINARY_OPS)
+    changed = [False]
+
+    def power(B, e2):
+        def ipow(m):
+            if m == 1:
+                return B.copy()
+            if m == 2 and "sq" in uops:
+                return Node("sq", B.copy())
+            if m == 3 and "cube" in uops:
+                return Node("cube", B.copy())
+            if m % 2 == 0:
+                h = ipow(m // 2)
+                return Node("sq", h) if "sq" in uops else Node("*", h, ipow(m // 2))
+            return Node("*", B.copy(), ipow(m - 1))
+        n_int, half = divmod(abs(e2), 2)
+        parts = []
+        if n_int:
+            parts.append(ipow(n_int))
+        if half:
+            if "sqrt" not in uops:
+                return None
+            parts.append(Node("sqrt", B.copy()))
+        out = parts[0]
+        for q in parts[1:]:
+            if "*" not in bops:
+                return None
+            out = Node("*", out, q)
+        if e2 < 0:
+            if "/" not in bops:
+                return None
+            out = Node("/", Node(1.0), out)
+        return out
+
+    def rec(n):
+        if n is None:
+            return None
+        if n.value == "pow" and n.left is not None and _small_is_const(n.right):
+            c = float(n.right.value)
+            e2 = int(round(2.0 * c))
+            base = rec(n.left)
+            if abs(e2) <= 12 and math.isfinite(c):
+                if e2 == 0:
+                    changed[0] = True
+                    return Node(1.0)
+                q = power(base, e2)
+                if q is not None:
+                    changed[0] = True
+                    return q
+            return Node("pow", base, Node(c))
+        return Node(n.value, rec(n.left), rec(n.right))
+
+    try:
+        out = rec(f)
+    except RecursionError:
+        return None
+    return out if changed[0] else None
+
+
+def _small_fit(f, X, y, cfg, scale_only):
+    """[1.4-S1] f ajusté sur (X, y) par l'étape de finition du moteur, en
+    projection variable sur a + b·f (b·f seul si scale_only), et sa mise à
+    l'échelle : (f ajusté, a, b), ou None."""
+    global _LS_SCALE_ONLY
+    keep = _LS_SCALE_ONLY
+    try:
+        if scale_only:
+            _LS_SCALE_ONLY = True
+        with np.errstate(all="ignore"):
+            g = _lm_to_convergence(f, X, y, cfg)
+            g = f if g is None else g
+            p = np.asarray(evaluate_vector(g, X), dtype=float)
+            if p.ndim == 0:
+                p = np.full(len(y), float(p))
+            if not np.all(np.isfinite(p)):
+                return None
+            a, b, ok = _linear_scale_params(p, y)
+        if not ok or not (math.isfinite(a) and math.isfinite(b)):
+            return None
+        return g, float(a), float(b)
+    except Exception:
+        return None
+    finally:
+        _LS_SCALE_ONLY = keep
+
+
+def _small_cv(start, X, y, cfg, scale_only):
+    """[1.4-S1] Erreur de validation croisée (moyenne et erreur type des
+    erreurs au carré sur les n lignes), plis i mod K, constantes ajustées de
+    nouveau sur les autres lignes à chaque pli. None si un pli échoue."""
+    n = len(y)
+    K = min(n, _SMALL_FOLDS)
+    fold = np.arange(n) % K
+    err = np.empty(n)
+    for k in range(K):
+        te = fold == k
+        r = _small_fit(start, X[~te], y[~te], cfg, scale_only)
+        if r is None:
+            return None
+        g, a, b = r
+        with np.errstate(all="ignore"):
+            q = np.asarray(evaluate_vector(g, X[te]), dtype=float)
+            e = (a + b * q - y[te]) ** 2
+        if not np.all(np.isfinite(e)):
+            return None
+        err[te] = e
+    m = float(np.mean(err))
+    se = float(np.std(err, ddof=1) / math.sqrt(n)) if n > 1 else 0.0
+    return m, se
+
+
+def _small_n_par(g, X, scale_only) -> int:
+    """[1.4-S1] Le nombre de constantes ajustées d'un candidat : le rang de
+    la jacobienne de ses prédictions par rapport à ses constantes et à sa
+    mise à l'échelle (b, et a sauf scale_only). Une constante que
+    l'ajustement ne peut pas bouger seule (le 1 d'un 1/x, que b absorbe)
+    n'y compte pas."""
+    n = X.shape[0]
+    with np.errstate(all="ignore"):
+        p = np.asarray(evaluate_vector(g, X), dtype=float)
+        if p.ndim == 0:
+            p = np.full(n, float(p))
+        cols = [p] if scale_only else [p, np.ones(n)]
+        try:
+            fn, consts = compile_parametric(g)
+        except Exception:
+            fn, consts = None, []
+        if fn is not None and consts:
+            cv = np.array([c.value for c in consts], dtype=float)
+            p0 = np.asarray(fn(X, cv), dtype=float)
+            for i in range(len(cv)):
+                h = 1e-6 * (1.0 + abs(cv[i]))
+                c2 = cv.copy()
+                c2[i] += h
+                cols.append((np.asarray(fn(X, c2), dtype=float) - p0) / h)
+        J = np.column_stack([np.broadcast_to(c, (n,)) for c in cols])
+        if not np.all(np.isfinite(J)):
+            return J.shape[1]
+        nrm = np.linalg.norm(J, axis=0)
+        J = J[:, nrm > 0] / nrm[nrm > 0]
+        if J.shape[1] == 0:
+            return 0
+        sv = np.linalg.svd(J, compute_uv=False)
+    return int(np.sum(sv > 1e-6 * sv[0]))
+
+
+def _small_materialize(g, a, b, scale_only):
+    """[1.4-S1] Le modèle livré : a + b·f, ou b·f, comme
+    wrap_linear_scaling l'écrit."""
+    if scale_only:
+        if g.value == "*" and _small_is_const(g.left):
+            w = g.copy()
+            w.left = Node(float(b) * float(g.left.value))
+            return w
+        return Node("*", Node(float(b)), g.copy())
+    return simplify(Node("+", Node(float(a)), Node("*", Node(float(b)), g.copy())))
+
+
+def _small_specs(champion, X, y):
+    """[1.4-S1] Les finalistes, 40 au plus, dans l'ordre où ils sont notés :
+    (f, scale_only, origine). Le champion d'abord, puis les formes de
+    famille, les 8 meilleurs de la recherche, les 8 plus petits de la bande
+    de tolérance, chacun suivi de ses variantes."""
+    var = float(np.var(y))
+    ranked = sorted(_SMALL_CANDS, key=lambda t: (t[0], t[2]))
+    bases = []
+    if champion is not None:
+        bases.append((champion, "champion"))
+    for t in _SMALL_FAMILY:
+        bases.append((t, "family"))
+    for t in ranked[:_SMALL_SEARCH]:
+        bases.append((t[3], "search"))
+    if ranked:
+        thr = ranked[0][0] + max(ranked[0][1], float(
+            globals().get("VAL_R2_TOLERANCE", 0.003)) * var)
+        small = sorted((t for t in ranked if t[0] <= thr), key=lambda t: (t[2], t[0]))
+        for t in small[:_SMALL_SEARCH]:
+            bases.append((t[3], "band"))
+    modes = (True,) if _LS_SCALE_ONLY else (False, True)
+    specs, seen = [], set()
+    for tree, origin in bases:
+        f = tree if origin == "family" else _small_strip(tree)
+        fr = _small_round_powers(f)
+        for g, rounded in ((f, False), (fr, True)):
+            if g is None:
+                continue
+            for so in modes:
+                if _DIM_GATE_DIMS is not None:
+                    try:
+                        if not _ds().is_typed_valid(Node("*", Node(1.0), g),
+                                                    _DIM_GATE_DIMS, _DIM_GATE_TARGET,
+                                                    _DIM_UNKNOWN_CONST):
+                            continue
+                    except Exception:
+                        continue
+                key = (g.canonical_hash(), so)
+                if key in seen:
+                    continue
+                seen.add(key)
+                label = origin + (", exponents rounded" if rounded else "") + \
+                    (", without the constant" if so and not _LS_SCALE_ONLY else "")
+                specs.append((g, so, label))
+                if len(specs) >= _SMALL_FINALISTS:
+                    return specs
+    return specs
+
+
+def _small_table_select(champion, xs, ys, cfg):
+    """[1.4-S1] Le modèle d'une table de moins de 30 lignes (voir plus haut).
+    Rend le champion si rien n'est noté."""
+    global _VAL_TRAIN_XS, _VAL_TRAIN_YS
+    X = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
+    y = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+    var = float(np.var(y))
+    if not var > 1e-15:
+        return champion
+    t0 = time.time()
+    _dl = getattr(cfg, "DEADLINE", None)
+    _stop = None if _dl is None else max(time.time(), float(_dl)) + _POLISH_GRACE_S
+    specs = _small_specs(champion, X, y)
+    _SMALL_FRONT.clear()
+    for g, so, label in specs:
+        if _stop is not None and _SMALL_FRONT and time.time() > _stop:
+            break                                 # budget de temps épuisé
+        r = _small_fit(g, X, y, cfg, so)
+        if r is None:
+            continue
+        g_all, a, b = r
+        cv = _small_cv(g_all, X, y, cfg, so)
+        if cv is None:
+            continue
+        M = _small_materialize(g_all, a, b, so)
+        _SMALL_FRONT.append((cv[0], cv[1], tree_size(M), M,
+                             _small_n_par(g_all, X, so), label))
+    if not _SMALL_FRONT:
+        return champion
+    pick = _small_choose(_SMALL_FRONT, X, y)
+    TRACE.set("small_cv", "%d lignes, K = %d, %d candidats notés en %.2f s ; "
+              "choisi : %s, erreur croisée %.3g, %d constantes" % (
+                  len(y), min(len(y), _SMALL_FOLDS), len(_SMALL_FRONT),
+                  time.time() - t0, pick[5], pick[0], pick[4]))
+    return pick[3]
+
+
+def _small_choose(front, X, y):
+    """[1.4-S1] Le choix parmi des candidats notés en validation croisée :
+    ceux à une erreur type du meilleur, ou dans la tolérance de 0,003 en R²
+    (seulement les exacts si le meilleur l'est), puis le moins de constantes
+    ajustées, le plus petit, le plus précis ; départage par la fidélité de la
+    formule et la stabilité près du domaine, sur la table. Rend l'entrée."""
+    global _VAL_TRAIN_XS, _VAL_TRAIN_YS
+    var = float(np.var(y))
+    best_m, best_se = min((t[0], t[1]) for t in front)
+    thr = best_m + max(best_se, float(globals().get("VAL_R2_TOLERANCE", 0.003)) * var)
+    if best_m <= _EXACT_REL * var:                # priorité à l'exactitude
+        thr = _EXACT_REL * var
+    elig = sorted((t for t in front if t[0] <= thr),
+                  key=lambda t: (t[4], t[2], t[0]))
+    pick = elig[0]
+    # départages : formule fidèle et stable près du domaine, sur la table
+    keep = (_VAL_TRAIN_XS, _VAL_TRAIN_YS)
+    try:
+        _VAL_TRAIN_XS, _VAL_TRAIN_YS = X, y
+        _FAITHFUL_CACHE.clear()
+        _NEAR_CACHE.clear()
+        _build_near_probes(X, y)
+        if not (_formula_faithful(pick[3]) and _near_domain_stable(pick[3])):
+            both = [t for t in elig
+                    if _formula_faithful(t[3]) and _near_domain_stable(t[3])]
+            if both:
+                pick = both[0]
+    finally:
+        _VAL_TRAIN_XS, _VAL_TRAIN_YS = keep
+        globals()["_NEAR_PROBE_XS"] = None
+        globals()["_NEAR_BAND"] = None
+        _FAITHFUL_CACHE.clear()
+        _NEAR_CACHE.clear()
+    return pick
+
+
 def _split_holdout(xs, ys, cfg):
     """Découpe (xs, ys) en (train, val). Retourne (xs_tr, ys_tr) et installe
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
@@ -9348,6 +9790,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # lexicase, Adam, stigmergie, parallélisme) ne voit que le TRAIN.
     xs_full, ys_full = xs, ys
     xs, ys = _split_holdout(xs, ys, cfg)
+    _small_setup(cfg, ys)                     # [1.4-S1]
 
     # [v24-EXTRAP] En mode extrapolation, on ajoute une DROITE (OLS) au pool de
     # candidats-champions. Elle est ajustée sur le train (intérieur) puis jugée,
@@ -9766,6 +10209,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                 # donc le MSE rapporté correspond exactement à l'expression.
                 cand = wrap_linear_scaling(new_best, xs, ys)
                 _track_val_candidate(cand)            # [v21-VAL]
+                _track_small_candidate(cand, xs, ys)  # [1.4-S1]
                 s = fitness(cand, xs, ys, cfg, role="cleaner")
                 if s < global_score:
                     global_score  = s
@@ -9863,6 +10307,15 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             global_best = optimized
         # Si Adam a dégradé, global_best reste intact (deepcopy garantit l'isolation)
         _track_val_candidate(global_best)            # [v21-VAL] post-Adam
+        _track_small_candidate(global_best, xs, ys)  # [1.4-S1]
+
+    # [1.4-S1] Sous 30 lignes, pas de hold-out : les candidats en validation
+    # croisée (voir _small_table_select).
+    if _VAL_XS is None and global_best is not None and _SMALL_ON:
+        try:
+            global_best = _small_table_select(global_best, xs, ys, cfg)
+        except Exception:
+            pass
 
     # ── [v21-VAL] Sélection finale + rapport de généralisation ──────────
     # Le champion LIVRÉ est celui qui généralise le mieux : si un candidat

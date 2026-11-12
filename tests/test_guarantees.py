@@ -1851,3 +1851,128 @@ def test_n2_scores_better_places_at_most_twelve_and_keeps_1_3(monkeypatch):
     assert scores == sorted(scores)
     assert seen and all(after <= before for before, after in seen)
     assert len(_forms(new)) == len(new)                 # one seed per form
+
+
+# ── 1.4, S1: below 30 rows, the candidates compete in a cross-validation ────
+# Change S1 of benchmarks/results_1.4/PLAN.md. Below 30 rows the engine keeps
+# no hold-out; it used to return the best individual of the search on the
+# training rows, with no rule of parsimony, and every law came back with an
+# additive constant. Now the candidates (family forms of the noise-tolerant
+# stage, champions of the search, and their variants without the additive
+# constant and with half-integer exponents) are scored by a cross-validation
+# with K = min(n, 10) folds, row i in fold i mod K, and the one with the
+# fewest fitted constants within one standard error (or 0.003 in R²) of the
+# best is returned; result.pareto holds their front.
+
+def _s1_select(monkeypatch, pool, X, y, trees):
+    """The choice of S1 among the given trees, as the champions of a search
+    on the table (X already in the engine's variables)."""
+    _set_pool(monkeypatch, pool)
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
+    monkeypatch.setattr(core, "_SMALL_ON", True)
+    cfg = _binom_cfg(X.shape[1])
+    core._SMALL_CANDS.clear()
+    core._SMALL_FAMILY.clear()
+    for t in trees:
+        core._track_small_candidate(t, X, y)
+    return core._small_table_select(trees[0], X, y, cfg)
+
+
+def test_s1_is_off_from_30_rows(monkeypatch):
+    rng = np.random.RandomState(0)
+    for n, on in ((5, False), (6, True), (29, True), (30, False), (140, False)):
+        monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
+        core._small_setup(core.Config(), np.zeros(n))
+        assert core._SMALL_ON is on, n
+    core._small_setup(core.Config(), np.zeros(10))
+    monkeypatch.setattr(core, "_GENERIC_CSV_MODE", False)
+    core._small_setup(core.Config(), np.zeros(10))
+    assert core._SMALL_ON is False          # outside the API: as before
+    # a fit of 40 rows returns the same model with and without S1
+    Xr = np.c_[rng.uniform(1, 5, 40), rng.uniform(1, 5, 40)]
+    y = 2.5 * Xr[:, 0] * Xr[:, 1] + 0.05 * rng.randn(40)
+    out = []
+    for flag in (False, True):
+        monkeypatch.setattr(core, "_SMALL_CV", flag)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            r = symbolic_regression(Xr, y, generations=8, seed=0, parallel=False)
+        out.append((r.expression, r.mse_validation))
+    assert out[0] == out[1]
+
+
+def test_s1_cross_validation_chooses_an_exact_law_and_repeats(monkeypatch):
+    """12 exact points of 2.5·x0·x1: the law, to numerical precision, the
+    same at every run."""
+    rng = np.random.RandomState(3)
+    Xr = np.c_[rng.uniform(1, 5, 12), rng.uniform(1, 5, 12)]
+    y = 2.5 * Xr[:, 0] * Xr[:, 1]
+    runs = []
+    for _ in range(2):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            r = symbolic_regression(Xr, y, generations=10, seed=0, parallel=False)
+        runs.append((r.expression, [(p.size, p.mse_validation) for p in r.pareto]))
+        assert np.allclose(r.predict(Xr), y, rtol=1e-9, atol=1e-9)
+        assert r.formula_exact
+    assert runs[0] == runs[1]
+
+
+def test_s1_variant_without_the_additive_constant_wins(monkeypatch):
+    """Exact points of T = 2π·sqrt(L/g): a + b·sqrt(L) loses to b·sqrt(L)."""
+    L = np.linspace(0.1, 1.0, 10).reshape(-1, 1)
+    T = 2 * np.pi * np.sqrt(L[:, 0] / 9.81)
+    Xs = L / L.max()
+    with_c = N("+", N(0.01), N("*", N(2.0), N("sqrt", X(0))))
+    chosen = _s1_select(monkeypatch, "physical", Xs, T, [with_c])
+    assert core._small_strip(chosen).value == "sqrt"
+    assert not (chosen.value == "+")                       # no additive constant
+    assert np.allclose(core.evaluate_vector(chosen, Xs), T, rtol=1e-9)
+
+
+def test_s1_variant_with_a_half_integer_exponent_wins(monkeypatch):
+    """Exact points of d = g·t²/2: a candidate with the exponent 1.96 loses
+    to its variant with the exponent 2, written as a square."""
+    t = np.linspace(0.1, 0.6, 10).reshape(-1, 1)
+    d = 0.5 * 9.81 * t[:, 0] ** 2
+    Xs = t / t.max()
+    p196 = N("+", N(0.0), N("*", N(1.0), N("pow", X(0), N(1.96))))
+    chosen = _s1_select(monkeypatch, "physical", Xs, d, [p196])
+    assert "pow" not in _ops_in(chosen, set())
+    assert np.allclose(core.evaluate_vector(chosen, Xs), d, rtol=1e-9)
+
+
+def test_s1_pareto_lists_the_cross_validated_front():
+    rng = np.random.RandomState(1)
+    x = np.linspace(0.2, 2.0, 10).reshape(-1, 1)
+    y = 10.0 / (4 * np.pi * x[:, 0] ** 2) * (1 + 0.02 * rng.randn(10))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(x, y, feature_names=["d"], generations=15,
+                                seed=0, parallel=False)
+    assert isinstance(r.pareto, list) and r.pareto
+    sizes = [p.size for p in r.pareto]
+    errs = [p.mse_validation for p in r.pareto]
+    assert sizes == sorted(sizes) and errs == sorted(errs, reverse=True)
+    for p in r.pareto:
+        assert p.formula is not None and p.expression
+        assert np.isfinite(p.mse_validation) and p.r2_validation is not None
+    assert "small_cv" in core.TRACE.value
+
+
+def test_s1_candidates_pass_the_gate_of_dimensions():
+    """Under units=, every candidate of the cross-validation passes the gate
+    of dimensions, and so does the model returned."""
+    rng = np.random.RandomState(2)
+    L = np.linspace(0.1, 1.0, 12).reshape(-1, 1)
+    T = 2 * np.pi * np.sqrt(L[:, 0] / 9.81) * (1 + 0.02 * rng.randn(12))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(L, T, feature_names=["L"], units={"L": {"m": 1}},
+                                target_units={"s": 1}, unknown_constant=True,
+                                generations=15, seed=0, parallel=False)
+    assert core._SMALL_FRONT
+    for t in core._SMALL_FRONT:
+        assert DS.is_typed_valid(t[3], {0: {"m": 1}}, {"s": 1}, True)
+    ok, _msg = GD.check_dimensions(r.node, {0: {"m": 1}})
+    assert ok
