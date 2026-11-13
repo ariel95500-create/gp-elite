@@ -1,0 +1,62 @@
+engines: ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py'] / ['/home/user/gp-elite/gp_elite/__init__.py']
+crashes: 0
+
+== 1. The exact seeds are untouched: 95 bounded fits (20 generations, no time limit)
+  noise-tolerant stage of 1.3.0 not run: 32 fits; the model of the candidate is that of 1.3.0 in 32, differs in 0
+  stage of 1.3.0 run: 63 fits (reported, decide nothing)
+    same model in 63 of them; the others:
+  feyn: exact (1-R² < 1e-9 on the test rows) in 32 of 41 with 1.3.0, 32 with the candidate
+  ufeyn: exact (1-R² < 1e-9 on the test rows) in 32 of 41 with 1.3.0, 32 with the candidate
+
+== 5. The real data: the candidates of the stage on the 13 real fits
+  real     210_cloud                1.3.0 places none; candidate: 0 candidats, 0 formes, 0 sous le seuil; best score -; placed none
+  real     228_elusage              1.3.0 places none; candidate: 0 candidats, 0 formes, 0 sous le seuil; best score -; placed none
+  real     712_chscase_geyser1      1.3.0 places none; candidate: 0 candidats, 0 formes, 0 sous le seuil; best score -; placed none
+  real     561_cpu                  1.3.0 places none; candidate: 0 candidats, 0 formes, 0 sous le seuil; best score -; placed none
+  real     690_visualizing_galaxy   1.3.0 places none; candidate: 0 candidats, 0 formes, 0 sous le seuil; best score -; placed none
+  real     547_no2                  1.3.0 places none; candidate: 0 candidats, 0 formes, 0 sous le seuil; best score -; placed none
+  realraw  210_cloud                1.3.0 places none; candidate: 10 candidats, 10 formes, 0 sous le seuil; best score 0.1128; placed none
+  realraw  228_elusage              1.3.0 places none; candidate: 27 candidats, 17 formes, 0 sous le seuil; best score 0.1275; placed none
+  realraw  712_chscase_geyser1      1.3.0 places none; candidate: 22 candidats, 13 formes, 0 sous le seuil; best score 0.2273; placed none
+  realraw  561_cpu                  1.3.0 places none; candidate: 20 candidats, 15 formes, 0 sous le seuil; best score 0.0456; placed none
+  realraw  690_visualizing_galaxy   1.3.0 places none; candidate: 18 candidats, 12 formes, 0 sous le seuil; best score 0.9988; placed none
+  realraw  547_no2                  1.3.0 places none; candidate: 22 candidats, 16 formes, 0 sous le seuil; best score 0.5952; placed none
+  realraw  nikuradse_1              1.3.0 places none; candidate: 22 candidats, 13 formes, 0 sous le seuil; best score 0.0416; placed none
+
+== 6. The time of the stage on the fits of item 1 (where it runs), s
+  1.3.0     63 fits: median 0.001, largest 0.257
+  candidate 63 fits: median 0.002, largest 0.990
+
+== 2. No seed is lost: the 82 noisy targets of F41 (seed 0)
+  the stage runs on 82 targets; rows of the stage found in the training rows on 82
+  N2 off: the seeds printed are those of 1.3.0 from PyPI on 82 of 82
+  1.3.0 places a seed on 47 targets; every form it places is placed by the candidate on 47
+  seeds placed: 47 targets with 1.3.0, 59 with the candidate; 198 seeds in all against 405
+  feyn_n1: a seed with the structure of the law placed on 22 targets with 1.3.0, 30 with the candidate (of 41 where the stage runs)
+    gained: III.15.12, I.32.5, I.40.1, I.44.4, II.11.3, II.11.27, II.35.18, III.19.51
+    lost: none
+  feyn_n10: a seed with the structure of the law placed on 13 targets with 1.3.0, 17 with the candidate (of 41 where the stage runs)
+    gained: I.34.8, I.29.4, I.44.4, III.19.51
+    lost: none
+
+== 3. The second pass: the five equations that lose the single sign
+  I.40.1    feyn_n1  the law leaves 1.16e-04 (within the threshold); a candidate with its form: yes; placed: yes; 1.3.0 places 0 seed(s)
+  I.40.1    feyn_n10 the law leaves 1.19e-02 (within the threshold); a candidate with its form: NO; placed: no; 1.3.0 places 0 seed(s)
+  II.35.18  feyn_n1  the law leaves 9.26e-05 (within the threshold); a candidate with its form: yes; placed: yes; 1.3.0 places 0 seed(s)
+  II.35.18  feyn_n10 the law leaves 9.28e-03 (within the threshold); a candidate with its form: NO; placed: no; 1.3.0 places 0 seed(s)
+  II.11.27  feyn_n1  the law leaves 1.01e-04 (within the threshold); a candidate with its form: yes; placed: yes; 1.3.0 places 0 seed(s)
+  II.11.27  feyn_n10 the law leaves 1.00e-02 (within the threshold); a candidate with its form: NO; placed: no; 1.3.0 places 0 seed(s)
+  I.32.5    feyn_n1  the law leaves 7.65e-05 (within the threshold); a candidate with its form: yes; placed: yes; 1.3.0 places 0 seed(s)
+  I.32.5    feyn_n10 the law leaves 7.70e-03 (within the threshold); a candidate with its form: yes; placed: no; 1.3.0 places 0 seed(s)
+  III.19.51 feyn_n1  the law leaves 7.44e-05 (within the threshold); a candidate with its form: yes; placed: yes; 1.3.0 places 0 seed(s)
+  III.19.51 feyn_n10 the law leaves 7.66e-03 (within the threshold); a candidate with its form: yes; placed: yes; 1.3.0 places 0 seed(s)
+
+== 4. The best kept
+  III.15.12, 1 %: a trigonometric candidate with the structure of the law: yes; placed: yes
+    (v0 * ((0.998509 + (0.004087 * sin((3.928337 * (v1 * v2))))) + (-1.0 * cos((3.928337 * (v1 * v2)))))) (score 0.00011)
+    (v0 * ((0.998509 + (0.004087 * sin((3.928337 * (v1 * v2))))) + (-1.0 * cos((3.928337 * (v1 * v2)))))) (score 0.00011)
+  I.44.4, 1 %: a candidate with the logarithm and the structure of the law: yes; placed: yes
+    (((v0 * v1) * v2) * log((4.929509 * v3))) (score 9.9e-05)
+    (((v0 * v1) * v2) * log((4.929509 * v3))) (score 9.9e-05)
+
+== 6. The time of the stage on the 82 noisy targets: median 0.177 s, largest 0.722 s
