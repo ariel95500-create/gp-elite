@@ -1,0 +1,25 @@
+engines: base ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py']; candidate ['/venv14e2/lib/python3.11/site-packages/gp_elite/__init__.py']
+crashes: 0
+
+== 2. Exact data
+  feyn: the finder of E2 returns an exact form on 0 of 41 tables
+     noise-tolerant forms of E2 made on 0 tables
+  ufeyn: the finder of E2 returns an exact form on 0 of 41 tables
+     noise-tolerant forms of E2 made on 0 tables
+  the 82 bounded fits of F41 and U41: the model of the base in 82 of 82
+
+== 3. Real data: the candidates of E2 in the noise-tolerant stage
+  real     210_cloud                forms of E2 made: 0; seeds placed by the stage: none
+  real     228_elusage              forms of E2 made: 0; seeds placed by the stage: none
+  real     547_no2                  forms of E2 made: 0; seeds placed by the stage: none
+  real     561_cpu                  forms of E2 made: 0; seeds placed by the stage: none
+  real     690_visualizing_galaxy   forms of E2 made: 0; seeds placed by the stage: none
+  real     712_chscase_geyser1      forms of E2 made: 0; seeds placed by the stage: none
+  realraw  210_cloud                forms of E2 made: 0; seeds placed by the stage: none
+  realraw  228_elusage              forms of E2 made: 0; seeds placed by the stage: none
+  realraw  547_no2                  forms of E2 made: 0; seeds placed by the stage: none
+  realraw  561_cpu                  forms of E2 made: 0; seeds placed by the stage: none
+  realraw  690_visualizing_galaxy   forms of E2 made: 0; seeds placed by the stage: none
+  realraw  712_chscase_geyser1      forms of E2 made: 0; seeds placed by the stage: none
+  realraw  nikuradse_1              forms of E2 made: 1; seeds placed by the stage: none
+  the 13 real bounded fits: the model of the base in 13 of 13
