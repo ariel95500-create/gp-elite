@@ -1,0 +1,112 @@
+benchmarks/results_1.4/e2/campaign/slice.sh: 21: cannot open /home/user/e2_records/tp_main_e2.jsonl: No such file
+--- TP main (draws 0,1,2,3,4) 2026-11-13T07:49, benches of 6c0820c, kernel 6.18.44-fc-v445
+400 jobs to run with 2 engines
+10/400 07:50:30
+20/400 07:51:09
+30/400 07:52:00
+40/400 07:52:42
+50/400 07:53:15
+60/400 07:53:51
+70/400 07:54:28
+80/400 07:55:05
+90/400 07:55:51
+100/400 07:56:26
+110/400 07:57:18
+120/400 07:57:56
+130/400 07:58:43
+140/400 07:59:28
+150/400 08:00:19
+160/400 08:01:01
+170/400 08:02:00
+180/400 08:02:47
+190/400 08:03:22
+200/400 08:04:01
+210/400 08:04:49
+220/400 08:05:29
+230/400 08:06:20
+240/400 08:07:09
+250/400 08:07:49
+260/400 08:08:32
+270/400 08:09:15
+280/400 08:09:57
+290/400 08:10:41
+300/400 08:11:25
+310/400 08:12:02
+320/400 08:12:41
+330/400 08:13:40
+340/400 08:14:59
+350/400 08:15:59
+360/400 08:18:08
+370/400 08:18:46
+380/400 08:20:25
+390/400 08:20:55
+400/400 08:21:24
+--- TP ends 2026-11-13T08:21
+benchmarks/results_1.4/e2/campaign/slice.sh: 32: cannot open /home/user/e2_records/bench_1.3.0.jsonl: No such file
+benchmarks/results_1.4/e2/campaign/slice.sh: 33: cannot open /home/user/e2_records/bench_e2.jsonl: No such file
+--- slice 2026-11-13T08:24 (0 and 0 done), kernel 6.18.44-fc-v445
+1360 jobs to run with 2 engines
+25 jobs done, 19 s elapsed, 1334 left
+50 jobs done, 178 s elapsed, 1309 left
+75 jobs done, 200 s elapsed, 1284 left
+100 jobs done, 328 s elapsed, 1260 left
+125 jobs done, 420 s elapsed, 1235 left
+150 jobs done, 602 s elapsed, 1210 left
+175 jobs done, 623 s elapsed, 1184 left
+200 jobs done, 858 s elapsed, 1160 left
+225 jobs done, 1204 s elapsed, 1134 left
+250 jobs done, 1594 s elapsed, 1109 left
+275 jobs done, 2003 s elapsed, 1084 left
+300 jobs done, 2393 s elapsed, 1059 left
+325 jobs done, 2802 s elapsed, 1034 left
+350 jobs done, 3190 s elapsed, 1009 left
+375 jobs done, 3598 s elapsed, 984 left
+400 jobs done, 3985 s elapsed, 959 left
+425 jobs done, 4393 s elapsed, 934 left
+450 jobs done, 4783 s elapsed, 909 left
+475 jobs done, 5190 s elapsed, 884 left
+500 jobs done, 5578 s elapsed, 859 left
+525 jobs done, 5984 s elapsed, 834 left
+time slice over: 814 jobs left for the next call
+--- slice ends 2026-11-13T10:09
+--- slice 2026-11-13T10:09 (546 and 546 done), kernel 6.18.44-fc-v445
+814 jobs to run with 2 engines
+25 jobs done, 412 s elapsed, 788 left
+--- container restarted about 10:22 UTC (records 584 and 584, paired, intact); the jobs that were running are run again
+--- slice 2026-11-13T10:23 (584 and 584 done), kernel 6.18.44-fc-v445
+776 jobs to run with 2 engines
+25 jobs done, 416 s elapsed, 750 left
+50 jobs done, 802 s elapsed, 725 left
+75 jobs done, 1214 s elapsed, 700 left
+100 jobs done, 1598 s elapsed, 675 left
+125 jobs done, 2010 s elapsed, 650 left
+150 jobs done, 2392 s elapsed, 625 left
+175 jobs done, 2569 s elapsed, 601 left
+200 jobs done, 2730 s elapsed, 575 left
+225 jobs done, 2750 s elapsed, 550 left
+250 jobs done, 2832 s elapsed, 526 left
+275 jobs done, 2904 s elapsed, 500 left
+300 jobs done, 3067 s elapsed, 475 left
+325 jobs done, 3100 s elapsed, 450 left
+350 jobs done, 3179 s elapsed, 425 left
+375 jobs done, 3486 s elapsed, 400 left
+400 jobs done, 3880 s elapsed, 375 left
+425 jobs done, 4277 s elapsed, 350 left
+450 jobs done, 4671 s elapsed, 325 left
+475 jobs done, 5066 s elapsed, 300 left
+500 jobs done, 5462 s elapsed, 275 left
+525 jobs done, 5860 s elapsed, 250 left
+550 jobs done, 6258 s elapsed, 225 left
+time slice over: 222 jobs left for the next call
+--- slice ends 2026-11-13T12:09
+--- slice 2026-11-13T12:09 (1138 and 1138 done), kernel 6.18.44-fc-v445
+222 jobs to run with 2 engines
+25 jobs done, 411 s elapsed, 196 left
+50 jobs done, 791 s elapsed, 171 left
+75 jobs done, 1202 s elapsed, 146 left
+100 jobs done, 1587 s elapsed, 121 left
+125 jobs done, 1996 s elapsed, 96 left
+150 jobs done, 2380 s elapsed, 71 left
+175 jobs done, 2790 s elapsed, 46 left
+200 jobs done, 3172 s elapsed, 21 left
+--- slice ends 2026-11-13T13:07
