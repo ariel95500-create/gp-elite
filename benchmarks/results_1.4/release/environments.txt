@@ -1,0 +1,89 @@
+# SHA-256 of the release files built from commit f6a36cd (pyproject-build from a clean export, git archive), 13 November 2026
+69326a6e7fad53526fda227e617a4fa9b2d91f1fdc5fda9f2b5b5018e9c923c4  gp_elite-1.4.0-py3-none-any.whl
+4e39d2f246210297efefefd5d7a8021bf6f2f2498c2b26342cd929cfe7f52690  gp_elite-1.4.0.tar.gz
+
+# twine check --strict passes for both.
+# The engine is that of 227d837 (N2b, the candidate of its campaign); f6a36cd changes the version number,
+# the CHANGELOG and one comment of gp_elite/core.py.
+# /venv14r gp_elite files 11 identical to commit f6a36cd: True
+# /venv14rx gp_elite files 11 identical to commit f6a36cd: True
+# /venv13p: gp-elite 1.3.0 installed from PyPI; its 11 gp_elite/ files are identical to those of the wheel
+# published on PyPI, downloaded again on 13 November 2026, SHA-256
+# 38bcdcd589d571f1bf07341294d56ffcf006a8525f15719ef1254633195007a0 (../../results_1.3/release/environments.txt).
+# /venv14r has the packages of /venv13r, /venv14rx those of /venv13rx (uv pip freeze compared, gp-elite aside).
+
+# /venv14r (3.11.18) — uv pip freeze
+cloudpickle==3.1.2
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel14/dist/gp_elite-1.4.0-py3-none-any.whl
+iniconfig==2.3.1
+joblib==1.6.0
+mpmath==1.3.0
+narwhals==2.28.0
+numpy==2.4.6
+packaging==26.3
+pandas==3.0.6
+pip==24.0
+pluggy==1.7.0
+pygments==2.21.0
+pytest==9.2.0
+python-dateutil==4.0.0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+sympy==1.14.0
+threadpoolctl==3.7.0
+tzdata==2026.6
+
+# /venv14rx (3.11.18) — uv pip freeze
+cloudpickle==3.1.2
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.66.1
+gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel14/dist/gp_elite-1.4.0-py3-none-any.whl
+gplearn==0.4.3
+iniconfig==2.3.1
+joblib==1.6.0
+kiwisolver==1.5.1
+matplotlib==3.11.2
+mpmath==1.3.0
+narwhals==2.28.0
+numpy==2.4.6
+nvidia-nccl-cu12==2.32.3
+packaging==26.3
+pandas==3.0.6
+pillow==12.3.0
+pip==24.0
+pluggy==1.7.0
+pygments==2.21.0
+pyparsing==3.3.3
+pytest==9.2.0
+python-dateutil==4.0.0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+sympy==1.14.0
+threadpoolctl==3.7.0
+tzdata==2026.6
+xgboost==3.2.0
+
+# /venv13p (3.11.18) — uv pip freeze
+cloudpickle==3.1.2
+gp-elite==1.3.0
+iniconfig==2.3.1
+joblib==1.6.0
+mpmath==1.3.0
+narwhals==2.28.0
+numpy==2.4.6
+packaging==26.3
+pandas==3.0.6
+pip==24.0
+pluggy==1.7.0
+pygments==2.21.0
+pytest==9.2.0
+python-dateutil==4.0.0
+scikit-learn==1.9.1
+scipy==1.17.1
+setuptools==79.0.1
+sympy==1.14.0
+threadpoolctl==3.7.0
+tzdata==2026.6
