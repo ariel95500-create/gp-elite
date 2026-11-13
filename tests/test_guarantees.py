@@ -1750,8 +1750,12 @@ def _n2_case(monkeypatch, pool, Xr, clean, seed=1):
     return Xs, y, _binom_cfg(Xr.shape[1])
 
 
-def _n2_stage(monkeypatch, Xs, y, cfg, on):
+def _n2_stage(monkeypatch, Xs, y, cfg, on, refit=False):
+    """The stage of 1.3.0 (on False), or N2b (on True, the default since the
+    decision of 13 November 2026: no fit of the constants of the
+    candidates), or N2 as first measured (refit True)."""
     monkeypatch.setattr(core, "_TOLERANT_N2", on)
+    monkeypatch.setattr(core, "_TOLERANT_REFIT", refit)
     return core._make_tolerant_seeds(Xs, y, cfg)
 
 
@@ -1857,6 +1861,26 @@ def test_n2_scores_better_places_at_most_twelve_and_keeps_1_3(monkeypatch):
     assert scores == sorted(scores)
     assert seen and all(after <= before for before, after in seen)
     assert len(_forms(new)) == len(new)                 # one seed per form
+    # N2 as first measured fits the constants of each candidate, and the
+    # fit never makes one worse; N2b keeps those of the finders
+    seen.clear()
+    _n2_stage(monkeypatch, Xs, y, cfg, True, refit=True)
+    assert seen and all(after <= before for before, after in seen)
+    assert any(after < before for before, after in seen)
+
+
+def test_n2b_keeps_the_constants_of_the_finders(monkeypatch):
+    """[1.4-N2b] Without the fit of the constants, every seed of 1.3.0 is
+    placed as 1.3.0 places it, constants included, and the new forms come
+    beside it."""
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140), rng.uniform(3, 10, 140)]
+    clean = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean, seed=0)
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    exact = {t.exact_hash() for t in new}
+    assert old and all(t.exact_hash() in exact for t in old)
 
 
 # ── 1.4, S1: below 30 rows, the candidates compete in a cross-validation ────

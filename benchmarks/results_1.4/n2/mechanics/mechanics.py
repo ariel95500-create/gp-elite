@@ -26,6 +26,11 @@ bench).
 
 Items 5 and 6: the candidates on the 13 real fits, with their scores, and
 the time of the stage, from the fits of item 1.
+
+[N2b] With N2B_MECHANICS=1 in the environment, the candidate is N2b on
+1.3.0: N2 on, without the fit of the constants of its candidates, and E2 and
+S1 off, whatever the defaults of the engine (benchmarks/results_1.4/PLAN.md,
+"Decision of the author after the campaigns of N2 and S1").
 """
 import io
 import json
@@ -50,6 +55,15 @@ GENS = 20
 def _setup(engine_dir):
     sys.path.insert(0, engine_dir)
     sys.path.insert(1, BENCH)
+
+
+def _n2b(C):
+    """[N2b] The candidate of the mechanics of N2b, set before a fit."""
+    if os.environ.get("N2B_MECHANICS") == "1" and hasattr(C, "_TOLERANT_N2"):
+        C._TOLERANT_N2 = True
+        C._TOLERANT_REFIT = False
+        C._E2_SEEDS = False
+        C._SMALL_CV = False
 
 
 def _jobs_bounded():
@@ -83,6 +97,7 @@ def one_fit(job):
     from gp_elite import symbolic_regression
     import decision_bench as D
     Xtr, ytr, Xte, yte, _xo, _yo, names, pool, _clean = B._data(job)
+    _n2b(C)
     kw = dict(generations=GENS, seed=job["seed"], parallel=False, verbose=False,
               operators=pool)
     if names is not None:
@@ -146,6 +161,7 @@ def one_stage(job):
         return dict(job, engine=gp_elite.__file__,
                     stage_ran="tolerant_seed_s" in C.TRACE.value,
                     tolerant_seed=C.TRACE.value.get("tolerant_seed"))
+    _n2b(C)
     seen = {}
     orig_stage, orig_refit = C._make_tolerant_seeds, C._refit_inner
 

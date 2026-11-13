@@ -5532,8 +5532,11 @@ _TOLERANT_REL = 0.015
 # Non adopté (campagne N2, 13 novembre 2026, benchmarks/results_1.4/n2/
 # campaign/README.md) : sans bruit, F41 perd 5 lois exactes, toutes là où
 # l'étage tourne, à cause de l'ajustement des constantes des candidats.
-# Retiré du candidat : éteint, le code gardé pour la décision de l'auteur.
+# Retiré du candidat : éteint. Sur décision de l'auteur (13 novembre), N2
+# est mesuré de nouveau sans cet ajustement (N2b, _TOLERANT_REFIT False) :
+# chaque candidat garde les constantes de son chercheur.
 _TOLERANT_N2 = False
+_TOLERANT_REFIT = False
 _TOLERANT_MAX = 12
 
 
@@ -5584,7 +5587,10 @@ def _refit_inner(tree, X, y, cfg):
     d'entraînement par l'étape de finition du moteur (_lm_to_convergence).
     L'arbre d'entrée si rien n'est amélioré, ou quand la recherche n'a pas
     de mise à l'échelle linéaire (perte personnalisée) : le score des
-    graines et l'ajustement ne jugeraient pas la même forme."""
+    graines et l'ajustement ne jugeraient pas la même forme. [1.4-N2b]
+    L'arbre d'entrée aussi sans _TOLERANT_REFIT."""
+    if not _TOLERANT_REFIT:
+        return tree
     if not (_USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None):
         return tree
     try:
@@ -5666,7 +5672,12 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
         scored.append((_seed_rel_error(t2, X, y), i, t2))
     scored.sort(key=lambda r: (r[0], r[1]))
     forms, first = {}, set()
-    for r, i, t in scored:
+    # [1.4-N2b] sans ajustement des constantes, une forme que donnent les
+    # chercheurs d'avant garde leur arbre, constantes comprises : N2b ne fait
+    # qu'ajouter des formes aux graines de 1.3.0
+    order = scored if _TOLERANT_REFIT else sorted(
+        scored, key=lambda r: (r[1] >= n_first, r[0], r[1]))
+    for r, i, t in order:
         h = t.canonical_hash()
         if i < n_first:
             first.add(h)
