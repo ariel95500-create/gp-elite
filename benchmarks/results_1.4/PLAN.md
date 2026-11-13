@@ -418,6 +418,17 @@ E2 is adopted when all of these hold:
 **Confirmation.** Draws 10 to 14 of TP. E2 is kept when criteria 1 and 2
 hold there.
 
+Campaign E2, 13 November 2026 (`e2/campaign/README.md`): **not adopted.**
+A was 1.3.0, N2 and S1 being withdrawn. Criteria 1 and 2 fail: Newton's
+cooling has the law in 7 fits of 20 in the plain arm (A 3, the plan asks
+10), and the point source falls from 18 to 15. Criteria 3 and 4 hold. The
+cause: the seed of E2 has the structure of the law in 18 fits of the
+cooling, but on 10 or 20 noisy points the search returns another form in 11
+of them, as campaign S1 found; and its form comes within the threshold on
+all ten experiments, where its seeds, added to those of 1.3.0, move the
+search. E2 is withdrawn, its confirmation is not run, and its cause goes to
+the author. The campaign of N2b takes 1.3.0 as its base.
+
 ## Correction W1: the warning names the arcsine
 
 The warning of a formula that departs from `predict()` lists the guards

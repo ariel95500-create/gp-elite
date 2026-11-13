@@ -1,0 +1,83 @@
+400 fits, crashes 0; engines ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py', '/venv14e2/lib/python3.11/site-packages/gp_elite/__init__.py']
+  A: the model of the campaign again in 200 of 200 fits
+  B: the model of the campaign again in 200 of 200 fits
+
+By experiment (plain arm, 20 fits each): the law A -> B; the fits where B places a seed A does not place (a seed of E2), and the law there A -> B
+  chute            law 19 -> 19; a seed of E2 in 20 fits (law there 19 -> 19); a seed of A not placed by B in 0; models that differ 1
+  eclairement      law 18 -> 15; a seed of E2 in 20 fits (law there 18 -> 15); a seed of A not placed by B in 0; models that differ 14
+  gaz              law 18 -> 17; a seed of E2 in  6 fits (law there 6 -> 5); a seed of A not placed by B in 0; models that differ 2
+  lentille         law  2 ->  0; a seed of E2 in 16 fits (law there 2 -> 0); a seed of A not placed by B in 0; models that differ 15
+  pendule          law 17 -> 17; a seed of E2 in 10 fits (law there 10 -> 10); a seed of A not placed by B in 0; models that differ 0
+  puissance        law 20 -> 20; a seed of E2 in  2 fits (law there 2 -> 2); a seed of A not placed by B in 0; models that differ 0
+  rc               law 15 -> 13; a seed of E2 in 20 fits (law there 15 -> 13); a seed of A not placed by B in 0; models that differ 14
+  refroidissement  law  3 ->  7; a seed of E2 in 18 fits (law there 3 -> 7); a seed of A not placed by B in 0; models that differ 12
+  ressort          law 14 -> 14; a seed of E2 in 11 fits (law there 10 -> 10); a seed of A not placed by B in 0; models that differ 7
+  snell            law  0 ->  0; a seed of E2 in 16 fits (law there 0 -> 0); a seed of A not placed by B in 0; models that differ 0
+
+refroidissement, the fits one by one (points, noise, draw): the law A, B; the seeds of E2 placed by B, with their scores; the noise-tolerant candidates of B
+  10 pts 2 % draw 0: law False, False; E2 seeds: exp((-3.033926 * t)) (0.0011); None
+  10 pts 2 % draw 1: law False, True; E2 seeds: exp((-3.123115 * t)) (0.0009); None
+      A: 22.4273 - 57.7594 * (0.000555556 * t - |0.000555556 * t|^(0.000555556 * t))
+      B: 20.5482 + 59.83 * exp(-t / 576.348)
+  10 pts 2 % draw 2: law False, True; E2 seeds: exp((-2.896121 * t)) (0.0015); None
+      A: 81.1396 - 67.2968 * sqrt(|tanh(0.000555556 * t)|)
+      B: 20.1982 + 58.7476 * exp(-t / 621.521)
+  10 pts 2 % draw 3: law False, False; E2 seeds: exp((-2.741 * t)) (0.0016); None
+  10 pts 2 % draw 4: law False, False; E2 seeds: exp((-3.081372 * t)) (0.0019); None
+  10 pts 5 % draw 0: law False, False; E2 seeds: exp((-3.199661 * t)) (0.0069); None
+  10 pts 5 % draw 1: law False, True; E2 seeds: exp((-3.252601 * t)) (0.0031); None
+      A: 81.6916 - 77.1444 * tanh(tanh(0.00109743 * t))
+      B: 21.0918 + 61.4817 * exp(-t / 553.403)
+  10 pts 5 % draw 2: law False, False; E2 seeds: exp((-3.099523 * t)) (0.013); None
+  10 pts 5 % draw 3: law False, False; E2 seeds: exp((-1.970763 * t)) (0.011); None
+  10 pts 5 % draw 4: law False, False; E2 seeds: exp((-3.191537 * t)) (0.013); None
+  20 pts 2 % draw 0: law True, True; E2 seeds: exp((-3.154171 * t)) (0.002); None
+  20 pts 2 % draw 1: law True, True; E2 seeds: exp((-3.129671 * t)) (0.0016); None
+  20 pts 2 % draw 2: law False, True; E2 seeds: exp((-3.158011 * t)) (0.0012); None
+      A: -12.659 + 93.0486 * ((exp(t / 1800) - 0.000555556 * t) / exp(t / 1800))²
+      B: 20.7348 + 59.5003 * exp(-t / 569.979)
+  20 pts 2 % draw 3: law True, False; E2 seeds: exp((-2.983135 * t)) (0.0024); None
+      A: 20.4137 + 59.3447 * exp(-t / 603.392)
+      B: 78.7546 - 154.169 * tanh(0.000555556 * t / exp(t / 1800))
+  20 pts 2 % draw 4: law False, False; E2 seeds: exp((-3.182775 * t)) (0.003); None
+  20 pts 5 % draw 0: law False, False; E2 seeds: exp((-3.692034 * t)) (0.013); None
+  20 pts 5 % draw 1: law False, False; E2 seeds: exp((-2.811542 * t)) (0.013); None
+  20 pts 5 % draw 2: law False, False; E2 seeds: none; None
+  20 pts 5 % draw 3: law False, False; E2 seeds: none; None
+  20 pts 5 % draw 4: law False, True; E2 seeds: exp((-2.688513 * t)) (0.0087); None
+      A: 78.8126 - 0.0831813 * t / exp(t / 1800)
+      B: 17.9916 + 61.3918 * exp(-t / 669.515)
+
+eclairement, the fits one by one (points, noise, draw): the law A, B; the seeds of E2 placed by B, with their scores; the noise-tolerant candidates of B
+  10 pts 2 % draw 0: law True, True; E2 seeds: exp((0.211211 * (1.0 / d))) (0.00028) | exp((-14.174608 * d)) (0.0026); None
+  10 pts 2 % draw 1: law True, True; E2 seeds: exp((0.197132 * (1.0 / d))) (0.00065) | exp((-13.581421 * d)) (0.002); None
+  10 pts 2 % draw 2: law True, False; E2 seeds: exp((0.201373 * (1.0 / d))) (0.0004) | exp((-13.76936 * d)) (0.0025); None
+      A: 0.0167196 + 0.799464 / d²
+      B: -0.314498 + 0.786875 * exp(d / 2)^(0.707107 * sqrt(d)) / d²
+  10 pts 2 % draw 3: law True, True; E2 seeds: exp((0.204425 * (1.0 / d))) (0.0004) | exp((-13.893296 * d)) (0.0024); None
+  10 pts 2 % draw 4: law True, True; E2 seeds: exp((0.19993 * (1.0 / d))) (0.00044) | exp((-13.714116 * d)) (0.0024); None
+  10 pts 5 % draw 0: law True, False; E2 seeds: exp((0.231869 * (1.0 / d))) (7.4e-05) | exp((-15.08564 * d)) (0.0036); None
+      A: -0.0826836 + 0.864877 * (d / d²)²
+      B: -8.06181 + 8.25045 * (0.5 * d)^(-0.111304 / d)
+  10 pts 5 % draw 1: law True, True; E2 seeds: exp((0.210467 * (1.0 / d))) (0.00012) | exp((-14.215261 * d)) (0.0035); None
+  10 pts 5 % draw 2: law True, True; E2 seeds: exp((0.212765 * (1.0 / d))) (0.00089) | exp((-14.147305 * d)) (0.0015); None
+  10 pts 5 % draw 3: law True, False; E2 seeds: exp((0.19101 * (1.0 / d))) (0.0011) | exp((-13.305205 * d)) (0.0015); None
+      A: 0.00440861 + 0.793394 / d²
+      B: -0.652034 + 0.18383 * exp(d / 2) / tanh(0.5 * d)²
+  10 pts 5 % draw 4: law False, True; E2 seeds: exp((0.195634 * (1.0 / d))) (0.0003) | exp((-13.571342 * d)) (0.0031); None
+      A: -0.121355 + 0.746575 * sqrt(exp(d / 2)) / d²
+      B: 0.0503383 + 0.779436 / d²
+  20 pts 2 % draw 0: law True, True; E2 seeds: exp((0.192216 * (1.0 / d))) (0.0015) | exp((-14.483698 * d)) (0.0066); None
+  20 pts 2 % draw 1: law True, True; E2 seeds: exp((0.196497 * (1.0 / d))) (0.0012) | exp((-14.690623 * d)) (0.0072); None
+  20 pts 2 % draw 2: law True, True; E2 seeds: exp((0.189042 * (1.0 / d))) (0.0019) | exp((-14.346419 * d)) (0.0058); None
+  20 pts 2 % draw 3: law True, True; E2 seeds: exp((0.190133 * (1.0 / d))) (0.0013) | exp((-14.390069 * d)) (0.007); None
+  20 pts 2 % draw 4: law True, True; E2 seeds: exp((0.188067 * (1.0 / d))) (0.0021) | exp((-14.310246 * d)) (0.0055); None
+  20 pts 5 % draw 0: law True, False; E2 seeds: exp((0.217118 * (1.0 / d))) (0.00055) | exp((-15.776823 * d)) (0.011); None
+      A: -0.0613249 + 0.848549 / d²
+      B: 0.00478613 + 1.29277 * tanh((0.5 * d)^(0.5 * d)) / d²
+  20 pts 5 % draw 1: law True, True; E2 seeds: exp((0.197613 * (1.0 / d))) (0.0012) | exp((-14.749383 * d)) (0.0077); None
+  20 pts 5 % draw 2: law False, False; E2 seeds: exp((0.186854 * (1.0 / d))) (0.0021) | exp((-14.239255 * d)) (0.0055); None
+  20 pts 5 % draw 3: law True, True; E2 seeds: exp((0.198464 * (1.0 / d))) (0.0019) | exp((-14.766126 * d)) (0.0065); None
+  20 pts 5 % draw 4: law True, True; E2 seeds: exp((0.205994 * (1.0 / d))) (0.00067) | exp((-15.165811 * d)) (0.01); None
+
+Seeds of E2 placed, by experiment: {'chute': 40, 'eclairement': 40, 'gaz': 8, 'lentille': 27, 'pendule': 18, 'puissance': 3, 'rc': 20, 'refroidissement': 18, 'ressort': 17, 'snell': 31}
