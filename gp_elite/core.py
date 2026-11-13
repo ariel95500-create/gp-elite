@@ -5535,8 +5535,9 @@ _TOLERANT_REL = 0.015
 # l'étage tourne, à cause de l'ajustement des constantes des candidats.
 # Retiré du candidat : éteint. Sur décision de l'auteur (13 novembre), N2
 # est mesuré de nouveau sans cet ajustement (N2b, _TOLERANT_REFIT False) :
-# chaque candidat garde les constantes de son chercheur.
-_TOLERANT_N2 = False
+# chaque candidat garde les constantes de son chercheur. Allumé pour la
+# campagne de N2b, sur 1.3.0 (S1 et E2, non adoptés, sont éteints).
+_TOLERANT_N2 = True
 _TOLERANT_REFIT = False
 _TOLERANT_MAX = 12
 
