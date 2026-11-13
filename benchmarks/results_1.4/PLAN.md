@@ -355,6 +355,22 @@ Where it is gained, S1 returns textbook laws (the thin lens in 5 fits,
 Newton's cooling in 3). S1 is withdrawn, its confirmation is not run, and
 its cause goes to the author. The campaign of E2 takes 1.3.0 as its base.
 
+## Decision of the author after the campaigns of N2 and S1
+
+On 13 November 2026 the author approved the two proposals made to him:
+- **N2 is measured again without the fit of the constants of each
+  candidate** (item 3 of N2), the part that made the exact laws fall. This
+  is N2b: the second pass, the scans of the trigonometric and logarithm
+  finders (with the rule of their exponents found by the mechanics), the
+  deduplication and the twelve seeds at most, the seeds of 1.3.0 always
+  placed. Its mechanics are those of N2 without item 3; its campaign has the
+  benches and the six criteria of campaign N2, then its confirmation on new
+  draws of the noise. It is measured after E2, on the candidate with the
+  changes kept so far.
+- **S1 is postponed to the next version,** with a design written in advance
+  that answers the cause found by its campaign. Its code stays in the
+  engine, switched off, and is not part of 1.4.
+
 ## Change E2: a seed for a constant plus an exponential
 
 A new kind among the functions of a monomial: y = a + b·exp(c·g).
