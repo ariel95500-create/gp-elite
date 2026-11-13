@@ -28,8 +28,9 @@ Two changes since 1.3.0:
 
 The code of S1, of E2 and of the fit of the constants of N2 stays in the
 engine, switched off (`_SMALL_CV`, `_E2_SEEDS` and `_TOLERANT_REFIT` False).
-None of them is part of 1.4: their campaigns did not adopt them, S1 is
-postponed to the next version, and E2 waits for the decision of the author.
+None of them is part of 1.4: their campaigns did not adopt them, and by
+decision of the author S1 and E2 are postponed to the next version
+(`PLAN.md`).
 
 Beside the package:
 - the tests of these changes (`tests/test_guarantees.py`);

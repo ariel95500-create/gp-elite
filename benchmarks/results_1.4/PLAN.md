@@ -440,6 +440,12 @@ all ten experiments, where its seeds, added to those of 1.3.0, move the
 search. E2 is withdrawn, its confirmation is not run, and its cause goes to
 the author. The campaign of N2b takes 1.3.0 as its base.
 
+**Decision of the author after the campaign of E2.** On 13 November 2026 the
+author approved the proposal made to him: E2 is postponed to the next
+version, with S1. Both campaigns found the same cause, the final choice
+among the forms of the search on a few noisy points. Its code stays in the
+engine, switched off, and is not part of 1.4.
+
 ## Correction W1: the warning names the arcsine
 
 The warning of a formula that departs from `predict()` lists the guards
