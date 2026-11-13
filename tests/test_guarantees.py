@@ -1869,6 +1869,9 @@ def test_n2_scores_better_places_at_most_twelve_and_keeps_1_3(monkeypatch):
 # with K = min(n, 10) folds, row i in fold i mod K, and the one with the
 # fewest fitted constants within one standard error (or 0.003 in R²) of the
 # best is returned; result.pareto holds their front.
+# S1 was not adopted (campaign of 13 November 2026, benchmarks/results_1.4/
+# s1/campaign/README.md) and is switched off; these tests switch it on to
+# keep its code sound for the decision of the author.
 
 def _s1_select(monkeypatch, pool, X, y, trees):
     """The choice of S1 among the given trees, as the champions of a search
@@ -1884,8 +1887,21 @@ def _s1_select(monkeypatch, pool, X, y, trees):
     return core._small_table_select(trees[0], X, y, cfg)
 
 
+def test_s1_switched_off_leaves_small_tables_as_in_1_3():
+    """S1 off (its default since its campaign): below 30 rows there is no
+    front, as in 1.3.0."""
+    assert core._SMALL_CV is False
+    x = np.linspace(0.2, 2.0, 10).reshape(-1, 1)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(x, 3.0 / x[:, 0] ** 2, generations=3, seed=0,
+                                parallel=False)
+    assert r.pareto is None and "small_cv" not in core.TRACE.value
+
+
 def test_s1_is_off_from_30_rows(monkeypatch):
     rng = np.random.RandomState(0)
+    monkeypatch.setattr(core, "_SMALL_CV", True)
     monkeypatch.setattr(core, "_VAL_XS", None)
     for n, on in ((5, False), (6, True), (29, True), (30, False), (140, False)):
         monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
@@ -1916,6 +1932,7 @@ def test_s1_is_off_from_30_rows(monkeypatch):
 def test_s1_cross_validation_chooses_an_exact_law_and_repeats(monkeypatch):
     """12 exact points of 2.5·x0·x1: the law, to numerical precision, the
     same at every run."""
+    monkeypatch.setattr(core, "_SMALL_CV", True)
     rng = np.random.RandomState(3)
     Xr = np.c_[rng.uniform(1, 5, 12), rng.uniform(1, 5, 12)]
     y = 2.5 * Xr[:, 0] * Xr[:, 1]
@@ -1954,7 +1971,8 @@ def test_s1_variant_with_a_half_integer_exponent_wins(monkeypatch):
     assert np.allclose(core.evaluate_vector(chosen, Xs), d, rtol=1e-9)
 
 
-def test_s1_pareto_lists_the_cross_validated_front():
+def test_s1_pareto_lists_the_cross_validated_front(monkeypatch):
+    monkeypatch.setattr(core, "_SMALL_CV", True)
     rng = np.random.RandomState(1)
     x = np.linspace(0.2, 2.0, 10).reshape(-1, 1)
     y = 10.0 / (4 * np.pi * x[:, 0] ** 2) * (1 + 0.02 * rng.randn(10))
@@ -1972,9 +1990,10 @@ def test_s1_pareto_lists_the_cross_validated_front():
     assert "small_cv" in core.TRACE.value
 
 
-def test_s1_candidates_pass_the_gate_of_dimensions():
+def test_s1_candidates_pass_the_gate_of_dimensions(monkeypatch):
     """Under units=, every candidate of the cross-validation passes the gate
     of dimensions, and so does the model returned."""
+    monkeypatch.setattr(core, "_SMALL_CV", True)
     rng = np.random.RandomState(2)
     L = np.linspace(0.1, 1.0, 12).reshape(-1, 1)
     T = 2 * np.pi * np.sqrt(L[:, 0] / 9.81) * (1 + 0.02 * rng.randn(12))

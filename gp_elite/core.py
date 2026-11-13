@@ -5233,9 +5233,9 @@ def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL, weighted=False,
 # c'est l'exponentielle que la phase 4a ajuste déjà) ; dans l'étage tolérant,
 # un candidat comme les autres (ses trois meilleures formes). Une forme dont
 # l'exponentielle varie de moins d'un facteur e^0,5 sur les données n'est pas
-# rendue : elle imiterait une droite. Éteinte jusqu'à sa campagne : le plan
-# mesure N2, S1 et E2 l'un après l'autre.
-_E2_SEEDS = False
+# rendue : elle imiterait une droite. Allumée pour sa campagne (N2 et S1,
+# non adoptés, sont éteints : sa base est 1.3.0).
+_E2_SEEDS = True
 _E2_C_GRID = np.concatenate([-np.geomspace(50.0, 0.01, 40), np.geomspace(0.01, 50.0, 40)])
 _E2_GATE = 0.05                       # résidu de grille sous lequel on affine
 _E2_CURVE = 0.5                       # |c|·étendue de g au moins : l'exponentielle
