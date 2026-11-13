@@ -1,0 +1,67 @@
+Dnoise and Dguard: 1360 fits in A, 1360 in B, the same jobs: True; crashes A 0, B 0
+  engines: A ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv14n2/lib/python3.11/site-packages/gp_elite/__init__.py']
+TP: 400 fits in A, 400 in B, the same jobs: True; crashes A 0, B 0
+  engines: A ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv14n2/lib/python3.11/site-packages/gp_elite/__init__.py']
+
+| kind | A | B |
+|---|---|---|
+| F41N1, structure (of 205) | 116 | 144 |
+| F41N10, structure (of 205) | 87 | 102 |
+| U41N1, structure (of 205) | 121 | 147 |
+| U41N10, structure (of 205) | 95 | 103 |
+| F41, exact (of 205) | 171 | 166 |
+| U41, exact (of 205) | 174 | 174 |
+
+TP: | arm | law A | law B | useful A | useful B | median time A | B |
+  | plain | 126 | 122 | 174 | 173 | 6.9 s | 7.0 s |
+  | units | 120 | 120 | 139 | 139 | 8.1 s | 8.1 s |
+
+Criteria written before the run (PLAN.md):
+  [holds] 1. F41N1 + F41N10: B at least A + 15 of 410 (203, 246)
+  [holds] 1. F41N1: B no fewer than A - 3 (116, 144)
+  [holds] 1. F41N10: B no fewer than A - 3 (87, 102)
+  [holds] 2. U41N1: B no fewer than A - 3 (121, 147)
+  [holds] 2. U41N10: B no fewer than A - 3 (95, 103)
+  [FAILS] 3. F41 exact: B no fewer than A - 3 (171, 166)
+  [FAILS] 3. F41: no equation exact at three seeds or more in A falls to one or none (I.26.2)
+  [holds] 3. U41 exact: B no fewer than A - 3 (174, 174)
+  [holds] 3. U41: no equation exact at three seeds or more in A falls to one or none (none)
+  [holds] 4. R6 folds, median test R²: B not more than 0.005 below A (0.8095, 0.8095; 30 fits)
+  [holds] 4. R6 + R7raw, collapses out of domain: B not more than A + 2 (10, 10 of 65)
+  [holds] 5. the units guarantee: every model of B under units passes (615 of 615 on the bench, 200 of 200 on TP)
+  [holds] 6. TP, plain: the law in B no fewer than A - 5 of 200 (126, 122)
+  [holds] 6. TP, plain: median time of B at most 1.5 times A (6.9 s, 7.0 s, ratio 1.00)
+  [holds] 6. TP, units: the law in B no fewer than A - 5 of 200 (120, 120)
+  [holds] 6. TP, units: median time of B at most 1.5 times A (8.1 s, 8.1 s, ratio 1.00)
+N2 NOT ADOPTED
+
+Beside, deciding nothing:
+  structures by equation (F41N1, F41N10, U41N1, U41N10), A -> B, where they differ:
+    I.10.7     5 -> 3   0 -> 0   5 -> 4   0 -> 0
+    I.18.12    5 -> 5   5 -> 5   5 -> 5   1 -> 3
+    I.26.2     3 -> 2   1 -> 1   3 -> 3   0 -> 0
+    I.27.6     5 -> 5   2 -> 5   5 -> 5   5 -> 5
+    I.32.5     2 -> 5   0 -> 5   5 -> 5   5 -> 5
+    I.40.1     0 -> 5   0 -> 0   1 -> 5   0 -> 0
+    I.44.4     0 -> 5   1 -> 5   0 -> 5   0 -> 5
+    II.11.27   0 -> 4   0 -> 0   0 -> 5   0 -> 1
+    II.11.3    0 -> 4   0 -> 1   0 -> 5   1 -> 1
+    II.35.18   0 -> 5   0 -> 0   0 -> 5   0 -> 0
+    III.15.12  0 -> 2   5 -> 3   0 -> 3   5 -> 5
+    III.19.51  2 -> 5   1 -> 5   5 -> 5   5 -> 5
+  exact laws by equation (F41, U41), A -> B, where they differ:
+    I.16.6     4 -> 2   4 -> 4
+    I.26.2     3 -> 0   3 -> 3
+  A: noise-tolerant seeds placed in 415 of 820 noisy fits; in 0 of 130 real fits; median size 14.0; formula_exact False in 63 of 1360; median time 30.4 s
+  B: noise-tolerant seeds placed in 535 of 820 noisy fits; in 0 of 130 real fits; median size 13.0; formula_exact False in 60 of 1360; median time 30.4 s
+  TP, the law by experiment and arm, A -> B:
+    chute            plain 19 -> 19   units 20 -> 20
+    eclairement      plain 18 -> 15   units 20 -> 20
+    gaz              plain 18 -> 16   units 20 -> 20
+    lentille         plain 2 -> 2   units 0 -> 0
+    pendule          plain 17 -> 17   units 20 -> 20
+    puissance        plain 20 -> 20   units 20 -> 20
+    rc               plain 15 -> 15   units 0 -> 0
+    refroidissement  plain 3 -> 3   units 0 -> 0
+    ressort          plain 14 -> 15   units 20 -> 20
+    snell            plain 0 -> 0   units 0 -> 0

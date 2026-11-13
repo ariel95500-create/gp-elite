@@ -1,0 +1,7 @@
+engine ['/venv14n2/lib/python3.11/site-packages/gp_elite/__init__.py']; 30 fits, crashes 0
+  I.16.6   n2       exact 2 of 5 (seeds [3, 4]); seeds placed: 4
+  I.16.6   norefit  exact 4 of 5 (seeds [0, 1, 2, 4]); seeds placed: 4
+  I.16.6   off      exact 4 of 5 (seeds [1, 2, 3, 4]); seeds placed: 4
+  I.26.2   n2       exact 0 of 5 (seeds []); seeds placed: 1
+  I.26.2   norefit  exact 3 of 5 (seeds [1, 2, 4]); seeds placed: 1
+  I.26.2   off      exact 3 of 5 (seeds [1, 2, 4]); seeds placed: 1

@@ -1,0 +1,80 @@
+--- slice 2026-11-13T03:42 (619 and 619 done), kernel 6.18.44-fc-v445
+741 jobs to run with 2 engines
+25 jobs done, 423 s elapsed, 715 left
+50 jobs done, 807 s elapsed, 690 left
+75 jobs done, 1217 s elapsed, 665 left
+100 jobs done, 1606 s elapsed, 640 left
+125 jobs done, 2012 s elapsed, 615 left
+150 jobs done, 2029 s elapsed, 590 left
+175 jobs done, 2193 s elapsed, 566 left
+200 jobs done, 2219 s elapsed, 540 left
+225 jobs done, 2368 s elapsed, 515 left
+250 jobs done, 2455 s elapsed, 490 left
+275 jobs done, 2569 s elapsed, 465 left
+300 jobs done, 2588 s elapsed, 440 left
+325 jobs done, 2795 s elapsed, 415 left
+350 jobs done, 3121 s elapsed, 390 left
+375 jobs done, 3517 s elapsed, 365 left
+400 jobs done, 3909 s elapsed, 340 left
+425 jobs done, 4307 s elapsed, 315 left
+450 jobs done, 4701 s elapsed, 290 left
+475 jobs done, 5100 s elapsed, 265 left
+500 jobs done, 5494 s elapsed, 240 left
+525 jobs done, 5892 s elapsed, 215 left
+550 jobs done, 6283 s elapsed, 190 left
+time slice over: 189 jobs left for the next call
+--- slice ends 2026-11-13T05:27
+--- slice 2026-11-13T05:27 (1171 and 1171 done), kernel 6.18.44-fc-v445
+189 jobs to run with 2 engines
+25 jobs done, 410 s elapsed, 163 left
+50 jobs done, 791 s elapsed, 138 left
+75 jobs done, 1203 s elapsed, 113 left
+100 jobs done, 1583 s elapsed, 88 left
+125 jobs done, 1992 s elapsed, 63 left
+150 jobs done, 2375 s elapsed, 38 left
+175 jobs done, 2784 s elapsed, 13 left
+--- slice ends 2026-11-13T06:17
+/home/user/gp-elite/benchmarks/results_1.4/n2/campaign/slice.sh: 25: cannot open /home/user/n2_records/tp_candidate.jsonl: No such file
+--- TP 2026-11-13T06:18, kernel 6.18.44-fc-v445
+400 jobs to run with 2 engines
+10/400 06:18:37
+20/400 06:19:12
+30/400 06:19:57
+40/400 06:20:38
+50/400 06:21:11
+60/400 06:21:47
+70/400 06:22:23
+80/400 06:23:00
+90/400 06:23:48
+100/400 06:24:27
+110/400 06:25:15
+120/400 06:25:52
+130/400 06:26:37
+140/400 06:27:16
+150/400 06:28:02
+160/400 06:28:45
+170/400 06:29:43
+180/400 06:30:31
+190/400 06:31:06
+200/400 06:31:44
+210/400 06:32:30
+220/400 06:33:10
+230/400 06:34:00
+240/400 06:34:47
+250/400 06:35:25
+260/400 06:36:07
+270/400 06:36:51
+280/400 06:37:29
+290/400 06:38:13
+300/400 06:38:54
+310/400 06:39:29
+320/400 06:40:06
+330/400 06:41:02
+340/400 06:42:19
+350/400 06:43:17
+360/400 06:45:19
+370/400 06:45:56
+380/400 06:47:31
+390/400 06:47:58
+400/400 06:48:27
+--- all done 2026-11-13T06:48
