@@ -5529,7 +5529,11 @@ _TOLERANT_REL = 0.015
 #   placés, les meilleurs d'abord, douze au plus. Les formes que les
 #   chercheurs d'avant donnent sont toujours placées quand elles passent le
 #   seuil : toute graine que plaçait 1.3.0 l'est encore.
-_TOLERANT_N2 = True
+# Non adopté (campagne N2, 13 novembre 2026, benchmarks/results_1.4/n2/
+# campaign/README.md) : sans bruit, F41 perd 5 lois exactes, toutes là où
+# l'étage tourne, à cause de l'ajustement des constantes des candidats.
+# Retiré du candidat : éteint, le code gardé pour la décision de l'auteur.
+_TOLERANT_N2 = False
 _TOLERANT_MAX = 12
 
 

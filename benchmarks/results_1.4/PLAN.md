@@ -256,6 +256,15 @@ the two kinds.
 If N2 is not adopted or not kept, the cause is examined and goes to the
 author. Its parts can then be measured one by one.
 
+Campaign N2, 12 and 13 November 2026 (`n2/campaign/README.md`): **not
+adopted.** Criteria 1, 2, 4, 5 and 6 hold (the structure under noise 203 →
+246 of 410 without units). Criterion 3 fails: F41 has 166 exact laws
+against 171, and I.26.2 falls from three exact seeds to none. The cause,
+examined on the fits concerned, is the fit of the constants of each
+candidate (item 3 of N2). N2 is withdrawn from the candidate, and the
+confirmation is not run; the cause goes to the author. The campaigns of S1
+and E2 take 1.3.0 as their base.
+
 ## Change S1: on small tables, the candidates compete in a cross-validation
 
 S1 acts only on tables below 30 rows, where the engine keeps no hold-out.
