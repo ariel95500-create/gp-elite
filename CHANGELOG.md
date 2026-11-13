@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.4.0
+
+The noise-tolerant seeds. When no seed holds the data exactly, the engine
+places at the start of the search the forms its finders give within 1.5 % of
+the variance of the target. 1.4 gives that stage more forms: a second pass
+that weights the rows by y² and does not need the target to keep one sign,
+scans of the finders of the sine, the cosine and the logarithm, and up to
+twelve seeds. Every seed 1.3.0 placed is still placed, with the constants
+its finder gave. On the 41-equation bench with Gaussian noise on the target,
+measured beside 1.3.0 before the release
+(`benchmarks/results_1.4/n2b/campaign/`), the structure of the law came back
+in 247 fits of 410 against 203 (1 % and 10 % noise), and in 192 of 328
+against 156 on four new draws of the noise. Without noise, the exact laws
+were those of 1.3.0. The figures of the release measurement follow.
+
+### Added
+- The second pass, the scans and the twelve seeds of the noise-tolerant
+  stage.
+
+### Changed
+- The warning of a formula that departs from `predict()` names the clip of
+  the arcsine among the guards that can make it depart.
+
+### Known limits
+- On a few noisy points, a seed with the structure of the law does not make
+  the search keep it. On the point source of the TP diagnostic, 10 or 20
+  points with 2 % or 5 % noise, the law came back in 14 fits of 20 against
+  18 with 1.3.0 (`benchmarks/results_1.4/n2b/campaign/examine/`).
+- Three changes were measured for 1.4 and not adopted
+  (`benchmarks/results_1.4/PLAN.md`): a cross-validation on small tables
+  (S1), a seed for a constant plus an exponential (E2), and the fit of the
+  constants of each noise-tolerant candidate. Their code stays in the
+  engine, switched off.
+
 ## 1.3.0 — "Arc"
 
 The arcsine. The pools `trig` and `full` have a new operator, `arcsin`, the
