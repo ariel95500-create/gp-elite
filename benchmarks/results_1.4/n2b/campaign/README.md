@@ -1,4 +1,4 @@
-# Campaign N2b: adopted
+# Campaign N2b: adopted and kept
 
 Run on 13 November 2026, from 13:40 to 18:51 UTC. Plan: `../../PLAN.md`,
 "Decision of the author after the campaigns of N2 and S1" (the benches and
@@ -47,7 +47,28 @@ the six criteria of campaign N2); mechanics: `../mechanics/README.md`.
 6. **TP:** the law in 126 → 123 fits (plain) and 120 → 120 (units), within
    the 5 allowed; median time 7.0 s → 7.0 s and 8.4 s → 8.5 s. Holds.
 
-**N2b is adopted.** Its confirmation follows, on new draws of the noise.
+**N2b is adopted.**
+
+## The confirmation
+
+Run on 13 November 2026, from 18:51 to 20:18 UTC, in one slice, as the
+campaign (`slice.sh ... conf`, log `driver_conf.log`): the new draws of the
+noise 1 to 4 on feyn_n1 and feyn_n10 at seed 0, 328 fits per version
+(`conf_*.jsonl`), no crash. Output: `compare_n2b_conf.txt`.
+
+| | A | B |
+|---|---|---|
+| F41N1, structure (of 164) | 90 | 121 |
+| F41N10, structure (of 164) | 66 | 71 |
+| both (of 328) | 156 | 192 |
+
+- B has 36 structures more than A over the 328 fits; the plan asks 10.
+  Holds.
+- F41N1 and F41N10 each have no fewer than A minus 3. Holds.
+
+**N2b is kept.** It is part of the candidate of 1.4. B has more structures
+than A in each draw at 1 % noise (+7 to +9), and in three draws of four at
+10 % noise (draw 3: 17 → 15).
 
 ## Beside the criteria
 
@@ -64,3 +85,23 @@ the six criteria of campaign N2); mechanics: `../mechanics/README.md`.
   source falls from 18 to 14 in the plain arm. Campaigns N2 and E2 lowered it
   too, to 15 each. The criteria of N2 read TP as a whole; this fall is
   reported to the author.
+
+## The point source
+
+`examine/` runs the 20 fits of the plain arm of the point source again with
+A and B and records the seeds each places (`examine.py`, output
+`examine.txt`). Each version returns the models of the campaign again in 20
+fits of 20.
+
+- B places every seed of A in the 20 fits, as N2b promises, and adds others:
+  210 seeds in all against 120. Most are forms of 1/d² with a small
+  correction, such as (1/d²)·(1 + ε/d²) or (1/d²)·log(K·d) with a very large
+  K, that follow the 10 or 20 noisy points as closely as the law.
+- 12 models of 20 change. The law is lost in 4 fits and gained in none: B
+  returns forms that follow the noise more closely, such as
+  0.907/d² + 0.149·d.
+
+As in campaign E2, the added seeds remove nothing but move the search, and
+on these few noisy points its final choice can leave the law. The three
+campaigns of 1.4 that act on small noisy tables (S1, E2 and, here, N2b)
+point to that final choice.

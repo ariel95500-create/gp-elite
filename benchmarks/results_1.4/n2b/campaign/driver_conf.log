@@ -1,0 +1,18 @@
+benchmarks/results_1.4/n2b/campaign/slice.sh: 32: cannot open /home/user/n2b_records/conf_1.3.0.jsonl: No such file
+benchmarks/results_1.4/n2b/campaign/slice.sh: 33: cannot open /home/user/n2b_records/conf_n2b.jsonl: No such file
+--- confirmation, slice 2026-11-13T18:51 (0 and 0 done), benches of 227d837, kernel 6.18.44-fc-v445
+328 jobs to run with 2 engines
+25 jobs done, 413 s elapsed, 302 left
+50 jobs done, 796 s elapsed, 277 left
+75 jobs done, 1208 s elapsed, 253 left
+100 jobs done, 1590 s elapsed, 227 left
+125 jobs done, 2001 s elapsed, 202 left
+150 jobs done, 2386 s elapsed, 177 left
+175 jobs done, 2797 s elapsed, 152 left
+200 jobs done, 3184 s elapsed, 127 left
+225 jobs done, 3594 s elapsed, 102 left
+250 jobs done, 3979 s elapsed, 77 left
+275 jobs done, 4390 s elapsed, 52 left
+300 jobs done, 4777 s elapsed, 27 left
+325 jobs done, 5186 s elapsed, 2 left
+--- slice ends 2026-11-13T20:18

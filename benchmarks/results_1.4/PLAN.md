@@ -371,6 +371,17 @@ On 13 November 2026 the author approved the two proposals made to him:
   that answers the cause found by its campaign. Its code stays in the
   engine, switched off, and is not part of 1.4.
 
+Campaign N2b, 13 November 2026 (`n2b/campaign/README.md`): **adopted and
+kept.** A was 1.3.0, N2, S1 and E2 being withdrawn. The six criteria of
+campaign N2 hold: under noise the structure comes back in 247 fits of 410
+against 203 without units, and F41 and U41 keep their 171 and 173 exact
+laws. The confirmation holds: 192 structures against 156 over the 328 fits
+of the draws of the noise 1 to 4. Beside the criteria, the point source of
+TP falls from 18 fits of 20 to 14 in the plain arm: the seeds N2b adds
+there, forms of 1/d² with a small correction, move the search, which ends
+in 4 fits on a form that follows the noise more closely. N2b is part of the
+candidate of 1.4.
+
 ## Change E2: a seed for a constant plus an exponential
 
 A new kind among the functions of a monomial: y = a + b·exp(c·g).
