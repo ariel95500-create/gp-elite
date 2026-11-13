@@ -9216,7 +9216,12 @@ def _select_one_se(champion, champ_val):
 #   personnalisée, en mode extrapolation, ni sous 6 lignes.
 # Rien ne change pour une table de 30 lignes ou plus.
 
-_SMALL_CV = True
+# Non adopté (campagne S1, 13 novembre 2026, benchmarks/results_1.4/s1/
+# campaign/README.md) : la loi revient dans 113 ajustements de TP sur 200
+# contre 126, la validation croisée favorisant des structures que la
+# recherche a choisies sur les mêmes points. Retiré du candidat : éteint, le
+# code gardé pour la décision de l'auteur.
+_SMALL_CV = False
 _SMALL_ROWS = 30                  # en dessous : pas de hold-out, S1
 _SMALL_MIN_ROWS = 6
 _SMALL_FAMILY_KEEP = 8

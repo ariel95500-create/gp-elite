@@ -345,6 +345,16 @@ Reported beside the criteria, deciding nothing:
 **Confirmation.** Draws 10 to 14. S1 is kept when criteria 1 to 3 hold
 there.
 
+Campaign S1, 13 November 2026 (`s1/campaign/README.md`): **not adopted.**
+A was 1.3.0, N2 being withdrawn. Criteria 1, 2 and 4 fail: the law in 113
+fits of 200 against 126 in the plain arm, five experiments fall by more
+than 2, and the median time is 1.67 times A's. The units arm holds. The
+cause: where the law is lost, the cross-validation chose structures the
+search had found on the same few points, whose error it underestimates.
+Where it is gained, S1 returns textbook laws (the thin lens in 5 fits,
+Newton's cooling in 3). S1 is withdrawn, its confirmation is not run, and
+its cause goes to the author. The campaign of E2 takes 1.3.0 as its base.
+
 ## Change E2: a seed for a constant plus an exponential
 
 A new kind among the functions of a monomial: y = a + b·exp(c·g).

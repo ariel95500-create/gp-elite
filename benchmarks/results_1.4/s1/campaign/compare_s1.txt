@@ -1,0 +1,45 @@
+TP: 400 fits in A, 400 in B, the same jobs: True; crashes A 0, B 0
+  engines: A ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv14s1/lib/python3.11/site-packages/gp_elite/__init__.py']
+  draws [0, 1, 2, 3, 4]
+
+| arm | law A | law B | useful A | useful B | median time A | B |
+|---|---|---|---|---|---|---|
+| plain | 126 | 113 | 174 | 153 | 7.0 s | 11.7 s |
+| units | 120 | 119 | 139 | 138 | 8.2 s | 8.3 s |
+
+Criteria written before the run (PLAN.md):
+  [FAILS] 1. TP, plain arm: the law in B at least A + 15 of 200 (126, 113)
+  [FAILS] 2. no experiment falls by more than 2 of 20 in the plain arm (chute 19 -> 16, gaz 18 -> 15, pendule 17 -> 13, rc 15 -> 12, ressort 14 -> 10)
+  [holds] 3. TP, units arm: the law in B no fewer than A - 3 of 200 (120, 119)
+  [holds] 3. every model of B under units passes its gate of dimensions (200 of 200)
+  [FAILS] 4. time, plain arm: median of B at most 1.5 times A (7.0 s, 11.7 s, ratio 1.67)
+  [holds] 4. time, units arm: median of B at most 1.5 times A (8.2 s, 8.3 s, ratio 1.00)
+S1 NOT ADOPTED
+
+Beside, deciding nothing:
+  the law by experiment, points and noise, plain arm, A -> B:
+    chute            10 pts 2 %: 5 -> 5   10 pts 5 %: 5 -> 2   20 pts 2 %: 4 -> 5   20 pts 5 %: 5 -> 4
+    eclairement      10 pts 2 %: 5 -> 5   10 pts 5 %: 4 -> 4   20 pts 2 %: 5 -> 5   20 pts 5 %: 4 -> 4
+    gaz              10 pts 2 %: 5 -> 5   10 pts 5 %: 4 -> 2   20 pts 2 %: 5 -> 5   20 pts 5 %: 4 -> 3
+    lentille         10 pts 2 %: 1 -> 0   10 pts 5 %: 0 -> 2   20 pts 2 %: 1 -> 2   20 pts 5 %: 0 -> 1
+    pendule          10 pts 2 %: 5 -> 3   10 pts 5 %: 3 -> 3   20 pts 2 %: 5 -> 5   20 pts 5 %: 4 -> 2
+    puissance        10 pts 2 %: 5 -> 5   10 pts 5 %: 5 -> 3   20 pts 2 %: 5 -> 5   20 pts 5 %: 5 -> 5
+    rc               10 pts 2 %: 4 -> 3   10 pts 5 %: 2 -> 1   20 pts 2 %: 5 -> 4   20 pts 5 %: 4 -> 4
+    refroidissement  10 pts 2 %: 0 -> 3   10 pts 5 %: 0 -> 0   20 pts 2 %: 3 -> 3   20 pts 5 %: 0 -> 0
+    ressort          10 pts 2 %: 3 -> 4   10 pts 5 %: 2 -> 0   20 pts 2 %: 5 -> 4   20 pts 5 %: 4 -> 2
+    snell            10 pts 2 %: 0 -> 0   10 pts 5 %: 0 -> 0   20 pts 2 %: 0 -> 0   20 pts 5 %: 0 -> 0
+  the law by experiment, units arm, A -> B:
+    chute            20 -> 20
+    eclairement      20 -> 20
+    gaz              20 -> 19
+    lentille         0 -> 0
+    pendule          20 -> 20
+    puissance        20 -> 20
+    rc               0 -> 0
+    refroidissement  0 -> 0
+    ressort          20 -> 20
+    snell            0 -> 0
+  A, plain arm: of the 126 fits with the law, 0 printed without an additive constant; the law on the front returned in 126 of 200 fits
+  B, plain arm: of the 113 fits with the law, 101 printed without an additive constant; the law on the front returned in 155 of 200 fits
+  B, plain arm, the origin of the model returned (with the law): champion, without the constant 82 (73); band, without the constant 27 (20); search 21 (3); champion 16 (4); band 14 (3); search, without the constant 13 (1); search, exponents rounded 8 (0); family, without the constant 8 (5); family 4 (2); band, exponents rounded 3 (0); band, exponents rounded, without the constant 2 (1); search, exponents rounded, without the constant 1 (0); champion, exponents rounded, without the constant 1 (1)
+  B, units arm, the origin of the model returned (with the law): champion 127 (90); search 44 (9); band 16 (16); family 13 (4)
