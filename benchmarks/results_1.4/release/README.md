@@ -143,6 +143,154 @@ versions. U41 has one exact law more in each version than in that campaign
   fits move (the capacitor charge 7 → 9, Kepler's third law 10 → 9, the
   thermistor 4 → 3).
 
+`m2/limits_figures.txt` gives the figures of the pages of the limits read
+from the records of M2, for both versions; the pages were brought to them
+with the documents.
+
+## M3, every public figure measured again (14 November 2026)
+
+`m3/` holds the records of the figures of the READMEs, the notebooks, the
+case studies and the paper. They were produced by `m3/m3_driver.sh` with
+`/venv14rx`, one step after the other, from 08:21 to 09:00 on 14 November,
+after M2, with nothing else on the machine (`m3/m3_driver.log`). The driver
+runs the steps of the M3 of 1.3 on a copy of `benchmarks/`, `examples/` and
+the READMEs of commit fbe9b00, without the package beside them. Beside them,
+it runs the deduced constant with 1.3.0 (`/venv13rx`), and the TP notebook
+four times more, 1.3.0 and 1.4.0 in turn (`m3/tp_timing/notebook_pair/`).
+The notebook is run as the script of its code cells without the `pip` line
+(`m3/tp_six_lois.py`), the script of the M3 of 1.2 and 1.3 to the byte.
+
+**Against the M3 of 1.3.** `m3_compare.py` compares each record with the one
+of 9 November once times, dates, the paths of the environments and folders,
+and the version numbers are masked (`m3_compare_1.3.0_vs_1.4.0.txt`). 44
+records are the same: every law, formula, error, size and count. Among them
+are the three figures on exact data that the plan names: Feynman 15 (15 of
+15 exact), the duel with gplearn (15 of 15 against 6 of 15) and the mystery
+constant. The examples of the README are the same too, and so are the
+snippets of the notebooks but two, the Nikuradse case study at seeds 0 and 3
+with its five reports, and Kepler's law normalised by min-max with the pool
+`full`.
+
+The comparison lists four records as new. The deduced constant with 1.4.0
+(`m3/deduced_constant_venv14rx.txt`) differs from the one with 1.3.0 only by
+the line of the version. The other three are the runs of the TP notebook
+with 1.4.0, below. The records of 1.3 that have no counterpart here are the
+runs of 1.2.0 (the deduced constant and two runs of the TP notebook),
+`notebook_tp_six_lois_1.3.0.txt`, whose run of 1.4.0 is compared with it
+below, and `examine/`, the examination that followed the M3 of 1.3.
+
+22 records differ, for six causes:
+- **The noise-tolerant stage on noisy data,** as the plan expected:
+  `battery_example.txt`, on the simulated battery data. On the forward
+  split, the equation of 1.4.0 has an R² of −3.812 on the cycles held out,
+  against +0.162 with 1.3.0, and the script's closing sentence changes with
+  it; on the random split, +0.992 against +0.993. The pages of the examples
+  were brought to it with the documents.
+- **The trace of the seeds placed:** `case_kepler.txt` and
+  `case_hubble.txt`. Their models, constants and errors are those of 1.3.0.
+  Their list of the seeds placed has the new passes of the noise-tolerant
+  stage, and on the fit without units of the eight planets (C8), the stage
+  places 10 seeds against 5.
+- **W1, the text of the warning:** `case_nikuradse/nikuradse_seed1.txt`,
+  `seed2` and `seed4`, `notebook_snippet_nikuradse.txt` and
+  `notebook_snippet_tp.txt`. The warning of a formula that departs from
+  `predict()` names the clip of the arcsine; the counts it gives are those
+  of 1.3.0.
+- **Data without noise where the noise-tolerant stage runs,** below: nine
+  records of five scripts, `scaling.jsonl` and `scaling.txt`,
+  `feynman15_units.jsonl` and `feynman15_units.txt`,
+  `robustness_check.jsonl`, `robustness_check.txt` and
+  `robustness_check_run.txt`, `small_data_release.jsonl`, and
+  `time_limit_check.txt`.
+- **Timing:** `claims_queues.txt`, the order in which the two queues of
+  `run_claims.py` ended; `console_hooke.txt` and `gp_elite_log.csv`, the
+  console example on three parallel islands, where the order of the islands'
+  prints and the statistics of the stigmergic memory change while the final
+  result stays `force = 250 * elongation`, constant 250 kg/s²; and
+  `import_time.txt`.
+- **The driver itself:** `m3_driver.log`, its dates, commit and kernel.
+
+As in the M3 of 1.3, `gp_elite_best.txt` and `gp_elite_log.csv`, which the
+console example writes, were compared here and are not published
+(`.gitignore`).
+
+**Data without noise.** The plan expected the figures on exact data to stay
+as they were, within the noise of time budgets. Nine records moved, because
+the noise-tolerant stage does not wait for noise: it runs wherever the exact
+finders of binomials and of functions of a monomial place no seed, and N2b
+adds its forms there. `m3_examine/seeds.py`, committed before its run and
+deciding nothing, builds the data of every fit of those five scripts and of
+the battery example as M3 does, runs each for one generation with 1.3.0 and
+1.4.0 (`/venv13rx` and `/venv14rx`), and records the seeds of each call of
+the stage (`m3_examine/seeds_compare.txt`; the data of the 86 fits whose
+records carry a hash are checked against it). Every fit whose record moved
+is one where 1.4.0 places other noise-tolerant seeds:
+- **The scaling bench** (`scaling.txt`): the 85 fits of five Feynman
+  equations from 25 to 10,000 points. The stage places other seeds in 6 of
+  them, all six of I.16.6, the relativistic addition of velocities: exactly
+  the 6 fits that return another model. The 79 fits with the same seeds
+  return the same models. I.16.6 is exact in 10 fits of 17 against 9: at 200
+  points in 3 of 3 against 2, once in a form other than the textbook one; at
+  2,000 points now in the textbook form, at 5,000 in another one.
+- **Feynman 15 under units** (`feynman15_units.txt`): 15 of 15 exact with
+  both versions. On I.16.6, where the stage places 5 seeds against 4, the law
+  comes back with a factor 1.00755 above and below that cancels, against
+  1.00758.
+- **The robustness check** (`robustness_check.txt`): on the case of a wide
+  dynamic range, y = x1·log(x0) with x0 from 1e-3 to 1e6, the stage of
+  1.4.0 places one seed, x1·log(c·x0), and 1.4.0 returns the law,
+  `X1 * log(X0)`, exact. 1.3.0, which placed no seed there, returned an
+  approximation of R² 0.999367 whose printed formula departed from the
+  model. The fifteen other cases are the same.
+- **The small-data check** (`small_data_release.jsonl`): on the 25 points of
+  2.5 exp(−0.7x) + 0.3, the stage places 5 seeds against 1, among them an
+  exponential of x. At search seeds 2 and 3, 1.4.0 returns the law as
+  written, `0.3 + 2.5 * exp(-X0 / 1.42857)`, size 8, where 1.3.0 returned two
+  longer forms of the same function, sizes 10 and 13. Every R² is that of
+  1.3.0, and so is the summary (`small_data_release.txt`).
+- **The check of `time_limit=`** (`time_limit_check.txt`): 15 of 16 checks
+  against 14 of 16. On its 3,000 rows of x0·x1/x2 + 0.3·x3, the stage places
+  4 seeds against 1. In sequence, 1.4.0 runs to its budget, 15.3 s, and
+  returns an approximation of R² 0.9979, where 1.3.0 returned the law at
+  6.3 s; the check that the budget stopped the search passes for that
+  reason. In parallel, the law comes back at 9.7 s, before the budget, as at
+  13.2 s with 1.3.0, so that check fails with both versions. On the first
+  300 rows, where the script runs three more fits, the stage places 4 seeds
+  against none, and their formulas no longer depart from `predict()`: with
+  1.3.0, the warning was printed for each of the three.
+
+The pages that quote these figures were brought to them with the documents:
+the scaling bench and I.16.6 under units in `docs/measurements.md`, the check
+of `time_limit=` in `docs/usage.md`, and their French versions.
+
+**Timing:**
+- The five fits of `feynman_scaling.py` at 1,000 and 10,000 points, with the
+  same models with both versions, take 40 s and 100 s, against 41 s and
+  113 s on 9 November.
+- The check of `time_limit=` in parallel, 9.7 s against 13.2 s, and the
+  import of the package, 0.069 to 0.083 s against 0.077 to 0.086 s.
+
+These are two days, on hosts that may differ, so these times do not compare
+the versions.
+
+**The TP notebook of the six laws.** The six fits return the formulas and
+the deduced constants of 1.3.0. The same day, one version after the other,
+alone on the machine:
+
+| fit | 1.3.0, run 1 / run 2 (s) | 1.4.0, run 1 / run 2 (s) |
+|---|---|---|
+| pendulum | 8 / 9 | 8 / 9 |
+| spring | 11 / 11 | 11 / 11 |
+| free fall | 8 / 9 | 8 / 8 |
+| power | 7 / 8 | 8 / 9 |
+| gas | 8 / 9 | 9 / 9 |
+| illuminance | 7 / 8 | 8 / 7 |
+| in all | 49 / 54 | 52 / 53 |
+
+Every fit returns the same formula in the four runs and in the run of the
+driver (`m3/notebook_tp_six_lois_1.4.0.txt`, 51 s in all), as with 1.3.0 in
+the M3 of 1.3.
+
 ## M4, tests (14 November 2026)
 
 `m4/summary.txt` gives the test suite of f005aab, run against the wheel of

@@ -1,2 +1,4 @@
 start 2026-11-16 22:14:49
 1.3.0 done 2026-11-16 22:17:23
+1.4.0 done 2026-11-16 22:20:16
+compare done 2026-11-16 22:20:28 (run again with /venv13p/bin/python: the python3 of the system has no NumPy)

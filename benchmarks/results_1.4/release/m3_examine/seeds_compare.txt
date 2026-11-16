@@ -1,0 +1,165 @@
+engines: 1.3.0 / 1.4.0
+data checked against the hashes of M3: 86 jobs, all equal
+
+fit                                              1.3.0 seeds per call         1.4.0 seeds per call         same seeds
+time_limit sequence (3000 rows, seed 0)          [1]                          [4]                          NO
+time_limit fits a and b (300 rows, seed 5)       [0]                          [4]                          NO
+time_limit fit c (300 rows, seed 1)              [0]                          [4]                          NO
+scaling I.12.1 N=25 rep=0                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=25 rep=1                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=25 rep=2                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=50 rep=0                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=50 rep=1                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=50 rep=2                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=100 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=100 rep=1                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=100 rep=2                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=200 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=200 rep=1                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=200 rep=2                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=500 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=1000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=2000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=5000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.1 N=10000 rep=0                     [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=25 rep=0                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=25 rep=1                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=25 rep=2                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=50 rep=0                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=50 rep=1                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=50 rep=2                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=100 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=100 rep=1                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=100 rep=2                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=200 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=200 rep=1                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=200 rep=2                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=500 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=1000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=2000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=5000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.8.14 N=10000 rep=0                     [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling III.15.12 N=25 rep=0                     not run                      not run                      yes
+scaling III.15.12 N=25 rep=1                     not run                      not run                      yes
+scaling III.15.12 N=25 rep=2                     not run                      not run                      yes
+scaling III.15.12 N=50 rep=0                     not run                      not run                      yes
+scaling III.15.12 N=50 rep=1                     not run                      not run                      yes
+scaling III.15.12 N=50 rep=2                     not run                      not run                      yes
+scaling III.15.12 N=100 rep=0                    not run                      not run                      yes
+scaling III.15.12 N=100 rep=1                    not run                      not run                      yes
+scaling III.15.12 N=100 rep=2                    not run                      not run                      yes
+scaling III.15.12 N=200 rep=0                    not run                      not run                      yes
+scaling III.15.12 N=200 rep=1                    not run                      not run                      yes
+scaling III.15.12 N=200 rep=2                    not run                      not run                      yes
+scaling III.15.12 N=500 rep=0                    not run                      not run                      yes
+scaling III.15.12 N=1000 rep=0                   not run                      not run                      yes
+scaling III.15.12 N=2000 rep=0                   not run                      not run                      yes
+scaling III.15.12 N=5000 rep=0                   not run                      not run                      yes
+scaling III.15.12 N=10000 rep=0                  not run                      not run                      yes
+scaling I.12.2 N=25 rep=0                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=25 rep=1                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=25 rep=2                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=50 rep=0                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=50 rep=1                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=50 rep=2                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=100 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=100 rep=1                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=100 rep=2                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=200 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=200 rep=1                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=200 rep=2                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=500 rep=0                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=1000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=2000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=5000 rep=0                      [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.12.2 N=10000 rep=0                     [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.16.6 N=25 rep=0                        [2, 2, 2, 2]                 [3, 3, 3, 3]                 NO
+scaling I.16.6 N=25 rep=1                        [4, 4, 4, 4]                 [10, 10, 10, 10]             NO
+scaling I.16.6 N=25 rep=2                        [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.16.6 N=50 rep=0                        [6, 6, 6, 6]                 [6, 6, 6, 6]                 yes
+scaling I.16.6 N=50 rep=1                        [7, 7, 7, 7]                 [7, 7, 7, 7]                 yes
+scaling I.16.6 N=50 rep=2                        [2, 2, 2, 2]                 [4, 4, 4, 4]                 NO
+scaling I.16.6 N=100 rep=0                       [5, 5, 5, 5]                 [5, 5, 5, 5]                 yes
+scaling I.16.6 N=100 rep=1                       [4, 4, 4, 4]                 [4, 4, 4, 4]                 yes
+scaling I.16.6 N=100 rep=2                       [0, 0, 0, 0]                 [0, 0, 0, 0]                 yes
+scaling I.16.6 N=200 rep=0                       [4, 4, 4, 4]                 [5, 5, 5, 5]                 NO
+scaling I.16.6 N=200 rep=1                       [5, 5, 5, 5]                 [5, 5, 5, 5]                 yes
+scaling I.16.6 N=200 rep=2                       [4, 4, 4, 4]                 [4, 4, 4, 4]                 yes
+scaling I.16.6 N=500 rep=0                       [4, 4, 4, 4]                 [4, 4, 4, 4]                 yes
+scaling I.16.6 N=1000 rep=0                      [4, 4, 4, 4]                 [4, 4, 4, 4]                 yes
+scaling I.16.6 N=2000 rep=0                      [4, 4, 4, 4]                 [5, 5, 5, 5]                 NO
+scaling I.16.6 N=5000 rep=0                      [4, 4, 4, 4]                 [5, 5, 5, 5]                 NO
+scaling I.16.6 N=10000 rep=0                     [4, 4, 4, 4]                 [4, 4, 4, 4]                 yes
+units I.16.6                                     [4, 4, 4, 4]                 [5, 5, 5, 5]                 NO
+robustness wide_dynamic_range                    [0]                          [1]                          NO
+small data 3 sin(2x) + 1 seed 0                  not run                      not run                      yes
+small data 3 sin(2x) + 1 seed 1                  not run                      not run                      yes
+small data 3 sin(2x) + 1 seed 2                  not run                      not run                      yes
+small data 3 sin(2x) + 1 seed 3                  not run                      not run                      yes
+small data x^1.5 seed 0                          [0]                          [0]                          yes
+small data x^1.5 seed 1                          [0]                          [0]                          yes
+small data x^1.5 seed 2                          [0]                          [0]                          yes
+small data x^1.5 seed 3                          [0]                          [0]                          yes
+small data 2.5 exp(-0.7x) + 0.3 seed 0           [1]                          [5]                          NO
+small data 2.5 exp(-0.7x) + 0.3 seed 1           [1]                          [5]                          NO
+small data 2.5 exp(-0.7x) + 0.3 seed 2           [1]                          [5]                          NO
+small data 2.5 exp(-0.7x) + 0.3 seed 3           [1]                          [5]                          NO
+small data x0 x1^2 seed 0                        [0]                          [0]                          yes
+small data x0 x1^2 seed 1                        [0]                          [0]                          yes
+small data x0 x1^2 seed 2                        [0]                          [0]                          yes
+small data x0 x1^2 seed 3                        [0]                          [0]                          yes
+small data x0 / (x0 + x1) seed 0                 not run                      not run                      yes
+small data x0 / (x0 + x1) seed 1                 not run                      not run                      yes
+small data x0 / (x0 + x1) seed 2                 not run                      not run                      yes
+small data x0 / (x0 + x1) seed 3                 not run                      not run                      yes
+battery forward split                            [3]                          [4]                          NO
+
+The seeds of the first call where they differ:
+  time_limit sequence (3000 rows, seed 0)
+    1.3.0: (((X0 * X1) / X2) * exp((0.240126 * ((X2 * X3) / (X0 * X1)))))
+    1.4.0: (((X0 * X1) / X2) * exp((0.240126 * ((X2 * X3) / (X0 * X1))))) | (((X0 * X1) / X2) / (1.0 + (-0.204299 * ((X2 * X3) / X1)))) | (((X0 * X1) / X2) / sqrt((1.0 + (-0.270886 * ((X2 * X3) / X1))))) | ((X0 * X3) * (1.0 + (2.043838 * (X1 / (X2 * X3)))))
+  time_limit fits a and b (300 rows, seed 5)
+    1.3.0: 
+    1.4.0: (((X0 * X1) / X2) / sqrt((1.0 + (-0.318763 * ((X2 * X3) / X0))))) | (((X0 * X1) / X2) / (1.0 + (-0.224834 * ((X2 * X3) / X1)))) | (((X0 * X1) / X2) * sqrt((1.0 + (0.399022 * (((X2)² * (X3)²) / (X1)²))))) | (((X0 * X1) / X2) * (1.0 + (0.144559 * (((X2)² * (X3)²) / (X1)²))))
+  time_limit fit c (300 rows, seed 1)
+    1.3.0: 
+    1.4.0: (((X0 * X1) / X2) / sqrt((1.0 + (-0.318763 * ((X2 * X3) / X0))))) | (((X0 * X1) / X2) / (1.0 + (-0.224834 * ((X2 * X3) / X1)))) | (((X0 * X1) / X2) * sqrt((1.0 + (0.399022 * (((X2)² * (X3)²) / (X1)²))))) | (((X0 * X1) / X2) * (1.0 + (0.144559 * (((X2)² * (X3)²) / (X1)²))))
+  scaling I.16.6 N=25 rep=0
+    1.3.0: ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.629722 * (((v0)² * (v1)²) / (v2)²))))) | ((sqrt(v0) * sqrt(v1)) / (1.0 + (0.281801 * (((v0)² * (v1)²) / (v2)²))))
+    1.4.0: ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (0.629722 * (((v0)² * (v1)²) / (v2)²))))) | ((v2)² * tanh((6.488737 * ((sqrt(v0) * sqrt(v1)) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) / (1.0 + (0.281801 * (((v0)² * (v1)²) / (v2)²))))
+  scaling I.16.6 N=25 rep=1
+    1.3.0: ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.512273 * ((v0 * (v1)²) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.895242 * ((v0 * (v1)²) / (v2)²))))) | ((pow(v0, 0.4354) * pow(v1, 0.4035)) * pow(v2, 0.1244)) | log((38.10683 * ((((v0 * (v0)²) * sqrt(v0)) * ((v1 * (v1)²) * sqrt(v1))) * v2)))
+    1.4.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.041785 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (2.283343 * ((v0 * v1) / (v2)²))))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.877637 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.618869 * ((v0 * v1) / (v2)²))))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.512273 * ((v0 * (v1)²) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-0.895242 * ((v0 * (v1)²) / (v2)²))))) | ((pow(v0, 0.4354) * pow(v1, 0.4035)) * pow(v2, 0.1244)) | log((38.10683 * ((((v0 * (v0)²) * sqrt(v0)) * ((v1 * (v1)²) * sqrt(v1))) * v2))) | ((v0 * v1) * log((34075.717992 * (v2 / ((v0 * ((v0)²)²) * (((v1)²)² * sqrt(v1))))))) | (v1 * log((711.376193 * ((((v0 * (v0)²) * sqrt(v0)) * v2) / (v1 * ((v1)²)²)))))
+  scaling I.16.6 N=50 rep=2
+    1.3.0: log((118.046611 * (((((v0)²)² * sqrt(v0)) * (((v1)²)² * sqrt(v1))) * v2))) | ((pow(v0, 0.4619) * pow(v1, 0.4397)) * pow(v2, 0.105))
+    1.4.0: log((118.046611 * (((((v0)²)² * sqrt(v0)) * (((v1)²)² * sqrt(v1))) * v2))) | ((v2)² * tanh((5.916759 * ((sqrt(v0) * sqrt(v1)) / (v2)²)))) | ((pow(v0, 0.4619) * pow(v1, 0.4397)) * pow(v2, 0.105)) | ((v0 * v1) * log((71423.375158 * (v2 / ((v0 * ((v0)²)²) * (v1 * ((v1)²)²))))))
+  scaling I.16.6 N=200 rep=0
+    1.3.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.015271 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.798092 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.417172 * ((v0 * v1) / (v2)²))))) | (v2 / sqrt((1.0 + (0.358977 * ((v2)² / (v0 * v1))))))
+    1.4.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.015271 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.798092 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (2.584872 * ((v0 * v1) / (v2)²))))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.417172 * ((v0 * v1) / (v2)²))))) | (v2 / sqrt((1.0 + (0.358977 * ((v2)² / (v0 * v1))))))
+  scaling I.16.6 N=2000 rep=0
+    1.3.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.018392 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.808692 * ((v0 * v1) / (v2)²)))) | (v2 / sqrt((1.0 + (0.390561 * ((v2)² / (v0 * v1)))))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.413906 * ((v0 * v1) / (v2)²)))))
+    1.4.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.018392 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (2.414918 * ((v0 * v1) / (v2)²))))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.808692 * ((v0 * v1) / (v2)²)))) | (v2 / sqrt((1.0 + (0.390561 * ((v2)² / (v0 * v1)))))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.413906 * ((v0 * v1) / (v2)²)))))
+  scaling I.16.6 N=5000 rep=0
+    1.3.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.015258 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.805339 * ((v0 * v1) / (v2)²)))) | (v2 / sqrt((1.0 + (0.388421 * ((v2)² / (v0 * v1)))))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.415594 * ((v0 * v1) / (v2)²)))))
+    1.4.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.015258 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (2.425787 * ((v0 * v1) / (v2)²))))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.805339 * ((v0 * v1) / (v2)²)))) | (v2 / sqrt((1.0 + (0.388421 * ((v2)² / (v0 * v1)))))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.415594 * ((v0 * v1) / (v2)²)))))
+  units I.16.6
+    1.3.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.015271 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.798092 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.417172 * ((v0 * v1) / (v2)²))))) | (v2 / sqrt((1.0 + (0.358977 * ((v2)² / (v0 * v1))))))
+    1.4.0: ((sqrt(v0) * sqrt(v1)) / (1.0 + (1.015271 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * (1.0 + (-0.798092 * ((v0 * v1) / (v2)²)))) | ((sqrt(v0) * sqrt(v1)) * sqrt((1.0 + (-1.417172 * ((v0 * v1) / (v2)²))))) | ((sqrt(v0) * sqrt(v1)) / sqrt((1.0 + (2.584872 * ((v0 * v1) / (v2)²))))) | (v2 / sqrt((1.0 + (0.358977 * ((v2)² / (v0 * v1))))))
+  robustness wide_dynamic_range
+    1.3.0: 
+    1.4.0: (X1 * log((976389.407153 * X0)))
+  small data 2.5 exp(-0.7x) + 0.3 seed 0
+    1.3.0: ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+    1.4.0: (1.0 / (exp((2.623149 * sqrt(X0))) + exp((-2.623149 * sqrt(X0))))) | exp((-2.530755 * X0)) | (1.0 / sqrt((1.0 + (20.298933 * (X0)²)))) | ((X0)² * tanh((0.000274 * (1.0 / ((X0)² * sqrt(X0)))))) | ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+  small data 2.5 exp(-0.7x) + 0.3 seed 1
+    1.3.0: ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+    1.4.0: (1.0 / (exp((2.623149 * sqrt(X0))) + exp((-2.623149 * sqrt(X0))))) | exp((-2.530755 * X0)) | (1.0 / sqrt((1.0 + (20.298933 * (X0)²)))) | ((X0)² * tanh((0.000274 * (1.0 / ((X0)² * sqrt(X0)))))) | ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+  small data 2.5 exp(-0.7x) + 0.3 seed 2
+    1.3.0: ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+    1.4.0: (1.0 / (exp((2.623149 * sqrt(X0))) + exp((-2.623149 * sqrt(X0))))) | exp((-2.530755 * X0)) | (1.0 / sqrt((1.0 + (20.298933 * (X0)²)))) | ((X0)² * tanh((0.000274 * (1.0 / ((X0)² * sqrt(X0)))))) | ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+  small data 2.5 exp(-0.7x) + 0.3 seed 3
+    1.3.0: ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+    1.4.0: (1.0 / (exp((2.623149 * sqrt(X0))) + exp((-2.623149 * sqrt(X0))))) | exp((-2.530755 * X0)) | (1.0 / sqrt((1.0 + (20.298933 * (X0)²)))) | ((X0)² * tanh((0.000274 * (1.0 / ((X0)² * sqrt(X0)))))) | ((1.0 / X0) / sqrt((1.0 + (0.051081 * (1.0 / (X0)²)))))
+  battery forward split
+    1.3.0: ((sqrt(temperature) * courant) / sqrt((1.0 + (0.784269 * ((cycle * (temperature)²) * courant))))) | (courant / (1.0 + (0.278684 * cycle))) | (courant * sqrt((1.0 + (-0.500434 * (cycle * (courant)²)))))
+    1.4.0: ((sqrt(temperature) * courant) / sqrt((1.0 + (0.669632 * ((cycle * (temperature)²) / courant))))) | ((sqrt(temperature) * courant) / sqrt((1.0 + (0.784269 * ((cycle * (temperature)²) * courant))))) | (courant / (1.0 + (0.278684 * cycle))) | (courant * sqrt((1.0 + (-0.500434 * (cycle * (courant)²)))))
