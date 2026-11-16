@@ -1,0 +1,3 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+Checking gp_elite-1.4.0-py3-none-any.whl: [32mPASSED[0m
+Checking gp_elite-1.4.0.tar.gz: [32mPASSED[0m
