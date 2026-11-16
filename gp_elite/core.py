@@ -5071,6 +5071,8 @@ def _elem_log_scan(X, y, cols, tol, signed: bool) -> list:
             continue
         g = tuple((j, float(e)) for j, e in zip(cols, ex) if e)
         lg = np.log(np.abs(_elem_mono(X, g)))
+        if not np.all(np.isfinite(lg)):           # [1.4-L1] une colonne négative
+            continue                              # et un exposant fractionnaire
         A = np.column_stack([np.ones(n), lg])
         a0, s0 = np.linalg.lstsq(A, r, rcond=None)[0]
         if not (float(np.var(r - A @ np.array([a0, s0]))) / float(np.var(r))

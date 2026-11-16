@@ -1883,6 +1883,24 @@ def test_n2b_keeps_the_constants_of_the_finders(monkeypatch):
     assert old and all(t.exact_hash() in exact for t in old)
 
 
+def test_l1_log_scan_skips_a_form_it_cannot_evaluate():
+    """[1.4-L1] On a column negative throughout, a monomial with a fractional
+    exponent is not a number. The scan of the logarithm skips that form
+    instead of raising (np.linalg.lstsq would raise, and the noise-tolerant
+    stage would drop every form of the pass), and the scans of the sine and
+    the cosine of the same pass still run."""
+    rng = np.random.RandomState(0)
+    x0, x1 = -rng.uniform(1, 5, 60), rng.uniform(1, 5, 60)
+    X = np.c_[x0, x1]
+    y = x0 * x1 * (1 + 0.01 * rng.randn(60))
+    with np.errstate(all="ignore"):
+        assert isinstance(core._elem_log_scan(X, y, [0, 1], 1.0, signed=True), list)
+    for weighted in (False, True):
+        forms = core._elementary_forms(X, y, ["log", "exp", "trig"], tol=1.0,
+                                       scan=True, weighted=weighted)
+        assert isinstance(forms, list)
+
+
 # ── 1.4, S1: below 30 rows, the candidates compete in a cross-validation ────
 # Change S1 of benchmarks/results_1.4/PLAN.md. Below 30 rows the engine keeps
 # no hold-out; it used to return the best individual of the search on the

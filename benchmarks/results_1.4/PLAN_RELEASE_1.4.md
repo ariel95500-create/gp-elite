@@ -172,7 +172,49 @@ time who has not seen the work. They cover:
 
 Every finding is corrected or answered in writing before gate 12.
 
+## Correction L1 after M4 (decision of the author, 16 November 2026)
+
+M4 found a fault of N2b (`release/m4/log_scan/`). Where an input column is
+negative throughout, a monomial of that column with a fractional exponent is
+not a number. The scan of the logarithm (`_elem_log_scan`) then passes it to
+`np.linalg.lstsq`, which raises. The try/except of the noise-tolerant stage
+drops every form of the pass, the scans of the sine and cosine included,
+and LAPACK prints "On entry to DLASCL ..." on the console. On noisy data with
+such a column, the scan raised in 11 cases of 12.
+
+It touched no fit measured for 1.4: run again for one generation, the 3,092
+fits of M2 and the 800 of TP and TPT10 have no pass of N2b that raises. All
+their inputs are positive.
+
+**L1:** the scan skips a form whose logarithm is not finite on the data
+instead of raising, and a test checks it on a negative column. Where the
+fault does not occur, the engine runs the same code, so the measurements of
+M2 stand for the corrected engine. The author chose this targeted
+verification over starting the measurements again. The corrected wheel, the
+same version 1.4.0, is installed in fresh environments (`/venv14r2` and
+`/venv14r2x`), and:
+- **M1:** the thirteen reference configurations are those of the measured
+  release, to the bit;
+- **TP and TPT10,** whose fits are reproducible: the 800 models are those of
+  1.4.0 in M2;
+- **the count** run again: no pass of N2b raises on the 3,892 fits; on the
+  cases with a negative column, no pass raises and LAPACK prints nothing;
+- **M3** again: the records are those of the M3 of the measured release,
+  times aside;
+- **M4** again, with the test of L1.
+
+A difference in any of them stops the release and goes to the author. The
+benches of M2 are not run again.
+
 ## Documents
+
+Asked whether 1.4 should also bring a short README, the author left the
+choice to Claude (16 November 2026). It does: the README has to be rewritten
+for 1.4 anyway, PyPI shows the README of the version published, and the
+reviews of M5 read it. The new README says in a few lines what GP_ELITE
+does and why it differs, with an example and links to its measurements. The
+longer sections move to `docs/` without being cut, and the reviews of M5
+read both.
 
 Brought up to date from M2 and M3 before M5:
 - **`README.md` and `README.fr.md`:** what's new, N2b; the counts of
