@@ -142,3 +142,71 @@ versions. U41 has one exact law more in each version than in that campaign
   useful in 173 fits against 169 in the plain arm. By experiment, at most 2
   fits move (the capacitor charge 7 → 9, Kepler's third law 10 → 9, the
   thermistor 4 → 3).
+
+## M4, tests (14 November 2026)
+
+`m4/summary.txt` gives the test suite of f005aab, run against the wheel of
+f6a36cd by `m4/run.sh`, from 09:00 to 09:10, after M3. The wheel was
+installed in a fresh environment for each of Python 3.9.25, 3.11.18 and
+3.14.6, with the pins of the M4 of 1.2 and 1.3 (`m4/requirements_*.txt`),
+each importing the installed package. 199 tests pass under the three versions
+(`m4/pytest_*.txt`). `twine check --strict` passes for the wheel and the
+source archive (`m4/twine_check.txt`), whose SHA-256 are those of
+`environments.txt`.
+
+Under 3.9 and 3.11, LAPACK printed "On entry to DLASCL ..." six times during
+the tests, so the last line of their output, which `summary.txt` keeps, is
+that message; the line before it reads "199 passed". The messages come from
+a check of scikit-learn that the tests run,
+`check_positive_only_tag_during_fit`: there the new scan of the logarithm met
+a form it could not evaluate. That was a fault of N2b, below.
+
+## The fault of the scan of the logarithm, and correction L1 (16 November 2026)
+
+Where an input column is negative throughout, a monomial of that column with
+a fractional exponent is not a number. The scan of the logarithm of N2b
+(`_elem_log_scan`) passed such a form to `np.linalg.lstsq`, which raised. The
+try/except of the noise-tolerant stage then dropped every form of that pass,
+the scans of the sine and the cosine included, and LAPACK printed its message
+on the console. Two scripts, which decide nothing, measured it
+(`m4/log_scan/`):
+- `negative.py`: on noisy data whose first input column is negative
+  throughout, six laws at 1 % and 10 % noise, a pass of N2b raised in 11
+  cases of 12, and LAPACK printed its message 114 times. With the column
+  positive, no pass raised.
+- `count.py`: the 3,892 fits of M2, TP and TPT10, run again with 1.4.0 for
+  one generation, which runs the noise-tolerant stage on the data of each
+  fit. The stage runs in 3,562 of them (2,762 of the 3,092 of the benches,
+  and the 800 of TP and TPT10), and no pass of N2b raises: all their inputs
+  are positive. The fault touched no fit of the measurements.
+
+The author decided to correct it and to check the corrected engine by a
+targeted verification rather than run the measurements again
+(`../PLAN_RELEASE_1.4.md`, "Correction L1 after M4", written before the
+verification ran). L1 (ec44e8e) adds two lines to `_elem_log_scan`: a form
+whose logarithm is not finite on the data is skipped. A test checks it on a
+negative column (`test_l1_log_scan_skips_a_form_it_cannot_evaluate` in
+`tests/test_guarantees.py`). The wheel and the source archive were built
+again from ec44e8e, with the same version number, 1.4.0. `l1/environments.txt`
+gives their SHA-256, `twine check --strict` passing for both, and the eleven
+files of `gp_elite/`, identical in the wheel and in the environments to those
+of the commit. `core.py` is the only one that differs from f6a36cd. The wheel
+was installed in two fresh environments with the packages of `/venv14r` and
+`/venv14rx`: `/venv14r2` and `/venv14r2x`.
+
+`l1/verify.sh` runs the verification in three parts, from a copy of
+`benchmarks/`, `examples/`, `tests/` and the READMEs of ec44e8e, without the
+package beside them (`l1/verify.log`).
+
+**Part a** (16 November, 20:56 to 22:09):
+- **M1:** the thirteen reference configurations are those of the measured
+  release, to the bit (`l1/M1_compare_release_vs_l1.txt`).
+- **TP and TPT10:** the 800 models are those of 1.4.0 in M2, on every field of
+  their records but the time, the date and the path of the engine
+  (`l1/compare_tp_l1.py`, `l1/compare_tp_l1.txt`).
+- **The 24 cases of `negative.py`:** no pass of N2b raises, and LAPACK prints
+  nothing (`l1/negative_l1.txt`).
+- **M4 again,** with fresh environments and the tests of ec44e8e: 200 tests
+  pass under Python 3.9.25, 3.11.18 and 3.14.6, the test of L1 among them,
+  and LAPACK prints nothing (`l1/m4_summary.txt`, `l1/m4_pytest_*.txt`,
+  `l1/m4_requirements_*.txt`).
