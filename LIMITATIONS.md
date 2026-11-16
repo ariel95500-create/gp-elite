@@ -54,6 +54,24 @@ they do from one campaign to the next. The figures of 1.3.0 are given first:
   test set with both (37 standardised, 28 in their own units);
 - 11 departing formulas of 130 with both, and 65 of 500 against 64.
 
+Version 1.4 gives the noise-tolerant seeds more forms, and leaves the models
+alone where those seeds are the same. Measured beside 1.3.0 for the release of
+1.4 (`benchmarks/results_1.4/release/`, the figures in `m2/limits_figures.txt`),
+1.4.0 gives:
+- 152 and 95 structures under noise against 116 and 87 (point 3);
+- on the test set, 31 of its equations never recovered against 33.
+
+Elsewhere the two versions give the same figures, or figures that move as
+they do from one campaign to the next. The figures of 1.4.0 are given first:
+- 171 exact laws of 205 on the decision bench with both, and the same five
+  equations never recovered; under units, 174 with both, and four equations
+  never recovered;
+- on the test set, 214 exact laws of 390 with both (203 and 204 of 290, 11
+  and 10 of 100), and 10 exact Strogatz fits of 70 against 9;
+- 10 collapses of 65 with both (the worst to −1,946), and 66 of 250 on the
+  test set with both (38 standardised, 28 in their own units);
+- 11 departing formulas of 130 against 12, and 65 of 500 against 68.
+
 ## 1. Laws it still misses
 
 On the 41 equations, the engine returns the exact law in 163 fits of 205 (0.9.0:
@@ -99,11 +117,25 @@ the main Feynman table (0.9.0: 144), but 10 of 100 on its 20 bonus equations
 
 With Gaussian noise on the training target, the structure of the law (the model
 returned, its constants refitted on clean data, reproduces the clean test rows) is
-retrieved in 105 fits of 205 with 1 % noise and 85 with 10 % (0.9.0: 67 and 66).
+retrieved in 105 fits of 205 with 1 % noise and 85 with 10 % (0.9.0: 67 and 66),
+and with 1.4.0 in 152 and 95 (1.3.0 beside it: 116 and 87).
 The constants of the returned formula carry the noise: with 1 % noise,
 `0.00115247 + 1.00099 * v0 / (1 - 0.997137 * v1 / v2)` for v0/(1 − v1/v2)
 (Feynman I.34.1).
 Above 10 % the engine has not been measured.
+
+Since 1.4 the noise-tolerant seeds hold more forms. Two things they do not
+settle:
+- **at 10 % noise, two equations lose their structure:** I.27.6 goes from 2
+  fits of 5 to none without units and from 5 to 1 with them, III.15.12 from 5
+  to 2 and from 5 to 1; the new seeds take the search elsewhere;
+- **on a few noisy points, a seed with the structure of the law does not make
+  the search keep it.** On the TP diagnostic (10 or 20 points with 2 % or 5 %
+  noise), the point source has the law in 14 fits of 20 against 18 with 1.3.0.
+  The seeds 1.4 adds there, forms of 1/d² with a small correction, move the
+  search, and in 4 fits it ends on a form that follows the noise more closely
+  (`benchmarks/results_1.4/n2b/campaign/examine/`). The two changes of 1.4 meant
+  for such tables were not adopted (point 11).
 
 ## 4. Real data, out of the training range
 
@@ -207,3 +239,31 @@ datasets, 9 collapses against 11. The median
 fit on noisy and real data took 7 to 9 s against 25 to 35 s. When the result
 matters more than the time, set `generations=` or `time_limit=`, or
 `patience=0`.
+
+## 11. What 1.4 measured and left out
+
+Three changes were measured for 1.4 and not adopted
+(`benchmarks/results_1.4/PLAN.md`). Their code stays in the engine, switched
+off:
+- **a cross-validation on tables below 30 rows (S1).** It chose structures the
+  search had found on the same few points, whose error it underestimated: on
+  the TP diagnostic the law came back in 113 fits of 200 against 126, and a fit
+  took 1.67 times as long;
+- **a seed for a constant plus an exponential (E2),** as in Newton's cooling.
+  The seed had the structure of the law in 18 fits of 20, but in 11 of them the
+  search returned another form, closer to the noise: the law came back in 7
+  fits of 20 against 3. Its form, close to many laws on a few noisy points,
+  also took the search away from the point source (18 fits of 20 to 15);
+- **the fit of the constants of each noise-tolerant candidate,** a part of the
+  first version of the change of 1.4. It lost exact laws without noise
+  (I.26.2 went from three exact fits of five to none).
+
+S1 and E2 are postponed to the next version: both meet the same cause, the
+final choice among the forms of the search on a few noisy points.
+
+## 12. The tables of the teaching results are simulated
+
+Every result on teaching comes from simulated tables: the TP diagnostic, its
+frozen set TPT10 and the noisy frozen set TF78N draw a Gaussian noise on exact
+laws, as the decision bench does with the Feynman equations. No table
+measured by students could be gathered for 1.4.
