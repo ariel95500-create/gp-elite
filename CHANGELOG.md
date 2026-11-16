@@ -8,12 +8,45 @@ the variance of the target. 1.4 gives that stage more forms: a second pass
 that weights the rows by y² and does not need the target to keep one sign,
 scans of the finders of the sine, the cosine and the logarithm, and up to
 twelve seeds. Every seed 1.3.0 placed is still placed, with the constants
-its finder gave. On the 41-equation bench with Gaussian noise on the target,
-measured beside 1.3.0 before the release
-(`benchmarks/results_1.4/n2b/campaign/`), the structure of the law came back
-in 247 fits of 410 against 203 (1 % and 10 % noise), and in 192 of 328
-against 156 on four new draws of the noise. Without noise, the exact laws
-were those of 1.3.0. The figures of the release measurement follow.
+its finder gave. The change was decided by a comparison written before it
+ran (`benchmarks/results_1.4/PLAN.md`): on the 41-equation bench with
+Gaussian noise on the target, the structure of the law came back in 247 fits
+of 410 against 203 (1 % and 10 % noise), and in 192 of 328 against 156 on
+four new draws of the noise (`benchmarks/results_1.4/n2b/campaign/`).
+Measured on the package, side by side with 1.3.0 installed from PyPI
+(`benchmarks/results_1.4/release/`) on the 3,092 fits of the bench, of its
+noisy and units kinds and of the frozen test sets, at 30 s per fit, and on
+the 800 of the TP diagnostic and its frozen set, with the defaults:
+
+- with noise, the structure of the law comes back in 152 and 95 fits of 205
+  (1 % and 10 %) against 116 and 87, and with units in 150 and 93 against
+  121 and 95;
+- without noise, the bench keeps its 171 exact laws of 205, and 174 with
+  units, and no equation falls;
+- on the 782 fits where both versions place the same noise-tolerant seeds
+  (most often none) and neither reaches its budget, the recorded formula,
+  the error on the test rows and `formula_exact` are those of 1.3.0, to the
+  bit. The real data give the same median and the same collapses out of the
+  training range;
+- every one of the 1,161 models returned under units passed the audit of
+  units;
+- on the TP diagnostic, simulated tables of ten lab experiments with 10 or
+  20 points and 2 % or 5 % noise, the law comes back in 123 fits of 200
+  against 126, and in 120 against 120 with units;
+- on the frozen test sets, which decide nothing: 214 exact laws of 390 with
+  both versions, and 228 with units; 10 of 70 on the Strogatz systems
+  against 9; on the frozen noisy set, the structure in 37 and 28 fits of 78
+  against 34 and 27, and with units in 37 and 33 against 35 and 32; on the
+  frozen TP tables, the law in 107 and 103 fits of 200 with both.
+
+The stage runs wherever no exact seed is found, with or without noise, so
+1.4 also moves a few fits on exact data. In the release measurement, the
+relativistic addition of velocities (Feynman I.16.6) comes back exact in
+10 fits of 17 of the scaling bench against 9; the case of the robustness
+check with inputs from 1e-3 to 1e6 returns its law, x1·log(x0), where 1.3.0
+returned an approximation; and the example of `time_limit=` in sequence
+returns an approximation of R² 0.9979 at its budget of 15 s, where 1.3.0
+returned the law at 6.3 s.
 
 ### Added
 - The second pass, the scans and the twelve seeds of the noise-tolerant
@@ -22,12 +55,30 @@ were those of 1.3.0. The figures of the release measurement follow.
 ### Changed
 - The warning of a formula that departs from `predict()` names the clip of
   the arcsine among the guards that can make it depart.
+- The README is short. Its longer sections moved to `docs/`, in French to
+  `docs/fr/`.
+
+### Fixed
+- Found by the release measurement and corrected before the release (L1):
+  where an input column is negative throughout, the new scan of the
+  logarithm met a form it could not evaluate. The error dropped every form
+  of its pass, the scans of the sine and the cosine included, and LAPACK
+  printed "On entry to DLASCL ..." on the console. The scan now skips such a
+  form. No fit of the release measurement had such a column, and the
+  corrected engine was checked against the measured one
+  (`benchmarks/results_1.4/release/`).
 
 ### Known limits
 - On a few noisy points, a seed with the structure of the law does not make
   the search keep it. On the point source of the TP diagnostic, 10 or 20
   points with 2 % or 5 % noise, the law came back in 14 fits of 20 against
   18 with 1.3.0 (`benchmarks/results_1.4/n2b/campaign/examine/`).
+- At 10 % noise, two equations of the bench lose fits with the structure of
+  the law: I.27.6 (2 to 0 of 5, and 5 to 1 with units) and III.15.12 (5 to
+  2, and 5 to 1).
+- On the simulated battery data of `examples/battery_soh.py`, the equation
+  returned on the forward split extrapolates worse than with 1.3.0: R² −3.81
+  on the cycles held out, against +0.16.
 - Three changes were measured for 1.4 and not adopted
   (`benchmarks/results_1.4/PLAN.md`): a cross-validation on small tables
   (S1), a seed for a constant plus an exponential (E2), and the fit of the
