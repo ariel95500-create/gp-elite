@@ -1,0 +1,3 @@
+[3.9.25] 200 passed in 209.76s (0:03:29); LAPACK messages: 0
+[3.11.18] 200 passed in 173.53s (0:02:53); LAPACK messages: 0
+[3.14.6] 200 passed in 159.59s (0:02:39); LAPACK messages: 0
