@@ -358,3 +358,9 @@ package beside them (`l1/verify.log`).
   pass under Python 3.9.25, 3.11.18 and 3.14.6, the test of L1 among them,
   and LAPACK prints nothing (`l1/m4_summary.txt`, `l1/m4_pytest_*.txt`,
   `l1/m4_requirements_*.txt`).
+
+**Part b** (16 November, 22:09 to 22:55): the count run again with
+`/venv14r2`. On the 3,892 fits, no pass of N2b raises and no fit crashes,
+and job by job the records are those of the count of M4 with the measured
+wheel: the same fits run the noise-tolerant stage (`l1/count_l1.jsonl`;
+`l1/count_l1.txt` is `m4/log_scan/count.txt` to the byte).
