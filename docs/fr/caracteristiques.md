@@ -6,9 +6,11 @@ Partie de la documentation de GP_ELITE : retour au [README](../../README.fr.md) 
 
 - **Plus de graines tolérantes au bruit** (v1.4) : une seconde passe qui pondère
   les lignes par y² et n'exige plus que la cible garde un signe, des balayages du
-  logarithme, du sinus et du cosinus sur toute leur bibliothèque, et jusqu'à
-  douze graines, chaque graine que plaçait la 1.3 toujours placée avec les
-  constantes de son chercheur
+  logarithme, du sinus et du cosinus sur toute leur bibliothèque, et de
+  nouvelles formes jusqu'à douze graines en tout, chaque graine que plaçait la
+  1.3 toujours placée avec les constantes de son chercheur ; l'étage tourne
+  quand aucune forme binomiale ni aucune fonction d'un monôme ne tient les
+  données exactement, avec ou sans bruit
 - **L'arc sinus** (v1.3) : `arcsin` dans les jeux `'trig'` et `'full'`, son
   argument ramené dans [−1, 1] et doté d'un facteur constant que l'ajustement
   des constantes règle, et parmi les formes ajustées directement l'arc sinus
@@ -107,5 +109,5 @@ constante manquante d'une loi. **0.4 « Lawful »** — recherche sous contraint
 dimensionnelle. **0.3 « Trust »** — diagnostics et stabilité.
 
 Historique complet, avec les mesures qui étayent chaque affirmation, dans
-[CHANGELOG.md](../../CHANGELOG.md). Chaque banc derrière un chiffre de ce README se
+[CHANGELOG.md](../../CHANGELOG.md). Chaque banc derrière un chiffre de cette page se
 trouve dans [`benchmarks/`](../../benchmarks/), avec ses résultats bruts.

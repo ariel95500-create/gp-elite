@@ -42,8 +42,9 @@ et en années, la constante de Kepler vaut 1, et c'est ce qui revient.
   de vos données ([unités physiques](docs/fr/unites.md)).
 - **Du Python et du NumPy, rien d'autre.** `pip install gp-elite` : pas de Julia,
   pas de compilation, pas de GPU, Python 3.9 à 3.14.
-- **Mesuré, pas revendiqué.** Chaque changement de la recherche est décidé par une
-  comparaison écrite avant de tourner, et publiée quel qu'en soit le résultat
+- **Mesuré, pas revendiqué.** Chaque changement destiné à améliorer la recherche
+  est décidé par une comparaison écrite avant de tourner, et publiée quel qu'en
+  soit le résultat
   ([comment GP_ELITE est mesuré](docs/fr/mesures.md)).
 - **Ses limites sont écrites,** chacune avec la mesure qui la fonde
   ([ce que GP_ELITE ne fait pas](LIMITATIONS.fr.md)).
@@ -69,7 +70,7 @@ from gp_elite import symbolic_regression
 if __name__ == "__main__":         # nécessaire dans un script, pas dans un notebook
     resultat = symbolic_regression(X, y, feature_names=["a", "b"])
     print(resultat.expression)     # la formule, dans vos variables
-    print(resultat.r2_validation)  # son score sur des lignes tenues à l'écart de la recherche
+    print(resultat.r2_validation)  # son score sur des lignes tenues à l'écart (None sous 30 lignes)
 ```
 
 Avec scikit-learn, `GPEliteRegressor` est un estimateur comme les autres :
@@ -105,11 +106,13 @@ problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 
 ## Comment les résultats sont mesurés
 
-L'hypothèse et les critères de chaque changement sont enregistrés avant sa
-première mesure. Le changement n'est adopté que s'il les remplit, et les
-résultats sont publiés dans tous les cas : pour la 1.4, quatre changements ont
-été mesurés et trois n'ont pas été adoptés
-([son plan et ses campagnes](benchmarks/results_1.4/)). Chaque version est aussi
+L'hypothèse et les critères de chaque changement destiné à améliorer la
+recherche sont enregistrés avant sa première mesure. Le changement n'est adopté
+que s'il les remplit, et les résultats sont publiés dans tous les cas : pour la
+1.4, quatre changements ont été mesurés et trois n'ont pas été adoptés
+([son plan et ses campagnes](benchmarks/results_1.4/)). La correction d'un
+défaut est vérifiée à la place contre la version mesurée, comme pour celui
+trouvé dans la 1.4 avant sa sortie. Chaque version est aussi
 mesurée une fois sur des jeux de test figés avant toute décision et qui n'ont
 jamais servi à en prendre une.
 

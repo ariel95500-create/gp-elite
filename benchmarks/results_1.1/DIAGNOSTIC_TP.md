@@ -256,8 +256,9 @@ beside 1.3.0 (`../results_1.4/release/m2/compare.txt`):
   in 120 against 120 under units. The point source loses it in 4 fits (18 to
   14): the new seeds, forms of 1/d² with a small correction, move the search,
   which then ends on a form closer to the noise
-  (`../results_1.4/n2b/campaign/examine/`). Every other experiment moves by
-  one fit at most, and Snell's law still comes back in none;
+  (`../results_1.4/n2b/campaign/examine/`). The count of every other
+  experiment moves by one at most (fit by fit, 2 other fits lose the law and
+  3 gain it), and Snell's law still comes back in none;
 - **the six laws of the notebook** come back as with 1.3.0, the same formulas
   in about the same time (`../results_1.4/release/m3/`);
 - **TPT10** has the law in 107 fits of 200 in the plain arm and 103 under

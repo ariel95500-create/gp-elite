@@ -6,8 +6,10 @@ Part of the documentation of GP_ELITE: back to the [README](../README.md); [vers
 
 - **More noise-tolerant seeds** (v1.4): a second pass that weights the rows by
   y² and does not need the target to keep one sign, scans of the logarithm, the
-  sine and the cosine over their whole library, and up to twelve seeds, every
-  seed 1.3 placed still placed with the constants its finder gave
+  sine and the cosine over their whole library, and new forms up to twelve
+  seeds in all, every seed 1.3 placed still placed with the constants its
+  finder gave; the stage runs when no binomial form and no function of a
+  monomial holds the data exactly, with or without noise
 - **The arcsine** (v1.3): `arcsin` in the pools `'trig'` and `'full'`, its
   argument clipped to [−1, 1] and given a constant factor that the fit of
   constants adjusts, and among the forms fitted directly the arcsine of a

@@ -106,8 +106,9 @@ guarantee.
   of a ten-point lab table then takes seconds: the six of the French TP notebook
   (`examples/tp_six_lois.ipynb`) took 48 s in all, against 194 to 198 s with 1.1.0 on the same machine, and
   returned the same formulas; with 1.4.0, in its release measurement, they
-  take 52 to 53 s, against 49 to 54 s with 1.3.0 the same day, with the same
-  formulas. A call that sets its budget (`generations=` or
+  take 52 and 53 s in the two runs paired with 1.3.0 the same day, against
+  49 and 54 s, with the same formulas (50 to 53 s over the four runs of
+  1.4.0). A call that sets its budget (`generations=` or
   `time_limit=`) gets all of it, as in
   1.1. An integer k applies a patience of k generations whatever the budget, and
   0 turns it off. `GPEliteRegressor` always sets its number of generations, so
@@ -142,8 +143,9 @@ under `if __name__ == "__main__":`, as above.
 Without the guard GP_ELITE detects the situation, finishes on one core with the
 islands in sequence, and says so once; the islands in sequence take another path
 than in parallel, so the model can differ. Hence `parallel=False` in the example
-above: with the islands in parallel (the default from four cores) it returns
-another model, an approximation of R² 0.99998. Notebooks need nothing.
+above: with the islands in parallel (the default from four cores) it returned
+another model, an approximation of R² 0.99998, when measured with 1.0.0
+(not measured again since). Notebooks need nothing.
 
 ### Reading the result
 
@@ -182,6 +184,9 @@ another model, an approximation of R² 0.99998. Notebooks need nothing.
   fit.
 - **`result.pareto`** lists the other non-dominated candidates, simplest first,
   each with its own `expression`, `r2_validation` and `predict`.
+- **Below 30 rows, nothing is held out:** `r2_validation` and `result.pareto`
+  are then `None`, as on Kepler's eight planets or a lab table of 10 or 20
+  points. Judge such a fit on rows of your own kept out of it.
 - **`predict()` checks what it is given.** It expects as many columns as the fit
   had (a single sample is `X.reshape(1, -1)`), and returns NaN for a row with a
   missing or infinite input, where 0.7 returned 0.

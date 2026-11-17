@@ -59,12 +59,18 @@ premier :
   unités) ;
 - 11 formules qui s'écartent sur 130 avec les deux, et 65 sur 500 contre 64.
 
-La version 1.4 donne plus de formes aux graines tolérantes au bruit, et laisse
-les modèles tels quels là où ces graines sont les mêmes. Mesurée à côté de la
-1.3.0 pour la sortie de la 1.4 (`benchmarks/results_1.4/release/`, les chiffres
-dans `m2/limits_figures.txt`), la 1.4.0 donne :
+La version 1.4 donne plus de formes aux graines tolérantes au bruit. Là où ces
+graines sont les mêmes dans les deux versions et où aucune n'atteint son budget
+de temps, elle rend les modèles de la 1.3.0 au bit près (782 ajustements de la
+mesure de sortie). Mesurée à côté de la 1.3.0 pour la sortie de la 1.4
+(`benchmarks/results_1.4/release/`, les chiffres dans `m2/limits_figures.txt`),
+la 1.4.0 donne :
 - 152 et 95 structures sous bruit contre 116 et 87 (point 3) ;
-- sur le jeu de test, 31 de ses équations jamais retrouvées contre 33.
+- sur le jeu de test, 31 de ses équations jamais retrouvées contre 33, 203 et
+  11 lois exactes sur ses parties principale et bonus contre 204 et 10 (214 sur
+  390 avec les deux), et 10 ajustements de Strogatz exacts sur 70 contre 9. Les
+  ajustements qui y changent de statut sont, à un près, des ajustements où la
+  1.4.0 place d'autres graines.
 
 Ailleurs, les deux versions donnent les mêmes chiffres, ou des chiffres qui
 bougent comme d'une campagne à l'autre. Les chiffres de la 1.4.0 viennent en
@@ -72,8 +78,6 @@ premier :
 - 171 lois exactes sur 205 sur le banc de décision avec les deux, et les mêmes
   cinq équations jamais retrouvées ; avec les unités, 174 avec les deux, et
   quatre équations jamais retrouvées ;
-- sur le jeu de test, 214 lois exactes sur 390 avec les deux (203 et 204 sur
-  290, 11 et 10 sur 100), et 10 ajustements de Strogatz exacts sur 70 contre 9 ;
 - 10 effondrements sur 65 avec les deux (le pire à −1 946), et 66 sur 250 sur
   le jeu de test avec les deux (38 standardisés, 28 dans leurs propres
   unités) ;
@@ -143,8 +147,9 @@ choses qu'elles ne règlent pas :
   de 5 à 2 et de 5 à 1 ; les nouvelles graines emmènent la recherche ailleurs ;
 - **sur quelques points bruités, une graine qui a la structure de la loi ne
   suffit pas à ce que la recherche la garde.** Sur le diagnostic des TP (10 ou
-  20 points avec 2 % ou 5 % de bruit), la source ponctuelle a la loi dans 14
-  ajustements sur 20 contre 18 avec la 1.3.0. Les graines que la 1.4 y ajoute,
+  20 points avec 2 % ou 5 % de bruit), la source ponctuelle a la loi sans les
+  unités dans 14 ajustements sur 20 contre 18 avec la 1.3.0 (avec les unités,
+  20 sur 20 avec les deux). Les graines que la 1.4 y ajoute,
   des formes en 1/d² avec une petite correction, déplacent la recherche, qui
   finit dans 4 ajustements sur une forme qui suit le bruit de plus près
   (`benchmarks/results_1.4/n2b/campaign/examine/`). Les deux changements de la
@@ -169,12 +174,26 @@ Quand des données suivent exactement une loi qu'aucune graine exacte ne couvre,
 une graine qui ne fait qu'approcher les données peut détourner la recherche de la
 loi. Vu sur la loi de Kepler normalisée par min-max (`normalize="minmax"`) : exacte
 dans 1 ajustement sur 10 au lieu de 3, à 40 générations
-(`release_1.0/m3/kepler_minmax_check.txt`). Le contrôle utilise le jeu `full` ;
+(`benchmarks/results_0.9/release_1.0/m3/kepler_minmax_check.txt`). Le contrôle utilise le jeu `full` ;
 avec son arc sinus, la 1.3.0 donne 2 sur 10 au lieu de 4
-(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`). Avec la
+(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`), et la 1.4.0 de
+même (`benchmarks/results_1.4/release/m3/kepler_minmax_check.txt`). Avec la
 normalisation par défaut, sur le
 banc, aucune loi n'a été perdue ainsi : aucune équation n'a moins d'ajustements
 exacts qu'avec la 0.9.0. `PLAN_PHASE5.md`, mécanique de N1.
+
+Depuis la 1.4, l'étage tolérant au bruit place aussi plus de formes sur des
+données exactes, là où aucune graine exacte ne les couvre. Dans la mesure de
+sortie de la 1.4.0, un chiffre y perd sa loi : sur les 3 000 lignes de
+x0·x1/x2 + 0,3·x3 de `benchmarks/time_limit_check.py`, l'étage place 4 graines
+contre 1, et en séquentiel la 1.4.0 va jusqu'à son budget de 15 s et rend une
+approximation de R² 0,9979, là où la 1.3.0 rendait la loi en 6,3 s. Trois en
+sortent mieux : Feynman I.16.6 sur le banc de taille, exacte dans 10
+ajustements sur 17 contre 9 ; un cas du contrôle de robustesse dont l'entrée va
+de 1e-3 à 1e6, qui rend sa loi là où la 1.3.0 rendait une approximation ; et
+une exponentielle du contrôle des petits jeux, écrite comme la loi là où la
+1.3.0 en écrivait des formes plus longues
+(`benchmarks/results_1.4/release/m3_examine/`).
 
 ## 6. Une formule qui s'écarte de ses prédictions
 

@@ -54,20 +54,22 @@ they do from one campaign to the next. The figures of 1.3.0 are given first:
   test set with both (37 standardised, 28 in their own units);
 - 11 departing formulas of 130 with both, and 65 of 500 against 64.
 
-Version 1.4 gives the noise-tolerant seeds more forms, and leaves the models
-alone where those seeds are the same. Measured beside 1.3.0 for the release of
-1.4 (`benchmarks/results_1.4/release/`, the figures in `m2/limits_figures.txt`),
-1.4.0 gives:
+Version 1.4 gives the noise-tolerant seeds more forms. Where those seeds are
+the same in both versions and neither reaches its time budget, it returns the
+models of 1.3.0 to the bit (782 fits of the release measurement). Measured
+beside 1.3.0 for the release of 1.4 (`benchmarks/results_1.4/release/`, the
+figures in `m2/limits_figures.txt`), 1.4.0 gives:
 - 152 and 95 structures under noise against 116 and 87 (point 3);
-- on the test set, 31 of its equations never recovered against 33.
+- on the test set, 31 of its equations never recovered against 33, 203 and
+  11 exact laws on its main and bonus parts against 204 and 10 (214 of 390
+  with both), and 10 exact Strogatz fits of 70 against 9. The fits that change
+  status there are, but one, fits where 1.4.0 places other seeds.
 
 Elsewhere the two versions give the same figures, or figures that move as
 they do from one campaign to the next. The figures of 1.4.0 are given first:
 - 171 exact laws of 205 on the decision bench with both, and the same five
   equations never recovered; under units, 174 with both, and four equations
   never recovered;
-- on the test set, 214 exact laws of 390 with both (203 and 204 of 290, 11
-  and 10 of 100), and 10 exact Strogatz fits of 70 against 9;
 - 10 collapses of 65 with both (the worst to −1,946), and 66 of 250 on the
   test set with both (38 standardised, 28 in their own units);
 - 11 departing formulas of 130 against 12, and 65 of 500 against 68.
@@ -131,7 +133,8 @@ settle:
   to 2 and from 5 to 1; the new seeds take the search elsewhere;
 - **on a few noisy points, a seed with the structure of the law does not make
   the search keep it.** On the TP diagnostic (10 or 20 points with 2 % or 5 %
-  noise), the point source has the law in 14 fits of 20 against 18 with 1.3.0.
+  noise), the point source has the law without units in 14 fits of 20
+  against 18 with 1.3.0 (with units, 20 of 20 with both).
   The seeds 1.4 adds there, forms of 1/d² with a small correction, move the
   search, and in 4 fits it ends on a form that follows the noise more closely
   (`benchmarks/results_1.4/n2b/campaign/examine/`). The two changes of 1.4 meant
@@ -154,11 +157,24 @@ the returned champion.
 When data follow a law exactly but no exact seed covers it, a seed that only
 approximates the data can draw the search away from the law. Seen on Kepler's law
 normalised by min-max (`normalize="minmax"`): exact in 1 fit of 10 instead of 3 at
-40 generations (`release_1.0/m3/kepler_minmax_check.txt`). The check uses the pool
+40 generations (`benchmarks/results_0.9/release_1.0/m3/kepler_minmax_check.txt`). The check uses the pool
 `full`; with its arcsine, 1.3.0 gives 2 of 10 instead of 4
-(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`). With the default
+(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`), and 1.4.0 the
+same (`benchmarks/results_1.4/release/m3/kepler_minmax_check.txt`). With the default
 normalisation, on the bench, no law was lost this way: no equation has fewer exact
 fits than with 0.9.0. `PLAN_PHASE5.md`, mechanics of N1.
+
+Since 1.4 the noise-tolerant stage places more forms on exact data too, where
+no exact seed covers it. In the release measurement of 1.4.0, one figure loses
+its law that way: on the 3,000 rows of x0·x1/x2 + 0.3·x3 of
+`benchmarks/time_limit_check.py`, the stage places 4 seeds against 1, and in
+sequence 1.4.0 runs to its budget of 15 s and returns an approximation of R²
+0.9979, where 1.3.0 returned the law at 6.3 s. Three come out better:
+Feynman I.16.6 in the scaling bench, exact in 10 fits of 17 against 9; a case
+of the robustness check whose input spans 1e-3 to 1e6, which returns its law
+where 1.3.0 returned an approximation; and an exponential of the small-data
+check, written as the law where 1.3.0 wrote longer forms of it
+(`benchmarks/results_1.4/release/m3_examine/`).
 
 ## 6. A formula that departs from its predictions
 

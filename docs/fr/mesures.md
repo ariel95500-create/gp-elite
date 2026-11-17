@@ -16,7 +16,7 @@ ce que ça vaut face aux alternatives, et ce que ça ne vaut pas.
 |---|---|---|---|
 | Sortie | **formule lisible** | boîte noire | formule lisible |
 | Installation | `pip install` (pur Python) | lourde | nécessite **Julia** |
-| Validation hors échantillon | **intégrée** (sert à choisir le modèle) | à faire soi-même | à faire soi-même |
+| Validation hors échantillon | **intégrée** dès 30 lignes (sert à choisir le modèle) | à faire soi-même | à faire soi-même |
 | Unités physiques | **contrainte dure pendant la recherche** (`units=`) | non | pénalité douce (`X_units=`) |
 | Stabilité de la réponse | **rapport bootstrap** (`stability_analysis`) | non | non |
 | Vitesse et précision à grande échelle | moindres | — | **supérieures** |

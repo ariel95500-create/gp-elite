@@ -114,8 +114,9 @@ exacte, sans garantie.
   quelques secondes : les six du notebook de TP (`examples/tp_six_lois.ipynb`)
   prenaient 48 s en tout, contre
   194 à 198 s avec la 1.1.0 sur la même machine, et rendaient les mêmes formules ;
-  avec la 1.4.0, dans sa mesure de sortie, ils prennent 52 à 53 s, contre 49 à
-  54 s avec la 1.3.0 le même jour, avec les mêmes formules.
+  avec la 1.4.0, dans sa mesure de sortie, ils prennent 52 et 53 s dans les deux
+  passages appariés avec la 1.3.0 le même jour, contre 49 et 54 s, avec les
+  mêmes formules (50 à 53 s sur les quatre passages de la 1.4.0).
   Un appel qui fixe son budget (`generations=` ou `time_limit=`) le reçoit en
   entier, comme en 1.1. Un entier k
   applique une patience de k générations quel que soit le budget, et 0 la coupe.
@@ -155,8 +156,9 @@ gardez le code de premier niveau sous
 la situation, termine sur un cœur avec les îles en séquence, et le signale une
 fois ; les îles en séquence suivent un autre chemin qu'en parallèle, et le modèle
 peut différer. D'où `parallel=False` dans l'exemple ci-dessus : avec les îles en
-parallèle (le défaut dès quatre cœurs), il rend un autre modèle, une approximation
-de R² 0,99998.
+parallèle (le défaut dès quatre cœurs), il rendait un autre modèle, une
+approximation de R² 0,99998, mesurée avec la 1.0.0 (pas mesurée de nouveau
+depuis).
 Rien à faire dans un notebook.
 
 ### Lire le résultat
@@ -202,6 +204,10 @@ Rien à faire dans un notebook.
   données de test hors de l'ajustement.
 - **`resultat.pareto`** liste les autres candidats non dominés, du plus simple au
   plus complexe, chacun avec son `expression`, son `r2_validation` et son `predict`.
+- **Sous 30 lignes, rien n'est tenu à l'écart :** `r2_validation` et
+  `resultat.pareto` valent alors `None`, comme sur les huit planètes de Kepler ou
+  un tableau de TP de 10 ou 20 points. Jugez un tel ajustement sur des lignes à
+  vous, gardées hors de lui.
 - **`predict()` vérifie ce qu'on lui donne.** Il attend autant de colonnes qu'à
   l'ajustement (un seul échantillon s'écrit `X.reshape(1, -1)`), et rend NaN pour
   une ligne dont une entrée manque ou est infinie, là où la 0.7 rendait 0.

@@ -16,7 +16,7 @@ against the alternatives, and where it does not.
 |---|---|---|---|
 | Output | **readable formula** | black box | readable formula |
 | Installation | `pip install` (pure Python) | heavy | requires **Julia** |
-| Held-out validation | **built in** (used for model selection) | do it yourself | do it yourself |
+| Held-out validation | **built in** from 30 rows (used for model selection) | do it yourself | do it yourself |
 | Physical units | **hard constraint during search** (`units=`) | no | soft penalty (`X_units=`) |
 | Stability of the answer | **bootstrap report** (`stability_analysis`) | no | no |
 | Speed and accuracy at scale | lower | — | **higher** |

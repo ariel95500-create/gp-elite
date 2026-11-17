@@ -32,9 +32,11 @@ with `/venv13p`, `/venv14n2b` and `/venv14r` by `run_m1.sh`, from a copy of
   (`M1_compare_n2b_vs_1.4.0.txt`);
 - **against 1.3.0** (`M1_compare_1.3.0_vs_1.4.0.txt`), twelve are identical,
   and C_big differs in its Pareto front only: its model is the same. C_big is
-  a noisy table, 5,000 rows of x0·x1/x2 with Gaussian noise. Run again with
-  each version to read its trace, 1.4.0 places twelve noise-tolerant seeds
-  there, the six of 1.3.0 among them, where 1.3.0 places six.
+  a noisy table, 5,000 rows of x0·x1/x2 with Gaussian noise. 1.4.0 places
+  twelve noise-tolerant seeds there, the six of 1.3.0 among them, where 1.3.0
+  places six. That was first read on a trace that was not kept; after the
+  first review of M5, `m1_examine/cbig_seeds.py`, committed before its run,
+  recorded it on one generation of each version (`m1_examine/`).
 
 The thirteen took 21.8 s with 1.3.0, 21.5 s with the candidate of N2b and
 26.2 s with 1.4.0, run in that order. The last two have the same engine, so
@@ -119,17 +121,23 @@ versions. U41 has one exact law more in each version than in that campaign
 **Beside, deciding nothing** (`m2/compare.txt`):
 - The structures move on nine equations, as in campaign N2b: gains at 1 %
   noise on I.32.5, I.40.1, I.44.4, II.11.27, II.11.3, II.35.18, III.15.12 and
-  III.19.51, and at 10 % on I.32.5, I.44.4 and III.19.51; losses at 10 %
+  III.19.51, and at 10 % on I.32.5, I.44.4 and III.19.51, and under units on
+  II.11.27 (0 → 1); losses at 10 %
   noise on I.27.6 (2 → 0 without units, 5 → 1 with them) and III.15.12 (5 → 2
   and 5 → 1).
 - The noise-tolerant seeds are placed in more fits with 1.4.0: 165 against
   140 in F41N1, 130 against 95 in F41N10, 125 against 95 in U41N1, 115
-  against 85 in U41N10. Neither version places one on R6, R7raw or TR25.
+  against 85 in U41N10. Neither version places one on R6, R7raw or TR25. On
+  TR25raw, seeds are placed in 7 fits; in 5 of them (four folds of
+  first_principles_planck, one of 1096_FacultySalaries), 1.4.0 places other
+  seeds and returns another formula, the test R² moving by 0.006 at most.
 - `formula_exact` is False about as often with both versions, suite by
   suite.
 - On TP, the point source has the law in 14 fits of 20 against 18 in the
-  plain arm (`../n2b/campaign/examine/`); every other experiment moves by one
-  fit at most.
+  plain arm (`../n2b/campaign/examine/`); the count of every other experiment
+  moves by one at most. Fit by fit, 9 change, all in the plain arm: 6 lose the
+  law (the point source 4, the gas and the thin lens 1 each) and 3 gain it
+  (the spring, the free fall and the thin lens).
 
 **The frozen test sets,** published as measured, decide nothing:
 - TF78, TS14, TR25 and TF78 under units hardly move. TF78 keeps its 214
@@ -139,9 +147,10 @@ versions. U41 has one exact law more in each version than in that campaign
   37 and 28 fits of 78 against 34 and 27, and under units in 37 and 33
   against 35 and 32.
 - TPT10: the law comes back in the same number of fits, 107 and 103; it is
-  useful in 173 fits against 169 in the plain arm. By experiment, at most 2
-  fits move (the capacitor charge 7 → 9, Kepler's third law 10 → 9, the
-  thermistor 4 → 3).
+  useful in 173 fits against 169 in the plain arm. By experiment, the count
+  moves by 2 at most (the capacitor charge 7 → 9, Kepler's third law 10 → 9,
+  the thermistor 4 → 3). Fit by fit, 10 change, all in the plain arm: 5 lose
+  the law and 5 gain it, Kepler's third law in 3 of them (2 lost, 1 gained).
 
 `m2/limits_figures.txt` gives the figures of the pages of the limits read
 from the records of M2, for both versions; the pages were brought to them
@@ -177,7 +186,8 @@ the line of the version. The other three are the runs of the TP notebook
 with 1.4.0, below. The records of 1.3 that have no counterpart here are the
 runs of 1.2.0 (the deduced constant and two runs of the TP notebook),
 `notebook_tp_six_lois_1.3.0.txt`, whose run of 1.4.0 is compared with it
-below, and `examine/`, the examination that followed the M3 of 1.3.
+below, and `../../results_1.3/release/m3/examine/`, the examination that
+followed the M3 of 1.3.
 
 22 records differ, for six causes:
 - **The noise-tolerant stage on noisy data,** as the plan expected:
@@ -191,7 +201,7 @@ below, and `examine/`, the examination that followed the M3 of 1.3.
   Their list of the seeds placed has the new passes of the noise-tolerant
   stage, and on the fit without units of the eight planets (C8), the stage
   places 10 seeds against 5.
-- **W1, the text of the warning:** `case_nikuradse/nikuradse_seed1.txt`,
+- **W1, the text of the warning:** `m3/case_nikuradse/nikuradse_seed1.txt`,
   `seed2` and `seed4`, `notebook_snippet_nikuradse.txt` and
   `notebook_snippet_tp.txt`. The warning of a formula that departs from
   `predict()` names the clip of the arcsine; the counts it gives are those
@@ -244,10 +254,11 @@ is one where 1.4.0 places other noise-tolerant seeds:
   model. The fifteen other cases are the same.
 - **The small-data check** (`small_data_release.jsonl`): on the 25 points of
   2.5 exp(−0.7x) + 0.3, the stage places 5 seeds against 1, among them an
-  exponential of x. At search seeds 2 and 3, 1.4.0 returns the law as
-  written, `0.3 + 2.5 * exp(-X0 / 1.42857)`, size 8, where 1.3.0 returned two
-  longer forms of the same function, sizes 10 and 13. Every R² is that of
-  1.3.0, and so is the summary (`small_data_release.txt`).
+  exponential of x. At search seeds 1 to 3, 1.4.0 returns the law as
+  written, `0.3 + 2.5 * exp(-X0 / 1.42857)`, size 8. 1.3.0 printed the same
+  formula at seed 1 from a model of size 9, and two longer forms of the same
+  function at seeds 2 and 3, sizes 10 and 13. Every R² is that of 1.3.0, and
+  so is the summary (`small_data_release.txt`).
 - **The check of `time_limit=`** (`time_limit_check.txt`): 15 of 16 checks
   against 14 of 16. On its 3,000 rows of x0·x1/x2 + 0.3·x3, the stage places
   4 seeds against 1. In sequence, 1.4.0 runs to its budget, 15.3 s, and
@@ -325,8 +336,17 @@ on the console. Two scripts, which decide nothing, measured it
 - `count.py`: the 3,892 fits of M2, TP and TPT10, run again with 1.4.0 for
   one generation, which runs the noise-tolerant stage on the data of each
   fit. The stage runs in 3,562 of them (2,762 of the 3,092 of the benches,
-  and the 800 of TP and TPT10), and no pass of N2b raises: all their inputs
-  are positive. The fault touched no fit of the measurements.
+  and the 800 of TP and TPT10), and no pass of N2b raises. The fault touched
+  no fit of the measurements.
+
+**A correction of the plan.** The amendment of the plan says of these fits
+that all their inputs are positive. That is not so: the standardised real
+datasets (R6, TR25) have negative values. The scans of N2b use only the input
+columns that keep one sign, positive or negative throughout
+(`_elementary_forms_n2` in `gp_elite/core.py`), so a column of mixed sign
+never reaches them; the fault needs a column negative throughout. What the
+count shows is that no pass raised on any of the 3,892 fits (first review of
+M5).
 
 The author decided to correct it and to check the corrected engine by a
 targeted verification rather than run the measurements again

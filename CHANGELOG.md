@@ -2,13 +2,14 @@
 
 ## 1.4.0
 
-The noise-tolerant seeds. When no seed holds the data exactly, the engine
-places at the start of the search the forms its finders give within 1.5 % of
-the variance of the target. 1.4 gives that stage more forms: a second pass
-that weights the rows by y² and does not need the target to keep one sign,
-scans of the finders of the sine, the cosine and the logarithm, and up to
-twelve seeds. Every seed 1.3.0 placed is still placed, with the constants
-its finder gave. The change was decided by a comparison written before it
+The noise-tolerant seeds. When no binomial form and no function of a
+monomial holds the data exactly (an exact power law does not stop it), the
+engine places at the start of the search the forms its finders give within
+1.5 % of the variance of the target. 1.4 gives that stage more forms: a
+second pass that weights the rows by y² and does not need the target to keep
+one sign, scans of the finders of the sine, the cosine and the logarithm, and
+new forms up to twelve seeds in all. Every seed 1.3.0 placed is still placed,
+with the constants its finder gave. The change was decided by a comparison written before it
 ran (`benchmarks/results_1.4/PLAN.md`): on the 41-equation bench with
 Gaussian noise on the target, the structure of the law came back in 247 fits
 of 410 against 203 (1 % and 10 % noise), and in 192 of 328 against 156 on
@@ -39,8 +40,8 @@ the 800 of the TP diagnostic and its frozen set, with the defaults:
   against 34 and 27, and with units in 37 and 33 against 35 and 32; on the
   frozen TP tables, the law in 107 and 103 fits of 200 with both.
 
-The stage runs wherever no exact seed is found, with or without noise, so
-1.4 also moves a few fits on exact data. In the release measurement, the
+The stage runs whenever those finders hold no exact form, with or without
+noise, so 1.4 also moves a few fits on exact data. In the release measurement, the
 relativistic addition of velocities (Feynman I.16.6) comes back exact in
 10 fits of 17 of the scaling bench against 9; the case of the robustness
 check with inputs from 1e-3 to 1e6 returns its law, x1·log(x0), where 1.3.0
@@ -64,16 +65,20 @@ returned the law at 6.3 s.
   logarithm met a form it could not evaluate. The error dropped every form
   of its pass, the scans of the sine and the cosine included, and LAPACK
   printed "On entry to DLASCL ..." on the console. The scan now skips such a
-  form. No fit of the release measurement had such a column. The corrected
-  engine returns what the measured one returned on its reference
-  configurations, on the 800 fits of the TP diagnostic and its frozen set,
-  and on every public figure, times aside (`benchmarks/results_1.4/release/`).
+  form. No pass of the scan raised on any fit of the release measurement.
+  The corrected engine returns what the measured one returned, times aside,
+  on its reference configurations, on the 800 fits of the TP diagnostic and
+  its frozen set, and on the records of the examples, notebooks and case
+  studies; on the 3,092 fits of the benches, run for one generation, its
+  noise-tolerant stage runs where the measured one ran and no pass raises
+  (`benchmarks/results_1.4/release/`).
 
 ### Known limits
 - On a few noisy points, a seed with the structure of the law does not make
   the search keep it. On the point source of the TP diagnostic, 10 or 20
-  points with 2 % or 5 % noise, the law came back in 14 fits of 20 against
-  18 with 1.3.0 (`benchmarks/results_1.4/n2b/campaign/examine/`).
+  points with 2 % or 5 % noise, the law came back without units in 14 fits
+  of 20 against 18 with 1.3.0, and with units in 20 of 20 with both
+  (`benchmarks/results_1.4/n2b/campaign/examine/`).
 - At 10 % noise, two equations of the bench lose fits with the structure of
   the law: I.27.6 (2 to 0 of 5, and 5 to 1 with units) and III.15.12 (5 to
   2, and 5 to 1).

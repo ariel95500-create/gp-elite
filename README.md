@@ -43,8 +43,9 @@ years, Kepler's constant is 1, and that is what comes back.
   ([physical units](https://github.com/ariel95500-create/gp-elite/blob/main/docs/units.md)).
 - **Pure Python and NumPy.** `pip install gp-elite`: no Julia, no compiler, no
   GPU, Python 3.9 to 3.14.
-- **Measured, not claimed.** Every change to the search is decided by a
-  comparison written before it runs, and published whatever the outcome
+- **Measured, not claimed.** Every change meant to improve the search is
+  decided by a comparison written before it runs, and published whatever the
+  outcome
   ([how GP_ELITE is measured](https://github.com/ariel95500-create/gp-elite/blob/main/docs/measurements.md)).
 - **Its limits are written down,** each with the measurement behind it
   ([what GP_ELITE does not do](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.md)).
@@ -70,7 +71,7 @@ from gp_elite import symbolic_regression
 if __name__ == "__main__":         # needed in scripts, not in notebooks
     result = symbolic_regression(X, y, feature_names=["a", "b"])
     print(result.expression)       # the formula, in your variables
-    print(result.r2_validation)    # its score on rows held out of the search
+    print(result.r2_validation)    # its score on rows held out (None below 30 rows)
 ```
 
 With scikit-learn, `GPEliteRegressor` is an estimator like the others:
@@ -106,10 +107,13 @@ does not claim otherwise.
 
 ## How the results are measured
 
-The hypothesis and the criteria of each change are committed before its first
-measurement. The change is adopted only if it meets them, and the results are
-published either way: for 1.4, four changes were measured and three were not
-adopted ([its plan and campaigns](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.4)).
+The hypothesis and the criteria of each change meant to improve the search are
+committed before its first measurement. The change is adopted only if it meets
+them, and the results are published either way: for 1.4, four changes were
+measured and three were not adopted
+([its plan and campaigns](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.4)).
+The correction of a fault is checked against the measured release instead, as
+for the one found in 1.4 before its release.
 Each release is also measured once on test sets frozen before any decision and
 never used to make one.
 
