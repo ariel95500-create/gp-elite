@@ -64,9 +64,10 @@ returned the law at 6.3 s.
   logarithm met a form it could not evaluate. The error dropped every form
   of its pass, the scans of the sine and the cosine included, and LAPACK
   printed "On entry to DLASCL ..." on the console. The scan now skips such a
-  form. No fit of the release measurement had such a column, and the
-  corrected engine was checked against the measured one
-  (`benchmarks/results_1.4/release/`).
+  form. No fit of the release measurement had such a column. The corrected
+  engine returns what the measured one returned on its reference
+  configurations, on the 800 fits of the TP diagnostic and its frozen set,
+  and on every public figure, times aside (`benchmarks/results_1.4/release/`).
 
 ### Known limits
 - On a few noisy points, a seed with the structure of the law does not make

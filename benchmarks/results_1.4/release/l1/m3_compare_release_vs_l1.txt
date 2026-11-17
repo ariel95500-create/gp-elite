@@ -1,0 +1,235 @@
+same     bad_inputs.txt
+same     battery_example.txt
+same     case_hubble.txt
+same     case_kepler.txt
+same     case_nikuradse/nikuradse_seed0.txt
+same     case_nikuradse/nikuradse_seed1.txt
+same     case_nikuradse/nikuradse_seed2.txt
+same     case_nikuradse/nikuradse_seed3.txt
+same     case_nikuradse/nikuradse_seed4.txt
+same     case_nikuradse/real_nikuradse_auto_seed0.json
+same     case_nikuradse/real_nikuradse_auto_seed1.json
+same     case_nikuradse/real_nikuradse_auto_seed2.json
+same     case_nikuradse/real_nikuradse_auto_seed3.json
+same     case_nikuradse/real_nikuradse_auto_seed4.json
+same     case_nikuradse_driver.txt
+differs  claims_queues.txt
+    first : queue2 == time_limit DATE
+    second: queue1 == snippet nikuradse DATE
+    first : queue1 == snippet nikuradse DATE
+    second: queue1 == robustness DATE
+    first : queue1 == robustness DATE
+    second: queue2 == time_limit DATE
+differs  console_hooke.txt
+    first : [GEN 0000|I1] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (T s)
+    second: [GEN 0000|I2] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (T s)
+    first : [GEN 0000|I2] FIT=-2234.06306542 RAW=0.00000001 SIZE=03 DEPTH=02 (T s)
+    second:   [SMART-RESET gen=40] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first :   EXPR = (24.974004 * elongation)
+    second:   [SMART-RESET gen=80] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first : 
+    second:   [SMART-RESET gen=120] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    first :   [SMART-RESET gen=40] 1 explorer island(s) — 3 semantic skeletons + 30% random (RAW=0.0000)
+    second: 
+    first :   [SMART-RESET gen=80] 1 explorer island(s) — 0 semantic skeletons + 30% random (RAW=0.0000)
+    second: ──────────────────────────────────────────────────────────────────────
+    first :   [SMART-RESET gen=120] 1 explorer island(s) — 0 semantic skeletons + 30% random (RAW=0.0000)
+    second: [v21-VAL] GENERALIZATION REPORT (final champion)
+    first : 
+    second:   MSE train      : 5.297422e-09
+    first : ──────────────────────────────────────────────────────────────────────
+    second:   Validation MSE : 6.696502e-09   (never seen by evolution)
+    first : [v21-VAL] GENERALIZATION REPORT (final champion)
+    second:   R² validation  : 1.0000
+    first :   MSE train      : 5.297422e-09
+    second:   Ratio val/train: 1.26
+    first :   Validation MSE : 6.696502e-09   (never seen by evolution)
+    second:   ✓ Healthy generalization.
+    first :   R² validation  : 1.0000
+    second: ──────────────────────────────────────────────────────────────────────
+    first :   Ratio val/train: 1.26
+    second: [LOG] History exported → /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3/gp_elite_log.csv
+    first :   ✓ Healthy generalization.
+    second: [STIGM] Fragments accumulated: 118
+    first : ──────────────────────────────────────────────────────────────────────
+    second: [STIGM] τ max : 6.0000  |  τ moyen : 1.3223
+    first : [LOG] History exported → /tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/relX/m3/gp_elite_log.csv
+    second: [STIGM] Dominant operators: [('*', 32), ('+', 16), ('/', 14), ('sqrt', 13), ('abs', 11)]
+    first : [STIGM] Fragments accumulated: 136
+    second: [STIGM] Top 3 fragments :
+    first : [STIGM] τ max : 6.0000  |  τ moyen : 0.9218
+    second:   τ=6.000  freq=2167  abs(elongation)
+    first : [STIGM] Dominant operators: [('*', 35), ('neg', 19), ('sqrt', 18), ('/', 16), ('sq', 16)]
+    second:   τ=6.000  freq=663  (elongation * elongation)
+    first : [STIGM] Top 3 fragments :
+    second:   τ=6.000  freq=645  (-elongation)
+    first :   τ=6.000  freq=1709  (1.9444 * elongation)
+    second: 
+    first :   τ=6.000  freq=1700  sqrt(elongation)
+    second: [COGRAPH] Co-occurrence edges: 1177
+    first :   τ=6.000  freq=1481  (sqrt(elongation))²
+    second: [COGRAPH] co max : 17.22428  |  co moyen : 1.84561
+    first : 
+    second: [COGRAPH] Top 5 paires co-occurrentes :
+    first : [COGRAPH] Co-occurrence edges: 2000
+    second:   co=17.2243  [(-15.0 / (elongation * elongation))]  ×  [sqrt((-15.0 / (elongation * elongat…]
+    first : [COGRAPH] co max : 13.48506  |  co moyen : 1.08911
+    second:   co=17.2154  [(5.273223 * sqrt((-15.0 / (elongati…]  ×  [sqrt((-15.0 / (elongation * elongat…]
+    first : [COGRAPH] Top 5 paires co-occurrentes :
+    second:   co=17.2129  [(5.273223 * sqrt((-15.0 / (elongati…]  ×  [(-14.072046 * (5.273223 * sqrt((-15…]
+    first :   co=13.4851  [(-sqrt(((elongation * (sqrt(elongat…]  ×  [sqrt(((elongation * (sqrt(elongatio…]
+    second:   co=17.2115  [(-15.0 / (elongation * elongation))]  ×  [(5.273223 * sqrt((-15.0 / (elongati…]
+    first :   co=13.4427  [(elongation * 2.9521)]  ×  [((elongation * 0.008246) + (-sqrt((…]
+    second:   co=17.2088  [sqrt((-15.0 / (elongation * elongat…]  ×  [(-14.072046 * (5.273223 * sqrt((-15…]
+    first :   co=13.4427  [(-sqrt(((elongation * (sqrt(elongat…]  ×  [((elongation * 0.008246) + (-sqrt((…]
+    second: 
+    first :   co=13.4427  [sqrt(((elongation * (sqrt(elongatio…]  ×  [((elongation * 0.008246) + (-sqrt((…]
+    second: [SEQ_MEM] Transitions apprises : 464  (poids total : 19499.45)
+    first :   co=13.4427  [(-sqrt(((elongation * (sqrt(elongat…]  ×  [(elongation * 2.9521)]
+    second: [SEQ_MEM] Top 5 transitions :
+    first : 
+    second:   root.root.unary           → *
+    first : [SEQ_MEM] Transitions apprises : 463  (poids total : 17019.34)
+    second:   *.root.unary              → *
+    first : [SEQ_MEM] Top 5 transitions :
+    second:   *.*.right                 → *
+    first :   root.root.unary           → X[0]
+    second:   *.*.left                  → const
+    first :   *.root.unary              → X[0]
+    second:   *.+.right                 → const
+    first :   *.sq.unary                → sq
+    second: 
+    first :   *.*.right                 → const
+    second: ======================================================================
+    first :   *.*.left                  → const
+    second: FINAL RESULT
+    first : 
+    second: ======================================================================
+    first : ======================================================================
+    second: 
+    first : FINAL RESULT
+    second: Target        : CSV: force = f(elongation)
+    first : ======================================================================
+    second: Expression    : (24.974004 * elongation′)
+    first : 
+    second: True MSE      : 5.5764939618e-09
+    first : Target        : CSV: force = f(elongation)
+    second: Hybrid score  : 0.0000000059   (5·(1-|r|) + mse/(1+mse))
+    first : Expression    : (24.974004 * elongation′)
+    second: Fitness       : 0.0000000162
+    first : True MSE      : 5.5764939618e-09
+    second: Size          : 3
+    first : Hybrid score  : 0.0000000059   (5·(1-|r|) + mse/(1+mse))
+    second: Depth         : 2
+    first : Fitness       : 0.0000000162
+    second: 
+    first : Size          : 3
+    second: Verification:
+    first : Depth         : 2
+    second:   X[0]          target       predicted         error
+    first : 
+    second:   ----------------------------------------------------------
+    first : Verification:
+    second:     0.5945     14.84830400     14.84825255      5.15e-05
+    first :   X[0]          target       predicted         error
+    second:     0.7444     18.59176100     18.59175319      7.81e-06
+    first :   ----------------------------------------------------------
+    second:     0.6432     16.06217600     16.06225276      7.68e-05
+    first :     0.5945     14.84830400     14.84825255      5.15e-05
+    second:     0.5910     14.75987200     14.75975253      1.19e-04
+    first :     0.7444     18.59176100     18.59175319      7.81e-06
+    second:     0.4818     12.03223300     12.03225206      1.91e-05
+    first :     0.6432     16.06217600     16.06225276      7.68e-05
+    second:     0.6820     17.03261800     17.03250292      1.15e-04
+    first :     0.5910     14.75987200     14.75975253      1.19e-04
+    second:     0.4943     12.34571200     12.34575212      4.01e-05
+    first :     0.4818     12.03223300     12.03225206      1.91e-05
+    second:     0.9035     22.56489300     22.56500387      1.11e-04
+    first :     0.6820     17.03261800     17.03250292      1.15e-04
+    second: 
+    first :     0.4943     12.34571200     12.34575212      4.01e-05
+    second: [SAVE] Meilleure solution → gp_elite_best.txt
+    first :     0.9035     22.56489300     22.56500387      1.11e-04
+    second: 
+    first : 
+    second:   Note: 'Expression' above is the engine's internal form, on
+    first : [SAVE] Meilleure solution → gp_elite_best.txt
+    second:   rescaled columns (a prime marks a rescaled column, e.g.
+    first : 
+    second:   elongation′). Use the formula below.
+    first :   Note: 'Expression' above is the engine's internal form, on
+    second: 
+    first :   rescaled columns (a prime marks a rescaled column, e.g.
+    second:   Formula in YOUR columns (checked on your data):
+    first :   elongation′). Use the formula below.
+    second:     force = 250 * elongation
+    first :   Formula in YOUR columns (checked on your data):
+    second:   Dimensional constraint was active: every candidate was
+    first :     force = 250 * elongation
+    second:   dimensionally consistent by construction.
+    first : 
+    second:   Deduced constant units : [kg / s^2]
+    first :   Dimensional constraint was active: every candidate was
+    second:   Deduced constant value : 250
+    first :   dimensionally consistent by construction.
+    second: 
+    first :   Deduced constant units : [kg / s^2]
+    second: ──────────────────────────────────────────────────────────────────────
+    first :   Deduced constant value : 250
+    second:   Done. Press Enter to quit...
+    first : 
+    second: <none>
+    first : ──────────────────────────────────────────────────────────────────────
+    second: <none>
+    first :   Done. Press Enter to quit...
+    second: <none>
+same     deduced_constant_venv14rx.txt
+same     duel_gplearn.txt
+same     duel_results.jsonl
+same     feyn_results.jsonl
+same     feyn_results_normalize-none.jsonl
+same     feynman15.txt
+same     feynman15_units.jsonl
+same     feynman15_units.txt
+same     feynman_angles_normalize_none.txt
+same     formula_fuzz.txt
+new      gp_elite_best.txt
+new      gp_elite_log.csv
+same     hooke.csv
+differs  import_time.txt
+    first : 0.081 0.069 0.082 0.071 0.083 0.069 0.082
+    second: 0.066 0.067 0.067 0.076 0.067 0.076 0.067
+same     kepler_demo.txt
+same     kepler_minmax_check.txt
+same     kepler_plot.txt
+same     mystery_constant.txt
+same     nikuradse_full.txt
+same     notebook_snippet_coulomb.txt
+same     notebook_snippet_hooke.txt
+same     notebook_snippet_kepler30.txt
+same     notebook_snippet_nikuradse.txt
+same     notebook_snippet_optionB.txt
+same     notebook_snippet_torque.txt
+same     notebook_snippet_tp.txt
+same     notebook_tp_six_lois_1.4.0.txt
+same     pools_check.txt
+same     readme_kepler.py
+same     readme_kepler.txt
+same     robust_example.txt
+same     robustness_check.jsonl
+same     robustness_check.txt
+same     robustness_check_run.txt
+same     scale_check_release.txt
+same     scaling.jsonl
+differs  scaling.txt
+    first :   N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10     T s  propre
+    second:   N=100    rep=1  EXACT  champ=0.0e+00 front=0.0e+00 size=10      T s  propre
+same     small_data_release.jsonl
+same     small_data_release.txt
+same     small_data_run.txt
+same     time_limit_check.txt
+same     tp_six_lois.py
+same     units_ab_ood.jsonl
+same     units_ab_ood.txt
+same     usage_example.py
+same     usage_example.txt

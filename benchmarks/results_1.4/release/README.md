@@ -364,3 +364,24 @@ package beside them (`l1/verify.log`).
 and job by job the records are those of the count of M4 with the measured
 wheel: the same fits run the noise-tolerant stage (`l1/count_l1.jsonl`;
 `l1/count_l1.txt` is `m4/log_scan/count.txt` to the byte).
+
+**Part c** (17 November, 02:28 to 03:01, alone on the machine): M3 again
+with `/venv14r2x`, the steps of `m3/m3_driver.sh` without the runs of 1.3.0
+and the timing pair (`l1/m3/`). Against the M3 of the measured release
+(`l1/m3_compare_release_vs_l1.txt`), 57 records are the same, the check of
+`time_limit=` among them, and the four that differ differ by timing only:
+- `claims_queues.txt`, the order in which the two queues ended;
+- `console_hooke.txt`, the order of the islands' prints and the statistics
+  of the stigmergic memory in the console example, whose result stays
+  `force = 250 * elongation`, constant 250 kg/s²;
+- `import_time.txt`, the times of the import;
+- `scaling.txt`, the width of one time on its line, 9.5 s against 10.0 s,
+  which the mask of the times leaves.
+
+The console example's `gp_elite_best.txt` is that of the measured M3, and
+its `gp_elite_log.csv` differs by the same timing; both were compared with
+the copies the measured M3 left outside the repository, as in M3.
+
+**The verification holds:** on every check of the amendment, the corrected
+engine gives what the measured release gave, times aside. The measurements
+of M2 and M3, and the figures of the documents, stand for it.
