@@ -1,0 +1,7 @@
+3892 fits, crashes 0
+bench: 3092 fits, the noise-tolerant stage runs in 2762; a pass of N2b raises in 0
+    by kind or experiment: {}
+tp: 400 fits, the noise-tolerant stage runs in 400; a pass of N2b raises in 0
+    by kind or experiment: {}
+tpt10: 400 fits, the noise-tolerant stage runs in 400; a pass of N2b raises in 0
+    by kind or experiment: {}
