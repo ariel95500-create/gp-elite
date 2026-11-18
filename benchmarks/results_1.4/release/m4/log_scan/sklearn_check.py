@@ -19,8 +19,9 @@ import gp_elite
 from gp_elite import GPEliteRegressor
 from sklearn.utils.estimator_checks import check_positive_only_tag_during_fit
 
-warnings.filterwarnings("ignore")
-print("gp_elite", gp_elite.__version__, gp_elite.__file__, flush=True)
-est = GPEliteRegressor(generations=5, speed="ultrafast", random_state=0)
-check_positive_only_tag_during_fit("GPEliteRegressor", est)
-print("check_positive_only_tag_during_fit passed", flush=True)
+if __name__ == "__main__":        # the islands' workers re-import this file
+    warnings.filterwarnings("ignore")
+    print("gp_elite", gp_elite.__version__, gp_elite.__file__, flush=True)
+    est = GPEliteRegressor(generations=5, speed="ultrafast", random_state=0)
+    check_positive_only_tag_during_fit("GPEliteRegressor", est)
+    print("check_positive_only_tag_during_fit passed", flush=True)
