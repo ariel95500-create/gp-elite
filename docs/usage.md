@@ -106,9 +106,8 @@ guarantee.
   of a ten-point lab table then takes seconds: the six of the French TP notebook
   (`examples/tp_six_lois.ipynb`) took 48 s in all, against 194 to 198 s with 1.1.0 on the same machine, and
   returned the same formulas; with 1.4.0, in its release measurement, they
-  take 52 and 53 s in the two runs paired with 1.3.0 the same day, against
-  49 and 54 s, with the same formulas (50 to 53 s over the four runs of
-  1.4.0). A call that sets its budget (`generations=` or
+  take 51 to 53 s over its three runs of the day, 52 and 53 s in the two
+  paired with 1.3.0, against 49 and 54 s, with the same formulas. A call that sets its budget (`generations=` or
   `time_limit=`) gets all of it, as in
   1.1. An integer k applies a patience of k generations whatever the budget, and
   0 turns it off. `GPEliteRegressor` always sets its number of generations, so

@@ -99,8 +99,9 @@ unread; no change of the engine followed, and TPT10 decides nothing.
 **Criteria of the plan:** the eighteen are met (`m2/compare.txt`).
 - **Where 1.4 does not act:** 2,428 fits of 3,092 place the same
   noise-tolerant seeds in both versions, none in most of them. On the 782 of
-  these where neither version reached its budget, the recorded formula, the
-  error on the test rows and `formula_exact` are those of 1.3.0, to the bit.
+  these where neither version reached its budget, the recorded formula (its
+  first 160 characters; 3 of the 782 are cut there), the error on the test
+  rows and `formula_exact` are those of 1.3.0, to the bit.
 - **TP:** the 400 models of 1.4.0 are those of the candidate of N2b in its
   campaign, as expected: the fits of TP are reproducible. The law comes back
   in 123 fits against 126 in the plain arm and 120 against 120 under units,
@@ -121,10 +122,11 @@ versions. U41 has one exact law more in each version than in that campaign
 **Beside, deciding nothing** (`m2/compare.txt`):
 - The structures move on nine equations, as in campaign N2b: gains at 1 %
   noise on I.32.5, I.40.1, I.44.4, II.11.27, II.11.3, II.35.18, III.15.12 and
-  III.19.51, and at 10 % on I.32.5, I.44.4 and III.19.51, and under units on
-  II.11.27 (0 → 1); losses at 10 %
-  noise on I.27.6 (2 → 0 without units, 5 → 1 with them) and III.15.12 (5 → 2
-  and 5 → 1).
+  III.19.51 without units, and on six of them under units (all but I.32.5 and
+  III.19.51); gains at 10 % on I.32.5, I.44.4 and III.19.51 without units, and
+  on I.44.4 (0 → 5) and II.11.27 (0 → 1) under units; losses at 10 % noise on
+  I.27.6 (2 → 0 without units, 5 → 1 with them) and III.15.12 (5 → 2 and
+  5 → 1).
 - The noise-tolerant seeds are placed in more fits with 1.4.0: 165 against
   140 in F41N1, 130 against 95 in F41N10, 125 against 95 in U41N1, 115
   against 85 in U41N10. Neither version places one on R6, R7raw or TR25. On
@@ -153,8 +155,10 @@ versions. U41 has one exact law more in each version than in that campaign
   the law and 5 gain it, Kepler's third law in 3 of them (2 lost, 1 gained).
 
 `m2/limits_figures.txt` gives the figures of the pages of the limits read
-from the records of M2, for both versions; the pages were brought to them
-with the documents.
+from the records of M2, for both versions, written by the script of the M2 of
+1.3 (`python ../../results_1.3/release/m2/limits_figures.py
+campaignR_1.3.0.jsonl campaignR_1.4.0.jsonl`, run from `m2/`, which gives it
+to the byte); the pages were brought to them with the documents.
 
 ## M3, every public figure measured again (14 November 2026)
 
@@ -229,12 +233,16 @@ as they were, within the noise of time budgets. Nine records moved, because
 the noise-tolerant stage does not wait for noise: it runs wherever the exact
 finders of binomials and of functions of a monomial place no seed, and N2b
 adds its forms there. `m3_examine/seeds.py`, committed before its run and
-deciding nothing, builds the data of every fit of those five scripts and of
-the battery example as M3 does, runs each for one generation with 1.3.0 and
-1.4.0 (`/venv13rx` and `/venv14rx`), and records the seeds of each call of
-the stage (`m3_examine/seeds_compare.txt`; the data of the 86 fits whose
-records carry a hash are checked against it). Every fit whose record moved
-is one where 1.4.0 places other noise-tolerant seeds:
+deciding nothing, builds the data of 111 fits as M3 does: the 85 of the
+scaling bench, the 20 of the small-data check, I.16.6 under units, the case
+of a wide range of the robustness check, the three tables of the check of
+`time_limit=`, and the forward split of the battery example. It runs each
+for one generation with 1.3.0 and 1.4.0 (`/venv13rx` and `/venv14rx`), and
+records the seeds of each call of the stage (`m3_examine/seeds_compare.txt`;
+the data of the 86 fits whose records carry a hash are checked against it).
+Every fit examined whose record moved is one where 1.4.0 places other
+noise-tolerant seeds; the random split of the battery example, which moved
+too (+0.993 to +0.992), was not examined:
 - **The scaling bench** (`scaling.txt`): the 85 fits of five Feynman
   equations from 25 to 10,000 points. The stage places other seeds in 6 of
   them, all six of I.16.6, the relativistic addition of velocities: exactly
@@ -317,8 +325,18 @@ Under 3.9 and 3.11, LAPACK printed "On entry to DLASCL ..." six times during
 the tests, so the last line of their output, which `summary.txt` keeps, is
 that message; the line before it reads "199 passed". The messages come from
 a check of scikit-learn that the tests run,
-`check_positive_only_tag_during_fit`: there the new scan of the logarithm met
-a form it could not evaluate. That was a fault of N2b, below.
+`check_positive_only_tag_during_fit`: it fits the estimator on the iris data
+minus their overall mean, whose fourth column is then negative throughout,
+and there the new scan of the logarithm met a form it could not evaluate.
+That was a fault of N2b, below. After the second review of M5,
+`m4/log_scan/sklearn_check.py`, committed before its run, ran that check
+alone on the estimator of the test: six messages with the measured wheel,
+none with the corrected one (`m4/log_scan/sklearn_check_*.txt`).
+
+The **Tests** workflow of the repository is green on every commit of the
+branch since the candidate that it ran on (`m4/ci_runs.txt`); it does not run
+on commits that change documents only. It is checked again on the commit of
+the release, with the pull request.
 
 ## The fault of the scan of the logarithm, and correction L1 (16 November 2026)
 
@@ -337,7 +355,7 @@ on the console. Two scripts, which decide nothing, measured it
   one generation, which runs the noise-tolerant stage on the data of each
   fit. The stage runs in 3,562 of them (2,762 of the 3,092 of the benches,
   and the 800 of TP and TPT10), and no pass of N2b raises. The fault touched
-  no fit of the measurements.
+  none of these fits; it showed in the test suite, above.
 
 **A correction of the plan.** The amendment of the plan says of these fits
 that all their inputs are positive. That is not so: the standardised real
@@ -399,9 +417,31 @@ and the timing pair (`l1/m3/`). Against the M3 of the measured release
   which the mask of the times leaves.
 
 The console example's `gp_elite_best.txt` is that of the measured M3, and
-its `gp_elite_log.csv` differs by the same timing; both were compared with
-the copies the measured M3 left outside the repository, as in M3.
+its `gp_elite_log.csv` differs by the same timing. `.gitignore` keeps both out
+of the repository; they were compared with the copies the measured M3 left
+outside it, and that comparison, recorded after the second review of M5, is
+`l1/m3_console_files_compare.txt`.
 
 **The verification holds:** on every check of the amendment, the corrected
-engine gives what the measured release gave, times aside. The measurements
-of M2 and M3, and the figures of the documents, stand for it.
+engine gives what the amendment expects: what the measured release gave,
+times aside, and, on the cases with a negative column, no pass that raises.
+The measurements of M2 and M3, and the figures of the documents, stand for
+it.
+
+## M5, two independent reviews (16 to 18 November 2026)
+
+`M5_review1.md` and `M5_review2.md`: two agents, one after the other, each
+without having seen the work, the second without the first review either
+(it disclosed having seen one line of it, `M5_review2.md`). Both stopped once
+on a usage limit of the agents and resumed where they were. They checked
+about 380 and 240 claims of the documents against the records and the code,
+and recomputed about 150 figures each, with read-only scripts that import
+nothing of the engine and run no fit (`m5/review1/`, `m5/review2/`). Each
+recomputed the eighteen criteria of the plan with code of its own, and found
+them met with the figures of `m2/compare.txt`. Neither found an error in a
+figure that decides the release, or in a criterion of the plan. Each
+reported 13 findings: sentences that say more than the records show,
+descriptions of the noise-tolerant stage that the code does not bear out,
+limits left incomplete, statements without a committed record, and stale or
+imprecise wording. Each is corrected or answered there; the reports and
+scripts are in `m5/`.

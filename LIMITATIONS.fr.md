@@ -61,8 +61,9 @@ premier :
 
 La version 1.4 donne plus de formes aux graines tolérantes au bruit. Là où ces
 graines sont les mêmes dans les deux versions et où aucune n'atteint son budget
-de temps, elle rend les modèles de la 1.3.0 au bit près (782 ajustements de la
-mesure de sortie). Mesurée à côté de la 1.3.0 pour la sortie de la 1.4
+de temps, la formule enregistrée (ses 160 premiers caractères), l'erreur sur
+les lignes de test et `formula_exact` sont ceux de la 1.3.0, au bit près (782
+ajustements de la mesure de sortie). Mesurée à côté de la 1.3.0 pour la sortie de la 1.4
 (`benchmarks/results_1.4/release/`, les chiffres dans `m2/limits_figures.txt`),
 la 1.4.0 donne :
 - 152 et 95 structures sous bruit contre 116 et 87 (point 3) ;
@@ -142,9 +143,12 @@ pas été mesuré.
 
 Depuis la 1.4, les graines tolérantes au bruit portent plus de formes. Deux
 choses qu'elles ne règlent pas :
-- **à 10 % de bruit, deux équations perdent leur structure :** I.27.6 passe de
-  2 ajustements sur 5 à aucun sans les unités et de 5 à 1 avec elles, III.15.12
-  de 5 à 2 et de 5 à 1 ; les nouvelles graines emmènent la recherche ailleurs ;
+- **à 10 % de bruit, deux équations perdent des ajustements qui ont la
+  structure de la loi :** I.27.6 passe de 2 ajustements sur 5 à aucun sans les
+  unités et de 5 à 1 avec elles, III.15.12 de 5 à 2 et de 5 à 1. Dans ces vingt
+  ajustements, la 1.4.0 place d'autres graines (une là où la 1.3.0 n'en plaçait
+  aucune sur I.27.6, trois contre une sur III.15.12), et la campagne N2b donnait
+  les mêmes nombres : la cause probable, non examinée ;
 - **sur quelques points bruités, une graine qui a la structure de la loi ne
   suffit pas à ce que la recherche la garde.** Sur le diagnostic des TP (10 ou
   20 points avec 2 % ou 5 % de bruit), la source ponctuelle a la loi sans les
@@ -183,8 +187,8 @@ banc, aucune loi n'a été perdue ainsi : aucune équation n'a moins d'ajustemen
 exacts qu'avec la 0.9.0. `PLAN_PHASE5.md`, mécanique de N1.
 
 Depuis la 1.4, l'étage tolérant au bruit place aussi plus de formes sur des
-données exactes, là où aucune graine exacte ne les couvre. Dans la mesure de
-sortie de la 1.4.0, un chiffre y perd sa loi : sur les 3 000 lignes de
+données exactes, là où aucune graine exacte ne les couvre. Parmi les chiffres
+publics mesurés de nouveau pour la sortie de la 1.4.0 (M3), un y perd sa loi : sur les 3 000 lignes de
 x0·x1/x2 + 0,3·x3 de `benchmarks/time_limit_check.py`, l'étage place 4 graines
 contre 1, et en séquentiel la 1.4.0 va jusqu'à son budget de 15 s et rend une
 approximation de R² 0,9979, là où la 1.3.0 rendait la loi en 6,3 s. Trois en
@@ -193,7 +197,10 @@ ajustements sur 17 contre 9 ; un cas du contrôle de robustesse dont l'entrée v
 de 1e-3 à 1e6, qui rend sa loi là où la 1.3.0 rendait une approximation ; et
 une exponentielle du contrôle des petits jeux, écrite comme la loi là où la
 1.3.0 en écrivait des formes plus longues
-(`benchmarks/results_1.4/release/m3_examine/`).
+(`benchmarks/results_1.4/release/m3_examine/`). Sur le jeu de test figé de la
+mesure de sortie, sans les unités, 4 ajustements perdent leur loi exacte (2 de
+TF78, 2 des systèmes de Strogatz) et 6 en gagnent une (2 et 4, dont une sur les
+lignes hors du domaine), tous là où la 1.4.0 place d'autres graines.
 
 ## 6. Une formule qui s'écarte de ses prédictions
 
@@ -288,9 +295,9 @@ Trois changements ont été mesurés pour la 1.4 et non adoptés
 (`benchmarks/results_1.4/PLAN.md`). Leur code reste dans le moteur, éteint :
 - **une validation croisée sur les tableaux de moins de 30 lignes (S1).** Elle
   choisissait des structures que la recherche avait trouvées sur les mêmes
-  quelques points, dont elle sous-estimait l'erreur : sur le diagnostic des TP,
-  la loi revenait dans 113 ajustements sur 200 contre 126, et un ajustement
-  prenait 1,67 fois plus de temps ;
+  quelques points, dont elle sous-estimait l'erreur : sur le bras sans unités
+  du diagnostic des TP, la loi revenait dans 113 ajustements sur 200 contre
+  126, et l'ajustement médian prenait 1,67 fois plus de temps ;
 - **une graine pour une constante plus une exponentielle (E2),** comme dans le
   refroidissement de Newton. La graine avait la structure de la loi dans 18
   ajustements sur 20, mais dans 11 d'entre eux la recherche rendait une autre

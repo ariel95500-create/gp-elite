@@ -114,9 +114,9 @@ exacte, sans garantie.
   quelques secondes : les six du notebook de TP (`examples/tp_six_lois.ipynb`)
   prenaient 48 s en tout, contre
   194 à 198 s avec la 1.1.0 sur la même machine, et rendaient les mêmes formules ;
-  avec la 1.4.0, dans sa mesure de sortie, ils prennent 52 et 53 s dans les deux
-  passages appariés avec la 1.3.0 le même jour, contre 49 et 54 s, avec les
-  mêmes formules (50 à 53 s sur les quatre passages de la 1.4.0).
+  avec la 1.4.0, dans sa mesure de sortie, ils prennent 51 à 53 s sur ses trois
+  passages du jour, 52 et 53 s dans les deux appariés avec la 1.3.0, contre 49 et
+  54 s, avec les mêmes formules.
   Un appel qui fixe son budget (`generations=` ou `time_limit=`) le reçoit en
   entier, comme en 1.1. Un entier k
   applique une patience de k générations quel que soit le budget, et 0 la coupe.

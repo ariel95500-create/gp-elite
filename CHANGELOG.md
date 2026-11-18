@@ -25,9 +25,9 @@ the 800 of the TP diagnostic and its frozen set, with the defaults:
 - without noise, the bench keeps its 171 exact laws of 205, and 174 with
   units, and no equation falls;
 - on the 782 fits where both versions place the same noise-tolerant seeds
-  (most often none) and neither reaches its budget, the recorded formula,
-  the error on the test rows and `formula_exact` are those of 1.3.0, to the
-  bit. The real data give the same median and the same collapses out of the
+  (most often none) and neither reaches its budget, the recorded formula
+  (its first 160 characters), the error on the test rows and `formula_exact`
+  are those of 1.3.0, to the bit. The real data give the same median and the same collapses out of the
   training range;
 - every one of the 1,161 models returned under units passed the audit of
   units;
@@ -65,13 +65,14 @@ returned the law at 6.3 s.
   logarithm met a form it could not evaluate. The error dropped every form
   of its pass, the scans of the sine and the cosine included, and LAPACK
   printed "On entry to DLASCL ..." on the console. The scan now skips such a
-  form. No pass of the scan raised on any fit of the release measurement.
-  The corrected engine returns what the measured one returned, times aside,
-  on its reference configurations, on the 800 fits of the TP diagnostic and
-  its frozen set, and on the records of the examples, notebooks and case
-  studies; on the 3,092 fits of the benches, run for one generation, its
-  noise-tolerant stage runs where the measured one ran and no pass raises
-  (`benchmarks/results_1.4/release/`).
+  form. The fault showed in a check of the test suite (M4); on the 3,892
+  fits of the benches and of the TP diagnostic of the release measurement,
+  run again for one generation, no pass of the scan raised. The corrected
+  engine returns what the measured one returned, times aside, on its
+  reference configurations, on the 800 fits of the TP diagnostic and its
+  frozen set, and on the records of the examples, notebooks and case
+  studies; on the 3,092 fits of the benches, its noise-tolerant stage runs
+  where the measured one ran (`benchmarks/results_1.4/release/`).
 
 ### Known limits
 - On a few noisy points, a seed with the structure of the law does not make

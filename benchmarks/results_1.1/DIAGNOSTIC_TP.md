@@ -266,6 +266,6 @@ beside 1.3.0 (`../results_1.4/release/m2/compare.txt`):
 
 Two changes meant for these tables were measured for 1.4 and not adopted: a
 cross-validation of the candidates below 30 rows, and a seed for Newton's
-cooling. Both found the same cause: on 10 or 20 noisy points, the final choice
-among the forms of the search, not the seeds, decides whether the law comes
-back.
+cooling. Both point the same way: on 10 or 20 noisy points, a seed with the
+structure of the law does not make the search keep it, and the final choice
+among the forms of the search decides whether the law comes back.

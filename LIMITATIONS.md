@@ -55,8 +55,10 @@ they do from one campaign to the next. The figures of 1.3.0 are given first:
 - 11 departing formulas of 130 with both, and 65 of 500 against 64.
 
 Version 1.4 gives the noise-tolerant seeds more forms. Where those seeds are
-the same in both versions and neither reaches its time budget, it returns the
-models of 1.3.0 to the bit (782 fits of the release measurement). Measured
+the same in both versions and neither reaches its time budget, the recorded
+formula (its first 160 characters), the error on the test rows and
+`formula_exact` are those of 1.3.0, to the bit (782 fits of the release
+measurement). Measured
 beside 1.3.0 for the release of 1.4 (`benchmarks/results_1.4/release/`, the
 figures in `m2/limits_figures.txt`), 1.4.0 gives:
 - 152 and 95 structures under noise against 116 and 87 (point 3);
@@ -128,9 +130,12 @@ Above 10 % the engine has not been measured.
 
 Since 1.4 the noise-tolerant seeds hold more forms. Two things they do not
 settle:
-- **at 10 % noise, two equations lose their structure:** I.27.6 goes from 2
-  fits of 5 to none without units and from 5 to 1 with them, III.15.12 from 5
-  to 2 and from 5 to 1; the new seeds take the search elsewhere;
+- **at 10 % noise, two equations lose fits with the structure of the law:**
+  I.27.6 goes from 2 fits of 5 to none without units and from 5 to 1 with
+  them, III.15.12 from 5 to 2 and from 5 to 1. In all twenty of these fits
+  1.4.0 places other seeds (one where 1.3.0 placed none on I.27.6, three
+  against one on III.15.12), and campaign N2b gave the same counts: the
+  likely cause, not examined;
 - **on a few noisy points, a seed with the structure of the law does not make
   the search keep it.** On the TP diagnostic (10 or 20 points with 2 % or 5 %
   noise), the point source has the law without units in 14 fits of 20
@@ -165,8 +170,8 @@ normalisation, on the bench, no law was lost this way: no equation has fewer exa
 fits than with 0.9.0. `PLAN_PHASE5.md`, mechanics of N1.
 
 Since 1.4 the noise-tolerant stage places more forms on exact data too, where
-no exact seed covers it. In the release measurement of 1.4.0, one figure loses
-its law that way: on the 3,000 rows of x0·x1/x2 + 0.3·x3 of
+no exact seed covers it. Among the public figures measured again for the
+release of 1.4.0 (M3), one loses its law that way: on the 3,000 rows of x0·x1/x2 + 0.3·x3 of
 `benchmarks/time_limit_check.py`, the stage places 4 seeds against 1, and in
 sequence 1.4.0 runs to its budget of 15 s and returns an approximation of R²
 0.9979, where 1.3.0 returned the law at 6.3 s. Three come out better:
@@ -174,7 +179,10 @@ Feynman I.16.6 in the scaling bench, exact in 10 fits of 17 against 9; a case
 of the robustness check whose input spans 1e-3 to 1e6, which returns its law
 where 1.3.0 returned an approximation; and an exponential of the small-data
 check, written as the law where 1.3.0 wrote longer forms of it
-(`benchmarks/results_1.4/release/m3_examine/`).
+(`benchmarks/results_1.4/release/m3_examine/`). On the frozen test set of the
+release measurement, without units, 4 fits lose their exact law (2 of TF78, 2
+of the Strogatz systems) and 6 gain one (2 and 4, one of them on the rows out
+of the domain), all where 1.4.0 places other seeds.
 
 ## 6. A formula that departs from its predictions
 
@@ -262,9 +270,9 @@ Three changes were measured for 1.4 and not adopted
 (`benchmarks/results_1.4/PLAN.md`). Their code stays in the engine, switched
 off:
 - **a cross-validation on tables below 30 rows (S1).** It chose structures the
-  search had found on the same few points, whose error it underestimated: on
-  the TP diagnostic the law came back in 113 fits of 200 against 126, and a fit
-  took 1.67 times as long;
+  search had found on the same few points, whose error it underestimated: in
+  the plain arm of the TP diagnostic the law came back in 113 fits of 200
+  against 126, and the median fit took 1.67 times as long;
 - **a seed for a constant plus an exponential (E2),** as in Newton's cooling.
   The seed had the structure of the law in 18 fits of 20, but in 11 of them the
   search returned another form, closer to the noise: the law came back in 7

@@ -99,6 +99,11 @@ In the release measurement of 1.4.0, five seeds and 30 s per fit, against
 | the 41 with their physical units: exact law (of 205) | 174 | 174 |
 | models returned under units that pass the audit of units | 1,161 of 1,161 | 1,161 of 1,161 |
 
+1.4 places more noise-tolerant seeds at the start of the search, forms its
+finders fit to the data: hence the gains under noise
+([what's new](https://github.com/ariel95500-create/gp-elite/blob/main/docs/features.md#whats-new),
+[CHANGELOG](https://github.com/ariel95500-create/gp-elite/blob/main/CHANGELOG.md)).
+
 The structure of the law is retrieved when the returned model, its constants
 refitted on the noiseless data, reproduces the law. On 15 Feynman equations, head
 to head with gplearn on the same data, GP_ELITE returns 15 exact laws against 6.

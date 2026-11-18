@@ -1,0 +1,8 @@
+gp_elite 1.4.0 /venvt14_3.11.18/lib/python3.11/site-packages/gp_elite/__init__.py
+check_positive_only_tag_during_fit passed
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  5 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value

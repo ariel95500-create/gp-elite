@@ -98,6 +98,10 @@ la 1.3.0 mesurée à côté
 | les 41 avec leurs unités physiques : loi exacte (sur 205) | 174 | 174 |
 | modèles rendus sous unités qui passent l'audit des unités | 1 161 sur 1 161 | 1 161 sur 1 161 |
 
+La 1.4 place plus de graines tolérantes au bruit au début de la recherche, des
+formes que ses chercheurs ajustent aux données : d'où les gains sous bruit
+([nouveautés](docs/fr/caracteristiques.md#nouveautés), [CHANGELOG](CHANGELOG.md)).
+
 La structure de la loi est retrouvée quand le modèle rendu, ses constantes
 réajustées sur les données sans bruit, reproduit la loi. Sur 15 équations de
 Feynman, en duel avec gplearn sur les mêmes données, GP_ELITE rend 15 lois
