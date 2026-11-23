@@ -31,5 +31,8 @@ while :; do
     S=6300
   fi
   lscpu > $O/machine_$(date -u +%Y%m%dT%H%M).txt
+  # the records into the repository after each slice, so that a restart of
+  # the machine loses at most one slice
+  bash /home/user/gp-elite/benchmarks/results_1.5/size/checkpoint.sh >> $O/checkpoint.log 2>&1 || true
 done
 echo "--- all done $(date -u +%Y-%m-%dT%H:%M)"
