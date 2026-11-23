@@ -12,6 +12,8 @@ to the engine and before any measurement of this phase. Method as before:
 The author validates this plan before any change (gate 13), and decides the
 publication of 1.5 after its measurement (gate 14).
 
+Gate 13: the author validated this plan in full on 23 November 2026.
+
 ## What 1.5 has to do
 
 The strategic plan the author approved on 23 November 2026 puts the split of
