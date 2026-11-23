@@ -1,28 +1,41 @@
 # The workflows of the repository on the branch claude/peaceful-knuth-4q7m4p,
-# from the candidate f6a36cd on, read on 18 November 2026 (GitHub Actions).
+# from the candidate f6a36cd on, then the merge commit on main and the tag v1.4.0,
+# read on 23 November 2026 (GitHub Actions).
 # The Tests workflow does not run on commits that change only documents
 # (paths-ignore "**.md" and "paper/**"); Draft PDF runs on those that touch the paper.
-# workflow  run  commit   conclusion  created (UTC)
-Tests       337  f6a36cd  success     2026-11-13T20:40:11Z
-Tests       338  796b31c  success     2026-11-13T20:46:02Z
-Tests       339  3819415  success     2026-11-14T08:21:04Z
-Tests       340  fbe9b00  success     2026-11-14T08:21:40Z
-Tests       341  f005aab  success     2026-11-14T08:22:31Z
-Tests       342  965fa18  success     2026-11-16T18:50:20Z
-Tests       343  33172a5  success     2026-11-16T19:35:40Z
-Tests       344  ec44e8e  success     2026-11-16T20:54:50Z
-Tests       345  ac4c7b6  success     2026-11-16T20:56:09Z
-Tests       346  a82a292  success     2026-11-16T21:03:25Z
-Draft PDF    41  a82a292  success     2026-11-16T21:03:25Z
-Tests       347  9efc847  success     2026-11-16T21:03:46Z
-Tests       348  3cfb5f0  success     2026-11-16T22:09:41Z
-Tests       349  5dd9909  success     2026-11-16T22:14:48Z
-Tests       350  d4455c2  success     2026-11-16T22:17:28Z
-Tests       351  0d8ae32  success     2026-11-16T22:20:17Z
-Tests       352  808e0ca  success     2026-11-16T22:22:17Z
-Tests       353  b3fc7af  success     2026-11-17T02:28:16Z
-Tests       354  858fe19  success     2026-11-17T02:28:41Z
-Tests       355  31bed58  success     2026-11-17T03:02:43Z
-Tests       356  b35566a  success     2026-11-17T03:20:58Z
-Tests       357  d0051ea  success     2026-11-17T03:23:40Z
+# workflow  run  commit   event         ref                            conclusion  created (UTC)
+Tests       337  f6a36cd  push          claude/peaceful-knuth-4q7m4p   success     2026-11-13T20:40:11Z
+Tests       338  796b31c  push          claude/peaceful-knuth-4q7m4p   success     2026-11-13T20:46:02Z
+Tests       339  3819415  push          claude/peaceful-knuth-4q7m4p   success     2026-11-14T08:21:04Z
+Tests       340  fbe9b00  push          claude/peaceful-knuth-4q7m4p   success     2026-11-14T08:21:40Z
+Tests       341  f005aab  push          claude/peaceful-knuth-4q7m4p   success     2026-11-14T08:22:31Z
+Tests       342  965fa18  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T18:50:20Z
+Tests       343  33172a5  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T19:35:40Z
+Tests       344  ec44e8e  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T20:54:50Z
+Tests       345  ac4c7b6  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T20:56:09Z
+Draft PDF    41  a82a292  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T21:03:25Z
+Tests       346  a82a292  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T21:03:25Z
+Tests       347  9efc847  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T21:03:46Z
+Tests       348  3cfb5f0  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T22:09:41Z
+Tests       349  5dd9909  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T22:14:48Z
+Tests       350  d4455c2  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T22:17:28Z
+Tests       351  0d8ae32  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T22:20:17Z
+Tests       352  808e0ca  push          claude/peaceful-knuth-4q7m4p   success     2026-11-16T22:22:17Z
+Tests       353  b3fc7af  push          claude/peaceful-knuth-4q7m4p   success     2026-11-17T02:28:16Z
+Tests       354  858fe19  push          claude/peaceful-knuth-4q7m4p   success     2026-11-17T02:28:41Z
+Tests       355  31bed58  push          claude/peaceful-knuth-4q7m4p   success     2026-11-17T03:02:43Z
+Tests       356  b35566a  push          claude/peaceful-knuth-4q7m4p   success     2026-11-17T03:20:58Z
+Tests       357  d0051ea  push          claude/peaceful-knuth-4q7m4p   success     2026-11-17T03:23:40Z
+Tests       358  1d70d64  push          claude/peaceful-knuth-4q7m4p   success     2026-11-18T07:38:08Z
+Tests       359  1a83cb3  push          claude/peaceful-knuth-4q7m4p   success     2026-11-18T07:44:23Z
+Tests       360  3e5ed99  push          claude/peaceful-knuth-4q7m4p   success     2026-11-18T07:44:52Z
+Tests       361  7d1fb3d  push          claude/peaceful-knuth-4q7m4p   success     2026-11-18T07:47:38Z
+Draft PDF    42  d0639d0  push          claude/peaceful-knuth-4q7m4p   success     2026-11-23T16:48:03Z
+Tests       362  d0639d0  push          claude/peaceful-knuth-4q7m4p   success     2026-11-23T16:48:03Z
+Tests       363  6f092d8  push          claude/peaceful-knuth-4q7m4p   success     2026-11-23T16:49:08Z
+Tests       364  6f092d8  pull_request  claude/peaceful-knuth-4q7m4p   success     2026-11-23T16:49:45Z
+Draft PDF    43  6dc1e35  push          main                           success     2026-11-23T16:59:47Z
+Draft PDF    44  6dc1e35  push          v1.4.0                         success     2026-11-23T17:15:18Z
+Tests       365  6dc1e35  push          main                           success     2026-11-23T16:59:47Z
+Tests       366  6dc1e35  push          v1.4.0                         success     2026-11-23T17:15:18Z
 # no run, documents only: f0e37c9 (CHANGELOG.md), 5f3199f (benchmarks/results_1.4/release/README.md)

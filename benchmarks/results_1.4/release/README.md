@@ -470,8 +470,7 @@ decision, since the description of the PyPI page is the README
 - **The merge.** The pull request of the release (#10) was merged into
   `main` by a merge commit, 6dc1e35, whose tree is that of 6f092d8. The
   **Tests** workflow is green for 6f092d8 (runs 363 and 364) and for that
-  merge commit on `main` (run 365); the run of the tag, 366, was under way
-  when this was written (`m4/ci_runs.txt`).
+  merge commit on `main` (run 365) (`m4/ci_runs.txt`).
 - **PyPI.** The author published the two files on 23 November 2026, at
   17:09 UTC, after the run on `main` had ended green. Their SHA-256 on PyPI
   are those of the files built from d0639d0 (`environments.txt`), and the
@@ -481,4 +480,6 @@ decision, since the description of the PyPI page is the README
   those of `main` and to those of the corrected wheel that L1 verified.
 - **The release page.** v1.4.0 on GitHub, tag on 6dc1e35, was published at
   17:15 UTC with the two files, whose SHA-256 are those of
-  `environments.txt`.
+  `environments.txt`. The **Tests** workflow is green on the tag too
+  (run 366), and so is the **Draft PDF** workflow of the paper, on `main`
+  and on the tag (runs 43 and 44; `m4/ci_runs.txt`).
