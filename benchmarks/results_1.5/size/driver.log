@@ -1,0 +1,27 @@
+--- size study, bench of 2cb14bf, Model name: Intel(R) Xeon(R) Processor, 4 cores
+benchmarks/results_1.5/size/driver.sh: 24: cannot open /home/user/size_records/campaign.jsonl: No such file
+--- slice 2026-11-23T21:11 (0 done), Model name: Intel(R) Xeon(R) Processor
+1845 jobs to run, 0 already done
+25 done, 9 s elapsed, 1819 left
+50 done, 30 s elapsed, 1792 left
+75 done, 374 s elapsed, 1770 left
+100 done, 475 s elapsed, 1745 left
+125 done, 542 s elapsed, 1720 left
+150 done, 761 s elapsed, 1694 left
+175 done, 998 s elapsed, 1669 left
+200 done, 1059 s elapsed, 1643 left
+225 done, 1265 s elapsed, 1620 left
+250 done, 1607 s elapsed, 1595 left
+275 done, 1869 s elapsed, 1567 left
+300 done, 2118 s elapsed, 1545 left
+325 done, 2226 s elapsed, 1519 left
+time slice over: 1498 jobs left for the next call
+r100         first 10 fits: median     0.3 s, budget    30 s
+r1000        first 10 fits: median     0.3 s, budget    30 s
+r10000       first 10 fits: median     0.8 s, budget    30 s
+r100000      first 10 fits: median     5.3 s, budget    30 s
+r100000_10T  first 10 fits: median     5.3 s, budget   300 s
+k5           first 10 fits: median     0.3 s, budget    30 s
+k10          first 10 fits: median     0.3 s, budget    30 s
+k20          first 10 fits: median     0.4 s, budget    30 s
+k20_10T      first 10 fits: median     0.4 s, budget   300 s
