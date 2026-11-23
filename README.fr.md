@@ -127,6 +127,7 @@ jamais servi à en prendre une.
 - [Régression robuste](docs/fr/robuste.md), pour des données avec des valeurs aberrantes
 - [Exemples](docs/fr/exemples.md) : le vieillissement de batteries simulé, et trois études de cas sur données publiques
 - [Comment GP_ELITE est mesuré](docs/fr/mesures.md) : face aux alternatives, et ce sur quoi il est bon et moins bon
+- [Comment GP_ELITE est fait](docs/fr/comment-il-est-fait.md) : qui fait quoi entre l'auteur et l'assistant d'IA, et comment c'est contrôlé
 - [Ce que GP_ELITE ne fait pas](LIMITATIONS.fr.md)
 - [Caractéristiques techniques et historique](docs/fr/caracteristiques.md), et le [CHANGELOG](CHANGELOG.md)
 

@@ -129,6 +129,7 @@ never used to make one.
 - [Robust regression](https://github.com/ariel95500-create/gp-elite/blob/main/docs/robust.md), for data with outliers
 - [Examples](https://github.com/ariel95500-create/gp-elite/blob/main/docs/examples.md): simulated battery ageing, and three case studies on public data
 - [How GP_ELITE is measured](https://github.com/ariel95500-create/gp-elite/blob/main/docs/measurements.md): against the alternatives, and what it is good and less good at
+- [How GP_ELITE is made](https://github.com/ariel95500-create/gp-elite/blob/main/docs/how-it-is-made.md): who does what between the author and the AI assistant, and how it is checked
 - [What GP_ELITE does not do](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.md)
 - [Technical features and history](https://github.com/ariel95500-create/gp-elite/blob/main/docs/features.md), and the [CHANGELOG](https://github.com/ariel95500-create/gp-elite/blob/main/CHANGELOG.md)
 
