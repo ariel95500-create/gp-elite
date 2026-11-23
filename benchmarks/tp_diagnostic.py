@@ -34,6 +34,11 @@ units_ok stays the strict check against the target, in every experiment.
 model returned is a sum whose one term is a constant) and small_cv (the
 trace of S1: the candidates scored and the origin of the model chosen;
 None for an engine without S1). The fits are unchanged.
+[1.5] The generations are counted by a wrap of evolve_island set in every
+module of the package that holds it (benchmarks/results_1.5/PLAN.md, Part A:
+the engine in modules); with 1.4.0 and before only gp_elite.core holds it,
+and the fits are those of before. A fit whose wrap was not called is a
+crash, and the run stops.
 """
 import argparse
 import io
@@ -48,6 +53,25 @@ from contextlib import redirect_stdout
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def _wrap(C, name, new):
+    """[1.5] Set `new` in place of the engine's function `name` in every module
+    of the package that holds it, so that a wrap reaches the calls whether the
+    engine is the one file of 1.4.0 and before (only gp_elite.core holds the
+    function) or the modules of 1.5 (benchmarks/results_1.5/PLAN.md, Part A).
+    Returns the function that undoes it."""
+    orig = getattr(C, name)
+    held = [m for k, m in list(sys.modules.items())
+            if (k == "gp_elite" or k.startswith("gp_elite."))
+            and getattr(m, name, None) is orig]
+    for m in held:
+        setattr(m, name, new)
+
+    def undo():
+        for m in held:
+            setattr(m, name, orig)
+    return undo
 
 # ── units (SI base units) ───────────────────────────────────────────────────
 S = {"s": 1}
@@ -249,13 +273,15 @@ def worker(job):
         g = a[3] if len(a) > 3 else k.get("generation", 0)
         gens[0] = max(gens[0], int(g) + 1)
         return orig_isl(*a, **k)
-    C.evolve_island = counted
+    undo_wrap = _wrap(C, "evolve_island", counted)     # [1.5]
     t0 = time.time()
     with redirect_stdout(io.StringIO()), warnings.catch_warnings():
         warnings.simplefilter("ignore")
         r = symbolic_regression(X, y, **kw)
     dt = time.time() - t0
-    C.evolve_island = orig_isl
+    undo_wrap()
+    if gens[0] == 0:                    # [1.5] the wrap must have been reached
+        raise RuntimeError("the wrap of evolve_island was not called")
     rec = dict(job)
     try:
         rec["err_law"] = structure(r, r.scaler, X, y_clean, Xg, yg)
@@ -366,6 +392,10 @@ def run(python, out, workers, arm=None, draws=DRAWS, exps=None,
         for i, rec in enumerate(ex.map(one, jobs)):
             fh.write(json.dumps(rec) + "\n")
             fh.flush()
+            if rec.get("crash") and "wrap of evolve_island" in rec.get("stderr", ""):
+                print("the wrap of evolve_island was not called: the run stops")
+                ex.shutdown(wait=False, cancel_futures=True)   # [1.5]
+                break
             if (i + 1) % 20 == 0:
                 print("%d/%d %s" % (i + 1, len(jobs), time.strftime("%H:%M:%S")))
                 sys.stdout.flush()

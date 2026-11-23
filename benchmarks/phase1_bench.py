@@ -60,6 +60,11 @@ Two engines side by side, each job started with both at the same time (the
 campaign R of 0.9.0, PLAN_RELEASE_0.9.md):
   python benchmarks/phase1_bench.py run-paired --python A/bin/python --out a.jsonl \\
          --python B/bin/python --out b.jsonl --pairs 2
+[1.5] The generations are counted by a wrap of evolve_island set in every
+module of the package that holds it (benchmarks/results_1.5/PLAN.md, Part A:
+the engine in modules); with 1.4.0 and before only gp_elite.core holds it,
+and the fits are those of before. A fit whose wrap was not called is a crash,
+and the run stops.
 """
 import argparse
 import io
@@ -74,6 +79,25 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+
+
+def _wrap(C, name, new):
+    """[1.5] Set `new` in place of the engine's function `name` in every module
+    of the package that holds it, so that a wrap reaches the calls whether the
+    engine is the one file of 1.4.0 and before (only gp_elite.core holds the
+    function) or the modules of 1.5 (benchmarks/results_1.5/PLAN.md, Part A).
+    Returns the function that undoes it."""
+    orig = getattr(C, name)
+    held = [m for k, m in list(sys.modules.items())
+            if (k == "gp_elite" or k.startswith("gp_elite."))
+            and getattr(m, name, None) is orig]
+    for m in held:
+        setattr(m, name, new)
+
+    def undo():
+        for m in held:
+            setattr(m, name, orig)
+    return undo
 
 TIME_LIMIT, GENERATIONS = 30.0, 1000
 BENCH_SEEDS = [0, 1, 2, 3, 4]
@@ -233,7 +257,7 @@ def run_one(job):
         g = args[3] if len(args) > 3 else kwargs.get("generation", 0)
         gens[0] = max(gens[0], int(g) + 1)
         return orig(*args, **kwargs)
-    C.evolve_island = counted
+    undo_wrap = _wrap(C, "evolve_island", counted)     # [1.5]
 
     # [1.2] X1 checked in M2 (PLAN_RELEASE_1.2.md): the calls of the engine
     # to its formula are noted during the fit (arguments and text only); the
@@ -274,7 +298,9 @@ def run_one(job):
         warnings.simplefilter("ignore")
         r = symbolic_regression(Xtr, ytr, **kw)
     dt = time.time() - t0
-    C.evolve_island = orig
+    undo_wrap()
+    if gens[0] == 0:                    # [1.5] the wrap must have been reached
+        raise RuntimeError("the wrap of evolve_island was not called")
     if x1:
         API._build_raw_formula = brf
 
@@ -422,6 +448,9 @@ def drive(python, out, workers, kinds=None, max_seconds=None):
             with open(out, "a") as fh:
                 fh.write(json.dumps(rec) + "\n")
             n_done += 1
+            if rec.get("status") == "CRASH" and "wrap of evolve_island" in rec.get("error", ""):
+                print("the wrap of evolve_island was not called: the run stops", flush=True)
+                todo = []                   # [1.5]
             if n_done % 25 == 0:
                 el = time.time() - t_start
                 print("%d done, %.0f s elapsed, %d left" % (n_done, el, len(todo)
