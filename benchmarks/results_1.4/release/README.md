@@ -445,3 +445,22 @@ descriptions of the noise-tolerant stage that the code does not bear out,
 limits left incomplete, statements without a committed record, and stale or
 imprecise wording. Each is corrected or answered there; the reports and
 scripts are in `m5/`.
+
+## Gate 12 (17 to 23 November 2026)
+
+The author received:
+- the figures measured and the differences with 1.3.0;
+- the fault found in M4, its correction L1 and its verification;
+- the two reviews;
+- one consequence outside the benches: the SRBench wrapper installs the last
+  version of gp-elite (`gp-elite>=0.5.0`), so once 1.4.0 is on PyPI, its runs
+  on noisy targets have N2b.
+
+He took a few days, and decided on 23 November 2026:
+- 1.4.0 is published;
+- its name is "Signal".
+
+`CITATION.cff` and the paper are dated 23 November 2026, the day the author
+can publish. The files to publish are built again from the commit of this
+decision, since the description of the PyPI page is the README
+(`environments.txt`).

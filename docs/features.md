@@ -57,7 +57,7 @@ Part of the documentation of GP_ELITE: back to the [README](../README.md); [vers
 
 ## What's new
 
-**1.4** — more noise-tolerant seeds: on the 41 Feynman equations of the
+**1.4 "Signal"** — more noise-tolerant seeds: on the 41 Feynman equations of the
 decision bench with Gaussian noise on the target, the structure of the law comes
 back in 152 and 95 fits of 205 (1 % and 10 % noise) against 116 and 87 for 1.3
 measured beside it, and in 150 and 93 with units against 121 and 95; without

@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0
+## 1.4.0 — "Signal"
 
 The noise-tolerant seeds. When no binomial form and no function of a
 monomial holds the data exactly (an exact power law does not stop it), the

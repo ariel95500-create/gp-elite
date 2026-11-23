@@ -59,7 +59,7 @@ Partie de la documentation de GP_ELITE : retour au [README](../../README.fr.md) 
 
 ## Nouveautés
 
-**1.4** — plus de graines tolérantes au bruit : sur les 41 équations de Feynman du
+**1.4 « Signal »** — plus de graines tolérantes au bruit : sur les 41 équations de Feynman du
 banc de décision avec un bruit gaussien sur la cible, la structure de la loi
 revient dans 152 et 95 ajustements sur 205 (1 % et 10 % de bruit) contre 116 et 87
 pour la 1.3 mesurée à côté, et dans 150 et 93 avec les unités contre 121 et 95 ;
