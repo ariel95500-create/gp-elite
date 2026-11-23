@@ -25,3 +25,38 @@ k5           first 10 fits: median     0.3 s, budget    30 s
 k10          first 10 fits: median     0.3 s, budget    30 s
 k20          first 10 fits: median     0.4 s, budget    30 s
 k20_10T      first 10 fits: median     0.4 s, budget   300 s
+--- slice 2026-11-23T21:56 (347 done), Model name: Intel(R) Xeon(R) Processor
+1498 jobs to run, 347 already done
+25 done, 161 s elapsed, 1473 left
+50 done, 210 s elapsed, 1448 left
+75 done, 385 s elapsed, 1422 left
+100 done, 783 s elapsed, 1398 left
+125 done, 810 s elapsed, 1373 left
+150 done, 849 s elapsed, 1347 left
+175 done, 1133 s elapsed, 1323 left
+200 done, 1356 s elapsed, 1298 left
+225 done, 1419 s elapsed, 1273 left
+250 done, 1700 s elapsed, 1248 left
+275 done, 2058 s elapsed, 1222 left
+300 done, 2287 s elapsed, 1198 left
+325 done, 2585 s elapsed, 1170 left
+350 done, 2646 s elapsed, 1148 left
+375 done, 3082 s elapsed, 1122 left
+400 done, 3201 s elapsed, 1098 left
+425 done, 3236 s elapsed, 1072 left
+450 done, 3402 s elapsed, 1046 left
+475 done, 3778 s elapsed, 1023 left
+500 done, 3797 s elapsed, 997 left
+525 done, 3868 s elapsed, 973 left
+550 done, 4169 s elapsed, 945 left
+575 done, 4365 s elapsed, 923 left
+600 done, 4402 s elapsed, 897 left
+625 done, 4691 s elapsed, 873 left
+650 done, 5117 s elapsed, 848 left
+675 done, 5253 s elapsed, 823 left
+700 done, 5518 s elapsed, 798 left
+725 done, 5625 s elapsed, 772 left
+750 done, 6121 s elapsed, 748 left
+775 done, 6177 s elapsed, 723 left
+800 done, 6217 s elapsed, 697 left
+time slice over: 685 jobs left for the next call
