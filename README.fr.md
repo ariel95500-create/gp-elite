@@ -15,7 +15,7 @@ d'une boîte noire. Il est fait pour les petits tableaux de mesures, jusqu'à un
 dizaine de variables, quand on veut comprendre la relation : une loi physique,
 une calibration, une corrélation d'ingénierie.
 
-![GP_ELITE redécouvre la 3ᵉ loi de Kepler à partir de 8 points (R² = 1.000000)](kepler_plot.png)
+![GP_ELITE redécouvre la 3ᵉ loi de Kepler à partir de 8 points (R² = 1.000000)](docs/img/kepler.fr.gif)
 
 À partir des seules distances et périodes orbitales des huit planètes, il
 retrouve la 3ᵉ loi de Kepler, T = a^1,5 ([`examples/kepler_demo.py`](examples/kepler_demo.py)) :
