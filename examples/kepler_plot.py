@@ -1,8 +1,10 @@
-"""Regenerates kepler_plot.png, the figure at the top of the README.
+"""Regenerates kepler_plot.png, the fixed figure of the Kepler example: at
+the top of the README up to 1.4.0, whose PyPI page still shows it (the README
+now has the animation of examples/kepler_gif.py).
 
-Same fit as examples/kepler_demo.py; the formula, R² and search time printed
-on the figure are the ones measured by this run, so the image never claims
-more than the code does.
+Same fit as examples/kepler_demo.py, on one CPU core; the formula, R² and
+search time printed on the figure are the ones measured by this run, so the
+image never claims more than the code does.
 
 Run:  python examples/kepler_plot.py      (needs matplotlib)
 """
@@ -11,6 +13,7 @@ import time
 
 import numpy as np
 
+import gp_elite
 from gp_elite import symbolic_regression
 
 
@@ -26,7 +29,7 @@ def main():
     t0 = time.time()
     res = symbolic_regression(a.reshape(-1, 1), T, feature_names=["a"],
                               operators="physical", generations=40, speed="fast",
-                              validation_split=0.0, seed=0)
+                              validation_split=0.0, seed=0, parallel=False)
     secs = time.time() - t0
     pred = res.predict(a.reshape(-1, 1))
     r2 = 1 - np.sum((pred - T) ** 2) / np.sum((T - T.mean()) ** 2)
@@ -53,8 +56,8 @@ def main():
     ax.set_ylabel("Orbital period  T  (years, log scale)", color="white", fontsize=13)
     ax.set_title("GP_ELITE rediscovered Kepler's Third Law from 8 data points",
                  color="white", fontsize=15, fontweight="bold")
-    ax.text(0.04, 0.95, "R² = %.6f\nFound in %.0f seconds\n(gp-elite, one CPU core)"
-            % (r2, secs), transform=ax.transAxes, va="top", color="white",
+    ax.text(0.04, 0.95, "R² = %.6f\nFound in %.0f seconds\n(gp-elite %s, one CPU core)"
+            % (r2, secs, gp_elite.__version__), transform=ax.transAxes, va="top", color="white",
             fontsize=12, bbox=dict(boxstyle="round", facecolor="#1a1d2e",
                                    edgecolor="#4da6ff"))
     leg = ax.legend(loc="lower right", facecolor="#111111", edgecolor="#555555",

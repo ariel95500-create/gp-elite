@@ -23,6 +23,13 @@
 # for both. Installed in a fresh environment with the packages of /venv14r2, the wheel imports as
 # 1.4.0 and fits 2 * X0 * X1.
 
+# After the publication, 23 November 2026: on PyPI, the two files have the SHA-256 above (those built
+# from d0639d0), uploaded at 17:09 UTC, and the description of the page is the short README. On the
+# release page v1.4.0 on GitHub, the two files have the same SHA-256. /venv14p: gp-elite 1.4.0
+# installed from PyPI (uv pip install --no-deps gp-elite==1.4.0) in a fresh environment with the
+# packages of /venv14r2; it imports as 1.4.0, and its 11 gp_elite/ files are identical to those of
+# main (6dc1e35) and to those of the corrected wheel verified by L1.
+
 # /venv14r (3.11.18) — uv pip freeze
 cloudpickle==3.1.2
 gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel14/dist/gp_elite-1.4.0-py3-none-any.whl

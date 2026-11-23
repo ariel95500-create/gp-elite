@@ -15,7 +15,7 @@ instead of a black box. It is built for small experimental tables, up to about
 ten variables, where you want to understand the relationship: a physical law, a
 calibration, an engineering correlation.
 
-![GP_ELITE rediscovers Kepler's third law from 8 data points (R² = 1.000000)](https://raw.githubusercontent.com/ariel95500-create/gp-elite/main/kepler_plot.png)
+![GP_ELITE rediscovers Kepler's third law from 8 data points (R² = 1.000000)](https://raw.githubusercontent.com/ariel95500-create/gp-elite/main/docs/img/kepler.gif)
 
 Given only the distance and the orbital period of the eight planets, it finds
 Kepler's third law, T = a^1.5
