@@ -12,6 +12,17 @@
 # 38bcdcd589d571f1bf07341294d56ffcf006a8525f15719ef1254633195007a0 (../../results_1.3/release/environments.txt).
 # /venv14r has the packages of /venv13r, /venv14rx those of /venv13rx (uv pip freeze compared, gp-elite aside).
 
+# SHA-256 of the files to publish, built again from commit d0639d0 after the decision of gate 12
+# (python -m build from a clean export of the commit, git archive), 23 November 2026:
+2aae841bb04a374ba5ca08cf0204f332b14aec6ab3460ff4b4efe22044e5812e  gp_elite-1.4.0-py3-none-any.whl
+1ac9c146b711fd5910fd147234bb52e3f4e8603d28dced9fae0d87ff17d3c8a4  gp_elite-1.4.0.tar.gz
+# Every gp_elite/ file of the wheel (11, py.typed included) is identical to those of the corrected
+# wheel of ec44e8e verified by L1 (l1/environments.txt) and to those of the branch; the wheel differs
+# from it in gp_elite-1.4.0.dist-info/METADATA (the description, from the README) and in RECORD, the
+# source archive in PKG-INFO, gp_elite.egg-info/PKG-INFO and README.md. twine check --strict passes
+# for both. Installed in a fresh environment with the packages of /venv14r2, the wheel imports as
+# 1.4.0 and fits 2 * X0 * X1.
+
 # /venv14r (3.11.18) — uv pip freeze
 cloudpickle==3.1.2
 gp-elite @ file:///tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/rel14/dist/gp_elite-1.4.0-py3-none-any.whl
