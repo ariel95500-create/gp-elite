@@ -14,7 +14,7 @@ authors:
 affiliations:
   - index: 1
     name: Independent Researcher, France
-date: 10 November 2026
+date: 23 November 2026
 bibliography: paper.bib
 ---
 
@@ -63,7 +63,10 @@ notebook); it prints an exponential law as
 one, $\exp(-t/\tau)$; and its time limit now bounds the start of the
 dimensional search as well. Version 1.3 adds the arcsine to its trigonometric
 operator sets, with the arcsine of a monomial among the forms fitted
-directly; the default operator set is left as it was.
+directly; the default operator set is left as it was. Version 1.4 gives the
+seeds that tolerate noise more forms: on the 41 equations of the decision bench
+with Gaussian noise on the target, the structure of the law comes back in 247
+of 410 fits against 203 for 1.3, and the exact laws without noise are kept.
 
 # Statement of need
 
@@ -120,7 +123,7 @@ baseline (2000 programs over 30 generations, against 400 over 30 generations
 and 4 restarts), on a fixed 15-equation subset of the Feynman problems chosen
 before any measurement,
 and each method judged on the model it returns, it recovers 15/15 exactly
-($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (versions 1.0.0 to 1.3.0,
+($1 - R^2 < 10^{-9}$ on held-out data) against 6/15 (versions 1.0.0 to 1.4.0,
 `benchmarks/duel.py`; 12/15 for version 0.9.0). That
 figure is a single-seed head-to-head with one baseline on a subset, not a
 benchmark-wide result, and is not comparable to rates published on the full
@@ -223,7 +226,10 @@ without noise, and the frozen test set) passes the dimensional audit
 1,005 models passes the audit again (`benchmarks/results_1.2/release/`).
 Measured beside 1.2.0 for the release of 1.3.0, whose arcsine brings back the
 two arcsine laws of the bench, 1.3.0 recovers 174 against 166, and each of
-the 1,005 models passes the audit (`benchmarks/results_1.3/release/`). The
+the 1,005 models passes the audit (`benchmarks/results_1.3/release/`).
+Measured beside 1.3.0 for the release of 1.4.0, both recover 174, and each of
+the 1,161 models returned under units, a noisy frozen set included, passes the
+audit (`benchmarks/results_1.4/release/`). The
 constraint guarantees that whatever is returned is physically coherent.
 
 Each release is also measured once on a test set frozen before any decision of
@@ -245,7 +251,12 @@ units. Version 1.3.0, measured beside 1.2.0, recovers 214 exact laws in 390
 fits without units against 213, 8 in 70 on the Strogatz systems with both
 versions, and 228 in 390 with units against 229; the 213 and 8 of 1.2.0 in
 this campaign, against 214 and 10 in its own, are the time budget moving the
-counts from one campaign to the next. Three case studies
+counts from one campaign to the next. Version 1.4.0, measured beside 1.3.0,
+recovers 214 exact laws in 390 fits without units with both versions, 10 in 70
+on the Strogatz systems against 9, and 228 in 390 with units with both; on the
+same 78 Feynman equations with 1 % and 10 % noise on the target, frozen before
+the work of 1.4, it retrieves the structure of the law in 65 of 156 fits
+against 61. Three case studies
 on public data accompany it: Kepler's third law with units, where the four
 inner planets give the product of the gravitational constant and the mass of
 the Sun within 0.002 % of its nominal value; Hubble's measurements of 1929; and

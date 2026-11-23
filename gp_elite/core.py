@@ -4259,6 +4259,36 @@ def _power_law_exponents(X, y, min_r2=None):
     return cols, coef[1:]
 
 
+def _power_law_exponents_w(X, y):
+    """[1.4-N2] Les exposants de _power_law_exponents pour la seconde passe
+    des graines tolérantes au bruit : moindres carrés sur les logarithmes
+    pondérés par y², sans la condition de signe constant de la cible et sans
+    seuil sur R². Un bruit de taille constante σ déplace log|y| de σ/|y| :
+    le poids y² est celui qu'un tel bruit demande, et les lignes proches de
+    zéro, où le bruit change le signe, ne pèsent presque rien. Les lignes où
+    y est nul n'ont ni logarithme ni poids : elles sont écartées."""
+    with np.errstate(all="ignore"):
+        if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
+            return None
+        keep = y != 0
+        m = int(keep.sum())
+        cols = [j for j in range(X.shape[1])
+                if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
+        if not cols or m < len(cols) + 3:
+            return None
+        ay = np.abs(y[keep])
+        sw = ay / float(ay.max())
+        A = np.column_stack([np.ones(m), np.log(np.abs(X[keep][:, cols]))])
+        try:
+            coef, _res, rank, _sv = np.linalg.lstsq(A * sw[:, None],
+                                                    np.log(ay) * sw, rcond=None)
+        except Exception:
+            return None
+    if rank < A.shape[1] or not np.all(np.isfinite(coef)):
+        return None
+    return cols, coef[1:]
+
+
 def _half_integer_power(term: str, e2: int, uops) -> Optional["Node"]:
     """x^(e2/2) pour e2 > 0, avec les seuls opérateurs du pool (sq, cube,
     sqrt, *). None si une racine est nécessaire et que sqrt manque."""
@@ -4296,9 +4326,11 @@ def _product(nodes: list) -> Optional["Node"]:
     return out
 
 
-def _make_power_law_seeds(xs, ys, cfg, min_r2=None) -> list:
+def _make_power_law_seeds(xs, ys, cfg, min_r2=None, weighted=False) -> list:
     """[v0.8] Voir le commentaire ci-dessus. Rend 0, 1 ou 2 arbres. min_r2
-    remplace _POWER_LAW_MIN_R2 (graines tolérantes au bruit, phase 5)."""
+    remplace _POWER_LAW_MIN_R2 (graines tolérantes au bruit, phase 5).
+    [1.4-N2] weighted : la seconde passe de ces graines
+    (_power_law_exponents_w)."""
     if not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) \
             or not bool(getattr(cfg, "POWER_LAW_SEEDS", True)):
@@ -4314,7 +4346,8 @@ def _make_power_law_seeds(xs, ys, cfg, min_r2=None) -> list:
     if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
             or X.shape[1] != len(terms):
         return []
-    fit = _power_law_exponents(X, y, min_r2)
+    fit = (_power_law_exponents_w(X, y) if weighted
+           else _power_law_exponents(X, y, min_r2))
     if fit is None:
         return []
     cols, expo = fit
@@ -4434,20 +4467,31 @@ def _golden_min(f, a, b, it=60):
     return (c1, f1) if f1 < f2 else (c2, f2)
 
 
-def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
+def _binomial_forms(X, y, top: int = 8, tol=None, weighted=False) -> list:
     """Formes y = b·f·(1 + c·g)^p qui tiennent à la précision numérique.
     Rend une liste de (p, cols, exposants de f dans y, g, c). tol remplace
-    _BINOM_TOL (graines tolérantes au bruit, phase 5)."""
+    _BINOM_TOL (graines tolérantes au bruit, phase 5).
+
+    [1.4-N2] weighted : la seconde passe des graines tolérantes au bruit. Les
+    moindres carrés sur les logarithmes sont pondérés par y² (voir
+    _power_law_exponents_w) et la cible n'a plus à garder un signe ; les
+    lignes où y est nul sont écartées. Sans weighted, les calculs sont ceux
+    d'avant, opération pour opération."""
     tol = _BINOM_TOL if tol is None else tol
     X = np.asarray(X, dtype=float)
     y = np.asarray(y, dtype=float)
-    n = y.shape[0]
     out = []
     with np.errstate(all="ignore"):
         if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
             return out
-        if not (np.all(y > 0) or np.all(y < 0)):
+        if weighted:
+            nzr = y != 0
+            X, y = X[nzr], y[nzr]
+            if not y.shape[0]:
+                return out
+        elif not (np.all(y > 0) or np.all(y < 0)):
             return out
+        n = y.shape[0]
         cols = [j for j in range(X.shape[1])
                 if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
         if not cols or n < len(cols) + 6:
@@ -4457,12 +4501,50 @@ def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
             return out
         LU = np.log(np.abs(X[:, cols]))
         L = np.column_stack([np.ones(n), LU])
-        Q, Rr = np.linalg.qr(L)
+        sub = np.unique(np.linspace(0, n - 1, min(n, _BINOM_GRID_ROWS)).astype(int))
+        if weighted:
+            sw = np.abs(y) / float(np.max(np.abs(y)))
+            Lw = L * sw[:, None]
+            Q, Rr = np.linalg.qr(Lw)
+            Qs = np.linalg.qr(Lw[sub])[0]
+            sws = sw[sub]
+            un = sw / float(np.linalg.norm(sw))
+
+            def rvar(z):                  # carré moyen du résidu pondéré
+                zw = z * sw
+                r_ = zw - Q @ (Q.T @ zw)
+                return float(np.mean(r_ * r_))
+
+            def rvar_sub(Z):
+                Zw = Z * sws[:, None]
+                R_ = Zw - Qs @ (Qs.T @ Zw)
+                return np.mean(R_ * R_, axis=0)
+
+            def wvar(z):                  # variance pondérée
+                zw = z * sw
+                r_ = zw - un * float(un @ zw)
+                return float(np.mean(r_ * r_))
+
+            def lsq(z):
+                return np.linalg.lstsq(Lw, z * sw, rcond=None)[0]
+        else:
+            Q, Rr = np.linalg.qr(L)
+            Qs = np.linalg.qr(L[sub])[0]
+
+            def rvar(z):
+                return float(np.var(z - Q @ (Q.T @ z)))
+
+            def rvar_sub(Z):
+                return np.var(Z - Qs @ (Qs.T @ Z), axis=0)
+
+            def wvar(z):
+                return float(np.var(z))
+
+            def lsq(z):
+                return np.linalg.lstsq(L, z, rcond=None)[0]
         dR = np.abs(np.diag(Rr))
         if not np.min(dR) > 1e-10 * np.max(dR):
             return out
-        sub = np.unique(np.linspace(0, n - 1, min(n, _BINOM_GRID_ROWS)).astype(int))
-        Qs = np.linalg.qr(L[sub])[0]
         pos = {j: i for i, j in enumerate(cols)}
         E = np.zeros((len(cols), len(lib)))
         sg = np.ones(len(lib))
@@ -4477,10 +4559,10 @@ def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
         GNs = GN[sub]
         for k in (1, 2):                          # t = |y|^k
             lt = k * np.log(np.abs(y))
-            vt = float(np.var(lt))
+            vt = wvar(lt)
             if not vt > 0.0:
                 continue
-            if float(np.var(lt - Q @ (Q.T @ lt))) / vt < _POWER_TOL:
+            if rvar(lt) / vt < _POWER_TOL:
                 continue                          # une loi de puissance
             lts = lt[sub]
             for sig in (-1.0, 1.0):               # t = f·(1 + c·g)^(-sig)
@@ -4489,7 +4571,7 @@ def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
                     W = 1.0 + s * GNs
                     ok = np.all(W > 0, axis=0)
                     Z = lts[:, None] + sig * np.log(np.where(W > 0, W, 1.0))
-                    v = np.var(Z - Qs @ (Qs.T @ Z), axis=0)
+                    v = rvar_sub(Z)
                     v[~ok] = np.inf
                     best = np.minimum(best, v)
                 found = None
@@ -4503,7 +4585,7 @@ def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
                         if np.any(w <= 0):
                             return np.inf
                         z = lt + sig * np.log(w)
-                        return float(np.var(z - Q @ (Q.T @ z)))
+                        return rvar(z)
                     vals = [obj(s) for s in _BINOM_GRID]
                     i = int(np.argmin(vals))
                     a = _BINOM_GRID[i - 1] if i > 0 else -1.0 + 1e-9
@@ -4516,7 +4598,7 @@ def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
                 _v, m, s = found
                 gn = GN[:, m]
                 z = lt + sig * np.log(1.0 + s * gn)
-                coef = np.linalg.lstsq(L, z, rcond=None)[0][1:]
+                coef = lsq(z)[1:]
                 step = 2.0 if k == 1 else 1.0     # demi-entiers dans y
                 ex = np.round(coef * step) / step
                 if not np.all(np.abs(ex) <= 6.0 * k):
@@ -4527,7 +4609,7 @@ def _binomial_forms(X, y, top: int = 8, tol=None) -> list:
                     w2 = 1.0 + s2 * gn
                     if np.any(w2 <= 0):
                         return np.inf
-                    return float(np.var(base + sig * np.log(w2)))
+                    return wvar(base + sig * np.log(w2))
                 h = 0.05 * (1.0 + abs(s))
                 s2, v2 = _golden_min(obj2, s - h, s + h)
                 if not v2 / vt < tol:
@@ -4552,9 +4634,10 @@ def _monomial(terms, pairs, uops) -> Optional["Node"]:
     return Node("/", top if top is not None else Node(1.0), bot)
 
 
-def _make_binomial_seeds(xs, ys, cfg, tol=None) -> list:
+def _make_binomial_seeds(xs, ys, cfg, tol=None, weighted=False) -> list:
     """[0.10, phase 4b] Voir le commentaire ci-dessus. Rend 0 à 4 arbres.
-    Le drapeau _BINOMIAL_SEEDS (actif par défaut) les coupe."""
+    Le drapeau _BINOMIAL_SEEDS (actif par défaut) les coupe. [1.4-N2]
+    weighted : la seconde passe des graines tolérantes au bruit."""
     if not _BINOMIAL_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
@@ -4570,7 +4653,7 @@ def _make_binomial_seeds(xs, ys, cfg, tol=None) -> list:
             or X.shape[1] != len(terms):
         return []
     t0 = time.time()
-    forms = _binomial_forms(X, y, tol=tol)
+    forms = _binomial_forms(X, y, tol=tol, weighted=weighted)
     TRACE.set("binomial_seed_s", round(time.time() - t0, 3))
     bops = set(_GENERIC_BINARY_OPS)
     uops = set(_GENERIC_UNARY_OPS)
@@ -4788,6 +4871,221 @@ def _elem_inverse_forms(X, y, cols, kinds, top: int = 6, tol=_BINOM_TOL) -> list
     return out
 
 
+def _elem_wrel(Z, Q, w):
+    """[1.4-N2] _elem_rel pondérée : variance résiduelle relative de chaque
+    colonne de Z, les lignes pesant w² (Q : base orthonormée de l'espace
+    pondéré, w·[1, log|x_j|]). La variance de référence est celle du résidu
+    sur la constante pondérée."""
+    Zw = Z * w[:, None]
+    Rz = Zw - Q @ (Q.T @ Zw)
+    u = w / float(np.linalg.norm(w))
+    Cz = Zw - u[:, None] * (u @ Zw)[None, :]
+    V = np.mean(Cz * Cz, axis=0)
+    with np.errstate(all="ignore"):
+        out = np.mean(Rz * Rz, axis=0) / V
+    return np.where(V > 0, out, np.inf)
+
+
+def _log_g_exponents(coef):
+    """[1.4-N2] Exposants de g de la forme y = b·f·log(c·g), pour les graines
+    tolérantes au bruit : les coefficients de y/f sur les log|x_j| valent
+    b·e_j. Les chercheurs exacts les rapportent au plus petit coefficient
+    non nul (au-dessus de 1e-6) ; sous bruit, un exposant nul a un
+    coefficient de l'ordre du bruit, qui devient ce dénominateur (sur une
+    loi n·log(V2/V1) à 1 % de bruit, les exposants 564 et -566 au lieu de 1
+    et -1). Ici un coefficient compte comme nul sous le douzième du plus
+    grand : les exposants gardés, des demi-entiers d'au plus 6 rapportés au
+    plus petit, ne descendent pas sous le sixième. None si aucun ne reste."""
+    a = np.abs(coef)
+    if not a.size or not float(a.max()) > 1e-6:
+        return None
+    c = np.where(a > float(a.max()) / 12.0, coef, 0.0)
+    ex = np.round(2.0 * c / float(np.min(np.abs(c[c != 0])))) / 2.0
+    if not np.any(ex) or not np.all(np.abs(ex) <= 6.0):
+        return None
+    return ex
+
+
+def _elem_inverse_forms_w(X, y, cols, kinds, top: int = 6, tol=_BINOM_TOL) -> list:
+    """[1.4-N2] La seconde passe de _elem_inverse_forms, pour les graines
+    tolérantes au bruit : la cible n'a plus à garder un signe (|y/f| est
+    transformé), et les moindres carrés sur les transformées logarithmiques
+    sont pondérés par y² (voir _power_law_exponents_w). La forme du
+    logarithme, dont les moindres carrés portent sur y/f et non sur un
+    logarithme de la cible, garde les siens, sans la condition de signe.
+    y n'a pas de zéro (écartés par _elementary_forms)."""
+    n = y.shape[0]
+    out = []
+    lib = _elem_flib(cols)
+    if lib is None:
+        return out
+    FV = np.column_stack([_elem_mono(X, m) for m in lib])
+    R = y[:, None] / FV
+    idx = np.where(np.all(np.isfinite(R), axis=0) & np.all(R != 0, axis=0))[0]
+    if not idx.size:
+        return out
+    R = R[:, idx]
+    LU = np.log(np.abs(X[:, cols]))
+    L = np.column_stack([np.ones(n), LU])
+    sub = np.unique(np.linspace(0, n - 1, min(n, _BINOM_GRID_ROWS)).astype(int))
+    sw = np.abs(y) / float(np.max(np.abs(y)))
+    Lw = L * sw[:, None]
+    Qw = np.linalg.qr(Lw)[0]
+    Qws = np.linalg.qr(Lw[sub])[0]
+    sws = sw[sub]
+    ww = sw * sw
+
+    def g_of(coef):
+        ex = np.round(2.0 * coef) / 2.0
+        if not np.any(ex) or not np.all(np.abs(ex) <= 6.0):
+            return None
+        return tuple((j, float(e)) for j, e in zip(cols, ex) if e)
+
+    if "log" in kinds:                    # comme _elem_inverse_forms, les
+        Q = np.linalg.qr(L)[0]            # exposants de g par _log_g_exponents
+        v = _elem_rel(R, Q)
+        for m in np.where(v < tol)[0]:
+            r = R[:, m]
+            ex = _log_g_exponents(np.linalg.lstsq(L, r, rcond=None)[0][1:])
+            if ex is None:
+                continue
+            g = tuple((j, float(e)) for j, e in zip(cols, ex) if e)
+            lg = np.log(np.abs(_elem_mono(X, g)))
+            A = np.column_stack([np.ones(n), lg])
+            a0, s0 = np.linalg.lstsq(A, r, rcond=None)[0]
+            if not (float(np.var(r - A @ np.array([a0, s0]))) / float(np.var(r))
+                    < tol) or s0 == 0.0 or abs(a0 / s0) > 700.0:
+                continue
+            out.append(("log", lib[idx[m]], g, float(math.exp(a0 / s0))))
+            break
+    for kind in [k for k in ("exp-", "exp+", "tanh", "sech", "arcsin")
+                 if k.rstrip("+-") in kinds]:
+        best = np.full(R.shape[1], np.inf)
+        with np.errstate(all="ignore"):
+            for s in _ELEM_S_GRID:
+                T = _elem_transform(kind, R[sub], s)
+                fin = np.all(np.isfinite(T), axis=0)
+                v = _elem_wrel(np.where(np.isfinite(T), T, 0.0), Qws, sws)
+                v[~fin] = np.inf
+                best = np.minimum(best, v)
+        order = [int(m) for m in np.argsort(best, kind="stable")[:top]]
+        if kind == "arcsin":
+            j0 = np.where(idx == 0)[0]
+            if j0.size and np.isfinite(best[j0[0]]):
+                order = [int(j0[0])] + [m for m in order if m != j0[0]]
+        for m in order:
+            if not np.isfinite(best[m]):
+                break
+            r = R[:, [m]]
+
+            def obj(s, r=r):
+                with np.errstate(all="ignore"):
+                    t = _elem_transform(kind, r, s)[:, 0]
+                if not np.all(np.isfinite(t)):
+                    return np.inf
+                return float(_elem_wrel(t[:, None], Qw, sw)[0])
+            vals = [obj(s) for s in _ELEM_S_GRID]
+            i = int(np.argmin(vals))
+            if i in (0, len(_ELEM_S_GRID) - 1):
+                continue
+            s, v = _golden_min(obj, float(_ELEM_S_GRID[i - 1]),
+                               float(_ELEM_S_GRID[i + 1]))
+            if not v < tol:
+                continue
+            with np.errstate(all="ignore"):
+                t = _elem_transform(kind, r, s)[:, 0]
+            g = g_of(np.linalg.lstsq(Lw, t * sw, rcond=None)[0][1:])
+            if g is None:
+                continue
+            lg = np.log(np.abs(_elem_mono(X, g)))
+
+            def wvar(z):
+                mu = float(np.sum(ww * z) / np.sum(ww))
+                return float(np.sum(ww * (z - mu) ** 2) / np.sum(ww))
+
+            def obj2(s2, r=r, lg=lg):
+                with np.errstate(all="ignore"):
+                    t2 = _elem_transform(kind, r, s2)[:, 0] - lg
+                if not np.all(np.isfinite(t2)):
+                    return np.inf
+                vt = wvar(t2 + lg)
+                return wvar(t2) / vt if vt > 0 else np.inf
+            s2, v2 = _golden_min(obj2, s - 0.5, s + 0.5)
+            if not v2 < tol:
+                continue
+            with np.errstate(all="ignore"):
+                dt = _elem_transform(kind, r, s2)[:, 0] - lg
+                k0 = float(np.sum(ww * dt) / np.sum(ww))
+            if not abs(k0) <= 700.0:
+                continue
+            c = math.exp(k0) * (-1.0 if kind == "exp+" else 1.0)
+            out.append((kind.rstrip("+-"), lib[idx[m]], g, c))
+            break
+    return out
+
+
+def _pred_rel_error(p, y) -> float:
+    """[1.4-N2] Le score des graines tolérantes (_seed_rel_error) calculé
+    sur des prédictions : 1 - R² après mise à l'échelle linéaire."""
+    with np.errstate(all="ignore"):
+        p = np.asarray(p, dtype=float)
+        if not np.all(np.isfinite(p)) or not np.var(p) > 0:
+            return float("inf")
+        a, b, ok = _linear_scale_params(p, y)
+        if not ok:
+            return float("inf")
+        r = float(np.mean((y - (a + b * p)) ** 2) / np.var(y))
+    return r if math.isfinite(r) else float("inf")
+
+
+_SCAN_KEEP = 3                        # [1.4-N2] formes gardées par balayage
+
+
+def _elem_log_scan(X, y, cols, tol, signed: bool) -> list:
+    """[1.4-N2] Le chercheur du logarithme sur toute sa bibliothèque : les
+    _SCAN_KEEP meilleures formes y = b·f·log(c·g) au score des graines
+    tolérantes, les exposants de g par _log_g_exponents. signed : seulement
+    les f où y/f garde un signe, comme dans la première passe."""
+    n = y.shape[0]
+    lib = _elem_flib(cols)
+    if lib is None:
+        return []
+    FV = np.column_stack([_elem_mono(X, m) for m in lib])
+    R = y[:, None] / FV
+    ok = np.all(np.isfinite(R), axis=0)
+    if signed:
+        ok &= np.all(R > 0, axis=0) | np.all(R < 0, axis=0)
+    idx = np.where(ok)[0]
+    if not idx.size:
+        return []
+    R = R[:, idx]
+    LU = np.log(np.abs(X[:, cols]))
+    L = np.column_stack([np.ones(n), LU])
+    Q = np.linalg.qr(L)[0]
+    v = _elem_rel(R, Q)
+    found = []
+    for m in np.where(v < tol)[0]:
+        r = R[:, m]
+        ex = _log_g_exponents(np.linalg.lstsq(L, r, rcond=None)[0][1:])
+        if ex is None:
+            continue
+        g = tuple((j, float(e)) for j, e in zip(cols, ex) if e)
+        lg = np.log(np.abs(_elem_mono(X, g)))
+        if not np.all(np.isfinite(lg)):           # [1.4-L1] une colonne négative
+            continue                              # et un exposant fractionnaire
+        A = np.column_stack([np.ones(n), lg])
+        a0, s0 = np.linalg.lstsq(A, r, rcond=None)[0]
+        if not (float(np.var(r - A @ np.array([a0, s0]))) / float(np.var(r))
+                < tol) or s0 == 0.0 or abs(a0 / s0) > 700.0:
+            continue
+        sc = _pred_rel_error(FV[:, idx[m]] * (a0 / s0 + lg), y)
+        if math.isfinite(sc):
+            found.append((sc, len(found),
+                          ("log", lib[idx[m]], g, float(math.exp(a0 / s0)))))
+    found.sort(key=lambda t: (t[0], t[1]))
+    return [f for _sc, _i, f in found[:_SCAN_KEEP]]
+
+
 def _elem_trig_grid(z, gn):
     """Résidu relatif de z ~ 1 + sin(ω·gn) + cos(ω·gn) pour chaque ω de la
     grille (équations normales : pour classer seulement)."""
@@ -4832,9 +5130,16 @@ def _elem_trig_exact(z, gn, sub):
     return val, w, np.linalg.lstsq(A, z, rcond=None)[0]
 
 
-def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL) -> list:
+def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL, weighted=False,
+                     scan=False) -> list:
     """Forme y = f·(a + β·sin(ω·g) + γ·cos(ω·g)) : au plus une. Rend des
-    tuples ("trig", f, g, ω rapporté à g, (a, β, γ))."""
+    tuples ("trig", f, g, ω rapporté à g, (a, β, γ)).
+
+    [1.4-N2] weighted : la seconde passe des graines tolérantes au bruit, où
+    les moindres carrés sur log|y| qui donnent les exposants de f sont
+    pondérés par y². scan : toute la bibliothèque est parcourue, et les
+    _SCAN_KEEP meilleures formes au score des graines tolérantes sont rendues
+    (au lieu de la première qui passe). Sans eux, le calcul d'avant."""
     n = y.shape[0]
     glib = [((j, 1),) for j in range(X.shape[1])]
     if len(cols) <= 8:
@@ -4843,6 +5148,8 @@ def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL) -> list:
                 glib.append(((j, e1), (k, e2)))
     nz = np.abs(y) > 0
     sub = np.unique(np.linspace(0, n - 1, min(n, _BINOM_GRID_ROWS)).astype(int))
+    found = []
+    wy = np.abs(y) / float(np.max(np.abs(y))) if weighted else None
     for g in glib:
         gv = _elem_mono(X, g)
         gmax = float(np.max(np.abs(gv)))
@@ -4854,7 +5161,12 @@ def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL) -> list:
         if others:
             LU = np.log(np.abs(X[:, others]))
             L = np.column_stack([np.ones(n), LU])
-            e0 = np.linalg.lstsq(L[nz], np.log(np.abs(y[nz])), rcond=None)[0][1:]
+            if weighted:
+                e0 = np.linalg.lstsq(L[nz] * wy[nz, None],
+                                     np.log(np.abs(y[nz])) * wy[nz],
+                                     rcond=None)[0][1:]
+            else:
+                e0 = np.linalg.lstsq(L[nz], np.log(np.abs(y[nz])), rcond=None)[0][1:]
             f0 = np.exp(LU @ e0)
         else:
             e0, f0 = np.zeros(0), np.ones(n)
@@ -4868,10 +5180,18 @@ def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL) -> list:
                 A = np.column_stack([np.ones(n), np.sin(w0 * gn), np.cos(w0 * gn)])
                 h = A @ np.linalg.lstsq(A, z0, rcond=None)[0]
                 keep = np.abs(h) > 0.3 * np.max(np.abs(h))
+                if weighted:
+                    keep &= nz
                 if keep.sum() > len(others) + 3:
-                    e1 = np.linalg.lstsq(
-                        L[keep], (np.log(np.abs(y)) - np.log(np.abs(h)))[keep],
-                        rcond=None)[0][1:]
+                    if weighted:
+                        e1 = np.linalg.lstsq(
+                            L[keep] * wy[keep, None],
+                            ((np.log(np.abs(y)) - np.log(np.abs(h))) * wy)[keep],
+                            rcond=None)[0][1:]
+                    else:
+                        e1 = np.linalg.lstsq(
+                            L[keep], (np.log(np.abs(y)) - np.log(np.abs(h)))[keep],
+                            rcond=None)[0][1:]
                     cands += [np.round(e1), np.round(2.0 * e1) / 2.0]
         cands += [np.round(e0), np.round(2.0 * e0) / 2.0]
         seen = set()
@@ -4886,21 +5206,151 @@ def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL) -> list:
             val, w, c = _elem_trig_exact(y / fv, gn, sub)
             if val < tol:
                 f = tuple((j, float(e)) for j, e in zip(others, ex) if e)
-                return [("trig", f, g, float(w) / gmax, tuple(float(x) for x in c))]
+                form = ("trig", f, g, float(w) / gmax, tuple(float(x) for x in c))
+                if not scan:
+                    return [form]
+                A = np.column_stack([np.ones(n), np.sin(w * gn), np.cos(w * gn)])
+                sc = _pred_rel_error(fv * (A @ c), y)
+                if math.isfinite(sc):
+                    found.append((sc, len(found), form))
+    if scan:
+        found.sort(key=lambda t: (t[0], t[1]))
+        return [f for _sc, _i, f in found[:_SCAN_KEEP]]
     return []
 
 
-def _elementary_forms(X, y, kinds, tol=None) -> list:
+# [1.4-E2] UNE GRAINE POUR UNE CONSTANTE PLUS UNE EXPONENTIELLE
+# Constat (benchmarks/results_1.4/analysis/README.md) : la loi de Newton,
+# θ = θa + (θ0 − θa)·exp(−t/τ), n'avait pas de graine. Le chercheur de
+# l'exponentielle (phase 4a) passe par log|y/f|, qu'une constante additive
+# rend non linéaire, et la loi revenait dans 9 ajustements de TP sur 40. E2
+# (benchmarks/results_1.4/PLAN.md) cherche y = a + b·exp(c·g) dans les
+# données, sans logarithme de la cible (elle n'a donc pas à garder un
+# signe) : g est une colonne à la puissance 1 ou −1, ou, jusqu'à huit
+# colonnes, le produit ou le rapport de deux colonnes (la bibliothèque du
+# sinus et du cosinus) ; c se cherche sur une grille puis par la section
+# dorée, sur le résidu des moindres carrés en (a, b). La graine est exp(c·g),
+# la mise à l'échelle linéaire de la recherche portant a et b. Graine exacte
+# quand la forme tient à la précision numérique et que a n'est pas nul (sinon
+# c'est l'exponentielle que la phase 4a ajuste déjà) ; dans l'étage tolérant,
+# un candidat comme les autres (ses trois meilleures formes). Une forme dont
+# l'exponentielle varie de moins d'un facteur e^0,5 sur les données n'est pas
+# rendue : elle imiterait une droite. Non adoptée par sa campagne
+# (benchmarks/results_1.4/e2/campaign/README.md) : éteinte, son code gardé
+# pour la décision de l'auteur.
+_E2_SEEDS = False
+_E2_C_GRID = np.concatenate([-np.geomspace(50.0, 0.01, 40), np.geomspace(0.01, 50.0, 40)])
+_E2_GATE = 0.05                       # résidu de grille sous lequel on affine
+_E2_CURVE = 0.5                       # |c|·étendue de g au moins : l'exponentielle
+                                      # varie d'un facteur e^0,5 sur les données,
+                                      # sinon elle imite une droite
+
+
+def _e2_residuals(gn, y, cs):
+    """Résidu relatif de y ≈ a + b·exp(c·gn) pour chaque c de cs."""
+    with np.errstate(all="ignore"):
+        U = np.exp(np.outer(gn, cs))
+        Uc = U - U.mean(axis=0)
+        yc = y - y.mean()
+        vu = np.einsum("ij,ij->j", Uc, Uc)
+        cov = Uc.T @ yc
+        vy = float(yc @ yc)
+        r = 1.0 - cov * cov / (vu * vy)
+    return np.where(np.isfinite(r) & (vu > 0), np.maximum(r, 0.0), np.inf)
+
+
+def _elem_aexp_forms(X, y, tol=_BINOM_TOL) -> list:
+    """[1.4-E2] Formes y = a + b·exp(c·g) : au plus _SCAN_KEEP, rendues comme
+    des formes ("exp", (), g, c) de la phase 4a (f = 1, c rapporté à g). Une
+    forme n'est rendue sous un tol exact (sous 1e-3) que si a n'est pas nul."""
+    n = y.shape[0]
+    out = []
+    if n < 7 or not np.var(y) > 0:
+        return out
+    cols = [j for j in range(X.shape[1]) if np.all(X[:, j] != 0)]
+    glib = []
+    for j in range(X.shape[1]):
+        glib.append(((j, 1),))
+        if j in cols:
+            glib.append(((j, -1),))
+    if X.shape[1] <= 8:
+        for j, k in itertools.combinations(range(X.shape[1]), 2):
+            glib.append(((j, 1), (k, 1)))
+            if k in cols:
+                glib.append(((j, 1), (k, -1)))
+            if j in cols:
+                glib.append(((j, -1), (k, 1)))
+    found = []
+    with np.errstate(all="ignore"):
+        for g in glib:
+            gv = _elem_mono(X, g)
+            gmax = float(np.max(np.abs(gv)))
+            if not (np.all(np.isfinite(gv)) and gmax > 0) or not np.var(gv) > 0:
+                continue
+            gn = gv / gmax
+            v = _e2_residuals(gn, y, _E2_C_GRID)
+            i = int(np.argmin(v))
+            if not v[i] < _E2_GATE:
+                continue
+            lo = float(_E2_C_GRID[max(i - 1, 0)])
+            hi = float(_E2_C_GRID[min(i + 1, len(_E2_C_GRID) - 1)])
+            if lo < 0 < hi:                       # pas de c nul
+                lo, hi = (lo, -1e-3) if _E2_C_GRID[i] < 0 else (1e-3, hi)
+            c, _r = _golden_min(lambda cc: float(_e2_residuals(gn, y, np.array([cc]))[0]),
+                                lo, hi)
+            # quelques pas de Gauss-Newton sur (a, b, c) : la section dorée sur
+            # un résidu calculé par différence s'arrête vers 1e-7 en c
+            u = np.exp(c * gn)
+            a, b = np.linalg.lstsq(np.column_stack([np.ones(n), u]), y, rcond=None)[0]
+            e = y - a - b * u
+            sse = float(e @ e)
+            for _ in range(8):
+                J = np.column_stack([np.ones(n), u, b * gn * u])
+                d = np.linalg.lstsq(J, e, rcond=None)[0]
+                c2 = c + float(d[2])
+                u2 = np.exp(c2 * gn)
+                ab = np.linalg.lstsq(np.column_stack([np.ones(n), u2]), y, rcond=None)[0]
+                e2 = y - ab[0] - ab[1] * u2
+                s2 = float(e2 @ e2)
+                if not (np.isfinite(s2) and s2 < sse):
+                    break
+                c, u, (a, b), e, sse = c2, u2, ab, e2, s2
+            r = sse / (n * float(np.var(y)))
+            if not r < tol or abs(c) * float(np.ptp(gn)) < _E2_CURVE:
+                continue                          # pas une droite déguisée
+            if tol < 1e-3 and not abs(a) > 1e-9 * float(np.max(np.abs(y))):
+                continue                          # a nul : la phase 4a
+            found.append((r, len(found), ("exp", (), g, float(c) / gmax)))
+    found.sort(key=lambda t: (t[0], t[1]))
+    return [f for _r, _i, f in found[:_SCAN_KEEP]]
+
+
+def _elementary_forms(X, y, kinds, tol=None, weighted=False, scan=False) -> list:
     """Formes de la phase 4a qui tiennent à la précision numérique (à tol
-    près, graines tolérantes au bruit de la phase 5)."""
+    près, graines tolérantes au bruit de la phase 5).
+
+    [1.4-N2] Pour les graines tolérantes au bruit seulement :
+    - weighted : la seconde passe. Les lignes où y est nul sont écartées, la
+      cible n'a plus à garder un signe, et les moindres carrés sur les
+      logarithmes sont pondérés par y² (_elem_inverse_forms_w, et les
+      exposants de f de la forme trigonométrique).
+    - scan : les seules formes du balayage de toute la bibliothèque, pour le
+      logarithme et pour le sinus et le cosinus (leurs _SCAN_KEEP
+      meilleures au score des graines tolérantes).
+    Sans eux, le calcul d'avant."""
     tol = _BINOM_TOL if tol is None else tol
     X = np.asarray(X, dtype=float)
     y = np.asarray(y, dtype=float)
-    n = y.shape[0]
     out = []
     with np.errstate(all="ignore"):
         if not (np.all(np.isfinite(y)) and np.all(np.isfinite(X))):
             return out
+        if weighted:
+            nzr = y != 0
+            X, y = X[nzr], y[nzr]
+        if scan or weighted:
+            return _elementary_forms_n2(X, y, kinds, tol, weighted, scan)
+        n = y.shape[0]
         cols = [j for j in range(X.shape[1])
                 if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
         inv = [k for k in kinds if k != "trig"]
@@ -4913,12 +5363,49 @@ def _elementary_forms(X, y, kinds, tol=None) -> list:
             out += _elem_inverse_forms(X, y, cols, inv, tol=tol)
         if "trig" in kinds and n > 10 and np.var(y) > 0:
             out += _elem_trig_forms(X, y, cols, tol=tol)
+        if "aexp" in kinds:                       # [1.4-E2]
+            out += _elem_aexp_forms(X, y, tol=tol)
     return out
 
 
-def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
+def _elementary_forms_n2(X, y, kinds, tol, weighted, scan) -> list:
+    """[1.4-N2] La partie de _elementary_forms propre aux graines tolérantes
+    au bruit (voir sa documentation). Les gardes sont celles de la première
+    passe, sans la condition de signe de la cible quand weighted."""
+    n = y.shape[0]
+    out = []
+    if not n:
+        return out
+    cols = [j for j in range(X.shape[1])
+            if np.all(X[:, j] > 0) or np.all(X[:, j] < 0)]
+    inv = [k for k in kinds if k != "trig"]
+    if inv and cols and n > len(cols) + 6 \
+            and (weighted or np.all(y > 0) or np.all(y < 0)):
+        L = np.column_stack([np.ones(n), np.log(np.abs(X[:, cols]))])
+        if weighted:
+            sw = np.abs(y) / float(np.max(np.abs(y)))
+            Qw = np.linalg.qr(L * sw[:, None])[0]
+            power = _elem_wrel(np.log(np.abs(y))[:, None], Qw, sw)[0] < _POWER_TOL
+        else:
+            Q = np.linalg.qr(L)[0]
+            power = _elem_rel(np.log(np.abs(y))[:, None], Q)[0] < _POWER_TOL
+        if power:
+            return out                    # une loi de puissance : ses graines
+        if scan:
+            if "log" in inv:
+                out += _elem_log_scan(X, y, cols, tol, signed=not weighted)
+        else:
+            out += _elem_inverse_forms_w(X, y, cols, inv, tol=tol)
+    if "trig" in kinds and n > 10 and np.var(y) > 0:
+        out += _elem_trig_forms(X, y, cols, tol=tol, weighted=weighted, scan=scan)
+    return out
+
+
+def _make_elementary_seeds(xs, ys, cfg, tol=None, weighted=False,
+                           scan=False) -> list:
     """[0.10, phase 4a] Voir le commentaire ci-dessus. Rend 0 à 5 arbres.
-    Le drapeau _ELEMENTARY_SEEDS (actif par défaut) les coupe."""
+    Le drapeau _ELEMENTARY_SEEDS (actif par défaut) les coupe. [1.4-N2]
+    weighted, scan : voir _elementary_forms (graines tolérantes au bruit)."""
     if not _ELEMENTARY_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
@@ -4941,10 +5428,12 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
                                ("tanh", {"tanh"}), ("sech", {"exp"}),
                                ("trig", {"sin", "cos"}),
                                ("arcsin", {"arcsin"})) if need <= uops]   # [1.3-A3]
+    if _E2_SEEDS and "exp" in uops:               # [1.4-E2]
+        kinds.append("aexp")
     if not kinds:
         return []
     t0 = time.time()
-    forms = _elementary_forms(X, y, kinds, tol=tol)
+    forms = _elementary_forms(X, y, kinds, tol=tol, weighted=weighted, scan=scan)
     TRACE.set("elementary_seed_s", round(time.time() - t0, 3))
     seeds = []
     for form in forms:
@@ -5016,6 +5505,45 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None) -> list:
 _TOLERANT_SEEDS = True
 _TOLERANT_REL = 0.015
 
+# [1.4-N2] LES CHERCHEURS TOLÉRANTS VOIENT À TRAVERS LE BRUIT
+# Constat (benchmarks/results_1.4/analysis/README.md) : sous bruit, trois
+# règles des chercheurs, écrites pour des données exactes, défont les
+# graines tolérantes. (1) La cible doit garder un signe : 1 % de bruit le
+# lui fait perdre près de zéro dans 7 équations sur 41, dont deux monômes.
+# (2) Le chercheur du sinus et du cosinus (et celui du logarithme) rend la
+# première forme qui passe, pas la meilleure : sur III.15.12 à 1 %, une
+# forme en k seul au lieu de la loi en k·d. (3) La constante interne vient
+# du chercheur, ajustée dans l'espace transformé. (4) Trouvée par la
+# mécanique de N2 : le logarithme rapporte les exposants de g au plus petit
+# coefficient non nul, qu'un exposant nul a sous bruit (voir
+# _log_g_exponents). N2 garde l'étage, son score et son seuil, et change ses
+# candidats (benchmarks/results_1.4/PLAN.md) :
+# - chaque chercheur tourne comme avant, puis une seconde fois avec ses
+#   moindres carrés sur les logarithmes pondérés par y² et sans la
+#   condition de signe ;
+# - le logarithme, le sinus et le cosinus parcourent toute leur
+#   bibliothèque et rendent aussi leurs trois meilleures formes au score
+#   (les exposants de g du logarithme par _log_g_exponents) ;
+# - chaque candidat a ses constantes ajustées sur les lignes d'entraînement
+#   par l'ajustement de constantes du moteur avant d'être noté (ses
+#   exposants, arrondis par le chercheur, sont dans la structure de
+#   l'arbre et restent) ;
+# - les candidats sont dédoublonnés par leur forme, et ceux sous le seuil
+#   placés, les meilleurs d'abord, douze au plus. Les formes que les
+#   chercheurs d'avant donnent sont toujours placées quand elles passent le
+#   seuil : toute graine que plaçait 1.3.0 l'est encore.
+# Non adopté (campagne N2, 13 novembre 2026, benchmarks/results_1.4/n2/
+# campaign/README.md) : sans bruit, F41 perd 5 lois exactes, toutes là où
+# l'étage tourne, à cause de l'ajustement des constantes des candidats.
+# Retiré du candidat : éteint. Sur décision de l'auteur (13 novembre), N2
+# est mesuré de nouveau sans cet ajustement (N2b, _TOLERANT_REFIT False) :
+# chaque candidat garde les constantes de son chercheur. N2b est adopté et
+# gardé (campagne et confirmation, 13 novembre 2026, benchmarks/
+# results_1.4/n2b/campaign/README.md) : il fait partie de la 1.4.
+_TOLERANT_N2 = True
+_TOLERANT_REFIT = False
+_TOLERANT_MAX = 12
+
 
 def _seed_rel_error(tree, X, y) -> float:
     """1 - R² d'un arbre après mise à l'échelle linéaire (inf s'il n'est pas
@@ -5032,6 +5560,50 @@ def _seed_rel_error(tree, X, y) -> float:
         return r if math.isfinite(r) else float("inf")
     except Exception:
         return float("inf")
+
+
+def _small_family(scored, cfg, t0) -> list:
+    """[1.4-S1] Sous 30 lignes, l'étage tolérant place ses huit meilleures
+    formes, une par forme, qui laissent au plus la moitié de la variance (le
+    seuil de 1,5 % n'y sert pas), et les garde pour la sélection finale."""
+    seen, fam = set(), []
+    for r, _i, t in scored:
+        if not r <= _SMALL_FAMILY_SHARE:
+            break
+        h = t.canonical_hash()
+        if h in seen:
+            continue
+        seen.add(h)
+        fam.append((r, t))
+        if len(fam) >= _SMALL_FAMILY_KEEP:
+            break
+    seeds = _typed_seeds([t for _r, t in fam], cfg)
+    kept = {id(t) for t in seeds}
+    _SMALL_FAMILY[:] = [t.copy() for t in seeds]
+    TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
+    if seeds:
+        TRACE.set("tolerant_seed", " | ".join(
+            "%s (%.2g)" % (to_string(t), r) for r, t in fam if id(t) in kept))
+    return seeds
+
+
+def _refit_inner(tree, X, y, cfg):
+    """[1.4-N2] Les constantes d'un candidat ajustées sur les lignes
+    d'entraînement par l'étape de finition du moteur (_lm_to_convergence).
+    L'arbre d'entrée si rien n'est amélioré, ou quand la recherche n'a pas
+    de mise à l'échelle linéaire (perte personnalisée) : le score des
+    graines et l'ajustement ne jugeraient pas la même forme. [1.4-N2b]
+    L'arbre d'entrée aussi sans _TOLERANT_REFIT."""
+    if not _TOLERANT_REFIT:
+        return tree
+    if not (_USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None):
+        return tree
+    try:
+        with np.errstate(all="ignore"):
+            out = _lm_to_convergence(tree, X, y, cfg)
+    except Exception:
+        return tree
+    return tree if out is None else out
 
 
 def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
@@ -5066,20 +5638,74 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
             cands += fn(X, y, cfg, **kw)
         except Exception:
             pass
+    n_first = len(cands)                          # [1.4-N2] ceux d'avant
+    if _TOLERANT_N2:
+        more = [(_make_elementary_seeds, dict(tol=1.0, scan=True)),
+                (_make_binomial_seeds, dict(tol=1.0, weighted=True)),
+                (_make_elementary_seeds, dict(tol=1.0, weighted=True)),
+                (_make_elementary_seeds, dict(tol=1.0, weighted=True, scan=True))]
+        if not power_done:
+            more.insert(1, (_make_power_law_seeds, dict(weighted=True)))
+        for fn, kw in more:
+            try:
+                cands += fn(X, y, cfg, **kw)
+            except Exception:
+                pass
     for k, v in trace.items():                    # les traces des graines exactes
         if v is None:
             TRACE.value.pop(k, None)
         else:
             TRACE.set(k, v)
-    scored = sorted(((_seed_rel_error(t, X, y), i, t) for i, t in enumerate(cands)),
+    if not _TOLERANT_N2:                          # 1.3.0
+        scored = sorted(((_seed_rel_error(t, X, y), i, t) for i, t in enumerate(cands)),
+                        key=lambda r: (r[0], r[1]))
+        if _SMALL_ON:                             # [1.4-S1] les formes de famille
+            return _small_family(scored, cfg, t0)
+        seeds = _typed_seeds([t for r, _, t in scored if r <= _TOLERANT_REL], cfg)
+        TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
+        if seeds:
+            kept = {id(t) for t in seeds}
+            TRACE.set("tolerant_seed", " | ".join(
+                "%s (%.2g)" % (to_string(t), r) for r, _, t in scored
+                if r <= _TOLERANT_REL and id(t) in kept))
+        return seeds
+    # [1.4-N2] les constantes ajustées, puis le score ; une forme, le meilleur
+    # de ses candidats
+    scored = []
+    for i, t in enumerate(cands):
+        t2 = _refit_inner(t, X, y, cfg)
+        scored.append((_seed_rel_error(t2, X, y), i, t2))
+    scored.sort(key=lambda r: (r[0], r[1]))
+    forms, first = {}, set()
+    # [1.4-N2b] sans ajustement des constantes, une forme que donnent les
+    # chercheurs d'avant garde leur arbre, constantes comprises : N2b ne fait
+    # qu'ajouter des formes aux graines de 1.3.0
+    order = scored if _TOLERANT_REFIT else sorted(
+        scored, key=lambda r: (r[1] >= n_first, r[0], r[1]))
+    for r, i, t in order:
+        h = t.canonical_hash()
+        if i < n_first:
+            first.add(h)
+        if h not in forms:
+            forms[h] = (r, i, t)
+    if _SMALL_ON:                                 # [1.4-S1] les formes de famille
+        return _small_family(sorted(forms.values(), key=lambda r: (r[0], r[1])),
+                             cfg, t0)
+    within = sorted((v for v in forms.values() if v[0] <= _TOLERANT_REL),
                     key=lambda r: (r[0], r[1]))
-    seeds = _typed_seeds([t for r, _, t in scored if r <= _TOLERANT_REL], cfg)
+    old = [v for v in within if v[2].canonical_hash() in first]
+    new = [v for v in within if v[2].canonical_hash() not in first]
+    placed = sorted(old + new[:max(0, _TOLERANT_MAX - len(old))],
+                    key=lambda r: (r[0], r[1]))
+    seeds = _typed_seeds([t for _r, _i, t in placed], cfg)
     TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
+    TRACE.set("tolerant_cands", "%d candidats, %d formes, %d sous le seuil" % (
+        len(cands), len(forms), len(within)))
     if seeds:
         kept = {id(t) for t in seeds}
         TRACE.set("tolerant_seed", " | ".join(
-            "%s (%.2g)" % (to_string(t), r) for r, _, t in scored
-            if r <= _TOLERANT_REL and id(t) in kept))
+            "%s (%.2g)" % (to_string(t), r) for r, _, t in placed
+            if id(t) in kept))
     return seeds
 
 
@@ -7883,6 +8509,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                         continue
                     cand = wrap_linear_scaling(best_local, xs, ys)
                     _track_val_candidate(cand)        # [v21-VAL]
+                    _track_small_candidate(cand, xs, ys)   # [1.4-S1]
                     s = fitness(cand, xs, ys, cfg, role="cleaner")
                     if s < global_score:
                         global_score = s
@@ -8566,6 +9193,424 @@ def _select_one_se(champion, champ_val):
     m, _, _, node = eligible[0]
     return node, m
 
+# ════════════════════════════════════════════════════════════════
+# [1.4-S1] SOUS 30 LIGNES, LES CANDIDATS EN VALIDATION CROISÉE
+# ════════════════════════════════════════════════════════════════
+# Constat (benchmarks/results_1.4/analysis/README.md) : sous 30 lignes le
+# moteur ne garde pas de hold-out (_split_holdout). Il ne suivait alors aucun
+# candidat, ne polissait aucun finaliste, n'appliquait aucune règle de
+# parcimonie : il rendait le meilleur individu de la recherche sur les
+# lignes d'entraînement. Sur les tables de TP (10 et 20 points), la lentille
+# revenait dans 2 ajustements sur 40 alors que sa graine était placée, et
+# toute loi rendue sans unités portait une constante additive que seule la
+# loi de Newton a. S1 (benchmarks/results_1.4/PLAN.md) :
+# - les candidats : les huit meilleures formes de famille de l'étage
+#   tolérant qui expliquent au moins la moitié de la variance (sans le seuil
+#   de 1,5 %), placées au départ et gardées pour la fin ; les champions de
+#   la recherche sur les lignes d'entraînement (64 au plus) ; et des
+#   variantes de chaque finaliste, sans la constante additive de la mise à
+#   l'échelle finale, et avec chaque exposant ajusté mis au demi-entier le
+#   plus proche (écrit dans la structure) ;
+# - 40 finalistes au plus : le champion, les formes de famille, les 8
+#   meilleurs de la recherche, les 8 plus petits de la bande de tolérance,
+#   et leurs variantes ;
+# - la validation croisée : K = min(n, 10) plis, la ligne i dans le pli
+#   i mod K (aucun tirage) ; pour chaque pli, les constantes du candidat
+#   sont ajustées de nouveau sur les autres lignes, et ses erreurs au carré
+#   sur les lignes du pli gardées ; son erreur est leur moyenne sur la table ;
+# - le choix : parmi les candidats à une erreur type du meilleur, ou dans la
+#   tolérance de 0,003 en R², celui qui a le moins de constantes ajustées
+#   (le rang de la jacobienne de ses prédictions : une constante que
+#   l'ajustement ne peut pas bouger seule ne compte pas), puis le plus
+#   petit, puis le plus précis ; la priorité à une loi exacte et les
+#   départages d'aujourd'hui (formule fidèle, stable près du domaine) sont
+#   gardés ;
+# - result.pareto tient le front de ces candidats par taille et erreur
+#   croisée ;
+# - la validation croisée s'arrête une seconde après l'échéance de
+#   time_limit=, comme le polissage ; elle ne tourne pas avec une perte
+#   personnalisée, en mode extrapolation, ni sous 6 lignes.
+# Rien ne change pour une table de 30 lignes ou plus.
+
+# Non adopté (campagne S1, 13 novembre 2026, benchmarks/results_1.4/s1/
+# campaign/README.md) : la loi revient dans 113 ajustements de TP sur 200
+# contre 126, la validation croisée favorisant des structures que la
+# recherche a choisies sur les mêmes points. Retiré du candidat : éteint, le
+# code gardé pour la décision de l'auteur.
+_SMALL_CV = False
+_SMALL_ROWS = 30                  # en dessous : pas de hold-out, S1
+_SMALL_MIN_ROWS = 6
+_SMALL_FAMILY_KEEP = 8
+_SMALL_FAMILY_SHARE = 0.5         # part de variance laissée au plus
+_SMALL_SEARCH = 8                 # meilleurs, et plus petits de la bande
+_SMALL_FINALISTS = 40
+_SMALL_FOLDS = 10
+_SMALL_CANDS_MAX = 64
+_SMALL_ON = False                 # actif pour l'ajustement en cours
+_SMALL_CANDS: list = []           # [(mse_train, se, taille, arbre)]
+_SMALL_FAMILY: list = []          # formes de famille (arbres sans échelle)
+_SMALL_FRONT: list = []           # [(mse_cv, se_cv, taille, arbre, n_par, origine)]
+
+
+def _small_setup(cfg, ys) -> None:
+    """[1.4-S1] Au début d'un ajustement, après _split_holdout : S1 est-il
+    actif ? Seulement sans hold-out : une table de 30 à 37 lignes en garde
+    un, et son reste d'entraînement, sous 30 lignes, n'est pas concerné."""
+    global _SMALL_ON
+    _SMALL_CANDS.clear()
+    _SMALL_FAMILY.clear()
+    _SMALL_FRONT.clear()
+    n = len(ys)
+    _SMALL_ON = bool(_SMALL_CV and _GENERIC_CSV_MODE and _VAL_XS is None
+                     and _SMALL_MIN_ROWS <= n < _SMALL_ROWS
+                     and _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
+                     and not bool(getattr(cfg, "EXTRAPOLATION_MODE", False)))
+
+
+def _track_small_candidate(cand, xs, ys) -> None:
+    """[1.4-S1] Un champion de la recherche, noté sur les lignes
+    d'entraînement (sous units=, seulement s'il passe la porte)."""
+    if not _SMALL_ON or cand is None:
+        return
+    if _DIM_GATE_DIMS is not None:
+        try:
+            if not _ds().is_typed_valid(cand, _DIM_GATE_DIMS, _DIM_GATE_TARGET,
+                                        _DIM_UNKNOWN_CONST):
+                return
+        except Exception:
+            return
+    try:
+        h = cand.exact_hash()
+        if any(t[3].exact_hash() == h for t in _SMALL_CANDS):
+            return
+        X = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
+        y = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+        with np.errstate(all="ignore"):
+            e = (np.asarray(evaluate_vector(cand, X), dtype=float) - y) ** 2
+        m = float(np.mean(e))
+        if not math.isfinite(m):
+            return
+        se = float(np.std(e, ddof=1) / math.sqrt(len(e))) if len(e) > 1 else 0.0
+        _SMALL_CANDS.append((m, se, tree_size(cand), cand.copy()))
+        if len(_SMALL_CANDS) > _SMALL_CANDS_MAX:
+            _SMALL_CANDS.sort(key=lambda t: (t[0], t[2]))
+            del _SMALL_CANDS[_SMALL_CANDS_MAX:]
+    except Exception:
+        pass
+
+
+def _small_is_const(n) -> bool:
+    return (n is not None and n.left is None and n.right is None
+            and not isinstance(n.value, str))
+
+
+def _small_strip(t):
+    """[1.4-S1] L'arbre sans la mise à l'échelle que la recherche a
+    matérialisée (a + b·f, b·f, a + f) : f. L'arbre lui-même sinon."""
+    if t is None or t.left is None or t.right is None:
+        return t
+    if t.value == "+":
+        for c, o in ((t.left, t.right), (t.right, t.left)):
+            if _small_is_const(c):
+                if o.value == "*" and o.left is not None and o.right is not None:
+                    if _small_is_const(o.left):
+                        return o.right
+                    if _small_is_const(o.right):
+                        return o.left
+                return o
+    if t.value == "*":
+        if _small_is_const(t.left):
+            return t.right
+        if _small_is_const(t.right):
+            return t.left
+    return t
+
+
+def _small_round_powers(f):
+    """[1.4-S1] Copie de f où chaque pow(B, c) d'exposant constant c reçoit
+    le demi-entier le plus proche, écrit dans la structure (carrés, cubes,
+    racines, produits, 1/…) pour que l'ajustement ne le déplace plus. None si
+    rien ne change ou si le pool n'a pas les opérateurs nécessaires."""
+    uops, bops = set(_GENERIC_UNARY_OPS), set(_GENERIC_BINARY_OPS)
+    changed = [False]
+
+    def power(B, e2):
+        def ipow(m):
+            if m == 1:
+                return B.copy()
+            if m == 2 and "sq" in uops:
+                return Node("sq", B.copy())
+            if m == 3 and "cube" in uops:
+                return Node("cube", B.copy())
+            if m % 2 == 0:
+                h = ipow(m // 2)
+                return Node("sq", h) if "sq" in uops else Node("*", h, ipow(m // 2))
+            return Node("*", B.copy(), ipow(m - 1))
+        n_int, half = divmod(abs(e2), 2)
+        parts = []
+        if n_int:
+            parts.append(ipow(n_int))
+        if half:
+            if "sqrt" not in uops:
+                return None
+            parts.append(Node("sqrt", B.copy()))
+        out = parts[0]
+        for q in parts[1:]:
+            if "*" not in bops:
+                return None
+            out = Node("*", out, q)
+        if e2 < 0:
+            if "/" not in bops:
+                return None
+            out = Node("/", Node(1.0), out)
+        return out
+
+    def rec(n):
+        if n is None:
+            return None
+        if n.value == "pow" and n.left is not None and _small_is_const(n.right):
+            c = float(n.right.value)
+            e2 = int(round(2.0 * c))
+            base = rec(n.left)
+            if abs(e2) <= 12 and math.isfinite(c):
+                if e2 == 0:
+                    changed[0] = True
+                    return Node(1.0)
+                q = power(base, e2)
+                if q is not None:
+                    changed[0] = True
+                    return q
+            return Node("pow", base, Node(c))
+        return Node(n.value, rec(n.left), rec(n.right))
+
+    try:
+        out = rec(f)
+    except RecursionError:
+        return None
+    return out if changed[0] else None
+
+
+def _small_fit(f, X, y, cfg, scale_only):
+    """[1.4-S1] f ajusté sur (X, y) par l'étape de finition du moteur, en
+    projection variable sur a + b·f (b·f seul si scale_only), et sa mise à
+    l'échelle : (f ajusté, a, b), ou None."""
+    global _LS_SCALE_ONLY
+    keep = _LS_SCALE_ONLY
+    try:
+        if scale_only:
+            _LS_SCALE_ONLY = True
+        with np.errstate(all="ignore"):
+            g = _lm_to_convergence(f, X, y, cfg)
+            g = f if g is None else g
+            p = np.asarray(evaluate_vector(g, X), dtype=float)
+            if p.ndim == 0:
+                p = np.full(len(y), float(p))
+            if not np.all(np.isfinite(p)):
+                return None
+            a, b, ok = _linear_scale_params(p, y)
+        if not ok or not (math.isfinite(a) and math.isfinite(b)):
+            return None
+        return g, float(a), float(b)
+    except Exception:
+        return None
+    finally:
+        _LS_SCALE_ONLY = keep
+
+
+def _small_cv(start, X, y, cfg, scale_only):
+    """[1.4-S1] Erreur de validation croisée (moyenne et erreur type des
+    erreurs au carré sur les n lignes), plis i mod K, constantes ajustées de
+    nouveau sur les autres lignes à chaque pli. None si un pli échoue."""
+    n = len(y)
+    K = min(n, _SMALL_FOLDS)
+    fold = np.arange(n) % K
+    err = np.empty(n)
+    for k in range(K):
+        te = fold == k
+        r = _small_fit(start, X[~te], y[~te], cfg, scale_only)
+        if r is None:
+            return None
+        g, a, b = r
+        with np.errstate(all="ignore"):
+            q = np.asarray(evaluate_vector(g, X[te]), dtype=float)
+            e = (a + b * q - y[te]) ** 2
+        if not np.all(np.isfinite(e)):
+            return None
+        err[te] = e
+    m = float(np.mean(err))
+    se = float(np.std(err, ddof=1) / math.sqrt(n)) if n > 1 else 0.0
+    return m, se
+
+
+def _small_n_par(g, X, scale_only) -> int:
+    """[1.4-S1] Le nombre de constantes ajustées d'un candidat : le rang de
+    la jacobienne de ses prédictions par rapport à ses constantes et à sa
+    mise à l'échelle (b, et a sauf scale_only). Une constante que
+    l'ajustement ne peut pas bouger seule (le 1 d'un 1/x, que b absorbe)
+    n'y compte pas."""
+    n = X.shape[0]
+    with np.errstate(all="ignore"):
+        p = np.asarray(evaluate_vector(g, X), dtype=float)
+        if p.ndim == 0:
+            p = np.full(n, float(p))
+        cols = [p] if scale_only else [p, np.ones(n)]
+        try:
+            fn, consts = compile_parametric(g)
+        except Exception:
+            fn, consts = None, []
+        if fn is not None and consts:
+            cv = np.array([c.value for c in consts], dtype=float)
+            p0 = np.asarray(fn(X, cv), dtype=float)
+            for i in range(len(cv)):
+                h = 1e-6 * (1.0 + abs(cv[i]))
+                c2 = cv.copy()
+                c2[i] += h
+                cols.append((np.asarray(fn(X, c2), dtype=float) - p0) / h)
+        J = np.column_stack([np.broadcast_to(c, (n,)) for c in cols])
+        if not np.all(np.isfinite(J)):
+            return J.shape[1]
+        nrm = np.linalg.norm(J, axis=0)
+        J = J[:, nrm > 0] / nrm[nrm > 0]
+        if J.shape[1] == 0:
+            return 0
+        sv = np.linalg.svd(J, compute_uv=False)
+    return int(np.sum(sv > 1e-6 * sv[0]))
+
+
+def _small_materialize(g, a, b, scale_only):
+    """[1.4-S1] Le modèle livré : a + b·f, ou b·f, comme
+    wrap_linear_scaling l'écrit."""
+    if scale_only:
+        if g.value == "*" and _small_is_const(g.left):
+            w = g.copy()
+            w.left = Node(float(b) * float(g.left.value))
+            return w
+        return Node("*", Node(float(b)), g.copy())
+    return simplify(Node("+", Node(float(a)), Node("*", Node(float(b)), g.copy())))
+
+
+def _small_specs(champion, X, y):
+    """[1.4-S1] Les finalistes, 40 au plus, dans l'ordre où ils sont notés :
+    (f, scale_only, origine). Le champion d'abord, puis les formes de
+    famille, les 8 meilleurs de la recherche, les 8 plus petits de la bande
+    de tolérance, chacun suivi de ses variantes."""
+    var = float(np.var(y))
+    ranked = sorted(_SMALL_CANDS, key=lambda t: (t[0], t[2]))
+    bases = []
+    if champion is not None:
+        bases.append((champion, "champion"))
+    for t in _SMALL_FAMILY:
+        bases.append((t, "family"))
+    for t in ranked[:_SMALL_SEARCH]:
+        bases.append((t[3], "search"))
+    if ranked:
+        thr = ranked[0][0] + max(ranked[0][1], float(
+            globals().get("VAL_R2_TOLERANCE", 0.003)) * var)
+        small = sorted((t for t in ranked if t[0] <= thr), key=lambda t: (t[2], t[0]))
+        for t in small[:_SMALL_SEARCH]:
+            bases.append((t[3], "band"))
+    modes = (True,) if _LS_SCALE_ONLY else (False, True)
+    specs, seen = [], set()
+    for tree, origin in bases:
+        f = tree if origin == "family" else _small_strip(tree)
+        fr = _small_round_powers(f)
+        for g, rounded in ((f, False), (fr, True)):
+            if g is None:
+                continue
+            for so in modes:
+                if _DIM_GATE_DIMS is not None:
+                    try:
+                        if not _ds().is_typed_valid(Node("*", Node(1.0), g),
+                                                    _DIM_GATE_DIMS, _DIM_GATE_TARGET,
+                                                    _DIM_UNKNOWN_CONST):
+                            continue
+                    except Exception:
+                        continue
+                key = (g.canonical_hash(), so)
+                if key in seen:
+                    continue
+                seen.add(key)
+                label = origin + (", exponents rounded" if rounded else "") + \
+                    (", without the constant" if so and not _LS_SCALE_ONLY else "")
+                specs.append((g, so, label))
+                if len(specs) >= _SMALL_FINALISTS:
+                    return specs
+    return specs
+
+
+def _small_table_select(champion, xs, ys, cfg):
+    """[1.4-S1] Le modèle d'une table de moins de 30 lignes (voir plus haut).
+    Rend le champion si rien n'est noté."""
+    global _VAL_TRAIN_XS, _VAL_TRAIN_YS
+    X = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
+    y = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
+    var = float(np.var(y))
+    if not var > 1e-15:
+        return champion
+    t0 = time.time()
+    _dl = getattr(cfg, "DEADLINE", None)
+    _stop = None if _dl is None else max(time.time(), float(_dl)) + _POLISH_GRACE_S
+    specs = _small_specs(champion, X, y)
+    _SMALL_FRONT.clear()
+    for g, so, label in specs:
+        if _stop is not None and _SMALL_FRONT and time.time() > _stop:
+            break                                 # budget de temps épuisé
+        r = _small_fit(g, X, y, cfg, so)
+        if r is None:
+            continue
+        g_all, a, b = r
+        cv = _small_cv(g_all, X, y, cfg, so)
+        if cv is None:
+            continue
+        M = _small_materialize(g_all, a, b, so)
+        _SMALL_FRONT.append((cv[0], cv[1], tree_size(M), M,
+                             _small_n_par(g_all, X, so), label))
+    if not _SMALL_FRONT:
+        return champion
+    pick = _small_choose(_SMALL_FRONT, X, y)
+    TRACE.set("small_cv", "%d lignes, K = %d, %d candidats notés en %.2f s ; "
+              "choisi : %s, erreur croisée %.3g, %d constantes" % (
+                  len(y), min(len(y), _SMALL_FOLDS), len(_SMALL_FRONT),
+                  time.time() - t0, pick[5], pick[0], pick[4]))
+    return pick[3]
+
+
+def _small_choose(front, X, y):
+    """[1.4-S1] Le choix parmi des candidats notés en validation croisée :
+    ceux à une erreur type du meilleur, ou dans la tolérance de 0,003 en R²
+    (seulement les exacts si le meilleur l'est), puis le moins de constantes
+    ajustées, le plus petit, le plus précis ; départage par la fidélité de la
+    formule et la stabilité près du domaine, sur la table. Rend l'entrée."""
+    global _VAL_TRAIN_XS, _VAL_TRAIN_YS
+    var = float(np.var(y))
+    best_m, best_se = min((t[0], t[1]) for t in front)
+    thr = best_m + max(best_se, float(globals().get("VAL_R2_TOLERANCE", 0.003)) * var)
+    if best_m <= _EXACT_REL * var:                # priorité à l'exactitude
+        thr = _EXACT_REL * var
+    elig = sorted((t for t in front if t[0] <= thr),
+                  key=lambda t: (t[4], t[2], t[0]))
+    pick = elig[0]
+    # départages : formule fidèle et stable près du domaine, sur la table
+    keep = (_VAL_TRAIN_XS, _VAL_TRAIN_YS)
+    try:
+        _VAL_TRAIN_XS, _VAL_TRAIN_YS = X, y
+        _FAITHFUL_CACHE.clear()
+        _NEAR_CACHE.clear()
+        _build_near_probes(X, y)
+        if not (_formula_faithful(pick[3]) and _near_domain_stable(pick[3])):
+            both = [t for t in elig
+                    if _formula_faithful(t[3]) and _near_domain_stable(t[3])]
+            if both:
+                pick = both[0]
+    finally:
+        _VAL_TRAIN_XS, _VAL_TRAIN_YS = keep
+        globals()["_NEAR_PROBE_XS"] = None
+        globals()["_NEAR_BAND"] = None
+        _FAITHFUL_CACHE.clear()
+        _NEAR_CACHE.clear()
+    return pick
+
+
 def _split_holdout(xs, ys, cfg):
     """Découpe (xs, ys) en (train, val). Retourne (xs_tr, ys_tr) et installe
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
@@ -8881,6 +9926,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # lexicase, Adam, stigmergie, parallélisme) ne voit que le TRAIN.
     xs_full, ys_full = xs, ys
     xs, ys = _split_holdout(xs, ys, cfg)
+    _small_setup(cfg, ys)                     # [1.4-S1]
 
     # [v24-EXTRAP] En mode extrapolation, on ajoute une DROITE (OLS) au pool de
     # candidats-champions. Elle est ajustée sur le train (intérieur) puis jugée,
@@ -9299,6 +10345,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                 # donc le MSE rapporté correspond exactement à l'expression.
                 cand = wrap_linear_scaling(new_best, xs, ys)
                 _track_val_candidate(cand)            # [v21-VAL]
+                _track_small_candidate(cand, xs, ys)  # [1.4-S1]
                 s = fitness(cand, xs, ys, cfg, role="cleaner")
                 if s < global_score:
                     global_score  = s
@@ -9396,6 +10443,15 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             global_best = optimized
         # Si Adam a dégradé, global_best reste intact (deepcopy garantit l'isolation)
         _track_val_candidate(global_best)            # [v21-VAL] post-Adam
+        _track_small_candidate(global_best, xs, ys)  # [1.4-S1]
+
+    # [1.4-S1] Sous 30 lignes, pas de hold-out : les candidats en validation
+    # croisée (voir _small_table_select).
+    if _VAL_XS is None and global_best is not None and _SMALL_ON:
+        try:
+            global_best = _small_table_select(global_best, xs, ys, cfg)
+        except Exception:
+            pass
 
     # ── [v21-VAL] Sélection finale + rapport de généralisation ──────────
     # Le champion LIVRÉ est celui qui généralise le mieux : si un candidat

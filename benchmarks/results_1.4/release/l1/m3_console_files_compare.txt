@@ -1,0 +1,11 @@
+# The two files the console example writes (.gitignore keeps them out of the repository),
+# in the M3 of the measured release (scratchpad rel14/m3, 14 November) against part c of L1
+# (scratchpad rel14b/m3, 17 November): python m3_compare_l1.py on folders holding only them.
+same     gp_elite_best.txt
+differs  gp_elite_log.csv
+    first : 0,0,-2234.0630654230613,5.6417561524840194e-09,3,2,(24.974004 * elongation),0.040543317794799805
+    second: 0,0,-2234.0630654237093,5.6417544871208786e-09,3,2,(24.974004 * elongation),0.05077552795410156
+    first : 0,1,-2234.0630654237093,5.641755042232403e-09,3,2,(24.974004 * elongation),0.0731971263885498
+    second: 0,2,-2234.0630654237566,5.641755042230299e-09,3,2,(24.974004 * elongation),0.12472724914550781
+    first : 0,2,-2234.0630654237566,5.641755042230299e-09,3,2,(24.974004 * elongation),0.11185789108276367
+    second: <none>

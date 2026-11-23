@@ -1,0 +1,5 @@
+tests of f005aab, wheel gp_elite-1.4.0-py3-none-any.whl 69326a6e7fad5352
+[3.9.25] 3.9.25  ** On entry to DLASCL parameter number  4 had an illegal value
+[3.11.18] 3.11.18  ** On entry to DLASCL parameter number  4 had an illegal value
+[3.14.6] 3.14.6 199 passed in 168.98s (0:02:48)
+all done

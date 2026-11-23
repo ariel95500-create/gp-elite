@@ -1,0 +1,74 @@
+800 fits, version string of the engine ['1.1.0'] (the candidate of campaign H1)
+
+experiment        plain: law / useful, of 40   units: law / useful, of 40
+  pendule          30 / 32                      40 / 37
+  ressort          29 / 29                      40 / 40
+  chute            38 / 40                      40 / 40
+  puissance        39 / 40                      40 / 40
+  gaz              34 / 37                      39 / 39
+  eclairement      31 / 38                      40 / 38
+  rc               30 / 39                       0 /  0
+  refroidissement   9 / 28                       0 /  4
+  lentille          2 / 22                       0 /  0
+  snell             0 / 38                       0 / 39
+plain arm: the law in 242 fits of 400
+units arm: the law in 239 fits of 400
+
+plain arm, the fits without the law, by points and noise, and what they return (the first four):
+  pendule: 10 of 40; 6 at 10 points and 5 %, 4 at 20 points and 5 %
+      10 points, 5 %, draw 2: 0.527083 + 1.93269 * tanh(L)
+      10 points, 5 %, draw 3: 0.521699 + 1.62917 * L
+      10 points, 5 %, draw 5: -0.188743 + 2.49262 * sqrt(tanh(L))
+      10 points, 5 %, draw 7: -0.041153 + 2.18623 * sqrt(tanh(L))
+  ressort: 11 of 40; 2 at 10 points and 2 %, 7 at 10 points and 5 %, 2 at 20 points and 5 %
+      10 points, 2 %, draw 0: 1.75249 - 1.10534 * exp((0.0209339 * k - 2.00016 * m) / exp(0.0209339 * k))
+      10 points, 2 %, draw 1: 0.323472 + 29.9527 * m / k
+      10 points, 5 %, draw 0: 0.301419 + 0.544775 * tanh(108.033 * m / k)²
+      10 points, 5 %, draw 1: 0.04881 + 0.486946 * (2.34158 * m - log(tanh(0.0239845 * k)))
+  chute: 2 of 40; 1 at 20 points and 2 %, 1 at 20 points and 5 %
+      20 points, 2 %, draw 1: -1.47278 + 1.49179 * exp(tanh(2.77778 * t²))
+      20 points, 5 %, draw 6: -0.345722 + 0.289726 * exp(1.66667 * t)²
+  puissance: 1 of 40; 1 at 10 points and 2 %
+      10 points, 2 %, draw 9: 0.0159113 + U² / R * (0.877544 + 0.0128906 * U)
+  gaz: 6 of 40; 2 at 10 points and 5 %, 4 at 20 points and 5 %
+      10 points, 5 %, draw 3: -3522.02 + 357.594 * tanh(0.0279215 * T * n) / V
+      10 points, 5 %, draw 8: 2116.69 + 3473.27 * n * tanh(0.00286456 * T) / V
+      20 points, 5 %, draw 3: -3294.97 + 0.927096 * tanh(11.0543 * n) * T / V
+      20 points, 5 %, draw 7: 151.32 + 1116.24 * n * exp(0.0026868 * T) / V
+  eclairement: 9 of 40; 2 at 10 points and 2 %, 3 at 10 points and 5 %, 4 at 20 points and 5 %
+      10 points, 2 %, draw 6: -0.139271 + 0.808722 / d² + 0.107035 * sqrt(d)
+      10 points, 2 %, draw 8: -1.64292 + 0.497493 * (0.5 * d + exp(1.49047 * sqrt(d^(-1.15153))))
+      10 points, 5 %, draw 4: -0.121355 + 0.746575 * sqrt(exp(0.5 * d)) / d²
+      10 points, 5 %, draw 5: -0.451274 + 0.186297 * exp(0.5 * d) / tanh(0.25 * d²)
+  rc: 10 of 40; 2 at 10 points and 2 %, 4 at 10 points and 5 %, 1 at 20 points and 2 %, 3 at 20 points and 5 %
+      10 points, 2 %, draw 3: -0.318902 + 50028.4 * 6.24057e-06^tanh(exp(0.2 * t))
+      10 points, 2 %, draw 9: -0.0196032 + 4.88887 * (0.0107913 * |0.2 * t|^(0.2 * t))^(0.2 * t)
+      20 points, 2 %, draw 6: -2.96723 + 7.91442 * exp(tanh(-2.74065 * tanh(0.2 * t)))
+      10 points, 5 %, draw 1: -2.9553 + 2.90442 * exp(exp(-0.747346 * t))
+  refroidissement: 31 of 40; 8 at 10 points and 2 %, 9 at 10 points and 5 %, 4 at 20 points and 2 %, 10 at 20 points and 5 %
+      10 points, 2 %, draw 0: 23.2203 + 71.3532 * tanh(0.0180389^(0.000555556 * t))
+      10 points, 2 %, draw 1: 22.4273 - 57.7594 * (0.000555556 * t - |0.000555556 * t|^(0.000555556 * t))
+      10 points, 2 %, draw 2: 81.1396 - 67.2968 * sqrt(|tanh(0.000555556 * t)|)
+      10 points, 2 %, draw 3: 3023.66 - 3028.07 * tanh(exp(tanh(exp(0.000555556 * t))))
+  lentille: 38 of 40; 9 at 10 points and 2 %, 10 at 10 points and 5 %, 9 at 20 points and 2 %, 10 at 20 points and 5 %
+      10 points, 2 %, draw 0: 0.0942957 + 0.0313183 * (1.66667 * p)^(log(p) + 0.510826)
+      10 points, 2 %, draw 1: 0.0928784 + 0.0288818 * (1.66667 * p)^log(tanh(tanh(1.66667 * p)))
+      10 points, 2 %, draw 2: 0.0819915 + 0.020561 * exp(0.357204 / p)
+      10 points, 2 %, draw 4: 0.105479 + 0.00663246 * exp(0.6 * tanh(exp(1.66667 * p)) / p)
+  snell: 40 of 40; 10 at 10 points and 2 %, 10 at 10 points and 5 %, 10 at 20 points and 2 %, 10 at 20 points and 5 %
+      10 points, 2 %, draw 0: -0.00599024 + 0.978626 * sin(sin(0.714286 * i1))
+      10 points, 2 %, draw 1: -0.0110227 + 0.978105 * tanh(0.714286 * i1)
+      10 points, 2 %, draw 2: -0.00247817 + 0.961547 * tanh(0.714286 * i1)
+      10 points, 2 %, draw 3: -0.00522851 + 0.973196 * tanh(0.714286 * i1)
+
+plain arm, formulas that carry an additive constant among the fits with the law (their text starts with a number followed by + or -):
+  pendule          30 of 30
+  ressort          29 of 29
+  chute            38 of 38
+  puissance        39 of 39
+  gaz              34 of 34
+  eclairement      31 of 31
+  rc               30 of 30
+  refroidissement   9 of  9
+  lentille          2 of  2
+  the experiments whose law has no additive constant (all but refroidissement): 233 of 233

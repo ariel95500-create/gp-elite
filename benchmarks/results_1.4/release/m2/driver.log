@@ -1,0 +1,228 @@
+--- TP and TPT10 2026-11-13T20:46, benches of 796b31c, kernel 6.18.44-fc-v470
+400 jobs to run with 2 engines
+10/400 20:46:44
+20/400 20:47:19
+30/400 20:48:03
+40/400 20:48:44
+50/400 20:49:16
+60/400 20:49:50
+70/400 20:50:24
+80/400 20:50:59
+90/400 20:51:48
+100/400 20:52:26
+110/400 20:53:11
+120/400 20:53:54
+130/400 20:54:43
+140/400 20:55:20
+150/400 20:56:08
+160/400 20:56:53
+170/400 20:57:55
+180/400 20:58:36
+190/400 20:59:14
+200/400 20:59:50
+210/400 21:00:39
+220/400 21:01:19
+230/400 21:02:11
+240/400 21:02:59
+250/400 21:03:40
+260/400 21:04:23
+270/400 21:05:06
+280/400 21:05:46
+290/400 21:06:31
+300/400 21:07:14
+310/400 21:07:50
+320/400 21:08:27
+330/400 21:09:26
+340/400 21:10:42
+350/400 21:11:39
+360/400 21:13:42
+370/400 21:14:18
+380/400 21:15:50
+390/400 21:16:15
+400/400 21:16:44
+400 jobs to run with 2 engines
+10/400 21:17:23
+20/400 21:17:58
+30/400 21:18:34
+40/400 21:19:09
+50/400 21:19:53
+60/400 21:20:39
+70/400 21:21:18
+80/400 21:21:58
+90/400 21:22:52
+100/400 21:23:28
+110/400 21:24:29
+120/400 21:25:09
+130/400 21:25:58
+140/400 21:26:53
+150/400 21:27:36
+160/400 21:28:18
+170/400 21:28:51
+180/400 21:29:25
+190/400 21:30:25
+200/400 21:31:19
+210/400 21:31:57
+220/400 21:32:42
+230/400 21:33:24
+240/400 21:34:20
+250/400 21:35:04
+260/400 21:35:50
+270/400 21:36:33
+280/400 21:37:17
+290/400 21:37:58
+300/400 21:38:31
+310/400 21:39:01
+320/400 21:39:44
+330/400 21:41:03
+340/400 21:42:19
+350/400 21:43:35
+360/400 21:45:18
+370/400 21:46:48
+380/400 21:49:00
+390/400 21:51:20
+400/400 21:52:58
+--- TP and TPT10 end 2026-11-13T21:52
+--- slice 2026-11-13T21:53 (0 and 0 done), kernel 6.18.44-fc-v470
+3092 jobs to run with 2 engines
+25 jobs done, 19 s elapsed, 3066 left
+50 jobs done, 174 s elapsed, 3041 left
+75 jobs done, 192 s elapsed, 3016 left
+100 jobs done, 316 s elapsed, 2992 left
+125 jobs done, 407 s elapsed, 2967 left
+150 jobs done, 587 s elapsed, 2942 left
+175 jobs done, 607 s elapsed, 2916 left
+200 jobs done, 838 s elapsed, 2892 left
+225 jobs done, 1185 s elapsed, 2866 left
+250 jobs done, 1573 s elapsed, 2841 left
+275 jobs done, 1979 s elapsed, 2816 left
+300 jobs done, 2366 s elapsed, 2791 left
+325 jobs done, 2777 s elapsed, 2766 left
+350 jobs done, 3003 s elapsed, 2742 left
+375 jobs done, 3163 s elapsed, 2717 left
+400 jobs done, 3253 s elapsed, 2692 left
+425 jobs done, 3270 s elapsed, 2666 left
+450 jobs done, 3288 s elapsed, 2641 left
+475 jobs done, 3381 s elapsed, 2617 left
+500 jobs done, 3465 s elapsed, 2592 left
+525 jobs done, 3733 s elapsed, 2566 left
+550 jobs done, 3986 s elapsed, 2541 left
+575 jobs done, 4217 s elapsed, 2516 left
+600 jobs done, 4305 s elapsed, 2492 left
+625 jobs done, 4484 s elapsed, 2466 left
+650 jobs done, 4901 s elapsed, 2441 left
+675 jobs done, 5287 s elapsed, 2416 left
+700 jobs done, 5674 s elapsed, 2392 left
+725 jobs done, 5936 s elapsed, 2366 left
+750 jobs done, 6287 s elapsed, 2341 left
+time slice over: 2340 jobs left for the next call
+--- slice ends 2026-11-13T23:38
+--- slice 2026-11-13T23:38 (752 and 752 done), kernel 6.18.44-fc-v470
+2340 jobs to run with 2 engines
+25 jobs done, 393 s elapsed, 2314 left
+50 jobs done, 782 s elapsed, 2289 left
+75 jobs done, 1191 s elapsed, 2264 left
+100 jobs done, 1576 s elapsed, 2239 left
+125 jobs done, 1829 s elapsed, 2214 left
+150 jobs done, 2220 s elapsed, 2189 left
+175 jobs done, 2622 s elapsed, 2164 left
+200 jobs done, 3010 s elapsed, 2139 left
+225 jobs done, 3416 s elapsed, 2114 left
+250 jobs done, 3804 s elapsed, 2089 left
+275 jobs done, 4210 s elapsed, 2064 left
+300 jobs done, 4596 s elapsed, 2039 left
+325 jobs done, 5003 s elapsed, 2014 left
+350 jobs done, 5387 s elapsed, 1989 left
+375 jobs done, 5796 s elapsed, 1964 left
+400 jobs done, 6179 s elapsed, 1939 left
+time slice over: 1932 jobs left for the next call
+--- slice ends 2026-11-14T01:23
+--- slice 2026-11-14T01:23 (1160 and 1160 done), kernel 6.18.44-fc-v470
+1932 jobs to run with 2 engines
+25 jobs done, 411 s elapsed, 1906 left
+50 jobs done, 794 s elapsed, 1881 left
+75 jobs done, 1208 s elapsed, 1856 left
+100 jobs done, 1589 s elapsed, 1831 left
+125 jobs done, 2000 s elapsed, 1806 left
+150 jobs done, 2382 s elapsed, 1781 left
+175 jobs done, 2793 s elapsed, 1756 left
+200 jobs done, 3178 s elapsed, 1731 left
+225 jobs done, 3588 s elapsed, 1706 left
+250 jobs done, 3973 s elapsed, 1681 left
+275 jobs done, 4382 s elapsed, 1656 left
+300 jobs done, 4766 s elapsed, 1631 left
+325 jobs done, 5178 s elapsed, 1606 left
+350 jobs done, 5560 s elapsed, 1581 left
+375 jobs done, 5971 s elapsed, 1556 left
+time slice over: 1534 jobs left for the next call
+--- slice ends 2026-11-14T03:09
+--- slice 2026-11-14T03:09 (1558 and 1558 done), kernel 6.18.44-fc-v470
+1534 jobs to run with 2 engines
+25 jobs done, 413 s elapsed, 1508 left
+50 jobs done, 795 s elapsed, 1483 left
+75 jobs done, 1209 s elapsed, 1458 left
+100 jobs done, 1594 s elapsed, 1433 left
+125 jobs done, 2009 s elapsed, 1408 left
+150 jobs done, 2391 s elapsed, 1383 left
+175 jobs done, 2805 s elapsed, 1358 left
+200 jobs done, 3189 s elapsed, 1333 left
+225 jobs done, 3453 s elapsed, 1309 left
+250 jobs done, 3543 s elapsed, 1283 left
+275 jobs done, 3636 s elapsed, 1258 left
+300 jobs done, 3699 s elapsed, 1233 left
+325 jobs done, 3783 s elapsed, 1208 left
+350 jobs done, 3868 s elapsed, 1184 left
+375 jobs done, 3978 s elapsed, 1158 left
+400 jobs done, 3994 s elapsed, 1133 left
+425 jobs done, 4269 s elapsed, 1108 left
+450 jobs done, 4666 s elapsed, 1083 left
+475 jobs done, 5058 s elapsed, 1058 left
+500 jobs done, 5456 s elapsed, 1033 left
+525 jobs done, 5850 s elapsed, 1008 left
+550 jobs done, 6247 s elapsed, 983 left
+time slice over: 979 jobs left for the next call
+--- slice ends 2026-11-14T04:54
+--- slice 2026-11-14T04:54 (2113 and 2113 done), kernel 6.18.44-fc-v470
+979 jobs to run with 2 engines
+25 jobs done, 413 s elapsed, 953 left
+50 jobs done, 793 s elapsed, 928 left
+75 jobs done, 1202 s elapsed, 903 left
+100 jobs done, 1582 s elapsed, 878 left
+125 jobs done, 1991 s elapsed, 853 left
+150 jobs done, 2373 s elapsed, 828 left
+175 jobs done, 2782 s elapsed, 803 left
+200 jobs done, 3165 s elapsed, 778 left
+225 jobs done, 3573 s elapsed, 753 left
+250 jobs done, 3955 s elapsed, 728 left
+275 jobs done, 4364 s elapsed, 703 left
+300 jobs done, 4472 s elapsed, 679 left
+325 jobs done, 4685 s elapsed, 653 left
+350 jobs done, 4761 s elapsed, 628 left
+375 jobs done, 4778 s elapsed, 603 left
+400 jobs done, 4856 s elapsed, 578 left
+425 jobs done, 4890 s elapsed, 553 left
+450 jobs done, 4982 s elapsed, 529 left
+475 jobs done, 5184 s elapsed, 504 left
+500 jobs done, 5497 s elapsed, 478 left
+525 jobs done, 5611 s elapsed, 453 left
+550 jobs done, 5706 s elapsed, 429 left
+575 jobs done, 5996 s elapsed, 403 left
+time slice over: 384 jobs left for the next call
+--- slice ends 2026-11-14T06:40
+--- slice 2026-11-14T06:40 (2708 and 2708 done), kernel 6.18.44-fc-v470
+384 jobs to run with 2 engines
+25 jobs done, 368 s elapsed, 358 left
+50 jobs done, 754 s elapsed, 333 left
+75 jobs done, 1071 s elapsed, 308 left
+100 jobs done, 1466 s elapsed, 283 left
+125 jobs done, 1870 s elapsed, 258 left
+150 jobs done, 2266 s elapsed, 233 left
+175 jobs done, 2667 s elapsed, 208 left
+200 jobs done, 3062 s elapsed, 183 left
+225 jobs done, 3465 s elapsed, 158 left
+250 jobs done, 3857 s elapsed, 133 left
+275 jobs done, 4259 s elapsed, 108 left
+300 jobs done, 4653 s elapsed, 83 left
+325 jobs done, 5055 s elapsed, 58 left
+350 jobs done, 5444 s elapsed, 33 left
+375 jobs done, 5849 s elapsed, 8 left
+--- slice ends 2026-11-14T08:19

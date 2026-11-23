@@ -1,0 +1,131 @@
+Benches: 3092 jobs in 1.3.0, 3092 in 1.4.0, the same jobs: True; crashes 0 and 0
+  engines: [('1.3.0', '/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py')]; [('1.4.0', '/venv14r/lib/python3.11/site-packages/gp_elite/__init__.py')]
+TP: 400 jobs in 1.3.0, 400 in 1.4.0, the same jobs: True; crashes 0 and 0
+  engines: [('1.3.0', '/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py')]; [('1.4.0', '/venv14r/lib/python3.11/site-packages/gp_elite/__init__.py')]
+TPT10: 400 jobs in 1.3.0, 400 in 1.4.0, the same jobs: True; crashes 0 and 0
+  engines: [('1.3.0', '/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py')]; [('1.4.0', '/venv14r/lib/python3.11/site-packages/gp_elite/__init__.py')]
+
+| indicator | 1.3.0 | 1.4.0 |
+|---|---|---|
+| F41 exact | 171 | 171 |
+| F41N1 structure retrieved | 116 | 152 |
+| F41N10 structure retrieved | 87 | 95 |
+| TF78 exact | 214 | 214 |
+| TS14 test exact | 9 | 10 |
+| R6 folds median R² | 0.8095 | 0.8095 |
+| R6 out-of-domain collapses | 5 | 5 |
+| R6 worst out-of-domain R² | -1946.0 | -1946.0 |
+| R7raw folds median R² | 0.8787 | 0.8787 |
+| R7raw out-of-domain collapses | 5 | 5 |
+| R7raw worst out-of-domain R² | -232.5 | -232.5 |
+| TR25 folds median R² | 0.7692 | 0.7692 |
+| TR25 out-of-domain collapses | 38 | 38 |
+| TR25 worst out-of-domain R² | -1.275e+22 | -1.275e+22 |
+| TR25raw folds median R² | 0.7708 | 0.7708 |
+| TR25raw out-of-domain collapses | 28 | 28 |
+| TR25raw worst out-of-domain R² | -6.333e+17 | -6.333e+17 |
+| R6 + R7raw out-of-domain collapses | 10 | 10 |
+| formula_exact False, R6 + R7raw folds and test | 6 | 5 |
+| crashes | 0 | 0 |
+| fits | 3092 | 3092 |
+| U41 exact | 174 | 174 |
+| U41N1 structure retrieved | 121 | 150 |
+| U41N10 structure retrieved | 95 | 93 |
+| TF78 under units exact | 228 | 228 |
+| fits under units | 1005 | 1005 |
+| fits under units passing the audit | 1005 | 1005 |
+| crashes under units | 0 | 0 |
+| under units, median time of a fit (s) | 30.18 | 30.2 |
+| under units, longest fit (s) | 31.48 | 31.41 |
+| TF78N1 structure retrieved | 34 | 37 |
+| TF78N10 structure retrieved | 27 | 28 |
+| TF78N1 under units structure retrieved | 35 | 37 |
+| TF78N10 under units structure retrieved | 32 | 33 |
+| every kind under units, TF78N included: fits passing the audit | 1161 of 1161 | 1161 of 1161 |
+
+Where 1.4 does not act: 2428 fits of 3092 place the same noise-tolerant seeds (none included); 782 of them reach no time budget in either version, of which 0 differ in formula, test error or formula_exact. The same recorded formula in 2597 fits of 3092.
+
+TP: | arm | law 1.3.0 | law 1.4.0 | useful | useful | median time | median time |
+  | plain | 126 | 123 | 174 | 174 | 7.0 s | 7.0 s |
+  | units | 120 | 120 | 139 | 139 | 8.3 s | 8.4 s |
+  the models of 1.4.0 are those of B in campaign N2b in 400 fits of 400 (expected: all)
+
+Criteria written before the run (PLAN_RELEASE_1.4.md, M2):
+  [met] where 1.4 does not act (the same noise-tolerant seeds, no time budget reached), the formula, the test error and formula_exact are those of 1.3.0 (782 fits, 0 differ)
+  [met] TP, plain arm: the law in no more than 5 fewer fits than 1.3.0 (126, 123)
+  [met] TP, plain arm: median time at most 1.5 times 1.3.0's (7.0 s, 7.0 s, ratio 1.01)
+  [met] TP, units arm: the law in no more than 5 fewer fits than 1.3.0 (120, 120)
+  [met] TP, units arm: median time at most 1.5 times 1.3.0's (8.3 s, 8.4 s, ratio 1.01)
+  [met] TP, units arm: every model of 1.4.0 passes its gate of dimensions (200 of 200)
+  [met] F41: not more than 3 fewer exact laws than 1.3.0 (171 -> 171)
+  [met] F41: no equation exact at three seeds or more falls to one or none (none)
+  [met] F41N1: not more than 3 fewer structures than 1.3.0 (116 -> 152)
+  [met] F41N10: not more than 3 fewer structures than 1.3.0 (87 -> 95)
+  [met] F41N1 + F41N10: at least 15 structures more than 1.3.0, the gain of N2b (203 -> 247)
+  [met] R6 folds median R² not more than 0.005 below 1.3.0 (0.8095 -> 0.8095)
+  [met] R6 + R7raw collapses out of domain not more than 1.3.0 plus 2 (10 -> 10)
+  [met] U41: not more than 3 fewer exact laws than 1.3.0 (174 -> 174)
+  [met] U41: no equation exact at three seeds or more falls to one or none (none)
+  [met] U41N1: not more than 3 fewer structures than 1.3.0 (121 -> 150)
+  [met] U41N10: not more than 3 fewer structures than 1.3.0 (95 -> 93)
+  [met] every model returned under units passes check_dimensions (1161 of 1161)
+ALL MET
+
+Reported, deciding nothing:
+  status or structure changed, by suite (1.3.0 -> 1.4.0 counts of exact / structure):
+    F41: {'fits': 205, 'status changed': 1, 'structure changed': 0, 'exact 1.3.0': 171, 'exact 1.4.0': 171, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 15, 'tolerant seeds 1.4.0': 15, 'formula_exact False 1.3.0': 5, 'formula_exact False 1.4.0': 6, 'budget reached 1.3.0': 44, 'budget reached 1.4.0': 44}
+    F41N1: {'fits': 205, 'status changed': 21, 'structure changed': 36, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 116, 'structure 1.4.0': 152, 'tolerant seeds 1.3.0': 140, 'tolerant seeds 1.4.0': 165, 'formula_exact False 1.3.0': 9, 'formula_exact False 1.4.0': 6, 'budget reached 1.3.0': 205, 'budget reached 1.4.0': 205}
+    F41N10: {'fits': 205, 'status changed': 25, 'structure changed': 18, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 87, 'structure 1.4.0': 95, 'tolerant seeds 1.3.0': 95, 'tolerant seeds 1.4.0': 130, 'formula_exact False 1.3.0': 11, 'formula_exact False 1.4.0': 11, 'budget reached 1.3.0': 205, 'budget reached 1.4.0': 205}
+    R6: {'fits': 60, 'status changed': 0, 'structure changed': 0, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 0, 'tolerant seeds 1.4.0': 0, 'formula_exact False 1.3.0': 2, 'formula_exact False 1.4.0': 2, 'budget reached 1.3.0': 60, 'budget reached 1.4.0': 60}
+    R7raw: {'fits': 70, 'status changed': 0, 'structure changed': 0, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 0, 'tolerant seeds 1.4.0': 0, 'formula_exact False 1.3.0': 10, 'formula_exact False 1.4.0': 9, 'budget reached 1.3.0': 70, 'budget reached 1.4.0': 70}
+    TF78: {'fits': 390, 'status changed': 14, 'structure changed': 0, 'exact 1.3.0': 214, 'exact 1.4.0': 214, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 90, 'tolerant seeds 1.4.0': 95, 'formula_exact False 1.3.0': 15, 'formula_exact False 1.4.0': 16, 'budget reached 1.3.0': 172, 'budget reached 1.4.0': 171}
+    TF78 under units: {'fits': 390, 'status changed': 7, 'structure changed': 0, 'exact 1.3.0': 228, 'exact 1.4.0': 228, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 75, 'tolerant seeds 1.4.0': 80, 'formula_exact False 1.3.0': 11, 'formula_exact False 1.4.0': 11, 'budget reached 1.3.0': 161, 'budget reached 1.4.0': 162}
+    TF78N1: {'fits': 78, 'status changed': 2, 'structure changed': 3, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 34, 'structure 1.4.0': 37, 'tolerant seeds 1.3.0': 57, 'tolerant seeds 1.4.0': 60, 'formula_exact False 1.3.0': 2, 'formula_exact False 1.4.0': 3, 'budget reached 1.3.0': 78, 'budget reached 1.4.0': 78}
+    TF78N1 under units: {'fits': 78, 'status changed': 3, 'structure changed': 2, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 35, 'structure 1.4.0': 37, 'tolerant seeds 1.3.0': 38, 'tolerant seeds 1.4.0': 47, 'formula_exact False 1.3.0': 0, 'formula_exact False 1.4.0': 0, 'budget reached 1.3.0': 78, 'budget reached 1.4.0': 78}
+    TF78N10: {'fits': 78, 'status changed': 8, 'structure changed': 5, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 27, 'structure 1.4.0': 28, 'tolerant seeds 1.3.0': 37, 'tolerant seeds 1.4.0': 51, 'formula_exact False 1.3.0': 4, 'formula_exact False 1.4.0': 3, 'budget reached 1.3.0': 78, 'budget reached 1.4.0': 78}
+    TF78N10 under units: {'fits': 78, 'status changed': 3, 'structure changed': 1, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 32, 'structure 1.4.0': 33, 'tolerant seeds 1.3.0': 30, 'tolerant seeds 1.4.0': 42, 'formula_exact False 1.3.0': 2, 'formula_exact False 1.4.0': 2, 'budget reached 1.3.0': 78, 'budget reached 1.4.0': 78}
+    TR25: {'fits': 250, 'status changed': 0, 'structure changed': 0, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 0, 'tolerant seeds 1.4.0': 0, 'formula_exact False 1.3.0': 35, 'formula_exact False 1.4.0': 33, 'budget reached 1.3.0': 250, 'budget reached 1.4.0': 250}
+    TR25raw: {'fits': 250, 'status changed': 0, 'structure changed': 0, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 7, 'tolerant seeds 1.4.0': 7, 'formula_exact False 1.3.0': 33, 'formula_exact False 1.4.0': 32, 'budget reached 1.3.0': 250, 'budget reached 1.4.0': 250}
+    TS14: {'fits': 140, 'status changed': 9, 'structure changed': 0, 'exact 1.3.0': 14, 'exact 1.4.0': 16, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 10, 'tolerant seeds 1.4.0': 20, 'formula_exact False 1.3.0': 26, 'formula_exact False 1.4.0': 24, 'budget reached 1.3.0': 116, 'budget reached 1.4.0': 115}
+    U41: {'fits': 205, 'status changed': 0, 'structure changed': 0, 'exact 1.3.0': 174, 'exact 1.4.0': 174, 'structure 1.3.0': 0, 'structure 1.4.0': 0, 'tolerant seeds 1.3.0': 15, 'tolerant seeds 1.4.0': 15, 'formula_exact False 1.3.0': 9, 'formula_exact False 1.4.0': 9, 'budget reached 1.3.0': 37, 'budget reached 1.4.0': 37}
+    U41N1: {'fits': 205, 'status changed': 9, 'structure changed': 29, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 121, 'structure 1.4.0': 150, 'tolerant seeds 1.3.0': 95, 'tolerant seeds 1.4.0': 125, 'formula_exact False 1.3.0': 8, 'formula_exact False 1.4.0': 8, 'budget reached 1.3.0': 205, 'budget reached 1.4.0': 205}
+    U41N10: {'fits': 205, 'status changed': 13, 'structure changed': 14, 'exact 1.3.0': 0, 'exact 1.4.0': 0, 'structure 1.3.0': 95, 'structure 1.4.0': 93, 'tolerant seeds 1.3.0': 85, 'tolerant seeds 1.4.0': 115, 'formula_exact False 1.3.0': 8, 'formula_exact False 1.4.0': 8, 'budget reached 1.3.0': 205, 'budget reached 1.4.0': 205}
+  structures by equation where they differ (F41N1, F41N10, U41N1, U41N10):
+    I.27.6     5 -> 5   2 -> 0   5 -> 5   5 -> 1
+    I.32.5     2 -> 5   0 -> 5   5 -> 5   5 -> 5
+    I.40.1     0 -> 5   0 -> 0   1 -> 5   0 -> 0
+    I.44.4     0 -> 5   1 -> 5   0 -> 5   0 -> 5
+    II.11.27   0 -> 5   0 -> 0   0 -> 5   0 -> 1
+    II.11.3    0 -> 5   0 -> 0   0 -> 5   1 -> 1
+    II.35.18   0 -> 5   0 -> 0   0 -> 5   0 -> 0
+    III.15.12  0 -> 5   5 -> 2   0 -> 5   5 -> 1
+    III.19.51  2 -> 5   1 -> 5   5 -> 5   5 -> 5
+  TP, the law by experiment and arm, 1.3.0 -> 1.4.0:
+    chute            plain 19 -> 20   units 20 -> 20
+    eclairement      plain 18 -> 14   units 20 -> 20
+    gaz              plain 18 -> 17   units 20 -> 20
+    lentille         plain 2 -> 2   units 0 -> 0
+    pendule          plain 17 -> 17   units 20 -> 20
+    puissance        plain 20 -> 20   units 20 -> 20
+    rc               plain 15 -> 15   units 0 -> 0
+    refroidissement  plain 3 -> 3   units 0 -> 0
+    ressort          plain 14 -> 15   units 20 -> 20
+    snell            plain 0 -> 0   units 0 -> 0
+
+The frozen test sets, published as measured, deciding nothing:
+  TF78 exact 214 -> 214; TS14 test exact 9 -> 10; TR25 folds median R² 0.7692 -> 0.7692; TF78 under units exact 228 -> 228
+  TF78N, the structure: TF78N1 34 -> 37 of 78; TF78N10 27 -> 28 of 78; TF78N1 under units 35 -> 37 of 78; TF78N10 under units 32 -> 33 of 78
+  TPT10: | arm | law 1.3.0 | law 1.4.0 | useful | useful |
+    | plain | 107 | 107 | 169 | 173 |
+    | units | 103 | 103 | 122 | 122 |
+  TPT10, the law by experiment and arm, 1.3.0 -> 1.4.0:
+    boyle            plain 12 -> 12   units 20 -> 20
+    charge           plain 7 -> 9   units 0 -> 0
+    interfrange      plain 16 -> 16   units 19 -> 19
+    kepler3          plain 10 -> 9   units 20 -> 20
+    malus            plain 5 -> 5   units 3 -> 3
+    michaelis        plain 0 -> 0   units 0 -> 0
+    ohm              plain 19 -> 19   units 20 -> 20
+    ph               plain 17 -> 17   units 1 -> 1
+    thermistance     plain 4 -> 3   units 0 -> 0
+    torricelli       plain 17 -> 17   units 20 -> 20

@@ -1,0 +1,58 @@
+TP: 400 fits in A, 400 in B, the same jobs: True; crashes A 0, B 0
+  engines: A ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv14e2/lib/python3.11/site-packages/gp_elite/__init__.py']
+  draws [0, 1, 2, 3, 4]
+Dnoise and Dguard: 1360 fits in A, 1360 in B, the same jobs: True; crashes A 0, B 0
+  engines: A ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv14e2/lib/python3.11/site-packages/gp_elite/__init__.py']
+
+Criteria written before the run (PLAN.md):
+  [FAILS] 1. Newton's cooling, plain arm: the law in at least 10 of its 20 fits in B (A 3, B 7)
+  [FAILS] 2. plain arm: no other experiment falls by more than 2 of 20 (eclairement 18 -> 15)
+  [holds] 2. units arm: the law in B no fewer than A - 3 of 200 (120, 120)
+  [holds] 3. F41N1: B no fewer structures than A - 3 (115, 116)
+  [holds] 3. F41N10: B no fewer structures than A - 3 (87, 87)
+  [holds] 3. U41N1: B no fewer structures than A - 3 (121, 121)
+  [holds] 3. U41N10: B no fewer structures than A - 3 (95, 95)
+  [holds] 3. F41 exact: B no fewer than A - 3 (171, 171)
+  [holds] 3. F41: no equation exact at three seeds or more in A falls to one or none (none)
+  [holds] 3. U41 exact: B no fewer than A - 3 (173, 173)
+  [holds] 3. U41: no equation exact at three seeds or more in A falls to one or none (none)
+  [holds] 3. R6 folds, median test R²: B not more than 0.005 below A (0.8095, 0.8095)
+  [holds] 3. R6 + R7raw, collapses out of domain: B not more than A + 2 (10, 10)
+  [holds] 3. the units guarantee: every model of B under units passes (615 of 615 on the bench, 200 of 200 on TP)
+  [holds] 4. TP, plain arm: median time of B at most 1.5 times A (7.2 s, 7.0 s, ratio 0.98)
+  [holds] 4. TP, units arm: median time of B at most 1.5 times A (8.5 s, 8.5 s, ratio 1.00)
+E2 NOT ADOPTED
+
+Beside, deciding nothing: the law by experiment and arm, A -> B
+  chute            plain 19 -> 19   units 20 -> 20
+  eclairement      plain 18 -> 15   units 20 -> 20
+  gaz              plain 18 -> 17   units 20 -> 20
+  lentille         plain 2 -> 0   units 0 -> 0
+  pendule          plain 17 -> 17   units 20 -> 20
+  puissance        plain 20 -> 20   units 20 -> 20
+  rc               plain 15 -> 13   units 0 -> 0
+  refroidissement  plain 3 -> 7   units 0 -> 0
+  ressort          plain 14 -> 14   units 20 -> 20
+  snell            plain 0 -> 0   units 0 -> 0
+  B, cooling, 10 pts 2 % draw 0: law False; 20.3954 + 75.1909 * tanh(exp(-3.87169 * tanh(0.000555556 * t)))
+  B, cooling, 10 pts 2 % draw 1: law True; 20.5482 + 59.83 * exp(-t / 576.348)
+  B, cooling, 10 pts 2 % draw 2: law True; 20.1982 + 58.7476 * exp(-t / 621.521)
+  B, cooling, 10 pts 2 % draw 3: law False; 78.0723 - 0.081811 * t / exp(t / 1800)
+  B, cooling, 10 pts 2 % draw 4: law False; 21.4963 - 17.0829 * log(|-0.0309326 + 0.000555556 * t|)
+  B, cooling, 10 pts 5 % draw 0: law False; 22.0892 - 62.2228 * (0.000555556 * t - |0.000555556 * t|^(0.000555556 * t))
+  B, cooling, 10 pts 5 % draw 1: law True; 21.0918 + 61.4817 * exp(-t / 553.403)
+  B, cooling, 10 pts 5 % draw 2: law False; 78.8135 - 64.7169 * sqrt(|tanh(0.000555556 * t)|)
+  B, cooling, 10 pts 5 % draw 3: law False; 229.277 - 209.383 * tanh(exp(t / 1800))
+  B, cooling, 10 pts 5 % draw 4: law False; 81.1254 - 67.2732 * sqrt(|tanh(0.000555556 * t)|)
+  B, cooling, 20 pts 2 % draw 0: law True; 20.3163 + 61.7356 * exp(-t / 570.673)
+  B, cooling, 20 pts 2 % draw 1: law True; 20.7886 + 60.0544 * exp(-t / 575.14)
+  B, cooling, 20 pts 2 % draw 2: law True; 20.7348 + 59.5003 * exp(-t / 569.979)
+  B, cooling, 20 pts 2 % draw 3: law False; 78.7546 - 154.169 * tanh(0.000555556 * t / exp(t / 1800))
+  B, cooling, 20 pts 2 % draw 4: law False; -19.2524 + 37.3459 * exp(exp(-t / 843.814))
+  B, cooling, 20 pts 5 % draw 0: law False; 88.6778 - 89.2299 * tanh(0.0235702 * sqrt(|t|))
+  B, cooling, 20 pts 5 % draw 1: law False; 83.6783 - 71.1617 * sqrt(|tanh(0.000555556 * t)|)
+  B, cooling, 20 pts 5 % draw 2: law False; 84.2419 - 81.8876 * tanh(0.0235702 * sqrt(|t|))
+  B, cooling, 20 pts 5 % draw 3: law False; 85.7174 - 83.5766 * tanh(0.0235702 * sqrt(|t|))
+  B, cooling, 20 pts 5 % draw 4: law True; 17.9916 + 61.3918 * exp(-t / 669.515)
+  the structures by equation where they differ (F41N1, F41N10, U41N1, U41N10):
+    I.26.2     2 -> 3   1 -> 1   3 -> 3   0 -> 0

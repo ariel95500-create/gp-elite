@@ -1,0 +1,18 @@
+Real data — 8 planets:
+  Mercury   a =   0.387 AU   T =    0.241 yr
+  Venus     a =   0.723 AU   T =    0.615 yr
+  Earth     a =   1.000 AU   T =    1.000 yr
+  Mars      a =   1.524 AU   T =    1.881 yr
+  Jupiter   a =   5.203 AU   T =   11.862 yr
+  Saturn    a =   9.537 AU   T =   29.457 yr
+  Uranus    a =  19.191 AU   T =   84.011 yr
+  Neptune   a =  30.069 AU   T =  164.790 yr
+
+=======================================================
+LAW DISCOVERED BY GP_ELITE
+=======================================================
+  T = 0.00279171 + 0.999396 * a * sqrt(a)
+  R² = 1.000000
+
+  a·sqrt(a) = a^1.5  →  T² ∝ a³  =  Kepler's Third Law (1618)
+  Rediscovered from raw data in seconds.

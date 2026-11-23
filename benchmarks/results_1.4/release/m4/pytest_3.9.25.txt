@@ -1,0 +1,10 @@
+........................................................................ [ 36%]
+........................................................................ [ 72%]
+.......................................................                  [100%]
+199 passed in 226.72s (0:03:46)
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  5 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value

@@ -646,9 +646,15 @@ def test_inexact_formula_triggers_a_warning(monkeypatch):
 
     monkeypatch.setattr(API._formula, "raw_formula", inexact)
     Xd = np.random.RandomState(0).uniform(1, 3, (40, 1))
-    with pytest.warns(RuntimeWarning, match="departs from predict"):
+    with pytest.warns(RuntimeWarning, match="departs from predict") as rec:
         res = symbolic_regression(Xd, 2 * Xd[:, 0], generations=2, parallel=False, seed=0)
     assert res.formula_exact is False
+    # [1.4-W1] the text names every safety net that can act, the clip of
+    # the arcsine of 1.3 among them
+    text = " ".join(str(w.message) for w in rec)
+    for net in ("power capped", "near-zero denominator",
+                "arcsine whose argument is clipped to [-1, 1]"):
+        assert net in text
 
 
 def test_inexact_formula_warning_names_the_exact_alternatives(monkeypatch):
@@ -1468,8 +1474,15 @@ def test_tolerant_seed_carries_a_noisy_law(monkeypatch):
     monkeypatch.setattr(core, "_TOLERANT_SEEDS", True)        # the default
     seeds = core._make_tolerant_seeds(Xs, y, cfg)
     assert seeds and core._seed_rel_error(seeds[0], Xs, y) < 1e-3
-    # the first seed has the structure: refitted on the clean target, exact
-    assert _scaled_residual(seeds[0], Xs, clean) < 1e-6
+    # the first seed has the structure: refitted on the clean target, exact.
+    # [1.4-N2] Its constants are now fitted on the noisy rows before it is
+    # scored, so they are those of the noisy optimum (1.0 and -0.2025 become
+    # 0.99994 and -0.2027), and its residual on the clean target as it
+    # stands, 1.6e-7 in 1.3.0, is 1.4e-6: the structure is checked by
+    # refitting it, as this comment always said.
+    fitted = core._lm_to_convergence(seeds[0].copy(), Xs, clean, cfg)
+    assert _scaled_residual(fitted if fitted is not None else seeds[0],
+                            Xs, clean) < 1e-9
 
 
 def test_tolerant_seed_only_under_its_threshold(monkeypatch):
@@ -1715,3 +1728,383 @@ def test_patience_refuses_what_is_not_a_count(bad):
     Xr, y = _noisy_product()
     with pytest.raises(ValueError):
         symbolic_regression(Xr, y, generations=2, patience=bad)
+
+
+# ── 1.4, N2: the noise-tolerant finders see through the noise ───────────────
+# Change N2 of benchmarks/results_1.4/PLAN.md. Under noise, three rules of
+# the seed finders, written for exact data, defeated the noise-tolerant
+# seeds: the target had to keep one sign, the trigonometric (and logarithm)
+# finder returned the first form that passed, and the inner constant came
+# from the transformed space. A fourth was found by the mechanics: the
+# logarithm normalised its exponents by a coefficient that only noise made
+# non-zero. The stage now runs every finder a second time (least squares on
+# logarithms weighted by y², no condition of sign), scans the whole library
+# of the trigonometric and logarithm finders for their three best forms, fits
+# the constants of every candidate with the engine's finishing step before
+# the score, and places at most twelve, those of 1.3.0 always.
+
+def _n2_case(monkeypatch, pool, Xr, clean, seed=1):
+    _set_pool(monkeypatch, pool)
+    y = clean + 0.01 * np.std(clean) * np.random.RandomState(seed).randn(len(clean))
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    return Xs, y, _binom_cfg(Xr.shape[1])
+
+
+def _n2_stage(monkeypatch, Xs, y, cfg, on, refit=False):
+    """The stage of 1.3.0 (on False), or N2b (on True, the default since the
+    decision of 13 November 2026: no fit of the constants of the
+    candidates), or N2 as first measured (refit True)."""
+    monkeypatch.setattr(core, "_TOLERANT_N2", on)
+    monkeypatch.setattr(core, "_TOLERANT_REFIT", refit)
+    return core._make_tolerant_seeds(Xs, y, cfg)
+
+
+def _has_structure(tree, Xs, clean, cfg):
+    """Refitted on the noiseless target with the engine's finishing step,
+    the candidate is exact (the test of structure of the benches)."""
+    fitted = core._lm_to_convergence(tree.copy(), Xs, clean, cfg)
+    t = fitted if fitted is not None else tree
+    return core._seed_rel_error(t, Xs, clean) < 1e-9
+
+
+def _forms(seeds):
+    return {t.canonical_hash() for t in seeds}
+
+
+@pytest.mark.parametrize("law", ["monomial", "exp", "sech"])
+def test_n2_second_pass_sees_a_law_whose_noise_changes_the_sign(monkeypatch, law):
+    rng = np.random.RandomState(0)
+    if law == "monomial":
+        Xr = np.c_[rng.uniform(0.1, 2, 140), rng.uniform(0.1, 2, 140),
+                   rng.uniform(1, 5, 140)]
+        clean = Xr[:, 0] ** 2 * Xr[:, 1] / Xr[:, 2] ** 3
+    else:
+        Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140),
+                   rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+        u = Xr[:, 1] * Xr[:, 2] / Xr[:, 3]
+        clean = (Xr[:, 0] * np.exp(-u) if law == "exp"
+                 else Xr[:, 0] / (np.exp(u) + np.exp(-u)))
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean)
+    assert not (np.all(y > 0) or np.all(y < 0))      # 1 % noise: both signs
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    assert not any(_has_structure(t, Xs, clean, cfg) for t in old)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert any(_has_structure(t, Xs, clean, cfg) for t in new)
+    assert _forms(old) <= _forms(new)
+
+
+def test_n2_trigonometric_finder_keeps_the_best_form(monkeypatch):
+    """III.15.12, 2U(1 - cos(kd)), with 1 % noise: the first argument of the
+    library whose coarse fit passes is not k·d; the scan of the library
+    puts the law first, and the stage places it."""
+    rng = np.random.RandomState(1)
+    Xr = np.c_[rng.uniform(1, 5, 112), rng.uniform(0.5, 2, 112),
+               rng.uniform(0.5, 2, 112)]
+    clean = 2 * Xr[:, 0] * (1 - np.cos(Xr[:, 1] * Xr[:, 2]))
+    _set_pool(monkeypatch, "trig")
+    y = clean + 0.01 * np.std(clean) * rng.randn(112)
+    Xs = Xr / np.abs(Xr).max(axis=0)
+    cfg = _binom_cfg(3)
+    law = ((1, 1), (2, 1))
+    with np.errstate(all="ignore"):
+        first = core._elem_trig_forms(Xs, y, [0, 1, 2], tol=1.0)
+        scan = core._elem_trig_forms(Xs, y, [0, 1, 2], tol=1.0, scan=True)
+    assert first and first[0][2] != law
+    assert scan and scan[0][2] == law and len(scan) <= core._SCAN_KEEP
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert not any(_has_structure(t, Xs, clean, cfg) for t in old)
+    assert any(_has_structure(t, Xs, clean, cfg) for t in new)
+    assert _forms(old) <= _forms(new)
+
+
+def test_n2_logarithm_found_under_noise(monkeypatch):
+    """I.44.4, n·kb·T·log(V), with 1 % noise: a noise coefficient no longer
+    sets the exponents of g, and the law with its logarithm is placed."""
+    assert list(core._log_g_exponents(np.array([-0.00876, 4.93914, -4.9547]))) \
+        == [0.0, 1.0, -1.0]
+    assert core._log_g_exponents(np.array([1e-9, 0.0, 0.0])) is None
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+    clean = Xr[:, 0] * Xr[:, 1] * np.log(Xr[:, 2])
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean)
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert not any(_has_structure(t, Xs, clean, cfg) for t in old)
+    logs = [t for t in new if "log" in _ops_in(t, set())]
+    assert any(_has_structure(t, Xs, clean, cfg) for t in logs)
+    assert _forms(old) <= _forms(new)
+
+
+def test_n2_scores_better_places_at_most_twelve_and_keeps_1_3(monkeypatch):
+    """The noisy binomial of section 23: every form 1.3.0 places is placed,
+    at most twelve seeds, each within the threshold, the best first; the
+    fit of the constants never makes a candidate worse."""
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140), rng.uniform(3, 10, 140)]
+    clean = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean, seed=0)
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    seen = []
+    orig = core._refit_inner
+
+    def noted(tree, X, yy, c):
+        out = orig(tree, X, yy, c)
+        seen.append((core._seed_rel_error(tree, X, yy), core._seed_rel_error(out, X, yy)))
+        return out
+    monkeypatch.setattr(core, "_refit_inner", noted)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    assert old and _forms(old) <= _forms(new)
+    assert len(new) <= core._TOLERANT_MAX
+    scores = [core._seed_rel_error(t, Xs, y) for t in new]
+    assert all(s <= core._TOLERANT_REL for s in scores)
+    assert scores == sorted(scores)
+    assert seen and all(after <= before for before, after in seen)
+    assert len(_forms(new)) == len(new)                 # one seed per form
+    # N2 as first measured fits the constants of each candidate, and the
+    # fit never makes one worse; N2b keeps those of the finders
+    seen.clear()
+    _n2_stage(monkeypatch, Xs, y, cfg, True, refit=True)
+    assert seen and all(after <= before for before, after in seen)
+    assert any(after < before for before, after in seen)
+
+
+def test_n2b_keeps_the_constants_of_the_finders(monkeypatch):
+    """[1.4-N2b] Without the fit of the constants, every seed of 1.3.0 is
+    placed as 1.3.0 places it, constants included, and the new forms come
+    beside it."""
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 2, 140), rng.uniform(3, 10, 140)]
+    clean = Xr[:, 0] / (1 - Xr[:, 1] / Xr[:, 2])
+    Xs, y, cfg = _n2_case(monkeypatch, "physical", Xr, clean, seed=0)
+    old = _n2_stage(monkeypatch, Xs, y, cfg, False)
+    new = _n2_stage(monkeypatch, Xs, y, cfg, True)
+    exact = {t.exact_hash() for t in new}
+    assert old and all(t.exact_hash() in exact for t in old)
+
+
+def test_l1_log_scan_skips_a_form_it_cannot_evaluate():
+    """[1.4-L1] On a column negative throughout, a monomial with a fractional
+    exponent is not a number. The scan of the logarithm skips that form
+    instead of raising (np.linalg.lstsq would raise, and the noise-tolerant
+    stage would drop every form of the pass), and the scans of the sine and
+    the cosine of the same pass still run."""
+    rng = np.random.RandomState(0)
+    x0, x1 = -rng.uniform(1, 5, 60), rng.uniform(1, 5, 60)
+    X = np.c_[x0, x1]
+    y = x0 * x1 * (1 + 0.01 * rng.randn(60))
+    with np.errstate(all="ignore"):
+        assert isinstance(core._elem_log_scan(X, y, [0, 1], 1.0, signed=True), list)
+    for weighted in (False, True):
+        forms = core._elementary_forms(X, y, ["log", "exp", "trig"], tol=1.0,
+                                       scan=True, weighted=weighted)
+        assert isinstance(forms, list)
+
+
+# ── 1.4, S1: below 30 rows, the candidates compete in a cross-validation ────
+# Change S1 of benchmarks/results_1.4/PLAN.md. Below 30 rows the engine keeps
+# no hold-out; it used to return the best individual of the search on the
+# training rows, with no rule of parsimony, and every law came back with an
+# additive constant. Now the candidates (family forms of the noise-tolerant
+# stage, champions of the search, and their variants without the additive
+# constant and with half-integer exponents) are scored by a cross-validation
+# with K = min(n, 10) folds, row i in fold i mod K, and the one with the
+# fewest fitted constants within one standard error (or 0.003 in R²) of the
+# best is returned; result.pareto holds their front.
+# S1 was not adopted (campaign of 13 November 2026, benchmarks/results_1.4/
+# s1/campaign/README.md) and is switched off; these tests switch it on to
+# keep its code sound for the decision of the author.
+
+def _s1_select(monkeypatch, pool, X, y, trees):
+    """The choice of S1 among the given trees, as the champions of a search
+    on the table (X already in the engine's variables)."""
+    _set_pool(monkeypatch, pool)
+    monkeypatch.setattr(core, "_USE_LINEAR_SCALING", True)
+    monkeypatch.setattr(core, "_SMALL_ON", True)
+    cfg = _binom_cfg(X.shape[1])
+    core._SMALL_CANDS.clear()
+    core._SMALL_FAMILY.clear()
+    for t in trees:
+        core._track_small_candidate(t, X, y)
+    return core._small_table_select(trees[0], X, y, cfg)
+
+
+def test_s1_switched_off_leaves_small_tables_as_in_1_3():
+    """S1 off (its default since its campaign): below 30 rows there is no
+    front, as in 1.3.0."""
+    assert core._SMALL_CV is False
+    x = np.linspace(0.2, 2.0, 10).reshape(-1, 1)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(x, 3.0 / x[:, 0] ** 2, generations=3, seed=0,
+                                parallel=False)
+    assert r.pareto is None and "small_cv" not in core.TRACE.value
+
+
+def test_s1_is_off_from_30_rows(monkeypatch):
+    rng = np.random.RandomState(0)
+    monkeypatch.setattr(core, "_SMALL_CV", True)
+    monkeypatch.setattr(core, "_VAL_XS", None)
+    for n, on in ((5, False), (6, True), (29, True), (30, False), (140, False)):
+        monkeypatch.setattr(core, "_GENERIC_CSV_MODE", True)
+        core._small_setup(core.Config(), np.zeros(n))
+        assert core._SMALL_ON is on, n
+    # a table of 30 rows keeps a hold-out of 8: its 22 training rows are not
+    # a small table
+    monkeypatch.setattr(core, "_VAL_XS", np.zeros((8, 1)))
+    core._small_setup(core.Config(), np.zeros(22))
+    assert core._SMALL_ON is False
+    monkeypatch.setattr(core, "_VAL_XS", None)
+    monkeypatch.setattr(core, "_GENERIC_CSV_MODE", False)
+    core._small_setup(core.Config(), np.zeros(10))
+    assert core._SMALL_ON is False          # outside the API: as before
+    # a fit of 40 rows returns the same model with and without S1
+    Xr = np.c_[rng.uniform(1, 5, 40), rng.uniform(1, 5, 40)]
+    y = 2.5 * Xr[:, 0] * Xr[:, 1] + 0.05 * rng.randn(40)
+    out = []
+    for flag in (False, True):
+        monkeypatch.setattr(core, "_SMALL_CV", flag)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            r = symbolic_regression(Xr, y, generations=8, seed=0, parallel=False)
+        out.append((r.expression, r.mse_validation))
+    assert out[0] == out[1]
+
+
+def test_s1_cross_validation_chooses_an_exact_law_and_repeats(monkeypatch):
+    """12 exact points of 2.5·x0·x1: the law, to numerical precision, the
+    same at every run."""
+    monkeypatch.setattr(core, "_SMALL_CV", True)
+    rng = np.random.RandomState(3)
+    Xr = np.c_[rng.uniform(1, 5, 12), rng.uniform(1, 5, 12)]
+    y = 2.5 * Xr[:, 0] * Xr[:, 1]
+    runs = []
+    for _ in range(2):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            r = symbolic_regression(Xr, y, generations=10, seed=0, parallel=False)
+        runs.append((r.expression, [(p.size, p.mse_validation) for p in r.pareto]))
+        assert np.allclose(r.predict(Xr), y, rtol=1e-9, atol=1e-9)
+        assert r.formula_exact
+    assert runs[0] == runs[1]
+
+
+def test_s1_variant_without_the_additive_constant_wins(monkeypatch):
+    """Exact points of T = 2π·sqrt(L/g): a + b·sqrt(L) loses to b·sqrt(L)."""
+    L = np.linspace(0.1, 1.0, 10).reshape(-1, 1)
+    T = 2 * np.pi * np.sqrt(L[:, 0] / 9.81)
+    Xs = L / L.max()
+    with_c = N("+", N(0.01), N("*", N(2.0), N("sqrt", X(0))))
+    chosen = _s1_select(monkeypatch, "physical", Xs, T, [with_c])
+    assert core._small_strip(chosen).value == "sqrt"
+    assert not (chosen.value == "+")                       # no additive constant
+    assert np.allclose(core.evaluate_vector(chosen, Xs), T, rtol=1e-9)
+
+
+def test_s1_variant_with_a_half_integer_exponent_wins(monkeypatch):
+    """Exact points of d = g·t²/2: a candidate with the exponent 1.96 loses
+    to its variant with the exponent 2, written as a square."""
+    t = np.linspace(0.1, 0.6, 10).reshape(-1, 1)
+    d = 0.5 * 9.81 * t[:, 0] ** 2
+    Xs = t / t.max()
+    p196 = N("+", N(0.0), N("*", N(1.0), N("pow", X(0), N(1.96))))
+    chosen = _s1_select(monkeypatch, "physical", Xs, d, [p196])
+    assert "pow" not in _ops_in(chosen, set())
+    assert np.allclose(core.evaluate_vector(chosen, Xs), d, rtol=1e-9)
+
+
+def test_s1_pareto_lists_the_cross_validated_front(monkeypatch):
+    monkeypatch.setattr(core, "_SMALL_CV", True)
+    rng = np.random.RandomState(1)
+    x = np.linspace(0.2, 2.0, 10).reshape(-1, 1)
+    y = 10.0 / (4 * np.pi * x[:, 0] ** 2) * (1 + 0.02 * rng.randn(10))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(x, y, feature_names=["d"], generations=15,
+                                seed=0, parallel=False)
+    assert isinstance(r.pareto, list) and r.pareto
+    sizes = [p.size for p in r.pareto]
+    errs = [p.mse_validation for p in r.pareto]
+    assert sizes == sorted(sizes) and errs == sorted(errs, reverse=True)
+    for p in r.pareto:
+        assert p.formula is not None and p.expression
+        assert np.isfinite(p.mse_validation) and p.r2_validation is not None
+    assert "small_cv" in core.TRACE.value
+
+
+def test_s1_candidates_pass_the_gate_of_dimensions(monkeypatch):
+    """Under units=, every candidate of the cross-validation passes the gate
+    of dimensions, and so does the model returned."""
+    monkeypatch.setattr(core, "_SMALL_CV", True)
+    rng = np.random.RandomState(2)
+    L = np.linspace(0.1, 1.0, 12).reshape(-1, 1)
+    T = 2 * np.pi * np.sqrt(L[:, 0] / 9.81) * (1 + 0.02 * rng.randn(12))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(L, T, feature_names=["L"], units={"L": {"m": 1}},
+                                target_units={"s": 1}, unknown_constant=True,
+                                generations=15, seed=0, parallel=False)
+    assert core._SMALL_FRONT
+    for t in core._SMALL_FRONT:
+        assert DS.is_typed_valid(t[3], {0: {"m": 1}}, {"s": 1}, True)
+    ok, _msg = GD.check_dimensions(r.node, {0: {"m": 1}})
+    assert ok
+
+
+# ── 1.4, E2: a seed for a constant plus an exponential ───────────────────────
+# Change E2 of benchmarks/results_1.4/PLAN.md. Newton's cooling,
+# θ = θa + (θ0 − θa)·exp(−t/τ), had no seed: the finder of the exponential
+# works on log|y/f|, which an additive constant makes non-linear. E2 looks
+# for y = a + b·exp(c·g) in the data, c on a grid then by golden section and
+# a few Gauss-Newton steps; an exact seed when the form holds to numerical
+# precision and a is not zero, a noise-tolerant candidate otherwise.
+
+def test_e2_finds_newtons_cooling(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    monkeypatch.setattr(core, "_E2_SEEDS", True)
+    t = np.linspace(0, 1800, 20).reshape(-1, 1)
+    theta = 20 + 60 * np.exp(-t[:, 0] / 600)
+    ts = t / t.max()
+    forms = core._elem_aexp_forms(ts, theta)
+    assert len(forms) == 1 and forms[0][:3] == ("exp", (), ((0, 1),))
+    c = forms[0][3]
+    u = np.exp(c * ts[:, 0])
+    a, b = np.linalg.lstsq(np.column_stack([np.ones(20), u]), theta, rcond=None)[0]
+    assert abs(a - 20) < 1e-9 and abs(b - 60) < 1e-9
+    assert abs(c / 1800 + 1 / 600) < 1e-14
+    seeds = core._make_elementary_seeds(ts, theta, _binom_cfg(1))
+    assert any(_scaled_residual(s, ts, theta) < 1e-20 for s in seeds)
+    monkeypatch.setattr(core, "_E2_SEEDS", False)            # 1.3.0: no seed
+    assert not core._make_elementary_seeds(ts, theta, _binom_cfg(1))
+
+
+def test_e2_places_nothing_on_other_exact_laws(monkeypatch):
+    _set_pool(monkeypatch, "physical")
+    rng = np.random.RandomState(0)
+    Xr = np.c_[rng.uniform(1, 5, 140), rng.uniform(1, 5, 140)]
+    Xs = Xr / Xr.max(axis=0)
+    for y in (Xr[:, 0] * Xr[:, 1],                          # a product
+              Xr[:, 0] ** 2 / Xr[:, 1],                     # a monomial
+              np.exp(-Xr[:, 1]),                            # a = 0: phase 4a
+              3.0 * Xr[:, 0] + 1.0,                         # a line
+              np.sin(Xr[:, 0]) * Xr[:, 1]):
+        assert core._elem_aexp_forms(Xs, y) == []
+    # nor, as a noise-tolerant candidate, on a product: an exponential that
+    # varies by less than e^0.5 over the data is not returned (it would
+    # mimic a line). On a line it can be (exp(-1.04/x) leaves 0.2 %), but
+    # there the binomial seed is exact and the noise-tolerant stage does not
+    # run.
+    assert core._elem_aexp_forms(Xs, Xr[:, 0] * Xr[:, 1], tol=1.0) == []
+    assert core._make_binomial_seeds(Xs, 3.0 * Xr[:, 0] + 1.0, _binom_cfg(2))
+
+
+def test_e2_a_short_fit_returns_newtons_law(monkeypatch):
+    monkeypatch.setattr(core, "_E2_SEEDS", True)
+    t = np.linspace(0, 1800, 20).reshape(-1, 1)
+    theta = 20 + 60 * np.exp(-t[:, 0] / 600)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = symbolic_regression(t, theta, feature_names=["t"], generations=5,
+                                seed=0, parallel=False)
+    assert np.allclose(r.predict(t), theta, rtol=1e-9)
+    assert r.formula_exact and "exp" in r.expression

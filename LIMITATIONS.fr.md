@@ -59,6 +59,31 @@ premier :
   unités) ;
 - 11 formules qui s'écartent sur 130 avec les deux, et 65 sur 500 contre 64.
 
+La version 1.4 donne plus de formes aux graines tolérantes au bruit. Là où ces
+graines sont les mêmes dans les deux versions et où aucune n'atteint son budget
+de temps, la formule enregistrée (ses 160 premiers caractères), l'erreur sur
+les lignes de test et `formula_exact` sont ceux de la 1.3.0, au bit près (782
+ajustements de la mesure de sortie). Mesurée à côté de la 1.3.0 pour la sortie de la 1.4
+(`benchmarks/results_1.4/release/`, les chiffres dans `m2/limits_figures.txt`),
+la 1.4.0 donne :
+- 152 et 95 structures sous bruit contre 116 et 87 (point 3) ;
+- sur le jeu de test, 31 de ses équations jamais retrouvées contre 33, 203 et
+  11 lois exactes sur ses parties principale et bonus contre 204 et 10 (214 sur
+  390 avec les deux), et 10 ajustements de Strogatz exacts sur 70 contre 9. Les
+  ajustements qui y changent de statut sont, à un près, des ajustements où la
+  1.4.0 place d'autres graines.
+
+Ailleurs, les deux versions donnent les mêmes chiffres, ou des chiffres qui
+bougent comme d'une campagne à l'autre. Les chiffres de la 1.4.0 viennent en
+premier :
+- 171 lois exactes sur 205 sur le banc de décision avec les deux, et les mêmes
+  cinq équations jamais retrouvées ; avec les unités, 174 avec les deux, et
+  quatre équations jamais retrouvées ;
+- 10 effondrements sur 65 avec les deux (le pire à −1 946), et 66 sur 250 sur
+  le jeu de test avec les deux (38 standardisés, 28 dans leurs propres
+  unités) ;
+- 11 formules qui s'écartent sur 130 contre 12, et 65 sur 500 contre 68.
+
 ## 1. Les lois qu'il manque encore
 
 Sur les 41 équations, le moteur rend la loi exacte dans 163 ajustements sur 205
@@ -109,11 +134,30 @@ sur 70 sur les lignes de test, contre 8.
 Avec un bruit gaussien sur la cible d'entraînement, la structure de la loi (le
 modèle rendu, ses constantes réajustées sur des données propres, reproduit les
 lignes de test propres) est retrouvée dans 105 ajustements sur 205 avec 1 % de
-bruit et 85 avec 10 % (0.9.0 : 67 et 66). Les constantes de la formule rendue
+bruit et 85 avec 10 % (0.9.0 : 67 et 66), et avec la 1.4.0 dans 152 et 95 (la
+1.3.0 mesurée à côté : 116 et 87). Les constantes de la formule rendue
 portent le bruit : avec 1 % de bruit,
 `0.00115247 + 1.00099 * v0 / (1 - 0.997137 * v1 / v2)` pour v0/(1 − v1/v2)
 (Feynman I.34.1). Au-delà de 10 %, le moteur n'a
 pas été mesuré.
+
+Depuis la 1.4, les graines tolérantes au bruit portent plus de formes. Deux
+choses qu'elles ne règlent pas :
+- **à 10 % de bruit, deux équations perdent des ajustements qui ont la
+  structure de la loi :** I.27.6 passe de 2 ajustements sur 5 à aucun sans les
+  unités et de 5 à 1 avec elles, III.15.12 de 5 à 2 et de 5 à 1. Dans ces vingt
+  ajustements, la 1.4.0 place d'autres graines (une là où la 1.3.0 n'en plaçait
+  aucune sur I.27.6, trois contre une sur III.15.12), et la campagne N2b donnait
+  les mêmes nombres : la cause probable, non examinée ;
+- **sur quelques points bruités, une graine qui a la structure de la loi ne
+  suffit pas à ce que la recherche la garde.** Sur le diagnostic des TP (10 ou
+  20 points avec 2 % ou 5 % de bruit), la source ponctuelle a la loi sans les
+  unités dans 14 ajustements sur 20 contre 18 avec la 1.3.0 (avec les unités,
+  20 sur 20 avec les deux). Les graines que la 1.4 y ajoute,
+  des formes en 1/d² avec une petite correction, déplacent la recherche, qui
+  finit dans 4 ajustements sur une forme qui suit le bruit de plus près
+  (`benchmarks/results_1.4/n2b/campaign/examine/`). Les deux changements de la
+  1.4 prévus pour ces tableaux n'ont pas été adoptés (point 11).
 
 ## 4. Des données réelles, hors du domaine d'entraînement
 
@@ -134,12 +178,29 @@ Quand des données suivent exactement une loi qu'aucune graine exacte ne couvre,
 une graine qui ne fait qu'approcher les données peut détourner la recherche de la
 loi. Vu sur la loi de Kepler normalisée par min-max (`normalize="minmax"`) : exacte
 dans 1 ajustement sur 10 au lieu de 3, à 40 générations
-(`release_1.0/m3/kepler_minmax_check.txt`). Le contrôle utilise le jeu `full` ;
+(`benchmarks/results_0.9/release_1.0/m3/kepler_minmax_check.txt`). Le contrôle utilise le jeu `full` ;
 avec son arc sinus, la 1.3.0 donne 2 sur 10 au lieu de 4
-(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`). Avec la
+(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`), et la 1.4.0 de
+même (`benchmarks/results_1.4/release/m3/kepler_minmax_check.txt`). Avec la
 normalisation par défaut, sur le
 banc, aucune loi n'a été perdue ainsi : aucune équation n'a moins d'ajustements
 exacts qu'avec la 0.9.0. `PLAN_PHASE5.md`, mécanique de N1.
+
+Depuis la 1.4, l'étage tolérant au bruit place aussi plus de formes sur des
+données exactes, là où aucune graine exacte ne les couvre. Parmi les chiffres
+publics mesurés de nouveau pour la sortie de la 1.4.0 (M3), un y perd sa loi : sur les 3 000 lignes de
+x0·x1/x2 + 0,3·x3 de `benchmarks/time_limit_check.py`, l'étage place 4 graines
+contre 1, et en séquentiel la 1.4.0 va jusqu'à son budget de 15 s et rend une
+approximation de R² 0,9979, là où la 1.3.0 rendait la loi en 6,3 s. Trois en
+sortent mieux : Feynman I.16.6 sur le banc de taille, exacte dans 10
+ajustements sur 17 contre 9 ; un cas du contrôle de robustesse dont l'entrée va
+de 1e-3 à 1e6, qui rend sa loi là où la 1.3.0 rendait une approximation ; et
+une exponentielle du contrôle des petits jeux, écrite comme la loi là où la
+1.3.0 en écrivait des formes plus longues
+(`benchmarks/results_1.4/release/m3_examine/`). Sur le jeu de test figé de la
+mesure de sortie, sans les unités, 4 ajustements perdent leur loi exacte (2 de
+TF78, 2 des systèmes de Strogatz) et 6 en gagnent une (2 et 4, dont une sur les
+lignes hors du domaine), tous là où la 1.4.0 place d'autres graines.
 
 ## 6. Une formule qui s'écarte de ses prédictions
 
@@ -227,3 +288,35 @@ effondrements contre 11. L'ajustement
 médian sur données bruitées et réelles a pris de 7 à 9 s contre 25 à 35 s. Quand
 le résultat compte plus que le temps, fixez `generations=` ou `time_limit=`, ou
 `patience=0`.
+
+## 11. Ce que la 1.4 a mesuré et laissé de côté
+
+Trois changements ont été mesurés pour la 1.4 et non adoptés
+(`benchmarks/results_1.4/PLAN.md`). Leur code reste dans le moteur, éteint :
+- **une validation croisée sur les tableaux de moins de 30 lignes (S1).** Elle
+  choisissait des structures que la recherche avait trouvées sur les mêmes
+  quelques points, dont elle sous-estimait l'erreur : sur le bras sans unités
+  du diagnostic des TP, la loi revenait dans 113 ajustements sur 200 contre
+  126, et l'ajustement médian prenait 1,67 fois plus de temps ;
+- **une graine pour une constante plus une exponentielle (E2),** comme dans le
+  refroidissement de Newton. La graine avait la structure de la loi dans 18
+  ajustements sur 20, mais dans 11 d'entre eux la recherche rendait une autre
+  forme, plus proche du bruit : la loi revenait dans 7 ajustements sur 20 contre
+  3. Sa forme, proche de beaucoup de lois sur quelques points bruités, éloignait
+  aussi la recherche de la source ponctuelle (18 ajustements sur 20 à 15) ;
+- **l'ajustement des constantes de chaque candidat tolérant au bruit,** une
+  partie de la première version du changement de la 1.4. Il faisait perdre des
+  lois exactes sans bruit (I.26.2 passait de trois ajustements exacts sur cinq
+  à aucun).
+
+S1 et E2 sont reportés à la version suivante : tous deux butent sur la même
+cause, le choix final parmi les formes de la recherche sur quelques points
+bruités.
+
+## 12. Les tableaux des résultats d'enseignement sont simulés
+
+Tous les résultats sur l'enseignement viennent de tableaux simulés : le
+diagnostic des TP, son jeu figé TPT10 et le jeu figé bruité TF78N tirent un
+bruit gaussien sur des lois exactes, comme le banc de décision le fait avec les
+équations de Feynman. Aucun tableau mesuré par des élèves n'a pu être réuni pour
+la 1.4.

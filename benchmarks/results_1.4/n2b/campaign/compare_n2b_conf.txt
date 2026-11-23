@@ -1,0 +1,15 @@
+Confirmation, noise draws 1 to 4: 328 fits in A, 328 in B, the same jobs: True; crashes A 0, B 0
+  engines: A ['/venv13p/lib/python3.11/site-packages/gp_elite/__init__.py']; B ['/venv14n2b/lib/python3.11/site-packages/gp_elite/__init__.py']
+  draws of the noise: [1, 2, 3, 4]; seeds [0]
+
+Criteria written before the run (PLAN.md, confirmation of N2b):
+  [holds] B at least A + 10 structures over the 328 fits (156, 192)
+  [holds] F41N1: B no fewer than A - 3 (90, 121)
+  [holds] F41N10: B no fewer than A - 3 (66, 71)
+N2b KEPT
+
+Beside: structures by draw of the noise, A -> B:
+    draw 1: feyn_n1 22 -> 31   feyn_n10 15 -> 18
+    draw 2: feyn_n1 23 -> 31   feyn_n10 18 -> 20
+    draw 3: feyn_n1 21 -> 28   feyn_n10 17 -> 15
+    draw 4: feyn_n1 24 -> 31   feyn_n10 16 -> 18

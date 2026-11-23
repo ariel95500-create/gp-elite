@@ -243,3 +243,29 @@ have it. It does not bring Snell's law back on the TP.
 The argument of Snell's law, sin(i1)/n, is not a monomial, so the seeds of
 the arcsine of 1.3 do not reach it either. The six laws of the notebook use
 the pool `physical`, which 1.3 leaves as it was.
+
+## Note added for version 1.4 (16 November 2026)
+
+The diagnostic above is left as written. Version 1.4 changes the seeds that
+tolerate noise, which these small noisy tables use, and its plan made the
+diagnostic a design set: its failures were read to choose the changes of 1.4,
+and ten other classic experiments were frozen as a test set, TPT10, never used
+to decide (`../results_1.4/PLAN.md`). In the release measurement of 1.4.0,
+beside 1.3.0 (`../results_1.4/release/m2/compare.txt`):
+- **the law** comes back in 123 fits of 200 in the plain arm against 126, and
+  in 120 against 120 under units. The point source loses it in 4 fits (18 to
+  14): the new seeds, forms of 1/d² with a small correction, move the search,
+  which then ends on a form closer to the noise
+  (`../results_1.4/n2b/campaign/examine/`). The count of every other
+  experiment moves by one at most (fit by fit, 2 other fits lose the law and
+  3 gain it), and Snell's law still comes back in none;
+- **the six laws of the notebook** come back as with 1.3.0, the same formulas
+  in about the same time (`../results_1.4/release/m3/`);
+- **TPT10** has the law in 107 fits of 200 in the plain arm and 103 under
+  units, with both versions.
+
+Two changes meant for these tables were measured for 1.4 and not adopted: a
+cross-validation of the candidates below 30 rows, and a seed for Newton's
+cooling. Both point the same way: on 10 or 20 noisy points, a seed with the
+structure of the law does not make the search keep it, and the final choice
+among the forms of the search decides whether the law comes back.

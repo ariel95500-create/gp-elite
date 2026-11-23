@@ -1,0 +1,31 @@
+--- campaign N2, benches of 8cc3d26, Model name: Intel(R) Xeon(R) Processor, kernel 6.18.44-fc-v445, 4 cores
+/home/user/gp-elite/benchmarks/results_1.4/n2/campaign/driver.sh: 27: cannot open /home/user/n2_records/bench_1.3.0.jsonl: No such file
+/home/user/gp-elite/benchmarks/results_1.4/n2/campaign/driver.sh: 28: cannot open /home/user/n2_records/bench_candidate.jsonl: No such file
+--- slice 2026-11-12T22:01 (0 and 0 done)
+1360 jobs to run with 2 engines
+25 jobs done, 17 s elapsed, 1334 left
+50 jobs done, 186 s elapsed, 1310 left
+75 jobs done, 204 s elapsed, 1284 left
+100 jobs done, 367 s elapsed, 1260 left
+125 jobs done, 451 s elapsed, 1235 left
+150 jobs done, 636 s elapsed, 1210 left
+175 jobs done, 655 s elapsed, 1184 left
+200 jobs done, 887 s elapsed, 1160 left
+225 jobs done, 1236 s elapsed, 1134 left
+250 jobs done, 1626 s elapsed, 1109 left
+275 jobs done, 2032 s elapsed, 1084 left
+300 jobs done, 2420 s elapsed, 1059 left
+325 jobs done, 2828 s elapsed, 1034 left
+350 jobs done, 3215 s elapsed, 1009 left
+375 jobs done, 3625 s elapsed, 984 left
+400 jobs done, 4011 s elapsed, 959 left
+425 jobs done, 4419 s elapsed, 934 left
+450 jobs done, 4807 s elapsed, 909 left
+475 jobs done, 5216 s elapsed, 884 left
+500 jobs done, 5606 s elapsed, 859 left
+525 jobs done, 6011 s elapsed, 834 left
+time slice over: 815 jobs left for the next call
+--- slice 2026-11-12T23:47 (545 and 545 done)
+815 jobs to run with 2 engines
+25 jobs done, 414 s elapsed, 789 left
+50 jobs done, 797 s elapsed, 764 left

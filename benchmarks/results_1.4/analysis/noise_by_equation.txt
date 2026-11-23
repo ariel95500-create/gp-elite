@@ -1,0 +1,61 @@
+gp-elite 1.3.0, M2 of its release, 205 fits per kind (41 equations, seeds 0 to 4, 30 s).
+exact laws: F41 171, U41 174; structure retrieved: F41N1 116, F41N10 87, U41N1 121, U41N10 95
+
+fits of 5 by equation (exact without noise, structure with noise)
+equation   law                                      pool     F41 U41 | N1 N10 | UN1 UN10
+I.37.4     I1+I2+2*sqrt(I1*I2)*cos(d)               trig     0   0   | 0  0   | 0   0
+I.50.26    x1*(cos(w*t)+a*cos(w*t)^2)               trig     0   0   | 0  0   | 0   0
+III.17.37  B*(1+al*cos(th))                         trig     0   0   | 0  0   | 0   0
+III.9.52   pd*Ef*t/h*sin((w-w0)*t/2)^2              trig     0   0   | 0  0   | 0   0
+III.10.19  mom*sqrt(Bx^2+By^2+Bz^2)                 physical 0   2   | 0  0   | 0   0
+I.11.19    x1*y1+x2*y2+x3*y3                        physical 1   2   | 0  0   | 0   0
+I.16.6     (u+v)/(1+u*v/c^2)                        physical 4   4   | 0  0   | 0   0
+II.2.42    k*(T2-T1)*A/d                            physical 4   5   | 0  0   | 0   0
+I.15.10    m*v/sqrt(1-v^2/c^2)                      physical 5   5   | 0  0   | 0   0
+I.8.14     sqrt((x2-x1)^2+(y2-y1)^2)                physical 5   5   | 0  0   | 0   0
+II.11.27   n*al*eps*Ef/(1-n*al/3)                   physical 5   5   | 0  0   | 0   0
+II.35.18   n0/(exp(mom*B/(kb*T))+exp(-mom*B/(kb*T)) physical 5   5   | 0  0   | 0   0
+I.40.1     n0*exp(-m*g*x/(kb*T))                    physical 5   5   | 0  0   | 1   0
+I.44.4     n*kb*T*log(V2/V1)                        physical 5   5   | 0  1   | 0   0
+II.11.3    q*Ef/(m*(w0^2-w^2))                      physical 5   5   | 0  0   | 0   1
+I.26.2     arcsin(n*sin(th2))                       trig     3   3   | 3  1   | 3   0
+I.6.20a    exp(-th^2/2)/sqrt(2*pi)                  physical 4   3   | 4  2   | 2   3
+I.10.7     m/sqrt(1-v^2/c^2)                        physical 5   5   | 5  0   | 5   0
+I.30.5     arcsin(lam/(n*d))                        trig     5   5   | 5  0   | 5   0
+II.13.23   rho/sqrt(1-v^2/c^2)                      physical 5   5   | 5  0   | 5   0
+II.24.17   sqrt(om^2/c^2-pi^2/d^2)                  physical 5   5   | 5  0   | 5   0
+II.6.15b   3*pd*cos(th)*sin(th)/(4*pi*eps*r^3)      trig     5   5   | 5  0   | 5   0
+III.15.12  2*U*(1-cos(k*d))                         trig     5   5   | 0  5   | 0   5
+I.32.5     q^2*a^2/(6*pi*eps*c^3)                   physical 5   5   | 2  0   | 5   5
+III.19.51  -m*q^4/(2*(4*pi*eps)^2*h^2*n^2)          physical 5   5   | 2  1   | 5   5
+I.18.12    r*F*sin(th)                              trig     5   5   | 5  5   | 5   1
+I.27.6     1/(1/d1+n/d2)                            physical 5   5   | 5  2   | 5   5
+I.12.1     mu*Nn                                    physical 5   5   | 5  5   | 5   5
+I.12.2     q1*q2/(4*pi*eps*r^2)                     physical 5   5   | 5  5   | 5   5
+I.12.5     q2*Ef                                    physical 5   5   | 5  5   | 5   5
+I.14.4     k*x^2/2                                  physical 5   5   | 5  5   | 5   5
+I.25.13    q/C                                      physical 5   5   | 5  5   | 5   5
+I.29.4     om/c                                     physical 5   5   | 5  5   | 5   5
+I.34.1     om0/(1-v/c)                              physical 5   5   | 5  5   | 5   5
+I.34.8     q*v*B/p                                  physical 5   5   | 5  5   | 5   5
+I.39.1     (3/2)*pr*V                               physical 5   5   | 5  5   | 5   5
+I.43.16    mu*q*V/d                                 physical 5   5   | 5  5   | 5   5
+II.15.4    -mu*B*cos(th)                            trig     5   5   | 5  5   | 5   5
+II.3.24    P/(4*pi*r^2)                             physical 5   5   | 5  5   | 5   5
+II.34.2    q*v*r/2                                  physical 5   5   | 5  5   | 5   5
+II.38.3    Y*A*x/d                                  physical 5   5   | 5  5   | 5   5
+
+the noisy fits by the seed placed at the start (the records keep the seeds of phases 4a and 5):
+  feyn_n1   a noise-tolerant seed: structure retrieved in 108 fits of 140
+  feyn_n1   none of them:          structure retrieved in   8 fits of  65
+  feyn_n10  a noise-tolerant seed: structure retrieved in  65 fits of  95
+  feyn_n10  none of them:          structure retrieved in  22 fits of 110
+  ufeyn_n1  a noise-tolerant seed: structure retrieved in  63 fits of  95
+  ufeyn_n1  none of them:          structure retrieved in  58 fits of 110
+  ufeyn_n10 a noise-tolerant seed: structure retrieved in  62 fits of  85
+  ufeyn_n10 none of them:          structure retrieved in  33 fits of 120
+
+equations exact in at least 4 fits of 5 without noise and with the structure in none of the 5 fits:
+  feyn_n1 (10): I.15.10, I.16.6, I.40.1, I.44.4, I.8.14, II.11.27, II.11.3, II.2.42, II.35.18, III.15.12
+  feyn_n10 (14): I.10.7, I.15.10, I.16.6, I.30.5, I.32.5, I.40.1, I.8.14, II.11.27, II.11.3, II.13.23, II.2.42, II.24.17, II.35.18, II.6.15b
+equations with the structure more often at 10 % noise than at 1 %: I.44.4 (0 and 1), III.15.12 (0 and 5)

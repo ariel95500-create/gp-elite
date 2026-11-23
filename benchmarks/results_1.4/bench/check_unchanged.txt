@@ -1,0 +1,49 @@
+== phase1_bench.py, against f93f77b
+  jobs, with_units=False: 1775 before, 1775 now, same list           holds
+  their keys are the same                                            holds
+  jobs, with_units=True: 2780 before, 2780 now, same list            holds
+  their keys are the same                                            holds
+  data of the 808 distinct (kind, problem, split): identical         holds
+
+== the new draws of the noise (--noise-draws 1,2,3,4)
+  feyn_n1 and feyn_n10 at seed 0: 328 jobs (the plan: 328)           holds
+  their keys are all distinct                                        holds
+  draw 0 asked for with another: the job of before, no field         holds
+  inputs, test rows and clean targets: those of draw 0               holds
+  noisy targets: other than those of draw 0, in every job            holds
+  the four draws of an equation differ from one another              holds
+    noise measured / noise asked for: median 0.989, from 0.820 to 1.160
+
+== TF78N, the frozen noisy test set (on request only)
+  312 jobs (the plan: 312), 78 per kind, seed 5                      holds
+  they are not among the jobs of a run without them                  holds
+  inputs, test and out-of-domain rows: those of TF78                 holds
+  clean targets: the training targets of TF78                        holds
+  their generators (7500 to 7577) are not those of F41 (7000 to 7040) holds
+  with and without units: the same noisy targets                     holds
+    noise measured / noise asked for: median 0.982, from 0.832 to 1.169
+
+== tp_diagnostic.py, against f93f77b
+  jobs of the diagnostic, draws 0 to 14: 1200 before, 1200 now, same holds
+  default jobs (draws 0 to 4): 400, same                             holds
+  data of the 600 distinct tables: identical                         holds
+
+== TPT10, the frozen test set for teaching (--set tpt10)
+  400 jobs (the plan: 400), 10 experiments, two arms                 holds
+  its experiments are numbered 10 to 19 in the generator             holds
+  no key of TPT10 is a key of the diagnostic                         holds
+  no table of TPT10 shares the generator of a table of the diagnostic holds
+    the plan's table, read back from the list:
+    ohm           U = R*I                      physical  I 0.01 to 0.2; target from 0.47 to 9.4; within reach under units
+    torricelli    v = sqrt(2*g*h)              physical  h 0.05 to 0.5; target from 0.9905 to 3.132; within reach under units
+    boyle         P = k/V                      physical  V 2e-05 to 6e-05; target from 1e+05 to 3e+05; within reach under units
+    kepler3       T = 2*pi*sqrt(a^3/GM)        physical  a 5.8e+10 to 1.43e+12; target from 7.618e+06 to 9.327e+08; within reach under units
+    interfrange   i = lambda*D/a               physical  lam 4.5e-07 to 6.5e-07, D 1 to 2, a 0.0001 to 0.0005; target from 0.0009939 to 0.01028; within reach under units
+    malus         I = I0*cos(theta)^2          trig      theta 0 to 1.5; target from 4.003 to 800; within reach under units
+    charge        u = E*(1 - exp(-t/tau))      physical  t 0 to 5; target from 0 to 4.966; not within reach under units
+    michaelis     v = Vmax*S/(Km + S)          physical  S 0.5 to 10; target from 0.002 to 0.008333; not within reach under units
+    ph            pH = -log10(c)               physical  c 0.001 to 0.1; target from 1 to 3; not within reach under units
+    thermistance  R = R0*exp(B*(1/T - 1/T0))   physical  T 283.15 to 353.15; target from 1270 to 2.017e+04; not within reach under units
+  every table and grid of TPT10 is finite                            holds
+
+All of it holds.

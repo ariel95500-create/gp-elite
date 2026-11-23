@@ -1,0 +1,11 @@
+312 records
+tf_n1     n=  78  time median 30.6 s, max 31.4 s  EXACT 0 NEAR 52 MISS 26 CRASH 0  structure 34
+   out of domain, models not exact: n=78, median 1-R² 1.32e-05, collapses 3, worst R² -4.36
+tf_n10    n=  78  time median 30.6 s, max 31.5 s  EXACT 0 NEAR 33 MISS 45 CRASH 0  structure 27
+   out of domain, models not exact: n=78, median 1-R² 0.00616, collapses 5, worst R² -67.9
+utf_n1    n=  78  time median 30.3 s, max 31.5 s  EXACT 0 NEAR 53 MISS 25 CRASH 0  structure 35  units ok 78 of 78
+   test  n= 78  R² median 1.000, worst -0.000583, collapses (R²<0) 1, formula_exact False 0
+   out of domain, models not exact: n=78, median 1-R² 4.76e-06, collapses 3, worst R² -0.0844
+utf_n10   n=  78  time median 30.3 s, max 31.2 s  EXACT 0 NEAR 44 MISS 34 CRASH 0  structure 32  units ok 78 of 78
+   test  n= 78  R² median 0.999, worst -0.0135, collapses (R²<0) 1, formula_exact False 2
+   out of domain, models not exact: n=78, median 1-R² 0.000581, collapses 3, worst R² -0.489

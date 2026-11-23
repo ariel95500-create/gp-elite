@@ -54,6 +54,28 @@ they do from one campaign to the next. The figures of 1.3.0 are given first:
   test set with both (37 standardised, 28 in their own units);
 - 11 departing formulas of 130 with both, and 65 of 500 against 64.
 
+Version 1.4 gives the noise-tolerant seeds more forms. Where those seeds are
+the same in both versions and neither reaches its time budget, the recorded
+formula (its first 160 characters), the error on the test rows and
+`formula_exact` are those of 1.3.0, to the bit (782 fits of the release
+measurement). Measured
+beside 1.3.0 for the release of 1.4 (`benchmarks/results_1.4/release/`, the
+figures in `m2/limits_figures.txt`), 1.4.0 gives:
+- 152 and 95 structures under noise against 116 and 87 (point 3);
+- on the test set, 31 of its equations never recovered against 33, 203 and
+  11 exact laws on its main and bonus parts against 204 and 10 (214 of 390
+  with both), and 10 exact Strogatz fits of 70 against 9. The fits that change
+  status there are, but one, fits where 1.4.0 places other seeds.
+
+Elsewhere the two versions give the same figures, or figures that move as
+they do from one campaign to the next. The figures of 1.4.0 are given first:
+- 171 exact laws of 205 on the decision bench with both, and the same five
+  equations never recovered; under units, 174 with both, and four equations
+  never recovered;
+- 10 collapses of 65 with both (the worst to −1,946), and 66 of 250 on the
+  test set with both (38 standardised, 28 in their own units);
+- 11 departing formulas of 130 against 12, and 65 of 500 against 68.
+
 ## 1. Laws it still misses
 
 On the 41 equations, the engine returns the exact law in 163 fits of 205 (0.9.0:
@@ -99,11 +121,29 @@ the main Feynman table (0.9.0: 144), but 10 of 100 on its 20 bonus equations
 
 With Gaussian noise on the training target, the structure of the law (the model
 returned, its constants refitted on clean data, reproduces the clean test rows) is
-retrieved in 105 fits of 205 with 1 % noise and 85 with 10 % (0.9.0: 67 and 66).
+retrieved in 105 fits of 205 with 1 % noise and 85 with 10 % (0.9.0: 67 and 66),
+and with 1.4.0 in 152 and 95 (1.3.0 beside it: 116 and 87).
 The constants of the returned formula carry the noise: with 1 % noise,
 `0.00115247 + 1.00099 * v0 / (1 - 0.997137 * v1 / v2)` for v0/(1 − v1/v2)
 (Feynman I.34.1).
 Above 10 % the engine has not been measured.
+
+Since 1.4 the noise-tolerant seeds hold more forms. Two things they do not
+settle:
+- **at 10 % noise, two equations lose fits with the structure of the law:**
+  I.27.6 goes from 2 fits of 5 to none without units and from 5 to 1 with
+  them, III.15.12 from 5 to 2 and from 5 to 1. In all twenty of these fits
+  1.4.0 places other seeds (one where 1.3.0 placed none on I.27.6, three
+  against one on III.15.12), and campaign N2b gave the same counts: the
+  likely cause, not examined;
+- **on a few noisy points, a seed with the structure of the law does not make
+  the search keep it.** On the TP diagnostic (10 or 20 points with 2 % or 5 %
+  noise), the point source has the law without units in 14 fits of 20
+  against 18 with 1.3.0 (with units, 20 of 20 with both).
+  The seeds 1.4 adds there, forms of 1/d² with a small correction, move the
+  search, and in 4 fits it ends on a form that follows the noise more closely
+  (`benchmarks/results_1.4/n2b/campaign/examine/`). The two changes of 1.4 meant
+  for such tables were not adopted (point 11).
 
 ## 4. Real data, out of the training range
 
@@ -122,11 +162,27 @@ the returned champion.
 When data follow a law exactly but no exact seed covers it, a seed that only
 approximates the data can draw the search away from the law. Seen on Kepler's law
 normalised by min-max (`normalize="minmax"`): exact in 1 fit of 10 instead of 3 at
-40 generations (`release_1.0/m3/kepler_minmax_check.txt`). The check uses the pool
+40 generations (`benchmarks/results_0.9/release_1.0/m3/kepler_minmax_check.txt`). The check uses the pool
 `full`; with its arcsine, 1.3.0 gives 2 of 10 instead of 4
-(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`). With the default
+(`benchmarks/results_1.3/release/m3/kepler_minmax_check.txt`), and 1.4.0 the
+same (`benchmarks/results_1.4/release/m3/kepler_minmax_check.txt`). With the default
 normalisation, on the bench, no law was lost this way: no equation has fewer exact
 fits than with 0.9.0. `PLAN_PHASE5.md`, mechanics of N1.
+
+Since 1.4 the noise-tolerant stage places more forms on exact data too, where
+no exact seed covers it. Among the public figures measured again for the
+release of 1.4.0 (M3), one loses its law that way: on the 3,000 rows of x0·x1/x2 + 0.3·x3 of
+`benchmarks/time_limit_check.py`, the stage places 4 seeds against 1, and in
+sequence 1.4.0 runs to its budget of 15 s and returns an approximation of R²
+0.9979, where 1.3.0 returned the law at 6.3 s. Three come out better:
+Feynman I.16.6 in the scaling bench, exact in 10 fits of 17 against 9; a case
+of the robustness check whose input spans 1e-3 to 1e6, which returns its law
+where 1.3.0 returned an approximation; and an exponential of the small-data
+check, written as the law where 1.3.0 wrote longer forms of it
+(`benchmarks/results_1.4/release/m3_examine/`). On the frozen test set of the
+release measurement, without units, 4 fits lose their exact law (2 of TF78, 2
+of the Strogatz systems) and 6 gain one (2 and 4, one of them on the rows out
+of the domain), all where 1.4.0 places other seeds.
 
 ## 6. A formula that departs from its predictions
 
@@ -207,3 +263,31 @@ datasets, 9 collapses against 11. The median
 fit on noisy and real data took 7 to 9 s against 25 to 35 s. When the result
 matters more than the time, set `generations=` or `time_limit=`, or
 `patience=0`.
+
+## 11. What 1.4 measured and left out
+
+Three changes were measured for 1.4 and not adopted
+(`benchmarks/results_1.4/PLAN.md`). Their code stays in the engine, switched
+off:
+- **a cross-validation on tables below 30 rows (S1).** It chose structures the
+  search had found on the same few points, whose error it underestimated: in
+  the plain arm of the TP diagnostic the law came back in 113 fits of 200
+  against 126, and the median fit took 1.67 times as long;
+- **a seed for a constant plus an exponential (E2),** as in Newton's cooling.
+  The seed had the structure of the law in 18 fits of 20, but in 11 of them the
+  search returned another form, closer to the noise: the law came back in 7
+  fits of 20 against 3. Its form, close to many laws on a few noisy points,
+  also took the search away from the point source (18 fits of 20 to 15);
+- **the fit of the constants of each noise-tolerant candidate,** a part of the
+  first version of the change of 1.4. It lost exact laws without noise
+  (I.26.2 went from three exact fits of five to none).
+
+S1 and E2 are postponed to the next version: both meet the same cause, the
+final choice among the forms of the search on a few noisy points.
+
+## 12. The tables of the teaching results are simulated
+
+Every result on teaching comes from simulated tables: the TP diagnostic, its
+frozen set TPT10 and the noisy frozen set TF78N draw a Gaussian noise on exact
+laws, as the decision bench does with the Feynman equations. No table
+measured by students could be gathered for 1.4.

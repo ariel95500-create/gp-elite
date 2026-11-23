@@ -1,0 +1,12 @@
+fits out of the training range: 65; collapses: 10; median size of the collapsing models 55, of the others 20
+
+dataset                  training rows  collapses  sizes of the collapsing models
+228_elusage              44 (2 inputs)  7 of 10    [12, 19, 21, 46, 55, 63, 65]
+210_cloud                86 (5 inputs)  2 of 10    [38, 64]
+nikuradse_1              290 (2 inputs) 1 of 5     [71]
+712_chscase_geyser1      178 (2 inputs) 0 of 10    []
+561_cpu                  167 (7 inputs) 0 of 10    []
+690_visualizing_galaxy   258 (4 inputs) 0 of 10    []
+547_no2                  400 (7 inputs) 0 of 10    []
+
+with more time (budget study of 1.2.0, ../../results_1.2/budget_study/README.md): 10 collapses at 30 s, 16 at 90 s, 22 at 300 s.

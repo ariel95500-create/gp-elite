@@ -1,33 +1,24 @@
 # GP_ELITE
 
-**Régression symbolique par programmation génétique — pour découvrir des lois interprétables sur vos données expérimentales.**
+**Trouver la formule derrière vos mesures : la régression symbolique en Python pur.**
 
-Déclarez vos unités, et la recherche ne construit jamais que des équations
-dimensionnellement valides — une contrainte dure, pas une pénalité douce.
-L'enveloppe de fonctionnement est mesurée, pas revendiquée : combien de points
-il faut, comment le temps de calcul augmente, et où elle échoue.
+[![PyPI](https://img.shields.io/pypi/v/gp-elite)](https://pypi.org/project/gp-elite/)
+[![Python](https://img.shields.io/pypi/pyversions/gp-elite)](https://pypi.org/project/gp-elite/)
+[![Tests](https://github.com/ariel95500-create/gp-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/ariel95500-create/gp-elite/actions/workflows/tests.yml)
+[![Licence : MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
+[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb)
 
 *[🇬🇧 English version](README.md)*
 
-[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb) **Essayez dans votre navigateur** — rien à installer, cinq étapes.
-
-GP_ELITE cherche une **formule mathématique** qui relie vos variables à une cible, au lieu d'une boîte noire. Pensé pour les petits jeux de données expérimentaux (≤10 variables) où l'on veut *comprendre* la relation : lois de dégradation, calibration de capteurs, corrélations d'ingénierie, courbes dose-réponse, lois physiques.
-
-Sur cinq équations de Feynman (sans normalisation), le modèle rendu retrouve la loi exacte de quatre d'entre elles à chaque taille de 25 à 10 000 points, à chaque run ; la cinquième, la forme rationnelle imbriquée I.16.6, revient exacte à partir de 1 000 points (à 2 000 sous une autre forme que celle du manuel), et dans 5 des 13 runs en dessous. Les cinq ajustements prennent 41 s au total à 1 000 points et 113 s à 10 000 sur un cœur de notre machine à 4 cœurs (`benchmarks/feynman_scaling.py`, version 1.3.0 ; les temps dépendent de la machine).
-
-Depuis la **0.4 « Lawful »**, vous pouvez aussi déclarer les unités physiques de vos colonnes — la recherche elle-même ne construit alors que des expressions dimensionnellement saines, au lieu de formules qui collent aux chiffres tout en violant la physique (voir *Contraintes dimensionnelles* plus bas).
-
-Pur **Python / NumPy** — pas de Julia, pas de compilation, pas de GPU. `pip install` et c'est parti.
-
-Trois [études de cas sur données publiques](https://github.com/ariel95500-create/gp-elite/tree/main/examples/case_studies)
-(la loi de Kepler avec les unités, les mesures de Hubble en 1929, les tuyaux de
-Nikuradse) montrent ce qu'il rend sur des données publiques et ce qu'il ne trouve pas, et
-[ce que GP_ELITE ne fait pas](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.fr.md)
-liste ses limites connues, chacune avec la mesure qui la fonde.
+GP_ELITE cherche une formule lisible qui relie vos variables à une cible, au lieu
+d'une boîte noire. Il est fait pour les petits tableaux de mesures, jusqu'à une
+dizaine de variables, quand on veut comprendre la relation : une loi physique,
+une calibration, une corrélation d'ingénierie.
 
 ![GP_ELITE redécouvre la 3ᵉ loi de Kepler à partir de 8 points (R² = 1.000000)](kepler_plot.png)
 
-> À partir des seules distances et périodes orbitales des 8 planètes, GP_ELITE a redécouvert la 3ᵉ loi de Kepler, `T = a·√a = a^1.5` — voir [`examples/kepler_demo.py`](examples/kepler_demo.py).
+À partir des seules distances et périodes orbitales des huit planètes, il
+retrouve la 3ᵉ loi de Kepler, T = a^1,5 ([`examples/kepler_demo.py`](examples/kepler_demo.py)) :
 
 ```python
 import numpy as np
@@ -40,658 +31,118 @@ resultat = symbolic_regression(a.reshape(-1, 1), T, feature_names=["a"], generat
 print(resultat.expression)   # 0.00279171 + 0.999396 * a * sqrt(a)
 ```
 
-La formule est écrite dans *vos* variables et *vos* unités : en unités astronomiques et
-en années, la constante de Kepler vaut 1, et c'est ce qui revient.
+La formule est écrite dans vos variables et vos unités : en unités astronomiques
+et en années, la constante de Kepler vaut 1, et c'est ce qui revient.
 
----
+## Pourquoi GP_ELITE
 
-## Est-ce pour vous ?
-
-GP_ELITE est probablement fait pour vous si **au moins une** de ces phrases vous
-correspond :
-
-- **Vous avez un tableau de mesures et vous voulez la formule, pas une
-  prédiction.** Une courbe de dégradation, une calibration de capteur, une
-  corrélation d'ingénierie. C'est la *forme* de la relation qui vous intéresse,
-  et vous comptez la lire, la vérifier, peut-être la publier.
-- **Vous ne pouvez pas installer un second environnement d'exécution.** Machine
-  universitaire verrouillée, poste d'entreprise sans droits administrateur,
-  conteneur d'intégration continue que vous ne maîtrisez pas. `pip install
-  gp-elite` et ses trois dépendances suffisent — pas de compilateur, pas de
-  Julia, pas de GPU.
-- **Vous connaissez les unités physiques de vos colonnes.** Déclarez-les et la
-  recherche ne construira que des formules dimensionnellement saines — et pourra
-  vous donner les unités *et la valeur* d'une constante physique qui ne figure
-  même pas dans vos données.
-- **Vous enseignez ou apprenez la programmation génétique.** Le moteur est du
-  Python que vous pouvez lire, exécuter pas à pas et modifier, avec une interface
-  console qui ne demande aucun code.
-
-Si rien de tout cela ne vous correspond, d'autres outils vous serviront mieux :
-`PySR` et `Operon` sont plus rapides et plus précis à grande échelle — voir
-*Est-ce solide ?* plus bas.
-
----
+- **Les unités physiques comme contrainte dure.** Déclarez les unités de vos
+  colonnes, et la recherche ne construit que des formules dimensionnellement
+  saines. Elle peut aussi donner les unités et la valeur d'une constante absente
+  de vos données ([unités physiques](docs/fr/unites.md)).
+- **Du Python et du NumPy, rien d'autre.** `pip install gp-elite` : pas de Julia,
+  pas de compilation, pas de GPU, Python 3.9 à 3.14.
+- **Mesuré, pas revendiqué.** Chaque changement destiné à améliorer la recherche
+  est décidé par une comparaison écrite avant de tourner, et publiée quel qu'en
+  soit le résultat
+  ([comment GP_ELITE est mesuré](docs/fr/mesures.md)).
+- **Ses limites sont écrites,** chacune avec la mesure qui la fonde
+  ([ce que GP_ELITE ne fait pas](LIMITATIONS.fr.md)).
 
 ## Installation
 
 ```bash
-pip install gp-elite          # depuis PyPI
-# ou, depuis les sources :
-git clone https://github.com/ariel95500-create/gp-elite
-cd gp-elite && pip install -e ".[test]"
+pip install gp-elite
 ```
 
-Dépendances : `numpy`, `pandas`, `scikit-learn`. Python 3.9 à 3.14, testé sous Linux et Windows.
+Ou essayez-le dans votre navigateur, sans rien installer :
+[le démarrage rapide sur Colab](https://colab.research.google.com/github/ariel95500-create/gp-elite/blob/main/examples/quickstart.fr.ipynb).
 
----
+## Démarrage rapide
 
-## Utilisation
-
-### En une ligne, sur vos données (interface console)
-
-```bash
-gp-elite
-```
-
-Choisissez le mode **6 (CSV générique)**, indiquez votre fichier, et laissez les valeurs par défaut. GP_ELITE détecte les colonnes, sépare un jeu de validation, évolue, et affiche la loi trouvée — écrite avec les noms de vos colonnes et dans vos unités, vérifiée contre ses propres prédictions sur vos données.
-
-Le mode 6 demande aussi les **unités physiques** de vos colonnes.
-Les déclarer est facultatif — passer prend une touche — mais si vous le faites,
-la recherche se restreint aux formules dimensionnellement cohérentes, et le
-moteur peut déduire les unités et la valeur d'une constante physique manquante.
-Sur un CSV à deux colonnes de la loi de Hooke :
-
-```
-  Units for ['elongation'], comma-separated : m
-  Unit for TARGET 'force' : N
-  Deduce an unknown constant? [y/N] : y
-  ...
-  Formula in YOUR columns (checked on your data):
-    force = 250 * elongation
-  Deduced constant units : [kg / s^2]
-  Deduced constant value : 250
-```
-
-### Par programmation (notebooks, pipelines)
+Sur un fichier CSV, sans code : lancez `gp-elite`, choisissez le mode 6 (CSV
+générique) et gardez les réglages par défaut. En Python, avec `X` un tableau de
+mesures et `y` la cible :
 
 ```python
-import numpy as np
 from gp_elite import symbolic_regression
 
-rng = np.random.RandomState(0)
-X = rng.uniform(1, 5, (200, 2))
-y = 2.0 + 3.0 * np.sqrt(X[:, 0]) - 0.5 * X[:, 1]
-
-if __name__ == "__main__":        # nécessaire dans un script, voir la note plus bas
-    resultat = symbolic_regression(
-        X, y,
-        feature_names=["a", "b"],
-        operators="physical",     # 'physical' | 'trig' | 'full' | 'poly' | 'conserve'
-        generations=60,
-        speed="fast",             # 'ultrafast' | 'fast' | 'normal' | 'thorough'
-        seed=0,
-        parallel=False,           # le même modèle sur toute machine, voir plus bas
-    )
-    print(resultat.expression)      # 2 + 3 * sqrt(a) - 0.5 * b
-    print(resultat.r2_validation)   # 1.0
-    print(resultat.size)            # 33 (nœuds de l'arbre du moteur)
-    print(resultat.sympy())         # la même formule, lisible par sympy
+if __name__ == "__main__":         # nécessaire dans un script, pas dans un notebook
+    resultat = symbolic_regression(X, y, feature_names=["a", "b"])
+    print(resultat.expression)     # la formule, dans vos variables
+    print(resultat.r2_validation)  # son score sur des lignes tenues à l'écart (None sous 30 lignes)
 ```
 
-Ici, la recherche rend la loi qu'on lui a donnée, écrite dans vos variables : l'arbre
-du moteur a 33 nœuds, et la formule qui en est imprimée est 2 + 3·√a − 0.5·b ;
-l'ajustement vérifie que cette formule reproduit `predict()`. Ce n'est pas garanti. Sur une loi plus difficile, le même budget
-rend une approximation qui colle presque parfaitement au hold-out et n'est pourtant pas
-la loi (la 0.7 en rendait une pour cet exemple même) ; c'est en lisant la formule qu'on
-s'en aperçoit. `restarts=` et `speed="thorough"` consacrent plus de calcul à la forme
-exacte, sans garantie.
-
-- `speed` : `'ultrafast' | 'fast' (défaut) | 'normal' | 'thorough'`. `'thorough'`
-  (population 400, quatre îles, 200 générations) est le régime pour chercher une
-  loi exacte ; avec deux fois plus de générations que par défaut, il est plus
-  lent, et ne garantit pas de faire mieux. Sans `generations=` ni `time_limit=`,
-  depuis la 1.2, il s'arrête lui aussi dès qu'il ne progresse plus (`patience=`,
-  plus bas).
-- `time_limit=` (secondes) : la recherche s'arrête proprement à l'échéance et rend
-  le meilleur modèle trouvé, au lieu d'être interrompue sans résultat ; la
-  génération en cours et la sélection finale ajoutent un peu (dans la mesure de
-  sortie de la 1.3.0, les 1 983 ajustements arrêtés par un budget de 30 s ont
-  pris 30,5 s en médiane et 31,7 s au plus). Une recherche qui trouve une loi
-  exacte finit avant son budget : avec 15 s sur 3 000 lignes
-  (`benchmarks/time_limit_check.py`), la loi est revenue à 6,3 s en séquence et
-  à 13,2 s avec les îles en parallèle.
-- `patience=` (depuis la 1.2) : quand l'appel ne fixe ni `generations` ni
-  `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
-  côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
-  30 générations, puis polit et choisit comme
-  d'habitude. Un ajustement sur un tableau de TP de dix points prend alors
-  quelques secondes : les six du notebook de TP (`examples/tp_six_lois.ipynb`)
-  prennent 48 s en tout, contre
-  194 à 198 s avec la 1.1.0 sur la même machine, et rendent les mêmes formules.
-  Un appel qui fixe son budget (`generations=` ou `time_limit=`) le reçoit en
-  entier, comme en 1.1. Un entier k
-  applique une patience de k générations quel que soit le budget, et 0 la coupe.
-  `GPEliteRegressor` fixe toujours son nombre de générations, si bien que l'arrêt
-  n'y agit pas.
-- `restarts=` : évolutions indépendantes dont les candidats sont fusionnés avant le
-  choix final.
-
-**Vos données.** `X` peut être un tableau NumPy, une liste de lignes ou un
-DataFrame pandas, dont les noms de colonnes deviennent alors les noms de
-variables ; `y` un tableau 1-D ou une seule colonne. Une valeur manquante ou
-infinie est refusée avec la ligne et la colonne en cause (retirez-la ou
-complétez-la d'abord), et une colonne non numérique est nommée dans l'erreur.
-Avec la 0.7, une valeur manquante dans y ou dans une colonne dont la loi se sert
-passait, et l'ajustement rendait une formule sans rapport, sans avertissement
-(`benchmarks/bad_input_check.py`). Des valeurs éloignées de 1 ne demandent aucune
-préparation : une cible de l'ordre de 1e-9 ou de 1e20 est divisée en interne par
-une puissance de dix, une colonne de l'ordre de 1e-19 par sa plus grande valeur
-absolue (la normalisation par défaut), et la formule revient dans vos unités
-(jusqu'à la 0.7, une telle cible rendait une constante ou une droite fausse, avec
-un R² négatif, et aucun avertissement que l'ajustement avait échoué).
-
-**Reproductibilité.** Avec le même `seed`, les mêmes données et les mêmes
-réglages, un ajustement rend le même modèle d'un lancement à l'autre, sans fixer
-`PYTHONHASHSEED` (nécessaire jusqu'à la 0.7). Les îles parallèles suivent un
-autre chemin que la recherche séquentielle, et `parallel=None` les active dès
-quatre cœurs : fixez aussi `parallel=`. Sur une autre machine, le modèle peut
-encore différer : NumPy calcule des fonctions comme `exp` et `tanh` avec les
-instructions qu'offre le processeur, ce qui peut changer le dernier chiffre
-d'une valeur, et la recherche peut alors prendre un autre chemin.
-
-**Scripts et îles parallèles.** Sur une machine à quatre cœurs ou plus, les îles
-tournent dans des processus parallèles. Ces processus sont démarrés en mode
-`spawn` sur tous les systèmes (Linux compris) et ré-importent votre script :
-gardez le code de premier niveau sous
-`if __name__ == "__main__":`, comme ci-dessus. Sans cette garde, GP_ELITE détecte
-la situation, termine sur un cœur avec les îles en séquence, et le signale une
-fois ; les îles en séquence suivent un autre chemin qu'en parallèle, et le modèle
-peut différer. D'où `parallel=False` dans l'exemple ci-dessus : avec les îles en
-parallèle (le défaut dès quatre cœurs), il rend un autre modèle, une approximation
-de R² 0,99998.
-Rien à faire dans un notebook.
-
-### Lire le résultat
-
-- **`expression` est écrite dans vos variables.** Le moteur cherche sur des
-  colonnes remises à l'échelle en interne ; la formule rendue replie cette mise à
-  l'échelle dans ses constantes, et l'ajustement vérifie qu'elle reproduit
-  `predict()` sur vos données (`resultat.formula_exact`). `resultat.sympy()` donne
-  la même formule sous forme de chaîne lisible par `sympy.sympify`, et
-  `resultat.sympy_expr()` l'expression sympy elle-même, avec un symbole par
-  colonne : à utiliser quand un nom de colonne est aussi une constante ou une
-  fonction de sympy (`sympify` lit `E` comme 2,718..., `I` comme √-1) ou n'est
-  pas un identifiant ; `sympy()` le signale dans ce cas. (Avant la 0.7, les
-  constantes affichées étaient celles de l'espace normalisé interne.) Depuis la
-  1.2, une puissance d'un nombre s'écrit comme une exponentielle, et une
-  exponentielle d'une seule variable avec son échelle :
-  `0.00538504 + 5.05644 * 0.00614708^(0.2 * t)` revient sous la forme
-  `0.00538504 + 5.05644 * exp(-t / 0.981975)`. La formule réécrite n'est gardée que si elle
-  passe la même vérification, si bien que le modèle et `formula_exact` ne
-  changent pas. La
-  formule est la fonction mathématique pure : là où l'un des garde-fous
-  numériques du moteur agit sur vos données (une puissance bornée parce que sa
-  base dépasse 100 ou son exposant 6 en valeur absolue, ou sa valeur un million ;
-  une division par un dénominateur à moins de 1e-8 de zéro ; depuis la 1.3,
-  l'argument d'un arc sinus ramené dans [−1, 1]), ou, rarement, là où
-  l'arrondi ruine une expression mal conditionnée, elle s'écarte de `predict()` sur
-  ces lignes, `formula_exact` vaut False et l'ajustement le signale. Dans les
-  mesures de la 0.8
-  ([`benchmarks/results_0.8/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.8)),
-  c'était le cas pour 6 des 205 ajustements Feynman de la version publiée à 30 s
-  par ajustement, pour aucun des 60 ajustements sur données réelles
-  standardisées et 8 des 70 sur données réelles dans leurs unités (campagnes 5b
-  et 6b), et pour 1 des 105 ajustements de la comparaison à travail égal
-  (100 générations). L'avertissement dit aussi combien d'entrées de
-  `resultat.pareto` ont une formule exacte et nomme la plus précise d'entre
-  elles : imposer une formule exacte au modèle rendu coûte de la précision
-  (mesuré pour la 0.9 dans
-  [`benchmarks/results_0.9/PLAN_PHASE2.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_PHASE2.md)),
-  le choix vous revient donc.
-- **`r2_validation` est un score de sélection.** Le hold-out sur lequel il est
-  calculé sert aussi à choisir le modèle rendu parmi les candidats : il est donc
-  optimiste. Pour estimer comment la formule généralise, gardez vos propres
-  données de test hors de l'ajustement.
-- **`resultat.pareto`** liste les autres candidats non dominés, du plus simple au
-  plus complexe, chacun avec son `expression`, son `r2_validation` et son `predict`.
-- **`predict()` vérifie ce qu'on lui donne.** Il attend autant de colonnes qu'à
-  l'ajustement (un seul échantillon s'écrit `X.reshape(1, -1)`), et rend NaN pour
-  une ligne dont une entrée manque ou est infinie, là où la 0.7 rendait 0.
-
----
-
-## 🛡️ Régression robuste (loss résistante aux valeurs aberrantes)
-
-Les données réelles sont sales. Quelques points aberrants suffisent à faire dévier un ajustement aux moindres carrés loin de la vraie relation. GP_ELITE propose un **mode robuste** activable par un seul paramètre, conçu pour suivre la masse des données plutôt que quelques points extrêmes.
-
-```python
-resultat = symbolic_regression(X, y, feature_names=["x"], robust=True)
-```
-
-En interne, `robust=True` bascule l'objectif vers une **loss de Huber** et recale les coefficients finaux par **IRLS (moindres carrés repondérés itérativement)**. Le résultat reste une formule compacte et lisible.
-
-**Comportement mesuré** (récupération de `y = 2x + 1` ; RMSE contre la *vraie* loi sur les points propres, plus bas = meilleur ; cinq seeds, médiane et pire seed) :
-
-| valeurs aberrantes | défaut (MSE) | `robust=True` |
-|-------------------:|-------------:|--------------:|
-|                0 % | 0.063 [0.063] | 0.063 [0.063] |
-|               10 % | 1.398 [1.398] | **0.237** [0.237] |
-|               20 % | 1.925 [1.925] | 1.925 [1.925] |
-
-Sur données propres, les deux modes rendent des droites légèrement différentes, aussi
-proches l'une que l'autre de la vraie loi. Avec 10 % de valeurs aberrantes, le mode
-robuste divise l'erreur par six. Avec 20 %, sur cet exemple, il ne fait pas mieux que le
-défaut : le défaut rend la même droite pour les cinq seeds, tirée par les valeurs
-aberrantes (`y = 4.23319 + 1.32825 * x`), et le mode robuste la même droite pour quatre
-seeds sur cinq. La robustesse est un outil à essayer
-quand on soupçonne des valeurs aberrantes, pas une garantie — comparez les deux modes
-sur vos propres données.
-(Jusqu'en 0.6, ce tableau montrait le meilleur de trois runs, choisi en comparant avec
-la vraie loi, ce qu'aucun utilisateur ne peut faire.)
-
-Reproduire : `python examples/robust_regression.py`.
-
----
-
-## ⚖️ Contraintes dimensionnelles (pour les lois physiques)
-
-Déclarez les unités de vos entrées et de votre cible : GP_ELITE ne cherchera plus
-que des expressions dimensionnellement saines — fini les formules qui collent aux
-chiffres tout en étant physiquement dénuées de sens.
+Avec scikit-learn, `GPEliteRegressor` est un estimateur comme les autres :
 
 ```python
 from gp_elite import GPEliteRegressor
 
-est = GPEliteRegressor(
-    units=["kg", "m/s"],      # unités de X0, X1
-    target_units="J",         # unité de la cible
-)
-est.fit(X, y)
+est = GPEliteRegressor(units=["kg", "m/s"], target_units="J").fit(X, y)
 ```
 
-Les unités s'écrivent en texte simple — bases SI (`m kg s A K mol cd`), unités
-dérivées courantes (`N J W Pa Hz C V ohm T`), et les opérateurs `* / ^ ( )` :
-`"m/s"`, `"kg*m/s^2"`, `"s^-1"`, `"1"` pour une grandeur sans dimension. Les
-dictionnaires de dimensions (`{"m": 1, "s": -1}`) fonctionnent aussi, de même que
-les formes par nom (`{"X0": "kg"}`) et par indice (`{0: "kg"}`). Une chaîne mal
-formée (`"m/(s"`, `"kg^"`, `"m garbage"`) lève une erreur au lieu d'être devinée.
+[Utiliser GP_ELITE](docs/fr/utilisation.md) présente les options, la lecture du
+résultat et la reproductibilité.
 
-**Effet mesuré** — Feynman II.11.3, `x = q·Ef/(m·(w0²−w²))`, 5 variables,
-5 seeds, 40 générations, budget identique pour les deux premiers bras :
+## Ce qu'il trouve, mesuré
 
-| | sans `units=` | `units=` | sans `units=`, 4× générations |
-|---|---:|---:|---:|
-| dimensionnellement valides | 5 / 5 | 5 / 5 | 5 / 5 |
-| loi exacte retrouvée (tient hors domaine) | 5 / 5 | 5 / 5 | 5 / 5 |
-| R² test médian | 1.00000 | 1.00000 | 1.00000 |
-| R² hors domaine médian | 1.00000 | 1.00000 | 1.00000 |
-| taille médiane du modèle | 20 nœuds | 20 nœuds | 20 nœuds |
-| secondes / run (médiane) | 0 | 1 | 0 |
+Dans la mesure de sortie de la 1.4.0, cinq seeds et 30 s par ajustement, contre
+la 1.3.0 mesurée à côté
+([`benchmarks/results_1.4/release/`](benchmarks/results_1.4/release/)) :
 
-Depuis la 1.0, cette loi fait partie des formes que le moteur ajuste directement,
-un monôme multiplié par une puissance d'un binôme, et la forme ajustée est placée
-dans la population de départ. Depuis la 1.1, c'est vrai aussi avec `units=`, où
-une forme ajustée n'est placée que si elle passe la porte des dimensions que tout
-arbre typé doit passer : les deux recherches rendent la loi à chaque run, en une
-seconde environ. Avec la 1.0, dont les formes ajustées n'agissaient pas avec
-`units=`, la recherche contrainte la trouvait dans deux runs sur cinq et finissait
-les trois autres sur des approximations (médiane de ses cinq runs : 27 nœuds,
-27 s). Jusqu'à la 0.9, la recherche libre ne rendait aucun modèle
-valide sur cette loi, même avec quatre fois plus de générations : ses modèles
-prenaient le logarithme d'une fréquence, additionnaient des kilogrammes ou des
-hertz à des nombres purs, ou élevaient une grandeur à un exposant en coulombs, et
-la contrainte était le seul chemin vers une réponse valide. Elle le reste pour les
-lois que le moteur n'ajuste pas directement. (Depuis la 0.9, une génération typée
-coûte 1,4 fois une génération non typée, contre 8,5 fois avec la 0.8. Avec un
-budget fixé, comme ici, une recherche ne s'arrête plus tôt que sur une loi
-exacte, si bien que les runs qui finissent sur une approximation, et chaque run
-sur des données bruitées, parcourent toutes leurs générations ; `time_limit=` les
-borne, et avec les réglages par défaut, depuis la 1.2, `patience=` aussi.)
+| | 1.3.0 | 1.4.0 |
+|---|---|---|
+| 41 équations de Feynman : loi exacte (sur 205 ajustements) | 171 | 171 |
+| les mêmes avec 1 % de bruit : structure de la loi (sur 205) | 116 | 152 |
+| les mêmes avec 10 % de bruit : structure de la loi (sur 205) | 87 | 95 |
+| les 41 avec leurs unités physiques : loi exacte (sur 205) | 174 | 174 |
+| modèles rendus sous unités qui passent l'audit des unités | 1 161 sur 1 161 | 1 161 sur 1 161 |
 
-**Ce que ça ne fait *pas*.** Sur un jeu de test tiré *hors* du domaine
-d'entraînement (w/w0 poussé de [0.20, 0.67] vers la résonance, [0.70, 0.90]), la
-loi exacte tient (R² = 1.00000) et les approximations se dégradent : les trois runs
-contraints de la 1.0 qui finissaient sur l'une d'elles avaient un R² hors domaine
-de 0,32 à 0,65. Temps mesurés sur une
-machine Linux à 4 cœurs, deux runs à la fois, avec les îles en séquence
-(`parallel=False`). Reproductible avec `benchmarks/ab_ood.py`.
+La 1.4 place plus de graines tolérantes au bruit au début de la recherche, des
+formes que ses chercheurs ajustent aux données : d'où les gains sous bruit
+([nouveautés](docs/fr/caracteristiques.md#nouveautés), [CHANGELOG](CHANGELOG.md)).
 
-**Quand s'en servir.** Pour garantir que ce que le moteur rend a un sens physique,
-et pour déduire les unités et la valeur d'une constante (ci-dessous, et
-[l'étude de cas de Kepler](https://github.com/ariel95500-create/gp-elite/blob/main/examples/case_studies/kepler_units.fr.ipynb),
-où les unités écartent aussi un terme que les données seules ajouteraient).
-Depuis la 1.1, les formes que le moteur ajuste directement agissent aussi avec
-`units=` : sur les 41 équations de Feynman du banc de décision avec leurs unités,
-cinq seeds à 30 s par ajustement, 165 lois exactes sur 205 contre 108 avec la 1.0,
-et 163 sans unités. Avec l'arc sinus de la 1.3, 174 et 171, contre 166 et 163
-pour la 1.2 mesurée à côté. **Pas** pour de la
-prédiction en
-boîte noire : la contrainte écarte les approximations dimensionnellement fausses
-mais numériquement bonnes, et peut donc faire *baisser* le R² lorsque l'objectif
-est d'ajuster plutôt que de trouver une loi.
+La structure de la loi est retrouvée quand le modèle rendu, ses constantes
+réajustées sur les données sans bruit, reproduit la loi. Sur 15 équations de
+Feynman, en duel avec gplearn sur les mêmes données, GP_ELITE rend 15 lois
+exactes contre 6. PySR et Operon sont plus rapides et plus précis sur les
+problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
 
-**Lois à constante dimensionnée** (`unknown_constant=`). Par défaut les
-constantes ajustées sont sans dimension — convention AI Feynman — ce qui met une
-loi comme celle de Hooke, `F = k·x`, hors d'atteinte : aucune constante sans
-dimension ne peut relier des mètres à des newtons, et la recherche signale à
-juste titre qu'aucune expression valide n'est constructible. Avec
-`unknown_constant=True`, la constante de tête est autorisée à *porter* une
-dimension, déduite par homogénéité :
+## Comment les résultats sont mesurés
 
-```python
-est = GPEliteRegressor(units=["m"], target_units="N", unknown_constant=True)
-est.fit(X, y)
-est.constant_units_string()   # '[kg / s^2]'
-est.constant_value_           # 250.0
-```
+L'hypothèse et les critères de chaque changement destiné à améliorer la
+recherche sont enregistrés avant sa première mesure. Le changement n'est adopté
+que s'il les remplit, et les résultats sont publiés dans tous les cas : pour la
+1.4, quatre changements ont été mesurés et trois n'ont pas été adoptés
+([son plan et ses campagnes](benchmarks/results_1.4/)). La correction d'un
+défaut est vérifiée à la place contre la version mesurée, comme pour celui
+trouvé dans la 1.4 avant sa sortie. Chaque version est aussi
+mesurée une fois sur des jeux de test figés avant toute décision et qui n'ont
+jamais servi à en prendre une.
 
-Le moteur ne rend alors plus seulement la forme de la loi, mais **les unités et
-la valeur de la constante physique manquante**. Mesuré sur trois lois de
-référence :
+## Documentation
 
-| loi | structure retrouvée | unités déduites | valeur | réelle |
-|---|---|---|---|---|
-| Hooke `F = k·x` | oui | `kg / s²` | 250 | 250 |
-| Newton `F = G·m₁·m₂/r²` | oui | `m³ / kg s²` | 6,674e-11 | 6,674e-11 |
-| gaz parfaits `P = nRT/V` | oui | `kg m² / K mol s²` | 8,314462618 | 8,314462618 |
-
-La formule rendue porte elle-même la constante physique : le banc imprime
-`(249.99999999999997*X0)` pour Hooke et `(8.314462617999999*((X0*X1)/X2))` pour
-les gaz parfaits. Budget : 25 générations, deux redémarrages.
-
-Reproductible avec `benchmarks/test_constante_mystere.py`. Exige `units=` et
-`target_units=`. Si l'expression n'est pas un monôme des colonnes d'entrée
-(`m₁ + m₂` par exemple), aucune constante brute unique n'existe :
-`constant_value_` vaut alors `None`, les unités déduites restant valides.
-
-**Limite.** Sous `units=`, la mise à l'échelle interne est purement
-multiplicative (sans décalage additif), ce qui maintient chaque candidat
-dimensionnellement homogène.
-
----
-
-## Exemple sur des données de vieillissement de batterie simulées
-
-```bash
-python examples/battery_soh.py
-```
-
-Le fichier [`examples/nasa_battery_simulation.csv`](examples/nasa_battery_simulation.csv)
-contient 168 cycles de charge **simulés** (numéro de cycle, température, courant,
-état de santé de la capacité). Son origine n'est pas documentée au-delà de son nom :
-considérez-le comme une démonstration de la démarche, pas comme un résultat sur de
-vraies batteries. Le script y affiche (extrait) :
-
-```
-PROTOCOL 1 — random split (INTERPOLATION, leaks info)
-  GP_ELITE      R² = +0.993
-  RandomForest  R² = +0.997
-  XGBoost       R² = +0.997
-
-PROTOCOL 2 — forward split (EXTRAPOLATION): train on cycles 1..142, predict 143..168
-  RandomForest (300)      R² = -2.521
-  XGBoost (300 trees)     R² = -2.324
-  GP_ELITE (one equation) R² = +0.162
-
-  Equation: SOH = 0.428836 + 0.111661 * courant * exp(courant / 1.939) - 0.0181691 * sqrt(cycle)
-```
-
-Un découpage aléatoire de données séquentielles est de l'interpolation, qui flatte
-toutes les méthodes. Sur le découpage chronologique, les forêts d'arbres ne peuvent
-que répéter des valeurs vues à l'entraînement et passent loin sous la moyenne.
-L'équation que rendent les versions 1.0 à 1.2 (la 1.2 écrit son exponentielle avec
-son échelle), en fonction du courant et du cycle, fait mieux qu'elles,
-mais pas bien (R² +0,16) ; la 0.8 et la 0.9 en rendaient une à R² −0,31, sous la
-moyenne elle aussi, et la 0.7 une en fonction du cycle et du courant qui continuait de
-suivre la tendance (R² +0,594). Une formule peut
-extrapoler là où une forêt d'arbres ne le peut pas ; qu'elle le fasse dépend de la
-formule que rend la recherche — sur ce jeu simulé, à vérifier sur les vôtres.
-
----
-
-## Est-ce solide ?
-
-Question légitime pour un projet dont vous n'avez jamais entendu parler. Voici
-ce que ça vaut face aux alternatives, et ce que ça ne vaut pas.
-
-| | GP_ELITE | Réseaux de neurones | PySR (état de l'art) |
-|---|---|---|---|
-| Sortie | **formule lisible** | boîte noire | formule lisible |
-| Installation | `pip install` (pur Python) | lourde | nécessite **Julia** |
-| Validation hors échantillon | **intégrée** (sert à choisir le modèle) | à faire soi-même | à faire soi-même |
-| Unités physiques | **contrainte dure pendant la recherche** (`units=`) | non | pénalité douce (`X_units=`) |
-| Stabilité de la réponse | **rapport bootstrap** (`stability_analysis`) | non | non |
-| Vitesse et précision à grande échelle | moindres | — | **supérieures** |
-
-La dernière ligne n'est pas une mesure de ce projet : c'est une concession, tirée
-des résultats publiés des moteurs compilés.
-
-**Comment les changements sont décidés.** Depuis la 0.8, un changement destiné à
-améliorer la recherche ou la sélection finale n'entre dans le comportement par
-défaut que s'il passe une comparaison écrite d'avance : l'hypothèse et les
-critères de décision sont enregistrés avant la première mesure
-([`benchmarks/results_0.8/PLAN.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/PLAN.md) ;
-le plan de la première campagne a été enregistré six minutes après le début de
-son premier ajustement), le moteur avec le changement est comparé au moteur sans
-lui sur 41 équations de Feynman et sur des jeux de données réels (six
-standardisés, sept dans leurs propres unités), 30 secondes par ajustement, un
-processus par ajustement, et les résultats sont publiés quels qu'ils soient
-([`RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)),
-y compris ceux des changements qui n'ont pas passé. Quand un changement a échoué
-et qu'une version restreinte en a ensuite été testée, la restriction a été conçue
-après avoir vu l'échec et mesurée sur les mêmes problèmes ; `RESULTS.md` dit où.
-Les corrections de défauts ne sont pas décidées ainsi ; les fichiers de
-`benchmarks/results_0.8/` montrent ce qu'elles changent. Les changements de la
-1.0 ont été décidés de la même façon
-([`benchmarks/results_0.9/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9),
-`PLAN_PHASE4.md` et `PLAN_PHASE5.md`), et depuis la 0.9 chaque version est aussi
-mesurée une fois sur un jeu de test figé avant toute décision et jamais utilisé
-pour en prendre une : 78 autres équations de Feynman, 14 systèmes de Strogatz et
-25 jeux de données réels. Sur ses équations de Feynman, la 1.0 retrouve 213 lois
-exactes sur 390, contre 145 pour la 0.9 mesurée à côté ; sur ses systèmes de
-Strogatz, 7 ajustements exacts sur 70 contre 8 ; sur ses jeux réels, le même R²
-médian à 0,004 près et le même nombre d'effondrements hors de la plage
-d'apprentissage
-([`release_1.0/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_0.9/release_1.0)).
-Le changement de la 1.1 a été décidé de la même façon
-([`benchmarks/results_1.1/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.1)).
-Mesurées côte à côte pour la sortie de la 1.1, les deux versions donnent sans
-unités les mêmes comptes de lois exactes sur le jeu figé (213 lois exactes sur 390 sur ses
-équations de Feynman, 8 sur 70 sur ses systèmes de Strogatz : sous un budget de
-temps, les comptes bougent un peu d'une campagne à l'autre), et avec leurs unités
-la 1.1 retrouve 226 lois exactes sur 390 contre 169. Les changements de la 1.2 ont
-été décidés de la même façon
-([`benchmarks/results_1.2/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.2)) ;
-mesurées côte à côte pour la sortie de la 1.2, les deux versions donnent les mêmes
-comptes sur le jeu figé, avec et sans unités (214 lois exactes sur 390 sur ses
-équations de Feynman, 10 sur 70 sur ses systèmes de Strogatz, et 229 sur 390 avec
-les unités). Le changement de la 1.3 a été décidé de la même façon
-([`benchmarks/results_1.3/`](https://github.com/ariel95500-create/gp-elite/tree/main/benchmarks/results_1.3)).
-Mesurée à côté de la 1.2 pour la sortie de la 1.3, sur le jeu figé, la 1.3
-retrouve 214 lois exactes sur 390 sur ses équations de Feynman contre 213, 8 sur
-70 sur ses systèmes de Strogatz avec les deux versions, et 228 sur 390 avec les
-unités contre 229. Les 213 et 8 de la 1.2 dans cette campagne, contre 214 et 10
-lors de sa propre sortie, viennent du budget de temps, qui fait bouger les comptes
-d'une campagne à l'autre.
-
-La niche de GP_ELITE : **zéro barrière d'entrée**. Un ingénieur de labo, un étudiant ou un technicien pointe un fichier CSV et reçoit une loi validée, sans devenir développeur. `PySR` et `Operon` sont plus rapides et plus précis sur les problèmes grands ou difficiles ; GP_ELITE ne prétend pas le contraire.
-
----
-
-## Sur quoi GP_ELITE est-il bon (et moins bon) ?
-
-**Bon** : lois physiques / d'ingénierie à structure multiplicative ou exponentielle, données expérimentales de taille modeste, problèmes où l'interprétabilité prime.
-
-Sur le **banc Feynman gelé** (15 équations de physique, `restarts=4`, une seed), jugé
-sur le modèle qu'il rend : **15/15 récupérations symboliques exactes** (1−R² < 1e-9
-sur des données tenues à l'écart), contre 12/15 pour la 0.9 ; les trois qu'il ajoute
-sont I.16.6 (addition relativiste des vitesses, une forme rationnelle imbriquée qui
-ne fait pas partie des formes que la 1.0 ajuste directement, atteinte par la
-recherche) et deux lois avec un sinus ou un cosinus, I.18.12 (r·F·sin θ) et
-III.15.12, que la 1.0 ajuste directement. Face-à-face contre **gplearn** sur les mêmes données et
-découpages (population 2000 × 30 générations), chaque méthode jugée sur le modèle
-qu'elle rend : **15/15 contre 6/15** exactes, 15/15 contre 7/15 sous 1e-3 — GP_ELITE
-devant sur 9 équations et à égalité sur 6. Jusqu'à la 0.9, une loi avec un angle dans
-un sinus ou un cosinus demandait `normalize='none'`, car diviser un angle par sa plus
-grande valeur change la période que le sinus doit retrouver (mesuré pour la 0.9 sur
-les dix lois trigonométriques du banc de 41 équations, cinq seeds chacune : 13
-ajustements exacts sur 50, contre 2 sur 50 avec le réglage par défaut ; sur données
-réelles, laisser telles quelles les colonnes d'échelles proches,
-`normalize='smart'`, a moins bien prédit hors de la plage d'apprentissage,
-[`benchmarks/results_0.9/PLAN_TRIG.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.9/PLAN_TRIG.md)) ;
-avec la 1.0, le réglage par défaut rend les trois lois de cette vitrine qui en ont
-un, et `normalize='none'` reste à essayer quand une telle loi ne revient pas. Avec
-les unités physiques déclarées (`units=`, même budget, sans normalisation), 15/15
-reviennent exactes (`benchmarks/feynman_units.py`), 14 sous leur forme de manuel ;
-I.16.6, manquée jusqu'à la 1.0, revient avec un facteur 1,00758 en haut et en bas
-qui se simplifie. Une seed sur quinze équations est une
-vitrine, pas une comparaison statistique :
-[`benchmarks/results_0.8/RESULTS.md`](https://github.com/ariel95500-create/gp-elite/blob/main/benchmarks/results_0.8/RESULTS.md)
-mesure la 0.7.0 et chaque changement de la recherche et de la sélection finale
-de la 0.8 sur 41 équations et cinq seeds à 30 s par ajustement, et la 0.7.0
-contre la 0.8.0 côte à côte, à travail égal, sur ces quinze équations avec cinq
-seeds et sur six jeux de données réels.
-Reproduire : `python benchmarks/feynman_bench.py 0 15` et `python benchmarks/duel.py`.
-
-**Moins bon** : suites chaotiques (ex. temps de vol de Collatz — composante intrinsèquement aléatoire), >15-20 variables (l'espace de recherche explose — même si `units=` le réduit nettement quand les unités physiques sont connues), gros jeux de données où la précision pure prime sur l'interprétabilité (les modèles d'ensemble dominent alors).
-
----
-
-## Caractéristiques techniques
-
-- **L'arc sinus** (v1.3) : `arcsin` dans les jeux `'trig'` et `'full'`, son
-  argument ramené dans [−1, 1] et doté d'un facteur constant que l'ajustement
-  des constantes règle, et parmi les formes ajustées directement l'arc sinus
-  d'un monôme, b·f·arcsin(c·g)
-- **Arrêt sur patience** (v1.2) : quand l'appel ne fixe ni `generations` ni
-  `time_limit`, la recherche s'arrête dès que son erreur sur les lignes mises de
-  côté (sur les lignes d'entraînement s'il n'y en a pas) n'a pas baissé de 1 % en
-  30 générations (`patience=`)
-- **Exponentielles écrites comme telles** (v1.2) : une puissance d'un nombre
-  s'imprime comme une exponentielle, et une exponentielle d'une seule variable
-  avec son échelle, `exp(-t / τ)`, chacune gardée seulement si elle passe la
-  vérification contre `predict()`
-- **Formes ajustées directement** (v1.0) : un monôme multiplié par une puissance
-  d'un binôme, b·f·(1 + c·g)^p avec p parmi −1, −½, ½, 1 (lois rationnelles,
-  1/√(1 − v²/c²), la racine d'une somme de deux termes), et un monôme multiplié par
-  une fonction d'un monôme, b·f·exp(c·g), b·f·log(c·g), b·f·tanh(c·g), b·f/cosh(c·g)
-  ou f·(a + β·sin(ω·g) + γ·cos(ω·g)) : chacune est ajustée par une recherche à une
-  dimension et des moindres carrés, et placée dans la population de départ
-  lorsqu'elle tient à la précision numérique
-- **Graines tolérantes au bruit** (v1.0) : quand aucune forme ne tient exactement, la
-  loi de puissance et les formes ci-dessus sont recherchées de nouveau avec leurs
-  seuils levés, et placées si elles laissent au plus 1,5 % de la variance inexpliquée
-- **Lois de puissance amorcées** (v0.8) : quand les données suivent une loi de puissance, le monôme ajusté sur les logarithmes entre dans la population initiale
-- **Polissage vers la loi exacte** (v0.8) : les finalistes reçoivent des constantes ajustées jusqu'à convergence et un coefficient par terme de chaque somme ; une variante n'est admise que si elle est exacte
-- **Constantes ajustées pour la forme jugée** (v0.8) : Levenberg–Marquardt en projection variable (l'échelle et le décalage de la mise à l'échelle linéaire résolus dans le résidu)
-- **Données de toute échelle** (v0.8) : une cible de n'importe quel ordre de grandeur est divisée en interne par une puissance de dix, et la normalisation par défaut divise chaque colonne par sa plus grande valeur absolue
-- **Formule dans vos variables, vérifiée** (v0.7) : la mise à l'échelle interne est repliée dans les constantes ; `formula_exact` indique si la formule reproduit `predict()` sur les données d'entraînement
-- **Budget de temps** (v0.7) : `time_limit=` arrête proprement et rend le meilleur modèle trouvé ; avec `units=`, le départ typé le respecte aussi depuis la v1.2
-- **Déduction de la constante mystère** (v0.5) : la constante de tête peut porter une dimension, inférée par homogénéité ; unités et valeur brute exposées sur l'estimateur, la valeur lue sur les prédictions quand le modèle est un monôme (v1.0)
-- **Recherche sous contrainte dimensionnelle** (v0.4) : génération typée constructive, mutation et croisement préservant les dimensions, filtre de validité dans `fitness()` — une seule sémantique partagée avec l'auditeur (v0.7)
-- **Mise à l'échelle purement multiplicative sous `units=`** (v0.4.1) : régression par l'origine, pour que la forme *notée* soit la forme *livrée*
-- **Garde numérique de l'optimiseur LM** (v0.4) : plus d'overflow float64 sur les chaînes `sq`/`cube`/`*` non bornées
-- **Audit dimensionnel post-hoc** (v0.3) : `dimensions.py`
-- **Optimisation des constantes par Levenberg–Marquardt** (v0.2) : déterministe, LM/Adam commutables
-- **Multi-restart + fusion des archives de candidats** (v0.2) : la variance de seed transformée en fiabilité
-- **API front de Pareto** (v0.2) : escalier non dominé complexité/précision
-- **Mode extrapolation / prévision protégé** (v0.2) : sondes hors-domaine, plancher linéaire, sélection-frontière
-- **Amorçage par motifs de composition** (v0.2) : gabarits pythagoricien, somme d'inverses, gaussienne pour les structures imbriquées
-- **Modèle en îles asymétriques** (explorer / cleaner / stigmergic) avec migration périodique, dans des processus parallèles sur les machines à quatre cœurs ou plus
-- **Linear scaling** (Keijzer 2003) : le moteur cherche la *forme*, échelle et décalage sont résolus en forme fermée
-- **Sélection ε-lexicase** (La Cava 2016) pour préserver la diversité comportementale
-- **Validation hold-out** + sélection parcimonieuse du champion (tolérance R²)
-- **Normalisation sans décalage** préservant la structure multiplicative (x·y reste un produit propre), pour toutes les données depuis la 0.7
-- **Mémoire stigmergique** exportable entre exécutions (export/import de grammaires) — une fonctionnalité documentée, pas un avantage de performance mesuré
-
----
-
-## Nouveautés
-
-**1.3 « Arc »** — l'arc sinus, dans les jeux `trig` et `full` : sur les 41 équations
-de Feynman du banc de décision, ses deux lois à arc sinus reviennent exactes
-dans 8 ajustements sur 10, avec et sans unités, là où la 1.2 n'en avait aucune.
-Cela fait 171 lois exactes sur 205 contre 163, et 174 contre 166 avec les
-unités. Le jeu `physical`, celui par défaut, reste tel qu'il était : avec lui,
-les modèles de la 1.2 à travail égal. **1.2 « Classroom »** — avec les réglages par défaut, un ajustement s'arrête dès qu'il ne
-progresse plus (`patience=`) : les six lois du notebook de TP en 48 s, contre 194
-à 198 s pour la 1.1.0 sur la même machine, avec les mêmes formules ; une
-exponentielle revient écrite comme telle, `exp(-t / τ)`, sans changer le modèle ;
-avec `units=`, Feynman III.19.51 sans bruit se termine en une seconde environ, là où la
-1.1.0 prenait environ six minutes avec un budget de 30 s. Avec un budget fixé,
-les modèles de la 1.1 à travail égal, sauf ceux dont la correction change le départ
-typé avec `units=` (III.19.51 sur le banc) : sur les 2 780 ajustements de la mesure
-de sortie, aucun ne change de statut. **1.1 « Coherent »** — les formes que la 1.0 ajuste directement agissent aussi avec `units=`,
-chacune placée seulement si elle passe la porte des dimensions : sur les 41
-équations de Feynman du banc de décision avec leurs unités, 165 lois exactes sur
-205 contre 108 pour la 1.0 mesurée à côté ; chacun des 1 005 modèles rendus avec
-unités dans la mesure de la version (ces équations avec et sans bruit, et le jeu
-de test figé) a passé l'audit des unités ; sans unités, les modèles de la 1.0 à
-travail égal.
-**1.0 « Families »** — des familles entières de lois ajustées directement (formes
-rationnelles, racines, exponentielles, logarithmes, sinus et cosinus d'un monôme),
-sur des données bruitées aussi : sur les 41 équations de Feynman du banc de
-décision, 163 lois exactes sur 205 contre 88 pour la 0.9 mesurée à côté, et sur
-78 autres équations de Feynman figées avant le travail, 213 sur 390 contre 145
-(sur les 14 systèmes de Strogatz figés avec elles, 7 sur 70 contre 8) ; sur
-données réelles, le même R² médian à 0,004 près et le même nombre d'effondrements
-hors de la plage d'apprentissage ; trois études de cas sur données publiques et une page de ce
-que le moteur ne fait pas. **0.9 « Steady »** — la recherche avec `units=` plus rapide, pour les mêmes
-modèles (plus de cinq fois sur Feynman II.11.3) ; une formule qui s'écarte du
-modèle nomme les formules exactes du front de Pareto ; un jeu de test figé avant
-toute décision et jamais utilisé pour en prendre une, sur lequel chaque version
-publiée est mesurée. **0.8 « Swift »** — plus rapide (les accélérations seules rendent les mêmes
-modèles), davantage de lois retrouvées (lois de puissance amorcées, structures
-justes menées jusqu'à la loi exacte), des données de toute échelle, des entrées
-vérifiées ; chaque changement destiné à améliorer la recherche décidé par une
-comparaison écrite avant de la lancer. **0.7 « Sound »** — la formule que vous obtenez est le modèle obtenu : écrite dans
-vos variables pour toute normalisation et vérifiée à l'ajustement ; un budget
-`time_limit=` ; des garanties dimensionnelles rendues strictes ; chaque chiffre de
-son README re-mesuré sur son code final. **0.6 « Bench »** — les unités
-physiques dans la console. **0.5 « Unknown »** — unités *et* valeur de la
-constante manquante d'une loi. **0.4 « Lawful »** — recherche sous contrainte
-dimensionnelle. **0.3 « Trust »** — diagnostics et stabilité.
-
-Historique complet, avec les mesures qui étayent chaque affirmation, dans
-[CHANGELOG.md](CHANGELOG.md). Chaque banc derrière un chiffre de ce README se
-trouve dans [`benchmarks/`](benchmarks/), avec ses résultats bruts.
+- [Utiliser GP_ELITE](docs/fr/utilisation.md) : la console, les options, la lecture du résultat
+- [Unités physiques](docs/fr/unites.md), et les unités et la valeur d'une constante manquante
+- [Régression robuste](docs/fr/robuste.md), pour des données avec des valeurs aberrantes
+- [Exemples](docs/fr/exemples.md) : le vieillissement de batteries simulé, et trois études de cas sur données publiques
+- [Comment GP_ELITE est mesuré](docs/fr/mesures.md) : face aux alternatives, et ce sur quoi il est bon et moins bon
+- [Ce que GP_ELITE ne fait pas](LIMITATIONS.fr.md)
+- [Caractéristiques techniques et historique](docs/fr/caracteristiques.md), et le [CHANGELOG](CHANGELOG.md)
 
 ## Ça n'a pas marché sur vos données ? Dites-le
 
-GP_ELITE est réglé sur des benchmarks publiés — Feynman, Strogatz — qui sont
-propres, sans bruit et bien échelonnés. Les mesures réelles ne sont rien de tout
-cela, et c'est précisément là que le moteur a le plus besoin de progresser.
-
-Donc s'il vous rend n'importe quoi sur vos données, c'est une **information
-utile, pas une erreur de votre part**.
-[Ouvrez une issue](https://github.com/ariel95500-create/gp-elite/issues/new/choose)
+GP_ELITE est réglé sur des benchmarks publiés, propres et bien échelonnés. Les
+mesures réelles ne le sont pas, et c'est là que le moteur a le plus besoin de
+progresser. S'il vous rend n'importe quoi sur vos données, c'est une information
+utile, pas une erreur de votre part :
+[ouvrez une issue](https://github.com/ariel95500-create/gp-elite/issues/new/choose)
 avec la forme de vos données et ce que vous avez obtenu. Pas besoin de partager
-les données elles-mêmes, pas besoin de savoir pourquoi ça a échoué, et vous
-pouvez écrire en français comme en anglais.
+les données elles-mêmes, et vous pouvez écrire en français comme en anglais
+([CONTRIBUTING.md](CONTRIBUTING.md)).
 
-Les rapports d'échec sur mesures réelles sont la contribution la plus précieuse
-que ce projet puisse recevoir. Voir [CONTRIBUTING.md](CONTRIBUTING.md).
+## Licence et citation
 
----
-
-## Tests
-
-```bash
-pip install -e ".[test]"
-python -m pytest tests/ -q
-```
-
-`tests/test_guarantees.py` fige chaque défaut trouvé jusqu'ici — chaque test a été
-vérifié en échec sur le code qui portait le défaut. La suite tourne à chaque envoi
-sur GitHub qui modifie du code (Linux, Python 3.9 à 3.14, et Windows).
-
----
-
-## Licence
-
-MIT — voir [LICENSE](LICENSE). Utilisation libre, y compris commerciale, avec conservation de la notice de copyright.
-
-## Citer GP_ELITE
-
-Si GP_ELITE vous est utile dans un travail académique, voir [CITATION.cff](CITATION.cff).
+MIT, voir [LICENSE](LICENSE) : utilisation libre, y compris commerciale, avec
+conservation de la notice de copyright. Si GP_ELITE vous est utile dans un
+travail académique, voir [CITATION.cff](CITATION.cff).
