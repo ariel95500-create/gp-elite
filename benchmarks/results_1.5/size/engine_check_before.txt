@@ -9,6 +9,6 @@ same      formula.py f0789e704b68310f3133175e6207eab04b9cad9e9f8cfbddc2200230472
 same      py.typed e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 same      sklearn_api.py 22a83eed8f0e76112ff8f83753f387e4a125d254ef2a9de9a0e4da10cfdb79fe
 same      stability.py 400ffd9fa29def6e6bbda6325ba89a512607b422ddb3794c2c92ebfbd1b67e66
-version 1.4.0 /home/user/gp-elite/gp_elite/__init__.py
+version 1.4.0 /venv14p/lib/python3.11/site-packages/gp_elite/__init__.py
 the 11 files are those of 6dc1e35
-2026-11-23T21:09:59Z
+2026-11-23T21:10:13Z

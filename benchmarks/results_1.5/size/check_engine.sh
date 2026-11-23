@@ -10,6 +10,6 @@ for f in __init__.py __main__.py api.py cli.py core.py dim_search.py dimensions.
   b=$(git show 6dc1e35:gp_elite/$f | sha256sum | cut -c1-64)
   if [ "$a" = "$b" ]; then echo "same      $f $a"; else echo "DIFFERENT $f $a $b"; bad=1; fi
 done
-/venv14p/bin/python -c "import gp_elite; print('version', gp_elite.__version__, gp_elite.__file__)"
+/venv14p/bin/python -I -c "import gp_elite; print('version', gp_elite.__version__, gp_elite.__file__)"
 [ $bad = 0 ] && echo "the 11 files are those of 6dc1e35" || echo "A FILE DIFFERS: stop and tell the author"
 date -u +%Y-%m-%dT%H:%M:%SZ
