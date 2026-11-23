@@ -1,0 +1,368 @@
+# The map of core.py at 6dc1e35 (Part A of benchmarks/results_1.5/PLAN.md)
+
+core.py: 12999 lines
+top-level functions and classes: 231
+run-time names: 45 (rebound inside core's functions 37; set on core by the package 12, by the tests 6)
+
+## Run-time names: who rebinds them, who sets them from outside
+COGRAPH                      rebound by _evolve_parallel,_island_round_task      set by -
+CSV_FEATURE_NAMES            rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
+CSV_TARGET_NAME              rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
+CURRENT_RESIDUAL_SIG         rebound by _evolve_parallel,_island_round_task,_smart_reset_explorers,evolve,evolve_island set by tests/test_speed_equivalence.py
+FRAGMENT_LIB                 rebound by _evolve_parallel,_island_round_task      set by -
+PROBE_X                      rebound by _parallel_worker_init,evolve             set by -
+SEQ_MEM                      rebound by _evolve_parallel,_island_round_task      set by -
+_BATTERY_CSV_MODE            rebound by _parallel_worker_init,load_custom_csv    set by -
+_COMPILE_CACHE               rebound by -                                        set by tests/test_speed_equivalence.py
+_CUSTOM_LOSS_FN              rebound by -                                        set by gp_elite/api.py
+_CUSTOM_LOSS_PARSIMONY       rebound by -                                        set by gp_elite/api.py
+_CUSTOM_LOSS_ROBUST          rebound by -                                        set by gp_elite/api.py
+_CUSTOM_LOSS_USE_SCALING     rebound by -                                        set by gp_elite/api.py
+_CUSTOM_SEEDS                rebound by -                                        set by gp_elite/api.py
+_DIM_GATE_DIMS               rebound by Island,evolve                            set by -
+_DIM_GATE_TARGET             rebound by Island,evolve                            set by -
+_DIM_SEARCH                  rebound by _ds                                      set by -
+_DIM_UNKNOWN_CONST           rebound by _parallel_worker_init,evolve             set by -
+_EXTRAP_BAND                 rebound by _split_holdout                           set by -
+_EXTRAP_PROBE_XS             rebound by _split_holdout                           set by -
+_GENERIC_BINARY_OPS          rebound by _parallel_worker_init,load_generic_csv   set by -
+_GENERIC_BINARY_WEIGHTS      rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
+_GENERIC_CSV_MODE            rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
+_GENERIC_UNARY_OPS           rebound by _parallel_worker_init,load_generic_csv   set by -
+_GENERIC_UNARY_WEIGHTS       rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
+_LS_SCALE_ONLY               rebound by _parallel_worker_init,_small_fit,evolve  set by tests/test_guarantees.py
+_NEAR_BAND                   rebound by _build_near_probes,_split_holdout        set by -
+_NEAR_PROBE_XS               rebound by _build_near_probes,_split_holdout        set by -
+_PARALLEL_WARNED             rebound by _warn_unguarded_main                     set by -
+_PARAMETRIC_CACHE            rebound by evolve                                   set by -
+_PRED_CACHE                  rebound by -                                        set by tests/test_guarantees.py
+_SMALL_ON                    rebound by _small_setup                             set by -
+_SYRACUSE_FEAT_MAXS          rebound by generate_syracuse_dataset                set by -
+_SYRACUSE_FEAT_MINS          rebound by generate_syracuse_dataset                set by -
+_SYRACUSE_MODE               rebound by _parallel_worker_init,generate_syracuse_dataset set by -
+_SYRACUSE_X_RAW              rebound by _parallel_worker_init,generate_syracuse_dataset set by -
+_SYRACUSE_Y_RAW              rebound by _parallel_worker_init,generate_syracuse_dataset set by -
+_USE_LINEAR_SCALING          rebound by _parallel_worker_init,evolve             set by gp_elite/api.py,tests/test_guarantees.py
+_VAL_CANDS                   rebound by -                                        set by gp_elite/api.py,tests/test_guarantees.py
+_VAL_TRAIN_XS                rebound by _small_choose,_small_table_select,_split_holdout set by -
+_VAL_TRAIN_YS                rebound by _small_choose,_small_table_select,_split_holdout set by -
+_VAL_XS                      rebound by _split_holdout                           set by -
+_VAL_YS                      rebound by _split_holdout                           set by -
+_feature_usage_counter       rebound by record_feature_usage,reset_feature_usage set by -
+_fitness_cache               rebound by evolve                                   set by -
+
+## Names the benches (benchmarks/*.py) set on core, apart
+_ARG_MUT                     benchmarks/phase2_bench.py
+_BINOMIAL_SEEDS              benchmarks/phase2_bench.py
+_ELEMENTARY_SEEDS            benchmarks/phase2_bench.py
+_FAR_EXT                     benchmarks/phase2_bench.py
+_FAR_GUARD                   benchmarks/phase2_bench.py
+_FAR_LINEAR                  benchmarks/phase2_bench.py
+_GENERIC_CSV_MODE            benchmarks/phase2_bench.py
+_GENERIC_UNARY_OPS           benchmarks/phase2_bench.py
+_GUARD_CATCHUP               benchmarks/phase2_bench.py
+_GUARD_SEARCH                benchmarks/phase2_bench.py
+_GUARD_STRICT                benchmarks/phase2_bench.py
+_TOLERANT_SEEDS              benchmarks/phase2_bench.py
+_TRIG_SEEDS                  benchmarks/phase2_bench.py
+_TRIG_SMART                  benchmarks/phase2_bench.py
+_build_near_probes           benchmarks/near_guard_study.py
+evolve_island                benchmarks/decision_bench.py,benchmarks/phase1_bench.py,benchmarks/phase3_bench.py,benchmarks/tp_diagnostic.py,benchmarks/typed_generations_check.py
+
+## Functions and classes, in the order of the file
+first  last   lines  module     name                               run-time names used (set*)
+404    408        5  core       _csv_deps                          
+411    416        6  core       _csv_deps_ok                       
+419    421        3  core       _MinMaxScaler                      
+428    442       15  memory     FragmentEntry                      
+457    842      386  memory     FragmentLibrary                    CURRENT_RESIDUAL_SIG, PROBE_X
+880    912       33  memory     init_probe_set                     
+915    932       18  memory     compute_semantic_sig               
+935    957       23  memory     semantic_score                     
+960    979       20  memory     update_residual_sig                
+986    1268     283  memory     FragmentCoGraph                    
+1279   1734     456  memory     FragmentSequenceMemory             
+1765   1806      42  config     _RunTrace                          
+1818   1825       8  config     _ds                                _DIM_SEARCH*
+1828   1829       2  config     _dim_active                        
+1833   2036     204  config     Config                             
+2144   2169      26  config     _get_ops_for_role                  _BATTERY_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _SYRACUSE_MODE
+2172   2202      31  config     _active_pools                      _BATTERY_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _SYRACUSE_MODE
+2223   2229       7  tree       _str_code                          
+2232   2238       7  tree       _value_code                        
+2241   2244       4  tree       _leaf_code_exact                   
+2247   2251       5  tree       _leaf_code_rounded                 
+2254   2257       4  tree       _leaf_code_canonical               
+2260   2287      28  tree       _node_hashes                       
+2290   2404     115  tree       Node                               
+2410   2450      41  tree       to_string                          CSV_FEATURE_NAMES, _GENERIC_CSV_MODE
+2488   2532      45  tree       node_to_sympy                      
+2539   2549      11  tree       tree_size                          
+2551   2562      12  tree       tree_depth                         
+2585   2598      14  tree       _is_adjusted_float                 
+2601   2628      28  tree       tree_complexity                    
+2634   2650      17  tree       get_all_nodes                      
+2652   2662      11  tree       collect_constants                  
+2670   2671       2  numeric    safe_div                           
+2673   2682      10  numeric    safe_pow                           
+2684   2689       6  numeric    safe_tan                           
+2691   2696       6  numeric    safe_arcsin                        
+2698   2699       2  numeric    safe_log                           
+2701   2706       6  numeric    safe_exp                           
+2708   2709       2  numeric    safe_sqrt                          
+2724   2745      22  numeric    _np_safe_div                       
+2747   2777      31  numeric    _np_safe_pow                       
+2779   2797      19  numeric    _np_safe_pow_var                   
+2799   2809      11  numeric    _is_const_subtree                  
+2811   2814       4  numeric    _np_safe_tan                       
+2816   2819       4  numeric    _np_safe_arcsin                    
+2821   2829       9  numeric    _np_safe_exp                       
+2831   2832       2  numeric    _np_safe_log                       
+2834   2835       2  numeric    _np_safe_sqrt                      
+2837   2850      14  numeric    _np_is_even                        
+2853   2862      10  numeric    _np_step                           
+2865   2867       3  numeric    _np_max2                           
+2870   2872       3  numeric    _np_min2                           
+2897   2916      20  evaluate   _float_literal                     
+2919   2981      63  evaluate   _to_np_code                        
+2983   2995      13  evaluate   _collect_constants_ordered         
+2998   3045      48  evaluate   _to_np_code_parametric             
+3082   3090       9  evaluate   _lm_apply                          
+3093   3095       3  evaluate   _LMPlan                            
+3102   3224     123  evaluate   _lm_build_plan                     
+3227   3236      10  evaluate   _lm_plan                           
+3239   3258      20  evaluate   _lm_column                         
+3261   3292      32  evaluate   compile_parametric                 _PARAMETRIC_CACHE
+3295   3320      26  evaluate   compile_to_numpy                   _COMPILE_CACHE
+3326   3383      58  evaluate   evaluate                           
+3402   3403       2  evaluate   _InterpTooDeep                     
+3406   3407       2  evaluate   _sq                                
+3410   3411       2  evaluate   _cube                              
+3424   3453      30  evaluate   _interp                            
+3456   3507      52  evaluate   evaluate_vector                    _COMPILE_CACHE
+3585   3622      38  datasets   _max_height_ratio                  
+3640   3649      10  datasets   _collatz_flight_time               
+3652   3666      15  datasets   _v2                                
+3669   3717      49  datasets   _log_max_height_level2             
+3720   3725       6  datasets   _scale_feature                     
+3728   3900     173  datasets   generate_syracuse_dataset          _SYRACUSE_FEAT_MAXS*, _SYRACUSE_FEAT_MINS*, _SYRACUSE_MODE*, _SYRACUSE_X_RAW*, _SYRACUSE_Y_RAW*
+3903   3984      82  datasets   build_dataset                      
+4007   4021      15  evaluate   _pearson_r                         
+4030   4051      22  evaluate   _predict_cached                    _PRED_CACHE
+4076   4097      22  evaluate   _safe_write                        
+4113   4159      47  seeds      _make_motif_seeds                  
+4203   4205       3  seeds      _seeds_blocked_by_units            
+4208   4218      11  seeds      _typed_seeds                       
+4221   4259      39  seeds      _power_law_exponents               
+4262   4289      28  seeds      _power_law_exponents_w             
+4292   4317      26  seeds      _half_integer_power                
+4320   4326       7  seeds      _product                           
+4329   4404      76  seeds      _make_power_law_seeds              _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
+4440   4450      11  seeds      _binom_library                     
+4453   4467      15  seeds      _golden_min                        
+4470   4619     150  seeds      _binomial_forms                    
+4622   4634      13  seeds      _monomial                          
+4637   4679      43  seeds      _make_binomial_seeds               _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
+4711   4724      14  seeds      _elem_flib                         
+4727   4731       5  seeds      _elem_mono                         
+4734   4741       8  seeds      _elem_rel                          
+4744   4759      16  seeds      _elem_transform                    
+4762   4871     110  seeds      _elem_inverse_forms                
+4874   4886      13  seeds      _elem_wrel                         
+4889   4906      18  seeds      _log_g_exponents                   
+4909   5024     116  seeds      _elem_inverse_forms_w              
+5027   5038      12  seeds      _pred_rel_error                    
+5044   5086      43  seeds      _elem_log_scan                     
+5089   5111      23  seeds      _elem_trig_grid                    
+5114   5130      17  seeds      _elem_trig_exact                   
+5133   5219      87  seeds      _elem_trig_forms                   
+5249   5259      11  seeds      _e2_residuals                      
+5262   5325      64  seeds      _elem_aexp_forms                   
+5328   5368      41  seeds      _elementary_forms                  
+5371   5401      31  seeds      _elementary_forms_n2               
+5404   5479      76  seeds      _make_elementary_seeds             _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
+5548   5562      15  seeds      _seed_rel_error                    
+5565   5587      23  seeds      _small_family                      
+5590   5606      17  seeds      _refit_inner                       _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING
+5609   5709     101  seeds      _make_tolerant_seeds               _GENERIC_CSV_MODE, _SMALL_ON
+5717   5750      34  fitness    _linear_scale_params               _LS_SCALE_ONLY
+5752   5779      28  fitness    _robust_scale_params               
+5781   5875      95  fitness    raw_mse                            _CUSTOM_LOSS_FN, _SYRACUSE_MODE, _USE_LINEAR_SCALING
+5878   5893      16  fitness    raw_pearson_r                      
+5896   5926      31  fitness    _pure_mse                          _USE_LINEAR_SCALING
+5929   5946      18  fitness    _target_scale                      
+5949   5970      22  fitness    _scale_tree                        
+5973   6033      61  fitness    wrap_linear_scaling                _LS_SCALE_ONLY, _USE_LINEAR_SCALING
+6046   6049       4  fitness    reset_feature_usage                _feature_usage_counter*
+6051   6066      16  fitness    record_feature_usage               _feature_usage_counter*
+6068   6079      12  fitness    get_feature_bias_weights           _feature_usage_counter
+6081   6093      13  fitness    count_distinct_features            
+6096   6173      78  fitness    fitness                            _CUSTOM_LOSS_FN, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _fitness_cache
+6179   6180       2  operators  random_constant                    
+6182   6194      13  operators  random_terminal                    _SYRACUSE_MODE, _feature_usage_counter
+6196   6212      17  operators  _random_tree_full                  
+6214   6228      15  operators  _random_tree_grow                  
+6230   6235       6  operators  random_tree                        
+6241   6242       2  simplify   _is_float                          
+6244   6245       2  simplify   _is_const                          
+6250   6253       4  simplify   _clear_simplify_caches             
+6255   6275      21  simplify   simplify                           
+6278   6313      36  simplify   _simplify_tree                     
+6320   6413      94  simplify   _simplify_node                     
+6416   6423       8  simplify   _has_own_factor                    
+6429   6438      10  simplify   _invalidate_all_hashes             
+6441   6600     160  constants  optimize_constants_lm              _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
+6603   6714     112  constants  optimize_constants_adam            
+6740   6750      11  operators  _semantic_key                      
+6753   6786      34  operators  semantic_dedup                     
+6789   6880      92  operators  EpsilonLexicaseSelector            _USE_LINEAR_SCALING
+6886   6897      12  operators  tournament                         
+6903   6945      43  operators  crossover_size_fair                
+6951   6968      18  operators  hoist_mutation                     
+6970   6985      16  operators  shrink_mutation                    
+6987   7015      29  operators  point_mutation                     
+7017   7032      16  operators  semantic_mutation                  
+7034   7055      22  operators  subtree_mutation                   
+7057   7082      26  operators  stigmergic_mutation                FRAGMENT_LIB
+7085   7129      45  operators  fragment_inject_mutation           FRAGMENT_LIB
+7132   7150      19  operators  mutate                             FRAGMENT_LIB
+7156   7177      22  operators  pareto_rank                        
+7183   7243      61  operators  build_stigmergic_tree              
+7246   7347     102  operators  build_stigmergic_tree_v2           
+7354   7392      39  operators  warm_transfer                      COGRAPH, FRAGMENT_LIB, SEQ_MEM
+7399   7505     107  operators  build_stigmergic_tree_v3           
+7512   7658     147  islands    Island                             COGRAPH, FRAGMENT_LIB, SEQ_MEM, _DIM_GATE_DIMS*, _DIM_GATE_TARGET*
+7661   7695      35  islands    migrate                            FRAGMENT_LIB, PROBE_X
+7701   8156     456  islands    evolve_island                      COGRAPH, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _SYRACUSE_MODE, _fitness_cache
+8185   8187       3  parallel   _pool_probe                        
+8190   8249      60  parallel   _parallel_worker_init              CSV_FEATURE_NAMES*, CSV_TARGET_NAME*, PROBE_X*, _BATTERY_CSV_MODE*, _DIM_UNKNOWN_CONST*, _GENERIC_BINARY_OPS*, _GENERIC_BINARY_WEIGHTS*, _GENERIC_CSV_MODE*, _GENERIC_UNARY_OPS*, _GENERIC_UNARY_WEIGHTS*, _LS_SCALE_ONLY*, _SYRACUSE_MODE*, _SYRACUSE_X_RAW*, _SYRACUSE_Y_RAW*, _USE_LINEAR_SCALING*
+8251   8282      32  parallel   _island_round_task                 COGRAPH*, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB*, SEQ_MEM*, _SYRACUSE_MODE, _fitness_cache
+8284   8291       8  parallel   _active_pool_ops                   _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
+8294   8308      15  parallel   _pool_choice                       
+8330   8331       2  parallel   _SkipLogExport                     
+8334   8354      21  parallel   _exit_if_reimported_by_worker      
+8357   8379      23  parallel   _warn_unguarded_main               _PARALLEL_WARNED*
+8382   8392      11  parallel   _parallel_enabled                  
+8394   8605     212  parallel   _evolve_parallel                   COGRAPH*, CSV_FEATURE_NAMES, CSV_TARGET_NAME, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB*, PROBE_X, SEQ_MEM*, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _SYRACUSE_MODE, _USE_LINEAR_SCALING
+8647   8683      37  selection  _formula_faithful                  _VAL_TRAIN_XS, _VAL_XS
+8696   8719      24  selection  _early_stop_threshold              _GENERIC_CSV_MODE, _VAL_YS
+8726   8748      23  selection  _Patience                          
+8751   8762      12  selection  _holdout_mse                       _VAL_XS, _VAL_YS
+8764   8799      36  selection  _is_numerically_stable             _EXTRAP_BAND, _EXTRAP_PROBE_XS, _VAL_TRAIN_XS, _VAL_TRAIN_YS
+8801   8836      36  selection  _track_val_candidate               _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _VAL_CANDS, _VAL_XS, _VAL_YS
+8872   8882      11  selection  _has_scale                         
+8885   8917      33  selection  _weight_sums                       
+8920   8933      14  selection  _lm_to_convergence                 
+8936   8972      37  selection  _refit_scaling                     _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
+8975   9009      35  selection  _finalists                         _VAL_CANDS, _VAL_YS
+9015   9037      23  selection  _track_if_exact                    _VAL_XS, _VAL_YS
+9040   9072      33  selection  _polish_finalists                  _CUSTOM_LOSS_FN
+9074   9088      15  selection  _build_near_probes                 _NEAR_BAND*, _NEAR_PROBE_XS*
+9091   9113      23  selection  _near_domain_stable                _NEAR_BAND, _NEAR_PROBE_XS
+9116   9194      79  selection  _select_one_se                     _VAL_CANDS, _VAL_YS
+9255   9267      13  selection  _small_setup                       _CUSTOM_LOSS_FN, _GENERIC_CSV_MODE, _SMALL_ON*, _USE_LINEAR_SCALING, _VAL_XS
+9270   9299      30  selection  _track_small_candidate             _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _SMALL_ON
+9302   9304       3  selection  _small_is_const                    
+9307   9326      20  selection  _small_strip                       
+9329   9390      62  selection  _small_round_powers                _GENERIC_BINARY_OPS, _GENERIC_UNARY_OPS
+9393   9417      25  selection  _small_fit                         _LS_SCALE_ONLY*
+9420   9442      23  selection  _small_cv                          
+9445   9477      33  selection  _small_n_par                       
+9480   9489      10  selection  _small_materialize                 
+9492   9538      47  selection  _small_specs                       _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _LS_SCALE_ONLY
+9541   9575      35  selection  _small_table_select                
+9578   9611      34  selection  _small_choose                      _VAL_TRAIN_XS*, _VAL_TRAIN_YS*
+9614   9714     101  search     _split_holdout                     _EXTRAP_BAND*, _EXTRAP_PROBE_XS*, _NEAR_BAND*, _NEAR_PROBE_XS*, _VAL_CANDS, _VAL_TRAIN_XS*, _VAL_TRAIN_YS*, _VAL_XS*, _VAL_YS*
+9717   9760      44  search     _make_linear_candidate             
+9763   9835      73  search     _smart_reset_explorers             CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB
+9837   10577    741  search     evolve                             COGRAPH, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB, PROBE_X*, SEQ_MEM, _BATTERY_CSV_MODE, _DIM_GATE_DIMS*, _DIM_GATE_TARGET*, _DIM_UNKNOWN_CONST*, _EXTRAP_PROBE_XS, _LS_SCALE_ONLY*, _PARAMETRIC_CACHE*, _PRED_CACHE, _SMALL_ON, _SYRACUSE_MODE, _USE_LINEAR_SCALING*, _VAL_XS, _VAL_YS, _fitness_cache*
+10583  10654     72  console    print_result                       
+10660  10790    131  console    decoy_report                       SEQ_MEM
+10793  10844     52  console    try_plot                           
+10850  10864     15  console    run                                
+10878  10879      2  data       _safe_sinc                         
+10940  10990     51  data       _ShiftFreeScaler                   
+10992  11006     15  data       _IdentityScaler                    
+11023  11036     14  data       _scale_ratio                       
+11039  11087     49  data       _choose_scaler                     
+11089  11191    103  data       load_generic_csv                   CSV_FEATURE_NAMES*, CSV_TARGET_NAME*, _GENERIC_BINARY_OPS*, _GENERIC_BINARY_WEIGHTS*, _GENERIC_CSV_MODE*, _GENERIC_UNARY_OPS*, _GENERIC_UNARY_WEIGHTS*
+11194  11309    116  data       load_custom_csv                    _BATTERY_CSV_MODE*
+11424  11449     26  config     _nd_diverse_population             
+11452  11463     12  config     _random_tree_full_nd               
+11466  11480     15  config     _random_tree_grow_nd               
+11483  11488      6  config     _random_tree_nd                    
+11491  11504     14  config     _detect_dominant_op                
+11507  11541     35  config     make_cfg_nd                        
+11559  11620     62  config     make_cfg                           
+11623  11638     16  console    _one_run                           
+11641  11793    153  console    run_benchmark                      
+11800  11820     21  console    _print_menu                        
+11823  11839     17  console    _ask                               
+11842  11854     13  console    _ask_int                           
+11857  12669    813  console    _interactive_menu                  FRAGMENT_LIB, _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_Y_RAW
+12672  12746     75  console    _deduce_console_constant           
+12749  12753      5  console    _pause                             
+
+## Module-level statements other than functions and classes
+core         396 lines
+console      243 lines
+data         121 lines
+evaluate      75 lines
+config        68 lines
+tree          29 lines
+seeds         27 lines
+selection     25 lines
+numeric       21 lines
+datasets      18 lines
+memory        16 lines
+parallel      15 lines
+simplify       3 lines
+fitness        1 lines
+islands        1 lines
+
+## By module
+module      defs  lines   with state  state lines  run-time names used
+console       12   1626            2          944  FRAGMENT_LIB, SEQ_MEM, _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_Y_RAW
+seeds         35   1357            5          313  _CUSTOM_LOSS_FN, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _SMALL_ON, _USE_LINEAR_SCALING
+memory         8   1250            1          386  CURRENT_RESIDUAL_SIG, PROBE_X
+search         4    959            3          915  COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _BATTERY_CSV_MODE, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _EXTRAP_BAND, _EXTRAP_PROBE_XS, _LS_SCALE_ONLY, _NEAR_BAND, _NEAR_PROBE_XS, _PARAMETRIC_CACHE, _PRED_CACHE, _SMALL_ON, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _VAL_CANDS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _VAL_XS, _VAL_YS, _fitness_cache
+selection     28    831           18          601  _CUSTOM_LOSS_FN, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _EXTRAP_BAND, _EXTRAP_PROBE_XS, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _LS_SCALE_ONLY, _NEAR_BAND, _NEAR_PROBE_XS, _SMALL_ON, _USE_LINEAR_SCALING, _VAL_CANDS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _VAL_XS, _VAL_YS
+operators     23    767            6          234  COGRAPH, FRAGMENT_LIB, SEQ_MEM, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _feature_usage_counter
+islands        3    639            3          638  COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _SYRACUSE_MODE, _fitness_cache
+evaluate      20    647            4          132  _COMPILE_CACHE, _PARAMETRIC_CACHE, _PRED_CACHE
+config        13    551            3           65  _BATTERY_CSV_MODE, _DIM_SEARCH, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _SYRACUSE_MODE
+fitness       13    429            8          331  _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _feature_usage_counter, _fitness_cache
+parallel      10    402            5          335  COGRAPH, CSV_FEATURE_NAMES, CSV_TARGET_NAME, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _PARALLEL_WARNED, _SYRACUSE_MODE, _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW, _USE_LINEAR_SCALING, _fitness_cache
+datasets       7    391            1          173  _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_MODE, _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW
+data           7    471            2          219  CSV_FEATURE_NAMES, CSV_TARGET_NAME, _BATTERY_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS
+tree          15    378            1           41  CSV_FEATURE_NAMES, _GENERIC_CSV_MODE
+constants      2    272            1          160  _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
+simplify       8    180            0            0  
+numeric       20    189            0            0  
+core           3    410            0            0  
+
+functions and classes that use run-time names: 63 (5487 lines); the others: 168 (5203 lines)
+
+## The roles
+    1-427   core       header, imports, optional dependencies of the CSV mode
+  428-1748  memory     the fragment library, the probe set and semantic signatures, the co-graph, the sequence memory
+ 1749-2222  config     the run trace, Config, the pools of operators
+ 2223-2669  tree       hashing, Node, to_string, sympy, size, depth, complexity, constants of a tree
+ 2670-2896  numeric    the protected operators, scalar and vectorised
+ 2897-3576  evaluate   code generation, the plans of the LM Jacobian, compilation, evaluation
+ 3577-4004  datasets   the Collatz (Syracuse) features and datasets, build_dataset
+ 4005-4101  evaluate   Pearson r, the cache of predictions, safe file writing
+ 4102-5716  seeds      the seeds: motifs, power laws, binomials, elementary forms, noise-tolerant forms
+ 5717-6178  fitness    linear and robust scaling, the errors, the target scale, feature usage, fitness
+ 6179-6240  operators  random trees
+ 6241-6440  simplify   simplification
+ 6441-6739  constants  the fitting of constants: Levenberg-Marquardt and Adam
+ 6740-7511  operators  deduplication, lexicase, tournament, crossover, mutations, Pareto ranks, stigmergic trees
+ 7512-8184  islands    Island, migration, evolve_island
+ 8185-8646  parallel   the parallel islands: workers, pools, the guard of the main module
+ 8647-9613  selection  the final choice: early stop, patience, hold-out, finalists, polish, near domain, one-SE, small tables
+ 9614-10582 search     the hold-out split, the linear candidate, the reset of explorers, evolve
+10583-10877 console    the printed result, the decoy report, the plot, run
+10878-11423 data       the scalers and the loading of CSV files
+11424-11622 config     the populations in n dimensions, make_cfg_nd, make_cfg
+11623-12999 console    the benchmark of the console and the interactive menu
