@@ -1,0 +1,21 @@
+Short A1 after the move of simplification (step 5 of the split): 1.4.0 from PyPI (/home/user/a1_140) against the working tree (/home/user/a1_05_simplification).
+
+== the 13 configurations
+A_feyn       same
+B_cpu        same
+C_big        same
+D_units      same
+E_minmax     same
+F_robust     same
+G_restarts   same
+H_parallel   same
+I_sklearn    same
+J_extrap     same
+K_thorough   same
+L_standard   same
+M_twice      same
+total time 21.2 s -> 21.3 s
+ALL IDENTICAL
+== the records (short: F41 only)
+phase1   205 jobs in A, 205 in B, 0 in one only, 0 different
+ALL IDENTICAL
