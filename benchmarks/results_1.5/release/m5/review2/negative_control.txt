@@ -1,3 +1,4 @@
+four faults planted
 DIFF  line 5041 ('assign', ("Name(id='_SCAN_KEEP', ctx=Store())",)) -> seeds.py line 959
       --- 1.4.0 after the rule
       +++ 1.5
