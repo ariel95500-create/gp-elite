@@ -1,0 +1,6 @@
+tests of 56007b2, wheel gp_elite-1.5.0-py3-none-any.whl 96d7e1e2c2190e72, 2026-11-24T08:05
+[3.9.25] 3.9.25 1.5.0 /venvt15_3.9.25/lib/python3.9/site-packages/gp_elite/__init__.py 269 passed in 226.99s (0:03:46)
+[3.11.18] 3.11.18 1.5.0 /venvt15_3.11.18/lib/python3.11/site-packages/gp_elite/__init__.py 269 passed in 183.56s (0:03:03)
+[3.14.6] 3.14.6 1.5.0 /venvt15_3.14.6/lib/python3.14/site-packages/gp_elite/__init__.py 269 passed in 173.10s (0:02:53)
+twine: warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead. Installed 27 packages in 305ms Checking gp_elite-1.5.0-py3-none-any.whl: [32mPASSED[0m Checking gp_elite-1.5.0.tar.gz: [32mPASSED[0m 
+all done

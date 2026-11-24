@@ -45,9 +45,10 @@ measurements of `../split/` and before this candidate; nothing was running.
 `m4/summary.txt` gives the test suite run by `m4/run.sh` against the wheel
 of the candidate, installed in a fresh environment for each of Python
 3.9.25, 3.11.18 and 3.14.6 with the pins of the M4 of 1.4
-(`m4/requirements_*.txt`), each importing the installed package
-(`m4/pytest_*.txt`), and `twine check --strict` on the wheel and the source
-archive (`m4/twine_check.txt`).
+(`m4/requirements_*.txt`), each importing the installed package, from
+08:05 to 08:17 UTC on 24 November, after M1: 269 tests pass under each of
+the three (`m4/pytest_*.txt`). `twine check --strict` passes for the wheel
+and the source archive (`m4/twine_check.txt`).
 
 The **Tests** workflow of the repository (Python 3.9 to 3.14 on Linux, 3.12
 and 3.14 on Windows) is green on every commit of the branch since eb2eac5,
