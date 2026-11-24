@@ -1,0 +1,6 @@
+--- M1 starts 2026-11-24T07:04, Model name: Intel(R) Xeon(R) Processor, kernel 6.18.44-fc-v819
+engine 1.5.0 /venv15r/lib/python3.11/site-packages/gp_elite/__init__.py
+--- A1: ALL IDENTICAL 07:36
+--- A3: 205 fits each; total A 695.9 s, B 694.7 s, ratio 0.9983; same formula in 205 A3 holds (within 3 %)  08:05
+--- A4: 69 passed in 0.70s 08:05
+--- M1 ends 2026-11-24T08:05

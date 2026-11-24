@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.5.0
+
+The engine in modules. Until 1.4.0 it was one file, `gp_elite/core.py`, of
+12,999 lines; it is now 17 modules, one per role, and the module of the
+shared state ([`docs/architecture.md`](docs/architecture.md)). Nothing a
+user can observe changes, as the plan required
+(`benchmarks/results_1.5/PLAN.md`). Measured on the package, side by side
+with 1.4.0 installed from PyPI (`benchmarks/results_1.5/release/`):
+
+- the same models, field by field and to the bit, at equal seed and equal
+  work: the 13 reference configurations of `benchmarks/speed_equivalence.py`,
+  the 41 Feynman equations without noise, with their units and with 1 %
+  noise under the defaults of the API (615 fits), the TP diagnostic (400
+  fits) and the console;
+- the same speed: 205 fits of the 41 equations, the two versions run in
+  turn, take 694.7 s against 695.9 s;
+- every name `gp_elite.core` had in 1.4.0 can still be read on it, and a
+  name set on it reaches the engine (`tests/test_door.py`, new), so that
+  scripts written for 1.4.0 work unchanged.
+
+The 61 names that change while a fit runs live in `gp_elite/state.py`, and
+every function reads and sets them there when it runs. How the split was
+made and checked, move by move, is in `benchmarks/results_1.5/split/`.
+
+What size costs, measured on 1.4.0 (`benchmarks/results_1.5/size/`): up to
+100,000 rows, little, and mostly time (154 exact laws of 205 at 100,000 rows
+against 165 at 100, and ten times the time gives back 6 of the 11); twenty
+variables that play no part in the law, much, and mostly the algorithm (108
+exact laws against 168, and ten times the time gives back 12): the seed
+finders limit their combinations of columns as the columns grow. See point 9
+of the limits.
+
 ## 1.4.0 — "Signal"
 
 The noise-tolerant seeds. When no binomial form and no function of a

@@ -6,8 +6,8 @@ Until 1.4.0, the engine of GP_ELITE was one file, `gp_elite/core.py`, of
 12,999 lines. Since 1.5 it is a package of modules, each with one role. The
 split changed how the code is organised, and nothing a user can observe: at
 equal seed and equal work, 1.5 returns the models 1.4.0 returns, bit for
-bit, with the same interface, at the same speed (205 fits of F41: 680.1 s
-against 678.2 s). This page is for anyone who wants to read the engine or
+bit, with the same interface, at the same speed (within 0.3 % on 205 fits of
+the 41 Feynman equations of the bench). This page is for anyone who wants to read the engine or
 change it.
 
 ## The modules
