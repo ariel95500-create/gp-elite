@@ -175,15 +175,17 @@ lean to the Python side on small tables.
 
 ## Deviations
 
-- **The profiles were cut once:** the worker of the session restarted
-  between 01:28 and 01:32 UTC on 24 November, after the campaign, and the
-  profile run stopped with it, at 21 of 42 records. It was resumed at 02:00
+- **The profiles were cut once:** the machine of the session restarted
+  after 01:28 UTC on 24 November, after the campaign (its uptime counts
+  from 02:00 UTC), and the profile run stopped with it, at 21 of 42
+  records. The files on its disk were kept. The run was resumed at 02:00
   UTC and skipped the recorded profiles; the fit running at the restart
   (I.8.14 at 100,000 rows, profiled) left no record and was run again. The
-  container did not change: the records outside the repository were still
-  there. Kernel at the profiles: 6.18.44-fc-v819.
-- Nothing else: no crash, no restart of the container during the campaign,
-  the same processor, the same engine before and after.
+  name of the processor is the same in all 42 records; the kernel, read
+  after the restart, is 6.18.44-fc-v819, and was not read before it.
+- Nothing else: no crash, no restart of the machine during the campaign
+  (one driver process ran from the first fit to the last), the same
+  processor, the same engine before and after.
 
 ## What follows
 
