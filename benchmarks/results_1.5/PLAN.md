@@ -14,6 +14,18 @@ publication of 1.5 after its measurement (gate 14).
 
 Gate 13: the author validated this plan in full on 23 November 2026.
 
+Amendment of 24 November 2026, approved by the author before any move:
+- the map of `core.py` (`split/map.txt`, corrected in 81ed9c3 and c7e00fa)
+  counts 66 run-time names, not the 45 of the first reading given under
+  "The shared state": 44 rebound by core's own functions (through `global`
+  or through `globals()`), 12 set on `core` by the package and 32 by the
+  tests; 61 hold data, and 5 are functions of `core.py` that the tests
+  replace;
+- the order of steps 2 and 3 under "How" changes: the shared state goes
+  first to its own module, every function still in `core.py`, in one
+  commit checked by the short version of A1; then every group moves, each
+  move a plain move, checked the same way. The criteria do not change.
+
 ## What 1.5 has to do
 
 The strategic plan the author approved on 23 November 2026 puts the split of
