@@ -1,0 +1,18 @@
+DIFF  line 5041 ('assign', ("Name(id='_SCAN_KEEP', ctx=Store())",)) -> seeds.py line 959
+      --- 1.4.0 after the rule
+      +++ 1.5
+      -_SCAN_KEEP = 3
+      +_SCAN_KEEP = 3 + 1
+DIFF  line 9614 ('def', '_split_holdout') -> search.py line 39
+      --- 1.4.0 after the rule
+      +++ 1.5
+      -    state._VAL_CANDS.clear()
+      +    _VAL_CANDS.clear()
+statements of 1.4.0 (but docstring, imports and the __main__ block): identical 391, different 2, missing 0
+  islands.py line 778: _ALIAS = state._VAL_CANDS
+  memory.py: state.X at module or class scope (run at import): [('FRAGMENT_LIB', 446, 'Store'), ('COGRAPH', 870, 'Store'), ('SEQ_MEM', 1336, 'Store')]
+  islands.py: state.X at module or class scope (run at import): [('_VAL_CANDS', 778, 'Load')]
+  search.py: state names used as bare globals: [('_VAL_CANDS', 48, 'Load')]
+  core.py: state.X at module or class scope (run at import): [('SEQ_MEM', 663, 'Load'), ('SEQ_MEM', 674, 'Load'), ('SEQ_MEM', 676, 'Load'), ('SEQ_MEM', 724, 'Load'), ('SEQ_MEM', 770, 'Load'), ('SEQ_MEM', 771, 'Load'), ('SEQ_MEM', 810, 'Load'), ('SEQ_MEM', 824, 'Load'), ('SEQ_MEM', 825, 'Load')]
+fitting.py      code: {'_pure_mse': [172, 173, 285, 286]}
+search.py       code: {'_VAL_CANDS': [48]}

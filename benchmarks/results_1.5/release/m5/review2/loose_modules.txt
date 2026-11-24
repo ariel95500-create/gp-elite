@@ -1,0 +1,7 @@
+== 1.4.0: 8 files copied from the package (without __init__ and __main__)
+fit runs: X0 * X1
+== 1.5: 26 files copied from the package (without __init__ and __main__)
+  File "<string>", line 3, in <module>
+  File "/tmp/claude-0/-home-user/bc0c332b-bd15-5108-8e98-a0d2a0e03650/scratchpad/loose_1.5/api.py", line 34, in <module>
+    raise ImportError(
+ImportError: GP_ELITE : placez core.py (ou core-2.py) dans le même dossier que ce fichier, puis importez-le depuis votre script : from api import symbolic_regression

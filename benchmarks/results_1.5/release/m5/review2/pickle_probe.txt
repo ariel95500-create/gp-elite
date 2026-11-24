@@ -1,0 +1,24 @@
+1.4.0 result    pickled, names the modules ['gp_elite.api', 'gp_elite.core', 'gp_elite.formula']
+1.4.0 estimator pickled, names the modules ['gp_elite.api', 'gp_elite.core', 'gp_elite.formula', 'gp_elite.sklearn_api']
+1.4.0 node      pickled, names the modules ['gp_elite.core']
+1.4.0 config    pickled, names the modules ['gp_elite.core']
+1.5.0 result    pickled, names the modules ['gp_elite.api', 'gp_elite.data', 'gp_elite.formula', 'gp_elite.tree']
+1.5.0 estimator pickled, names the modules ['gp_elite.api', 'gp_elite.data', 'gp_elite.formula', 'gp_elite.sklearn_api', 'gp_elite.tree']
+1.5.0 node      pickled, names the modules ['gp_elite.tree']
+1.5.0 config    pickled, names the modules ['gp_elite.config']
+engine 1.4.0 loading 1.4.0_config.pkl       loads as gp_elite.core.Config
+engine 1.4.0 loading 1.4.0_estimator.pkl    loads as gp_elite.sklearn_api.GPEliteRegressor; predict equal to the saving engine's: True
+engine 1.4.0 loading 1.4.0_node.pkl         loads as gp_elite.core.Node
+engine 1.4.0 loading 1.4.0_result.pkl       loads as gp_elite.api.SRResult
+engine 1.4.0 loading 1.5.0_config.pkl       FAILS: ModuleNotFoundError: No module named 'gp_elite.config'
+engine 1.4.0 loading 1.5.0_estimator.pkl    FAILS: ModuleNotFoundError: No module named 'gp_elite.tree'
+engine 1.4.0 loading 1.5.0_node.pkl         FAILS: ModuleNotFoundError: No module named 'gp_elite.tree'
+engine 1.4.0 loading 1.5.0_result.pkl       FAILS: ModuleNotFoundError: No module named 'gp_elite.tree'
+engine 1.5.0 loading 1.4.0_config.pkl       loads as gp_elite.config.Config
+engine 1.5.0 loading 1.4.0_estimator.pkl    loads as gp_elite.sklearn_api.GPEliteRegressor; predict equal to the saving engine's: True
+engine 1.5.0 loading 1.4.0_node.pkl         loads as gp_elite.tree.Node
+engine 1.5.0 loading 1.4.0_result.pkl       loads as gp_elite.api.SRResult
+engine 1.5.0 loading 1.5.0_config.pkl       loads as gp_elite.config.Config
+engine 1.5.0 loading 1.5.0_estimator.pkl    loads as gp_elite.sklearn_api.GPEliteRegressor; predict equal to the saving engine's: True
+engine 1.5.0 loading 1.5.0_node.pkl         loads as gp_elite.tree.Node
+engine 1.5.0 loading 1.5.0_result.pkl       loads as gp_elite.api.SRResult

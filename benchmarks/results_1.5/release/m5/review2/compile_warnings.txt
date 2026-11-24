@@ -1,0 +1,12 @@
+=== 1.4.0 core.py
+python 3.14.6, 1 files
+warnings by category: {}
+=== 1.5 engine modules
+python 3.14.6, 19 files
+warnings by category: {}
+=== 1.4.0 core.py
+python 3.11.18, 1 files
+warnings by category: {}
+=== 1.5 engine modules
+python 3.11.18, 19 files
+warnings by category: {}

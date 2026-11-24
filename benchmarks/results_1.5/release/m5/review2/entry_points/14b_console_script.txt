@@ -1,0 +1,61 @@
+
+══════════════════════════════════════════════════════════════════════
+  GP_ELITE  —  Symbolic Regression (1-D & N-D) via Genetic Programming
+══════════════════════════════════════════════════════════════════════
+
+  Available 1-D problems:
+
+  Classiques :
+     1.  sin(x²) + x·cos(x)                        [-3.0, 3.0]
+     2.  x³ - x² + x - 1                           [-3.0, 3.0]
+     3.  exp(-x²)·sin(2x)                          [-2.5, 2.5]
+     4.  log(1+x²)·cos(x)                          [-2.5, 2.5]
+
+  Complexes (★) :
+     5.  x·sin(x²)·cos(x/2)                        [-3.0, 3.0]
+     6.  exp(-|x|)·(x²-1)                          [-4.0, 4.0]
+     7.  sinc(x)·cos(x²)  [sinc=sin(x)/x]          [-3.0, 3.0]
+     8.  sin(πx)/(x²+1)                            [-3.0, 3.0]
+     9.  tanh(x)·exp(-x²/4)                        [-3.5, 3.5]
+    10.  x³·sin(1/x)                               [0.2, 3.0]
+
+  N-D problems (★★):
+   ND1.  X[:,0]·sin(X[:,1]) + X[:,2]²                    3 vars  [-3.0, 3.0]
+   ND2.  exp(-X[:,0]²)·cos(X[:,1])                       2 vars  [-2.5, 2.5]
+   ND3.  X[:,0]³ - X[:,1]·X[:,2]                         3 vars  [-3.0, 3.0]
+   ND4.  sin(X[:,0]+X[:,1]) · exp(-X[:,2]²/2)            3 vars  [-2.5, 2.5]
+   ND5.  X[:,0]·X[:,1] / (1 + X[:,2]²)                   3 vars  [-3.0, 3.0]
+  SYRACUSE.  Collatz flight time — 4 features [log2,v2,odd_part,mod4_1]  10 vars  [-2.0, 2.0]
+
+  N-D problems with decoy variable (★★★):
+   ND1_DECOY.  X[:,0]·sin(X[:,1]) + X[:,2]²  [+X[3] LEURRE]    4 vars  leurre=X[3]
+   ND3_DECOY.  X[:,0]³ - X[:,1]·X[:,2]  [+X[3] LEURRE]         4 vars  leurre=X[3]
+   ND5_DECOY.  X[:,0]·X[:,1]/(1+X[:,2]²)  [+X[3] LEURRE]       4 vars  leurre=X[3]
+  BATTERY_SOH.  1 - 0.02·exp(X[0])·X[1] - 0.005·X[2]²  [+X[3] LEURRE]  4 vars  leurre=X[3]
+
+──────────────────────────────────────────────────────────────────────
+
+  Available modes:
+    1. Single 1-D problem     — targeted run, fine-grained options
+    2. Ablation               — BASE / +LIB / +CO / +SEQ
+    3. Benchmark standard     — FULL vs NOSEED
+    4. Single N-D problem     — multi-variable regression  [v16-NDIM]
+    5. ★ SYRACUSE / Collatz  — flight time, 4 features [log2,v2,odd_part,mod4_1]  [SYRACUSE]
+    6. ★ Generic CSV          — regression on YOUR data (any file)  [v22-CSV]
+    7. ★ FORECAST             — extrapolate a trend beyond YOUR data  [v30]
+
+  Your choice [1/2/3/4/5/6/7] (default=1) : 
+======================================================================
+ERREUR FATALE — traceback complet :
+======================================================================
+Traceback (most recent call last):
+  File "<PKG>/cli.py", line 14, in main
+    core._interactive_menu()
+  File "<PKG>/core.py", line 11915, in _interactive_menu
+    mode_choice = _ask("  Your choice [1/2/3/4/5/6/7] (default=1) : ",
+  File "<PKG>/core.py", line 11826, in _ask
+    rep = input(prompt).strip()
+EOFError: EOF when reading a line
+======================================================================
+
+Appuyez sur Entrée pour quitter...exit=1

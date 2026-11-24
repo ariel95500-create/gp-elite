@@ -1,0 +1,40 @@
+--- scenario A
+engine 1.4.0
+A. after monkeypatch.delattr(core, 'evolve_island') and undo:
+   hasattr(core, 'evolve_island') = True
+   fit runs: X0 * X1
+--- scenario B
+engine 1.4.0
+B. after mock.patch.object(core, '_VAL_CANDS', [], create=True):
+   hasattr(core, '_VAL_CANDS') = True
+   fit runs: X0 * X1
+--- scenario C
+engine 1.4.0
+C. after mock.patch('gp_elite.core._USE_LINEAR_SCALING', False, create=True):
+   hasattr(core, '_USE_LINEAR_SCALING') = True
+   fit runs: X0 * X1
+--- scenario D
+engine 1.4.0
+D. importlib.reload(gp_elite.core) after setting _TIME_LIMIT_HIT=True, _POLISH_ADMITTED=7:
+   _TIME_LIMIT_HIT = False ; _POLISH_ADMITTED = 0 ; FRAGMENT_LIB is a new object: True
+
+--- scenario A
+engine 1.5.0
+A. after monkeypatch.delattr(core, 'evolve_island') and undo:
+   hasattr(core, 'evolve_island') = True
+   fit fails: NameError: name 'evolve_island' is not defined
+--- scenario B
+engine 1.5.0
+B. after mock.patch.object(core, '_VAL_CANDS', [], create=True):
+   hasattr(core, '_VAL_CANDS') = False
+   fit fails: AttributeError: module 'gp_elite.state' has no attribute '_VAL_CANDS'
+--- scenario C
+engine 1.5.0
+C. after mock.patch('gp_elite.core._USE_LINEAR_SCALING', False, create=True):
+   hasattr(core, '_USE_LINEAR_SCALING') = False
+   fit runs: X0 * X1
+--- scenario D
+engine 1.5.0
+D. importlib.reload(gp_elite.core) after setting _TIME_LIMIT_HIT=True, _POLISH_ADMITTED=7:
+   _TIME_LIMIT_HIT = True ; _POLISH_ADMITTED = 7 ; FRAGMENT_LIB is a new object: False
+

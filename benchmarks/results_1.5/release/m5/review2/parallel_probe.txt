@@ -1,0 +1,18 @@
+=== /venv14p/bin/python
+registered in sys.modules by the initializer: ['core', 'gp_v20']
+   core     -> file /venv14p/lib/python3.11/site-packages/gp_elite/core.py, executed: False
+   gp_v20   -> file /venv14p/lib/python3.11/site-packages/gp_elite/core.py, executed: False
+engine 1.4.0 parallel fit: X0 * X1 / X2 | r2_val 1.0 | size 7
+ENGINE 1.4.0
+WARNING [('RuntimeWarning', ['gp_elite', 'core.py'], 10299)]
+WITH A FILTER ON module='gp_elite.core': silenced
+SAME True X0 * X1
+=== /venv15s/bin/python
+registered in sys.modules by the initializer: ['gp_v20', 'parallel']
+   gp_v20   -> file /home/user/gp-elite/gp_elite/parallel.py, executed: False
+   parallel -> file /home/user/gp-elite/gp_elite/parallel.py, executed: False
+engine 1.5.0 parallel fit: X0 * X1 / X2 | r2_val 1.0 | size 7
+ENGINE 1.5.0
+WARNING [('RuntimeWarning', ['gp_elite', 'search.py'], 642)]
+WITH A FILTER ON module='gp_elite.core': still shown, from search.py
+SAME True X0 * X1

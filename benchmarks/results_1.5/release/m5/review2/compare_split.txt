@@ -1,0 +1,130 @@
+state names in map.txt (data): 61
+scope resolver vs symtable on 1.4.0 core.py: 335 function scopes compared, 19 disagreements
+   <function __init__ line 476>: only mine ['Dict', 'FragmentEntry', 'int']; only symtable []
+   <function evaporate line 669>: only mine ['Dict', 'float', 'str']; only symtable []
+   <function stats line 830>: only mine ['Dict', 'int', 'str']; only symtable []
+   <function __init__ line 1012>: only mine ['Dict', 'Tuple', 'float', 'int']; only symtable []
+   <function sample_companion line 1114>: only mine ['List', 'Tuple', 'float', 'int']; only symtable []
+   <function _adjacency line 1170>: only mine ['dict']; only symtable []
+   <function _pair_table line 1238>: only mine ['List', 'Tuple', 'float', 'int']; only symtable []
+   <function __init__ line 1305>: only mine ['Dict', 'Tuple', 'float', 'str']; only symtable []
+   <function build_top_down line 1454>: only mine ['int', 'str']; only symtable []
+   <function export_grammar line 1570>: only mine ['Dict', 'float']; only symtable []
+   <function _to_np_code_parametric line 2998>: only mine ['str']; only symtable []
+   <function _half_integer_power line 4292>: only mine ['int']; only symtable []
+   <function _simplify_tree line 6278>: only mine ['dict']; only symtable []
+   <function __init__ line 7513>: only mine ['List', 'Node', 'Optional', 'int', 'np', 'str']; only symtable []
+   <function evolve_island line 7701>: only mine ['Node', 'bool', 'dict']; only symtable []
+   <function evolve line 9837>: only mine ['Node', 'Optional', 'str']; only symtable []
+   <function decoy_report line 10660>: only mine ['Dict', 'int']; only symtable []
+   <function _detect_dominant_op line 11491>: only mine ['Dict', 'int']; only symtable []
+   <function run_benchmark line 11641>: only mine ['Dict', 'tuple']; only symtable []
+scope resolver vs symtable on config.py: 1 disagreements
+scope resolver vs symtable on simplification.py: 1 disagreements
+scope resolver vs symtable on evaluation.py: 1 disagreements
+scope resolver vs symtable on memory.py: 10 disagreements
+scope resolver vs symtable on seeds.py: 1 disagreements
+scope resolver vs symtable on islands.py: 2 disagreements
+scope resolver vs symtable on search.py: 1 disagreements
+scope resolver vs symtable on console.py: 2 disagreements
+state names in core._STATE_NAMES: 61; equal to map.txt: True
+names bound in state.py: 55; state names not bound there: ['COGRAPH', 'FRAGMENT_LIB', 'SEQ_MEM', 'VAL_R2_TOLERANCE', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING']; bound there but not state: []
+
+## Statement by statement (1.4.0 core.py -> 1.5)
+docstring of core.py: identical in 1.5 core.py
+
+the `if __name__ == "__main__":` block: identical after the rule
+
+statements of 1.4.0 (but docstring, imports and the __main__ block): identical 393, different 0, missing 0
+
+## Top-level statements of 1.5 that no statement of 1.4.0 maps to
+  core.py line 379: from . import state
+  core.py line 399: from .numeric import _COMPILE_CACHE_MAX, _NP_GLOBALS, _SAFE_LIMIT, _is_const_subtree, _np_abs, _np_is_even, _n
+  core.py line 407: from .config import ALL_BINARY_OPS, ALL_OPS, ALL_UNARY_OPS, BINARY_OPS, BINARY_WEIGHTS, CFG, Config, TRACE, UN
+  core.py line 419: from .tree import Node, _CANON_CONST, _FLOAT_COMPLEXITY_WEIGHT, _FLOAT_GAMMA, _PACK_D, _STR_CODES, _SYMPY_BINA
+  core.py line 426: from .simplification import _SIMPLIFY_CACHE, _TRIVIAL_CACHE, _UNARY_FOLD, _clear_simplify_caches, _has_own_fac
+  core.py line 430: from .evaluation import _COMPILE_AFTER, _EVAL_COUNTS, _HOT_ZONES, _INTERP_BINARY, _INTERP_MAX_DEPTH, _INTERP_U
+  core.py line 442: from .datasets import DECOY_FEATURES, SYRACUSE_FEATURE_NAMES, SYRACUSE_N_FEATURES, _collatz_flight_time, _log_
+  core.py line 447: from .scoring import _linear_scale_params, _pure_mse, _robust_scale_params, _scale_tree, _target_scale, count_
+  core.py line 452: from .fitting import optimize_constants_adam, optimize_constants_lm
+  core.py line 453: from .genetic import EpsilonLexicaseSelector, _nd_diverse_population, _random_tree_full, _random_tree_full_nd,
+  core.py line 463: from .memory import FragmentCoGraph, FragmentEntry, FragmentLibrary, FragmentSequenceMemory, _TRIVIAL_PROBE_X,
+  core.py line 467: from .final_choice import _EXACT_REL, _FAITHFUL_CACHE, _FINAL_LM_ITER, _NEAR_CACHE, _NEAR_EXT, _NEAR_K, _PATIE
+  core.py line 485: from .seeds import _BINOM_EXPS, _BINOM_GRID, _BINOM_GRID_ROWS, _BINOM_MAX_LIB, _BINOM_TOL, _E2_CURVE, _E2_C_GR
+  core.py line 502: from .islands import Island, _PW, _smart_reset_explorers, evolve_island, migrate
+  core.py line 504: from .parallel import _POOL_CHILD_ENV, _SkipLogExport, _evolve_parallel, _exit_if_reimported_by_worker, _islan
+  core.py line 508: from .search import _make_linear_candidate, _split_holdout, evolve
+  core.py line 509: from .data import ND_PROBLEMS, PROBLEMS, SCALE_RATIO_THRESHOLD, _IdentityScaler, _MinMaxScaler, _ND_UNARY_WEIG
+  core.py line 513: from .console import _ask, _ask_int, _deduce_console_constant, _interactive_menu, _one_run, _pause, _print_men
+  core.py line 527: _STATE_NAMES = frozenset(('COGRAPH', 'CSV_FEATURE_NAMES', 'CSV_TARGET_NAME', 'CURRENT_RESIDUAL_SIG', 'FRAGMENT
+  core.py line 528: _ENGINE_MODULES = tuple((sys.modules[__package__ + '.' + _m] for _m in ('numeric', 'config', 'tree', 'simplifi
+  core.py line 547: _MISSING = object()
+  core.py line 550: class _StateName: ...
+  core.py line 576: def __dir__(): ...
+  core.py line 580: class _Door(type(sys)): ...
+  core.py line 600: for _name in _STATE_NAMES: ...
+  core.py line 602: del _name
+  core.py line 603: sys.modules[__name__].__class__ = _Door
+
+## The rewrites the rule applied to 1.4.0 (by kind)
+  global-dropped   35
+  globals().get    13
+  globals()[]      33
+  in globals()     12
+  name             378
+  rewrites in top-level statements other than def/class (module scope at import):
+    line 846 assign: name FRAGMENT_LIB (line 846)
+    line 1272 assign: name COGRAPH (line 1272)
+    line 1738 assign: name SEQ_MEM (line 1738)
+    line 12756 if: in globals() SEQ_MEM (line 12812)
+    line 12756 if: globals()[] SEQ_MEM (line 12813)
+    line 12756 if: in globals() SEQ_MEM (line 12822)
+    line 12756 if: globals()[] SEQ_MEM (line 12824)
+    line 12756 if: globals()[] SEQ_MEM (line 12826)
+    line 12756 if: in globals() SEQ_MEM (line 12873)
+    line 12756 if: globals()[] SEQ_MEM (line 12874)
+    line 12756 if: in globals() SEQ_MEM (line 12919)
+    line 12756 if: globals()[] SEQ_MEM (line 12920)
+    line 12756 if: globals()[] SEQ_MEM (line 12921)
+    line 12756 if: in globals() SEQ_MEM (line 12959)
+    line 12756 if: globals()[] SEQ_MEM (line 12960)
+    line 12756 if: in globals() SEQ_MEM (line 12973)
+    line 12756 if: globals()[] SEQ_MEM (line 12974)
+    line 12756 if: globals()[] SEQ_MEM (line 12975)
+
+## Order: statements of a module of 1.5 in the order of 1.4.0's file?
+  state.py: 0 statements, in the order of 1.4.0
+  numeric.py: 27 statements, in the order of 1.4.0
+  config.py: 34 statements, in the order of 1.4.0
+  tree.py: 24 statements, in the order of 1.4.0
+  simplification.py: 11 statements, in the order of 1.4.0
+  evaluation.py: 35 statements, in the order of 1.4.0
+  datasets.py: 10 statements, in the order of 1.4.0
+  scoring.py: 13 statements, in the order of 1.4.0
+  fitting.py: 2 statements, in the order of 1.4.0
+  genetic.py: 26 statements, in the order of 1.4.0
+  memory.py: 13 statements, in the order of 1.4.0
+  final_choice.py: 48 statements, in the order of 1.4.0
+  seeds.py: 52 statements, in the order of 1.4.0
+  islands.py: 5 statements, in the order of 1.4.0
+  parallel.py: 9 statements, in the order of 1.4.0
+  search.py: 3 statements, in the order of 1.4.0
+  data.py: 14 statements, in the order of 1.4.0
+  console.py: 12 statements, in the order of 1.4.0
+  core.py: 0 statements, in the order of 1.4.0
+
+## Checks on the modules of 1.5
+  state.py: names read as globals and bound nowhere in the module: {'Optional': [17], 'Dict': [32, 33, 38], 'Any': [32, 33], 'List': [51]}
+  config.py: locals or attributes named like a state name (not globals): [('VAL_R2_TOLERANCE', 'class')]
+  datasets.py: names read as globals and bound nowhere in the module: {'Config': [356], 'arr': [169, 169, 171, 172]}
+  scoring.py: names read as globals and bound nowhere in the module: {'Config': [398]}
+  fitting.py: names read as globals and bound nowhere in the module: {'Node': [19, 22, 181, 184], 'Config': [22, 184]}
+  genetic.py: names read as globals and bound nowhere in the module: {'Config': [26, 29, 43, 61, 77, 256, 271, 338, 355, 387, 402, 425, 453, 502, 552, 616, 833, 861, 875, 892], 'FragmentLibrary': [551, 614, 722], 'FragmentCoGraph': [615, 723], 'FragmentSequenceMemory': [724]}
+  memory.py: state.X at module or class scope (run at import): [('FRAGMENT_LIB', 446, 'Store'), ('COGRAPH', 870, 'Store'), ('SEQ_MEM', 1336, 'Store')]
+  islands.py: names read as globals and bound nowhere in the module: {'Config': [705, 34]}
+  search.py: names read as globals and bound nowhere in the module: {'Config': [185]}
+  core.py: names read as globals and bound nowhere in the module: {'_tb': [623, 837], '_csv_err': [751]}
+  core.py: state.X at module or class scope (run at import): [('SEQ_MEM', 663, 'Load'), ('SEQ_MEM', 674, 'Load'), ('SEQ_MEM', 676, 'Load'), ('SEQ_MEM', 724, 'Load'), ('SEQ_MEM', 770, 'Load'), ('SEQ_MEM', 771, 'Load'), ('SEQ_MEM', 810, 'Load'), ('SEQ_MEM', 824, 'Load'), ('SEQ_MEM', 825, 'Load')]
+  core.py line 577: globals()
+
+names defined (not imported) at the top of more than one module of 1.5: none

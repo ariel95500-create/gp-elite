@@ -1,0 +1,6 @@
+engine 1.4.0: the console's code is in gp_elite.core; sys.modules['core'] = gp_elite.core
+  the top-level api imported by the console uses core = gp_elite.core
+  names api.py reads on core: 34; missing on that module: 2 ['_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING']
+engine 1.5.0: the console's code is in gp_elite.console; sys.modules['core'] = gp_elite.console
+  the top-level api imported by the console uses core = gp_elite.console
+  names api.py reads on core: 34; missing on that module: 25 ['CSV_FEATURE_NAMES', 'CSV_TARGET_NAME', '_CUSTOM_LOSS_FN', '_CUSTOM_LOSS_PARSIMONY', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING', '_CUSTOM_SEEDS', '_EXTRAP_PROBE_XS', '_GENCSV_POOLS', '_GENERIC_BINARY_OPS', '_GENERIC_BINARY_WEIGHTS', '_GENERIC_CSV_MODE', '_GENERIC_UNARY_OPS', '_GENERIC_UNARY_WEIGHTS', '_USE_LINEAR_SCALING', '_VAL_CANDS', '_VAL_CANDS_MAX', '_choose_scaler', '_finalists', '_holdout_mse', '_is_numerically_stable', '_make_linear_candidate', '_polish_finalists', '_select_one_se', '_small_choose']

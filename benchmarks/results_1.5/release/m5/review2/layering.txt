@@ -1,0 +1,11 @@
+relative imports checked: 113
+   config imports .dim_search (outside the engine) in a function, line 92
+   final_choice imports .formula (outside the engine) in a function, line 69
+   final_choice: import formula (line 71)
+   console imports .dim_search (outside the engine) in a function, line 1385
+   console: import gp_elite.dim_search (line 1387)
+   console: import api (line 1098)
+   console imports .formula (outside the engine) in a function, line 1319
+   console imports .dim_search (outside the engine) in a function, line 1212
+   console: import formula (line 1321)
+   console imports .dimensions (outside the engine) in a function, line 1353
