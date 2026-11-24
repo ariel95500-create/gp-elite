@@ -295,7 +295,7 @@ def main(module, dry):
     open(CORE, "w", encoding="utf-8").write(new_core)
     names = os.path.join(HERE, "core_names_1.4.0.txt")
     check = ("import gp_elite.core as C\n"
-             "names = [l.strip() for l in open(%r) if l.strip()]\n"
+             "names = [l.strip() for l in open(%r) if l.strip() and not l.startswith('#')]\n"
              "missing = [n for n in names if not hasattr(C, n)]\n"
              "print('names of 1.4.0 missing on gp_elite.core:', missing)\n"
              "raise SystemExit(1 if missing else 0)\n" % names)
