@@ -84,6 +84,12 @@ premier :
   unités) ;
 - 11 formules qui s'écartent sur 130 contre 12, et 65 sur 500 contre 68.
 
+La version 1.5 ne change que l'organisation du code : à graine égale et
+travail égal, elle rend les modèles de la 1.4.0, au bit près
+(`benchmarks/results_1.5/split/`), et les chiffres de la 1.4.0 valent donc pour
+elle. Le point 9 ajoute ce que l'étude de taille de la 1.5 a mesuré sur la
+1.4.0.
+
 ## 1. Les lois qu'il manque encore
 
 Sur les 41 équations, le moteur rend la loi exacte dans 163 ajustements sur 205
@@ -263,9 +269,23 @@ chacune placée seulement si elle passe la porte des dimensions. Sur les 41
 ## 9. La taille et la nature des données
 
 GP_ELITE est écrit en Python et NumPy seulement. Il est fait pour une centaine à
-quelques milliers de lignes et jusqu'à une dizaine de variables, la plage de ses
-mesures (10 000 lignes au plus, dans l'étude de taille) ; au-delà, rien n'est
-mesuré, et l'espace de recherche grandit vite avec le nombre de variables. Il n'est pas fait pour les suites
+quelques milliers de lignes et jusqu'à une dizaine de variables. L'étude de
+taille de la 1.5 a mesuré la 1.4.0 au-delà (`benchmarks/results_1.5/size/`),
+sur les 41 équations de Feynman du banc de décision sans bruit, cinq graines,
+30 s par ajustement :
+- **les lignes :** 165 lois exactes sur 205 à 100 lignes, 168 à 1 000, 161 à
+  10 000 et 154 à 100 000. Les graines trouvent les mêmes lois à chaque taille ;
+  la recherche perd les autres : les ajustements qui vont jusqu'à leur budget
+  atteignent une médiane de 3 générations à 100 000 lignes, contre 116 à 100.
+  Dix fois plus de temps en rend 6 sur 11.
+- **les variables qui ne jouent aucun rôle dans la loi :** avec 5, 10 et 20
+  ajoutées à 1 000 lignes, 144, 139 et 108 lois exactes contre 168, et dix fois
+  plus de temps en rend 12 sur 60. Les chercheurs de graines limitent leurs
+  combinaisons de colonnes quand les colonnes augmentent, et perdent un tiers de
+  leurs lois avec 20 ajoutées ; 26 formules rendues utilisent une variable
+  ajoutée.
+
+Au-delà de ces tailles, rien n'est mesuré. Il n'est pas fait pour les suites
 chaotiques, ni pour les grands jeux de données où la précision brute compte plus
 qu'une formule lisible : des modèles d'ensemble, ou des moteurs comme PySR et
 Operon, y conviennent mieux.

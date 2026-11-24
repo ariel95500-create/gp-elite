@@ -103,6 +103,10 @@ In the release measurement of 1.4.0, five seeds and 30 s per fit, against
 finders fit to the data: hence the gains under noise
 ([what's new](https://github.com/ariel95500-create/gp-elite/blob/main/docs/features.md#whats-new),
 [CHANGELOG](https://github.com/ariel95500-create/gp-elite/blob/main/CHANGELOG.md)).
+1.5 changes no model: it organises the engine in modules, and at equal seed
+and equal work returns the models of 1.4.0, bit for bit, at the same speed,
+so these figures hold for it
+([how the engine is organised](https://github.com/ariel95500-create/gp-elite/blob/main/docs/architecture.md)).
 
 The structure of the law is retrieved when the returned model, its constants
 refitted on the noiseless data, reproduces the law. On 15 Feynman equations, head
@@ -130,6 +134,7 @@ never used to make one.
 - [Examples](https://github.com/ariel95500-create/gp-elite/blob/main/docs/examples.md): simulated battery ageing, and three case studies on public data
 - [How GP_ELITE is measured](https://github.com/ariel95500-create/gp-elite/blob/main/docs/measurements.md): against the alternatives, and what it is good and less good at
 - [How GP_ELITE is made](https://github.com/ariel95500-create/gp-elite/blob/main/docs/how-it-is-made.md): who does what between the author and the AI assistant, and how it is checked
+- [How the engine is organised](https://github.com/ariel95500-create/gp-elite/blob/main/docs/architecture.md): its modules, the shared state and `gp_elite.core`, for contributors
 - [What GP_ELITE does not do](https://github.com/ariel95500-create/gp-elite/blob/main/LIMITATIONS.md)
 - [Technical features and history](https://github.com/ariel95500-create/gp-elite/blob/main/docs/features.md), and the [CHANGELOG](https://github.com/ariel95500-create/gp-elite/blob/main/CHANGELOG.md)
 

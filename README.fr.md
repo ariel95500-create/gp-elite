@@ -101,6 +101,10 @@ la 1.3.0 mesurée à côté
 La 1.4 place plus de graines tolérantes au bruit au début de la recherche, des
 formes que ses chercheurs ajustent aux données : d'où les gains sous bruit
 ([nouveautés](docs/fr/caracteristiques.md#nouveautés), [CHANGELOG](CHANGELOG.md)).
+La 1.5 ne change aucun modèle : elle organise le moteur en modules et, à graine
+égale et travail égal, rend les modèles de la 1.4.0, au bit près, à la même
+vitesse ; ces chiffres valent donc pour elle
+([comment le moteur est organisé](docs/fr/architecture.md)).
 
 La structure de la loi est retrouvée quand le modèle rendu, ses constantes
 réajustées sur les données sans bruit, reproduit la loi. Sur 15 équations de
@@ -128,6 +132,7 @@ jamais servi à en prendre une.
 - [Exemples](docs/fr/exemples.md) : le vieillissement de batteries simulé, et trois études de cas sur données publiques
 - [Comment GP_ELITE est mesuré](docs/fr/mesures.md) : face aux alternatives, et ce sur quoi il est bon et moins bon
 - [Comment GP_ELITE est fait](docs/fr/comment-il-est-fait.md) : qui fait quoi entre l'auteur et l'assistant d'IA, et comment c'est contrôlé
+- [Comment le moteur est organisé](docs/fr/architecture.md) : ses modules, l'état partagé et `gp_elite.core`, pour les contributeurs
 - [Ce que GP_ELITE ne fait pas](LIMITATIONS.fr.md)
 - [Caractéristiques techniques et historique](docs/fr/caracteristiques.md), et le [CHANGELOG](CHANGELOG.md)
 

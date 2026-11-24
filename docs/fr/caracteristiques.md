@@ -59,7 +59,14 @@ Partie de la documentation de GP_ELITE : retour au [README](../../README.fr.md) 
 
 ## Nouveautés
 
-**1.4 « Signal »** — plus de graines tolérantes au bruit : sur les 41 équations de Feynman du
+**1.5** — le moteur en modules : `gp_elite/core.py`, un seul fichier de 12 999
+lignes, devient 17 modules, un par rôle, et le module de l'état partagé
+([comment le moteur est organisé](architecture.md)). À graine égale et travail
+égal, il rend les modèles de la 1.4, au bit près, à la même vitesse, et
+`gp_elite.core` garde tous les noms qu'il avait. Et une mesure de ce que coûte
+la taille, sur la 1.4 : jusqu'à 100 000 lignes, peu, et surtout du temps ;
+vingt variables qui ne jouent aucun rôle dans la loi, beaucoup, et surtout
+l'algorithme ([limites, point 9](../../LIMITATIONS.fr.md#9-la-taille-et-la-nature-des-données)). **1.4 « Signal »** — plus de graines tolérantes au bruit : sur les 41 équations de Feynman du
 banc de décision avec un bruit gaussien sur la cible, la structure de la loi
 revient dans 152 et 95 ajustements sur 205 (1 % et 10 % de bruit) contre 116 et 87
 pour la 1.3 mesurée à côté, et dans 150 et 93 avec les unités contre 121 et 95 ;

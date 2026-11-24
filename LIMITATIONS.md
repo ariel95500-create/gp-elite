@@ -76,6 +76,11 @@ they do from one campaign to the next. The figures of 1.4.0 are given first:
   test set with both (38 standardised, 28 in their own units);
 - 11 departing formulas of 130 against 12, and 65 of 500 against 68.
 
+Version 1.5 changes the organisation of the code only: at equal seed and
+equal work it returns the models of 1.4.0, bit for bit
+(`benchmarks/results_1.5/split/`), so the figures of 1.4.0 hold for it.
+Point 9 adds what the size study of 1.5 measured on 1.4.0.
+
 ## 1. Laws it still misses
 
 On the 41 equations, the engine returns the exact law in 163 fits of 205 (0.9.0:
@@ -240,11 +245,22 @@ recovered in five seeds (1.0.0: 13). What remains:
 ## 9. Size and kind of data
 
 GP_ELITE is plain Python and NumPy. It is meant for a hundred to a few thousand
-rows and up to about ten variables, the range of its measurements (10,000 rows at
-most, in the size study); beyond, nothing is measured, and the search space grows
-quickly with the number of variables. It is not meant for chaotic sequences, nor for large datasets where
-raw accuracy matters more than a formula you can read: ensemble models or engines
-such as PySR and Operon serve those better.
+rows and up to about ten variables. The size study of 1.5 measured 1.4.0 beyond
+(`benchmarks/results_1.5/size/`), on the 41 Feynman equations of the decision
+bench without noise, five seeds, 30 s per fit:
+- **rows:** 165 exact laws of 205 at 100 rows, 168 at 1,000, 161 at 10,000 and
+  154 at 100,000. The seeds find the same laws at every size; the search loses
+  the others: the fits that run to their budget reach a median of 3 generations
+  at 100,000 rows, against 116 at 100. Ten times the time gives back 6 of the 11.
+- **variables that play no part in the law:** with 5, 10 and 20 of them added to
+  1,000 rows, 144, 139 and 108 exact laws against 168, and ten times the time
+  gives back 12 of the 60. The seed finders limit their combinations of columns
+  as the columns grow, and lose a third of their laws with 20 added; 26
+  returned formulas take in an added variable.
+
+Beyond these sizes nothing is measured. It is not meant for chaotic sequences,
+nor for large datasets where raw accuracy matters more than a formula you can
+read: ensemble models or engines such as PySR and Operon serve those better.
 
 ## 10. The stop under the defaults
 
