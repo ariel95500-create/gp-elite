@@ -29,11 +29,20 @@ def test_every_name_of_core_in_1_4_0_can_be_read():
 
 @pytest.mark.parametrize("name", sorted(core._STATE_NAMES))
 def test_a_name_of_the_state_set_on_core_is_set_in_the_state(name, monkeypatch):
+    missing = object()
+    before = getattr(state, name, missing)
     sentinel = object()
     monkeypatch.setattr(core, name, sentinel, raising=False)
     assert getattr(state, name) is sentinel
     assert getattr(core, name) is sentinel
     assert name not in vars(core)           # no copy left on the door
+    # set twice and put back, as a test does: the state gets its value back
+    # (pytest 9 puts back what it read in the module's own dictionary,
+    # unless the name is a data descriptor of the module's class)
+    monkeypatch.setattr(core, name, object(), raising=False)
+    monkeypatch.undo()
+    assert getattr(state, name, missing) is before
+    assert getattr(core, name, missing) is before
 
 
 def _holders(name, obj):

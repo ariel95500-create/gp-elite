@@ -517,11 +517,13 @@ from .console import (_ask, _ask_int, _deduce_console_constant,
 
 # ── The door ─────────────────────────────────────────────────────────────
 # gp_elite.core keeps every name it had in 1.4.0. The names of the shared
-# state live in gp_elite.state: read on gp_elite.core, they are read there;
-# set on it, they are set there. Any other name set on gp_elite.core (a
-# test that replaces a function, a bench that wraps one) is also set in the
-# engine's modules that hold the same object, as every function of core.py
-# saw it in 1.4.0.
+# state live in gp_elite.state, and each is a data descriptor of the class of
+# this module: read on gp_elite.core, it is read there; set on it, it is set
+# there; deleted on it, it is deleted there. So a tool that saves an
+# attribute and puts it back, as pytest's monkeypatch does, puts it back in
+# gp_elite.state. Any other name set on gp_elite.core (a test that replaces a
+# function, a bench that wraps one) is also set in the engine's modules that
+# hold the same object, as every function of core.py saw it in 1.4.0.
 _STATE_NAMES = frozenset(('COGRAPH', 'CSV_FEATURE_NAMES', 'CSV_TARGET_NAME', 'CURRENT_RESIDUAL_SIG', 'FRAGMENT_LIB', 'PROBE_X', 'SEQ_MEM', 'VAL_R2_TOLERANCE', '_BATTERY_CSV_MODE', '_BINOMIAL_SEEDS', '_COMPILE_CACHE', '_CUSTOM_LOSS_FN', '_CUSTOM_LOSS_PARSIMONY', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING', '_CUSTOM_SEEDS', '_DIM_GATE_DIMS', '_DIM_GATE_TARGET', '_DIM_SEARCH', '_DIM_UNKNOWN_CONST', '_E2_SEEDS', '_ELEMENTARY_SEEDS', '_EXACT_PRIORITY_SWAPS', '_EXTRAP_BAND', '_EXTRAP_PROBE_XS', '_FAITHFUL_SWAPS', '_GENERIC_BINARY_OPS', '_GENERIC_BINARY_WEIGHTS', '_GENERIC_CSV_MODE', '_GENERIC_UNARY_OPS', '_GENERIC_UNARY_WEIGHTS', '_LS_SCALE_ONLY', '_NEAR_BAND', '_NEAR_GUARD_SWAPS', '_NEAR_PROBE_XS', '_PARALLEL_BROKEN', '_PARALLEL_WARNED', '_PARAMETRIC_CACHE', '_POLISH_ADMITTED', '_POLISH_GRACE_S', '_PRED_CACHE', '_SEEDS_UNDER_UNITS', '_SMALL_CV', '_SMALL_ON', '_SYRACUSE_FEAT_MAXS', '_SYRACUSE_FEAT_MINS', '_SYRACUSE_MODE', '_SYRACUSE_X_RAW', '_SYRACUSE_Y_RAW', '_TIME_LIMIT_HIT', '_TOLERANT_N2', '_TOLERANT_REFIT', '_TOLERANT_SEEDS', '_USE_LINEAR_SCALING', '_VAL_CANDS', '_VAL_TRAIN_XS', '_VAL_TRAIN_YS', '_VAL_XS', '_VAL_YS', '_feature_usage_counter', '_fitness_cache'))
 _ENGINE_MODULES = tuple(sys.modules[__package__ + "." + _m] for _m in (
     'numeric',
@@ -545,10 +547,30 @@ _ENGINE_MODULES = tuple(sys.modules[__package__ + "." + _m] for _m in (
 _MISSING = object()
 
 
-def __getattr__(name):
-    if name in _STATE_NAMES and hasattr(state, name):
-        return getattr(state, name)
-    raise AttributeError("module %r has no attribute %r" % (__name__, name))
+class _StateName:
+    """A name of the shared state, on the class of gp_elite.core."""
+
+    def __init__(self, name):
+        self.name = name
+
+    def __get__(self, module, owner=None):
+        if module is None:
+            return self
+        try:
+            return getattr(state, self.name)
+        except AttributeError:
+            raise AttributeError("module %r has no attribute %r"
+                                 % (module.__name__, self.name)) from None
+
+    def __set__(self, module, value):
+        setattr(state, self.name, value)
+
+    def __delete__(self, module):
+        try:
+            delattr(state, self.name)
+        except AttributeError:
+            raise AttributeError("module %r has no attribute %r"
+                                 % (module.__name__, self.name)) from None
 
 
 def __dir__():
@@ -557,28 +579,27 @@ def __dir__():
 
 class _Door(type(sys)):
     def __setattr__(self, name, value):
-        if name in _STATE_NAMES:
-            setattr(state, name, value)
-            return
-        old = self.__dict__.get(name, _MISSING)
-        if old is not _MISSING:
-            for m in _ENGINE_MODULES:
-                if getattr(m, name, _MISSING) is old:
-                    setattr(m, name, value)
+        if name not in _STATE_NAMES:
+            old = self.__dict__.get(name, _MISSING)
+            if old is not _MISSING:
+                for m in _ENGINE_MODULES:
+                    if getattr(m, name, _MISSING) is old:
+                        setattr(m, name, value)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
-        if name in _STATE_NAMES:
-            delattr(state, name)
-            return
-        old = self.__dict__.get(name, _MISSING)
-        if old is not _MISSING:
-            for m in _ENGINE_MODULES:
-                if getattr(m, name, _MISSING) is old:
-                    delattr(m, name)
+        if name not in _STATE_NAMES:
+            old = self.__dict__.get(name, _MISSING)
+            if old is not _MISSING:
+                for m in _ENGINE_MODULES:
+                    if getattr(m, name, _MISSING) is old:
+                        delattr(m, name)
         super().__delattr__(name)
 
 
+for _name in _STATE_NAMES:
+    setattr(_Door, _name, _StateName(_name))
+del _name
 sys.modules[__name__].__class__ = _Door
 
 
