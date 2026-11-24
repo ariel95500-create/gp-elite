@@ -1,0 +1,32 @@
+== map.txt at HEAD
+  header: core.py: 12999 lines
+  header: top-level functions and classes: 231
+  header: run-time names: 66 (rebound inside core's functions 44; set on core by the package 12, by the tests 32); 61 hold data, 5 a function or class of core.py that the tests or the package replace
+  header: name                         holds     rebound by (core's functions); set by (other files); read through globals() by
+  rows 66, data 61, function 5, rebound inside core 44, set by the package 12, set by the tests 32
+  functions: ['_has_own_factor', '_lm_plan', '_refit_inner', 'evolve', 'evolve_island']
+== map.txt at 0a0090e
+  header: core.py: 12999 lines
+  header: top-level functions and classes: 231
+  header: run-time names: 45 (rebound inside core's functions 37; set on core by the package 12, by the tests 6)
+  rows 45, data 0, function 0, rebound inside core 37, set by the package 12, set by the tests 6
+== map.txt at 81ed9c3
+  header: core.py: 12999 lines
+  header: top-level functions and classes: 231
+  header: run-time names: 45 (rebound inside core's functions 37; set on core by the package 12, by the tests 6)
+  rows 45, data 0, function 0, rebound inside core 37, set by the package 12, set by the tests 6
+== map.txt at c7e00fa
+  header: core.py: 12999 lines
+  header: top-level functions and classes: 231
+  header: run-time names: 66 (rebound inside core's functions 44; set on core by the package 12, by the tests 32); 61 hold data, 5 a function or class of core.py that the tests or the package replace
+  header: name                         holds     rebound by (core's functions); set by (other files); read through globals() by
+  rows 66, data 61, function 5, rebound inside core 44, set by the package 12, set by the tests 32
+  functions: ['_has_own_factor', '_lm_plan', '_refit_inner', 'evolve', 'evolve_island']
+
+== gp_elite/state.py, read with ast
+names assigned at the top of state.py: 33 annotated: 22
+data names in the run-time table of map.txt: 61
+defined in state.py (plain or annotated): 55
+data names of map.txt not defined in state.py: ['COGRAPH', 'FRAGMENT_LIB', 'SEQ_MEM', 'VAL_R2_TOLERANCE', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING']
+names defined in state.py that are not data names of map.txt: []
+total lines of state.py: 70

@@ -1,0 +1,15 @@
+== README note: 3 figures in English, 3 in French
+   only in English: none
+   only in French: none
+== architecture, whole: 43 figures in English, 43 in French
+   only in English: none
+   only in French: none
+== features, 1.5: 7 figures in English, 7 in French
+   only in English: none
+   only in French: none
+== limits, note before point 1: 9 figures in English, 9 in French
+   only in English: none
+   only in French: none
+== limits, point 9: 33 figures in English, 33 in French
+   only in English: none
+   only in French: none

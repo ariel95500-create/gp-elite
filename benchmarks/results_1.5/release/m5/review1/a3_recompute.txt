@@ -1,0 +1,23 @@
+== benchmarks/results_1.5/split/a3_timing.jsonl
+records 205 distinct i 205 i from 0 to 204
+distinct (problem, seed) 205 problems 41 seeds [0, 1, 2, 3, 4]
+total A 678.23 s, total B 680.12 s, ratio B/A 1.00279, (B-A)/A 0.279 %
+same expr in 205
+longest expr 160
+interleaved as the script says (A first on even i, B first on odd): 205 of 205
+fit by fit B/A: median 1.0000, mean 1.0036
+fits over 2 s in A: 53, A 627.7 s, B 629.4 s, ratio 1.0028
+
+== benchmarks/results_1.5/release/M1_A3_timing.jsonl
+records 205 distinct i 205 i from 0 to 204
+distinct (problem, seed) 205 problems 41 seeds [0, 1, 2, 3, 4]
+total A 695.86 s, total B 694.66 s, ratio B/A 0.99828, (B-A)/A -0.172 %
+same expr in 205
+longest expr 160
+interleaved as the script says (A first on even i, B first on odd): 205 of 205
+fit by fit B/A: median 1.0000, mean 0.9951
+fits over 2 s in A: 53, A 644.5 s, B 643.8 s, ratio 0.9990
+
+the same jobs in both: True
+the same 1.4.0 formulas in both campaigns: 205
+1.4.0 total, split campaign 678.2 s, M1 campaign 695.9 s

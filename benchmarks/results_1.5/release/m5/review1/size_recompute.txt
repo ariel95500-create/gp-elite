@@ -1,0 +1,258 @@
+== records
+records 1845
+distinct jobs 1845
+equations True seeds [0, 1, 2, 3, 4] cells True
+statuses Counter({'EXACT': 1319, 'MISS': 348, 'NEAR': 178})
+min generations 1 fits with generations < 1: 0
+pythonhashseed Counter({'0': 1845})
+python Counter({'3.11.18': 1845})
+numpy Counter({'2.4.6': 1845})
+engine_version Counter({'1.4.0': 1845})
+engine_file Counter({'/venv14p/lib/python3.11/site-packages/gp_elite/__init__.py': 1845})
+first date 2026-11-23T21:11:34 last date 2026-11-24T01:23:24
+time_limit by cell {'r100': [30.0], 'r1000': [30.0], 'r10000': [30.0], 'r100000': [30.0], 'r100000_10T': [300.0], 'k5': [30.0], 'k10': [30.0], 'k20': [30.0], 'k20_10T': [300.0]}
+n_train by cell {'r100': [100], 'r1000': [1000], 'r10000': [10000], 'r100000': [100000], 'r100000_10T': [100000], 'k5': [1000], 'k10': [1000], 'k20': [1000], 'k20_10T': [1000]}
+variables per equation (count of equations with 1..6): [1, 8, 15, 11, 4, 2]
+columns at k20: min 21 max 26
+
+== the table of reading.txt, recomputed
+cell          fits exact  near crash medgen medfirst   elem    tol  added   past
+r100           205   165     7     0      1    0.174     40     15      0      0
+r1000          205   168     5     0      1    0.211     40     15      0      0
+r10000         205   161     3     0      1    0.521     40     15      0      4
+r100000        205   154     1     0      1    5.012     40     15      0     45
+r100000_10T    205   160     8     0      1    4.952     40     15      0      0
+k5             205   144    23     0      1    0.282     35     25     12      0
+k10            205   139    23     0      1    0.357     30     30     16      0
+k20            205   108    41     0     15    0.539     30     55     26      0
+k20_10T        205   120    67     0     15    0.541     30     55     10      0
+
+== the verdict
+rows: L = 11, R = 6, L/2 = 5.5 -> mostly brute force
+variables: L = 60, R = 12, L/4 = 15.0 -> mostly the algorithm
+
+== the guard: the first ten fits of each cell in the order of the file, median time
+r100         median 0.28 s (rounded 0.3); dates 2026-11-23T21:11:34 to 2026-11-23T21:18:51; equations [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+r1000        median 0.33 s (rounded 0.3); dates 2026-11-23T21:11:34 to 2026-11-23T21:18:51; equations [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+r10000       median 0.80 s (rounded 0.8); dates 2026-11-23T21:11:35 to 2026-11-23T21:18:52; equations [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+r100000      median 5.30 s (rounded 5.3); dates 2026-11-23T21:11:39 to 2026-11-23T21:18:58; equations [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+r100000_10T  median 5.29 s (rounded 5.3); dates 2026-11-23T21:11:40 to 2026-11-23T21:19:20; equations [0, 1, 2, 3, 4, 5, 6, 8, 9, 10]
+k5           median 0.33 s (rounded 0.3); dates 2026-11-23T21:11:35 to 2026-11-23T21:19:04; equations [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+k10          median 0.30 s (rounded 0.3); dates 2026-11-23T21:11:35 to 2026-11-23T21:19:05; equations [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+k20          median 0.38 s (rounded 0.4); dates 2026-11-23T21:11:35 to 2026-11-23T21:19:05; equations [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+k20_10T      median 0.36 s (rounded 0.4); dates 2026-11-23T21:11:36 to 2026-11-23T21:19:37; equations [0, 1, 2, 3, 4, 5, 6, 9, 10, 11]
+
+== exact at the first generation (generations == 1) and after it
+r100         exact 165, at gen 1 150, after  15, generations of exact: [(1, 150), (2, 2), (3, 1), (6, 1), (12, 1), (58, 1)]
+r1000        exact 168, at gen 1 150, after  18, generations of exact: [(1, 150), (2, 3), (8, 1), (10, 1), (17, 2), (21, 1)]
+r10000       exact 161, at gen 1 150, after  11, generations of exact: [(1, 150), (2, 1), (3, 1), (15, 1), (19, 1), (22, 2)]
+r100000      exact 154, at gen 1 150, after   4, generations of exact: [(1, 150), (2, 3), (4, 1)]
+r100000_10T  exact 160, at gen 1 150, after  10, generations of exact: [(1, 150), (2, 2), (5, 1), (9, 1), (21, 1), (23, 1)]
+k5           exact 144, at gen 1 135, after   9, generations of exact: [(1, 135), (6, 2), (61, 1), (66, 1), (82, 1), (84, 1)]
+k10          exact 139, at gen 1 130, after   9, generations of exact: [(1, 130), (2, 1), (18, 1), (23, 1), (31, 1), (35, 1)]
+k20          exact 108, at gen 1 100, after   8, generations of exact: [(1, 100), (2, 1), (7, 1), (15, 1), (27, 1), (86, 1)]
+k20_10T      exact 120, at gen 1 100, after  20, generations of exact: [(1, 100), (2, 1), (7, 1), (15, 1), (27, 1), (91, 1)]
+rows cells: the same fits at the first generation: True
+k5       first-gen set is a subset of r1000's: True; lost 15; new 0
+k10      first-gen set is a subset of r1000's: True; lost 20; new 0
+k20      first-gen set is a subset of r1000's: True; lost 50; new 0
+k20_10T  first-gen set is a subset of r1000's: True; lost 50; new 0
+k20 and k20_10T: the same first-gen set: True
+note: r100000 has 10 fits that stopped at generation 1 without an exact law
+
+== the laws lost at 100,000 rows: fits exact at r100 and not at r100000
+lost 12 gained 1
+generations at r100 of the lost ones: [2, 3, 12, 58, 83, 88, 100, 114, 115, 127, 130, 136]
+lost by equation: Counter({'II.2.42': 4, 'I.8.14': 3, 'I.26.2': 3, 'I.6.20a': 2})
+gained: [('I.6.20a', 3)]
+
+== the fits that ran to their budget (time_limit_reached or generations >= 1000 x factor)
+r100          46 to budget, median 116.0, min 99, max 136; time_limit_reached 46
+r1000         45 to budget, median 83, min 67, max 120; time_limit_reached 45
+r10000        49 to budget, median 31, min 19, max 43; time_limit_reached 49
+r100000       53 to budget, median 3, min 1, max 6; time_limit_reached 53
+r100000_10T   47 to budget, median 30, min 19, max 43; time_limit_reached 47
+k5            66 to budget, median 88.0, min 68, max 136; time_limit_reached 66
+k10           68 to budget, median 91.5, min 70, max 122; time_limit_reached 68
+k20           99 to budget, median 89, min 56, max 166; time_limit_reached 99
+k20_10T       74 to budget, median 708.0, min 511, max 907; time_limit_reached 74
+
+== time to the first generation: median, max; fits whose first generation comes after the time limit
+r100         median 0.174 max 1.373; past the time limit: 0 Counter()
+r1000        median 0.211 max 1.337; past the time limit: 0 Counter()
+r10000       median 0.521 max 2.935; past the time limit: 0 Counter()
+r100000      median 5.012 max 32.285; past the time limit: 5 Counter({'I.11.19': 4, 'III.9.52': 1})
+r100000_10T  median 4.952 max 31.993; past the time limit: 0 Counter()
+k5           median 0.282 max 2.548; past the time limit: 0 Counter()
+k10          median 0.357 max 1.878; past the time limit: 0 Counter()
+k20          median 0.539 max 3.012; past the time limit: 0 Counter()
+k20_10T      median 0.541 max 3.011; past the time limit: 0 Counter()
+
+== past the budget (time > 1.1 x time_limit): count, median and largest over
+r10000         4 over by 3.57 (median), 3.69 (largest)
+r100000       45 over by 8.06 (median), 15.99 (largest)
+r100         any time over the limit: 46
+r1000        any time over the limit: 45
+r10000       any time over the limit: 49
+r100000      any time over the limit: 53
+r100000_10T  any time over the limit: 47
+k5           any time over the limit: 66
+k10          any time over the limit: 69
+k20          any time over the limit: 99
+k20_10T      any time over the limit: 74
+
+== each equation: exact fits of five seeds, by cell
+5   I.6.20a      4   5   3   3   5   3   4   2   2
+6   I.8.14       4   5   5   1   2   1   1   0   0
+7   I.16.6       0   3   1   0   0   0   0   0   0
+8   I.27.6       5   5   5   5   5   0   0   1   1
+14  III.15.12    5   5   5   5   5   5   0   0   3
+15  I.10.7       5   5   5   5   5   5   5   1   1
+16  I.11.19      0   0   0   0   0   0   0   0   0
+17  I.15.10      5   5   5   5   5   5   5   0   1
+19  I.26.2       3   1   0   0   0   0   0   0   2
+23  I.34.1       5   5   5   5   5   5   5   0   1
+24  I.37.4       0   0   0   0   0   0   0   0   0
+26  I.44.4       5   5   5   5   5   0   0   1   2
+27  I.50.26      0   0   0   0   0   0   0   0   0
+28  II.2.42      4   4   2   0   3   5   4   3   1
+30  II.11.3      5   5   5   5   5   5   5   0   0
+31  II.11.27     5   5   5   5   5   5   5   0   0
+32  II.13.23     5   5   5   5   5   5   5   0   2
+33  II.24.17     5   5   5   5   5   0   0   0   2
+37  III.9.52     0   0   0   0   0   0   0   0   0
+38  III.10.19    0   0   0   0   0   0   0   0   0
+39  III.17.37    0   0   0   0   0   0   0   0   2
+
+== rows, the equations lost (r100, r100000, r100000_10T)
+I.8.14 4 1 2
+II.2.42 4 0 3
+I.26.2 3 0 0
+I.6.20a 4 3 5
+are the lost-at-100,000 fits found by the search at r100 (generations > 1)? True
+
+== variables: equations exact in 5 of 5 at r1000 that fall to 0 or 1 in a k cell at T
+I.8.14     r1000 5, k5 1, k10 1, k20 0: falls to <=1 from k5
+I.27.6     r1000 5, k5 0, k10 0, k20 1: falls to <=1 from k5
+III.15.12  r1000 5, k5 5, k10 0, k20 0: falls to <=1 from k10
+I.10.7     r1000 5, k5 5, k10 5, k20 1: falls to <=1 from k20
+I.15.10    r1000 5, k5 5, k10 5, k20 0: falls to <=1 from k20
+I.34.1     r1000 5, k5 5, k10 5, k20 0: falls to <=1 from k20
+I.44.4     r1000 5, k5 0, k10 0, k20 1: falls to <=1 from k5
+II.11.3    r1000 5, k5 5, k10 5, k20 0: falls to <=1 from k20
+II.11.27   r1000 5, k5 5, k10 5, k20 0: falls to <=1 from k20
+II.13.23   r1000 5, k5 5, k10 5, k20 0: falls to <=1 from k20
+II.24.17   r1000 5, k5 0, k10 0, k20 0: falls to <=1 from k5
+
+== variables: which seed finder found, at r1000, the first-gen laws lost in the k cells
+k5 15 {'binomial_seed': 10, 'elementary_seed': 5}
+k10 20 {'binomial_seed': 10, 'elementary_seed': 10}
+k20 50 {'binomial_seed': 40, 'elementary_seed': 10}
+
+== the binomial seed of I.34.1 and I.27.6 by cell (seed 0)
+I.34.1 r1000 columns 3 binomial: (v0 / (1.0 + (-0.200113 * (v1 / v2)))) | status EXACT gens 1
+I.34.1 k5 columns 8 binomial: (v3 / (1.0 + (-0.200147 * (v1 / v4)))) | status EXACT gens 1
+I.34.1 k10 columns 13 binomial: (v3 / (1.0 + (-0.199896 * (v7 / v2)))) | status EXACT gens 1
+I.34.1 k20 columns 23 binomial: None | status NEAR gens 95
+I.27.6 r1000 columns 3 binomial: ((v1 / v2) / (1.0 + (0.500011 * (v1 / (v0 * v2))))) | status EXACT gens 1
+I.27.6 k5 columns 8 binomial: None | status NEAR gens 136
+I.27.6 k10 columns 13 binomial: None | status NEAR gens 98
+I.27.6 k20 columns 23 binomial: None | status NEAR gens 73
+
+== the formulas that use an added variable, by status
+k5 12 {'EXACT': 2, 'MISS': 10}
+k10 16 {'MISS': 15, 'NEAR': 1}
+k20 26 {'MISS': 22, 'NEAR': 4}
+k20_10T 10 {'NEAR': 5, 'EXACT': 2, 'MISS': 3}
+  EXACT using an added variable: k20_10T II.24.17 0 160 3.08748e-06 + 1.05304 * v5 / v11 * exp(-0.053727 * 0.99205^tanh(144.14
+  EXACT using an added variable: k5 I.6.20a 1 160 0.398942 + 0.398942 * (0.0113922^(|0.33427 * v5|^(|sqrt(|tanh(-30.7303
+  EXACT using an added variable: k5 II.2.42 3 142 2.64465e+07 - 3.47252e+07 * tanh(exp(3.42794e-07 * v9 / v8 * sqrt(v2 *
+  EXACT using an added variable: k20_10T III.15.12 4 160 6.88336e-07 + 634.849 * v18 * tanh(0.00095785 * (arcsin(0.500727 * v7 
+
+== near fits by cell
+{'r100': 7, 'r1000': 5, 'r10000': 3, 'r100000': 1, 'r100000_10T': 8, 'k5': 23, 'k10': 23, 'k20': 41, 'k20_10T': 67}
+
+== the profiles
+records 42 Counter({'plain': 21, 'profiled': 21})
+dates 2026-11-24T01:24:10 to 2026-11-24T02:16:55
+records dated before 02:00: 21
+   2026-11-24T01:24:10 0 r100 plain 0.2493
+   2026-11-24T01:24:11 0 r100 profiled 0.5987
+   2026-11-24T01:24:12 0 r1000 plain 0.3373
+   2026-11-24T01:24:13 0 r1000 profiled 0.7078
+   2026-11-24T01:24:14 0 r10000 plain 0.5755
+   2026-11-24T01:24:15 0 r10000 profiled 0.9457
+   2026-11-24T01:24:20 0 r100000 plain 4.7055
+   2026-11-24T01:24:26 0 r100000 profiled 5.4861
+   2026-11-24T01:24:26 0 k5 plain 0.2921
+   2026-11-24T01:24:27 0 k5 profiled 0.559
+   2026-11-24T01:24:28 0 k10 plain 0.2748
+   2026-11-24T01:24:28 0 k10 profiled 0.6094
+   2026-11-24T01:24:29 0 k20 plain 0.3463
+   2026-11-24T01:24:30 0 k20 profiled 0.7301
+   2026-11-24T01:24:35 6 r100 plain 4.2686
+   2026-11-24T01:24:45 6 r100 profiled 10.026
+   2026-11-24T01:24:52 6 r1000 plain 6.9494
+   2026-11-24T01:25:06 6 r1000 profiled 13.5728
+   2026-11-24T01:25:25 6 r10000 plain 18.8714
+   2026-11-24T01:25:48 6 r10000 profiled 23.0877
+   2026-11-24T01:28:31 6 r100000 plain 162.6046
+   2026-11-24T02:03:33 6 r100000 profiled 170.0071
+   2026-11-24T02:03:37 6 k5 plain 4.4142
+   2026-11-24T02:03:47 6 k5 profiled 9.242
+   2026-11-24T02:03:51 6 k10 plain 3.8522
+   2026-11-24T02:03:58 6 k10 profiled 7.1618
+   2026-11-24T02:04:03 6 k20 plain 4.0876
+   2026-11-24T02:04:10 6 k20 profiled 6.3912
+   2026-11-24T02:04:14 16 r100 plain 3.9171
+   2026-11-24T02:04:23 16 r100 profiled 8.8559
+   2026-11-24T02:04:29 16 r1000 plain 6.1711
+   2026-11-24T02:04:43 16 r1000 profiled 13.1355
+   2026-11-24T02:05:05 16 r10000 plain 21.7285
+   2026-11-24T02:05:35 16 r10000 profiled 30.1476
+   2026-11-24T02:10:36 16 r100000 plain 299.9712
+   2026-11-24T02:15:52 16 r100000 profiled 316.1817
+   2026-11-24T02:16:00 16 k5 plain 7.0725
+   2026-11-24T02:16:14 16 k5 profiled 14.4643
+   2026-11-24T02:16:21 16 k10 plain 6.2375
+   2026-11-24T02:16:33 16 k10 profiled 12.3479
+   2026-11-24T02:16:41 16 k20 plain 7.5224
+   2026-11-24T02:16:55 16 k20 profiled 13.6756
+machine Counter({'Intel(R) Xeon(R) Processor': 42})
+engine Counter({'1.4.0': 42}) Counter({'0': 42})
+pairs 21 same formula in all: True
+eq  0 r100     plain     0.25 s prof     0.60 s ratio 2.40 gens 1 EXACT | total 0.6 | eval-group 29% const 6% seeds 0% | incl seeds 1% incl fit 9% | numeric 5% genetic-like {'tree': '29%', 'evaluate': '13%', 'fitness': '11%', 'memory': '10%', 'operators': '10%', 'simplify': '8%', 'constants': '6%', 'numeric': '5%'}
+eq  0 r1000    plain     0.34 s prof     0.71 s ratio 2.10 gens 1 EXACT | total 0.7 | eval-group 30% const 8% seeds 1% | incl seeds 1% incl fit 13% | numeric 7% genetic-like {'tree': '27%', 'evaluate': '13%', 'operators': '11%', 'fitness': '11%', 'memory': '10%', 'constants': '8%', 'simplify': '7%', 'numeric': '7%'}
+eq  0 r10000   plain     0.58 s prof     0.95 s ratio 1.64 gens 1 EXACT | total 0.9 | eval-group 32% const 4% seeds 1% | incl seeds 2% incl fit 7% | numeric 9% genetic-like {'operators': '25%', 'tree': '20%', 'evaluate': '12%', 'fitness': '11%', 'numeric': '9%', 'memory': '7%', 'simplify': '5%'}
+eq  0 r100000  plain     4.71 s prof     5.49 s ratio 1.17 gens 1 EXACT | total 5.3 | eval-group 50% const 16% seeds 2% | incl seeds 3% incl fit 31% | numeric 22% genetic-like {'operators': '24%', 'numeric': '22%', 'constants': '16%', 'evaluate': '14%', 'fitness': '14%'}
+eq  0 k5       plain     0.29 s prof     0.56 s ratio 1.91 gens 1 EXACT | total 0.6 | eval-group 33% const 8% seeds 2% | incl seeds 4% incl fit 13% | numeric 6% genetic-like {'tree': '27%', 'fitness': '14%', 'evaluate': '13%', 'operators': '8%', 'constants': '8%', 'simplify': '8%', 'memory': '7%', 'numeric': '6%'}
+eq  0 k10      plain     0.27 s prof     0.61 s ratio 2.22 gens 1 EXACT | total 0.6 | eval-group 33% const 8% seeds 4% | incl seeds 7% incl fit 14% | numeric 6% genetic-like {'tree': '25%', 'fitness': '13%', 'evaluate': '13%', 'operators': '8%', 'constants': '8%', 'simplify': '7%', 'numeric': '6%', 'memory': '6%'}
+eq  0 k20      plain     0.35 s prof     0.73 s ratio 2.11 gens 1 EXACT | total 0.7 | eval-group 31% const 9% seeds 11% | incl seeds 19% incl fit 15% | numeric 6% genetic-like {'tree': '23%', 'fitness': '12%', 'evaluate': '12%', 'seeds': '11%', 'constants': '9%', 'simplify': '7%', 'operators': '7%', 'numeric': '6%', 'memory': '5%'}
+eq  6 r100     plain     4.27 s prof    10.03 s ratio 2.35 gens 20 EXACT | total 9.9 | eval-group 22% const 10% seeds 5% | incl seeds 8% incl fit 16% | numeric 5% genetic-like {'tree': '33%', 'operators': '12%', 'constants': '10%', 'fitness': '9%', 'evaluate': '9%', 'simplify': '9%', 'memory': '6%'}
+eq  6 r1000    plain     6.95 s prof    13.57 s ratio 1.95 gens 20 EXACT | total 13.4 | eval-group 26% const 12% seeds 4% | incl seeds 7% incl fit 23% | numeric 10% genetic-like {'tree': '28%', 'operators': '16%', 'constants': '12%', 'numeric': '10%', 'evaluate': '8%', 'fitness': '8%', 'simplify': '7%'}
+eq  6 r10000   plain    18.87 s prof    23.09 s ratio 1.22 gens 20 EXACT | total 22.9 | eval-group 14% const 3% seeds 7% | incl seeds 12% incl fit 6% | numeric 3% genetic-like {'operators': '54%', 'tree': '14%', 'seeds': '7%', 'fitness': '6%', 'evaluate': '5%'}
+eq  6 r100000  plain   162.60 s prof   170.01 s ratio 1.05 gens 20 EXACT | total 165.5 | eval-group 19% const 6% seeds 12% | incl seeds 21% incl fit 15% | numeric 8% genetic-like {'operators': '59%', 'seeds': '12%', 'numeric': '8%', 'constants': '6%', 'evaluate': '6%'}
+eq  6 k5       plain     4.41 s prof     9.24 s ratio 2.09 gens 20 EXACT | total 9.2 | eval-group 27% const 11% seeds 7% | incl seeds 13% incl fit 19% | numeric 8% genetic-like {'tree': '27%', 'operators': '12%', 'constants': '11%', 'fitness': '10%', 'evaluate': '9%', 'simplify': '8%', 'numeric': '8%', 'seeds': '7%'}
+eq  6 k10      plain     3.85 s prof     7.16 s ratio 1.86 gens 20 MISS | total 7.1 | eval-group 24% const 7% seeds 19% | incl seeds 33% incl fit 11% | numeric 5% genetic-like {'tree': '22%', 'seeds': '19%', 'operators': '15%', 'fitness': '11%', 'evaluate': '8%', 'simplify': '8%', 'constants': '7%'}
+eq  6 k20      plain     4.09 s prof     6.39 s ratio 1.56 gens 20 MISS | total 6.4 | eval-group 21% const 4% seeds 33% | incl seeds 59% incl fit 6% | numeric 3% genetic-like {'seeds': '33%', 'operators': '17%', 'tree': '14%', 'fitness': '11%', 'evaluate': '7%', 'simplify': '6%'}
+eq 16 r100     plain     3.92 s prof     8.86 s ratio 2.26 gens 20 MISS | total 8.8 | eval-group 22% const 6% seeds 10% | incl seeds 17% incl fit 10% | numeric 3% genetic-like {'tree': '34%', 'operators': '11%', 'fitness': '10%', 'seeds': '10%', 'simplify': '10%', 'evaluate': '9%', 'constants': '6%', 'memory': '5%'}
+eq 16 r1000    plain     6.17 s prof    13.14 s ratio 2.13 gens 20 MISS | total 13.0 | eval-group 24% const 10% seeds 8% | incl seeds 13% incl fit 18% | numeric 7% genetic-like {'tree': '32%', 'operators': '11%', 'constants': '10%', 'evaluate': '9%', 'simplify': '9%', 'fitness': '8%', 'seeds': '8%', 'numeric': '7%'}
+eq 16 r10000   plain    21.73 s prof    30.15 s ratio 1.39 gens 20 MISS | total 29.3 | eval-group 32% const 18% seeds 9% | incl seeds 16% incl fit 39% | numeric 18% genetic-like {'numeric': '18%', 'constants': '18%', 'tree': '17%', 'operators': '15%', 'seeds': '9%', 'evaluate': '9%', 'fitness': '5%'}
+eq 16 r100000  plain   299.97 s prof   316.18 s ratio 1.05 gens 20 MISS | total 289.2 | eval-group 48% const 26% seeds 10% | incl seeds 18% incl fit 70% | numeric 35% genetic-like {'numeric': '35%', 'constants': '26%', 'operators': '12%', 'evaluate': '11%', 'seeds': '10%'}
+eq 16 k5       plain     7.07 s prof    14.46 s ratio 2.05 gens 20 MISS | total 14.2 | eval-group 25% const 15% seeds 7% | incl seeds 13% incl fit 27% | numeric 9% genetic-like {'tree': '29%', 'constants': '15%', 'operators': '9%', 'evaluate': '9%', 'simplify': '9%', 'numeric': '9%', 'fitness': '7%', 'seeds': '7%'}
+eq 16 k10      plain     6.24 s prof    12.35 s ratio 1.98 gens 20 MISS | total 12.2 | eval-group 25% const 10% seeds 13% | incl seeds 24% incl fit 20% | numeric 8% genetic-like {'tree': '26%', 'seeds': '13%', 'operators': '11%', 'constants': '10%', 'fitness': '9%', 'evaluate': '8%', 'simplify': '8%', 'numeric': '8%'}
+eq 16 k20      plain     7.52 s prof    13.68 s ratio 1.82 gens 20 MISS | total 13.5 | eval-group 22% const 11% seeds 21% | incl seeds 40% incl fit 21% | numeric 7% genetic-like {'tree': '24%', 'seeds': '21%', 'constants': '11%', 'operators': '9%', 'fitness': '8%', 'evaluate': '8%', 'simplify': '8%', 'numeric': '7%'}
+I.8.14 r100000 profiled: top functions
+   {'func': 'core.py:6818 select', 'role': 'operators', 'own': 50.4772, 'calls': 6675}
+   {'func': "~:0 <method 'reduce' of 'numpy.ufunc' objects>", 'role': None, 'own': 31.5467, 'calls': 1430656}
+   {'func': "~:0 <method 'partition' of 'numpy.ndarray' objects>", 'role': None, 'own': 9.7306, 'calls': 124}
+   {'func': 'core.py:2779 _np_safe_pow_var', 'role': 'numeric', 'own': 6.7062, 'calls': 11960}
+   {'func': 'core.py:4583 obj', 'role': 'seeds', 'own': 4.374, 'calls': 8064}
+I.11.19 r100000 profiled: top functions
+   {'func': 'core.py:2779 _np_safe_pow_var', 'role': 'numeric', 'own': 55.114, 'calls': 92710}
+   {'func': 'core.py:6441 optimize_constants_lm', 'role': 'constants', 'own': 29.9397, 'calls': 313}
+   {'func': 'core.py:2724 _np_safe_div', 'role': 'numeric', 'own': 21.5186, 'calls': 83059}
+   {'func': 'core.py:6469 _resid_p', 'role': 'constants', 'own': 21.3687, 'calls': 64983}
+   {'func': 'core.py:3082 _lm_apply', 'role': 'evaluate', 'own': 15.6357, 'calls': 304403}
+ratios profiled/plain at r100: [2.4, 2.35, 2.26]
+ratios profiled/plain at r100000: [1.17, 1.05, 1.05]

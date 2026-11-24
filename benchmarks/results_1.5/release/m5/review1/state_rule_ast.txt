@@ -1,0 +1,7 @@
+names of the state in the door: 61
+bare uses of a state name bound or imported at the top of a module: [('config', 220, 'VAL_R2_TOLERANCE', 'Store')]
+from .state import ...: none
+global statements naming a state name: none
+state.NAME read at import or at the definition of a function: none
+state names never used as state.NAME in the package: ['_CUSTOM_LOSS_PARSIMONY', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING', '_CUSTOM_SEEDS']
+state names that no module of the package ever sets (only the tests, or set once in state.py): 17 ['_BINOMIAL_SEEDS', '_COMPILE_CACHE', '_CUSTOM_LOSS_FN', '_CUSTOM_LOSS_PARSIMONY', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING', '_CUSTOM_SEEDS', '_E2_SEEDS', '_ELEMENTARY_SEEDS', '_POLISH_GRACE_S', '_PRED_CACHE', '_SEEDS_UNDER_UNITS', '_SMALL_CV', '_TOLERANT_N2', '_TOLERANT_REFIT', '_TOLERANT_SEEDS', '_VAL_CANDS']

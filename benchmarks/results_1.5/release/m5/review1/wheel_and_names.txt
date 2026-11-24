@@ -1,0 +1,25 @@
+== (1) the files of the wheel against the candidate 22f5734
+files listed: 29
+same as 22f5734: 29 of 29; same as 1.4.0 (6dc1e35): 9
+unchanged since 1.4.0: ['gp_elite/__main__.py', 'gp_elite/api.py', 'gp_elite/cli.py', 'gp_elite/dim_search.py', 'gp_elite/dimensions.py', 'gp_elite/formula.py', 'gp_elite/py.typed', 'gp_elite/sklearn_api.py', 'gp_elite/stability.py']
+files of gp_elite/ in the tree of 22f5734: 29 not in the list: []
+
+== (2) the names of A4
+the two copies identical: True
+comment lines: ['# The names of gp_elite.core in 1.4.0 (/venv14p, /venv14p/lib/python3.11/site-packages/gp_elite/__init__.py), one per line: 421.']
+names: 421 distinct: 421
+core.py of 1.4.0: 12999 lines
+top-level functions and classes of core.py 1.4.0: 231
+names of the list that start with __: []
+names of the list not bound at the top of core.py 1.4.0 (by ast, a rough check): [] 0
+
+== the names of 1.5's gp_elite.core: does core.py at HEAD bind or import each of the 421?
+state names in the door: 61
+names of 1.4.0 neither bound by core.py at HEAD (outside the __main__ block) nor a state name: []
+
+== (3) the tests of tests/test_door.py
+  test_every_name_of_core_in_1_4_0_can_be_read []
+  test_a_name_of_the_state_set_on_core_is_set_in_the_state ['sorted(core._STATE_NAMES)']
+  test_a_function_set_on_core_reaches_the_modules_that_hold_it ["['_has_own_factor', '_lm_plan', '_refit_inner', 'evolve', 'evolve_island']"]
+  test_a_wrap_of_evolve_island_set_on_core_sees_every_generation []
+  test_the_state_read_on_core_is_the_state_of_the_engine []

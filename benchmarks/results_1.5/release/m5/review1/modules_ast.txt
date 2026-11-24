@@ -1,0 +1,89 @@
+== lines, and the imports of package modules
+state              70 lines; imports []
+numeric           242 lines; imports []
+config            620 lines; imports ['dim_search', 'state']
+     inside a function: dim_search (in _ds, line 92)
+tree              474 lines; imports ['config', 'state']
+simplification    217 lines; imports ['config', 'numeric', 'tree']
+evaluation        790 lines; imports ['numeric', 'state']
+datasets          447 lines; imports ['config', 'evaluation', 'state']
+scoring           475 lines; imports ['config', 'evaluation', 'simplification', 'state', 'tree']
+fitting           292 lines; imports ['evaluation', 'numeric', 'scoring', 'simplification', 'state', 'tree']
+genetic           897 lines; imports ['config', 'evaluation', 'scoring', 'simplification', 'state', 'tree']
+memory           1381 lines; imports ['config', 'evaluation', 'genetic', 'simplification', 'state', 'tree']
+final_choice     1003 lines; imports ['config', 'evaluation', 'fitting', 'formula', 'scoring', 'simplification', 'state', 'tree']
+     inside a function: formula (in _formula_faithful, line 69)
+seeds            1623 lines; imports ['config', 'evaluation', 'final_choice', 'scoring', 'state', 'tree']
+islands           776 lines; imports ['config', 'evaluation', 'fitting', 'genetic', 'memory', 'scoring', 'simplification', 'state', 'tree']
+parallel          405 lines; imports ['config', 'final_choice', 'islands', 'memory', 'scoring', 'simplification', 'state', 'tree']
+search            920 lines; imports ['config', 'datasets', 'final_choice', 'fitting', 'islands', 'memory', 'parallel', 'scoring', 'seeds', 'simplification', 'state', 'tree']
+data              580 lines; imports ['config', 'datasets', 'state']
+console          1448 lines; imports ['config', 'data', 'datasets', 'dim_search', 'dimensions', 'evaluation', 'formula', 'memory', 'scoring', 'search', 'simplification', 'state', 'tree']
+     inside a function: dim_search (in _deduce_console_constant, line 1385)
+     inside a function: dim_search (in _deduce_console_constant, line 1387)
+     inside a function: formula (in _interactive_menu, line 1319)
+     inside a function: dim_search (in _interactive_menu, line 1212)
+     inside a function: dimensions (in _interactive_menu, line 1353)
+core              849 lines; imports ['config', 'console', 'data', 'datasets', 'evaluation', 'final_choice', 'fitting', 'genetic', 'islands', 'memory', 'numeric', 'parallel', 'scoring', 'search', 'seeds', 'simplification', 'state', 'tree']
+__init__           61 lines; imports ['api', 'core', 'dimensions', 'sklearn_api', 'stability']
+     IMPORTS core: top, line 32
+     inside a function: sklearn_api (in __getattr__, line 40)
+__main__            5 lines; imports ['cli']
+api              1026 lines; imports ['core', 'dim_search', 'formula']
+     IMPORTS core: top, line 21
+     inside a function: dim_search (in symbolic_regression, line 673)
+sklearn_api       308 lines; imports ['api', 'core', 'dim_search', 'dimensions']
+     inside a function: dim_search (in _deduce_constant, line 144)
+     inside a function: core (in _deduce_constant, line 145)
+     IMPORTS core: in _deduce_constant, line 145
+     inside a function: dimensions (in constant_units_string, line 230)
+     inside a function: core (in sympy, line 284)
+     IMPORTS core: in sympy, line 284
+formula           957 lines; imports ['core']
+     IMPORTS core: top, line 37
+dimensions        237 lines; imports ['core']
+     IMPORTS core: top, line 19
+dim_search        738 lines; imports ['core', 'dimensions']
+     IMPORTS core: top, line 33
+     inside a function: dimensions (in parse_unit_string, line 665)
+stability         134 lines; imports ['api', 'core']
+     IMPORTS core: top, line 19
+cli                32 lines; imports ['core']
+     IMPORTS core: top, line 9
+
+modules of the table that import a module below them, or core: none
+
+== the top-level names of each module of the table
+state             0 defs/classes: 
+                    other top-level names: PROBE_X, CURRENT_RESIDUAL_SIG, _DIM_SEARCH, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST, _GENERIC_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, CSV_FEATURE_NAMES, CSV_TARGET_NAME, _SYRACUSE_MODE, _BATTERY_CSV_MODE, _COMPILE_CACHE, _PARAMETRIC_CACHE, _SYRACUSE_Y_RAW, _SYRACUSE_X_RAW, _SYRACUSE_FEAT_MINS, _SYRACUSE_FEAT_MAXS, _fitness_cache, _PRED_CACHE, _USE_LINEAR_SCALING, _CUSTOM_LOSS_FN, _CUSTOM_SEEDS, _SEEDS_UNDER_UNITS, _BINOMIAL_SEEDS, _ELEMENTARY_SEEDS, _E2_SEEDS, _TOLERANT_SEEDS, _TOLERANT_N2, _TOLERANT_REFIT, _CUSTOM_LOSS_PARSIMONY, _feature_usage_counter, _PARALLEL_BROKEN, _PARALLEL_WARNED, _TIME_LIMIT_HIT, _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _NEAR_PROBE_XS, _NEAR_BAND, _NEAR_GUARD_SWAPS, _EXACT_PRIORITY_SWAPS, _FAITHFUL_SWAPS, _VAL_TRAIN_YS, _EXTRAP_PROBE_XS, _EXTRAP_BAND, _VAL_CANDS, _POLISH_GRACE_S, _POLISH_ADMITTED, _SMALL_CV, _SMALL_ON
+numeric          20 defs/classes: safe_div, safe_pow, safe_tan, safe_arcsin, safe_log, safe_exp, safe_sqrt, _np_safe_div, _np_safe_pow, _np_safe_pow_var, _is_const_subtree, _np_safe_tan, _np_safe_arcsin, _np_safe_exp, _np_safe_log, _np_safe_sqrt, _np_is_even, _np_step, _np_max2, _np_min2
+                    other top-level names: _SAFE_LIMIT, _np_minimum, _np_maximum, _np_abs, _np_isfinite, _COMPILE_CACHE_MAX, _NP_GLOBALS
+config           11 defs/classes: _RunTrace, _ds, _dim_active, Config, _get_ops_for_role, _active_pools, _active_pool_ops, _pool_choice, _detect_dominant_op, make_cfg_nd, make_cfg
+                    other top-level names: TRACE, CFG, BINARY_OPS, UNARY_OPS, ALL_OPS, ALL_UNARY_OPS, ALL_BINARY_OPS, BINARY_WEIGHTS, UNARY_WEIGHTS, _CLEANER_BINARY_OPS, _CLEANER_BINARY_WEIGHTS, _CLEANER_UNARY_OPS, _CLEANER_UNARY_WEIGHTS, _BATTERY_BINARY_OPS, _BATTERY_BINARY_WEIGHTS, _BATTERY_UNARY_OPS, _BATTERY_UNARY_WEIGHTS, _GENCSV_POOLS, _SYRACUSE_BINARY_OPS, _SYRACUSE_BINARY_WEIGHTS, _SYRACUSE_UNARY_OPS, _SYRACUSE_UNARY_WEIGHTS, _EXTRA_SEEDS
+tree             15 defs/classes: _str_code, _value_code, _leaf_code_exact, _leaf_code_rounded, _leaf_code_canonical, _node_hashes, Node, to_string, node_to_sympy, tree_size, tree_depth, _is_adjusted_float, tree_complexity, get_all_nodes, collect_constants
+                    other top-level names: _STR_CODES, _PACK_D, _UNPACK_Q, _CANON_CONST, _SYMPY_UNARY, _SYMPY_BINARY, _FLOAT_COMPLEXITY_WEIGHT, _FLOAT_GAMMA
+simplification    8 defs/classes: _is_float, _is_const, _clear_simplify_caches, simplify, _simplify_tree, _simplify_node, _has_own_factor, _invalidate_all_hashes
+                    other top-level names: _TRIVIAL_CACHE, _SIMPLIFY_CACHE, _UNARY_FOLD
+evaluation       20 defs/classes: _float_literal, _to_np_code, _collect_constants_ordered, _to_np_code_parametric, _lm_apply, _LMPlan, _lm_build_plan, _lm_plan, _lm_column, compile_parametric, compile_to_numpy, evaluate, _InterpTooDeep, _sq, _cube, _interp, evaluate_vector, _pearson_r, _predict_cached, _safe_write
+                    other top-level names: _PARAMETRIC_CACHE_MAX, _LM_UNARY_FN, _LM_UNARY_SRC, _LM_BINARY_SRC, _LM_BINARY_FN, _LM_PLAN_CACHE, _LM_PLAN_CACHE_MAX, _INTERP_MAX_DEPTH, _COMPILE_AFTER, _EVAL_COUNTS, _NAN, _INTERP_BINARY, _INTERP_UNARY, _HOT_ZONES, _PRED_CACHE_MAX
+datasets          7 defs/classes: _max_height_ratio, _collatz_flight_time, _v2, _log_max_height_level2, _scale_feature, generate_syracuse_dataset, build_dataset
+                    other top-level names: SYRACUSE_FEATURE_NAMES, SYRACUSE_N_FEATURES, DECOY_FEATURES
+scoring          13 defs/classes: _linear_scale_params, _robust_scale_params, raw_mse, raw_pearson_r, _pure_mse, _target_scale, _scale_tree, wrap_linear_scaling, reset_feature_usage, record_feature_usage, get_feature_bias_weights, count_distinct_features, fitness
+fitting           2 defs/classes: optimize_constants_lm, optimize_constants_adam
+genetic          26 defs/classes: random_constant, random_terminal, _random_tree_full, _random_tree_grow, random_tree, _semantic_key, semantic_dedup, EpsilonLexicaseSelector, tournament, crossover_size_fair, hoist_mutation, shrink_mutation, point_mutation, semantic_mutation, subtree_mutation, stigmergic_mutation, fragment_inject_mutation, mutate, pareto_rank, build_stigmergic_tree, build_stigmergic_tree_v2, build_stigmergic_tree_v3, _nd_diverse_population, _random_tree_full_nd, _random_tree_grow_nd, _random_tree_nd
+memory            9 defs/classes: FragmentEntry, FragmentLibrary, init_probe_set, compute_semantic_sig, semantic_score, update_residual_sig, FragmentCoGraph, FragmentSequenceMemory, warm_transfer
+                    other top-level names: _TRIVIAL_PROBE_X, state.FRAGMENT_LIB, state.COGRAPH, state.SEQ_MEM
+final_choice     28 defs/classes: _formula_faithful, _early_stop_threshold, _Patience, _holdout_mse, _is_numerically_stable, _track_val_candidate, _has_scale, _weight_sums, _lm_to_convergence, _refit_scaling, _finalists, _track_if_exact, _polish_finalists, _build_near_probes, _near_domain_stable, _select_one_se, _small_setup, _track_small_candidate, _small_is_const, _small_strip, _small_round_powers, _small_fit, _small_cv, _small_n_par, _small_materialize, _small_specs, _small_table_select, _small_choose
+                    other top-level names: _NEAR_CACHE, _EXACT_REL, _FAITHFUL_CACHE, _NEAR_EXT, _NEAR_K, _VAL_CANDS_MAX, _PATIENCE_GAIN, _FINAL_LM_ITER, _WEIGHTED_SUMS_MAX, _SMALL_ROWS, _SMALL_MIN_ROWS, _SMALL_FAMILY_KEEP, _SMALL_FAMILY_SHARE, _SMALL_SEARCH, _SMALL_FINALISTS, _SMALL_FOLDS, _SMALL_CANDS_MAX, _SMALL_CANDS, _SMALL_FAMILY, _SMALL_FRONT
+seeds            35 defs/classes: _make_motif_seeds, _seeds_blocked_by_units, _typed_seeds, _power_law_exponents, _power_law_exponents_w, _half_integer_power, _product, _make_power_law_seeds, _binom_library, _golden_min, _binomial_forms, _monomial, _make_binomial_seeds, _elem_flib, _elem_mono, _elem_rel, _elem_transform, _elem_inverse_forms, _elem_wrel, _log_g_exponents, _elem_inverse_forms_w, _pred_rel_error, _elem_log_scan, _elem_trig_grid, _elem_trig_exact, _elem_trig_forms, _e2_residuals, _elem_aexp_forms, _elementary_forms, _elementary_forms_n2, _make_elementary_seeds, _seed_rel_error, _small_family, _refit_inner, _make_tolerant_seeds
+                    other top-level names: _POWER_LAW_MIN_R2, _BINOM_EXPS, _BINOM_TOL, _POWER_TOL, _BINOM_MAX_LIB, _BINOM_GRID_ROWS, _BINOM_GRID, _ELEM_MAX_LIB, _ELEM_S_GRID, _ELEM_W_GRID, _ELEM_TRIG_GATE, _SCAN_KEEP, _E2_C_GRID, _E2_GATE, _E2_CURVE, _TOLERANT_REL, _TOLERANT_MAX
+islands           4 defs/classes: Island, migrate, evolve_island, _smart_reset_explorers
+                    other top-level names: _PW
+parallel          8 defs/classes: _pool_probe, _parallel_worker_init, _island_round_task, _SkipLogExport, _exit_if_reimported_by_worker, _warn_unguarded_main, _parallel_enabled, _evolve_parallel
+                    other top-level names: _POOL_CHILD_ENV
+search            3 defs/classes: _split_holdout, _make_linear_candidate, evolve
+data             10 defs/classes: _csv_deps, _csv_deps_ok, _MinMaxScaler, _safe_sinc, _ShiftFreeScaler, _IdentityScaler, _scale_ratio, _choose_scaler, load_generic_csv, load_custom_csv
+                    other top-level names: PROBLEMS, SCALE_RATIO_THRESHOLD, ND_PROBLEMS, _ND_UNARY_WEIGHTS_INIT
+console          12 defs/classes: print_result, decoy_report, try_plot, run, _one_run, run_benchmark, _print_menu, _ask, _ask_int, _interactive_menu, _deduce_console_constant, _pause
+core              3 defs/classes: _StateName, __dir__, _Door
+                    other top-level names: _STATE_NAMES, _ENGINE_MODULES, _MISSING

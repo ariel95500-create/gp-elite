@@ -1,0 +1,18 @@
+== a1_140 against a1_140b
+   13 configurations: 13 identical
+   phase1: 615 and 615 records {'feyn': 205, 'feyn_n1': 205, 'ufeyn': 205}, 0 different; expressions cut at 160 characters: 68
+   tp: 400 and 400 records, 0 different
+   console: result lines same True (6 lines), gp_elite_best.txt same True; whole console.txt: 185 and 185 lines, 166 equal line for line
+
+== a1_140 against a1_final
+   13 configurations: 13 identical
+   phase1: 615 and 615 records {'feyn': 205, 'feyn_n1': 205, 'ufeyn': 205}, 0 different; expressions cut at 160 characters: 68
+   tp: 400 and 400 records, 0 different
+   console: result lines same True (6 lines), gp_elite_best.txt same True; whole console.txt: 185 and 185 lines, 167 equal line for line
+
+== a1_140 against a1_rel
+   13 configurations: 13 identical
+   phase1: 615 and 615 records {'feyn': 205, 'feyn_n1': 205, 'ufeyn': 205}, 0 different; expressions cut at 160 characters: 68
+   tp: 400 and 400 records, 0 different
+   console: result lines same True (6 lines), gp_elite_best.txt same True; whole console.txt: 185 and 185 lines, 166 equal line for line
+

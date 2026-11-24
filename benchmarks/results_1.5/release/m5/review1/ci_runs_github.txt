@@ -1,0 +1,68 @@
+M5 review 1: the runs of the Tests workflow (tests.yml) on the branch claude/peaceful-knuth-4q7m4p,
+read on 24 November 2026 through the GitHub API (outside the repository; not a committed record).
+The workflow ignores pushes that change only *.md files or paper/ (paths-ignore).
+run id, head commit, event, conclusion, created, updated, title
+45354621108 5210b72 push success 2026-11-24T08:16:04Z 2026-11-24T08:22:24Z Release 1.5.0: M4 holds, 269 tests under Python 3.9, 3.11 and 3.14 on…
+45353266912 4685af2 push success 2026-11-24T08:06:37Z 2026-11-24T08:12:43Z Release 1.5.0: M1 holds on the wheel; the CHANGELOG
+45345409060 56007b2 push success 2026-11-24T07:06:16Z 2026-11-24T07:12:45Z Release 1.5.0: the script of M4 (tests on the wheel under three Pytho…
+45345341210 da1c0a4 push success 2026-11-24T07:05:45Z 2026-11-24T07:11:56Z Release 1.5.0: the documents, but the CHANGELOG
+45344797232 22f5734 push success 2026-11-24T07:01:31Z 2026-11-24T07:07:44Z Release 1.5.0: the candidate, the version number
+45336815941 cea0ebd push success 2026-11-24T05:56:36Z 2026-11-24T06:02:37Z Split: A3 holds, the engine in modules within 0.3 % of 1.4.0
+45333469603 6269364 push success 2026-11-24T05:27:39Z 2026-11-24T05:34:05Z Split: A1 holds in full, all identical
+45330747837 fb96543 push success 2026-11-24T05:04:42Z 2026-11-24T05:11:10Z Split: A2 on the machine, the whole suite under Python 3.9, 3.11 and …
+45329464649 7d79872 push success 2026-11-24T04:53:17Z 2026-11-24T04:59:39Z Split: the short A1 holds on the new door, all identical
+45328967306 eb2eac5 push success 2026-11-24T04:48:51Z 2026-11-24T04:55:23Z Split: the door holds the names of the state as data descriptors
+45327911267 6ba1356 push failure 2026-11-24T04:39:37Z 2026-11-24T04:43:36Z Tests: the door of 1.5 (criterion A4)
+45327802576 3190a7c push failure 2026-11-24T04:38:36Z 2026-11-24T04:42:36Z Split 18: the short A1 holds, all identical
+45327329020 61b9eaa push failure 2026-11-24T04:34:26Z 2026-11-24T04:38:24Z Split 18: gp_elite/console.py
+45327324532 b4667aa push failure 2026-11-24T04:34:24Z 2026-11-24T04:38:26Z Split 17: the short A1 holds, all identical
+45326839107 4e2a3b6 push failure 2026-11-24T04:30:15Z 2026-11-24T04:34:09Z Split 17: gp_elite/data.py
+45326834151 b49cc04 push failure 2026-11-24T04:30:12Z 2026-11-24T04:36:51Z Split 16: the short A1 holds, all identical
+45326354986 cb55e95 push failure 2026-11-24T04:25:59Z 2026-11-24T04:30:00Z Split 16: gp_elite/search.py
+45326352282 84c6bde push failure 2026-11-24T04:25:57Z 2026-11-24T04:29:51Z Split 15: the short A1 holds, all identical
+45325852808 4eaeddb push failure 2026-11-24T04:21:45Z 2026-11-24T04:28:13Z Split 15: gp_elite/parallel.py
+45325849330 05ac172 push failure 2026-11-24T04:21:43Z 2026-11-24T04:25:43Z Split 14: the short A1 holds, all identical
+45325365239 50ae429 push failure 2026-11-24T04:17:34Z 2026-11-24T04:23:55Z Split 14: gp_elite/islands.py
+45325360478 8cfc942 push failure 2026-11-24T04:17:31Z 2026-11-24T04:24:05Z Split 13: the short A1 holds, all identical
+45324858745 ada372b push failure 2026-11-24T04:13:21Z 2026-11-24T04:17:25Z Split 13: gp_elite/seeds.py
+45324854557 6550b61 push failure 2026-11-24T04:13:19Z 2026-11-24T04:17:27Z Split 12: the short A1 holds, all identical
+45324367864 c1b4303 push failure 2026-11-24T04:09:07Z 2026-11-24T04:13:06Z Split 12: gp_elite/final_choice.py
+45324363287 63ddaa5 push failure 2026-11-24T04:09:05Z 2026-11-24T04:13:11Z Split 11: the short A1 holds, all identical
+45323860850 cb4df48 push failure 2026-11-24T04:04:51Z 2026-11-24T04:09:04Z Split 11: gp_elite/memory.py
+45323856090 99542fe push failure 2026-11-24T04:04:48Z 2026-11-24T04:08:51Z Split 10: the short A1 holds, all identical
+45323376525 dfb01d2 push failure 2026-11-24T04:00:39Z 2026-11-24T04:04:44Z Split 10: gp_elite/genetic.py
+45323371442 065c79f push failure 2026-11-24T04:00:36Z 2026-11-24T04:04:33Z Split 9: the short A1 holds, all identical
+45322909914 71775f3 push failure 2026-11-24T03:56:24Z 2026-11-24T04:03:22Z Split 9: gp_elite/fitting.py
+45322905470 b5cfb3b push failure 2026-11-24T03:56:21Z 2026-11-24T04:02:48Z Split 8: the short A1 holds, all identical
+45322440808 d88cd95 push failure 2026-11-24T03:52:11Z 2026-11-24T03:58:39Z Split 8: gp_elite/scoring.py
+45322436328 fbd5f46 push failure 2026-11-24T03:52:09Z 2026-11-24T03:56:13Z Split 7: the short A1 holds, all identical
+45321978918 45aa276 push failure 2026-11-24T03:48:01Z 2026-11-24T03:52:01Z Split 7: gp_elite/datasets.py
+45321974462 9f5d33f push failure 2026-11-24T03:47:58Z 2026-11-24T03:52:13Z Split 6: the short A1 holds, all identical
+45321503644 bd4fa70 push failure 2026-11-24T03:43:49Z 2026-11-24T03:47:59Z Split 6: gp_elite/evaluation.py
+45321497343 1ec6d58 push failure 2026-11-24T03:43:46Z 2026-11-24T03:48:31Z Split 5: the short A1 holds, all identical
+45321041395 b5b7a79 push failure 2026-11-24T03:39:39Z 2026-11-24T03:44:37Z Split 5: gp_elite/simplification.py
+45321038036 af1cad3 push failure 2026-11-24T03:39:37Z 2026-11-24T03:44:19Z Split 4: the short A1 holds, all identical
+45320686733 528a943 push failure 2026-11-24T03:36:29Z 2026-11-24T03:41:58Z Split: A1 run twice on 1.4.0 finds the two runs identical
+45320570802 6ecc505 push failure 2026-11-24T03:35:28Z 2026-11-24T03:40:56Z Split 4: gp_elite/tree.py
+45320565545 398e94d push failure 2026-11-24T03:35:25Z 2026-11-24T03:42:00Z Split: the move tool reads the statements at the top as the layout ch…
+45320495283 66c9950 push failure 2026-11-24T03:34:50Z 2026-11-24T03:38:48Z Split 3: the short A1 holds, all identical
+45319562023 b81d2e0 push failure 2026-11-24T03:26:48Z 2026-11-24T03:33:11Z Split 3: gp_elite/config.py
+45319557359 96ee6b8 push failure 2026-11-24T03:26:45Z 2026-11-24T03:30:49Z Split 2: the short A1 holds, all identical
+45318614915 232110f push failure 2026-11-24T03:18:47Z 2026-11-24T03:22:53Z Split 2: gp_elite/numeric.py
+45318333918 4fe34dc push failure 2026-11-24T03:16:25Z 2026-11-24T03:20:26Z Split: the check of the names skips the comment line of their list
+45318265547 0068717 push failure 2026-11-24T03:15:52Z 2026-11-24T03:22:12Z Split 1: the short A1 holds, all identical
+45317942884 2df5225 push failure 2026-11-24T03:13:11Z 2026-11-24T03:17:21Z Split: the driver of the moves, each checked by the short A1 before t…
+45316440636 5387f42 push success 2026-11-24T03:00:34Z 2026-11-24T03:07:37Z Split: the modules, their order and the parts that change section
+45316164879 a5a646f push success 2026-11-24T02:58:10Z 2026-11-24T03:04:29Z Split: compare_a1.py --short, the short version of A1
+45316119193 3b770da push success 2026-11-24T02:57:45Z 2026-11-24T03:04:03Z Split: the tool of the one change of code (the shared state), not app…
+45311749256 c7e00fa push success 2026-11-24T02:21:19Z 2026-11-24T02:27:36Z Split: the corrected map of core.py and what its parts use, before an…
+45311597620 e91b705 push success 2026-11-24T02:20:06Z 2026-11-24T02:26:28Z Size study: the results
+45309394212 16c3eb3 push success 2026-11-24T02:02:10Z 2026-11-24T02:08:14Z Size study: the reading of the plan, the engine after the run, the pr…
+45304685273 29b167f push success 2026-11-24T01:23:28Z 2026-11-24T01:29:43Z Size study: records at 2026-11-24T01:23:25Z
+45295308436 81ed9c3 push success 2026-11-24T00:12:53Z 2026-11-24T00:19:09Z Split: the map also sees the module's dictionary and setattr; the ord…
+45291298102 6c04f2f push success 2026-11-23T23:43:46Z 2026-11-23T23:50:04Z Size study: records at 2026-11-23T23:43:41Z
+45275780095 f0681bb push success 2026-11-23T22:02:53Z 2026-11-23T22:07:50Z Split: the tools of A1, A3 and A4, and the benches' wrap of evolve_is…
+
+Log of run 45327802576 (head 3190a7c, Split 18 check), job py3.11 / ubuntu-latest, last summary line:
+  55 failed, 145 passed, 6 errors in 133.72s (0:02:13)
+In that run 7 of 8 jobs failed; the job that passed is py3.9 / ubuntu-24.04.
