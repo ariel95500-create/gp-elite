@@ -1,4 +1,4 @@
-Short A1 after the move of the shared state (step 1 of the split): 1.4.0 from PyPI (/home/user/a1_140) against the working tree (/home/user/a1_s1). The two runs overlapped another run of 1.4.0 on the machine, so the total time of the configurations says nothing of the speed (A3 measures it).
+Short A1 after the move of the shared state (step 1 of the split): 1.4.0 from PyPI (/home/user/a1_140) against the working tree (/home/user/a1_s1). The run of the working tree overlapped another run of 1.4.0 on the machine (a1_140 ran alone), so the total time of the configurations says nothing of the speed (A3 measures it).
 
 == the 13 configurations
 A_feyn       same

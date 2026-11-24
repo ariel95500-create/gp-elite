@@ -1,0 +1,24 @@
+A1 run twice on 1.4.0 from PyPI (/venv14p), full: /home/user/a1_140 (02:21-02:51 UTC) and /home/user/a1_140b (02:51-03:35 UTC), compared with compare_a1.py. The comparison finds the two runs identical in every field, which is what A1 rests on: without a time limit the engine is deterministic, and the tool reports no difference where there is none.
+
+== the 13 configurations
+A_feyn       same
+B_cpu        same
+C_big        same
+D_units      same
+E_minmax     same
+F_robust     same
+G_restarts   same
+H_parallel   same
+I_sklearn    same
+J_extrap     same
+K_thorough   same
+L_standard   same
+M_twice      same
+total time 21.2 s -> 21.0 s
+ALL IDENTICAL
+== the records
+phase1   615 jobs in A, 615 in B, 0 in one only, 0 different
+tp       400 jobs in A, 400 in B, 0 in one only, 0 different
+== the console: same result
+ALL IDENTICAL
+
