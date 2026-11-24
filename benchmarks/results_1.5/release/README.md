@@ -104,10 +104,38 @@ wheel alone, with the packages of `/venv14p`, Python 3.11.18). Of the 29
 files, 17 differ from the first candidate: `core.py`, `state.py` and the 15
 modules that read the shared state, whose docstrings changed.
 
-### M1 and M4
+### M1, A1, A3 and A4 on the wheel (24 November 2026, 16:56 to 17:58 UTC)
 
-Running at the time of this commit, as for the first candidate
-(`candidate2/run_m1.sh`, `candidate2/M1.log`, then `candidate2/m4/run.sh`).
+`candidate2/run_m1.sh`, as for the first candidate, one after the other
+(`candidate2/M1.log`, which also records the cores, the kernel, the boot
+time and the Python of the environment):
+- **A1, in full:** against the same run of 1.4.0
+  (`../split/a1/runs/a1_140` against `a1_rel2`): all identical, the 13
+  configurations, the 615 fits, the 400 fits of the TP diagnostic and the
+  console (`candidate2/M1_A1.txt`).
+- **A3, alone on the machine:** 709.5 s for 1.4.0, 707.1 s for the wheel, a
+  ratio of 0.9966, within the 3 % of the criterion; the same first 160
+  characters of the formula in all 205 jobs (25 formulas are longer)
+  (`candidate2/M1_A3.txt`, `candidate2/M1_A3_timing.jsonl`). The import of
+  `gp_elite`, beside: 0.110 s and 0.118 s (median of 20). Both A3 and the
+  import times are higher than in the morning for both versions alike: the
+  machine had restarted in between, and times are compared only within one
+  campaign.
+- **A4:** `tests/test_door.py` of the candidate against the installed
+  wheel: 76 passed (`candidate2/M1_A4.txt`).
+
+### M4, tests
+
+`candidate2/m4/run.sh`, as for the first candidate: the test suite of
+96ce1b6 against the wheel of the second candidate, installed in a fresh
+environment for each of Python 3.9.25, 3.11.18 and 3.14.6 with the same
+pins (`candidate2/m4/requirements_*.txt`, which differ from the first only
+by the wheel), each importing the installed package, from 17:58 to 18:08 UTC
+(its last file was written at 18:08:25): 279 tests pass under each of the
+three, the 269 of the first candidate, the 7 new tests of the door and the
+3 of the order of the modules (`candidate2/m4/summary.txt`,
+`candidate2/m4/pytest_*.txt`). `twine check --strict` passes for the wheel
+and the source archive (`candidate2/m4/twine_check.txt`).
 
 ### The CI
 

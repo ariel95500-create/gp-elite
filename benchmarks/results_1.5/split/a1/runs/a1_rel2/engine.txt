@@ -1,0 +1,1 @@
+1.5.0 /venv15r2/lib/python3.11/site-packages/gp_elite/__init__.py 2.4.6 3.11.18

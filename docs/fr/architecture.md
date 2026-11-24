@@ -7,8 +7,8 @@ Jusqu'à la 1.4.0, le moteur de GP_ELITE tenait dans un seul fichier,
 modules, chacun avec un rôle. Le découpage a changé l'organisation du code,
 pas ce que fait le moteur : à graine égale et travail égal, la 1.5 rend les
 modèles que rend la 1.4.0, au bit près, avec la même interface, à la même
-vitesse (à 0,3 % près sur 205 ajustements des 41 équations de Feynman du
-banc). Le code qui va chercher à l'intérieur de `gp_elite.core` peut voir
+vitesse (sur 205 ajustements des 41 équations de Feynman du banc, trois mesures
+s'écartent de la 1.4.0 de 0,4 % au plus). Le code qui va chercher à l'intérieur de `gp_elite.core` peut voir
 quelques changements, listés plus bas. Cette page est pour qui veut lire le
 moteur ou le modifier.
 

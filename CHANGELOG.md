@@ -20,8 +20,7 @@ the package, side by side with 1.4.0 installed from PyPI
   the console, compared on the lines of its result and the formula it
   writes;
 - the same speed: 205 fits of the 41 equations, the two versions run in
-  turn, take 694.7 s against 695.9 s (the first candidate; the second is
-  being measured);
+  turn, take 707.1 s against 709.5 s;
 - every name `gp_elite.core` had in 1.4.0 can still be read on it, and a
   name set on it, or deleted and set again, reaches the engine
   (`tests/test_door.py`, new); the tests of 1.4.0 pass unchanged.
@@ -61,8 +60,8 @@ review of the release, `benchmarks/results_1.5/release/M5_review2.md`):
   class of a module that comes after theirs (`_detect_dominant_op`, and
   `build_stigmergic_tree` in its three versions), and
   `gp_elite.core.__annotations__` is empty;
-- `import gp_elite` takes 0.102 s against 0.093 s for 1.4.0 (median of 20,
-  the first candidate).
+- `import gp_elite` takes about 8 ms more: 0.118 s against 0.110 s for
+  1.4.0 (median of 20).
 
 What size costs, measured on 1.4.0 (`benchmarks/results_1.5/size/`): up to
 100,000 rows, 11 exact laws of 205 (154 at 100,000 rows against 165 at 100),
