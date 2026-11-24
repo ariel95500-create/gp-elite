@@ -1,0 +1,31 @@
+# The modules of the split, the lower first (layout_core.py checks it).
+# A part of core.py goes to the module of its section in the map
+# (map_core.py, ROLES) unless a line below moves it.
+
+order: core numeric config tree simplify evaluate datasets fitness constants operators memory selection seeds islands parallel search data console
+
+move _SAFE_LIMIT numeric                 # the bound of the protected operators
+move _random_tree_nd operators           # the random trees in n dimensions
+move _random_tree_full_nd operators
+move _random_tree_grow_nd operators
+move _nd_diverse_population operators
+move DECOY_FEATURES datasets             # used by build_dataset
+move _active_pool_ops config             # the pools of operators
+move _pool_choice config
+move _smart_reset_explorers islands      # resets the explorer islands
+move _EXACT_REL selection                # the final choice's constants and caches
+move _FAITHFUL_CACHE selection
+move _NEAR_CACHE selection
+move _TRIVIAL_CACHE simplify             # a cache of the simplification
+move warm_transfer memory                # makes libraries and co-graphs for the next run
+move _CANON_CONST tree                   # the codes of the hashes of a tree
+move _PACK_D tree
+move _STR_CODES tree
+move _TAG_BINARY tree
+move _TAG_FLOAT tree
+move _TAG_OTHER tree
+move _TAG_UNARY tree
+move _UNPACK_Q tree
+move _csv_deps data                      # the optional dependencies of the CSV mode
+move _csv_deps_ok data
+move _MinMaxScaler data
