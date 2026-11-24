@@ -60,3 +60,32 @@ k20_10T      first 10 fits: median     0.4 s, budget   300 s
 775 done, 6177 s elapsed, 723 left
 800 done, 6217 s elapsed, 697 left
 time slice over: 685 jobs left for the next call
+--- slice 2026-11-23T23:43 (1160 done), Model name: Intel(R) Xeon(R) Processor
+685 jobs to run, 1160 already done
+25 done, 458 s elapsed, 659 left
+50 done, 504 s elapsed, 635 left
+75 done, 546 s elapsed, 609 left
+100 done, 872 s elapsed, 585 left
+125 done, 1106 s elapsed, 560 left
+150 done, 1154 s elapsed, 534 left
+175 done, 1447 s elapsed, 510 left
+200 done, 1818 s elapsed, 484 left
+225 done, 2051 s elapsed, 460 left
+250 done, 2361 s elapsed, 434 left
+275 done, 2406 s elapsed, 410 left
+300 done, 2884 s elapsed, 384 left
+325 done, 3016 s elapsed, 359 left
+350 done, 3041 s elapsed, 335 left
+375 done, 3186 s elapsed, 307 left
+400 done, 3552 s elapsed, 285 left
+425 done, 3576 s elapsed, 259 left
+450 done, 3645 s elapsed, 235 left
+475 done, 3873 s elapsed, 209 left
+500 done, 4080 s elapsed, 185 left
+525 done, 4115 s elapsed, 159 left
+550 done, 4316 s elapsed, 135 left
+575 done, 4846 s elapsed, 110 left
+600 done, 4935 s elapsed, 84 left
+625 done, 5100 s elapsed, 60 left
+650 done, 5197 s elapsed, 32 left
+675 done, 5694 s elapsed, 10 left
