@@ -1,0 +1,259 @@
+# What the parts of core.py at 6dc1e35 use (Part A of benchmarks/results_1.5/PLAN.md)
+
+from __future__ import annotations: yes
+
+## Each function and class: the other roles whose names it uses
+457    memory     FragmentLibrary                    evaluate: evaluate_vector; simplify: simplify; tree: get_all_nodes, tree_depth, tree_size
+915    memory     compute_semantic_sig               evaluate: evaluate_vector
+960    memory     update_residual_sig                evaluate: evaluate_vector
+986    memory     FragmentCoGraph                    tree: get_all_nodes, to_string, tree_size
+1279   memory     FragmentSequenceMemory             config: _active_pools; console: os; evaluate: _safe_write; operators: random_terminal, random_tree; simplify: simplify; tree: Node, tree_depth, tree_size
+1818   config     _ds                                memory: _DIM_SEARCH
+2223   tree       _str_code                          config: _STR_CODES
+2241   tree       _leaf_code_exact                   config: _PACK_D, _TAG_FLOAT, _TAG_OTHER, _UNPACK_Q
+2247   tree       _leaf_code_rounded                 config: _PACK_D, _TAG_FLOAT, _TAG_OTHER, _UNPACK_Q
+2254   tree       _leaf_code_canonical               config: _CANON_CONST, _TAG_OTHER
+2260   tree       _node_hashes                       config: _TAG_BINARY, _TAG_UNARY
+2290   tree       Node                               config: _PACK_D, _STR_CODES, _UNPACK_Q
+2410   tree       to_string                          config: ALL_BINARY_OPS, ALL_UNARY_OPS, CSV_FEATURE_NAMES, _GENERIC_CSV_MODE
+2673   numeric    safe_pow                           tree: _SAFE_LIMIT
+2684   numeric    safe_tan                           tree: _SAFE_LIMIT
+2701   numeric    safe_exp                           tree: _SAFE_LIMIT
+2724   numeric    _np_safe_div                       tree: _SAFE_LIMIT
+2747   numeric    _np_safe_pow                       tree: _SAFE_LIMIT
+2779   numeric    _np_safe_pow_var                   tree: _SAFE_LIMIT
+2811   numeric    _np_safe_tan                       tree: _SAFE_LIMIT
+2919   evaluate   _to_np_code                        numeric: _is_const_subtree
+2998   evaluate   _to_np_code_parametric             numeric: _is_const_subtree
+3102   evaluate   _lm_build_plan                     numeric: _NP_GLOBALS, _is_const_subtree
+3261   evaluate   compile_parametric                 numeric: _NP_GLOBALS
+3295   evaluate   compile_to_numpy                   numeric: _COMPILE_CACHE, _COMPILE_CACHE_MAX, _NP_GLOBALS
+3326   evaluate   evaluate                           numeric: safe_arcsin, safe_div, safe_exp, safe_log, safe_pow, safe_sqrt, safe_tan
+3424   evaluate   _interp                            numeric: _is_const_subtree, _np_safe_pow, _np_safe_pow_var
+3456   evaluate   evaluate_vector                    numeric: _COMPILE_CACHE, _np_maximum, _np_minimum
+3728   datasets   generate_syracuse_dataset          config: _SYRACUSE_BINARY_OPS, _SYRACUSE_MODE, _SYRACUSE_UNARY_OPS; evaluate: _HOT_ZONES
+3903   datasets   build_dataset                      data: DECOY_FEATURES; evaluate: _HOT_ZONES
+4113   seeds      _make_motif_seeds                  tree: Node
+4203   seeds      _seeds_blocked_by_units            config: _dim_active
+4208   seeds      _typed_seeds                       config: TRACE, _dim_active, _ds
+4292   seeds      _half_integer_power                tree: Node
+4320   seeds      _product                           tree: Node
+4329   seeds      _make_power_law_seeds              config: TRACE, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _dim_active; tree: Node, to_string
+4622   seeds      _monomial                          tree: Node
+4637   seeds      _make_binomial_seeds               config: TRACE, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS; tree: Node, to_string
+5027   seeds      _pred_rel_error                    fitness: _linear_scale_params
+5404   seeds      _make_elementary_seeds             config: TRACE, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS; tree: Node, to_string
+5548   seeds      _seed_rel_error                    evaluate: evaluate_vector; fitness: _linear_scale_params
+5565   seeds      _small_family                      config: TRACE; selection: _SMALL_FAMILY, _SMALL_FAMILY_KEEP, _SMALL_FAMILY_SHARE; tree: to_string
+5590   seeds      _refit_inner                       evaluate: _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING; selection: _lm_to_convergence
+5609   seeds      _make_tolerant_seeds               config: TRACE, _GENERIC_CSV_MODE; selection: _SMALL_ON; tree: to_string
+5717   fitness    _linear_scale_params               config: _LS_SCALE_ONLY
+5781   fitness    raw_mse                            config: _SYRACUSE_MODE; evaluate: _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING, _pearson_r, _predict_cached; tree: tree_size
+5878   fitness    raw_pearson_r                      evaluate: _pearson_r, _predict_cached
+5896   fitness    _pure_mse                          evaluate: _USE_LINEAR_SCALING, _predict_cached
+5949   fitness    _scale_tree                        tree: Node
+5973   fitness    wrap_linear_scaling                config: _LS_SCALE_ONLY; evaluate: _USE_LINEAR_SCALING, evaluate_vector; simplify: simplify; tree: Node
+6096   fitness    fitness                            config: TRACE, _SYRACUSE_MODE, _dim_active, _ds; datasets: _fitness_cache; evaluate: _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING; tree: _FLOAT_GAMMA, tree_complexity, tree_depth, tree_size
+6182   operators  random_terminal                    config: _SYRACUSE_MODE; fitness: _feature_usage_counter, get_feature_bias_weights; tree: Node
+6196   operators  _random_tree_full                  config: _active_pools; tree: Node
+6214   operators  _random_tree_grow                  config: _active_pools; tree: Node
+6250   simplify   _clear_simplify_caches             memory: _TRIVIAL_CACHE
+6278   simplify   _simplify_tree                     tree: Node
+6320   simplify   _simplify_node                     config: BINARY_OPS; numeric: safe_arcsin, safe_div, safe_exp, safe_log, safe_pow, safe_sqrt, safe_tan; tree: Node
+6441   constants  optimize_constants_lm              config: _LS_SCALE_ONLY; evaluate: _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING, _collect_constants_ordered, _lm_column, _lm_plan, compile_parametric; fitness: _linear_scale_params, _pure_mse; numeric: _np_maximum, _np_minimum; simplify: _invalidate_all_hashes; tree: tree_complexity, tree_depth
+6603   constants  optimize_constants_adam            evaluate: compile_parametric; fitness: _pure_mse; simplify: _invalidate_all_hashes; tree: tree_complexity
+6740   operators  _semantic_key                      evaluate: _predict_cached
+6753   operators  semantic_dedup                     tree: tree_size
+6789   operators  EpsilonLexicaseSelector            evaluate: _USE_LINEAR_SCALING, _predict_cached; fitness: _linear_scale_params
+6886   operators  tournament                         fitness: fitness
+6903   operators  crossover_size_fair                tree: get_all_nodes, tree_depth, tree_size
+6951   operators  hoist_mutation                     tree: get_all_nodes
+6970   operators  shrink_mutation                    tree: get_all_nodes
+6987   operators  point_mutation                     config: ALL_BINARY_OPS, ALL_UNARY_OPS, _get_ops_for_role; simplify: simplify; tree: get_all_nodes
+7017   operators  semantic_mutation                  fitness: fitness
+7034   operators  subtree_mutation                   config: _random_tree_nd; simplify: simplify; tree: get_all_nodes, tree_depth, tree_size
+7057   operators  stigmergic_mutation                memory: FRAGMENT_LIB; simplify: simplify; tree: get_all_nodes, tree_depth, tree_size
+7085   operators  fragment_inject_mutation           memory: FRAGMENT_LIB; simplify: simplify; tree: get_all_nodes, tree_size
+7132   operators  mutate                             memory: FRAGMENT_LIB
+7156   operators  pareto_rank                        fitness: raw_mse; tree: tree_size
+7183   operators  build_stigmergic_tree              parallel: _pool_choice; simplify: simplify; tree: Node, get_all_nodes, tree_size
+7246   operators  build_stigmergic_tree_v2           parallel: _pool_choice; simplify: simplify; tree: Node, get_all_nodes, tree_size
+7354   operators  warm_transfer                      memory: COGRAPH, FRAGMENT_LIB, FragmentCoGraph, FragmentLibrary, SEQ_MEM
+7399   operators  build_stigmergic_tree_v3           simplify: simplify; tree: Node, get_all_nodes, tree_size
+7512   islands    Island                             config: _dim_active, _ds, _nd_diverse_population; fitness: fitness; memory: COGRAPH, FRAGMENT_LIB, SEQ_MEM, _DIM_GATE_DIMS, _DIM_GATE_TARGET; operators: build_stigmergic_tree_v3, random_tree; parallel: _active_pool_ops; tree: tree_size
+7661   islands    migrate                            fitness: fitness; memory: FRAGMENT_LIB, PROBE_X, compute_semantic_sig
+7701   islands    evolve_island                      config: TRACE, _SYRACUSE_MODE, _detect_dominant_op, _dim_active, _ds, _nd_diverse_population, _random_tree_nd; constants: optimize_constants_adam; datasets: _fitness_cache; evaluate: evaluate_vector; fitness: fitness, raw_mse, raw_pearson_r, record_feature_usage; memory: COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, update_residual_sig; operators: EpsilonLexicaseSelector, build_stigmergic_tree_v3, crossover_size_fair, mutate, random_tree, semantic_dedup, semantic_mutation, tournament; parallel: _active_pool_ops; simplify: simplify; tree: get_all_nodes, tree_depth, tree_size
+8190   parallel   _parallel_worker_init              config: CSV_FEATURE_NAMES, CSV_TARGET_NAME, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _SYRACUSE_MODE; datasets: _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW; evaluate: _USE_LINEAR_SCALING; islands: _PW; memory: PROBE_X
+8251   parallel   _island_round_task                 config: _SYRACUSE_MODE; datasets: _fitness_cache; islands: _PW, evolve_island; memory: COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, SEQ_MEM; simplify: _clear_simplify_caches
+8284   parallel   _active_pool_ops                   config: _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
+8334   parallel   _exit_if_reimported_by_worker      console: os
+8357   parallel   _warn_unguarded_main               console: os
+8394   parallel   _evolve_parallel                   config: CSV_FEATURE_NAMES, CSV_TARGET_NAME, TRACE, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _SYRACUSE_MODE; evaluate: _USE_LINEAR_SCALING; fitness: fitness, raw_mse, wrap_linear_scaling; islands: migrate; memory: COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, update_residual_sig; search: _smart_reset_explorers; selection: _Patience, _early_stop_threshold, _holdout_mse, _track_small_candidate, _track_val_candidate; tree: to_string, tree_depth, tree_size
+8647   selection  _formula_faithful                  evaluate: evaluate_vector; parallel: _FAITHFUL_CACHE, _VAL_TRAIN_XS, _VAL_XS
+8696   selection  _early_stop_threshold              config: _GENERIC_CSV_MODE; parallel: _EXACT_REL, _VAL_YS
+8751   selection  _holdout_mse                       evaluate: evaluate_vector; fitness: _pure_mse; parallel: _VAL_XS, _VAL_YS
+8764   selection  _is_numerically_stable             evaluate: evaluate_vector; parallel: _VAL_TRAIN_XS
+8801   selection  _track_val_candidate               config: _DIM_UNKNOWN_CONST, _ds; evaluate: evaluate_vector; memory: _DIM_GATE_DIMS, _DIM_GATE_TARGET; parallel: _VAL_XS, _VAL_YS; tree: tree_size
+8885   selection  _weight_sums                       tree: Node
+8920   selection  _lm_to_convergence                 constants: optimize_constants_lm
+8936   selection  _refit_scaling                     config: _LS_SCALE_ONLY; evaluate: _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING, evaluate_vector; fitness: _linear_scale_params, wrap_linear_scaling; tree: Node
+8975   selection  _finalists                         parallel: _VAL_YS
+9015   selection  _track_if_exact                    evaluate: evaluate_vector; parallel: _EXACT_REL, _VAL_XS, _VAL_YS
+9040   selection  _polish_finalists                  constants: optimize_constants_adam; evaluate: _CUSTOM_LOSS_FN; fitness: _pure_mse; simplify: simplify
+9074   selection  _build_near_probes                 parallel: _NEAR_BAND, _NEAR_PROBE_XS
+9091   selection  _near_domain_stable                evaluate: evaluate_vector; parallel: _NEAR_BAND, _NEAR_CACHE, _NEAR_PROBE_XS
+9116   selection  _select_one_se                     config: TRACE; parallel: _EXACT_PRIORITY_SWAPS, _EXACT_REL, _FAITHFUL_SWAPS, _NEAR_GUARD_SWAPS, _VAL_YS; tree: tree_size
+9255   selection  _small_setup                       config: _GENERIC_CSV_MODE; evaluate: _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING; parallel: _VAL_XS
+9270   selection  _track_small_candidate             config: _DIM_UNKNOWN_CONST, _ds; evaluate: evaluate_vector; memory: _DIM_GATE_DIMS, _DIM_GATE_TARGET; tree: tree_size
+9329   selection  _small_round_powers                config: _GENERIC_BINARY_OPS, _GENERIC_UNARY_OPS; tree: Node
+9393   selection  _small_fit                         config: _LS_SCALE_ONLY; evaluate: evaluate_vector; fitness: _linear_scale_params
+9420   selection  _small_cv                          evaluate: evaluate_vector
+9445   selection  _small_n_par                       evaluate: compile_parametric, evaluate_vector
+9480   selection  _small_materialize                 simplify: simplify; tree: Node
+9492   selection  _small_specs                       config: _DIM_UNKNOWN_CONST, _LS_SCALE_ONLY, _ds; memory: _DIM_GATE_DIMS, _DIM_GATE_TARGET; tree: Node
+9541   selection  _small_table_select                config: TRACE; parallel: _VAL_TRAIN_XS; tree: tree_size
+9578   selection  _small_choose                      parallel: _EXACT_REL, _FAITHFUL_CACHE, _NEAR_CACHE, _VAL_TRAIN_XS
+9614   search     _split_holdout                     parallel: _FAITHFUL_CACHE, _NEAR_BAND, _NEAR_CACHE, _NEAR_PROBE_XS, _VAL_TRAIN_XS, _VAL_XS, _VAL_YS; selection: _EXTRAP_BAND, _EXTRAP_PROBE_XS, _VAL_CANDS, _VAL_TRAIN_YS, _build_near_probes
+9717   search     _make_linear_candidate             tree: Node
+9763   search     _smart_reset_explorers             config: _random_tree_nd; memory: CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, semantic_score; tree: Node
+9837   search     evolve                             config: ALL_OPS, TRACE, _BATTERY_BINARY_OPS, _BATTERY_CSV_MODE, _BATTERY_UNARY_OPS, _DIM_UNKNOWN_CONST, _LS_SCALE_ONLY, _SYRACUSE_BINARY_OPS, _SYRACUSE_MODE, _SYRACUSE_UNARY_OPS, _dim_active; console: os; constants: optimize_constants_adam; datasets: _fitness_cache, build_dataset; evaluate: _PARAMETRIC_CACHE, _PRED_CACHE, _USE_LINEAR_SCALING; fitness: _pure_mse, fitness, raw_mse, reset_feature_usage, wrap_linear_scaling; islands: Island, evolve_island, migrate; memory: COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _DIM_GATE_DIMS, _DIM_GATE_TARGET, init_probe_set; parallel: _SkipLogExport, _VAL_XS, _VAL_YS, _evolve_parallel, _exit_if_reimported_by_worker, _parallel_enabled; seeds: _make_binomial_seeds, _make_elementary_seeds, _make_motif_seeds, _make_power_law_seeds, _make_tolerant_seeds; selection: _EXTRAP_PROBE_XS, _Patience, _SMALL_ON, _early_stop_threshold, _finalists, _holdout_mse, _is_numerically_stable, _polish_finalists, _refit_scaling, _select_one_se, _small_setup, _small_table_select, _track_small_candidate, _track_val_candidate; simplify: _clear_simplify_caches, simplify; tree: Node, to_string, tree_depth, tree_size
+10583  console    print_result                       evaluate: evaluate, evaluate_vector; fitness: _pure_mse, fitness, raw_mse; simplify: simplify; tree: to_string, tree_depth, tree_size
+10660  console    decoy_report                       data: DECOY_FEATURES; evaluate: evaluate_vector; memory: SEQ_MEM; tree: to_string
+10793  console    try_plot                           evaluate: evaluate; tree: to_string
+10850  console    run                                config: Config; search: evolve
+11039  data       _choose_scaler                     core: _MinMaxScaler
+11089  data       load_generic_csv                   config: CSV_FEATURE_NAMES, CSV_TARGET_NAME, _GENCSV_POOLS, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS; console: os; core: _csv_deps, _csv_deps_ok
+11194  data       load_custom_csv                    config: _BATTERY_CSV_MODE, _BATTERY_UNARY_OPS; console: os; core: _MinMaxScaler, _csv_deps, _csv_deps_ok
+11424  config     _nd_diverse_population             tree: Node
+11452  config     _random_tree_full_nd               operators: random_terminal; tree: Node
+11466  config     _random_tree_grow_nd               operators: random_terminal; tree: Node
+11623  console    _one_run                           fitness: raw_mse; search: evolve; tree: to_string, tree_size
+11641  console    run_benchmark                      config: make_cfg; data: PROBLEMS; operators: warm_transfer
+11800  console    _print_menu                        data: PROBLEMS
+11857  console    _interactive_menu                  config: make_cfg, make_cfg_nd; data: DECOY_FEATURES, ND_PROBLEMS, PROBLEMS, load_custom_csv, load_generic_csv; datasets: SYRACUSE_N_FEATURES, _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_Y_RAW, _collatz_flight_time, _v2, generate_syracuse_dataset; evaluate: evaluate_vector; fitness: _scale_tree, _target_scale; memory: FRAGMENT_LIB; search: evolve; tree: Node, to_string
+12672  console    _deduce_console_constant           data: _IdentityScaler, _ShiftFreeScaler
+
+## Roles: which roles each uses (number of uses)
+config     -> memory 1, operators 2, tree 3
+console    -> config 6, data 14, datasets 9, evaluate 6, fitness 6, memory 2, operators 1, search 4, simplify 1, tree 9
+constants  -> config 1, evaluate 7, fitness 3, numeric 2, simplify 2, tree 3
+core       -> -
+data       -> config 10, console 2, core 6, datasets 1
+datasets   -> config 3, data 1, evaluate 2
+evaluate   -> numeric 41
+fitness    -> config 7, datasets 1, evaluate 12, simplify 1, tree 7
+islands    -> config 10, constants 1, datasets 1, evaluate 1, fitness 6, memory 14, operators 10, parallel 2, simplify 1, tree 4
+memory     -> config 1, console 1, evaluate 4, operators 2, simplify 2, tree 9
+numeric    -> tree 7
+operators  -> config 7, evaluate 3, fitness 6, memory 8, parallel 2, simplify 7, tree 28
+parallel   -> config 27, console 2, datasets 3, evaluate 2, fitness 3, islands 4, memory 11, search 1, selection 5, simplify 1, tree 3
+search     -> config 12, console 1, constants 1, datasets 2, evaluate 3, fitness 5, islands 3, memory 11, parallel 13, seeds 5, selection 19, simplify 2, tree 6
+seeds      -> config 20, evaluate 3, fitness 2, selection 5, tree 12
+selection  -> config 15, constants 2, evaluate 17, fitness 5, memory 6, parallel 30, simplify 2, tree 9
+simplify   -> config 1, memory 1, numeric 7, tree 2
+tree       -> config 20, console 2
+
+## Cycles between roles: 1
+roles config, console, constants, data, datasets, evaluate, fitness, islands, memory, numeric, operators, parallel, search, seeds, selection, simplify, tree:
+   config -> memory (1): _ds uses _DIM_SEARCH
+   config -> operators (2): _random_tree_full_nd uses random_terminal; _random_tree_grow_nd uses random_terminal
+   config -> tree (3): _nd_diverse_population uses Node; _random_tree_full_nd uses Node; _random_tree_grow_nd uses Node
+   console -> config (6): _interactive_menu uses make_cfg; _interactive_menu uses make_cfg_nd; line 12756 (If) uses make_cfg; line 12756 (If) uses make_cfg_nd; run uses Config; run_benchmark uses make_cfg
+   console -> data (14): _deduce_console_constant uses _IdentityScaler; _deduce_console_constant uses _ShiftFreeScaler; _interactive_menu uses DECOY_FEATURES; _interactive_menu uses ND_PROBLEMS; _interactive_menu uses PROBLEMS; _interactive_menu uses load_custom_csv; _interactive_menu uses load_generic_csv; _print_menu uses PROBLEMS; decoy_report uses DECOY_FEATURES; line 12756 (If) uses DECOY_FEATURES; line 12756 (If) uses ND_PROBLEMS; line 12756 (If) uses PROBLEMS ...
+   console -> datasets (9): _interactive_menu uses SYRACUSE_N_FEATURES; _interactive_menu uses _SYRACUSE_FEAT_MAXS; _interactive_menu uses _SYRACUSE_FEAT_MINS; _interactive_menu uses _SYRACUSE_Y_RAW; _interactive_menu uses _collatz_flight_time; _interactive_menu uses _v2; _interactive_menu uses generate_syracuse_dataset; line 12756 (If) uses SYRACUSE_N_FEATURES; line 12756 (If) uses generate_syracuse_dataset
+   console -> evaluate (6): _interactive_menu uses evaluate_vector; decoy_report uses evaluate_vector; line 12756 (If) uses evaluate_vector; print_result uses evaluate; print_result uses evaluate_vector; try_plot uses evaluate
+   console -> fitness (6): _interactive_menu uses _scale_tree; _interactive_menu uses _target_scale; _one_run uses raw_mse; print_result uses _pure_mse; print_result uses fitness; print_result uses raw_mse
+   console -> memory (2): _interactive_menu uses FRAGMENT_LIB; decoy_report uses SEQ_MEM
+   console -> operators (1): run_benchmark uses warm_transfer
+   console -> search (4): _interactive_menu uses evolve; _one_run uses evolve; line 12756 (If) uses evolve; run uses evolve
+   console -> simplify (1): print_result uses simplify
+   console -> tree (9): _interactive_menu uses Node; _interactive_menu uses to_string; _one_run uses to_string; _one_run uses tree_size; decoy_report uses to_string; print_result uses to_string; print_result uses tree_depth; print_result uses tree_size; try_plot uses to_string
+   constants -> config (1): optimize_constants_lm uses _LS_SCALE_ONLY
+   constants -> evaluate (7): optimize_constants_adam uses compile_parametric; optimize_constants_lm uses _CUSTOM_LOSS_FN; optimize_constants_lm uses _USE_LINEAR_SCALING; optimize_constants_lm uses _collect_constants_ordered; optimize_constants_lm uses _lm_column; optimize_constants_lm uses _lm_plan; optimize_constants_lm uses compile_parametric
+   constants -> fitness (3): optimize_constants_adam uses _pure_mse; optimize_constants_lm uses _linear_scale_params; optimize_constants_lm uses _pure_mse
+   constants -> numeric (2): optimize_constants_lm uses _np_maximum; optimize_constants_lm uses _np_minimum
+   constants -> simplify (2): optimize_constants_adam uses _invalidate_all_hashes; optimize_constants_lm uses _invalidate_all_hashes
+   constants -> tree (3): optimize_constants_adam uses tree_complexity; optimize_constants_lm uses tree_complexity; optimize_constants_lm uses tree_depth
+   data -> config (10): load_custom_csv uses _BATTERY_CSV_MODE; load_custom_csv uses _BATTERY_UNARY_OPS; load_generic_csv uses CSV_FEATURE_NAMES; load_generic_csv uses CSV_TARGET_NAME; load_generic_csv uses _GENCSV_POOLS; load_generic_csv uses _GENERIC_BINARY_OPS; load_generic_csv uses _GENERIC_BINARY_WEIGHTS; load_generic_csv uses _GENERIC_CSV_MODE; load_generic_csv uses _GENERIC_UNARY_OPS; load_generic_csv uses _GENERIC_UNARY_WEIGHTS
+   data -> console (2): load_custom_csv uses os; load_generic_csv uses os
+   data -> datasets (1): line 11325 (AnnAssign) uses SYRACUSE_N_FEATURES
+   datasets -> config (3): generate_syracuse_dataset uses _SYRACUSE_BINARY_OPS; generate_syracuse_dataset uses _SYRACUSE_MODE; generate_syracuse_dataset uses _SYRACUSE_UNARY_OPS
+   datasets -> data (1): build_dataset uses DECOY_FEATURES
+   datasets -> evaluate (2): build_dataset uses _HOT_ZONES; generate_syracuse_dataset uses _HOT_ZONES
+   evaluate -> numeric (41): _interp uses _is_const_subtree; _interp uses _np_safe_pow; _interp uses _np_safe_pow_var; _lm_build_plan uses _NP_GLOBALS; _lm_build_plan uses _is_const_subtree; _to_np_code uses _is_const_subtree; _to_np_code_parametric uses _is_const_subtree; compile_parametric uses _NP_GLOBALS; compile_to_numpy uses _COMPILE_CACHE; compile_to_numpy uses _COMPILE_CACHE_MAX; compile_to_numpy uses _NP_GLOBALS; evaluate uses safe_arcsin ...
+   fitness -> config (7): _linear_scale_params uses _LS_SCALE_ONLY; fitness uses TRACE; fitness uses _SYRACUSE_MODE; fitness uses _dim_active; fitness uses _ds; raw_mse uses _SYRACUSE_MODE; wrap_linear_scaling uses _LS_SCALE_ONLY
+   fitness -> datasets (1): fitness uses _fitness_cache
+   fitness -> evaluate (12): _pure_mse uses _USE_LINEAR_SCALING; _pure_mse uses _predict_cached; fitness uses _CUSTOM_LOSS_FN; fitness uses _USE_LINEAR_SCALING; raw_mse uses _CUSTOM_LOSS_FN; raw_mse uses _USE_LINEAR_SCALING; raw_mse uses _pearson_r; raw_mse uses _predict_cached; raw_pearson_r uses _pearson_r; raw_pearson_r uses _predict_cached; wrap_linear_scaling uses _USE_LINEAR_SCALING; wrap_linear_scaling uses evaluate_vector
+   fitness -> simplify (1): wrap_linear_scaling uses simplify
+   fitness -> tree (7): _scale_tree uses Node; fitness uses _FLOAT_GAMMA; fitness uses tree_complexity; fitness uses tree_depth; fitness uses tree_size; raw_mse uses tree_size; wrap_linear_scaling uses Node
+   islands -> config (10): Island uses _dim_active; Island uses _ds; Island uses _nd_diverse_population; evolve_island uses TRACE; evolve_island uses _SYRACUSE_MODE; evolve_island uses _detect_dominant_op; evolve_island uses _dim_active; evolve_island uses _ds; evolve_island uses _nd_diverse_population; evolve_island uses _random_tree_nd
+   islands -> constants (1): evolve_island uses optimize_constants_adam
+   islands -> datasets (1): evolve_island uses _fitness_cache
+   islands -> evaluate (1): evolve_island uses evaluate_vector
+   islands -> fitness (6): Island uses fitness; evolve_island uses fitness; evolve_island uses raw_mse; evolve_island uses raw_pearson_r; evolve_island uses record_feature_usage; migrate uses fitness
+   islands -> memory (14): Island uses COGRAPH; Island uses FRAGMENT_LIB; Island uses SEQ_MEM; Island uses _DIM_GATE_DIMS; Island uses _DIM_GATE_TARGET; evolve_island uses COGRAPH; evolve_island uses CURRENT_RESIDUAL_SIG; evolve_island uses FRAGMENT_LIB; evolve_island uses PROBE_X; evolve_island uses SEQ_MEM; evolve_island uses update_residual_sig; migrate uses FRAGMENT_LIB ...
+   islands -> operators (10): Island uses build_stigmergic_tree_v3; Island uses random_tree; evolve_island uses EpsilonLexicaseSelector; evolve_island uses build_stigmergic_tree_v3; evolve_island uses crossover_size_fair; evolve_island uses mutate; evolve_island uses random_tree; evolve_island uses semantic_dedup; evolve_island uses semantic_mutation; evolve_island uses tournament
+   islands -> parallel (2): Island uses _active_pool_ops; evolve_island uses _active_pool_ops
+   islands -> simplify (1): evolve_island uses simplify
+   islands -> tree (4): Island uses tree_size; evolve_island uses get_all_nodes; evolve_island uses tree_depth; evolve_island uses tree_size
+   memory -> config (1): FragmentSequenceMemory uses _active_pools
+   memory -> console (1): FragmentSequenceMemory uses os
+   memory -> evaluate (4): FragmentLibrary uses evaluate_vector; FragmentSequenceMemory uses _safe_write; compute_semantic_sig uses evaluate_vector; update_residual_sig uses evaluate_vector
+   memory -> operators (2): FragmentSequenceMemory uses random_terminal; FragmentSequenceMemory uses random_tree
+   memory -> simplify (2): FragmentLibrary uses simplify; FragmentSequenceMemory uses simplify
+   memory -> tree (9): FragmentCoGraph uses get_all_nodes; FragmentCoGraph uses to_string; FragmentCoGraph uses tree_size; FragmentLibrary uses get_all_nodes; FragmentLibrary uses tree_depth; FragmentLibrary uses tree_size; FragmentSequenceMemory uses Node; FragmentSequenceMemory uses tree_depth; FragmentSequenceMemory uses tree_size
+   numeric -> tree (7): _np_safe_div uses _SAFE_LIMIT; _np_safe_pow uses _SAFE_LIMIT; _np_safe_pow_var uses _SAFE_LIMIT; _np_safe_tan uses _SAFE_LIMIT; safe_exp uses _SAFE_LIMIT; safe_pow uses _SAFE_LIMIT; safe_tan uses _SAFE_LIMIT
+   operators -> config (7): _random_tree_full uses _active_pools; _random_tree_grow uses _active_pools; point_mutation uses ALL_BINARY_OPS; point_mutation uses ALL_UNARY_OPS; point_mutation uses _get_ops_for_role; random_terminal uses _SYRACUSE_MODE; subtree_mutation uses _random_tree_nd
+   operators -> evaluate (3): EpsilonLexicaseSelector uses _USE_LINEAR_SCALING; EpsilonLexicaseSelector uses _predict_cached; _semantic_key uses _predict_cached
+   operators -> fitness (6): EpsilonLexicaseSelector uses _linear_scale_params; pareto_rank uses raw_mse; random_terminal uses _feature_usage_counter; random_terminal uses get_feature_bias_weights; semantic_mutation uses fitness; tournament uses fitness
+   operators -> memory (8): fragment_inject_mutation uses FRAGMENT_LIB; mutate uses FRAGMENT_LIB; stigmergic_mutation uses FRAGMENT_LIB; warm_transfer uses COGRAPH; warm_transfer uses FRAGMENT_LIB; warm_transfer uses FragmentCoGraph; warm_transfer uses FragmentLibrary; warm_transfer uses SEQ_MEM
+   operators -> parallel (2): build_stigmergic_tree uses _pool_choice; build_stigmergic_tree_v2 uses _pool_choice
+   operators -> simplify (7): build_stigmergic_tree uses simplify; build_stigmergic_tree_v2 uses simplify; build_stigmergic_tree_v3 uses simplify; fragment_inject_mutation uses simplify; point_mutation uses simplify; stigmergic_mutation uses simplify; subtree_mutation uses simplify
+   operators -> tree (28): _random_tree_full uses Node; _random_tree_grow uses Node; build_stigmergic_tree uses Node; build_stigmergic_tree uses get_all_nodes; build_stigmergic_tree uses tree_size; build_stigmergic_tree_v2 uses Node; build_stigmergic_tree_v2 uses get_all_nodes; build_stigmergic_tree_v2 uses tree_size; build_stigmergic_tree_v3 uses Node; build_stigmergic_tree_v3 uses get_all_nodes; build_stigmergic_tree_v3 uses tree_size; crossover_size_fair uses get_all_nodes ...
+   parallel -> config (27): _active_pool_ops uses _GENERIC_BINARY_OPS; _active_pool_ops uses _GENERIC_CSV_MODE; _active_pool_ops uses _GENERIC_UNARY_OPS; _evolve_parallel uses CSV_FEATURE_NAMES; _evolve_parallel uses CSV_TARGET_NAME; _evolve_parallel uses TRACE; _evolve_parallel uses _BATTERY_CSV_MODE; _evolve_parallel uses _DIM_UNKNOWN_CONST; _evolve_parallel uses _GENERIC_BINARY_OPS; _evolve_parallel uses _GENERIC_BINARY_WEIGHTS; _evolve_parallel uses _GENERIC_CSV_MODE; _evolve_parallel uses _GENERIC_UNARY_OPS ...
+   parallel -> console (2): _exit_if_reimported_by_worker uses os; _warn_unguarded_main uses os
+   parallel -> datasets (3): _island_round_task uses _fitness_cache; _parallel_worker_init uses _SYRACUSE_X_RAW; _parallel_worker_init uses _SYRACUSE_Y_RAW
+   parallel -> evaluate (2): _evolve_parallel uses _USE_LINEAR_SCALING; _parallel_worker_init uses _USE_LINEAR_SCALING
+   parallel -> fitness (3): _evolve_parallel uses fitness; _evolve_parallel uses raw_mse; _evolve_parallel uses wrap_linear_scaling
+   parallel -> islands (4): _evolve_parallel uses migrate; _island_round_task uses _PW; _island_round_task uses evolve_island; _parallel_worker_init uses _PW
+   parallel -> memory (11): _evolve_parallel uses COGRAPH; _evolve_parallel uses CURRENT_RESIDUAL_SIG; _evolve_parallel uses FRAGMENT_LIB; _evolve_parallel uses PROBE_X; _evolve_parallel uses SEQ_MEM; _evolve_parallel uses update_residual_sig; _island_round_task uses COGRAPH; _island_round_task uses CURRENT_RESIDUAL_SIG; _island_round_task uses FRAGMENT_LIB; _island_round_task uses SEQ_MEM; _parallel_worker_init uses PROBE_X
+   parallel -> search (1): _evolve_parallel uses _smart_reset_explorers
+   parallel -> selection (5): _evolve_parallel uses _Patience; _evolve_parallel uses _early_stop_threshold; _evolve_parallel uses _holdout_mse; _evolve_parallel uses _track_small_candidate; _evolve_parallel uses _track_val_candidate
+   parallel -> simplify (1): _island_round_task uses _clear_simplify_caches
+   parallel -> tree (3): _evolve_parallel uses to_string; _evolve_parallel uses tree_depth; _evolve_parallel uses tree_size
+   search -> config (12): _smart_reset_explorers uses _random_tree_nd; evolve uses ALL_OPS; evolve uses TRACE; evolve uses _BATTERY_BINARY_OPS; evolve uses _BATTERY_CSV_MODE; evolve uses _BATTERY_UNARY_OPS; evolve uses _DIM_UNKNOWN_CONST; evolve uses _LS_SCALE_ONLY; evolve uses _SYRACUSE_BINARY_OPS; evolve uses _SYRACUSE_MODE; evolve uses _SYRACUSE_UNARY_OPS; evolve uses _dim_active
+   search -> console (1): evolve uses os
+   search -> constants (1): evolve uses optimize_constants_adam
+   search -> datasets (2): evolve uses _fitness_cache; evolve uses build_dataset
+   search -> evaluate (3): evolve uses _PARAMETRIC_CACHE; evolve uses _PRED_CACHE; evolve uses _USE_LINEAR_SCALING
+   search -> fitness (5): evolve uses _pure_mse; evolve uses fitness; evolve uses raw_mse; evolve uses reset_feature_usage; evolve uses wrap_linear_scaling
+   search -> islands (3): evolve uses Island; evolve uses evolve_island; evolve uses migrate
+   search -> memory (11): _smart_reset_explorers uses CURRENT_RESIDUAL_SIG; _smart_reset_explorers uses FRAGMENT_LIB; _smart_reset_explorers uses semantic_score; evolve uses COGRAPH; evolve uses CURRENT_RESIDUAL_SIG; evolve uses FRAGMENT_LIB; evolve uses PROBE_X; evolve uses SEQ_MEM; evolve uses _DIM_GATE_DIMS; evolve uses _DIM_GATE_TARGET; evolve uses init_probe_set
+   search -> parallel (13): _split_holdout uses _FAITHFUL_CACHE; _split_holdout uses _NEAR_BAND; _split_holdout uses _NEAR_CACHE; _split_holdout uses _NEAR_PROBE_XS; _split_holdout uses _VAL_TRAIN_XS; _split_holdout uses _VAL_XS; _split_holdout uses _VAL_YS; evolve uses _SkipLogExport; evolve uses _VAL_XS; evolve uses _VAL_YS; evolve uses _evolve_parallel; evolve uses _exit_if_reimported_by_worker ...
+   search -> seeds (5): evolve uses _make_binomial_seeds; evolve uses _make_elementary_seeds; evolve uses _make_motif_seeds; evolve uses _make_power_law_seeds; evolve uses _make_tolerant_seeds
+   search -> selection (19): _split_holdout uses _EXTRAP_BAND; _split_holdout uses _EXTRAP_PROBE_XS; _split_holdout uses _VAL_CANDS; _split_holdout uses _VAL_TRAIN_YS; _split_holdout uses _build_near_probes; evolve uses _EXTRAP_PROBE_XS; evolve uses _Patience; evolve uses _SMALL_ON; evolve uses _early_stop_threshold; evolve uses _finalists; evolve uses _holdout_mse; evolve uses _is_numerically_stable ...
+   search -> simplify (2): evolve uses _clear_simplify_caches; evolve uses simplify
+   search -> tree (6): _make_linear_candidate uses Node; _smart_reset_explorers uses Node; evolve uses Node; evolve uses to_string; evolve uses tree_depth; evolve uses tree_size
+   seeds -> config (20): _make_binomial_seeds uses TRACE; _make_binomial_seeds uses _GENERIC_BINARY_OPS; _make_binomial_seeds uses _GENERIC_CSV_MODE; _make_binomial_seeds uses _GENERIC_UNARY_OPS; _make_elementary_seeds uses TRACE; _make_elementary_seeds uses _GENERIC_BINARY_OPS; _make_elementary_seeds uses _GENERIC_CSV_MODE; _make_elementary_seeds uses _GENERIC_UNARY_OPS; _make_power_law_seeds uses TRACE; _make_power_law_seeds uses _GENERIC_BINARY_OPS; _make_power_law_seeds uses _GENERIC_CSV_MODE; _make_power_law_seeds uses _GENERIC_UNARY_OPS ...
+   seeds -> evaluate (3): _refit_inner uses _CUSTOM_LOSS_FN; _refit_inner uses _USE_LINEAR_SCALING; _seed_rel_error uses evaluate_vector
+   seeds -> fitness (2): _pred_rel_error uses _linear_scale_params; _seed_rel_error uses _linear_scale_params
+   seeds -> selection (5): _make_tolerant_seeds uses _SMALL_ON; _refit_inner uses _lm_to_convergence; _small_family uses _SMALL_FAMILY; _small_family uses _SMALL_FAMILY_KEEP; _small_family uses _SMALL_FAMILY_SHARE
+   seeds -> tree (12): _half_integer_power uses Node; _make_binomial_seeds uses Node; _make_binomial_seeds uses to_string; _make_elementary_seeds uses Node; _make_elementary_seeds uses to_string; _make_motif_seeds uses Node; _make_power_law_seeds uses Node; _make_power_law_seeds uses to_string; _make_tolerant_seeds uses to_string; _monomial uses Node; _product uses Node; _small_family uses to_string
+   selection -> config (15): _early_stop_threshold uses _GENERIC_CSV_MODE; _refit_scaling uses _LS_SCALE_ONLY; _select_one_se uses TRACE; _small_fit uses _LS_SCALE_ONLY; _small_round_powers uses _GENERIC_BINARY_OPS; _small_round_powers uses _GENERIC_UNARY_OPS; _small_setup uses _GENERIC_CSV_MODE; _small_specs uses _DIM_UNKNOWN_CONST; _small_specs uses _LS_SCALE_ONLY; _small_specs uses _ds; _small_table_select uses TRACE; _track_small_candidate uses _DIM_UNKNOWN_CONST ...
+   selection -> constants (2): _lm_to_convergence uses optimize_constants_lm; _polish_finalists uses optimize_constants_adam
+   selection -> evaluate (17): _formula_faithful uses evaluate_vector; _holdout_mse uses evaluate_vector; _is_numerically_stable uses evaluate_vector; _near_domain_stable uses evaluate_vector; _polish_finalists uses _CUSTOM_LOSS_FN; _refit_scaling uses _CUSTOM_LOSS_FN; _refit_scaling uses _USE_LINEAR_SCALING; _refit_scaling uses evaluate_vector; _small_cv uses evaluate_vector; _small_fit uses evaluate_vector; _small_n_par uses compile_parametric; _small_n_par uses evaluate_vector ...
+   selection -> fitness (5): _holdout_mse uses _pure_mse; _polish_finalists uses _pure_mse; _refit_scaling uses _linear_scale_params; _refit_scaling uses wrap_linear_scaling; _small_fit uses _linear_scale_params
+   selection -> memory (6): _small_specs uses _DIM_GATE_DIMS; _small_specs uses _DIM_GATE_TARGET; _track_small_candidate uses _DIM_GATE_DIMS; _track_small_candidate uses _DIM_GATE_TARGET; _track_val_candidate uses _DIM_GATE_DIMS; _track_val_candidate uses _DIM_GATE_TARGET
+   selection -> parallel (30): _build_near_probes uses _NEAR_BAND; _build_near_probes uses _NEAR_PROBE_XS; _early_stop_threshold uses _EXACT_REL; _early_stop_threshold uses _VAL_YS; _finalists uses _VAL_YS; _formula_faithful uses _FAITHFUL_CACHE; _formula_faithful uses _VAL_TRAIN_XS; _formula_faithful uses _VAL_XS; _holdout_mse uses _VAL_XS; _holdout_mse uses _VAL_YS; _is_numerically_stable uses _VAL_TRAIN_XS; _near_domain_stable uses _NEAR_BAND ...
+   selection -> simplify (2): _polish_finalists uses simplify; _small_materialize uses simplify
+   selection -> tree (9): _refit_scaling uses Node; _select_one_se uses tree_size; _small_materialize uses Node; _small_round_powers uses Node; _small_specs uses Node; _small_table_select uses tree_size; _track_small_candidate uses tree_size; _track_val_candidate uses tree_size; _weight_sums uses Node
+   simplify -> config (1): _simplify_node uses BINARY_OPS
+   simplify -> memory (1): _clear_simplify_caches uses _TRIVIAL_CACHE
+   simplify -> numeric (7): _simplify_node uses safe_arcsin; _simplify_node uses safe_div; _simplify_node uses safe_exp; _simplify_node uses safe_log; _simplify_node uses safe_pow; _simplify_node uses safe_sqrt; _simplify_node uses safe_tan
+   simplify -> tree (2): _simplify_node uses Node; _simplify_tree uses Node
+   tree -> config (20): Node uses _PACK_D; Node uses _STR_CODES; Node uses _UNPACK_Q; _leaf_code_canonical uses _CANON_CONST; _leaf_code_canonical uses _TAG_OTHER; _leaf_code_exact uses _PACK_D; _leaf_code_exact uses _TAG_FLOAT; _leaf_code_exact uses _TAG_OTHER; _leaf_code_exact uses _UNPACK_Q; _leaf_code_rounded uses _PACK_D; _leaf_code_rounded uses _TAG_FLOAT; _leaf_code_rounded uses _TAG_OTHER ...
+   tree -> console (2): line 2460 (Assign) uses a; line 2477 (Assign) uses a
+
+## An order of the roles, the used before the users (a cycle as one block)
+  core
+  config + console + constants + data + datasets + evaluate + fitness + islands + memory + numeric + operators + parallel + search + seeds + selection + simplify + tree

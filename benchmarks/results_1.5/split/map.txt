@@ -2,54 +2,76 @@
 
 core.py: 12999 lines
 top-level functions and classes: 231
-run-time names: 45 (rebound inside core's functions 37; set on core by the package 12, by the tests 6)
+run-time names: 66 (rebound inside core's functions 44; set on core by the package 12, by the tests 32); 61 hold data, 5 a function or class of core.py that the tests or the package replace
 
 ## Run-time names: who rebinds them, who sets them from outside
-COGRAPH                      rebound by _evolve_parallel,_island_round_task      set by -
-CSV_FEATURE_NAMES            rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
-CSV_TARGET_NAME              rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
-CURRENT_RESIDUAL_SIG         rebound by _evolve_parallel,_island_round_task,_smart_reset_explorers,evolve,evolve_island set by tests/test_speed_equivalence.py
-FRAGMENT_LIB                 rebound by _evolve_parallel,_island_round_task      set by -
-PROBE_X                      rebound by _parallel_worker_init,evolve             set by -
-SEQ_MEM                      rebound by _evolve_parallel,_island_round_task      set by -
-_BATTERY_CSV_MODE            rebound by _parallel_worker_init,load_custom_csv    set by -
-_COMPILE_CACHE               rebound by -                                        set by tests/test_speed_equivalence.py
-_CUSTOM_LOSS_FN              rebound by -                                        set by gp_elite/api.py
-_CUSTOM_LOSS_PARSIMONY       rebound by -                                        set by gp_elite/api.py
-_CUSTOM_LOSS_ROBUST          rebound by -                                        set by gp_elite/api.py
-_CUSTOM_LOSS_USE_SCALING     rebound by -                                        set by gp_elite/api.py
-_CUSTOM_SEEDS                rebound by -                                        set by gp_elite/api.py
-_DIM_GATE_DIMS               rebound by Island,evolve                            set by -
-_DIM_GATE_TARGET             rebound by Island,evolve                            set by -
-_DIM_SEARCH                  rebound by _ds                                      set by -
-_DIM_UNKNOWN_CONST           rebound by _parallel_worker_init,evolve             set by -
-_EXTRAP_BAND                 rebound by _split_holdout                           set by -
-_EXTRAP_PROBE_XS             rebound by _split_holdout                           set by -
-_GENERIC_BINARY_OPS          rebound by _parallel_worker_init,load_generic_csv   set by -
-_GENERIC_BINARY_WEIGHTS      rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
-_GENERIC_CSV_MODE            rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
-_GENERIC_UNARY_OPS           rebound by _parallel_worker_init,load_generic_csv   set by -
-_GENERIC_UNARY_WEIGHTS       rebound by _parallel_worker_init,load_generic_csv   set by gp_elite/api.py
-_LS_SCALE_ONLY               rebound by _parallel_worker_init,_small_fit,evolve  set by tests/test_guarantees.py
-_NEAR_BAND                   rebound by _build_near_probes,_split_holdout        set by -
-_NEAR_PROBE_XS               rebound by _build_near_probes,_split_holdout        set by -
-_PARALLEL_WARNED             rebound by _warn_unguarded_main                     set by -
-_PARAMETRIC_CACHE            rebound by evolve                                   set by -
-_PRED_CACHE                  rebound by -                                        set by tests/test_guarantees.py
-_SMALL_ON                    rebound by _small_setup                             set by -
-_SYRACUSE_FEAT_MAXS          rebound by generate_syracuse_dataset                set by -
-_SYRACUSE_FEAT_MINS          rebound by generate_syracuse_dataset                set by -
-_SYRACUSE_MODE               rebound by _parallel_worker_init,generate_syracuse_dataset set by -
-_SYRACUSE_X_RAW              rebound by _parallel_worker_init,generate_syracuse_dataset set by -
-_SYRACUSE_Y_RAW              rebound by _parallel_worker_init,generate_syracuse_dataset set by -
-_USE_LINEAR_SCALING          rebound by _parallel_worker_init,evolve             set by gp_elite/api.py,tests/test_guarantees.py
-_VAL_CANDS                   rebound by -                                        set by gp_elite/api.py,tests/test_guarantees.py
-_VAL_TRAIN_XS                rebound by _small_choose,_small_table_select,_split_holdout set by -
-_VAL_TRAIN_YS                rebound by _small_choose,_small_table_select,_split_holdout set by -
-_VAL_XS                      rebound by _split_holdout                           set by -
-_VAL_YS                      rebound by _split_holdout                           set by -
-_feature_usage_counter       rebound by record_feature_usage,reset_feature_usage set by -
-_fitness_cache               rebound by evolve                                   set by -
+name                         holds     rebound by (core's functions); set by (other files); read through globals() by
+COGRAPH                      data      rebound by _evolve_parallel,_island_round_task; set by -; read through globals() by -
+CSV_FEATURE_NAMES            data      rebound by _interactive_menu,_parallel_worker_init,load_generic_csv; set by gp_elite/api.py; read through globals() by _interactive_menu
+CSV_TARGET_NAME              data      rebound by _parallel_worker_init,load_generic_csv; set by gp_elite/api.py; read through globals() by -
+CURRENT_RESIDUAL_SIG         data      rebound by _evolve_parallel,_island_round_task,_smart_reset_explorers,evolve,evolve_island; set by tests/test_speed_equivalence.py; read through globals() by -
+FRAGMENT_LIB                 data      rebound by _evolve_parallel,_island_round_task; set by -; read through globals() by -
+PROBE_X                      data      rebound by _parallel_worker_init,evolve; set by -; read through globals() by -
+SEQ_MEM                      data      rebound by _evolve_parallel,_island_round_task; set by -; read through globals() by _interactive_menu
+VAL_R2_TOLERANCE             data      rebound by evolve; set by -; read through globals() by _finalists,_select_one_se,_small_choose,_small_specs
+_BATTERY_CSV_MODE            data      rebound by _parallel_worker_init,load_custom_csv; set by -; read through globals() by -
+_BINOMIAL_SEEDS              data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_COMPILE_CACHE               data      rebound by -; set by tests/test_speed_equivalence.py; read through globals() by -
+_CUSTOM_LOSS_FN              data      rebound by -; set by gp_elite/api.py,tests/test_guarantees.py; read through globals() by -
+_CUSTOM_LOSS_PARSIMONY       data      rebound by -; set by gp_elite/api.py; read through globals() by raw_mse
+_CUSTOM_LOSS_ROBUST          data      rebound by -; set by gp_elite/api.py; read through globals() by raw_mse,wrap_linear_scaling
+_CUSTOM_LOSS_USE_SCALING     data      rebound by -; set by gp_elite/api.py; read through globals() by raw_mse
+_CUSTOM_SEEDS                data      rebound by -; set by gp_elite/api.py; read through globals() by evolve
+_DIM_GATE_DIMS               data      rebound by Island,evolve; set by tests/test_guarantees.py; read through globals() by -
+_DIM_GATE_TARGET             data      rebound by Island,evolve; set by -; read through globals() by -
+_DIM_SEARCH                  data      rebound by _ds; set by -; read through globals() by -
+_DIM_UNKNOWN_CONST           data      rebound by _parallel_worker_init,evolve; set by -; read through globals() by -
+_E2_SEEDS                    data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_ELEMENTARY_SEEDS            data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_EXACT_PRIORITY_SWAPS        data      rebound by _select_one_se; set by -; read through globals() by -
+_EXTRAP_BAND                 data      rebound by _split_holdout; set by -; read through globals() by -
+_EXTRAP_PROBE_XS             data      rebound by _split_holdout; set by tests/test_guarantees.py; read through globals() by -
+_FAITHFUL_SWAPS              data      rebound by _select_one_se; set by -; read through globals() by -
+_GENERIC_BINARY_OPS          data      rebound by _parallel_worker_init,load_generic_csv; set by tests/test_arcsin.py,tests/test_guarantees.py; read through globals() by -
+_GENERIC_BINARY_WEIGHTS      data      rebound by _parallel_worker_init,load_generic_csv; set by gp_elite/api.py; read through globals() by -
+_GENERIC_CSV_MODE            data      rebound by _interactive_menu,_parallel_worker_init,load_generic_csv; set by gp_elite/api.py,tests/test_arcsin.py,tests/test_guarantees.py; read through globals() by -
+_GENERIC_UNARY_OPS           data      rebound by _parallel_worker_init,load_generic_csv; set by tests/test_arcsin.py,tests/test_guarantees.py; read through globals() by _make_motif_seeds
+_GENERIC_UNARY_WEIGHTS       data      rebound by _parallel_worker_init,load_generic_csv; set by gp_elite/api.py; read through globals() by -
+_LS_SCALE_ONLY               data      rebound by _parallel_worker_init,_small_fit,evolve; set by tests/test_arcsin.py,tests/test_guarantees.py; read through globals() by -
+_NEAR_BAND                   data      rebound by _build_near_probes,_small_choose,_split_holdout; set by -; read through globals() by -
+_NEAR_GUARD_SWAPS            data      rebound by _select_one_se; set by -; read through globals() by -
+_NEAR_PROBE_XS               data      rebound by _build_near_probes,_small_choose,_split_holdout; set by tests/test_guarantees.py; read through globals() by -
+_PARALLEL_BROKEN             data      rebound by _evolve_parallel; set by -; read through globals() by -
+_PARALLEL_WARNED             data      rebound by _warn_unguarded_main; set by -; read through globals() by -
+_PARAMETRIC_CACHE            data      rebound by evolve; set by -; read through globals() by -
+_POLISH_ADMITTED             data      rebound by _track_if_exact; set by -; read through globals() by -
+_POLISH_GRACE_S              data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_PRED_CACHE                  data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_SEEDS_UNDER_UNITS           data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_SMALL_CV                    data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_SMALL_ON                    data      rebound by _small_setup; set by tests/test_guarantees.py; read through globals() by -
+_SYRACUSE_FEAT_MAXS          data      rebound by generate_syracuse_dataset; set by -; read through globals() by -
+_SYRACUSE_FEAT_MINS          data      rebound by generate_syracuse_dataset; set by -; read through globals() by -
+_SYRACUSE_MODE               data      rebound by _parallel_worker_init,generate_syracuse_dataset; set by -; read through globals() by -
+_SYRACUSE_X_RAW              data      rebound by _parallel_worker_init,generate_syracuse_dataset; set by -; read through globals() by _evolve_parallel
+_SYRACUSE_Y_RAW              data      rebound by _parallel_worker_init,generate_syracuse_dataset; set by -; read through globals() by _evolve_parallel
+_TIME_LIMIT_HIT              data      rebound by _evolve_parallel,evolve; set by -; read through globals() by -
+_TOLERANT_N2                 data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_TOLERANT_REFIT              data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_TOLERANT_SEEDS              data      rebound by -; set by tests/test_guarantees.py; read through globals() by -
+_USE_LINEAR_SCALING          data      rebound by _parallel_worker_init,evolve; set by gp_elite/api.py,tests/test_guarantees.py; read through globals() by -
+_VAL_CANDS                   data      rebound by -; set by gp_elite/api.py,tests/test_guarantees.py; read through globals() by -
+_VAL_TRAIN_XS                data      rebound by _small_choose,_small_table_select,_split_holdout; set by tests/test_guarantees.py; read through globals() by -
+_VAL_TRAIN_YS                data      rebound by _small_choose,_small_table_select,_split_holdout; set by tests/test_guarantees.py; read through globals() by -
+_VAL_XS                      data      rebound by _split_holdout; set by tests/test_guarantees.py; read through globals() by -
+_VAL_YS                      data      rebound by _split_holdout; set by tests/test_guarantees.py; read through globals() by -
+_feature_usage_counter       data      rebound by record_feature_usage,reset_feature_usage; set by -; read through globals() by -
+_fitness_cache               data      rebound by evolve; set by -; read through globals() by -
+_has_own_factor              function  rebound by -; set by tests/test_arcsin.py; read through globals() by -
+_lm_plan                     function  rebound by -; set by tests/test_speed_equivalence.py; read through globals() by -
+_refit_inner                 function  rebound by -; set by tests/test_guarantees.py; read through globals() by -
+evolve                       function  rebound by -; set by tests/test_guarantees.py; read through globals() by -
+evolve_island                function  rebound by -; set by tests/test_guarantees.py; read through globals() by -
 
 ## Names the benches (benchmarks/*.py) set on core, apart
 _ARG_MUT                     benchmarks/phase2_bench.py
@@ -70,6 +92,7 @@ _build_near_probes           benchmarks/near_guard_study.py
 evolve_island                benchmarks/decision_bench.py,benchmarks/phase1_bench.py,benchmarks/phase3_bench.py,benchmarks/tp_diagnostic.py,benchmarks/typed_generations_check.py
 
 ## Functions and classes, in the order of the file
+(run-time names that hold data, * if the function sets them; name() for a function of core.py that a test or the package replaces)
 first  last   lines  module     name                               run-time names used (set*)
 404    408        5  core       _csv_deps                          
 411    416        6  core       _csv_deps_ok                       
@@ -85,7 +108,7 @@ first  last   lines  module     name                               run-time name
 1765   1806      42  config     _RunTrace                          
 1818   1825       8  config     _ds                                _DIM_SEARCH*
 1828   1829       2  config     _dim_active                        
-1833   2036     204  config     Config                             
+1833   2036     204  config     Config                             VAL_R2_TOLERANCE
 2144   2169      26  config     _get_ops_for_role                  _BATTERY_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _SYRACUSE_MODE
 2172   2202      31  config     _active_pools                      _BATTERY_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _SYRACUSE_MODE
 2223   2229       7  tree       _str_code                          
@@ -150,8 +173,8 @@ first  last   lines  module     name                               run-time name
 4007   4021      15  evaluate   _pearson_r                         
 4030   4051      22  evaluate   _predict_cached                    _PRED_CACHE
 4076   4097      22  evaluate   _safe_write                        
-4113   4159      47  seeds      _make_motif_seeds                  
-4203   4205       3  seeds      _seeds_blocked_by_units            
+4113   4159      47  seeds      _make_motif_seeds                  _GENERIC_UNARY_OPS
+4203   4205       3  seeds      _seeds_blocked_by_units            _SEEDS_UNDER_UNITS
 4208   4218      11  seeds      _typed_seeds                       
 4221   4259      39  seeds      _power_law_exponents               
 4262   4289      28  seeds      _power_law_exponents_w             
@@ -162,7 +185,7 @@ first  last   lines  module     name                               run-time name
 4453   4467      15  seeds      _golden_min                        
 4470   4619     150  seeds      _binomial_forms                    
 4622   4634      13  seeds      _monomial                          
-4637   4679      43  seeds      _make_binomial_seeds               _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
+4637   4679      43  seeds      _make_binomial_seeds               _BINOMIAL_SEEDS, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
 4711   4724      14  seeds      _elem_flib                         
 4727   4731       5  seeds      _elem_mono                         
 4734   4741       8  seeds      _elem_rel                          
@@ -180,19 +203,19 @@ first  last   lines  module     name                               run-time name
 5262   5325      64  seeds      _elem_aexp_forms                   
 5328   5368      41  seeds      _elementary_forms                  
 5371   5401      31  seeds      _elementary_forms_n2               
-5404   5479      76  seeds      _make_elementary_seeds             _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
+5404   5479      76  seeds      _make_elementary_seeds             _E2_SEEDS, _ELEMENTARY_SEEDS, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
 5548   5562      15  seeds      _seed_rel_error                    
 5565   5587      23  seeds      _small_family                      
-5590   5606      17  seeds      _refit_inner                       _CUSTOM_LOSS_FN, _USE_LINEAR_SCALING
-5609   5709     101  seeds      _make_tolerant_seeds               _GENERIC_CSV_MODE, _SMALL_ON
+5590   5606      17  seeds      _refit_inner                       _CUSTOM_LOSS_FN, _TOLERANT_REFIT, _USE_LINEAR_SCALING
+5609   5709     101  seeds      _make_tolerant_seeds               _GENERIC_CSV_MODE, _SMALL_ON, _TOLERANT_N2, _TOLERANT_REFIT, _TOLERANT_SEEDS, _refit_inner()
 5717   5750      34  fitness    _linear_scale_params               _LS_SCALE_ONLY
 5752   5779      28  fitness    _robust_scale_params               
-5781   5875      95  fitness    raw_mse                            _CUSTOM_LOSS_FN, _SYRACUSE_MODE, _USE_LINEAR_SCALING
+5781   5875      95  fitness    raw_mse                            _CUSTOM_LOSS_FN, _CUSTOM_LOSS_PARSIMONY, _CUSTOM_LOSS_ROBUST, _CUSTOM_LOSS_USE_SCALING, _SYRACUSE_MODE, _USE_LINEAR_SCALING
 5878   5893      16  fitness    raw_pearson_r                      
 5896   5926      31  fitness    _pure_mse                          _USE_LINEAR_SCALING
 5929   5946      18  fitness    _target_scale                      
 5949   5970      22  fitness    _scale_tree                        
-5973   6033      61  fitness    wrap_linear_scaling                _LS_SCALE_ONLY, _USE_LINEAR_SCALING
+5973   6033      61  fitness    wrap_linear_scaling                _CUSTOM_LOSS_ROBUST, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
 6046   6049       4  fitness    reset_feature_usage                _feature_usage_counter*
 6051   6066      16  fitness    record_feature_usage               _feature_usage_counter*
 6068   6079      12  fitness    get_feature_bias_weights           _feature_usage_counter
@@ -208,10 +231,10 @@ first  last   lines  module     name                               run-time name
 6250   6253       4  simplify   _clear_simplify_caches             
 6255   6275      21  simplify   simplify                           
 6278   6313      36  simplify   _simplify_tree                     
-6320   6413      94  simplify   _simplify_node                     
+6320   6413      94  simplify   _simplify_node                     _has_own_factor()
 6416   6423       8  simplify   _has_own_factor                    
 6429   6438      10  simplify   _invalidate_all_hashes             
-6441   6600     160  constants  optimize_constants_lm              _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
+6441   6600     160  constants  optimize_constants_lm              _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING, _lm_plan()
 6603   6714     112  constants  optimize_constants_adam            
 6740   6750      11  operators  _semantic_key                      
 6753   6786      34  operators  semantic_dedup                     
@@ -236,14 +259,14 @@ first  last   lines  module     name                               run-time name
 7701   8156     456  islands    evolve_island                      COGRAPH, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _SYRACUSE_MODE, _fitness_cache
 8185   8187       3  parallel   _pool_probe                        
 8190   8249      60  parallel   _parallel_worker_init              CSV_FEATURE_NAMES*, CSV_TARGET_NAME*, PROBE_X*, _BATTERY_CSV_MODE*, _DIM_UNKNOWN_CONST*, _GENERIC_BINARY_OPS*, _GENERIC_BINARY_WEIGHTS*, _GENERIC_CSV_MODE*, _GENERIC_UNARY_OPS*, _GENERIC_UNARY_WEIGHTS*, _LS_SCALE_ONLY*, _SYRACUSE_MODE*, _SYRACUSE_X_RAW*, _SYRACUSE_Y_RAW*, _USE_LINEAR_SCALING*
-8251   8282      32  parallel   _island_round_task                 COGRAPH*, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB*, SEQ_MEM*, _SYRACUSE_MODE, _fitness_cache
+8251   8282      32  parallel   _island_round_task                 COGRAPH*, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB*, SEQ_MEM*, _SYRACUSE_MODE, _fitness_cache, evolve_island()
 8284   8291       8  parallel   _active_pool_ops                   _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS
 8294   8308      15  parallel   _pool_choice                       
 8330   8331       2  parallel   _SkipLogExport                     
 8334   8354      21  parallel   _exit_if_reimported_by_worker      
 8357   8379      23  parallel   _warn_unguarded_main               _PARALLEL_WARNED*
-8382   8392      11  parallel   _parallel_enabled                  
-8394   8605     212  parallel   _evolve_parallel                   COGRAPH*, CSV_FEATURE_NAMES, CSV_TARGET_NAME, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB*, PROBE_X, SEQ_MEM*, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _SYRACUSE_MODE, _USE_LINEAR_SCALING
+8382   8392      11  parallel   _parallel_enabled                  _PARALLEL_BROKEN
+8394   8605     212  parallel   _evolve_parallel                   COGRAPH*, CSV_FEATURE_NAMES, CSV_TARGET_NAME, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB*, PROBE_X, SEQ_MEM*, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _PARALLEL_BROKEN*, _SYRACUSE_MODE, _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW, _TIME_LIMIT_HIT*, _USE_LINEAR_SCALING
 8647   8683      37  selection  _formula_faithful                  _VAL_TRAIN_XS, _VAL_XS
 8696   8719      24  selection  _early_stop_threshold              _GENERIC_CSV_MODE, _VAL_YS
 8726   8748      23  selection  _Patience                          
@@ -254,13 +277,13 @@ first  last   lines  module     name                               run-time name
 8885   8917      33  selection  _weight_sums                       
 8920   8933      14  selection  _lm_to_convergence                 
 8936   8972      37  selection  _refit_scaling                     _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
-8975   9009      35  selection  _finalists                         _VAL_CANDS, _VAL_YS
-9015   9037      23  selection  _track_if_exact                    _VAL_XS, _VAL_YS
-9040   9072      33  selection  _polish_finalists                  _CUSTOM_LOSS_FN
+8975   9009      35  selection  _finalists                         VAL_R2_TOLERANCE, _VAL_CANDS, _VAL_YS
+9015   9037      23  selection  _track_if_exact                    _POLISH_ADMITTED*, _VAL_XS, _VAL_YS
+9040   9072      33  selection  _polish_finalists                  _CUSTOM_LOSS_FN, _POLISH_GRACE_S
 9074   9088      15  selection  _build_near_probes                 _NEAR_BAND*, _NEAR_PROBE_XS*
 9091   9113      23  selection  _near_domain_stable                _NEAR_BAND, _NEAR_PROBE_XS
-9116   9194      79  selection  _select_one_se                     _VAL_CANDS, _VAL_YS
-9255   9267      13  selection  _small_setup                       _CUSTOM_LOSS_FN, _GENERIC_CSV_MODE, _SMALL_ON*, _USE_LINEAR_SCALING, _VAL_XS
+9116   9194      79  selection  _select_one_se                     VAL_R2_TOLERANCE, _EXACT_PRIORITY_SWAPS*, _FAITHFUL_SWAPS*, _NEAR_GUARD_SWAPS*, _VAL_CANDS, _VAL_YS
+9255   9267      13  selection  _small_setup                       _CUSTOM_LOSS_FN, _GENERIC_CSV_MODE, _SMALL_CV, _SMALL_ON*, _USE_LINEAR_SCALING, _VAL_XS
 9270   9299      30  selection  _track_small_candidate             _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _SMALL_ON
 9302   9304       3  selection  _small_is_const                    
 9307   9326      20  selection  _small_strip                       
@@ -269,17 +292,17 @@ first  last   lines  module     name                               run-time name
 9420   9442      23  selection  _small_cv                          
 9445   9477      33  selection  _small_n_par                       
 9480   9489      10  selection  _small_materialize                 
-9492   9538      47  selection  _small_specs                       _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _LS_SCALE_ONLY
-9541   9575      35  selection  _small_table_select                
-9578   9611      34  selection  _small_choose                      _VAL_TRAIN_XS*, _VAL_TRAIN_YS*
+9492   9538      47  selection  _small_specs                       VAL_R2_TOLERANCE, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _LS_SCALE_ONLY
+9541   9575      35  selection  _small_table_select                _POLISH_GRACE_S
+9578   9611      34  selection  _small_choose                      VAL_R2_TOLERANCE, _NEAR_BAND*, _NEAR_PROBE_XS*, _VAL_TRAIN_XS*, _VAL_TRAIN_YS*
 9614   9714     101  search     _split_holdout                     _EXTRAP_BAND*, _EXTRAP_PROBE_XS*, _NEAR_BAND*, _NEAR_PROBE_XS*, _VAL_CANDS, _VAL_TRAIN_XS*, _VAL_TRAIN_YS*, _VAL_XS*, _VAL_YS*
 9717   9760      44  search     _make_linear_candidate             
 9763   9835      73  search     _smart_reset_explorers             CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB
-9837   10577    741  search     evolve                             COGRAPH, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB, PROBE_X*, SEQ_MEM, _BATTERY_CSV_MODE, _DIM_GATE_DIMS*, _DIM_GATE_TARGET*, _DIM_UNKNOWN_CONST*, _EXTRAP_PROBE_XS, _LS_SCALE_ONLY*, _PARAMETRIC_CACHE*, _PRED_CACHE, _SMALL_ON, _SYRACUSE_MODE, _USE_LINEAR_SCALING*, _VAL_XS, _VAL_YS, _fitness_cache*
+9837   10577    741  search     evolve                             COGRAPH, CURRENT_RESIDUAL_SIG*, FRAGMENT_LIB, PROBE_X*, SEQ_MEM, VAL_R2_TOLERANCE*, _BATTERY_CSV_MODE, _CUSTOM_SEEDS, _DIM_GATE_DIMS*, _DIM_GATE_TARGET*, _DIM_UNKNOWN_CONST*, _EXTRAP_PROBE_XS, _LS_SCALE_ONLY*, _PARAMETRIC_CACHE*, _PRED_CACHE, _SMALL_ON, _SYRACUSE_MODE, _TIME_LIMIT_HIT*, _USE_LINEAR_SCALING*, _VAL_XS, _VAL_YS, _fitness_cache*, evolve_island()
 10583  10654     72  console    print_result                       
 10660  10790    131  console    decoy_report                       SEQ_MEM
 10793  10844     52  console    try_plot                           
-10850  10864     15  console    run                                
+10850  10864     15  console    run                                evolve()
 10878  10879      2  data       _safe_sinc                         
 10940  10990     51  data       _ShiftFreeScaler                   
 10992  11006     15  data       _IdentityScaler                    
@@ -294,12 +317,12 @@ first  last   lines  module     name                               run-time name
 11491  11504     14  config     _detect_dominant_op                
 11507  11541     35  config     make_cfg_nd                        
 11559  11620     62  config     make_cfg                           
-11623  11638     16  console    _one_run                           
+11623  11638     16  console    _one_run                           evolve()
 11641  11793    153  console    run_benchmark                      
 11800  11820     21  console    _print_menu                        
 11823  11839     17  console    _ask                               
 11842  11854     13  console    _ask_int                           
-11857  12669    813  console    _interactive_menu                  FRAGMENT_LIB, _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_Y_RAW
+11857  12669    813  console    _interactive_menu                  CSV_FEATURE_NAMES*, FRAGMENT_LIB, SEQ_MEM, _GENERIC_CSV_MODE*, _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_Y_RAW, evolve()
 12672  12746     75  console    _deduce_console_constant           
 12749  12753      5  console    _pause                             
 
@@ -321,27 +344,27 @@ fitness        1 lines
 islands        1 lines
 
 ## By module
-module      defs  lines   with state  state lines  run-time names used
-console       12   1626            2          944  FRAGMENT_LIB, SEQ_MEM, _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_Y_RAW
-seeds         35   1357            5          313  _CUSTOM_LOSS_FN, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _SMALL_ON, _USE_LINEAR_SCALING
-memory         8   1250            1          386  CURRENT_RESIDUAL_SIG, PROBE_X
-search         4    959            3          915  COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _BATTERY_CSV_MODE, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _EXTRAP_BAND, _EXTRAP_PROBE_XS, _LS_SCALE_ONLY, _NEAR_BAND, _NEAR_PROBE_XS, _PARAMETRIC_CACHE, _PRED_CACHE, _SMALL_ON, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _VAL_CANDS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _VAL_XS, _VAL_YS, _fitness_cache
-selection     28    831           18          601  _CUSTOM_LOSS_FN, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _EXTRAP_BAND, _EXTRAP_PROBE_XS, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _LS_SCALE_ONLY, _NEAR_BAND, _NEAR_PROBE_XS, _SMALL_ON, _USE_LINEAR_SCALING, _VAL_CANDS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _VAL_XS, _VAL_YS
-operators     23    767            6          234  COGRAPH, FRAGMENT_LIB, SEQ_MEM, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _feature_usage_counter
-islands        3    639            3          638  COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _SYRACUSE_MODE, _fitness_cache
-evaluate      20    647            4          132  _COMPILE_CACHE, _PARAMETRIC_CACHE, _PRED_CACHE
-config        13    551            3           65  _BATTERY_CSV_MODE, _DIM_SEARCH, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _SYRACUSE_MODE
-fitness       13    429            8          331  _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _feature_usage_counter, _fitness_cache
-parallel      10    402            5          335  COGRAPH, CSV_FEATURE_NAMES, CSV_TARGET_NAME, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _PARALLEL_WARNED, _SYRACUSE_MODE, _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW, _USE_LINEAR_SCALING, _fitness_cache
-datasets       7    391            1          173  _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_MODE, _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW
-data           7    471            2          219  CSV_FEATURE_NAMES, CSV_TARGET_NAME, _BATTERY_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS
-tree          15    378            1           41  CSV_FEATURE_NAMES, _GENERIC_CSV_MODE
-constants      2    272            1          160  _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
-simplify       8    180            0            0  
-numeric       20    189            0            0  
-core           3    410            0            0  
+module      defs  lines   with state  state lines  calls()  run-time names used (data)
+console       12   1626            2          944        3  CSV_FEATURE_NAMES, FRAGMENT_LIB, SEQ_MEM, _GENERIC_CSV_MODE, _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_Y_RAW
+seeds         35   1357            7          363        1  _BINOMIAL_SEEDS, _CUSTOM_LOSS_FN, _E2_SEEDS, _ELEMENTARY_SEEDS, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _SEEDS_UNDER_UNITS, _SMALL_ON, _TOLERANT_N2, _TOLERANT_REFIT, _TOLERANT_SEEDS, _USE_LINEAR_SCALING
+memory         8   1250            1          386        0  CURRENT_RESIDUAL_SIG, PROBE_X
+search         4    959            3          915        1  COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, VAL_R2_TOLERANCE, _BATTERY_CSV_MODE, _CUSTOM_SEEDS, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _EXTRAP_BAND, _EXTRAP_PROBE_XS, _LS_SCALE_ONLY, _NEAR_BAND, _NEAR_PROBE_XS, _PARAMETRIC_CACHE, _PRED_CACHE, _SMALL_ON, _SYRACUSE_MODE, _TIME_LIMIT_HIT, _USE_LINEAR_SCALING, _VAL_CANDS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _VAL_XS, _VAL_YS, _fitness_cache
+selection     28    831           19          636        0  VAL_R2_TOLERANCE, _CUSTOM_LOSS_FN, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _DIM_UNKNOWN_CONST, _EXACT_PRIORITY_SWAPS, _EXTRAP_BAND, _EXTRAP_PROBE_XS, _FAITHFUL_SWAPS, _GENERIC_BINARY_OPS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _LS_SCALE_ONLY, _NEAR_BAND, _NEAR_GUARD_SWAPS, _NEAR_PROBE_XS, _POLISH_ADMITTED, _POLISH_GRACE_S, _SMALL_CV, _SMALL_ON, _USE_LINEAR_SCALING, _VAL_CANDS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _VAL_XS, _VAL_YS
+operators     23    767            6          234        0  COGRAPH, FRAGMENT_LIB, SEQ_MEM, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _feature_usage_counter
+islands        3    639            3          638        0  COGRAPH, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _DIM_GATE_DIMS, _DIM_GATE_TARGET, _SYRACUSE_MODE, _fitness_cache
+evaluate      20    647            4          132        0  _COMPILE_CACHE, _PARAMETRIC_CACHE, _PRED_CACHE
+config        13    551            4          269        0  VAL_R2_TOLERANCE, _BATTERY_CSV_MODE, _DIM_SEARCH, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _SYRACUSE_MODE
+fitness       13    429            8          331        0  _CUSTOM_LOSS_FN, _CUSTOM_LOSS_PARSIMONY, _CUSTOM_LOSS_ROBUST, _CUSTOM_LOSS_USE_SCALING, _LS_SCALE_ONLY, _SYRACUSE_MODE, _USE_LINEAR_SCALING, _feature_usage_counter, _fitness_cache
+parallel      10    402            6          346        1  COGRAPH, CSV_FEATURE_NAMES, CSV_TARGET_NAME, CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, PROBE_X, SEQ_MEM, _BATTERY_CSV_MODE, _DIM_UNKNOWN_CONST, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS, _LS_SCALE_ONLY, _PARALLEL_BROKEN, _PARALLEL_WARNED, _SYRACUSE_MODE, _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW, _TIME_LIMIT_HIT, _USE_LINEAR_SCALING, _fitness_cache
+datasets       7    391            1          173        0  _SYRACUSE_FEAT_MAXS, _SYRACUSE_FEAT_MINS, _SYRACUSE_MODE, _SYRACUSE_X_RAW, _SYRACUSE_Y_RAW
+data           7    471            2          219        0  CSV_FEATURE_NAMES, CSV_TARGET_NAME, _BATTERY_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS, _GENERIC_CSV_MODE, _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS
+tree          15    378            1           41        0  CSV_FEATURE_NAMES, _GENERIC_CSV_MODE
+constants      2    272            1          160        1  _CUSTOM_LOSS_FN, _LS_SCALE_ONLY, _USE_LINEAR_SCALING
+simplify       8    180            0            0        1  
+numeric       20    189            0            0        0  
+core           3    410            0            0        0  
 
-functions and classes that use run-time names: 63 (5487 lines); the others: 168 (5203 lines)
+functions and classes that use run-time names holding data: 68 (5787 lines); the others: 163 (4903 lines); that call a function a test or the package replaces: 8
 
 ## The roles
     1-427   core       header, imports, optional dependencies of the CSV mode
