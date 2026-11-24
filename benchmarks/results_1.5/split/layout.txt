@@ -1,22 +1,31 @@
 # The modules of the split, the lower first (layout_core.py checks it).
 # A part of core.py goes to the module of its section in the map
-# (map_core.py, ROLES) unless a line below moves it.
+# (map_core.py, ROLES), under the file name below where the role's name
+# would collide with a name of core.py (simplify, evaluate, fitness) or
+# would mislead; unless a "move" line sends it elsewhere.
 
-order: core numeric config tree simplify evaluate datasets fitness constants operators memory selection seeds islands parallel search data console
+file simplify simplification             # the simplification of a tree
+file evaluate evaluation                 # code generation, compilation, evaluation
+file fitness scoring                     # scaling, errors, fitness
+file constants fitting                   # the fitting of constants (LM, Adam)
+file operators genetic                   # the genetic operators
+file selection final_choice              # the final choice of the model
+
+order: core numeric config tree simplification evaluation datasets scoring fitting genetic memory final_choice seeds islands parallel search data console
 
 move _SAFE_LIMIT numeric                 # the bound of the protected operators
-move _random_tree_nd operators           # the random trees in n dimensions
-move _random_tree_full_nd operators
-move _random_tree_grow_nd operators
-move _nd_diverse_population operators
+move _random_tree_nd genetic             # the random trees in n dimensions
+move _random_tree_full_nd genetic
+move _random_tree_grow_nd genetic
+move _nd_diverse_population genetic
 move DECOY_FEATURES datasets             # used by build_dataset
 move _active_pool_ops config             # the pools of operators
 move _pool_choice config
 move _smart_reset_explorers islands      # resets the explorer islands
-move _EXACT_REL selection                # the final choice's constants and caches
-move _FAITHFUL_CACHE selection
-move _NEAR_CACHE selection
-move _TRIVIAL_CACHE simplify             # a cache of the simplification
+move _EXACT_REL final_choice             # the final choice's constants and caches
+move _FAITHFUL_CACHE final_choice
+move _NEAR_CACHE final_choice
+move _TRIVIAL_CACHE simplification       # a cache of the simplification
 move warm_transfer memory                # makes libraries and co-graphs for the next run
 move _CANON_CONST tree                   # the codes of the hashes of a tree
 move _PACK_D tree

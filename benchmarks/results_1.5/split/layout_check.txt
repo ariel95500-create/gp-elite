@@ -1,6 +1,6 @@
 # The modules of the split, checked on core.py at 6dc1e35 (layout.txt)
 
-order: core < numeric < config < tree < simplify < evaluate < datasets < fitness < constants < operators < memory < selection < seeds < islands < parallel < search < data < console
+order: core < numeric < config < tree < simplification < evaluation < datasets < scoring < fitting < genetic < memory < final_choice < seeds < islands < parallel < search < data < console
 parts moved out of their section: 25
 
 ## Links that go up the order: 0
@@ -11,77 +11,77 @@ numeric      190 lines
 config       510 lines
 tree         382 lines
     from config     ALL_BINARY_OPS, ALL_UNARY_OPS
-simplify     181 lines
+simplification   181 lines
     from numeric    safe_arcsin, safe_div, safe_exp, safe_log, safe_pow, safe_sqrt, safe_tan
     from config     BINARY_OPS
     from tree       Node
-evaluate     647 lines
+evaluation   647 lines
     from numeric    _COMPILE_CACHE_MAX, _NP_GLOBALS, _is_const_subtree, _np_is_even, _np_max2, _np_maximum, _np_min2, _np_minimum, _np_safe_arcsin, _np_safe_div, _np_safe_exp, _np_safe_log, _np_safe_pow, _np_safe_pow_var, _np_safe_sqrt, _np_safe_tan, _np_step, safe_arcsin, safe_div, safe_exp, safe_log, safe_pow, safe_sqrt, safe_tan
 datasets     397 lines
     from config     _SYRACUSE_BINARY_OPS, _SYRACUSE_UNARY_OPS
-    from evaluate   _HOT_ZONES
-fitness      429 lines
+    from evaluation _HOT_ZONES
+scoring      429 lines
     from config     TRACE, _dim_active, _ds
     from tree       Node, _FLOAT_GAMMA, tree_complexity, tree_depth, tree_size
-    from simplify   simplify
-    from evaluate   _pearson_r, _predict_cached, evaluate_vector
-constants    272 lines
+    from simplification simplify
+    from evaluation _pearson_r, _predict_cached, evaluate_vector
+fitting      272 lines
     from numeric    _np_maximum, _np_minimum
     from tree       tree_complexity, tree_depth
-    from simplify   _invalidate_all_hashes
-    from evaluate   _collect_constants_ordered, _lm_column, _lm_plan, compile_parametric
-    from fitness    _linear_scale_params, _pure_mse
-operators    787 lines
+    from simplification _invalidate_all_hashes
+    from evaluation _collect_constants_ordered, _lm_column, _lm_plan, compile_parametric
+    from scoring    _linear_scale_params, _pure_mse
+genetic      787 lines
     from config     ALL_BINARY_OPS, ALL_UNARY_OPS, _active_pools, _get_ops_for_role, _pool_choice
     from tree       Node, get_all_nodes, tree_depth, tree_size
-    from simplify   simplify
-    from evaluate   _predict_cached
-    from fitness    _linear_scale_params, fitness, get_feature_bias_weights, raw_mse
+    from simplification simplify
+    from evaluation _predict_cached
+    from scoring    _linear_scale_params, fitness, get_feature_bias_weights, raw_mse
 memory      1288 lines
     from config     _active_pools
     from tree       Node, get_all_nodes, to_string, tree_depth, tree_size
-    from simplify   _TRIVIAL_CACHE, simplify
-    from evaluate   _safe_write, evaluate_vector
-    from operators  random_terminal, random_tree
-selection    834 lines
+    from simplification _TRIVIAL_CACHE, simplify
+    from evaluation _safe_write, evaluate_vector
+    from genetic    random_terminal, random_tree
+final_choice   834 lines
     from config     TRACE, _ds
     from tree       Node, tree_size
-    from simplify   simplify
-    from evaluate   compile_parametric, evaluate_vector
-    from fitness    _linear_scale_params, _pure_mse, wrap_linear_scaling
-    from constants  optimize_constants_adam, optimize_constants_lm
+    from simplification simplify
+    from evaluation compile_parametric, evaluate_vector
+    from scoring    _linear_scale_params, _pure_mse, wrap_linear_scaling
+    from fitting    optimize_constants_adam, optimize_constants_lm
 seeds       1357 lines
     from config     TRACE, _dim_active, _ds
     from tree       Node, to_string
-    from evaluate   evaluate_vector
-    from fitness    _linear_scale_params
-    from selection  _SMALL_FAMILY, _SMALL_FAMILY_KEEP, _SMALL_FAMILY_SHARE, _lm_to_convergence
+    from evaluation evaluate_vector
+    from scoring    _linear_scale_params
+    from final_choice _SMALL_FAMILY, _SMALL_FAMILY_KEEP, _SMALL_FAMILY_SHARE, _lm_to_convergence
 islands      712 lines
     from config     TRACE, _active_pool_ops, _detect_dominant_op, _dim_active, _ds
     from tree       Node, get_all_nodes, tree_depth, tree_size
-    from simplify   simplify
-    from evaluate   evaluate_vector
-    from fitness    fitness, raw_mse, raw_pearson_r, record_feature_usage
-    from constants  optimize_constants_adam
-    from operators  EpsilonLexicaseSelector, _nd_diverse_population, _random_tree_nd, build_stigmergic_tree_v3, crossover_size_fair, mutate, random_tree, semantic_dedup, semantic_mutation, tournament
+    from simplification simplify
+    from evaluation evaluate_vector
+    from scoring    fitness, raw_mse, raw_pearson_r, record_feature_usage
+    from fitting    optimize_constants_adam
+    from genetic    EpsilonLexicaseSelector, _nd_diverse_population, _random_tree_nd, build_stigmergic_tree_v3, crossover_size_fair, mutate, random_tree, semantic_dedup, semantic_mutation, tournament
     from memory     compute_semantic_sig, semantic_score, update_residual_sig
 parallel     376 lines
     from config     TRACE
     from tree       to_string, tree_depth, tree_size
-    from simplify   _clear_simplify_caches
-    from fitness    fitness, raw_mse, wrap_linear_scaling
+    from simplification _clear_simplify_caches
+    from scoring    fitness, raw_mse, wrap_linear_scaling
     from memory     update_residual_sig
-    from selection  _Patience, _early_stop_threshold, _holdout_mse, _track_small_candidate, _track_val_candidate
+    from final_choice _Patience, _early_stop_threshold, _holdout_mse, _track_small_candidate, _track_val_candidate
     from islands    _PW, _smart_reset_explorers, evolve_island, migrate
 search       886 lines
     from config     ALL_OPS, TRACE, _BATTERY_BINARY_OPS, _BATTERY_UNARY_OPS, _SYRACUSE_BINARY_OPS, _SYRACUSE_UNARY_OPS, _dim_active
     from tree       Node, to_string, tree_depth, tree_size
-    from simplify   _clear_simplify_caches, simplify
+    from simplification _clear_simplify_caches, simplify
     from datasets   build_dataset
-    from fitness    _pure_mse, fitness, raw_mse, reset_feature_usage, wrap_linear_scaling
-    from constants  optimize_constants_adam
+    from scoring    _pure_mse, fitness, raw_mse, reset_feature_usage, wrap_linear_scaling
+    from fitting    optimize_constants_adam
     from memory     init_probe_set
-    from selection  _FAITHFUL_CACHE, _NEAR_CACHE, _Patience, _build_near_probes, _early_stop_threshold, _finalists, _holdout_mse, _is_numerically_stable, _polish_finalists, _refit_scaling, _select_one_se, _small_setup, _small_table_select, _track_small_candidate, _track_val_candidate
+    from final_choice _FAITHFUL_CACHE, _NEAR_CACHE, _Patience, _build_near_probes, _early_stop_threshold, _finalists, _holdout_mse, _is_numerically_stable, _polish_finalists, _refit_scaling, _select_one_se, _small_setup, _small_table_select, _track_small_candidate, _track_val_candidate
     from seeds      _make_binomial_seeds, _make_elementary_seeds, _make_motif_seeds, _make_power_law_seeds, _make_tolerant_seeds
     from islands    Island, _smart_reset_explorers, evolve_island, migrate
     from parallel   _SkipLogExport, _evolve_parallel, _exit_if_reimported_by_worker, _parallel_enabled
@@ -91,10 +91,10 @@ data         479 lines
 console     1626 lines
     from config     Config, make_cfg, make_cfg_nd
     from tree       Node, to_string, tree_depth, tree_size
-    from simplify   simplify
-    from evaluate   evaluate, evaluate_vector
+    from simplification simplify
+    from evaluation evaluate, evaluate_vector
     from datasets   DECOY_FEATURES, SYRACUSE_N_FEATURES, _collatz_flight_time, _v2, generate_syracuse_dataset
-    from fitness    _pure_mse, _scale_tree, _target_scale, fitness, raw_mse
+    from scoring    _pure_mse, _scale_tree, _target_scale, fitness, raw_mse
     from memory     warm_transfer
     from search     evolve
     from data       ND_PROBLEMS, PROBLEMS, _IdentityScaler, _ShiftFreeScaler, load_custom_csv, load_generic_csv

@@ -33,7 +33,7 @@ import symtable  # noqa: E402
 
 
 def read_layout(path):
-    order, moves = [], {}
+    order, moves, files = [], {}, {}
     for line in open(path, encoding="utf-8"):
         line = line.split("#", 1)[0].strip()
         if not line:
@@ -43,7 +43,23 @@ def read_layout(path):
         elif line.startswith("move "):
             _m, name, mod = line.split()
             moves[name] = mod
-    return order, moves
+        elif line.startswith("file "):
+            _f, role, mod = line.split()
+            files[role] = mod
+    return order, moves, files
+
+
+def assignment(tree, binders, path):
+    """id(statement) -> module, for the top-level statements of core.py."""
+    order, moves, files = read_layout(path)
+
+    def module_of(s):
+        for n, bs in binders.items():
+            if n in moves and any(b is s for b in bs):
+                return moves[n]
+        role = M.role_of(s.lineno)
+        return files.get(role, role)
+    return {id(s): module_of(s) for s in tree.body}
 
 
 def state_names():
@@ -63,7 +79,7 @@ def is_library(stmt, name):
 
 
 def main(path):
-    order, moves = read_layout(path)
+    order, moves, _files = read_layout(path)
     rank = {m: i for i, m in enumerate(order)}
     state = state_names()
     src = M.git_show("gp_elite/core.py")
@@ -71,17 +87,7 @@ def main(path):
     top = symtable.symtable(src, "core.py", "exec")
     tables = {(t.get_name(), t.get_lineno()): t for t in top.get_children()}
     binders = D.bound_at_top(tree)
-
-    def defined_names(s):
-        return [n for n, bs in binders.items() if any(b is s for b in bs)]
-
-    def module_of(s):
-        for n in defined_names(s):
-            if n in moves:
-                return moves[n]
-        return M.role_of(s.lineno)
-
-    where = {id(s): module_of(s) for s in tree.body}
+    where = assignment(tree, binders, path)
     unknown = sorted({m for m in where.values() if m not in rank})
     if unknown:
         raise SystemExit("modules not in the order: %s" % unknown)
