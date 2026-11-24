@@ -1,0 +1,8 @@
+A3 of ../PLAN.md, 24 November 2026, 05:28-05:56 UTC, the machine otherwise idle: F41 with the defaults of the API, 205 fits per engine, one at a time, each in its own process, the two engines interleaved fit by fit (time_a3.py; records in a3_timing.jsonl).
+A: 1.4.0 from PyPI (/venv14p). B: the engine in modules (/venv15s, the working tree at 6269364).
+
+205 fits each; total A 678.2 s, B 680.1 s, ratio 1.0028; same formula in 205
+A3 holds (within 3 %)
+import time, median of 20: A 0.102 s, B 0.106 s
+
+Beside, deciding nothing: the ratio B/A fit by fit has a median of 1.0000 and a mean of 1.0036; the 53 fits over 2 s in A take 627.7 s in A and 629.4 s in B (ratio 1.0028).
