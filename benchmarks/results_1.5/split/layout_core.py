@@ -78,6 +78,26 @@ def is_library(stmt, name):
     return False
 
 
+def top_loads(s):
+    """The names a statement at the top reads, less the names its
+    comprehensions and lambdas bind for themselves."""
+    own = set()
+    for sub in ast.walk(s):
+        if isinstance(sub, ast.comprehension):
+            own |= {n.id for n in ast.walk(sub.target) if isinstance(n, ast.Name)}
+        elif isinstance(sub, ast.Lambda):
+            own |= {a.arg for a in sub.args.args + sub.args.kwonlyargs}
+    out = set()
+    for sub in ast.walk(s):
+        if isinstance(sub, ast.Name) and isinstance(sub.ctx, ast.Load) and sub.id not in own:
+            out.add(sub.id)
+        elif isinstance(sub, ast.AnnAssign):
+            pass
+    if isinstance(s, ast.AnnAssign):       # the annotation is not evaluated
+        out -= D.loads([s.annotation]) - D.loads([s.value] if s.value else [])
+    return out
+
+
 def main(path):
     order, moves, _files = read_layout(path)
     rank = {m: i for i, m in enumerate(order)}
@@ -104,25 +124,6 @@ def main(path):
         else:
             parts += s.args.defaults + [d for d in s.args.kw_defaults if d is not None]
         return D.loads(parts)
-
-    def top_loads(s):
-        """The names a statement at the top reads, less the names its
-        comprehensions and lambdas bind for themselves."""
-        own = set()
-        for sub in ast.walk(s):
-            if isinstance(sub, ast.comprehension):
-                own |= {n.id for n in ast.walk(sub.target) if isinstance(n, ast.Name)}
-            elif isinstance(sub, ast.Lambda):
-                own |= {a.arg for a in sub.args.args + sub.args.kwonlyargs}
-        out = set()
-        for sub in ast.walk(s):
-            if isinstance(sub, ast.Name) and isinstance(sub.ctx, ast.Load) and sub.id not in own:
-                out.add(sub.id)
-            elif isinstance(sub, ast.AnnAssign):
-                pass
-        if isinstance(s, ast.AnnAssign):       # the annotation is not evaluated
-            out -= D.loads([s.annotation]) - D.loads([s.value] if s.value else [])
-        return out
 
     def uses(s):
         if isinstance(s, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):

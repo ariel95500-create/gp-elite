@@ -119,6 +119,14 @@ def main(module, dry):
         mods = {old_where[id(b)] for b in bs if not L.is_library(b, n)}
         if len(mods) == 1:
             module_of_name[n] = mods.pop()
+    # the names bound only by the `if __name__ == "__main__":` block stay
+    # with it in core.py
+    for s in old_tree.body:
+        if (isinstance(s, ast.If) and isinstance(s.test, ast.Compare)
+                and isinstance(s.test.left, ast.Name) and s.test.left.id == "__name__"):
+            for n, bs in old_binders.items():
+                if all(b is s for b in bs):
+                    module_of_name[n] = "core"
     state = L.state_names()
 
     src = open(CORE, encoding="utf-8").read()
@@ -205,7 +213,7 @@ def main(module, dry):
                 s.bases + [k.value for k in s.keywords] if isinstance(s, ast.ClassDef)
                 else s.args.defaults + [d for d in s.args.kw_defaults if d is not None]))
         else:
-            real |= D.loads([s])
+            real |= L.top_loads(s)
     from_lower = {}
     for n in sorted((used & real) - defined - state - {"state"}):
         m = module_of_name.get(n)
