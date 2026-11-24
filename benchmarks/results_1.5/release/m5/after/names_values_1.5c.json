@@ -1,0 +1,3872 @@
+{
+ "annotations": [],
+ "core_class": "_Door",
+ "core_file": [
+  "gp_elite",
+  "core.py"
+ ],
+ "engine": "1.5.0",
+ "names": {
+  "ALL_BINARY_OPS": {
+   "type": "list",
+   "value": "list['+', '-', '*', '/', 'pow', 'max2', 'min2']"
+  },
+  "ALL_OPS": {
+   "type": "list",
+   "value": "list['+', '-', '*', '/', 'pow', 'sin', 'cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube']"
+  },
+  "ALL_UNARY_OPS": {
+   "type": "list",
+   "value": "list['sin', 'cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube', 'tanh', 'exp', 'tan', 'is_even', 'step', 'arcsin']"
+  },
+  "Any": {
+   "doc": "149abea7a912",
+   "file": null,
+   "module": "typing",
+   "qualname": "Any",
+   "signature": "(*args, **kwargs)",
+   "type": "_AnyMeta"
+  },
+  "BINARY_OPS": {
+   "type": "list",
+   "value": "list['+', '-', '*', '/', 'pow']"
+  },
+  "BINARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[3, 3, 4, 2, 1]"
+  },
+  "CFG": {
+   "type": "Config",
+   "value": "object Config"
+  },
+  "COGRAPH": {
+   "type": "FragmentCoGraph",
+   "value": "object FragmentCoGraph"
+  },
+  "CSV_FEATURE_NAMES": {
+   "type": "list",
+   "value": "list[]"
+  },
+  "CSV_TARGET_NAME": {
+   "type": "str",
+   "value": "'y'"
+  },
+  "CURRENT_RESIDUAL_SIG": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "Config": {
+   "doc": "84ef6157244f",
+   "file": null,
+   "module": "gp_elite.config",
+   "qualname": "Config",
+   "signature": "(POP_SIZE: 'int' = 800, GENERATIONS: 'int' = 400, ELITE_SIZE: 'int' = 8, TOURNAMENT_SIZE: 'int' = 5, TOURNAMENT_PRESSURE: 'float' = 0.85, MAX_INIT_DEPTH: 'int' = 6, MAX_MUTATION_DEPTH: 'int' = 4, MAX_TREE_SIZE: 'int' = 60, MAX_TREE_DEPTH: 'int' = 12, MUTATION_RATE: 'float' = 0.7, CROSSOVER_RATE: 'float' = 0.7, HOIST_RATE: 'float' = 0.1, POINT_MUTATION_RATE: 'float' = 0.15, SHRINK_RATE: 'float' = 0.1, SEMANTIC_MUTATION_RATE: 'float' = 0.15, PARSIMONY: 'float' = 0.002, DEPTH_PENALTY: 'float' = 0.0005, RANDOM_INJECTION: 'float' = 0.08, STAGNATION_LIMIT: 'int' = 30, RESET_FRACTION: 'float' = 0.3, CROWDING_FACTOR: 'int' = 3, CONST_OPT_PROB: 'float' = 0.15, CONST_OPT_ITER: 'int' = 20, CONST_OPT_LM: 'bool' = True, MOTIF_SEEDS: 'bool' = True, MOTIF_SEEDS_N: 'int' = 32, FINAL_POLISH: 'bool' = True, POWER_LAW_SEEDS: 'bool' = True, ADAM_LR: 'float' = 0.05, ADAM_BETA1: 'float' = 0.9, ADAM_BETA2: 'float' = 0.999, ADAM_EPS: 'float' = 1e-08, N_ISLANDS: 'int' = 4, MIGRATION_INTERVAL: 'int' = 20, MIGRATION_SIZE: 'int' = 5, FRAG_EVAP_RATE: 'float' = 0.85, FRAG_TAU_MAX: 'float' = 40.0, N_POINTS: 'int' = 120, X_MIN: 'float' = -3.0, X_MAX: 'float' = 3.0, NOISE_STD: 'float' = 0.0, TERMINALS: 'List[str]' = <factory>, OP_DIVERSITY_CAP: 'float' = 0.4, ERC_MIN: 'float' = -5.0, ERC_MAX: 'float' = 5.0, PERFECT_THRESHOLD: 'float' = 1e-09, EARLY_STOPPING_MSE: 'float' = 1e-06, USE_SEEDING: 'bool' = True, USE_LIB: 'bool' = True, USE_COGRAPH: 'bool' = True, USE_SEQMEM: 'bool' = True, USE_LINEAR_SCALING: 'bool' = True, USE_LEXICASE: 'bool' = True, VALIDATION_SPLIT: 'float' = 0.2, HOLDOUT_SEED: 'int' = 1234, VAL_R2_TOLERANCE: 'float' = 0.003, EXTRAPOLATION_MODE: 'bool' = False, EXTRAPOLATION_FRONTIER_FRAC: 'float' = 0.2, EXTRAPOLATION_FEATURE: 'Optional[int]' = None, EXTRAPOLATION_DIRECTION: 'str' = 'both', EXTRAPOLATION_FRONTIER_SPLIT: 'bool' = False, SEED: 'Optional[int]' = None, PARALLEL_ISLANDS: 'Optional[bool]' = None, PARALLEL_ROUND: 'int' = 0, DEADLINE: 'Optional[float]' = None, USE_SEMANTIC_DEDUP: 'bool' = False, SEMANTIC_DEDUP_DECIMALS: 'int' = 3, LOG_CSV: 'str' = 'gp_elite_log.csv', WRITE_LOG_CSV: 'bool' = True, SAVE_BEST: 'str' = 'gp_elite_best.txt') -> None",
+   "type": "type"
+  },
+  "DECOY_FEATURES": {
+   "type": "dict",
+   "value": "dict{'BATTERY_SOH': list[3], 'ND1_DECOY': list[3], 'ND3_DECOY': list[3], 'ND5_DECOY': list[3]}"
+  },
+  "Dict": {
+   "type": "_SpecialGenericAlias",
+   "value": "callable _SpecialGenericAlias"
+  },
+  "EpsilonLexicaseSelector": {
+   "doc": "da39a3ee5e6b",
+   "file": null,
+   "module": "gp_elite.genetic",
+   "qualname": "EpsilonLexicaseSelector",
+   "signature": "(population: \"List['Node']\", xs, ys)",
+   "type": "type"
+  },
+  "FRAGMENT_LIB": {
+   "type": "FragmentLibrary",
+   "value": "object FragmentLibrary"
+  },
+  "FragmentCoGraph": {
+   "doc": "5282b769895c",
+   "file": null,
+   "module": "gp_elite.memory",
+   "qualname": "FragmentCoGraph",
+   "signature": "()",
+   "type": "type"
+  },
+  "FragmentEntry": {
+   "doc": "54f5c63c1d18",
+   "file": null,
+   "module": "gp_elite.memory",
+   "qualname": "FragmentEntry",
+   "signature": "(node: 'Any' = None, tau: 'float' = 0.0, freq: 'int' = 0, best_fitness: 'float' = 1000000000.0, last_gen: 'int' = 0, size: 'int' = 0, depth: 'int' = 0, root_op: 'str' = '', gen_stable: 'int' = 0, semantic_signature: 'Optional[np.ndarray]' = None) -> None",
+   "type": "type"
+  },
+  "FragmentLibrary": {
+   "doc": "1dd252638564",
+   "file": null,
+   "module": "gp_elite.memory",
+   "qualname": "FragmentLibrary",
+   "signature": "()",
+   "type": "type"
+  },
+  "FragmentSequenceMemory": {
+   "doc": "c9381e255d5e",
+   "file": null,
+   "module": "gp_elite.memory",
+   "qualname": "FragmentSequenceMemory",
+   "signature": "()",
+   "type": "type"
+  },
+  "Island": {
+   "doc": "da39a3ee5e6b",
+   "file": null,
+   "module": "gp_elite.islands",
+   "qualname": "Island",
+   "signature": "(island_id: 'int', cfg: 'Config', stigmergic: 'bool' = False)",
+   "type": "type"
+  },
+  "List": {
+   "type": "_SpecialGenericAlias",
+   "value": "callable _SpecialGenericAlias"
+  },
+  "ND_PROBLEMS": {
+   "type": "dict",
+   "value": "dict{'BATTERY_SOH': tuple['1 - 0.02\u00b7exp(X[0])\u00b7X[1] - 0.005\u00b7X[2]\u00b2  [+X[3] LEURRE]', function gp_elite.data.<lambda>, 4, -2.0, 2.0], 'ND1': tuple['X[:,0]\u00b7sin(X[:,1]) + X[:,2]\u00b2', function gp_elite.data.<lambda>, 3, -3.0, 3.0], 'ND1_DECOY': tuple['X[:,0]\u00b7sin(X[:,1]) + X[:,2]\u00b2  [+X[3] LEURRE]', function gp_elite.data.<lambda>, 4, -3.0, 3.0], 'ND2': tuple['exp(-X[:,0]\u00b2)\u00b7cos(X[:,1])', function gp_elite.data.<lambda>, 2, -2.5, 2.5], 'ND3': tuple['X[:,0]\u00b3 - X[:,1]\u00b7X[:,2]', function gp_elite.data.<lambda>, 3, -3.0, 3.0], 'ND3_DECOY': tuple['X[:,0]\u00b3 - X[:,1]\u00b7X[:,2]  [+X[3] LEURRE]', function gp_elite.data.<lambda>, 4, -3.0, 3.0], 'ND4': tuple['sin(X[:,0]+X[:,1]) \u00b7 exp(-X[:,2]\u00b2/2)', function gp_elite.data.<lambda>, 3, -2.5, 2.5], 'ND5': tuple['X[:,0]\u00b7X[:,1] / (1 + X[:,2]\u00b2)', function gp_elite.data.<lambda>, 3, -3.0, 3.0], 'ND5_DECOY': tuple['X[:,0]\u00b7X[:,1]/(1+X[:,2]\u00b2)  [+X[3] LEURRE]', function gp_elite.data.<lambda>, 4, -3.0, 3.0], 'SYRACUSE': tuple['Collatz flight time \u2014 4 features [log2,v2,odd_part,mod4_1]', function gp_elite.data.<lambda>, 10, -2.0, 2.0]}"
+  },
+  "Node": {
+   "doc": "da39a3ee5e6b",
+   "file": null,
+   "module": "gp_elite.tree",
+   "qualname": "Node",
+   "signature": "(value, left=None, right=None)",
+   "type": "type"
+  },
+  "Optional": {
+   "type": "_SpecialForm",
+   "value": "callable _SpecialForm"
+  },
+  "PROBE_X": {
+   "type": "ndarray",
+   "value": "ndarray(20, 4) float64 1f6763983967"
+  },
+  "PROBLEMS": {
+   "type": "dict",
+   "value": "dict{'1': tuple['sin(x\u00b2) + x\u00b7cos(x)', function gp_elite.data.<lambda>, -3.0, 3.0], '10': tuple['x\u00b3\u00b7sin(1/x)', function gp_elite.data.<lambda>, 0.2, 3.0], '2': tuple['x\u00b3 - x\u00b2 + x - 1', function gp_elite.data.<lambda>, -3.0, 3.0], '3': tuple['exp(-x\u00b2)\u00b7sin(2x)', function gp_elite.data.<lambda>, -2.5, 2.5], '4': tuple['log(1+x\u00b2)\u00b7cos(x)', function gp_elite.data.<lambda>, -2.5, 2.5], '5': tuple['x\u00b7sin(x\u00b2)\u00b7cos(x/2)', function gp_elite.data.<lambda>, -3.0, 3.0], '6': tuple['exp(-|x|)\u00b7(x\u00b2-1)', function gp_elite.data.<lambda>, -4.0, 4.0], '7': tuple['sinc(x)\u00b7cos(x\u00b2)  [sinc=sin(x)/x]', function gp_elite.data.<lambda>, -3.0, 3.0], '8': tuple['sin(\u03c0x)/(x\u00b2+1)', function gp_elite.data.<lambda>, -3.0, 3.0], '9': tuple['tanh(x)\u00b7exp(-x\u00b2/4)', function gp_elite.data.<lambda>, -3.5, 3.5]}"
+  },
+  "SCALE_RATIO_THRESHOLD": {
+   "type": "float",
+   "value": "10.0"
+  },
+  "SEQ_MEM": {
+   "type": "FragmentSequenceMemory",
+   "value": "object FragmentSequenceMemory"
+  },
+  "SYRACUSE_FEATURE_NAMES": {
+   "type": "list",
+   "value": "list['X[0]=log2(n)', 'X[1]=v2(n)', 'X[2]=log(max_height/n)', 'X[3]=is_mod4_1(n)', 'X[4]=log2(n)*log2(v2+1)', 'X[5]=log(max_h2/max_h1)', 'X[6]=log(traj_step_14)', 'X[7]=log(traj_step_21)', 'X[8]=log(traj_step_28)', 'X[9]=log(traj_step_30)']"
+  },
+  "SYRACUSE_N_FEATURES": {
+   "type": "int",
+   "value": "10"
+  },
+  "TRACE": {
+   "type": "_RunTrace",
+   "value": "object _RunTrace"
+  },
+  "Tuple": {
+   "type": "_TupleType",
+   "value": "callable _TupleType"
+  },
+  "UNARY_OPS": {
+   "type": "list",
+   "value": "list['sin', 'cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube']"
+  },
+  "UNARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[3, 3, 2, 2, 1, 1, 3, 1]"
+  },
+  "_BATTERY_BINARY_OPS": {
+   "type": "list",
+   "value": "list['+', '-', '*', '/', 'pow']"
+  },
+  "_BATTERY_BINARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[4, 4, 5, 2, 3]"
+  },
+  "_BATTERY_CSV_MODE": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_BATTERY_UNARY_OPS": {
+   "type": "list",
+   "value": "list['exp', 'log', 'sqrt', 'tanh', 'sq', 'neg']"
+  },
+  "_BATTERY_UNARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[4, 3, 3, 2, 3, 1]"
+  },
+  "_BINOMIAL_SEEDS": {
+   "type": "bool",
+   "value": "True"
+  },
+  "_BINOM_EXPS": {
+   "type": "tuple",
+   "value": "tuple[-2, -1, 1, 2]"
+  },
+  "_BINOM_GRID": {
+   "type": "ndarray",
+   "value": "ndarray(22,) float64 f8e151f64485"
+  },
+  "_BINOM_GRID_ROWS": {
+   "type": "int",
+   "value": "64"
+  },
+  "_BINOM_MAX_LIB": {
+   "type": "int",
+   "value": "4096"
+  },
+  "_BINOM_TOL": {
+   "type": "float",
+   "value": "1e-12"
+  },
+  "_CANON_CONST": {
+   "type": "int",
+   "value": "-8095928024164777269"
+  },
+  "_CLEANER_BINARY_OPS": {
+   "type": "list",
+   "value": "list['+', '-', '*', '/', 'pow', 'max2', 'min2']"
+  },
+  "_CLEANER_BINARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[3, 3, 4, 2, 2, 2, 2]"
+  },
+  "_CLEANER_UNARY_OPS": {
+   "type": "list",
+   "value": "list['cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube', 'is_even', 'step']"
+  },
+  "_CLEANER_UNARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[1, 3, 2, 1, 1, 3, 2, 5, 2]"
+  },
+  "_COMPILE_AFTER": {
+   "type": "int",
+   "value": "3"
+  },
+  "_COMPILE_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_COMPILE_CACHE_MAX": {
+   "type": "int",
+   "value": "4096"
+  },
+  "_CUSTOM_LOSS_FN": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_CUSTOM_LOSS_PARSIMONY": {
+   "type": "float",
+   "value": "0.0"
+  },
+  "_CUSTOM_SEEDS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_DIM_GATE_DIMS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_DIM_GATE_TARGET": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_DIM_SEARCH": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_DIM_UNKNOWN_CONST": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_Door": {
+   "doc": "da39a3ee5e6b",
+   "file": null,
+   "module": "gp_elite.core",
+   "qualname": "_Door",
+   "signature": "(name, doc=None)",
+   "type": "type"
+  },
+  "_E2_CURVE": {
+   "type": "float",
+   "value": "0.5"
+  },
+  "_E2_C_GRID": {
+   "type": "ndarray",
+   "value": "ndarray(80,) float64 a7bdbf13b58f"
+  },
+  "_E2_GATE": {
+   "type": "float",
+   "value": "0.05"
+  },
+  "_E2_SEEDS": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_ELEMENTARY_SEEDS": {
+   "type": "bool",
+   "value": "True"
+  },
+  "_ELEM_MAX_LIB": {
+   "type": "int",
+   "value": "4096"
+  },
+  "_ELEM_S_GRID": {
+   "type": "ndarray",
+   "value": "ndarray(37,) float64 1e9003dacc59"
+  },
+  "_ELEM_TRIG_GATE": {
+   "type": "float",
+   "value": "0.05"
+  },
+  "_ELEM_W_GRID": {
+   "type": "ndarray",
+   "value": "ndarray(800,) float64 51ecc07767ae"
+  },
+  "_ENGINE_MODULES": {
+   "type": "tuple",
+   "value": "tuple[module gp_elite.numeric, module gp_elite.config, module gp_elite.tree, module gp_elite.simplification, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.data, module gp_elite.console]"
+  },
+  "_EVAL_COUNTS": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_EXACT_PRIORITY_SWAPS": {
+   "type": "int",
+   "value": "0"
+  },
+  "_EXACT_REL": {
+   "type": "float",
+   "value": "1e-12"
+  },
+  "_EXTRAP_BAND": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_EXTRAP_PROBE_XS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_EXTRA_SEEDS": {
+   "type": "dict",
+   "value": "dict{'10': list['x_cube'], '5': list['sin_sq_x', 'x_cos_x', 'sin_sq_x'], '6': list['exp_sq_x'], '7': list[], '8': list[], '9': list[]}"
+  },
+  "_FAITHFUL_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_FAITHFUL_SWAPS": {
+   "type": "int",
+   "value": "0"
+  },
+  "_FINAL_LM_ITER": {
+   "type": "int",
+   "value": "100"
+  },
+  "_FLOAT_COMPLEXITY_WEIGHT": {
+   "type": "int",
+   "value": "3"
+  },
+  "_FLOAT_GAMMA": {
+   "type": "float",
+   "value": "2.0"
+  },
+  "_GENCSV_POOLS": {
+   "type": "dict",
+   "value": "dict{'conserve': tuple[list['+', '-', '*'], list[4, 3, 4], list['sq', 'cos', 'sin', 'neg'], list[4, 3, 3, 1]], 'full': tuple[list['+', '-', '*', '/', 'pow'], list[3, 3, 4, 2, 1], list['sin', 'cos', 'log', 'exp', 'sqrt', 'tanh', 'abs', 'neg', 'sq', 'cube', 'arcsin'], list[2, 2, 2, 2, 2, 2, 1, 1, 3, 1, 2]], 'physical': tuple[list['+', '-', '*', '/', 'pow'], list[4, 4, 5, 2, 3], list['exp', 'log', 'sqrt', 'tanh', 'sq', 'neg', 'abs'], list[4, 3, 3, 2, 3, 1, 2]], 'poly': tuple[list['+', '-', '*', '/'], list[4, 4, 5, 2], list['sqrt', 'neg', 'sq', 'cube', 'abs'], list[2, 1, 3, 2, 1]], 'trig': tuple[list['+', '-', '*', '/', 'pow'], list[3, 3, 4, 2, 1], list['sin', 'cos', 'exp', 'log', 'sqrt', 'tanh', 'sq', 'neg', 'abs', 'arcsin'], list[3, 3, 2, 2, 2, 2, 2, 1, 1, 2]]}"
+  },
+  "_GENERIC_BINARY_OPS": {
+   "type": "list",
+   "value": "list['+', '-', '*', '/', 'pow']"
+  },
+  "_GENERIC_BINARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[4, 4, 5, 2, 3]"
+  },
+  "_GENERIC_CSV_MODE": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_GENERIC_UNARY_OPS": {
+   "type": "list",
+   "value": "list['exp', 'log', 'sqrt', 'tanh', 'sq', 'neg', 'abs']"
+  },
+  "_GENERIC_UNARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[4, 3, 3, 2, 3, 1, 2]"
+  },
+  "_HOLDERS": {
+   "type": "dict",
+   "value": "dict{'ALL_BINARY_OPS': tuple[module gp_elite.config, module gp_elite.tree, module gp_elite.genetic], 'ALL_OPS': tuple[module gp_elite.config, module gp_elite.search], 'ALL_UNARY_OPS': tuple[module gp_elite.config, module gp_elite.tree, module gp_elite.genetic], 'Any': tuple[module gp_elite.config, module gp_elite.tree, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'BINARY_OPS': tuple[module gp_elite.config, module gp_elite.simplification], 'BINARY_WEIGHTS': tuple[module gp_elite.config], 'CFG': tuple[module gp_elite.config], 'Config': tuple[module gp_elite.config, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.memory, module gp_elite.islands, module gp_elite.search, module gp_elite.console], 'DECOY_FEATURES': tuple[module gp_elite.datasets, module gp_elite.console], 'Dict': tuple[module gp_elite.config, module gp_elite.tree, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'EpsilonLexicaseSelector': tuple[module gp_elite.genetic, module gp_elite.islands], 'FragmentCoGraph': tuple[module gp_elite.memory], 'FragmentEntry': tuple[module gp_elite.memory], 'FragmentLibrary': tuple[module gp_elite.memory], 'FragmentSequenceMemory': tuple[module gp_elite.memory], 'Island': tuple[module gp_elite.islands, module gp_elite.search], 'List': tuple[module gp_elite.config, module gp_elite.tree, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'ND_PROBLEMS': tuple[module gp_elite.data, module gp_elite.console], 'Node': tuple[module gp_elite.tree, module gp_elite.simplification, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search, module gp_elite.console], 'Optional': tuple[module gp_elite.config, module gp_elite.tree, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'PROBLEMS': tuple[module gp_elite.data, module gp_elite.console], 'SCALE_RATIO_THRESHOLD': tuple[module gp_elite.data], 'SYRACUSE_FEATURE_NAMES': tuple[module gp_elite.datasets], 'SYRACUSE_N_FEATURES': tuple[module gp_elite.datasets, module gp_elite.data, module gp_elite.console], 'TRACE': tuple[module gp_elite.config, module gp_elite.scoring, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search], 'Tuple': tuple[module gp_elite.config, module gp_elite.tree, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'UNARY_OPS': tuple[module gp_elite.config], 'UNARY_WEIGHTS': tuple[module gp_elite.config], '_BATTERY_BINARY_OPS': tuple[module gp_elite.config, module gp_elite.search], '_BATTERY_BINARY_WEIGHTS': tuple[module gp_elite.config], '_BATTERY_UNARY_OPS': tuple[module gp_elite.config, module gp_elite.search, module gp_elite.data], '_BATTERY_UNARY_WEIGHTS': tuple[module gp_elite.config], '_BINOM_EXPS': tuple[module gp_elite.seeds], '_BINOM_GRID': tuple[module gp_elite.seeds], '_BINOM_GRID_ROWS': tuple[module gp_elite.seeds], '_BINOM_MAX_LIB': tuple[module gp_elite.seeds], '_BINOM_TOL': tuple[module gp_elite.seeds], '_CANON_CONST': tuple[module gp_elite.tree], '_CLEANER_BINARY_OPS': tuple[module gp_elite.config], '_CLEANER_BINARY_WEIGHTS': tuple[module gp_elite.config], '_CLEANER_UNARY_OPS': tuple[module gp_elite.config], '_CLEANER_UNARY_WEIGHTS': tuple[module gp_elite.config], '_COMPILE_AFTER': tuple[module gp_elite.evaluation], '_COMPILE_CACHE_MAX': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_E2_CURVE': tuple[module gp_elite.seeds], '_E2_C_GRID': tuple[module gp_elite.seeds], '_E2_GATE': tuple[module gp_elite.seeds], '_ELEM_MAX_LIB': tuple[module gp_elite.seeds], '_ELEM_S_GRID': tuple[module gp_elite.seeds], '_ELEM_TRIG_GATE': tuple[module gp_elite.seeds], '_ELEM_W_GRID': tuple[module gp_elite.seeds], '_EVAL_COUNTS': tuple[module gp_elite.evaluation], '_EXACT_REL': tuple[module gp_elite.final_choice], '_EXTRA_SEEDS': tuple[module gp_elite.config], '_FAITHFUL_CACHE': tuple[module gp_elite.final_choice, module gp_elite.search], '_FINAL_LM_ITER': tuple[module gp_elite.final_choice], '_FLOAT_COMPLEXITY_WEIGHT': tuple[module gp_elite.tree], '_FLOAT_GAMMA': tuple[module gp_elite.tree, module gp_elite.scoring], '_GENCSV_POOLS': tuple[module gp_elite.config, module gp_elite.data], '_HOT_ZONES': tuple[module gp_elite.evaluation, module gp_elite.datasets], '_INTERP_BINARY': tuple[module gp_elite.evaluation], '_INTERP_MAX_DEPTH': tuple[module gp_elite.evaluation], '_INTERP_UNARY': tuple[module gp_elite.evaluation], '_IdentityScaler': tuple[module gp_elite.data, module gp_elite.console], '_InterpTooDeep': tuple[module gp_elite.evaluation], '_LMPlan': tuple[module gp_elite.evaluation], '_LM_BINARY_FN': tuple[module gp_elite.evaluation], '_LM_BINARY_SRC': tuple[module gp_elite.evaluation], '_LM_PLAN_CACHE': tuple[module gp_elite.evaluation], '_LM_PLAN_CACHE_MAX': tuple[module gp_elite.evaluation], '_LM_UNARY_FN': tuple[module gp_elite.evaluation], '_LM_UNARY_SRC': tuple[module gp_elite.evaluation], '_MISSING': tuple[module gp_elite.numeric, module gp_elite.config, module gp_elite.tree, module gp_elite.simplification, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.data, module gp_elite.console], '_MinMaxScaler': tuple[module gp_elite.data], '_NAN': tuple[module gp_elite.evaluation], '_ND_UNARY_WEIGHTS_INIT': tuple[module gp_elite.data], '_NEAR_CACHE': tuple[module gp_elite.final_choice, module gp_elite.search], '_NEAR_EXT': tuple[module gp_elite.final_choice], '_NEAR_K': tuple[module gp_elite.final_choice], '_NP_GLOBALS': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_PACK_D': tuple[module gp_elite.tree], '_PARAMETRIC_CACHE_MAX': tuple[module gp_elite.evaluation], '_PATIENCE_GAIN': tuple[module gp_elite.final_choice], '_POOL_CHILD_ENV': tuple[module gp_elite.parallel], '_POWER_LAW_MIN_R2': tuple[module gp_elite.seeds], '_POWER_TOL': tuple[module gp_elite.seeds], '_PRED_CACHE_MAX': tuple[module gp_elite.evaluation], '_PW': tuple[module gp_elite.islands, module gp_elite.parallel], '_Patience': tuple[module gp_elite.final_choice, module gp_elite.parallel, module gp_elite.search], '_RunTrace': tuple[module gp_elite.config], '_SAFE_LIMIT': tuple[module gp_elite.numeric], '_SCAN_KEEP': tuple[module gp_elite.seeds], '_SIMPLIFY_CACHE': tuple[module gp_elite.simplification], '_SMALL_CANDS': tuple[module gp_elite.final_choice], '_SMALL_CANDS_MAX': tuple[module gp_elite.final_choice], '_SMALL_FAMILY': tuple[module gp_elite.final_choice, module gp_elite.seeds], '_SMALL_FAMILY_KEEP': tuple[module gp_elite.final_choice, module gp_elite.seeds], '_SMALL_FAMILY_SHARE': tuple[module gp_elite.final_choice, module gp_elite.seeds], '_SMALL_FINALISTS': tuple[module gp_elite.final_choice], '_SMALL_FOLDS': tuple[module gp_elite.final_choice], '_SMALL_FRONT': tuple[module gp_elite.final_choice], '_SMALL_MIN_ROWS': tuple[module gp_elite.final_choice], '_SMALL_ROWS': tuple[module gp_elite.final_choice], '_SMALL_SEARCH': tuple[module gp_elite.final_choice], '_STR_CODES': tuple[module gp_elite.tree], '_SYMPY_BINARY': tuple[module gp_elite.tree], '_SYMPY_UNARY': tuple[module gp_elite.tree], '_SYRACUSE_BINARY_OPS': tuple[module gp_elite.config, module gp_elite.datasets, module gp_elite.search], '_SYRACUSE_BINARY_WEIGHTS': tuple[module gp_elite.config], '_SYRACUSE_UNARY_OPS': tuple[module gp_elite.config, module gp_elite.datasets, module gp_elite.search], '_SYRACUSE_UNARY_WEIGHTS': tuple[module gp_elite.config], '_ShiftFreeScaler': tuple[module gp_elite.data, module gp_elite.console], '_SkipLogExport': tuple[module gp_elite.parallel, module gp_elite.search], '_TAG_BINARY': tuple[module gp_elite.tree], '_TAG_FLOAT': tuple[module gp_elite.tree], '_TAG_OTHER': tuple[module gp_elite.tree], '_TAG_UNARY': tuple[module gp_elite.tree], '_TOLERANT_MAX': tuple[module gp_elite.seeds], '_TOLERANT_REL': tuple[module gp_elite.seeds], '_TRIVIAL_CACHE': tuple[module gp_elite.simplification, module gp_elite.memory], '_TRIVIAL_PROBE_X': tuple[module gp_elite.memory], '_UNARY_FOLD': tuple[module gp_elite.simplification], '_UNPACK_Q': tuple[module gp_elite.tree], '_VAL_CANDS_MAX': tuple[module gp_elite.final_choice], '_WEIGHTED_SUMS_MAX': tuple[module gp_elite.final_choice], '_active_pool_ops': tuple[module gp_elite.config, module gp_elite.islands], '_active_pools': tuple[module gp_elite.config, module gp_elite.genetic, module gp_elite.memory], '_ask': tuple[module gp_elite.console], '_ask_int': tuple[module gp_elite.console], '_binom_library': tuple[module gp_elite.seeds], '_binomial_forms': tuple[module gp_elite.seeds], '_build_near_probes': tuple[module gp_elite.final_choice, module gp_elite.search], '_choose_scaler': tuple[module gp_elite.data], '_clear_simplify_caches': tuple[module gp_elite.simplification, module gp_elite.parallel, module gp_elite.search], '_collatz_flight_time': tuple[module gp_elite.datasets, module gp_elite.console], '_collect_constants_ordered': tuple[module gp_elite.evaluation, module gp_elite.fitting], '_csv_deps': tuple[module gp_elite.data], '_csv_deps_ok': tuple[module gp_elite.data], '_cube': tuple[module gp_elite.evaluation], '_deduce_console_constant': tuple[module gp_elite.console], '_detect_dominant_op': tuple[module gp_elite.config, module gp_elite.islands], '_dim_active': tuple[module gp_elite.config, module gp_elite.scoring, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search], '_ds': tuple[module gp_elite.config, module gp_elite.scoring, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands], '_e2_residuals': tuple[module gp_elite.seeds], '_early_stop_threshold': tuple[module gp_elite.final_choice, module gp_elite.parallel, module gp_elite.search], '_elem_aexp_forms': tuple[module gp_elite.seeds], '_elem_flib': tuple[module gp_elite.seeds], '_elem_inverse_forms': tuple[module gp_elite.seeds], '_elem_inverse_forms_w': tuple[module gp_elite.seeds], '_elem_log_scan': tuple[module gp_elite.seeds], '_elem_mono': tuple[module gp_elite.seeds], '_elem_rel': tuple[module gp_elite.seeds], '_elem_transform': tuple[module gp_elite.seeds], '_elem_trig_exact': tuple[module gp_elite.seeds], '_elem_trig_forms': tuple[module gp_elite.seeds], '_elem_trig_grid': tuple[module gp_elite.seeds], '_elem_wrel': tuple[module gp_elite.seeds], '_elementary_forms': tuple[module gp_elite.seeds], '_elementary_forms_n2': tuple[module gp_elite.seeds], '_evolve_parallel': tuple[module gp_elite.parallel, module gp_elite.search], '_exit_if_reimported_by_worker': tuple[module gp_elite.parallel, module gp_elite.search], '_finalists': tuple[module gp_elite.final_choice, module gp_elite.search], '_float_literal': tuple[module gp_elite.evaluation], '_formula_faithful': tuple[module gp_elite.final_choice], '_get_ops_for_role': tuple[module gp_elite.config, module gp_elite.genetic], '_golden_min': tuple[module gp_elite.seeds], '_half_integer_power': tuple[module gp_elite.seeds], '_has_own_factor': tuple[module gp_elite.simplification], '_has_scale': tuple[module gp_elite.final_choice], '_holdout_mse': tuple[module gp_elite.final_choice, module gp_elite.parallel, module gp_elite.search], '_interactive_menu': tuple[module gp_elite.console], '_interp': tuple[module gp_elite.evaluation], '_invalidate_all_hashes': tuple[module gp_elite.simplification, module gp_elite.fitting], '_is_adjusted_float': tuple[module gp_elite.tree], '_is_const': tuple[module gp_elite.simplification], '_is_const_subtree': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_is_float': tuple[module gp_elite.simplification], '_is_numerically_stable': tuple[module gp_elite.final_choice, module gp_elite.search], '_island_round_task': tuple[module gp_elite.parallel], '_leaf_code_canonical': tuple[module gp_elite.tree], '_leaf_code_exact': tuple[module gp_elite.tree], '_leaf_code_rounded': tuple[module gp_elite.tree], '_linear_scale_params': tuple[module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.final_choice, module gp_elite.seeds], '_lm_apply': tuple[module gp_elite.evaluation], '_lm_build_plan': tuple[module gp_elite.evaluation], '_lm_column': tuple[module gp_elite.evaluation, module gp_elite.fitting], '_lm_plan': tuple[module gp_elite.evaluation, module gp_elite.fitting], '_lm_to_convergence': tuple[module gp_elite.final_choice, module gp_elite.seeds], '_log_g_exponents': tuple[module gp_elite.seeds], '_log_max_height_level2': tuple[module gp_elite.datasets], '_make_binomial_seeds': tuple[module gp_elite.seeds, module gp_elite.search], '_make_elementary_seeds': tuple[module gp_elite.seeds, module gp_elite.search], '_make_linear_candidate': tuple[module gp_elite.search], '_make_motif_seeds': tuple[module gp_elite.seeds, module gp_elite.search], '_make_power_law_seeds': tuple[module gp_elite.seeds, module gp_elite.search], '_make_tolerant_seeds': tuple[module gp_elite.seeds, module gp_elite.search], '_max_height_ratio': tuple[module gp_elite.datasets], '_monomial': tuple[module gp_elite.seeds], '_nd_diverse_population': tuple[module gp_elite.genetic, module gp_elite.islands], '_near_domain_stable': tuple[module gp_elite.final_choice], '_node_hashes': tuple[module gp_elite.tree], '_np_abs': tuple[module gp_elite.numeric], '_np_is_even': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_isfinite': tuple[module gp_elite.numeric], '_np_max2': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_maximum': tuple[module gp_elite.numeric, module gp_elite.evaluation, module gp_elite.fitting], '_np_min2': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_minimum': tuple[module gp_elite.numeric, module gp_elite.evaluation, module gp_elite.fitting], '_np_safe_arcsin': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_safe_div': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_safe_exp': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_safe_log': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_safe_pow': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_safe_pow_var': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_safe_sqrt': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_safe_tan': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_np_step': tuple[module gp_elite.numeric, module gp_elite.evaluation], '_one_run': tuple[module gp_elite.console], '_parallel_enabled': tuple[module gp_elite.parallel, module gp_elite.search], '_parallel_worker_init': tuple[module gp_elite.parallel], '_pause': tuple[module gp_elite.console], '_pearson_r': tuple[module gp_elite.evaluation, module gp_elite.scoring], '_polish_finalists': tuple[module gp_elite.final_choice, module gp_elite.search], '_pool_choice': tuple[module gp_elite.config, module gp_elite.genetic], '_pool_probe': tuple[module gp_elite.parallel], '_power_law_exponents': tuple[module gp_elite.seeds], '_power_law_exponents_w': tuple[module gp_elite.seeds], '_pred_rel_error': tuple[module gp_elite.seeds], '_predict_cached': tuple[module gp_elite.evaluation, module gp_elite.scoring, module gp_elite.genetic], '_print_menu': tuple[module gp_elite.console], '_product': tuple[module gp_elite.seeds], '_pure_mse': tuple[module gp_elite.scoring, module gp_elite.fitting, module gp_elite.final_choice, module gp_elite.search, module gp_elite.console], '_random_tree_full': tuple[module gp_elite.genetic], '_random_tree_full_nd': tuple[module gp_elite.genetic], '_random_tree_grow': tuple[module gp_elite.genetic], '_random_tree_grow_nd': tuple[module gp_elite.genetic], '_random_tree_nd': tuple[module gp_elite.genetic, module gp_elite.islands], '_refit_inner': tuple[module gp_elite.seeds], '_refit_scaling': tuple[module gp_elite.final_choice, module gp_elite.search], '_robust_scale_params': tuple[module gp_elite.scoring], '_safe_sinc': tuple[module gp_elite.data], '_safe_write': tuple[module gp_elite.evaluation, module gp_elite.memory], '_scale_feature': tuple[module gp_elite.datasets], '_scale_ratio': tuple[module gp_elite.data], '_scale_tree': tuple[module gp_elite.scoring, module gp_elite.console], '_seed_rel_error': tuple[module gp_elite.seeds], '_seeds_blocked_by_units': tuple[module gp_elite.seeds], '_select_one_se': tuple[module gp_elite.final_choice, module gp_elite.search], '_semantic_key': tuple[module gp_elite.genetic], '_simplify_node': tuple[module gp_elite.simplification], '_simplify_tree': tuple[module gp_elite.simplification], '_small_choose': tuple[module gp_elite.final_choice], '_small_cv': tuple[module gp_elite.final_choice], '_small_family': tuple[module gp_elite.seeds], '_small_fit': tuple[module gp_elite.final_choice], '_small_is_const': tuple[module gp_elite.final_choice], '_small_materialize': tuple[module gp_elite.final_choice], '_small_n_par': tuple[module gp_elite.final_choice], '_small_round_powers': tuple[module gp_elite.final_choice], '_small_setup': tuple[module gp_elite.final_choice, module gp_elite.search], '_small_specs': tuple[module gp_elite.final_choice], '_small_strip': tuple[module gp_elite.final_choice], '_small_table_select': tuple[module gp_elite.final_choice, module gp_elite.search], '_smart_reset_explorers': tuple[module gp_elite.islands, module gp_elite.parallel, module gp_elite.search], '_split_holdout': tuple[module gp_elite.search], '_sq': tuple[module gp_elite.evaluation], '_str_code': tuple[module gp_elite.tree], '_target_scale': tuple[module gp_elite.scoring, module gp_elite.console], '_to_np_code': tuple[module gp_elite.evaluation], '_to_np_code_parametric': tuple[module gp_elite.evaluation], '_track_if_exact': tuple[module gp_elite.final_choice], '_track_small_candidate': tuple[module gp_elite.final_choice, module gp_elite.parallel, module gp_elite.search], '_track_val_candidate': tuple[module gp_elite.final_choice, module gp_elite.parallel, module gp_elite.search], '_typed_seeds': tuple[module gp_elite.seeds], '_v2': tuple[module gp_elite.datasets, module gp_elite.console], '_value_code': tuple[module gp_elite.tree], '_warn_unguarded_main': tuple[module gp_elite.parallel], '_weight_sums': tuple[module gp_elite.final_choice], 'annotations': tuple[module gp_elite.numeric, module gp_elite.config, module gp_elite.tree, module gp_elite.simplification, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'bisect': tuple[module gp_elite.memory], 'build_dataset': tuple[module gp_elite.datasets, module gp_elite.search], 'build_stigmergic_tree': tuple[module gp_elite.genetic], 'build_stigmergic_tree_v2': tuple[module gp_elite.genetic], 'build_stigmergic_tree_v3': tuple[module gp_elite.genetic, module gp_elite.islands], 'collect_constants': tuple[module gp_elite.tree], 'compile_parametric': tuple[module gp_elite.evaluation, module gp_elite.fitting, module gp_elite.final_choice], 'compile_to_numpy': tuple[module gp_elite.evaluation], 'compute_semantic_sig': tuple[module gp_elite.memory, module gp_elite.islands], 'copy': tuple[module gp_elite.islands, module gp_elite.search], 'count_distinct_features': tuple[module gp_elite.scoring], 'crossover_size_fair': tuple[module gp_elite.genetic, module gp_elite.islands], 'csv': tuple[module gp_elite.search, module gp_elite.console], 'dataclass': tuple[module gp_elite.config, module gp_elite.memory], 'decoy_report': tuple[module gp_elite.console], 'deque': tuple[module gp_elite.tree], 'evaluate': tuple[module gp_elite.evaluation, module gp_elite.console], 'evaluate_vector': tuple[module gp_elite.evaluation, module gp_elite.scoring, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.console], 'evolve': tuple[module gp_elite.search, module gp_elite.console], 'evolve_island': tuple[module gp_elite.islands, module gp_elite.parallel, module gp_elite.search], 'field': tuple[module gp_elite.config, module gp_elite.memory], 'fitness': tuple[module gp_elite.scoring, module gp_elite.genetic, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.console], 'fragment_inject_mutation': tuple[module gp_elite.genetic], 'gc': tuple[module gp_elite.console], 'generate_syracuse_dataset': tuple[module gp_elite.datasets, module gp_elite.console], 'get_all_nodes': tuple[module gp_elite.tree, module gp_elite.genetic, module gp_elite.memory, module gp_elite.islands], 'get_feature_bias_weights': tuple[module gp_elite.scoring, module gp_elite.genetic], 'hashlib': tuple[module gp_elite.tree], 'hoist_mutation': tuple[module gp_elite.genetic], 'init_probe_set': tuple[module gp_elite.memory, module gp_elite.search], 'itertools': tuple[module gp_elite.seeds], 'json': tuple[module gp_elite.memory], 'load_custom_csv': tuple[module gp_elite.data, module gp_elite.console], 'load_generic_csv': tuple[module gp_elite.data, module gp_elite.console], 'make_cfg': tuple[module gp_elite.config, module gp_elite.console], 'make_cfg_nd': tuple[module gp_elite.config, module gp_elite.console], 'math': tuple[module gp_elite.numeric, module gp_elite.tree, module gp_elite.simplification, module gp_elite.evaluation, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'migrate': tuple[module gp_elite.islands, module gp_elite.parallel, module gp_elite.search], 'mutate': tuple[module gp_elite.genetic, module gp_elite.islands], 'node_to_sympy': tuple[module gp_elite.tree], 'np': tuple[module gp_elite.numeric, module gp_elite.evaluation, module gp_elite.datasets, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'operator': tuple[module gp_elite.evaluation], 'optimize_constants_adam': tuple[module gp_elite.fitting, module gp_elite.final_choice, module gp_elite.islands, module gp_elite.search], 'optimize_constants_lm': tuple[module gp_elite.fitting, module gp_elite.final_choice], 'os': tuple[module gp_elite.memory, module gp_elite.parallel, module gp_elite.search, module gp_elite.data, module gp_elite.console], 'pareto_rank': tuple[module gp_elite.genetic], 'point_mutation': tuple[module gp_elite.genetic], 'print_result': tuple[module gp_elite.console], 'random': tuple[module gp_elite.config, module gp_elite.datasets, module gp_elite.genetic, module gp_elite.memory, module gp_elite.seeds, module gp_elite.islands, module gp_elite.parallel, module gp_elite.console], 'random_constant': tuple[module gp_elite.genetic], 'random_terminal': tuple[module gp_elite.genetic, module gp_elite.memory], 'random_tree': tuple[module gp_elite.genetic, module gp_elite.memory, module gp_elite.islands], 'raw_mse': tuple[module gp_elite.scoring, module gp_elite.genetic, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.console], 'raw_pearson_r': tuple[module gp_elite.scoring, module gp_elite.islands], 'record_feature_usage': tuple[module gp_elite.scoring, module gp_elite.islands], 'reset_feature_usage': tuple[module gp_elite.scoring, module gp_elite.search], 'run': tuple[module gp_elite.console], 'run_benchmark': tuple[module gp_elite.console], 'safe_arcsin': tuple[module gp_elite.numeric, module gp_elite.simplification, module gp_elite.evaluation], 'safe_div': tuple[module gp_elite.numeric, module gp_elite.simplification, module gp_elite.evaluation], 'safe_exp': tuple[module gp_elite.numeric, module gp_elite.simplification, module gp_elite.evaluation], 'safe_log': tuple[module gp_elite.numeric, module gp_elite.simplification, module gp_elite.evaluation], 'safe_pow': tuple[module gp_elite.numeric, module gp_elite.simplification, module gp_elite.evaluation], 'safe_sqrt': tuple[module gp_elite.numeric, module gp_elite.simplification, module gp_elite.evaluation], 'safe_tan': tuple[module gp_elite.numeric, module gp_elite.simplification, module gp_elite.evaluation], 'semantic_dedup': tuple[module gp_elite.genetic, module gp_elite.islands], 'semantic_mutation': tuple[module gp_elite.genetic, module gp_elite.islands], 'semantic_score': tuple[module gp_elite.memory, module gp_elite.islands], 'shrink_mutation': tuple[module gp_elite.genetic], 'simplify': tuple[module gp_elite.simplification, module gp_elite.scoring, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.islands, module gp_elite.search, module gp_elite.console], 'stigmergic_mutation': tuple[module gp_elite.genetic], 'struct': tuple[module gp_elite.tree], 'subtree_mutation': tuple[module gp_elite.genetic], 'sys': tuple[module gp_elite.parallel], 'time': tuple[module gp_elite.final_choice, module gp_elite.seeds, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.console], 'to_string': tuple[module gp_elite.tree, module gp_elite.memory, module gp_elite.seeds, module gp_elite.parallel, module gp_elite.search, module gp_elite.console], 'tournament': tuple[module gp_elite.genetic, module gp_elite.islands], 'tree_complexity': tuple[module gp_elite.tree, module gp_elite.scoring, module gp_elite.fitting], 'tree_depth': tuple[module gp_elite.tree, module gp_elite.scoring, module gp_elite.fitting, module gp_elite.genetic, module gp_elite.memory, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.console], 'tree_size': tuple[module gp_elite.tree, module gp_elite.scoring, module gp_elite.genetic, module gp_elite.memory, module gp_elite.final_choice, module gp_elite.islands, module gp_elite.parallel, module gp_elite.search, module gp_elite.console], 'try_plot': tuple[module gp_elite.console], 'update_residual_sig': tuple[module gp_elite.memory, module gp_elite.islands, module gp_elite.parallel], 'warm_transfer': tuple[module gp_elite.memory, module gp_elite.console], 'weakref': tuple[module gp_elite.evaluation], 'wrap_linear_scaling': tuple[module gp_elite.scoring, module gp_elite.final_choice, module gp_elite.parallel, module gp_elite.search]}"
+  },
+  "_HOT_ZONES": {
+   "type": "dict",
+   "value": "dict{'1': list[1.25, -1.25, 1.77, -1.77, 2.17, -2.17, 2.51, -2.51, 2.81, -2.81], '10': list[0.3, 0.5, 0.8, 1.2, 1.6, 2.0, 2.5, 0.2, 0.4], '2': list[0.33, 1.0, -1.0, 0.0, 2.0, -2.0], '3': list[0.4, -0.4, 1.1, -1.1, 1.8, -1.8, 0.0], '4': list[0.0, 1.57, -1.57, 3.14, -3.14, 0.8, -0.8], '5': list[1.25, -1.25, 1.77, -1.77, 2.17, -2.17, 0.5, -0.5, 2.51, -2.51], '6': list[1.0, -1.0, 0.0, 0.5, -0.5, 2.0, -2.0, 1.5, -1.5], '7': list[0.01, 1.25, -1.25, 1.77, -1.77, 2.17, -2.17, 0.5, -0.5], '8': list[0.5, -0.5, 1.5, -1.5, 0.0, 1.0, -1.0, 2.0, -2.0], '9': list[1.0, -1.0, 0.5, -0.5, 1.5, -1.5, 0.0, 2.0, -2.0], 'BATTERY_SOH': list[1.5, 2.0, -1.5, -2.0, 0.0, 1.0, -1.0, 0.5, -0.5], 'ND1': list[0.0, 1.0, -1.0, 1.57, -1.57, 2.0, -2.0], 'ND2': list[0.0, 0.3, -0.3, 0.6, -0.6, 1.0, -1.0, 1.57, -1.57], 'ND3': list[0.0, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0], 'ND4': list[0.0, 0.78, -0.78, 1.57, -1.57, 0.5, -0.5], 'ND5': list[0.0, 0.5, -0.5, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0]}"
+  },
+  "_INTERP_BINARY": {
+   "type": "dict",
+   "value": "dict{'*': builtin_function_or_method _operator.mul, '+': builtin_function_or_method _operator.add, '-': builtin_function_or_method _operator.sub, '/': function gp_elite.numeric._np_safe_div, 'max2': function gp_elite.numeric._np_max2, 'min2': function gp_elite.numeric._np_min2}"
+  },
+  "_INTERP_MAX_DEPTH": {
+   "type": "int",
+   "value": "100"
+  },
+  "_INTERP_UNARY": {
+   "type": "dict",
+   "value": "dict{'abs': callable ufunc, 'arcsin': function gp_elite.numeric._np_safe_arcsin, 'cos': callable ufunc, 'cube': function gp_elite.evaluation._cube, 'exp': function gp_elite.numeric._np_safe_exp, 'is_even': function gp_elite.numeric._np_is_even, 'log': function gp_elite.numeric._np_safe_log, 'neg': builtin_function_or_method _operator.neg, 'sin': callable ufunc, 'sq': function gp_elite.evaluation._sq, 'sqrt': function gp_elite.numeric._np_safe_sqrt, 'step': function gp_elite.numeric._np_step, 'tan': function gp_elite.numeric._np_safe_tan, 'tanh': callable ufunc}"
+  },
+  "_IdentityScaler": {
+   "doc": "3bbe207c8687",
+   "file": null,
+   "module": "gp_elite.data",
+   "qualname": "_IdentityScaler",
+   "signature": "()",
+   "type": "type"
+  },
+  "_InterpTooDeep": {
+   "doc": "da39a3ee5e6b",
+   "file": null,
+   "module": "gp_elite.evaluation",
+   "qualname": "_InterpTooDeep",
+   "signature": null,
+   "type": "type"
+  },
+  "_LMPlan": {
+   "doc": "cf3c501833ae",
+   "file": null,
+   "module": "gp_elite.evaluation",
+   "qualname": "_LMPlan",
+   "signature": "()",
+   "type": "type"
+  },
+  "_LM_BINARY_FN": {
+   "type": "dict",
+   "value": "dict{'/': function gp_elite.numeric._np_safe_div, 'max2': function gp_elite.numeric._np_max2, 'min2': function gp_elite.numeric._np_min2}"
+  },
+  "_LM_BINARY_SRC": {
+   "type": "dict",
+   "value": "dict{'/': '_safe_div', 'max2': '_max2', 'min2': '_min2'}"
+  },
+  "_LM_PLAN_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_LM_PLAN_CACHE_MAX": {
+   "type": "int",
+   "value": "2048"
+  },
+  "_LM_UNARY_FN": {
+   "type": "dict",
+   "value": "dict{'abs': callable ufunc, 'arcsin': function gp_elite.numeric._np_safe_arcsin, 'cos': callable ufunc, 'exp': function gp_elite.numeric._np_safe_exp, 'is_even': function gp_elite.numeric._np_is_even, 'log': function gp_elite.numeric._np_safe_log, 'sin': callable ufunc, 'sqrt': function gp_elite.numeric._np_safe_sqrt, 'step': function gp_elite.numeric._np_step, 'tan': function gp_elite.numeric._np_safe_tan, 'tanh': callable ufunc}"
+  },
+  "_LM_UNARY_SRC": {
+   "type": "dict",
+   "value": "dict{'abs': 'np.abs', 'arcsin': '_safe_arcsin', 'cos': 'np.cos', 'exp': '_safe_exp', 'is_even': '_is_even', 'log': '_safe_log', 'sin': 'np.sin', 'sqrt': '_safe_sqrt', 'step': '_step', 'tan': '_safe_tan', 'tanh': 'np.tanh'}"
+  },
+  "_LS_SCALE_ONLY": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_MISSING": {
+   "type": "object",
+   "value": "object object"
+  },
+  "_MinMaxScaler": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "_MinMaxScaler",
+   "signature": "(*args, **kwargs)",
+   "type": "function"
+  },
+  "_NAN": {
+   "type": "float",
+   "value": "nan"
+  },
+  "_ND_UNARY_WEIGHTS_INIT": {
+   "type": "list",
+   "value": "list[3, 3, 2, 2, 1, 1, 3, 1, 3]"
+  },
+  "_NEAR_BAND": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_NEAR_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_NEAR_EXT": {
+   "type": "float",
+   "value": "0.1"
+  },
+  "_NEAR_GUARD_SWAPS": {
+   "type": "int",
+   "value": "0"
+  },
+  "_NEAR_K": {
+   "type": "float",
+   "value": "50.0"
+  },
+  "_NEAR_PROBE_XS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_NP_GLOBALS": {
+   "type": "dict",
+   "value": "dict{'_is_even': function gp_elite.numeric._np_is_even, '_max2': function gp_elite.numeric._np_max2, '_min2': function gp_elite.numeric._np_min2, '_safe_arcsin': function gp_elite.numeric._np_safe_arcsin, '_safe_div': function gp_elite.numeric._np_safe_div, '_safe_exp': function gp_elite.numeric._np_safe_exp, '_safe_log': function gp_elite.numeric._np_safe_log, '_safe_pow': function gp_elite.numeric._np_safe_pow, '_safe_powv': function gp_elite.numeric._np_safe_pow_var, '_safe_sqrt': function gp_elite.numeric._np_safe_sqrt, '_safe_tan': function gp_elite.numeric._np_safe_tan, '_step': function gp_elite.numeric._np_step, 'np': module numpy}"
+  },
+  "_PACK_D": {
+   "type": "builtin_function_or_method",
+   "value": "builtin_function_or_method None.Struct.pack"
+  },
+  "_PARALLEL_BROKEN": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_PARALLEL_WARNED": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_PARAMETRIC_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_PARAMETRIC_CACHE_MAX": {
+   "type": "int",
+   "value": "2048"
+  },
+  "_PATIENCE_GAIN": {
+   "type": "float",
+   "value": "0.01"
+  },
+  "_POLISH_ADMITTED": {
+   "type": "int",
+   "value": "0"
+  },
+  "_POLISH_GRACE_S": {
+   "type": "float",
+   "value": "1.0"
+  },
+  "_POOL_CHILD_ENV": {
+   "type": "str",
+   "value": "'GP_ELITE_POOL_CHILD'"
+  },
+  "_POWER_LAW_MIN_R2": {
+   "type": "float",
+   "value": "0.999"
+  },
+  "_POWER_TOL": {
+   "type": "float",
+   "value": "1e-12"
+  },
+  "_PRED_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_PRED_CACHE_MAX": {
+   "type": "int",
+   "value": "8192"
+  },
+  "_PW": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_Patience": {
+   "doc": "41807c95f166",
+   "file": null,
+   "module": "gp_elite.final_choice",
+   "qualname": "_Patience",
+   "signature": "(p)",
+   "type": "type"
+  },
+  "_RunTrace": {
+   "doc": "2de1fbf47cd7",
+   "file": null,
+   "module": "gp_elite.config",
+   "qualname": "_RunTrace",
+   "signature": "()",
+   "type": "type"
+  },
+  "_SAFE_LIMIT": {
+   "type": "float",
+   "value": "1000000.0"
+  },
+  "_SCAN_KEEP": {
+   "type": "int",
+   "value": "3"
+  },
+  "_SEEDS_UNDER_UNITS": {
+   "type": "bool",
+   "value": "True"
+  },
+  "_SIMPLIFY_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_SMALL_CANDS": {
+   "type": "list",
+   "value": "list[]"
+  },
+  "_SMALL_CANDS_MAX": {
+   "type": "int",
+   "value": "64"
+  },
+  "_SMALL_CV": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_SMALL_FAMILY": {
+   "type": "list",
+   "value": "list[]"
+  },
+  "_SMALL_FAMILY_KEEP": {
+   "type": "int",
+   "value": "8"
+  },
+  "_SMALL_FAMILY_SHARE": {
+   "type": "float",
+   "value": "0.5"
+  },
+  "_SMALL_FINALISTS": {
+   "type": "int",
+   "value": "40"
+  },
+  "_SMALL_FOLDS": {
+   "type": "int",
+   "value": "10"
+  },
+  "_SMALL_FRONT": {
+   "type": "list",
+   "value": "list[]"
+  },
+  "_SMALL_MIN_ROWS": {
+   "type": "int",
+   "value": "6"
+  },
+  "_SMALL_ON": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_SMALL_ROWS": {
+   "type": "int",
+   "value": "30"
+  },
+  "_SMALL_SEARCH": {
+   "type": "int",
+   "value": "8"
+  },
+  "_STATE": {
+   "type": "module",
+   "value": "gp_elite.state"
+  },
+  "_STATE_NAMES": {
+   "type": "frozenset",
+   "value": "frozenset{'COGRAPH', 'CSV_FEATURE_NAMES', 'CSV_TARGET_NAME', 'CURRENT_RESIDUAL_SIG', 'FRAGMENT_LIB', 'PROBE_X', 'SEQ_MEM', 'VAL_R2_TOLERANCE', '_BATTERY_CSV_MODE', '_BINOMIAL_SEEDS', '_COMPILE_CACHE', '_CUSTOM_LOSS_FN', '_CUSTOM_LOSS_PARSIMONY', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING', '_CUSTOM_SEEDS', '_DIM_GATE_DIMS', '_DIM_GATE_TARGET', '_DIM_SEARCH', '_DIM_UNKNOWN_CONST', '_E2_SEEDS', '_ELEMENTARY_SEEDS', '_EXACT_PRIORITY_SWAPS', '_EXTRAP_BAND', '_EXTRAP_PROBE_XS', '_FAITHFUL_SWAPS', '_GENERIC_BINARY_OPS', '_GENERIC_BINARY_WEIGHTS', '_GENERIC_CSV_MODE', '_GENERIC_UNARY_OPS', '_GENERIC_UNARY_WEIGHTS', '_LS_SCALE_ONLY', '_NEAR_BAND', '_NEAR_GUARD_SWAPS', '_NEAR_PROBE_XS', '_PARALLEL_BROKEN', '_PARALLEL_WARNED', '_PARAMETRIC_CACHE', '_POLISH_ADMITTED', '_POLISH_GRACE_S', '_PRED_CACHE', '_SEEDS_UNDER_UNITS', '_SMALL_CV', '_SMALL_ON', '_SYRACUSE_FEAT_MAXS', '_SYRACUSE_FEAT_MINS', '_SYRACUSE_MODE', '_SYRACUSE_X_RAW', '_SYRACUSE_Y_RAW', '_TIME_LIMIT_HIT', '_TOLERANT_N2', '_TOLERANT_REFIT', '_TOLERANT_SEEDS', '_USE_LINEAR_SCALING', '_VAL_CANDS', '_VAL_TRAIN_XS', '_VAL_TRAIN_YS', '_VAL_XS', '_VAL_YS', '_feature_usage_counter', '_fitness_cache'}"
+  },
+  "_STR_CODES": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_SYMPY_BINARY": {
+   "type": "dict",
+   "value": "dict{'*': function gp_elite.tree.<lambda>, '+': function gp_elite.tree.<lambda>, '-': function gp_elite.tree.<lambda>, '/': function gp_elite.tree.<lambda>, 'max2': function gp_elite.tree.<lambda>, 'min2': function gp_elite.tree.<lambda>, 'pow': function gp_elite.tree.<lambda>}"
+  },
+  "_SYMPY_UNARY": {
+   "type": "dict",
+   "value": "dict{'abs': function gp_elite.tree.<lambda>, 'arcsin': function gp_elite.tree.<lambda>, 'cos': function gp_elite.tree.<lambda>, 'cube': function gp_elite.tree.<lambda>, 'exp': function gp_elite.tree.<lambda>, 'inv': function gp_elite.tree.<lambda>, 'is_even': function gp_elite.tree.<lambda>, 'log': function gp_elite.tree.<lambda>, 'neg': function gp_elite.tree.<lambda>, 'sin': function gp_elite.tree.<lambda>, 'sq': function gp_elite.tree.<lambda>, 'sqrt': function gp_elite.tree.<lambda>, 'step': function gp_elite.tree.<lambda>, 'tan': function gp_elite.tree.<lambda>, 'tanh': function gp_elite.tree.<lambda>}"
+  },
+  "_SYRACUSE_BINARY_OPS": {
+   "type": "list",
+   "value": "list['+', '-', '*', '/', 'pow', 'max2', 'min2']"
+  },
+  "_SYRACUSE_BINARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[4, 4, 5, 2, 3, 2, 2]"
+  },
+  "_SYRACUSE_FEAT_MAXS": {
+   "type": "ndarray",
+   "value": "ndarray(0,) float64 da39a3ee5e6b"
+  },
+  "_SYRACUSE_FEAT_MINS": {
+   "type": "ndarray",
+   "value": "ndarray(0,) float64 da39a3ee5e6b"
+  },
+  "_SYRACUSE_MODE": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_SYRACUSE_UNARY_OPS": {
+   "type": "list",
+   "value": "list['cos', 'log', 'sqrt', 'abs', 'neg', 'sq', 'cube', 'is_even', 'step']"
+  },
+  "_SYRACUSE_UNARY_WEIGHTS": {
+   "type": "list",
+   "value": "list[1, 3, 2, 1, 2, 3, 2, 5, 3]"
+  },
+  "_SYRACUSE_X_RAW": {
+   "type": "ndarray",
+   "value": "ndarray(0,) float64 da39a3ee5e6b"
+  },
+  "_SYRACUSE_Y_RAW": {
+   "type": "ndarray",
+   "value": "ndarray(0,) float64 da39a3ee5e6b"
+  },
+  "_ShiftFreeScaler": {
+   "doc": "74283fa5802e",
+   "file": null,
+   "module": "gp_elite.data",
+   "qualname": "_ShiftFreeScaler",
+   "signature": "(group_ratio=None)",
+   "type": "type"
+  },
+  "_SkipLogExport": {
+   "doc": "156ce2540935",
+   "file": null,
+   "module": "gp_elite.parallel",
+   "qualname": "_SkipLogExport",
+   "signature": null,
+   "type": "type"
+  },
+  "_StateName": {
+   "doc": "13038748602e",
+   "file": null,
+   "module": "gp_elite.core",
+   "qualname": "_StateName",
+   "signature": "(name, state_module)",
+   "type": "type"
+  },
+  "_TAG_BINARY": {
+   "type": "int",
+   "value": "4"
+  },
+  "_TAG_FLOAT": {
+   "type": "int",
+   "value": "1"
+  },
+  "_TAG_OTHER": {
+   "type": "int",
+   "value": "2"
+  },
+  "_TAG_UNARY": {
+   "type": "int",
+   "value": "3"
+  },
+  "_TIME_LIMIT_HIT": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_TOLERANT_MAX": {
+   "type": "int",
+   "value": "12"
+  },
+  "_TOLERANT_N2": {
+   "type": "bool",
+   "value": "True"
+  },
+  "_TOLERANT_REFIT": {
+   "type": "bool",
+   "value": "False"
+  },
+  "_TOLERANT_REL": {
+   "type": "float",
+   "value": "0.015"
+  },
+  "_TOLERANT_SEEDS": {
+   "type": "bool",
+   "value": "True"
+  },
+  "_TRIVIAL_CACHE": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_TRIVIAL_PROBE_X": {
+   "type": "ndarray",
+   "value": "ndarray(5, 4) float64 ff9dc82bef6c"
+  },
+  "_UNARY_FOLD": {
+   "type": "frozenset",
+   "value": "frozenset{'abs', 'arcsin', 'cos', 'cube', 'exp', 'log', 'neg', 'sin', 'sq', 'sqrt', 'tan', 'tanh'}"
+  },
+  "_UNPACK_Q": {
+   "type": "builtin_function_or_method",
+   "value": "builtin_function_or_method None.Struct.unpack"
+  },
+  "_USE_LINEAR_SCALING": {
+   "type": "bool",
+   "value": "True"
+  },
+  "_VAL_CANDS": {
+   "type": "list",
+   "value": "list[]"
+  },
+  "_VAL_CANDS_MAX": {
+   "type": "int",
+   "value": "64"
+  },
+  "_VAL_TRAIN_XS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_VAL_TRAIN_YS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_VAL_XS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_VAL_YS": {
+   "type": "NoneType",
+   "value": "None"
+  },
+  "_WEIGHTED_SUMS_MAX": {
+   "type": "int",
+   "value": "6"
+  },
+  "__builtins__": {
+   "type": "dict",
+   "value": "dict{'ArithmeticError': type builtins.ArithmeticError, 'AssertionError': type builtins.AssertionError, 'AttributeError': type builtins.AttributeError, 'BaseException': type builtins.BaseException, 'BaseExceptionGroup': type builtins.BaseExceptionGroup, 'BlockingIOError': type builtins.BlockingIOError, 'BrokenPipeError': type builtins.BrokenPipeError, 'BufferError': type builtins.BufferError, 'BytesWarning': type builtins.BytesWarning, 'ChildProcessError': type builtins.ChildProcessError, 'ConnectionAbortedError': type builtins.ConnectionAbortedError, 'ConnectionError': type builtins.ConnectionError, 'ConnectionRefusedError': type builtins.ConnectionRefusedError, 'ConnectionResetError': type builtins.ConnectionResetError, 'DeprecationWarning': type builtins.DeprecationWarning, 'EOFError': type builtins.EOFError, 'Ellipsis': object ellipsis, 'EncodingWarning': type builtins.EncodingWarning, 'EnvironmentError': type builtins.OSError, 'Exception': type builtins.Exception, 'ExceptionGroup': type builtins.ExceptionGroup, 'False': False, 'FileExistsError': type builtins.FileExistsError, 'FileNotFoundError': type builtins.FileNotFoundError, 'FloatingPointError': type builtins.FloatingPointError, 'FutureWarning': type builtins.FutureWarning, 'GeneratorExit': type builtins.GeneratorExit, 'IOError': type builtins.OSError, 'ImportError': type builtins.ImportError, 'ImportWarning': type builtins.ImportWarning, 'IndentationError': type builtins.IndentationError, 'IndexError': type builtins.IndexError, 'InterruptedError': type builtins.InterruptedError, 'IsADirectoryError': type builtins.IsADirectoryError, 'KeyError': type builtins.KeyError, 'KeyboardInterrupt': type builtins.KeyboardInterrupt, 'LookupError': type builtins.LookupError, 'MemoryError': type builtins.MemoryError, 'ModuleNotFoundError': type builtins.ModuleNotFoundError, 'NameError': type builtins.NameError, 'None': None, 'NotADirectoryError': type builtins.NotADirectoryError, 'NotImplemented': object NotImplementedType, 'NotImplementedError': type builtins.NotImplementedError, 'OSError': type builtins.OSError, 'OverflowError': type builtins.OverflowError, 'PendingDeprecationWarning': type builtins.PendingDeprecationWarning, 'PermissionError': type builtins.PermissionError, 'ProcessLookupError': type builtins.ProcessLookupError, 'RecursionError': type builtins.RecursionError, 'ReferenceError': type builtins.ReferenceError, 'ResourceWarning': type builtins.ResourceWarning, 'RuntimeError': type builtins.RuntimeError, 'RuntimeWarning': type builtins.RuntimeWarning, 'StopAsyncIteration': type builtins.StopAsyncIteration, 'StopIteration': type builtins.StopIteration, 'SyntaxError': type builtins.SyntaxError, 'SyntaxWarning': type builtins.SyntaxWarning, 'SystemError': type builtins.SystemError, 'SystemExit': type builtins.SystemExit, 'TabError': type builtins.TabError, 'TimeoutError': type builtins.TimeoutError, 'True': True, 'TypeError': type builtins.TypeError, 'UnboundLocalError': type builtins.UnboundLocalError, 'UnicodeDecodeError': type builtins.UnicodeDecodeError, 'UnicodeEncodeError': type builtins.UnicodeEncodeError, 'UnicodeError': type builtins.UnicodeError, 'UnicodeTranslateError': type builtins.UnicodeTranslateError, 'UnicodeWarning': type builtins.UnicodeWarning, 'UserWarning': type builtins.UserWarning, 'ValueError': type builtins.ValueError, 'Warning': type builtins.Warning, 'ZeroDivisionError': type builtins.ZeroDivisionError, '__build_class__': builtin_function_or_method builtins.__build_class__, '__debug__': True, '__doc__': \"Built-in functions, types, exceptions, and other objects.\\n\\nThis module provides direct access to all 'built-in'\\nidentifiers of Python; for example, builtins.len is\\nthe full name for the built-in function len().\\n\\nThis module is not normally accessed explicitly by most\\napplications, but can be useful in modules that provide\\nobjects with the same name as a built-in value, but in\\nwhich the built-in of that name is also needed.\", '__import__': builtin_function_or_method builtins.__import__, '__loader__': type _frozen_importlib.BuiltinImporter, '__name__': 'builtins', '__package__': '', '__spec__': object ModuleSpec, 'abs': builtin_function_or_method builtins.abs, 'aiter': builtin_function_or_method builtins.aiter, 'all': builtin_function_or_method builtins.all, 'anext': builtin_function_or_method builtins.anext, 'any': builtin_function_or_method builtins.any, 'ascii': builtin_function_or_method builtins.ascii, 'bin': builtin_function_or_method builtins.bin, 'bool': type builtins.bool, 'breakpoint': builtin_function_or_method builtins.breakpoint, 'bytearray': type builtins.bytearray, 'bytes': type builtins.bytes, 'callable': builtin_function_or_method builtins.callable, 'chr': builtin_function_or_method builtins.chr, 'classmethod': type builtins.classmethod, 'compile': builtin_function_or_method builtins.compile, 'complex': type builtins.complex, 'copyright': callable _Printer, 'credits': callable _Printer, 'delattr': builtin_function_or_method builtins.delattr, 'dict': type builtins.dict, 'dir': builtin_function_or_method builtins.dir, 'divmod': builtin_function_or_method builtins.divmod, 'enumerate': type builtins.enumerate, 'eval': builtin_function_or_method builtins.eval, 'exec': builtin_function_or_method builtins.exec, 'exit': callable Quitter, 'filter': type builtins.filter, 'float': type builtins.float, 'format': builtin_function_or_method builtins.format, 'frozenset': type builtins.frozenset, 'getattr': builtin_function_or_method builtins.getattr, 'globals': builtin_function_or_method builtins.globals, 'hasattr': builtin_function_or_method builtins.hasattr, 'hash': builtin_function_or_method builtins.hash, 'help': callable _Helper, 'hex': builtin_function_or_method builtins.hex, 'id': builtin_function_or_method builtins.id, 'input': builtin_function_or_method builtins.input, 'int': type builtins.int, 'isinstance': builtin_function_or_method builtins.isinstance, 'issubclass': builtin_function_or_method builtins.issubclass, 'iter': builtin_function_or_method builtins.iter, 'len': builtin_function_or_method builtins.len, 'license': callable _Printer, 'list': type builtins.list, 'locals': builtin_function_or_method builtins.locals, 'map': type builtins.map, 'max': builtin_function_or_method builtins.max, 'memoryview': type builtins.memoryview, 'min': builtin_function_or_method builtins.min, 'next': builtin_function_or_method builtins.next, 'object': type builtins.object, 'oct': builtin_function_or_method builtins.oct, 'open': builtin_function_or_method io.open, 'ord': builtin_function_or_method builtins.ord, 'pow': builtin_function_or_method builtins.pow, 'print': builtin_function_or_method builtins.print, 'property': type builtins.property, 'quit': callable Quitter, 'range': type builtins.range, 'repr': builtin_function_or_method builtins.repr, 'reversed': type builtins.reversed, 'round': builtin_function_or_method builtins.round, 'set': type builtins.set, 'setattr': builtin_function_or_method builtins.setattr, 'slice': type builtins.slice, 'sorted': builtin_function_or_method builtins.sorted, 'staticmethod': type builtins.staticmethod, 'str': type builtins.str, 'sum': builtin_function_or_method builtins.sum, 'super': type builtins.super, 'tuple': type builtins.tuple, 'type': type builtins.type, 'vars': builtin_function_or_method builtins.vars, 'zip': type builtins.zip}"
+  },
+  "__cached__": {
+   "type": "str",
+   "value": "'/home/user/gp-elite/gp_elite/__pycache__/core.cpython-311.pyc'"
+  },
+  "__dir__": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "core.py",
+   "globals_is_core_dict": true,
+   "kwdefaults": "None",
+   "module": "gp_elite.core",
+   "qualname": "__dir__",
+   "signature": "()",
+   "type": "function"
+  },
+  "__doc__": {
+   "type": "str",
+   "value": "'\\nGP_ELITE.py  \u2014  Genetic Programming symbolique haute performance\\n================================================================\\n  v14.4 \u2014 Asym\u00e9trie des \u00celes (Sp\u00e9cialisation des r\u00f4les) + deepcopy champion\\n  --------------------------------------------------------------------------\\n  58. [v14.4] Island.role : sp\u00e9cialisation selon l\\'ID de l\\'\u00eele\\n\\n      Chaque \u00eele re\u00e7oit un r\u00f4le assign\u00e9 dans Island.__init__ :\\n        \u00b7 Derni\u00e8re \u00eele  (N-1)  : \"stigmergic\" \u2014 exploratrice stigmergique\\n        \u00b7 Avant-derni\u00e8re (N-2) : \"cleaner\"    \u2014 nettoyeuse BIC stricte\\n        \u00b7 Toutes les autres    : \"explorer\"   \u2014 exploratrices libres\\n      Avec N_ISLANDS=3 : \u00eele 0=explorer, \u00eele 1=cleaner, \u00eele 2=stigmergic\\n      Avec N_ISLANDS=2 : \u00eele 0=cleaner,  \u00eele 1=stigmergic\\n      Avec N_ISLANDS=1 : \u00eele 0=stigmergic (r\u00f4les fusionn\u00e9s)\\n\\n  59. [v14.4] fitness(role=...) : m\u00e9trique conditionnelle par r\u00f4le\\n\\n      \u00b7 role=\"cleaner\"  : BIC strict (v14.2)\\n            n\u00b7ln(MSE_pur) + k\u00b7ln(n) + \u03b3\u00b7n_adj\u00b2\u00b7ln(n)\\n        Rasoir d\\'Ockham forc\u00e9 \u2014 d\u00e9truit le bloat, promeut l\\'\u00e9l\u00e9gance.\\n      \u00b7 role=\"explorer\" ou \"stigmergic\" : MSE hybride + p\u00e9nalit\u00e9 lin\u00e9aire (v13.12)\\n            raw_mse(node) + min(size_pen + depth_pen, 0.05\u00b7base)\\n        Libert\u00e9 de construire des sous-structures complexes (sin(1/x), etc.)\\n        sans \u00eatre p\u00e9nalis\u00e9e pendant la phase d\\'assemblage transitoire.\\n      Cache : cl\u00e9 (hash, role) \u2014 un m\u00eame arbre peut avoir deux scores distincts.\\n\\n  60. [v14.4] Propagation coh\u00e9rente du role partout\\n\\n      Tous les appels \u00e0 fitness() et tournament() dans evolve_island(),\\n      receive_migrants() et migrate() re\u00e7oivent role=island.role.\\n      Le global_best dans evolve() est compar\u00e9 avec role=\"cleaner\" (BIC strict)\\n      comme r\u00e9f\u00e9rence universelle \u2014 la m\u00e9trique la plus discriminante.\\n\\n  61. [v14.4] Correction bug de r\u00e9f\u00e9rence sur le champion final\\n\\n      La s\u00e9quence optimize_constants_adam(global_best) + simplify() pouvait\\n      corrompre global_best si des n\u0153uds \u00e9taient partag\u00e9s par r\u00e9f\u00e9rence.\\n      Correction : copy.deepcopy(global_best) avant le passage \u00e0 Adam.\\n      Comparaison de conservation par raw_mse (MSE pur, coh\u00e9rent avec la demande).\\n\\n\\n\\n      Bug observ\u00e9 : le global_best FIT=-808 (gen 47) \u00e9tait d\u00e9grad\u00e9 en\\n      (1.229+x) MSE=0.88 par l\\'optimisation finale Adam.\\n      Cause : Adam faisait diverger les constantes vers des valeurs extr\u00eames,\\n      puis simplify() r\u00e9duisait l\\'expression d\u00e9g\u00e9n\u00e9r\u00e9e \u00e0 une feuille constante.\\n      La condition de conservation utilisait raw_mse (hybride Pearson+MSE),\\n      pas un vrai MSE, ce qui laissait passer la d\u00e9gradation.\\n\\n      Correction : avant de retourner child, on v\u00e9rifie :\\n        (a) _pure_mse(child) < _pure_mse(original)  \u2014 MSE pur, pas hybride\\n        (b) tree_complexity(child)[0] >= max(1, tree_complexity(original)[0]*0.4)\\n            \u2014 la complexit\u00e9 ne s\\'effondre pas de plus de 60% (signe de d\u00e9g\u00e9n\u00e9rescence)\\n      Si l\\'une des conditions \u00e9choue \u2192 retourner node.copy() (original intact).\\n\\n  56. [v14.3 CORRECTIF] evolve() : garde finale par BIC, pas raw_mse\\n\\n      La condition \"if raw_mse(optimized) < raw_mse(global_best)\" utilisait\\n      la m\u00e9trique hybride Pearson+MSE au lieu d\\'un vrai MSE, et ne d\u00e9tectait\\n      pas correctement la d\u00e9gradation post-Adam. Remplac\u00e9e par une comparaison\\n      BIC (fitness) : score_after < score_before. Coh\u00e9rent avec le reste du syst\u00e8me.\\n\\n  57. [v14.3 CORRECTIF] evolve() : _fitness_cache.clear() au lieu de = {}\\n\\n      \"_fitness_cache = {}\" dans la boucle de g\u00e9n\u00e9rations cr\u00e9ait une variable\\n      LOCALE qui masquait le dictionnaire global sans jamais le vider.\\n      Le cache global s\\'accumulait ind\u00e9finiment avec des entr\u00e9es stales.\\n      Corrig\u00e9 en _fitness_cache.clear() qui modifie le dict en place.\\n\\n\\n\\n      Probl\u00e8me observ\u00e9 : (0.042503-x)\u00b2 obtenait BIC=-417 et dominait la\\n      population sur x\u00b3\u00b7sin(1/x) car x\u00b3\u00b7sin(1/x) \u2248 x\u00b2 sur [0.1, 3]\\n      (les oscillations rapides de sin(1/x) pr\u00e8s de 0 sont absentes du\\n      dataset sur cette plage). La constante 0.042503 est ajust\u00e9e sur les\\n      donn\u00e9es, ce que la p\u00e9nalit\u00e9 lin\u00e9aire seule ne p\u00e9nalisait pas assez.\\n\\n      Nouvelle formule fitness_BIC v14.2 :\\n          fitness = n\u00b7ln(MSE_pur) + k\u00b7ln(n) + \u03b3\u00b7n_adj\u00b2\u00b7ln(n)\\n\\n          k     = \u03a3 co\u00fbt(n\u0153ud)  (float\u21923, op/x\u21921, inchang\u00e9)\\n          n_adj = nombre de constantes AJUST\u00c9ES dans l\\'arbre\\n          \u03b3     = _FLOAT_GAMMA = 2.0\\n\\n      Distinction constante enti\u00e8re vs ajust\u00e9e dans _is_adjusted_float() :\\n        \u00b7 Enti\u00e8re simple (0, \u00b11..\u00b110, v==round(v)) : \u00e9merge de la\\n          simplification alg\u00e9brique (x+x\u21922*x). Pas de p\u00e9nalit\u00e9 quadratique.\\n        \u00b7 Ajust\u00e9e (0.042503, -2.423\u2026, ou |v|>10) : encode de l\\'information\\n          sur le dataset. Contribue \u00e0 n_adj \u2192 p\u00e9nalit\u00e9 quadratique.\\n\\n      Impact sur n_adj :\\n        1 constante ajust\u00e9e  \u2192 + 2\u00b7ln(n)   \u2248 +  8.8 sur n=80\\n        2 constantes ajust\u00e9es \u2192 + 8\u00b7ln(n)  \u2248 + 35.2 sur n=80\\n        4 constantes ajust\u00e9es \u2192 +32\u00b7ln(n)  \u2248 +140.8 sur n=80\\n\\n      tree_complexity() retourne maintenant un tuple (k, n_adj).\\n      fitness() d\u00e9structure ce tuple et applique les deux termes.\\n      Tous les autres appelants de tree_complexity() sont mis \u00e0 jour\\n      pour utiliser k, _ = tree_complexity(node).\\n\\n\\n\\n      Bug v14 : fitness() passait raw_mse() dans ln(MSE) du BIC.\\n      Or raw_mse() retourne la fitness hybride dans [0, 3+], pas un vrai\\n      MSE. Sur x\u00b3\u00b7sin(1/x) avec l\\'arbre \\'x\\' (MSE reel = 5.55), la valeur\\n      hybride valait ~1.00, ce qui donnait ln(1.00) \u2248 0 au lieu de\\n      ln(5.55) \u2248 1.71 -> BIC = 4.45 au lieu de 141.5 -> l\\'arbre \\'x\\'\\n      semblait bon alors qu\\'il est mauvais (affichage FIT=1.73 observ\u00e9).\\n\\n      Correction : nouvelle fonction _pure_mse(node, xs, ys) qui calcule\\n      le MSE brut (np.mean((preds - ys)^2)) sans aucune pond\u00e9ration.\\n      Arbre constant -> mse + 1000.0 (penalite BIC garantie positive).\\n      raw_mse() et raw_pearson_r() restent inchanges (logs, seuils).\\n\\n  53. [v14.1 CORRECTIF] Logique burn-in anti-puits-empoisonne : AND strict\\n      -> deux voies OR\\n\\n      Bug v13.11/v14 : la condition d\\'ouverture de la stigmergie etait :\\n          generation >= 20  AND  r >= 0.50\\n      Sur le probleme 10 (x\u00b3\u00b7sin(1/x)), des individus avec r=0.969 et\\n      r=1.000 etaient bloques des la generation 0, privant la memoire\\n      collective d\\'un signal de haute qualite (\"Stigmergie Bloquee\" visible\\n      dans les logs meme avec r=1.000).\\n\\n      Correction : condition a deux voies :\\n          Voie A : generation >= 20  AND  r >= 0.50  (burn-in classique)\\n          Voie B : r >= 0.95                          (ouverture anticipee)\\n      _stigm_allowed = Voie_A  OR  Voie_B\\n\\n      La Voie B permet d\\'ouvrir la stigmergie immediatement si le meilleur\\n      individu est deja excellent, quelle que soit la generation. La Voie A\\n      protege contre les problemes difficiles ou la population met du temps\\n      a converger. Les trois seuils sont declares explicitement en tete du\\n      bloc pour faciliter le reglage.\\n\\n\\n\\n      Probl\u00e8me de v13 : la p\u00e9nalit\u00e9 \u00e9tait brid\u00e9e \u00e0 5% du MSE brut et\\n      s\\'\u00e9teignait quand le MSE devenait tr\u00e8s petit (max_pen = 0.05*mse +1e-8).\\n      Un polyn\u00f4me de 15 n\u0153uds avec 4 constantes ajust\u00e9es pouvait ainsi battre\\n      sin(x) d\u00e8s que ses micro-d\u00e9cimales le rendaient l\u00e9g\u00e8rement plus pr\u00e9cis\\n      (\"raccourci de Taylor\").\\n\\n      Nouvelle formule dans fitness() :\\n          fitness_BIC = n \u00b7 ln(max(MSE, 1e-15)) + k \u00b7 ln(n)\\n\\n          n   = len(ys)              nombre de points de donn\u00e9es\\n          k   = tree_complexity()    complexit\u00e9 pond\u00e9r\u00e9e (voir point 52)\\n          ln  = logarithme naturel\\n          1e-15 = plancher de MSE pour \u00e9viter ln(0) = -\u221e\\n\\n      Propri\u00e9t\u00e9s garanties :\\n        \u00b7 Plus basse = meilleure (valeurs souvent n\u00e9gatives pour MSE < 1 ;\\n          le tri, les \u00eeles, le tournoi et la stigmergie fonctionnent\\n          identiquement \u2014 ils ne supposent pas de positivit\u00e9).\\n        \u00b7 Une constante flottante (k += 3) doit am\u00e9liorer le MSE d\\'un\\n          facteur exp(3\u00b7ln(n)/n) \u2248 1.14 sur n=80 pour \u00eatre rentable.\\n          Cela bloque les micro-raffinements polynomiaux sans interdire\\n          les constantes utiles (\u03c0, 2.0 issue de x+x\u21922*x, etc.).\\n        \u00b7 Arbre constant : raw_mse retourne mse + 2.0 >> 1 \u2192\\n          n\u00b7ln(mse_safe) fortement positif \u2192 fitness tr\u00e8s haute \u2192 rejet.\\n\\n  52. [v14] Nouvelle fonction tree_complexity(node) apr\u00e8s tree_depth()\\n\\n      Travers\u00e9e it\u00e9rative (pas de r\u00e9cursion).\\n      Complexit\u00e9 pond\u00e9r\u00e9e :\\n        \u00b7 Variable \"x\" ou op\u00e9rateur symbolique  \u2192 1 point\\n        \u00b7 Constante flottante                   \u2192 3 points\\n          (_FLOAT_COMPLEXITY_WEIGHT = 3,\\n           choisir 4 pour un r\u00e9gime plus agressif)\\n\\n      tree_size() et tree_depth() sont conserv\u00e9s inchang\u00e9s (utilis\u00e9s dans\\n      les logs, l\\'affichage et le contr\u00f4le de taille max).\\n\\n  Garde-fous v13.x pr\u00e9serv\u00e9s intacts :\\n    \u00b7 raw_mse()        : fitness hybride Pearson+MSE (Obj.1 v13.11)\\n    \u00b7 raw_pearson_r()  : filtre Anti-Puits-Empoisonn\u00e9 (Obj.2 v13.11)\\n    \u00b7 simplify()       : r\u00e8gle x+x\u21922*x (v13.13) + all rules v13.12\\n    \u00b7 Bloc Obj.3       : simplification \u00e9lite avant d\u00e9p\u00f4t stigmergique\\n    \u00b7 Bloc Obj.3b      : simplification finale dans print_result\\n    \u00b7 _np_safe_div / _np_safe_pow / _np_safe_sqrt / \u2026\\n    \u00b7 LOG_CSV via os.path.abspath(__file__)\\n\\n\\n      Probl\u00e8me : le champion stock\u00e9 en m\u00e9moire peut contenir des introns\\n      r\u00e9siduels (x+x, 1*expr, -(-(x))\u2026) qui gonflent l\\'expression affich\u00e9e\\n      sans modifier la valeur num\u00e9rique.\\n\\n      Solution : simplify() appliqu\u00e9 en t\u00eate de print_result(), unique point\\n      d\\'entr\u00e9e commun \u00e0 tous les modes (interactif, CLI, run()).\\n      pop est List[Node] bruts \u2192 simplification directe sur le n\u0153ud racine.\\n      Couverture compl\u00e8te : mode 1 interactif, mode CLI \"python GP_ELITE N\",\\n      et la fonction run() de l\\'API programmatique.\\n      Le benchmark (run_benchmark \u2192 _one_run) ne passe pas par print_result\\n      et n\\'est pas affect\u00e9.\\n\\n  50. [OBJECTIF 3b] Nouvelle r\u00e8gle dans _simplify_once : expr + expr \u2192 2.0 * expr\\n      R\u00e9duit x+x, sin(x)+sin(x), (x*x)+(x*x), etc. en 2.0 * <expr>.\\n      Conditions de s\u00e9curit\u00e9 :\\n        \u00b7 Les deux branches ont le m\u00eame structural_hash()\\n        \u00b7 Aucune des deux n\\'est une constante flottante pure (\u00e9vite le doublon\\n          avec le repliage constant 3.0+3.0 qui existe d\u00e9j\u00e0 plus bas)\\n      La r\u00e8gle est ins\u00e9r\u00e9e dans le bloc \"if v == \\'+\\'\" existant, apr\u00e8s les\\n      identit\u00e9s x+0 / 0+x, avant les autres r\u00e8gles binaires.\\n      La double passe de simplify() propage ensuite les r\u00e9ductions en cascade\\n      (ex: 2.0*sin(x) + 2.0*sin(x) \u2192 2.0*(2.0*sin(x)) \u2192 4.0*sin(x)).\\n\\n\\n      Probl\u00e8me : les introns (x-x, 1*x, 0+x, sin(const)\u2026) survivent dans la\\n      population sans affecter la fitness mais polluent la m\u00e9moire collective.\\n      Un fragment \"sin(x-x+x)\" a un hash diff\u00e9rent de \"sin(x)\" et occupe un\\n      slot distinct dans FRAGMENT_LIB / COGRAPH / SEQ_MEM, ce qui dilue le\\n      signal utile et alourdit les structures stigmergiques.\\n\\n      Dans evolve_island(), juste APR\u00c8S le calcul de _stigm_allowed et AVANT\\n      les appels deposit_population / COGRAPH / SEQ_MEM :\\n\\n        if _stigm_allowed:\\n            _limit_clean = max(top_k, top_k_seq)   # top 20% au maximum\\n            for i in range(min(_limit_clean, len(pop))):\\n                _old_hash   = pop[i].structural_hash()\\n                _simplified = simplify(pop[i])\\n                _new_hash   = _simplified.structural_hash()\\n                if _new_hash != _old_hash:\\n                    _fitness_cache.pop(_old_hash, None)  # purge entr\u00e9e stale\\n                pop[i] = _simplified\\n            top_fits = [fitness(ind, xs, ys, cfg) for ind in pop[:top_k]]\\n\\n      \u00b7 P\u00e9rim\u00e8tre : max(top_k, top_k_seq) = top 20% (couvre FRAGMENT_LIB et SEQ_MEM)\\n      \u00b7 Ex\u00e9cut\u00e9 uniquement quand _stigm_allowed (pas de cycles CPU pendant chauffe)\\n      \u00b7 pop est List[Node] bruts \u2192 simplification directe en place\\n      \u00b7 Cache fitness invalid\u00e9 s\u00e9lectivement si le hash a chang\u00e9\\n      \u00b7 top_fits recalcul\u00e9 apr\u00e8s simplification pour refl\u00e9ter les nouveaux hashes\\n\\n\\n      R\u00e9sout le \"Mensonge du MSE\" : les arbres \u00e0 bonne forme g\u00e9om\u00e9trique mais\\n      mauvais d\u00e9calage d\\'\u00e9chelle n\\'\u00e9taient pas r\u00e9compens\u00e9s par le MSE pur.\\n\\n      Nouvelle formule dans raw_mse() :\\n        \u00b7 si std(pr\u00e9dictions) < 1e-6 (arbre constant) \u2192 mse + 2.0 (p\u00e9nalit\u00e9)\\n        \u00b7 sinon :\\n            r                = cov(p,t) / (std_p \u00d7 std_t), born\u00e9 [-1, 1]\\n            correlation_loss = 1 - r             (0 = corr\u00e9lation parfaite)\\n            fitness_hybride  = 5.0 \u00d7 correlation_loss\\n                             + mse / (1 + mse)   (born\u00e9 [0, 1))\\n      Fonctions ajout\u00e9es :\\n        \u00b7 _pearson_r(preds, ys_np) \u2192 (r, std_p)     : calcul Pearson vectoris\u00e9\\n        \u00b7 raw_pearson_r(node, xs, ys) \u2192 float        : r pur pour le filtre Obj.2\\n      Compatibilit\u00e9 totale avec le cache fitness, l\\'optimiseur Adam et le tri\\n      de la population (valeur plus basse = meilleure, inchang\u00e9).\\n\\n  47. [OBJECTIF 2] D\u00e9marrage Diff\u00e9r\u00e9 + Filtre Qualit\u00e9 (Anti-Poisoned Well)\\n      R\u00e9sout le \"Poisoned Well\" : en g\u00e9n\u00e9ration 0, la stigmergie absorbait\\n      des fragments issus d\\'arbres randoms \u2192 bruit \u2192 convergence pr\u00e9coce.\\n\\n      Dans evolve_island(), avant chaque d\u00e9p\u00f4t stigmergique :\\n        \u00b7 BURN_IN_GENERATIONS    = 20   (g\u00e9n\u00e9rations de chauffe)\\n        \u00b7 MIN_CORRELATION_REQUIRED = 0.50\\n        \u00b7 Condition : generation >= 20 ET raw_pearson_r(meilleur) >= 0.50\\n        \u00b7 Si non remplie \u2192 message \"[Stigmergie Bloqu\u00e9e] ...\" et d\u00e9p\u00f4ts skipp\u00e9s\\n        \u00b7 Les \u00e9vaporations continuent toujours (la lib s\\'\u00e9tiole si rien n\\'est\\n          d\u00e9pos\u00e9, ce qui est le comportement intentionnel).\\n      Structures concern\u00e9es : FragmentLibrary, FragmentCoGraph, FragmentSequenceMemory.\\n\\n  Garde-fous v13.10 pr\u00e9serv\u00e9s intacts :\\n    \u00b7 Filtre variance dans deposit_population (std > 10\u00d7std(ys))\\n    \u00b7 Guard anti-constante dans stagnation_reset (feuille terminale \u2192 arbre)\\n    \u00b7 Gestion s\u00e9curis\u00e9e _np_safe_div / _np_safe_pow\\n    \u00b7 Parsimonie plafonn\u00e9e \u00e0 5% dans fitness()\\n    \u00b7 LOG_CSV r\u00e9solu via os.path.abspath(__file__)\\n\\n  v13.9 \u2014 Corrections cibl\u00e9es post-ablation v13.8\\n  -------------------------------------------------\\n  39. Parsimonie dynamique conditionnelle (+SEQ uniquement)\\n      - v13.8 activait le bloc sur toutes les conditions \u2192 vidait le\\n        cache fitness global en BASE, d\u00e9gradait la convergence (\u00d760)\\n      - v13.9 : activ\u00e9 seulement si cfg.USE_SEQMEM=True\\n      - Invalidation s\u00e9lective : seules les entr\u00e9es des individus de\\n        taille > 20 sont purg\u00e9es du cache, pas la totalit\u00e9\\n\\n  40. \u03c4_max adaptatif selon la long\u00e9vit\u00e9 des fragments\\n      - Fragments ayant surv\u00e9cu \u226510 g\u00e9n\u00e9rations cons\u00e9cutives\\n        au-dessus du seuil minimal : plafond doubl\u00e9 (\u03c4_max \u00d7 2)\\n      - Bons fragments durables (sin(x), x\u00b2) peuvent se renforcer\\n        sans que les fragments r\u00e9cents pathologiques explosent\\n      - Compteur gen_stable ajout\u00e9 dans FragmentEntry\\n\\n  41. Taux d\\'\u00e9vaporation diff\u00e9renci\u00e9 par condition en ultrafast\\n      - +LIB seul          : 0.90 (agressive, pas de COGRAPH \u00e0 nourrir)\\n      - +CO / +SEQ / FULL  : 0.95 (mod\u00e9r\u00e9e, pr\u00e9serve la m\u00e9moire lib\u2192COGRAPH)\\n      - Non-ultrafast       : 0.97 (inchang\u00e9)\\n\\n  v13.8 \u2014 Patch correctif (audit complet)\\n  ----------------------------------------\\n  34. AttributeError critique sur _xs/_ys corrig\u00e9\\n      - Island.__init__ initialise d\u00e9sormais self._xs = self._ys = None\\n        et self._key = \"1\" \u2192 plus aucun AttributeError si migrate() ou\\n        receive_migrants() est appel\u00e9 avant evolve() (cas ultrafast)\\n      - migrate() : guard \"if island._xs is None: skip\" sur chaque \u00eele\\n      - receive_migrants() : fallback tree_size si _xs non disponible\\n\\n  35. Biais inter-runs du _fitness_cache corrig\u00e9\\n      - evolve() remet _fitness_cache = {} et _PARAMETRIC_CACHE = {}\\n        \u00e0 chaque appel \u2192 les fitness d\\'un probl\u00e8me pr\u00e9c\u00e9dent ne\\n        contaminent plus le run suivant dans run_benchmark()\\n\\n  36. Seeding distribu\u00e9 en round-robin entre les \u00eeles\\n      - Avant : m\u00eame seed[j] inject\u00e9e en slot j dans TOUTES les \u00eeles\\n        \u2192 \u00eeles identiques en t\u00eate, diversit\u00e9 initiale nulle\\n      - Apr\u00e8s : seed[j] \u2192 \u00eele (j % N_ISLANDS), slot (j // N_ISLANDS)\\n\\n  37. Seuils d\\'activation du MODE A (v3) adaptatifs\\n      - has_co / has_seq proportionnels \u00e0 la taille de la lib\\n        \u2192 le MODE A (co-graphe + s\u00e9quences) s\\'active plus t\u00f4t en\\n        ultrafast (pop=150, 2 \u00eeles) qu\\'en mode normal\\n\\n  38. Libell\u00e9s version corrig\u00e9s (v11 \u2192 v13 partout)\\n\\n  v13 \u2014 Corrections critiques + am\u00e9liorations performances\\n  --------------------------------------------------------\\n  30. Bug parent1 corrig\u00e9 dans evolve_island\\n      - parent1 est d\u00e9sormais TOUJOURS d\u00e9fini avant les deux branches\\n        (stigmergique et classique), servant de fallback s\u00fbr en cas\\n        de d\u00e9passement de MAX_TREE_SIZE / MAX_TREE_DEPTH\\n      - \u00c9limine le NameError latent / variable stale dans l\\'\u00eele C\\n\\n  31. Optimisation des constantes (Adam) renforc\u00e9e\\n      - _invalidate_all_hashes() : invalidation r\u00e9cursive sur tout l\\'arbre\\n        (et non plus seulement la racine) \u2192 \u00e9valuation NumPy toujours fra\u00eeche\\n      - LR adaptative : divis\u00e9e par 2 apr\u00e8s 5 pas sans am\u00e9lioration\\n      - Restart random depuis les meilleures valeurs si blocage \u2265 10 pas\\n      - Plus d\\'it\u00e9rations quand peu de constantes (\u22644) : max_iter \u00d7 2\\n\\n  32. Hot zones adapt\u00e9es par probl\u00e8me (_HOT_ZONES)\\n      - Dictionnaire {problem_key: [zones]} couvrant P1\u2013P10\\n      - Sur-\u00e9chantillonnage cibl\u00e9 sur les extrema/inflexions/singularit\u00e9s\\n        propres \u00e0 chaque cible, pas uniquement ceux de sin(x\u00b2)\\n      - build_dataset() accepte problem_key et l\\'utilise\\n\\n  33. Seeds compl\u00e8tes P6\u2013P10\\n      - make_seed() enrichi : exp_neg_abs, x2_minus1, exp_abs_x2,\\n        sin_over_x, cos_sq_x, sinc_cos_sq, sin_pi_x, lorentz_sin,\\n        exp_x2_4, sin_exp_gauss, tanh_approx_exp, x_cube_sin_inv\\n      - seed_map couvre maintenant P1 \u00e0 P10\\n\\n  Am\u00e9liorations majeures h\u00e9rit\u00e9es des versions pr\u00e9c\u00e9dentes (1\u201329) :\\n  1.  Ramped Half-and-Half        \u2192 initialisation diversifi\u00e9e (standard Koza)\\n  2.  Op\u00e9rateurs \u00e9tendus          \u2192 tan, log, exp, sqrt, abs, neg\\n  3.  Cache global persistant     \u2192 hash structurel, survit entre g\u00e9n\u00e9rations\\n  4.  Gradient num\u00e9rique          \u2192 diff. finies + Adam pour les constantes\\n  5.  Crossover size-fair         \u2192 limite le bloat par l\\'\u00e9change \u00e9quilibr\u00e9\\n  6.  Fitness multi-crit\u00e8res      \u2192 front de Pareto (erreur \u00d7 taille)\\n  7.  Niching / crowding          \u2192 diversit\u00e9 ph\u00e9notypique maintenue\\n  8.  Island model (4 \u00eeles)       \u2192 \u00e9volutions parall\u00e8les + migrations\\n  9.  Mutation operator-aware     \u2192 op\u00e9rateurs compatibles (unaire\u2194unaire)\\n  10. Semantic distance           \u2192 mutations orient\u00e9es s\u00e9mantiquement\\n  11. Dataset bruit\u00e9 + stratifi\u00e9  \u2192 hot zones adapt\u00e9es par probl\u00e8me (v13)\\n  12. Logging CSV                 \u2192 historique complet des meilleures solutions\\n  13. Visualisation matplotlib    \u2192 courbes d\\'apprentissage + fit final\\n  14. Arr\u00eat adaptatif             \u2192 d\u00e9tecte la convergence r\u00e9elle\\n  15. get_all_nodes it\u00e9ratif      \u2192 pas de risque de stack overflow\\n  16. FragmentCoGraph             \u2192 matrice de co-occurrence entre fragments\\n  17. sample_pair()              \u2192 paire (root, companion) co-occurrente\\n  18. build_stigmergic_tree_v2() \u2192 construction guid\u00e9e par co-occurrences\\n  19. Statistiques du graphe     \u2192 top paires en fin de run\\n  20. FragmentSequenceMemory      \u2192 s\u00e9quences structurelles parent\u2192enfant\\n  21. build_stigmergic_tree_v3()  \u2192 construction top-down guid\u00e9e par s\u00e9quences + co-graphe\\n  22. Transfert inter-probl\u00e8mes   \u2192 warm_transfer entre runs\\n  23. Nouveaux probl\u00e8mes complexes P5\u2013P10\\n  24. Benchmark int\u00e9gr\u00e9           \u2192 run_benchmark(problems, n_runs)\\n  25. Filtre s\u00e9mantique           \u2192 _is_semantically_trivial()\\n  26. SEQ_MEM d\u00e9p\u00f4t depth >= 3   \u2192 transitions ordre 2 fiables\\n  27. Bug receive_migrants corrig\u00e9 \u2192 tri par fitness r\u00e9elle\\n  28. make_cfg : N_ISLANDS=4, POP_SIZE=600 en mode normal\\n  29. Seeds P5 : cos_half_x, x_sin_sq, x_sin_sq_cos_half\\n'"
+  },
+  "__file__": {
+   "type": "str",
+   "value": "'/home/user/gp-elite/gp_elite/core.py'"
+  },
+  "__loader__": {
+   "type": "SourceFileLoader",
+   "value": "object SourceFileLoader"
+  },
+  "__name__": {
+   "type": "str",
+   "value": "'gp_elite.core'"
+  },
+  "__package__": {
+   "type": "str",
+   "value": "'gp_elite'"
+  },
+  "__spec__": {
+   "type": "ModuleSpec",
+   "value": "object ModuleSpec"
+  },
+  "_active_pool_ops": {
+   "defaults": "None",
+   "doc": "8cdbc4fbaacf",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "_active_pool_ops",
+   "signature": "()",
+   "type": "function"
+  },
+  "_active_pools": {
+   "defaults": "None",
+   "doc": "9d95827e6336",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "_active_pools",
+   "signature": "()",
+   "type": "function"
+  },
+  "_ask": {
+   "defaults": "tuple['']",
+   "doc": "cbc1b36ab278",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "_ask",
+   "signature": "(prompt: 'str', valid: 'List[str]', default: 'str' = '') -> 'str'",
+   "type": "function"
+  },
+  "_ask_int": {
+   "defaults": "None",
+   "doc": "c568eff60ddb",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "_ask_int",
+   "signature": "(prompt: 'str', lo: 'int', hi: 'int', default: 'int') -> 'int'",
+   "type": "function"
+  },
+  "_binom_library": {
+   "defaults": "None",
+   "doc": "8a35125b04db",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_binom_library",
+   "signature": "(cols, n_max)",
+   "type": "function"
+  },
+  "_binomial_forms": {
+   "defaults": "tuple[8, None, False]",
+   "doc": "d0637472e308",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_binomial_forms",
+   "signature": "(X, y, top: 'int' = 8, tol=None, weighted=False) -> 'list'",
+   "type": "function"
+  },
+  "_build_near_probes": {
+   "defaults": "tuple[400]",
+   "doc": "2981be19e98f",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_build_near_probes",
+   "signature": "(xs_np, ys_np, n=400)",
+   "type": "function"
+  },
+  "_choose_scaler": {
+   "defaults": "None",
+   "doc": "4b14ba74acef",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "_choose_scaler",
+   "signature": "(X_raw, normalize, x_range)",
+   "type": "function"
+  },
+  "_clear_simplify_caches": {
+   "defaults": "None",
+   "doc": "69924b7fd31d",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "_clear_simplify_caches",
+   "signature": "()",
+   "type": "function"
+  },
+  "_collatz_flight_time": {
+   "defaults": "None",
+   "doc": "b994ebf79974",
+   "file": "datasets.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.datasets",
+   "qualname": "_collatz_flight_time",
+   "signature": "(n: 'int') -> 'int'",
+   "type": "function"
+  },
+  "_collect_constants_ordered": {
+   "defaults": "None",
+   "doc": "e3e10fa511b5",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_collect_constants_ordered",
+   "signature": "(node) -> 'list'",
+   "type": "function"
+  },
+  "_csv_deps": {
+   "defaults": "None",
+   "doc": "0942b2a1baa1",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "_csv_deps",
+   "signature": "()",
+   "type": "function"
+  },
+  "_csv_deps_ok": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "_csv_deps_ok",
+   "signature": "() -> 'bool'",
+   "type": "function"
+  },
+  "_cube": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_cube",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_deduce_console_constant": {
+   "defaults": "tuple[None, None]",
+   "doc": "af80b675a3c1",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "_deduce_console_constant",
+   "signature": "(node, feat_dims, target_dim, scaler, n_feat, Xraw=None, preds=None)",
+   "type": "function"
+  },
+  "_detect_dominant_op": {
+   "defaults": "None",
+   "doc": "20d16957dcb1",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "_detect_dominant_op",
+   "signature": "(population: \"List['Node']\") -> 'str'",
+   "type": "function"
+  },
+  "_dim_active": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "_dim_active",
+   "signature": "(cfg)",
+   "type": "function"
+  },
+  "_ds": {
+   "defaults": "None",
+   "doc": "8d32aec67733",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "_ds",
+   "signature": "()",
+   "type": "function"
+  },
+  "_e2_residuals": {
+   "defaults": "None",
+   "doc": "22157fd66edf",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_e2_residuals",
+   "signature": "(gn, y, cs)",
+   "type": "function"
+  },
+  "_early_stop_threshold": {
+   "defaults": "None",
+   "doc": "7a0ebd060b1f",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_early_stop_threshold",
+   "signature": "(cfg, ys_train) -> 'float'",
+   "type": "function"
+  },
+  "_elem_aexp_forms": {
+   "defaults": "tuple[1e-12]",
+   "doc": "6f8ca7d8a593",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_aexp_forms",
+   "signature": "(X, y, tol=1e-12) -> 'list'",
+   "type": "function"
+  },
+  "_elem_flib": {
+   "defaults": "None",
+   "doc": "d6e21f180e94",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_flib",
+   "signature": "(cols)",
+   "type": "function"
+  },
+  "_elem_inverse_forms": {
+   "defaults": "tuple[6, 1e-12]",
+   "doc": "986a3339d075",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_inverse_forms",
+   "signature": "(X, y, cols, kinds, top: 'int' = 6, tol=1e-12) -> 'list'",
+   "type": "function"
+  },
+  "_elem_inverse_forms_w": {
+   "defaults": "tuple[6, 1e-12]",
+   "doc": "292c56a023ea",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_inverse_forms_w",
+   "signature": "(X, y, cols, kinds, top: 'int' = 6, tol=1e-12) -> 'list'",
+   "type": "function"
+  },
+  "_elem_log_scan": {
+   "defaults": "None",
+   "doc": "8cbcd81ce764",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_log_scan",
+   "signature": "(X, y, cols, tol, signed: 'bool') -> 'list'",
+   "type": "function"
+  },
+  "_elem_mono": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_mono",
+   "signature": "(X, m)",
+   "type": "function"
+  },
+  "_elem_rel": {
+   "defaults": "None",
+   "doc": "d63221ffc6da",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_rel",
+   "signature": "(Z, Q)",
+   "type": "function"
+  },
+  "_elem_transform": {
+   "defaults": "None",
+   "doc": "b8d432085f49",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_transform",
+   "signature": "(kind, R, s)",
+   "type": "function"
+  },
+  "_elem_trig_exact": {
+   "defaults": "None",
+   "doc": "6030eef14003",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_trig_exact",
+   "signature": "(z, gn, sub)",
+   "type": "function"
+  },
+  "_elem_trig_forms": {
+   "defaults": "tuple[1e-12, False, False]",
+   "doc": "02e4dfb87b6a",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_trig_forms",
+   "signature": "(X, y, cols, tol=1e-12, weighted=False, scan=False) -> 'list'",
+   "type": "function"
+  },
+  "_elem_trig_grid": {
+   "defaults": "None",
+   "doc": "9341af7fd32f",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_trig_grid",
+   "signature": "(z, gn)",
+   "type": "function"
+  },
+  "_elem_wrel": {
+   "defaults": "None",
+   "doc": "c80bb75ba4a0",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elem_wrel",
+   "signature": "(Z, Q, w)",
+   "type": "function"
+  },
+  "_elementary_forms": {
+   "defaults": "tuple[None, False, False]",
+   "doc": "aaf297f57dfe",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elementary_forms",
+   "signature": "(X, y, kinds, tol=None, weighted=False, scan=False) -> 'list'",
+   "type": "function"
+  },
+  "_elementary_forms_n2": {
+   "defaults": "None",
+   "doc": "8999fd3116e9",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_elementary_forms_n2",
+   "signature": "(X, y, kinds, tol, weighted, scan) -> 'list'",
+   "type": "function"
+  },
+  "_evolve_parallel": {
+   "defaults": "None",
+   "doc": "449becda62e2",
+   "file": "parallel.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.parallel",
+   "qualname": "_evolve_parallel",
+   "signature": "(islands, xs, ys, cfg, t0, log_rows)",
+   "type": "function"
+  },
+  "_exit_if_reimported_by_worker": {
+   "defaults": "None",
+   "doc": "8e405013202f",
+   "file": "parallel.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.parallel",
+   "qualname": "_exit_if_reimported_by_worker",
+   "signature": "()",
+   "type": "function"
+  },
+  "_feature_usage_counter": {
+   "type": "list",
+   "value": "list[]"
+  },
+  "_finalists": {
+   "defaults": "tuple[8]",
+   "doc": "82ae435a5553",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_finalists",
+   "signature": "(cfg, k: 'int' = 8) -> 'list'",
+   "type": "function"
+  },
+  "_fitness_cache": {
+   "type": "dict",
+   "value": "dict{}"
+  },
+  "_float_literal": {
+   "defaults": "None",
+   "doc": "de0f8a7d92d1",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_float_literal",
+   "signature": "(v) -> 'str'",
+   "type": "function"
+  },
+  "_formula_faithful": {
+   "defaults": "None",
+   "doc": "033b57535433",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_formula_faithful",
+   "signature": "(node) -> 'bool'",
+   "type": "function"
+  },
+  "_get_ops_for_role": {
+   "defaults": "None",
+   "doc": "b345f3a3f8f7",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "_get_ops_for_role",
+   "signature": "(role: 'str')",
+   "type": "function"
+  },
+  "_golden_min": {
+   "defaults": "tuple[60]",
+   "doc": "f7340ee59642",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_golden_min",
+   "signature": "(f, a, b, it=60)",
+   "type": "function"
+  },
+  "_half_integer_power": {
+   "defaults": "None",
+   "doc": "02c4d161e7d6",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_half_integer_power",
+   "signature": "(term: 'str', e2: 'int', uops) -> \"Optional['Node']\"",
+   "type": "function"
+  },
+  "_has_own_factor": {
+   "defaults": "None",
+   "doc": "618e1fcd2972",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "_has_own_factor",
+   "signature": "(n) -> 'bool'",
+   "type": "function"
+  },
+  "_has_scale": {
+   "defaults": "None",
+   "doc": "cda1db6b7eeb",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_has_scale",
+   "signature": "(t) -> 'bool'",
+   "type": "function"
+  },
+  "_holdout_mse": {
+   "defaults": "None",
+   "doc": "3448ca294008",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_holdout_mse",
+   "signature": "(node, xs_train, ys_train) -> 'float'",
+   "type": "function"
+  },
+  "_interactive_menu": {
+   "defaults": "None",
+   "doc": "a9bbbe5a6fff",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "_interactive_menu",
+   "signature": "()",
+   "type": "function"
+  },
+  "_interp": {
+   "defaults": "None",
+   "doc": "dac5008990e7",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_interp",
+   "signature": "(n, x, d)",
+   "type": "function"
+  },
+  "_invalidate_all_hashes": {
+   "defaults": "None",
+   "doc": "9250f7fff5f9",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "_invalidate_all_hashes",
+   "signature": "(node: 'Node')",
+   "type": "function"
+  },
+  "_is_adjusted_float": {
+   "defaults": "None",
+   "doc": "9297fd5c3c42",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "_is_adjusted_float",
+   "signature": "(value) -> 'bool'",
+   "type": "function"
+  },
+  "_is_const": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "_is_const",
+   "signature": "(n, v: 'float') -> 'bool'",
+   "type": "function"
+  },
+  "_is_const_subtree": {
+   "defaults": "None",
+   "doc": "4a1988f1cf70",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_is_const_subtree",
+   "signature": "(node) -> 'bool'",
+   "type": "function"
+  },
+  "_is_float": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "_is_float",
+   "signature": "(n) -> 'bool'",
+   "type": "function"
+  },
+  "_is_numerically_stable": {
+   "defaults": "None",
+   "doc": "a7bed4abb05c",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_is_numerically_stable",
+   "signature": "(cand) -> 'bool'",
+   "type": "function"
+  },
+  "_island_round_task": {
+   "defaults": "None",
+   "doc": "581b4cc8ff0d",
+   "file": "parallel.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.parallel",
+   "qualname": "_island_round_task",
+   "signature": "(payload)",
+   "type": "function"
+  },
+  "_leaf_code_canonical": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "_leaf_code_canonical",
+   "signature": "(v) -> 'int'",
+   "type": "function"
+  },
+  "_leaf_code_exact": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "_leaf_code_exact",
+   "signature": "(v) -> 'int'",
+   "type": "function"
+  },
+  "_leaf_code_rounded": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "_leaf_code_rounded",
+   "signature": "(v) -> 'int'",
+   "type": "function"
+  },
+  "_linear_scale_params": {
+   "defaults": "None",
+   "doc": "0d53885f1a97",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "_linear_scale_params",
+   "signature": "(preds: 'np.ndarray', ys_np: 'np.ndarray')",
+   "type": "function"
+  },
+  "_lm_apply": {
+   "defaults": "None",
+   "doc": "8d274ee41934",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_lm_apply",
+   "signature": "(op, a, b)",
+   "type": "function"
+  },
+  "_lm_build_plan": {
+   "defaults": "None",
+   "doc": "3d16d371ac51",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_lm_build_plan",
+   "signature": "(node, consts) -> 'Optional[_LMPlan]'",
+   "type": "function"
+  },
+  "_lm_column": {
+   "defaults": "None",
+   "doc": "3ae190653298",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_lm_column",
+   "signature": "(plan, j, cv, values)",
+   "type": "function"
+  },
+  "_lm_plan": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_lm_plan",
+   "signature": "(node, consts) -> 'Optional[_LMPlan]'",
+   "type": "function"
+  },
+  "_lm_to_convergence": {
+   "defaults": "None",
+   "doc": "045b246584ad",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_lm_to_convergence",
+   "signature": "(node, xs, ys, cfg) -> \"Optional['Node']\"",
+   "type": "function"
+  },
+  "_log_g_exponents": {
+   "defaults": "None",
+   "doc": "1f26bca5496b",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_log_g_exponents",
+   "signature": "(coef)",
+   "type": "function"
+  },
+  "_log_max_height_level2": {
+   "defaults": "tuple[300]",
+   "doc": "cdab181a2553",
+   "file": "datasets.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.datasets",
+   "qualname": "_log_max_height_level2",
+   "signature": "(n: 'int', cap: 'int' = 300) -> 'float'",
+   "type": "function"
+  },
+  "_make_binomial_seeds": {
+   "defaults": "tuple[None, False]",
+   "doc": "10f55a61f73d",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_make_binomial_seeds",
+   "signature": "(xs, ys, cfg, tol=None, weighted=False) -> 'list'",
+   "type": "function"
+  },
+  "_make_elementary_seeds": {
+   "defaults": "tuple[None, False, False]",
+   "doc": "694a9e3f1d12",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_make_elementary_seeds",
+   "signature": "(xs, ys, cfg, tol=None, weighted=False, scan=False) -> 'list'",
+   "type": "function"
+  },
+  "_make_linear_candidate": {
+   "defaults": "None",
+   "doc": "21395997749f",
+   "file": "search.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.search",
+   "qualname": "_make_linear_candidate",
+   "signature": "(xs_tr, ys_tr, cfg)",
+   "type": "function"
+  },
+  "_make_motif_seeds": {
+   "defaults": "tuple[32]",
+   "doc": "aa5ff3a60902",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_make_motif_seeds",
+   "signature": "(cfg, n_max: 'int' = 32) -> 'list'",
+   "type": "function"
+  },
+  "_make_power_law_seeds": {
+   "defaults": "tuple[None, False]",
+   "doc": "1685bba8e74a",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_make_power_law_seeds",
+   "signature": "(xs, ys, cfg, min_r2=None, weighted=False) -> 'list'",
+   "type": "function"
+  },
+  "_make_tolerant_seeds": {
+   "defaults": "tuple[False]",
+   "doc": "928fd7c8d057",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_make_tolerant_seeds",
+   "signature": "(xs, ys, cfg, power_done: 'bool' = False) -> 'list'",
+   "type": "function"
+  },
+  "_max_height_ratio": {
+   "defaults": "tuple[300]",
+   "doc": "67a1bd94251e",
+   "file": "datasets.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.datasets",
+   "qualname": "_max_height_ratio",
+   "signature": "(n: 'int', cap: 'int' = 300) -> 'float'",
+   "type": "function"
+  },
+  "_monomial": {
+   "defaults": "None",
+   "doc": "16a88622880a",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_monomial",
+   "signature": "(terms, pairs, uops) -> \"Optional['Node']\"",
+   "type": "function"
+  },
+  "_nd_diverse_population": {
+   "defaults": "None",
+   "doc": "f3777a09f8aa",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "_nd_diverse_population",
+   "signature": "(cfg: 'Config', n: 'int') -> \"List['Node']\"",
+   "type": "function"
+  },
+  "_near_domain_stable": {
+   "defaults": "None",
+   "doc": "537a8bbd88bb",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_near_domain_stable",
+   "signature": "(cand) -> 'bool'",
+   "type": "function"
+  },
+  "_node_hashes": {
+   "defaults": "None",
+   "doc": "b464f68a9e9a",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "_node_hashes",
+   "signature": "(root, attr, leaf_code)",
+   "type": "function"
+  },
+  "_np_abs": {
+   "type": "ufunc",
+   "value": "callable ufunc"
+  },
+  "_np_is_even": {
+   "defaults": "None",
+   "doc": "624a6ba17076",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_is_even",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_np_isfinite": {
+   "type": "ufunc",
+   "value": "callable ufunc"
+  },
+  "_np_max2": {
+   "defaults": "None",
+   "doc": "b8e219ad1bd7",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_max2",
+   "signature": "(a, b)",
+   "type": "function"
+  },
+  "_np_maximum": {
+   "type": "ufunc",
+   "value": "callable ufunc"
+  },
+  "_np_min2": {
+   "defaults": "None",
+   "doc": "2c07dabd91dd",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_min2",
+   "signature": "(a, b)",
+   "type": "function"
+  },
+  "_np_minimum": {
+   "type": "ufunc",
+   "value": "callable ufunc"
+  },
+  "_np_safe_arcsin": {
+   "defaults": "None",
+   "doc": "c5c405750c91",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_arcsin",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_np_safe_div": {
+   "defaults": "None",
+   "doc": "782fce4f84fc",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_div",
+   "signature": "(a, b)",
+   "type": "function"
+  },
+  "_np_safe_exp": {
+   "defaults": "None",
+   "doc": "7b168ebb170d",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_exp",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_np_safe_log": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_log",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_np_safe_pow": {
+   "defaults": "None",
+   "doc": "a22974eb5bbb",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_pow",
+   "signature": "(a, b)",
+   "type": "function"
+  },
+  "_np_safe_pow_var": {
+   "defaults": "None",
+   "doc": "8f330a1a7a66",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_pow_var",
+   "signature": "(a, b)",
+   "type": "function"
+  },
+  "_np_safe_sqrt": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_sqrt",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_np_safe_tan": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_safe_tan",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_np_step": {
+   "defaults": "None",
+   "doc": "993441a8199a",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "_np_step",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_one_run": {
+   "defaults": "None",
+   "doc": "2fbbe69a6938",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "_one_run",
+   "signature": "(key: 'str', func, cfg: 'Config') -> 'dict'",
+   "type": "function"
+  },
+  "_parallel_enabled": {
+   "defaults": "None",
+   "doc": "bb72a854bd10",
+   "file": "parallel.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.parallel",
+   "qualname": "_parallel_enabled",
+   "signature": "(cfg) -> 'bool'",
+   "type": "function"
+  },
+  "_parallel_worker_init": {
+   "defaults": "tuple[None, False, False, False, False]",
+   "doc": "e47c476fcde5",
+   "file": "parallel.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.parallel",
+   "qualname": "_parallel_worker_init",
+   "signature": "(data_path, use_ls, syracuse_mode, gencsv=None, battery_mode=False, ls_scale_only=False, dim_unknown_const=False, quiet=False)",
+   "type": "function"
+  },
+  "_pause": {
+   "defaults": "None",
+   "doc": "e2ab1be3bfb9",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "_pause",
+   "signature": "()",
+   "type": "function"
+  },
+  "_pearson_r": {
+   "defaults": "None",
+   "doc": "efebb7966b81",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_pearson_r",
+   "signature": "(preds: 'np.ndarray', ys_np: 'np.ndarray') -> 'float'",
+   "type": "function"
+  },
+  "_polish_finalists": {
+   "defaults": "None",
+   "doc": "e4c8c498e211",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_polish_finalists",
+   "signature": "(top, xs, ys, cfg) -> 'None'",
+   "type": "function"
+  },
+  "_pool_choice": {
+   "defaults": "tuple['neg']",
+   "doc": "af0ee8a24b5f",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "_pool_choice",
+   "signature": "(ops, weights, fallback='neg')",
+   "type": "function"
+  },
+  "_pool_probe": {
+   "defaults": "None",
+   "doc": "4e5b4ac23f55",
+   "file": "parallel.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.parallel",
+   "qualname": "_pool_probe",
+   "signature": "()",
+   "type": "function"
+  },
+  "_power_law_exponents": {
+   "defaults": "tuple[None]",
+   "doc": "4d043e1d3162",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_power_law_exponents",
+   "signature": "(X, y, min_r2=None)",
+   "type": "function"
+  },
+  "_power_law_exponents_w": {
+   "defaults": "None",
+   "doc": "2e2ea165084e",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_power_law_exponents_w",
+   "signature": "(X, y)",
+   "type": "function"
+  },
+  "_pred_rel_error": {
+   "defaults": "None",
+   "doc": "0e187b2f1ef5",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_pred_rel_error",
+   "signature": "(p, y) -> 'float'",
+   "type": "function"
+  },
+  "_predict_cached": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_predict_cached",
+   "signature": "(node, xs_np)",
+   "type": "function"
+  },
+  "_print_menu": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "_print_menu",
+   "signature": "()",
+   "type": "function"
+  },
+  "_product": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_product",
+   "signature": "(nodes: 'list') -> \"Optional['Node']\"",
+   "type": "function"
+  },
+  "_pure_mse": {
+   "defaults": "None",
+   "doc": "de2e3572cd31",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "_pure_mse",
+   "signature": "(node, xs, ys) -> 'float'",
+   "type": "function"
+  },
+  "_random_tree_full": {
+   "defaults": "None",
+   "doc": "6455fdd015cb",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "_random_tree_full",
+   "signature": "(depth: 'int', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "_random_tree_full_nd": {
+   "defaults": "None",
+   "doc": "528d1a12f6f6",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "_random_tree_full_nd",
+   "signature": "(depth: 'int', cfg: 'Config') -> \"'Node'\"",
+   "type": "function"
+  },
+  "_random_tree_grow": {
+   "defaults": "None",
+   "doc": "b68854d93ce9",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "_random_tree_grow",
+   "signature": "(depth: 'int', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "_random_tree_grow_nd": {
+   "defaults": "None",
+   "doc": "3417d05ae0df",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "_random_tree_grow_nd",
+   "signature": "(depth: 'int', cfg: 'Config') -> \"'Node'\"",
+   "type": "function"
+  },
+  "_random_tree_nd": {
+   "defaults": "None",
+   "doc": "a19170b025ab",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "_random_tree_nd",
+   "signature": "(max_depth: 'int', cfg: 'Config') -> \"'Node'\"",
+   "type": "function"
+  },
+  "_refit_inner": {
+   "defaults": "None",
+   "doc": "ebd4ca4d63a9",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_refit_inner",
+   "signature": "(tree, X, y, cfg)",
+   "type": "function"
+  },
+  "_refit_scaling": {
+   "defaults": "None",
+   "doc": "7acb2cb0260b",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_refit_scaling",
+   "signature": "(tree, xs, ys)",
+   "type": "function"
+  },
+  "_robust_scale_params": {
+   "defaults": "tuple[0.5, 5]",
+   "doc": "3755739ee60c",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "_robust_scale_params",
+   "signature": "(preds: 'np.ndarray', ys_np: 'np.ndarray', delta: 'float' = 0.5, n_iter: 'int' = 5)",
+   "type": "function"
+  },
+  "_safe_sinc": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "_safe_sinc",
+   "signature": "(x: 'float') -> 'float'",
+   "type": "function"
+  },
+  "_safe_write": {
+   "defaults": "tuple['file']",
+   "doc": "afe0a996cef6",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_safe_write",
+   "signature": "(filepath, writer, what='file')",
+   "type": "function"
+  },
+  "_scale_feature": {
+   "defaults": "None",
+   "doc": "77ba3e724f66",
+   "file": "datasets.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.datasets",
+   "qualname": "_scale_feature",
+   "signature": "(arr: 'np.ndarray') -> 'np.ndarray'",
+   "type": "function"
+  },
+  "_scale_ratio": {
+   "defaults": "None",
+   "doc": "501a9820fbc2",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "_scale_ratio",
+   "signature": "(X_raw)",
+   "type": "function"
+  },
+  "_scale_tree": {
+   "defaults": "None",
+   "doc": "bb4497a165af",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "_scale_tree",
+   "signature": "(tree, s: 'float')",
+   "type": "function"
+  },
+  "_seed_rel_error": {
+   "defaults": "None",
+   "doc": "45dfa2767f2a",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_seed_rel_error",
+   "signature": "(tree, X, y) -> 'float'",
+   "type": "function"
+  },
+  "_seeds_blocked_by_units": {
+   "defaults": "None",
+   "doc": "09f92ccfef39",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_seeds_blocked_by_units",
+   "signature": "(cfg) -> 'bool'",
+   "type": "function"
+  },
+  "_select_one_se": {
+   "defaults": "None",
+   "doc": "a7b0369a6ce2",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_select_one_se",
+   "signature": "(champion, champ_val)",
+   "type": "function"
+  },
+  "_semantic_key": {
+   "defaults": "None",
+   "doc": "4c7b900da5b0",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "_semantic_key",
+   "signature": "(ind, xs_np, decimals: 'int')",
+   "type": "function"
+  },
+  "_simplify_node": {
+   "defaults": "None",
+   "doc": "f7dbfb4dfe58",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "_simplify_node",
+   "signature": "(v, left, right) -> 'Node'",
+   "type": "function"
+  },
+  "_simplify_tree": {
+   "defaults": "None",
+   "doc": "b90d5842e933",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "_simplify_tree",
+   "signature": "(root: 'Node') -> 'Node'",
+   "type": "function"
+  },
+  "_small_choose": {
+   "defaults": "None",
+   "doc": "44e05b701415",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_choose",
+   "signature": "(front, X, y)",
+   "type": "function"
+  },
+  "_small_cv": {
+   "defaults": "None",
+   "doc": "615d129c7d87",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_cv",
+   "signature": "(start, X, y, cfg, scale_only)",
+   "type": "function"
+  },
+  "_small_family": {
+   "defaults": "None",
+   "doc": "5db3a1c529bc",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_small_family",
+   "signature": "(scored, cfg, t0) -> 'list'",
+   "type": "function"
+  },
+  "_small_fit": {
+   "defaults": "None",
+   "doc": "e1371c0ba09a",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_fit",
+   "signature": "(f, X, y, cfg, scale_only)",
+   "type": "function"
+  },
+  "_small_is_const": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_is_const",
+   "signature": "(n) -> 'bool'",
+   "type": "function"
+  },
+  "_small_materialize": {
+   "defaults": "None",
+   "doc": "831fe774662f",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_materialize",
+   "signature": "(g, a, b, scale_only)",
+   "type": "function"
+  },
+  "_small_n_par": {
+   "defaults": "None",
+   "doc": "0d76cf9a8f7b",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_n_par",
+   "signature": "(g, X, scale_only) -> 'int'",
+   "type": "function"
+  },
+  "_small_round_powers": {
+   "defaults": "None",
+   "doc": "7babffab80f9",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_round_powers",
+   "signature": "(f)",
+   "type": "function"
+  },
+  "_small_setup": {
+   "defaults": "None",
+   "doc": "16b9b99335d9",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_setup",
+   "signature": "(cfg, ys) -> 'None'",
+   "type": "function"
+  },
+  "_small_specs": {
+   "defaults": "None",
+   "doc": "0167fa078097",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_specs",
+   "signature": "(champion, X, y)",
+   "type": "function"
+  },
+  "_small_strip": {
+   "defaults": "None",
+   "doc": "33e63ff79e22",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_strip",
+   "signature": "(t)",
+   "type": "function"
+  },
+  "_small_table_select": {
+   "defaults": "None",
+   "doc": "1210de1dfe74",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_small_table_select",
+   "signature": "(champion, xs, ys, cfg)",
+   "type": "function"
+  },
+  "_smart_reset_explorers": {
+   "defaults": "None",
+   "doc": "aeb64d4e59ab",
+   "file": "islands.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.islands",
+   "qualname": "_smart_reset_explorers",
+   "signature": "(islands: \"List['Island']\", cfg: 'Config', gen: 'int', cur_raw: 'float') -> 'bool'",
+   "type": "function"
+  },
+  "_split_holdout": {
+   "defaults": "None",
+   "doc": "23ed68822faa",
+   "file": "search.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.search",
+   "qualname": "_split_holdout",
+   "signature": "(xs, ys, cfg)",
+   "type": "function"
+  },
+  "_sq": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_sq",
+   "signature": "(a)",
+   "type": "function"
+  },
+  "_str_code": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "_str_code",
+   "signature": "(s) -> 'int'",
+   "type": "function"
+  },
+  "_target_scale": {
+   "defaults": "None",
+   "doc": "ee3cd7cd1cde",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "_target_scale",
+   "signature": "(y)",
+   "type": "function"
+  },
+  "_to_np_code": {
+   "defaults": "None",
+   "doc": "a38e40fe4f36",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_to_np_code",
+   "signature": "(node) -> 'str'",
+   "type": "function"
+  },
+  "_to_np_code_parametric": {
+   "defaults": "None",
+   "doc": "f07af1cc2e92",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "_to_np_code_parametric",
+   "signature": "(node, const_list: 'list') -> 'str'",
+   "type": "function"
+  },
+  "_track_if_exact": {
+   "defaults": "None",
+   "doc": "79a893706735",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_track_if_exact",
+   "signature": "(cand) -> 'None'",
+   "type": "function"
+  },
+  "_track_small_candidate": {
+   "defaults": "None",
+   "doc": "1766bccca346",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_track_small_candidate",
+   "signature": "(cand, xs, ys) -> 'None'",
+   "type": "function"
+  },
+  "_track_val_candidate": {
+   "defaults": "None",
+   "doc": "a8133d76b54d",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_track_val_candidate",
+   "signature": "(cand)",
+   "type": "function"
+  },
+  "_typed_seeds": {
+   "defaults": "None",
+   "doc": "8a3ce88031c4",
+   "file": "seeds.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.seeds",
+   "qualname": "_typed_seeds",
+   "signature": "(seeds: 'list', cfg) -> 'list'",
+   "type": "function"
+  },
+  "_v2": {
+   "defaults": "None",
+   "doc": "56fb41d4d4d3",
+   "file": "datasets.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.datasets",
+   "qualname": "_v2",
+   "signature": "(n: 'int') -> 'int'",
+   "type": "function"
+  },
+  "_value_code": {
+   "defaults": "None",
+   "doc": "7c493edfa89b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "_value_code",
+   "signature": "(v) -> 'int'",
+   "type": "function"
+  },
+  "_warn_unguarded_main": {
+   "defaults": "None",
+   "doc": "ddfb7d86c03a",
+   "file": "parallel.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.parallel",
+   "qualname": "_warn_unguarded_main",
+   "signature": "(err)",
+   "type": "function"
+  },
+  "_weight_sums": {
+   "defaults": "tuple[False]",
+   "doc": "bcab03f6a970",
+   "file": "final_choice.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.final_choice",
+   "qualname": "_weight_sums",
+   "signature": "(node, innermost_only: 'bool' = False) -> \"Optional['Node']\"",
+   "type": "function"
+  },
+  "annotations": {
+   "type": "_Feature",
+   "value": "object _Feature"
+  },
+  "bisect": {
+   "type": "module",
+   "value": "bisect"
+  },
+  "build_dataset": {
+   "defaults": "tuple['1']",
+   "doc": "4f8e58139508",
+   "file": "datasets.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.datasets",
+   "qualname": "build_dataset",
+   "signature": "(func, cfg: 'Config', problem_key: 'str' = '1') -> 'Tuple[np.ndarray, np.ndarray]'",
+   "type": "function"
+  },
+  "build_stigmergic_tree": {
+   "defaults": "None",
+   "doc": "da001c7c7522",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "build_stigmergic_tree",
+   "signature": "(lib: 'FragmentLibrary', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "build_stigmergic_tree_v2": {
+   "defaults": "None",
+   "doc": "407fcd5953ec",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "build_stigmergic_tree_v2",
+   "signature": "(lib: 'FragmentLibrary', cograph: 'FragmentCoGraph', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "build_stigmergic_tree_v3": {
+   "defaults": "None",
+   "doc": "d8e276094957",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "build_stigmergic_tree_v3",
+   "signature": "(lib: 'FragmentLibrary', cograph: 'FragmentCoGraph', seq_mem: 'FragmentSequenceMemory', cfg) -> 'Node'",
+   "type": "function"
+  },
+  "collect_constants": {
+   "defaults": "None",
+   "doc": "81a1cb040c88",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "collect_constants",
+   "signature": "(root) -> 'List[Node]'",
+   "type": "function"
+  },
+  "compile_parametric": {
+   "defaults": "None",
+   "doc": "641d50f224e1",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "compile_parametric",
+   "signature": "(node) -> 'Tuple[Any, list]'",
+   "type": "function"
+  },
+  "compile_to_numpy": {
+   "defaults": "None",
+   "doc": "42fa99596385",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "compile_to_numpy",
+   "signature": "(node)",
+   "type": "function"
+  },
+  "compute_semantic_sig": {
+   "defaults": "None",
+   "doc": "5360f5c4706d",
+   "file": "memory.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.memory",
+   "qualname": "compute_semantic_sig",
+   "signature": "(node: \"'Node'\", probe: 'np.ndarray') -> 'Optional[np.ndarray]'",
+   "type": "function"
+  },
+  "copy": {
+   "type": "module",
+   "value": "copy"
+  },
+  "count_distinct_features": {
+   "defaults": "None",
+   "doc": "9511054ec471",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "count_distinct_features",
+   "signature": "(node: \"'Node'\", terminals: 'List[str]') -> 'int'",
+   "type": "function"
+  },
+  "crossover_size_fair": {
+   "defaults": "None",
+   "doc": "7263561c0498",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "crossover_size_fair",
+   "signature": "(a: 'Node', b: 'Node', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "csv": {
+   "type": "module",
+   "value": "csv"
+  },
+  "dataclass": {
+   "defaults": "tuple[None]",
+   "doc": "038f7c0fed25",
+   "file": "dataclasses.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "dict{'eq': True, 'frozen': False, 'init': True, 'kw_only': False, 'match_args': True, 'order': False, 'repr': True, 'slots': False, 'unsafe_hash': False, 'weakref_slot': False}",
+   "module": "dataclasses",
+   "qualname": "dataclass",
+   "signature": "(cls=None, /, *, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)",
+   "type": "function"
+  },
+  "decoy_report": {
+   "defaults": "None",
+   "doc": "0efec50b45ff",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "decoy_report",
+   "signature": "(problem_key: 'str', best: \"'Node'\", X_data: 'np.ndarray', y_data: 'np.ndarray', cfg: \"'Config'\")",
+   "type": "function"
+  },
+  "deque": {
+   "doc": "b1554d53326d",
+   "file": null,
+   "module": "collections",
+   "qualname": "deque",
+   "signature": null,
+   "type": "type"
+  },
+  "evaluate": {
+   "defaults": "None",
+   "doc": "aa604c6945ad",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "evaluate",
+   "signature": "(node, x) -> 'float'",
+   "type": "function"
+  },
+  "evaluate_vector": {
+   "defaults": "None",
+   "doc": "8f842a4f7ca0",
+   "file": "evaluation.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.evaluation",
+   "qualname": "evaluate_vector",
+   "signature": "(node, xs) -> 'np.ndarray'",
+   "type": "function"
+  },
+  "evolve": {
+   "defaults": "tuple['1', None, None]",
+   "doc": "16a4fb3bbbf0",
+   "file": "search.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.search",
+   "qualname": "evolve",
+   "signature": "(func, cfg: 'Config', problem_key: 'str' = '1', X_override=None, y_override=None)",
+   "type": "function"
+  },
+  "evolve_island": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "islands.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.islands",
+   "qualname": "evolve_island",
+   "signature": "(island: 'Island', xs: 'List[float]', ys: 'List[float]', generation: 'int') -> 'Optional[Node]'",
+   "type": "function"
+  },
+  "field": {
+   "defaults": "None",
+   "doc": "a1ddcad457c8",
+   "file": "dataclasses.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "dict{'compare': True, 'default': object _MISSING_TYPE, 'default_factory': object _MISSING_TYPE, 'hash': None, 'init': True, 'kw_only': object _MISSING_TYPE, 'metadata': None, 'repr': True}",
+   "module": "dataclasses",
+   "qualname": "field",
+   "signature": "(*, default=<dataclasses._MISSING_TYPE object at 0x7fa602201850>, default_factory=<dataclasses._MISSING_TYPE object at 0x7fa602201850>, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=<dataclasses._MISSING_TYPE object at 0x7fa602201850>)",
+   "type": "function"
+  },
+  "fitness": {
+   "defaults": "tuple['explorer']",
+   "doc": "aab141480151",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "fitness",
+   "signature": "(node, xs: 'List[float]', ys: 'List[float]', cfg: 'Config', role: 'str' = 'explorer') -> 'float'",
+   "type": "function"
+  },
+  "fragment_inject_mutation": {
+   "defaults": "None",
+   "doc": "fea7c09a0709",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "fragment_inject_mutation",
+   "signature": "(node: 'Node', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "gc": {
+   "type": "module",
+   "value": "gc"
+  },
+  "generate_syracuse_dataset": {
+   "defaults": "tuple[2, 2000]",
+   "doc": "fcb18149efb4",
+   "file": "datasets.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.datasets",
+   "qualname": "generate_syracuse_dataset",
+   "signature": "(n_start: 'int' = 2, n_end: 'int' = 2000) -> 'tuple'",
+   "type": "function"
+  },
+  "get_all_nodes": {
+   "defaults": "None",
+   "doc": "adfbe7cba4ec",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "get_all_nodes",
+   "signature": "(root)",
+   "type": "function"
+  },
+  "get_feature_bias_weights": {
+   "defaults": "None",
+   "doc": "0bd50f721397",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "get_feature_bias_weights",
+   "signature": "(terminals: 'List[str]') -> 'List[float]'",
+   "type": "function"
+  },
+  "hashlib": {
+   "type": "module",
+   "value": "hashlib"
+  },
+  "hoist_mutation": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "hoist_mutation",
+   "signature": "(node: 'Node') -> 'Node'",
+   "type": "function"
+  },
+  "init_probe_set": {
+   "defaults": "tuple[30]",
+   "doc": "0187d4608d66",
+   "file": "memory.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.memory",
+   "qualname": "init_probe_set",
+   "signature": "(cfg: \"'Config'\", n_probe: 'int' = 30) -> 'np.ndarray'",
+   "type": "function"
+  },
+  "itertools": {
+   "type": "module",
+   "value": "itertools"
+  },
+  "json": {
+   "type": "module",
+   "value": "json"
+  },
+  "load_custom_csv": {
+   "defaults": "None",
+   "doc": "c9925b86c538",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "load_custom_csv",
+   "signature": "(file_path: 'str')",
+   "type": "function"
+  },
+  "load_generic_csv": {
+   "defaults": "tuple[None, None, 'physical', 'auto', tuple[-2.0, 2.0]]",
+   "doc": "4bca63b4a5ed",
+   "file": "data.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.data",
+   "qualname": "load_generic_csv",
+   "signature": "(file_path: 'str', target_col: 'str' = None, feature_cols: 'list' = None, op_pool: 'str' = 'physical', normalize: 'str' = 'auto', x_range: 'tuple' = (-2.0, 2.0))",
+   "type": "function"
+  },
+  "make_cfg": {
+   "defaults": "tuple[False, False, False, True, True, True, True]",
+   "doc": "1b511dbffc93",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "make_cfg",
+   "signature": "(x_min: 'float', x_max: 'float', fast: 'bool' = False, ultrafast: 'bool' = False, thorough: 'bool' = False, use_seeding: 'bool' = True, use_lib: 'bool' = True, use_cograph: 'bool' = True, use_seqmem: 'bool' = True) -> 'Config'",
+   "type": "function"
+  },
+  "make_cfg_nd": {
+   "defaults": "tuple[-3.0, 3.0, False, False, False, False, True, True, True]",
+   "doc": "7966a8bef443",
+   "file": "config.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.config",
+   "qualname": "make_cfg_nd",
+   "signature": "(n_features: 'int', x_min: 'float' = -3.0, x_max: 'float' = 3.0, fast: 'bool' = False, ultrafast: 'bool' = False, thorough: 'bool' = False, use_seeding: 'bool' = False, use_lib: 'bool' = True, use_cograph: 'bool' = True, use_seqmem: 'bool' = True) -> 'Config'",
+   "type": "function"
+  },
+  "math": {
+   "type": "module",
+   "value": "math"
+  },
+  "migrate": {
+   "defaults": "None",
+   "doc": "5e4a5093a454",
+   "file": "islands.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.islands",
+   "qualname": "migrate",
+   "signature": "(islands: 'List[Island]')",
+   "type": "function"
+  },
+  "mutate": {
+   "defaults": "tuple['explorer']",
+   "doc": "da39a3ee5e6b",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "mutate",
+   "signature": "(node: 'Node', xs: 'List[float]', ys: 'List[float]', cfg: 'Config', role: 'str' = 'explorer') -> 'Node'",
+   "type": "function"
+  },
+  "node_to_sympy": {
+   "defaults": "tuple[None]",
+   "doc": "61a6f3bde1be",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "node_to_sympy",
+   "signature": "(node, feature_names=None)",
+   "type": "function"
+  },
+  "np": {
+   "type": "module",
+   "value": "numpy"
+  },
+  "operator": {
+   "type": "module",
+   "value": "operator"
+  },
+  "optimize_constants_adam": {
+   "defaults": "None",
+   "doc": "19e10ca6183a",
+   "file": "fitting.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.fitting",
+   "qualname": "optimize_constants_adam",
+   "signature": "(node: 'Node', xs: 'np.ndarray', ys: 'np.ndarray', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "optimize_constants_lm": {
+   "defaults": "None",
+   "doc": "bfdb3f3b998c",
+   "file": "fitting.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.fitting",
+   "qualname": "optimize_constants_lm",
+   "signature": "(node: 'Node', xs: 'np.ndarray', ys: 'np.ndarray', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "os": {
+   "type": "module",
+   "value": "os"
+  },
+  "pareto_rank": {
+   "defaults": "None",
+   "doc": "a0ebe4a1ba89",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "pareto_rank",
+   "signature": "(population: 'List[Node]', xs: 'List[float]', ys: 'List[float]') -> 'List[int]'",
+   "type": "function"
+  },
+  "point_mutation": {
+   "defaults": "tuple['explorer']",
+   "doc": "bcc4306765a8",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "point_mutation",
+   "signature": "(node: 'Node', cfg: 'Config', role: 'str' = 'explorer') -> 'Node'",
+   "type": "function"
+  },
+  "print_result": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "print_result",
+   "signature": "(name: 'str', best: 'Node', xs: 'List[float]', ys: 'List[float]', cfg: 'Config')",
+   "type": "function"
+  },
+  "random": {
+   "type": "module",
+   "value": "random"
+  },
+  "random_constant": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "random_constant",
+   "signature": "(cfg: 'Config') -> 'float'",
+   "type": "function"
+  },
+  "random_terminal": {
+   "defaults": "None",
+   "doc": "278a948c1b4d",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "random_terminal",
+   "signature": "(cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "random_tree": {
+   "defaults": "None",
+   "doc": "d2ca0755012f",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "random_tree",
+   "signature": "(max_depth: 'int', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "raw_mse": {
+   "defaults": "None",
+   "doc": "8c1a8c59b5fe",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "raw_mse",
+   "signature": "(node, xs, ys) -> 'float'",
+   "type": "function"
+  },
+  "raw_pearson_r": {
+   "defaults": "None",
+   "doc": "d442dee91f57",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "raw_pearson_r",
+   "signature": "(node, xs, ys) -> 'float'",
+   "type": "function"
+  },
+  "record_feature_usage": {
+   "defaults": "None",
+   "doc": "080b127f3941",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "record_feature_usage",
+   "signature": "(node: \"'Node'\", terminals: 'List[str]')",
+   "type": "function"
+  },
+  "reset_feature_usage": {
+   "defaults": "None",
+   "doc": "98e4dc01af09",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "reset_feature_usage",
+   "signature": "(n_features: 'int')",
+   "type": "function"
+  },
+  "run": {
+   "defaults": "tuple[None, '1']",
+   "doc": "da39a3ee5e6b",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "run",
+   "signature": "(name: 'str', func, cfg: 'Config' = None, problem_key: 'str' = '1')",
+   "type": "function"
+  },
+  "run_benchmark": {
+   "defaults": "tuple[5, True, False, False, False, 'benchmark_v13.csv']",
+   "doc": "4ada667427b7",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "run_benchmark",
+   "signature": "(keys: 'List[str]', n_runs: 'int' = 5, fast: 'bool' = True, ultrafast: 'bool' = False, transfer: 'bool' = False, ablation: 'bool' = False, csv_out: 'str' = 'benchmark_v13.csv')",
+   "type": "function"
+  },
+  "safe_arcsin": {
+   "defaults": "None",
+   "doc": "746c4ca6d679",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "safe_arcsin",
+   "signature": "(x: 'float') -> 'float'",
+   "type": "function"
+  },
+  "safe_div": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "safe_div",
+   "signature": "(a: 'float', b: 'float') -> 'float'",
+   "type": "function"
+  },
+  "safe_exp": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "safe_exp",
+   "signature": "(x: 'float') -> 'float'",
+   "type": "function"
+  },
+  "safe_log": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "safe_log",
+   "signature": "(x: 'float') -> 'float'",
+   "type": "function"
+  },
+  "safe_pow": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "safe_pow",
+   "signature": "(a: 'float', b: 'float') -> 'float'",
+   "type": "function"
+  },
+  "safe_sqrt": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "safe_sqrt",
+   "signature": "(x: 'float') -> 'float'",
+   "type": "function"
+  },
+  "safe_tan": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "numeric.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.numeric",
+   "qualname": "safe_tan",
+   "signature": "(x: 'float') -> 'float'",
+   "type": "function"
+  },
+  "semantic_dedup": {
+   "defaults": "tuple[0]",
+   "doc": "e20653656bf5",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "semantic_dedup",
+   "signature": "(population, xs, ys, cfg, protected=0)",
+   "type": "function"
+  },
+  "semantic_mutation": {
+   "defaults": "tuple['explorer']",
+   "doc": "bc419b9ca12b",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "semantic_mutation",
+   "signature": "(node: 'Node', xs: 'List[float]', ys: 'List[float]', cfg: 'Config', role: 'str' = 'explorer') -> 'Node'",
+   "type": "function"
+  },
+  "semantic_score": {
+   "defaults": "None",
+   "doc": "8a36e5a2d190",
+   "file": "memory.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.memory",
+   "qualname": "semantic_score",
+   "signature": "(frag_sig: 'Optional[np.ndarray]', residual_sig: 'Optional[np.ndarray]') -> 'float'",
+   "type": "function"
+  },
+  "shrink_mutation": {
+   "defaults": "None",
+   "doc": "dfe43933a95c",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "shrink_mutation",
+   "signature": "(node: 'Node', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "simplify": {
+   "defaults": "None",
+   "doc": "c4faa30e174a",
+   "file": "simplification.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.simplification",
+   "qualname": "simplify",
+   "signature": "(node: 'Node') -> 'Node'",
+   "type": "function"
+  },
+  "state": {
+   "type": "module",
+   "value": "gp_elite.state"
+  },
+  "stigmergic_mutation": {
+   "defaults": "None",
+   "doc": "7e5f5acc62c3",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "stigmergic_mutation",
+   "signature": "(node: 'Node', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "struct": {
+   "type": "module",
+   "value": "struct"
+  },
+  "subtree_mutation": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "subtree_mutation",
+   "signature": "(node: 'Node', cfg: 'Config') -> 'Node'",
+   "type": "function"
+  },
+  "sys": {
+   "type": "module",
+   "value": "sys"
+  },
+  "time": {
+   "type": "module",
+   "value": "time"
+  },
+  "to_string": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "to_string",
+   "signature": "(node) -> 'str'",
+   "type": "function"
+  },
+  "tournament": {
+   "defaults": "tuple['explorer']",
+   "doc": "da39a3ee5e6b",
+   "file": "genetic.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.genetic",
+   "qualname": "tournament",
+   "signature": "(population: 'List[Node]', xs: 'List[float]', ys: 'List[float]', cfg: 'Config', role: 'str' = 'explorer') -> 'Node'",
+   "type": "function"
+  },
+  "tree_complexity": {
+   "defaults": "None",
+   "doc": "dcbb2703c378",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "tree_complexity",
+   "signature": "(node) -> 'tuple'",
+   "type": "function"
+  },
+  "tree_depth": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "tree_depth",
+   "signature": "(node) -> 'int'",
+   "type": "function"
+  },
+  "tree_size": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "tree.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.tree",
+   "qualname": "tree_size",
+   "signature": "(node) -> 'int'",
+   "type": "function"
+  },
+  "try_plot": {
+   "defaults": "None",
+   "doc": "da39a3ee5e6b",
+   "file": "console.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.console",
+   "qualname": "try_plot",
+   "signature": "(name: 'str', func, best: 'Node', xs: 'List[float]', ys: 'List[float]', log_csv: 'str')",
+   "type": "function"
+  },
+  "update_residual_sig": {
+   "defaults": "None",
+   "doc": "9672b9ede0bb",
+   "file": "memory.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.memory",
+   "qualname": "update_residual_sig",
+   "signature": "(best_ind: \"'Node'\", probe: 'np.ndarray', probe_y: 'np.ndarray') -> 'Optional[np.ndarray]'",
+   "type": "function"
+  },
+  "warm_transfer": {
+   "defaults": "tuple[0.4, 0.3, 0.5]",
+   "doc": "c2a56be070bf",
+   "file": "memory.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.memory",
+   "qualname": "warm_transfer",
+   "signature": "(decay_lib: 'float' = 0.4, decay_co: 'float' = 0.3, decay_seq: 'float' = 0.5)",
+   "type": "function"
+  },
+  "weakref": {
+   "type": "module",
+   "value": "weakref"
+  },
+  "wrap_linear_scaling": {
+   "defaults": "None",
+   "doc": "0691654469a9",
+   "file": "scoring.py",
+   "globals_is_core_dict": false,
+   "kwdefaults": "None",
+   "module": "gp_elite.scoring",
+   "qualname": "wrap_linear_scaling",
+   "signature": "(node, xs, ys)",
+   "type": "function"
+  }
+ },
+ "python": "3.11.18",
+ "star_import": [
+  "ALL_BINARY_OPS",
+  "ALL_OPS",
+  "ALL_UNARY_OPS",
+  "Any",
+  "BINARY_OPS",
+  "BINARY_WEIGHTS",
+  "CFG",
+  "Config",
+  "DECOY_FEATURES",
+  "Dict",
+  "EpsilonLexicaseSelector",
+  "FragmentCoGraph",
+  "FragmentEntry",
+  "FragmentLibrary",
+  "FragmentSequenceMemory",
+  "Island",
+  "List",
+  "ND_PROBLEMS",
+  "Node",
+  "Optional",
+  "PROBLEMS",
+  "SCALE_RATIO_THRESHOLD",
+  "SYRACUSE_FEATURE_NAMES",
+  "SYRACUSE_N_FEATURES",
+  "TRACE",
+  "Tuple",
+  "UNARY_OPS",
+  "UNARY_WEIGHTS",
+  "annotations",
+  "bisect",
+  "build_dataset",
+  "build_stigmergic_tree",
+  "build_stigmergic_tree_v2",
+  "build_stigmergic_tree_v3",
+  "collect_constants",
+  "compile_parametric",
+  "compile_to_numpy",
+  "compute_semantic_sig",
+  "copy",
+  "count_distinct_features",
+  "crossover_size_fair",
+  "csv",
+  "dataclass",
+  "decoy_report",
+  "deque",
+  "evaluate",
+  "evaluate_vector",
+  "evolve",
+  "evolve_island",
+  "field",
+  "fitness",
+  "fragment_inject_mutation",
+  "gc",
+  "generate_syracuse_dataset",
+  "get_all_nodes",
+  "get_feature_bias_weights",
+  "hashlib",
+  "hoist_mutation",
+  "init_probe_set",
+  "itertools",
+  "json",
+  "load_custom_csv",
+  "load_generic_csv",
+  "make_cfg",
+  "make_cfg_nd",
+  "math",
+  "migrate",
+  "mutate",
+  "node_to_sympy",
+  "np",
+  "operator",
+  "optimize_constants_adam",
+  "optimize_constants_lm",
+  "os",
+  "pareto_rank",
+  "point_mutation",
+  "print_result",
+  "random",
+  "random_constant",
+  "random_terminal",
+  "random_tree",
+  "raw_mse",
+  "raw_pearson_r",
+  "record_feature_usage",
+  "reset_feature_usage",
+  "run",
+  "run_benchmark",
+  "safe_arcsin",
+  "safe_div",
+  "safe_exp",
+  "safe_log",
+  "safe_pow",
+  "safe_sqrt",
+  "safe_tan",
+  "semantic_dedup",
+  "semantic_mutation",
+  "semantic_score",
+  "shrink_mutation",
+  "simplify",
+  "state",
+  "stigmergic_mutation",
+  "struct",
+  "subtree_mutation",
+  "sys",
+  "time",
+  "to_string",
+  "tournament",
+  "tree_complexity",
+  "tree_depth",
+  "tree_size",
+  "try_plot",
+  "update_residual_sig",
+  "warm_transfer",
+  "weakref",
+  "wrap_linear_scaling"
+ ],
+ "vars_has": [
+  "ALL_BINARY_OPS",
+  "ALL_OPS",
+  "ALL_UNARY_OPS",
+  "Any",
+  "BINARY_OPS",
+  "BINARY_WEIGHTS",
+  "CFG",
+  "Config",
+  "DECOY_FEATURES",
+  "Dict",
+  "EpsilonLexicaseSelector",
+  "FragmentCoGraph",
+  "FragmentEntry",
+  "FragmentLibrary",
+  "FragmentSequenceMemory",
+  "Island",
+  "List",
+  "ND_PROBLEMS",
+  "Node",
+  "Optional",
+  "PROBLEMS",
+  "SCALE_RATIO_THRESHOLD",
+  "SYRACUSE_FEATURE_NAMES",
+  "SYRACUSE_N_FEATURES",
+  "TRACE",
+  "Tuple",
+  "UNARY_OPS",
+  "UNARY_WEIGHTS",
+  "_BATTERY_BINARY_OPS",
+  "_BATTERY_BINARY_WEIGHTS",
+  "_BATTERY_UNARY_OPS",
+  "_BATTERY_UNARY_WEIGHTS",
+  "_BINOM_EXPS",
+  "_BINOM_GRID",
+  "_BINOM_GRID_ROWS",
+  "_BINOM_MAX_LIB",
+  "_BINOM_TOL",
+  "_CANON_CONST",
+  "_CLEANER_BINARY_OPS",
+  "_CLEANER_BINARY_WEIGHTS",
+  "_CLEANER_UNARY_OPS",
+  "_CLEANER_UNARY_WEIGHTS",
+  "_COMPILE_AFTER",
+  "_COMPILE_CACHE_MAX",
+  "_Door",
+  "_E2_CURVE",
+  "_E2_C_GRID",
+  "_E2_GATE",
+  "_ELEM_MAX_LIB",
+  "_ELEM_S_GRID",
+  "_ELEM_TRIG_GATE",
+  "_ELEM_W_GRID",
+  "_ENGINE_MODULES",
+  "_EVAL_COUNTS",
+  "_EXACT_REL",
+  "_EXTRA_SEEDS",
+  "_FAITHFUL_CACHE",
+  "_FINAL_LM_ITER",
+  "_FLOAT_COMPLEXITY_WEIGHT",
+  "_FLOAT_GAMMA",
+  "_GENCSV_POOLS",
+  "_HOLDERS",
+  "_HOT_ZONES",
+  "_INTERP_BINARY",
+  "_INTERP_MAX_DEPTH",
+  "_INTERP_UNARY",
+  "_IdentityScaler",
+  "_InterpTooDeep",
+  "_LMPlan",
+  "_LM_BINARY_FN",
+  "_LM_BINARY_SRC",
+  "_LM_PLAN_CACHE",
+  "_LM_PLAN_CACHE_MAX",
+  "_LM_UNARY_FN",
+  "_LM_UNARY_SRC",
+  "_MISSING",
+  "_MinMaxScaler",
+  "_NAN",
+  "_ND_UNARY_WEIGHTS_INIT",
+  "_NEAR_CACHE",
+  "_NEAR_EXT",
+  "_NEAR_K",
+  "_NP_GLOBALS",
+  "_PACK_D",
+  "_PARAMETRIC_CACHE_MAX",
+  "_PATIENCE_GAIN",
+  "_POOL_CHILD_ENV",
+  "_POWER_LAW_MIN_R2",
+  "_POWER_TOL",
+  "_PRED_CACHE_MAX",
+  "_PW",
+  "_Patience",
+  "_RunTrace",
+  "_SAFE_LIMIT",
+  "_SCAN_KEEP",
+  "_SIMPLIFY_CACHE",
+  "_SMALL_CANDS",
+  "_SMALL_CANDS_MAX",
+  "_SMALL_FAMILY",
+  "_SMALL_FAMILY_KEEP",
+  "_SMALL_FAMILY_SHARE",
+  "_SMALL_FINALISTS",
+  "_SMALL_FOLDS",
+  "_SMALL_FRONT",
+  "_SMALL_MIN_ROWS",
+  "_SMALL_ROWS",
+  "_SMALL_SEARCH",
+  "_STATE",
+  "_STATE_NAMES",
+  "_STR_CODES",
+  "_SYMPY_BINARY",
+  "_SYMPY_UNARY",
+  "_SYRACUSE_BINARY_OPS",
+  "_SYRACUSE_BINARY_WEIGHTS",
+  "_SYRACUSE_UNARY_OPS",
+  "_SYRACUSE_UNARY_WEIGHTS",
+  "_ShiftFreeScaler",
+  "_SkipLogExport",
+  "_StateName",
+  "_TAG_BINARY",
+  "_TAG_FLOAT",
+  "_TAG_OTHER",
+  "_TAG_UNARY",
+  "_TOLERANT_MAX",
+  "_TOLERANT_REL",
+  "_TRIVIAL_CACHE",
+  "_TRIVIAL_PROBE_X",
+  "_UNARY_FOLD",
+  "_UNPACK_Q",
+  "_VAL_CANDS_MAX",
+  "_WEIGHTED_SUMS_MAX",
+  "__builtins__",
+  "__cached__",
+  "__dir__",
+  "__doc__",
+  "__file__",
+  "__loader__",
+  "__name__",
+  "__package__",
+  "__spec__",
+  "_active_pool_ops",
+  "_active_pools",
+  "_ask",
+  "_ask_int",
+  "_binom_library",
+  "_binomial_forms",
+  "_build_near_probes",
+  "_choose_scaler",
+  "_clear_simplify_caches",
+  "_collatz_flight_time",
+  "_collect_constants_ordered",
+  "_csv_deps",
+  "_csv_deps_ok",
+  "_cube",
+  "_deduce_console_constant",
+  "_detect_dominant_op",
+  "_dim_active",
+  "_ds",
+  "_e2_residuals",
+  "_early_stop_threshold",
+  "_elem_aexp_forms",
+  "_elem_flib",
+  "_elem_inverse_forms",
+  "_elem_inverse_forms_w",
+  "_elem_log_scan",
+  "_elem_mono",
+  "_elem_rel",
+  "_elem_transform",
+  "_elem_trig_exact",
+  "_elem_trig_forms",
+  "_elem_trig_grid",
+  "_elem_wrel",
+  "_elementary_forms",
+  "_elementary_forms_n2",
+  "_evolve_parallel",
+  "_exit_if_reimported_by_worker",
+  "_finalists",
+  "_float_literal",
+  "_formula_faithful",
+  "_get_ops_for_role",
+  "_golden_min",
+  "_half_integer_power",
+  "_has_own_factor",
+  "_has_scale",
+  "_holdout_mse",
+  "_interactive_menu",
+  "_interp",
+  "_invalidate_all_hashes",
+  "_is_adjusted_float",
+  "_is_const",
+  "_is_const_subtree",
+  "_is_float",
+  "_is_numerically_stable",
+  "_island_round_task",
+  "_leaf_code_canonical",
+  "_leaf_code_exact",
+  "_leaf_code_rounded",
+  "_linear_scale_params",
+  "_lm_apply",
+  "_lm_build_plan",
+  "_lm_column",
+  "_lm_plan",
+  "_lm_to_convergence",
+  "_log_g_exponents",
+  "_log_max_height_level2",
+  "_make_binomial_seeds",
+  "_make_elementary_seeds",
+  "_make_linear_candidate",
+  "_make_motif_seeds",
+  "_make_power_law_seeds",
+  "_make_tolerant_seeds",
+  "_max_height_ratio",
+  "_monomial",
+  "_nd_diverse_population",
+  "_near_domain_stable",
+  "_node_hashes",
+  "_np_abs",
+  "_np_is_even",
+  "_np_isfinite",
+  "_np_max2",
+  "_np_maximum",
+  "_np_min2",
+  "_np_minimum",
+  "_np_safe_arcsin",
+  "_np_safe_div",
+  "_np_safe_exp",
+  "_np_safe_log",
+  "_np_safe_pow",
+  "_np_safe_pow_var",
+  "_np_safe_sqrt",
+  "_np_safe_tan",
+  "_np_step",
+  "_one_run",
+  "_parallel_enabled",
+  "_parallel_worker_init",
+  "_pause",
+  "_pearson_r",
+  "_polish_finalists",
+  "_pool_choice",
+  "_pool_probe",
+  "_power_law_exponents",
+  "_power_law_exponents_w",
+  "_pred_rel_error",
+  "_predict_cached",
+  "_print_menu",
+  "_product",
+  "_pure_mse",
+  "_random_tree_full",
+  "_random_tree_full_nd",
+  "_random_tree_grow",
+  "_random_tree_grow_nd",
+  "_random_tree_nd",
+  "_refit_inner",
+  "_refit_scaling",
+  "_robust_scale_params",
+  "_safe_sinc",
+  "_safe_write",
+  "_scale_feature",
+  "_scale_ratio",
+  "_scale_tree",
+  "_seed_rel_error",
+  "_seeds_blocked_by_units",
+  "_select_one_se",
+  "_semantic_key",
+  "_simplify_node",
+  "_simplify_tree",
+  "_small_choose",
+  "_small_cv",
+  "_small_family",
+  "_small_fit",
+  "_small_is_const",
+  "_small_materialize",
+  "_small_n_par",
+  "_small_round_powers",
+  "_small_setup",
+  "_small_specs",
+  "_small_strip",
+  "_small_table_select",
+  "_smart_reset_explorers",
+  "_split_holdout",
+  "_sq",
+  "_str_code",
+  "_target_scale",
+  "_to_np_code",
+  "_to_np_code_parametric",
+  "_track_if_exact",
+  "_track_small_candidate",
+  "_track_val_candidate",
+  "_typed_seeds",
+  "_v2",
+  "_value_code",
+  "_warn_unguarded_main",
+  "_weight_sums",
+  "annotations",
+  "bisect",
+  "build_dataset",
+  "build_stigmergic_tree",
+  "build_stigmergic_tree_v2",
+  "build_stigmergic_tree_v3",
+  "collect_constants",
+  "compile_parametric",
+  "compile_to_numpy",
+  "compute_semantic_sig",
+  "copy",
+  "count_distinct_features",
+  "crossover_size_fair",
+  "csv",
+  "dataclass",
+  "decoy_report",
+  "deque",
+  "evaluate",
+  "evaluate_vector",
+  "evolve",
+  "evolve_island",
+  "field",
+  "fitness",
+  "fragment_inject_mutation",
+  "gc",
+  "generate_syracuse_dataset",
+  "get_all_nodes",
+  "get_feature_bias_weights",
+  "hashlib",
+  "hoist_mutation",
+  "init_probe_set",
+  "itertools",
+  "json",
+  "load_custom_csv",
+  "load_generic_csv",
+  "make_cfg",
+  "make_cfg_nd",
+  "math",
+  "migrate",
+  "mutate",
+  "node_to_sympy",
+  "np",
+  "operator",
+  "optimize_constants_adam",
+  "optimize_constants_lm",
+  "os",
+  "pareto_rank",
+  "point_mutation",
+  "print_result",
+  "random",
+  "random_constant",
+  "random_terminal",
+  "random_tree",
+  "raw_mse",
+  "raw_pearson_r",
+  "record_feature_usage",
+  "reset_feature_usage",
+  "run",
+  "run_benchmark",
+  "safe_arcsin",
+  "safe_div",
+  "safe_exp",
+  "safe_log",
+  "safe_pow",
+  "safe_sqrt",
+  "safe_tan",
+  "semantic_dedup",
+  "semantic_mutation",
+  "semantic_score",
+  "shrink_mutation",
+  "simplify",
+  "state",
+  "stigmergic_mutation",
+  "struct",
+  "subtree_mutation",
+  "sys",
+  "time",
+  "to_string",
+  "tournament",
+  "tree_complexity",
+  "tree_depth",
+  "tree_size",
+  "try_plot",
+  "update_residual_sig",
+  "warm_transfer",
+  "weakref",
+  "wrap_linear_scaling"
+ ]
+}

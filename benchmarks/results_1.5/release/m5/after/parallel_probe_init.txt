@@ -1,0 +1,4 @@
+=== /venv15s/bin/python (working tree at f5fc346)
+registered in sys.modules by the initializer: ['core', 'gp_v20']
+   core     -> file /home/user/gp-elite/gp_elite/core.py, executed: False
+   gp_v20   -> file /home/user/gp-elite/gp_elite/core.py, executed: False

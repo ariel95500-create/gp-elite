@@ -1,0 +1,7 @@
+engine 1.5.0: get_type_hints() on 234 functions and classes of core: 4 fail
+    _detect_dominant_op (NameError: name 'Node' is not defined)
+    build_stigmergic_tree (NameError: name 'FragmentLibrary' is not defined)
+    build_stigmergic_tree_v2 (NameError: name 'FragmentLibrary' is not defined)
+    build_stigmergic_tree_v3 (NameError: name 'FragmentLibrary' is not defined)
+   get_type_hints(gp_elite.state): ok
+   get_type_hints(gp_elite.core): 0 entries

@@ -1,0 +1,11 @@
+1.4.0 line 1951: VAL_R2_TOLERANCE as a bare name (Store, class)
+1.4.0 line 5994: '_CUSTOM_LOSS_ROBUST' as a string (globals().get or globals()[...])
+1.4.0 line 9872: 'VAL_R2_TOLERANCE' as a string (globals().get or globals()[...])
+1.4.0 line 8987: 'VAL_R2_TOLERANCE' as a string (globals().get or globals()[...])
+1.4.0 line 9141: 'VAL_R2_TOLERANCE' as a string (globals().get or globals()[...])
+1.4.0 line 9872: 'VAL_R2_TOLERANCE' as a string (globals().get or globals()[...])
+1.4.0 line 5821: '_CUSTOM_LOSS_USE_SCALING' as a string (globals().get or globals()[...])
+1.4.0 line 5822: '_CUSTOM_LOSS_ROBUST' as a string (globals().get or globals()[...])
+1.4.0 line 9587: 'VAL_R2_TOLERANCE' as a string (globals().get or globals()[...])
+1.4.0 line 9508: 'VAL_R2_TOLERANCE' as a string (globals().get or globals()[...])
+try blocks of 1.5 catching AttributeError around a read of state.X: 0

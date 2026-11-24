@@ -1,0 +1,4 @@
+engine 1.5.0, console.py: _sys7.modules.setdefault("core", _sys7.modules[__package__ + ".core"])
+  sys.modules['core'] = gp_elite.core
+  the top-level api imported by the console uses core = gp_elite.core
+  names api.py reads on core: 34; missing on that module: 2 ['_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING']

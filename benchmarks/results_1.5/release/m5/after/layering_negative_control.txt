@@ -1,0 +1,12 @@
+package imported from: /tmp/tmp.KonWIqUtx9/gp_elite/__init__.py
+E       AssertionError: tree.py line 19: console is not above it
+E         fitting.py line 14: formula outside the engine, at import
+E         data.py line 18: core imports gp_elite.core
+E       assert not [('tree', 19, 'console', 'is not above it'), ('fitting', 14, 'formula', 'outside the engine, at import'), ('data', 18, 'core', 'imports gp_elite.core')]
+E       AssertionError: not in the order: ['extra']; missing: []
+E       assert {'__init__', ...console', ...} == {'__init__', ...console', ...}
+E         
+E         Extra items in the left set:
+E         'extra'
+E         Use -v to get more diff
+2 failed, 1 passed in 0.19s

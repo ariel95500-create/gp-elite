@@ -1,0 +1,2278 @@
+{
+ "engine": "1.5.0",
+ "obs": {
+  "after reload: _TIME_LIMIT_HIT, _VAL_CANDS reset; FRAGMENT_LIB new; evolve new": [
+   true,
+   false,
+   false,
+   false
+  ],
+  "core.__dict__[...] = v reaches the engine": [
+   "orig",
+   "orig"
+  ],
+  "core.evolve.__globals__ is vars(core)": false,
+  "mock.patch(str) COGRAPH": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) CSV_FEATURE_NAMES": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) CSV_TARGET_NAME": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) CURRENT_RESIDUAL_SIG": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) FRAGMENT_LIB": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) PROBE_X": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) SEQ_MEM": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) VAL_R2_TOLERANCE": [
+   "AttributeError",
+   "orig"
+  ],
+  "mock.patch(str) _BATTERY_CSV_MODE": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _BINOMIAL_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _COMPILE_CACHE": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _CUSTOM_LOSS_FN": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _CUSTOM_LOSS_PARSIMONY": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _CUSTOM_LOSS_ROBUST": [
+   "AttributeError",
+   "orig"
+  ],
+  "mock.patch(str) _CUSTOM_LOSS_USE_SCALING": [
+   "AttributeError",
+   "orig"
+  ],
+  "mock.patch(str) _CUSTOM_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _DIM_GATE_DIMS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _DIM_GATE_TARGET": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _DIM_SEARCH": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _DIM_UNKNOWN_CONST": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _E2_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _ELEMENTARY_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _EXACT_PRIORITY_SWAPS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _EXTRAP_BAND": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _EXTRAP_PROBE_XS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _FAITHFUL_SWAPS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _GENERIC_BINARY_OPS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _GENERIC_BINARY_WEIGHTS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _GENERIC_CSV_MODE": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _GENERIC_UNARY_OPS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _GENERIC_UNARY_WEIGHTS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _LS_SCALE_ONLY": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _NEAR_BAND": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _NEAR_GUARD_SWAPS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _NEAR_PROBE_XS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _PARALLEL_BROKEN": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _PARALLEL_WARNED": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _PARAMETRIC_CACHE": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _POLISH_ADMITTED": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _POLISH_GRACE_S": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _PRED_CACHE": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SEEDS_UNDER_UNITS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SMALL_CV": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SMALL_ON": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SYRACUSE_FEAT_MAXS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SYRACUSE_FEAT_MINS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SYRACUSE_MODE": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SYRACUSE_X_RAW": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _SYRACUSE_Y_RAW": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _TIME_LIMIT_HIT": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _TOLERANT_N2": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _TOLERANT_REFIT": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _TOLERANT_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _USE_LINEAR_SCALING": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _VAL_CANDS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _VAL_TRAIN_XS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _VAL_TRAIN_YS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _VAL_XS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _VAL_YS": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _build_near_probes": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _feature_usage_counter": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _fitness_cache": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _has_own_factor": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _lm_plan": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _make_binomial_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _make_elementary_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _make_power_law_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _make_tolerant_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) _refit_inner": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) evolve": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) evolve_island": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) np": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) time": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch(str) to_string": [
+   "s1",
+   "orig"
+  ],
+  "mock.patch.object COGRAPH": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object CSV_FEATURE_NAMES": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object CSV_TARGET_NAME": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object CURRENT_RESIDUAL_SIG": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object FRAGMENT_LIB": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object PROBE_X": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object SEQ_MEM": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object VAL_R2_TOLERANCE": [
+   "AttributeError",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _BATTERY_CSV_MODE": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _BINOMIAL_SEEDS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _COMPILE_CACHE": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _CUSTOM_LOSS_FN": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _CUSTOM_LOSS_PARSIMONY": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _CUSTOM_LOSS_ROBUST": [
+   "AttributeError",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _CUSTOM_LOSS_USE_SCALING": [
+   "AttributeError",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _CUSTOM_SEEDS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _DIM_GATE_DIMS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _DIM_GATE_TARGET": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _DIM_SEARCH": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _DIM_UNKNOWN_CONST": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _E2_SEEDS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _ELEMENTARY_SEEDS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _EXACT_PRIORITY_SWAPS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _EXTRAP_BAND": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _EXTRAP_PROBE_XS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _FAITHFUL_SWAPS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _GENERIC_BINARY_OPS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _GENERIC_BINARY_WEIGHTS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _GENERIC_CSV_MODE": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _GENERIC_UNARY_OPS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _GENERIC_UNARY_WEIGHTS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _LS_SCALE_ONLY": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _NEAR_BAND": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _NEAR_GUARD_SWAPS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _NEAR_PROBE_XS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _PARALLEL_BROKEN": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _PARALLEL_WARNED": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _PARAMETRIC_CACHE": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _POLISH_ADMITTED": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _POLISH_GRACE_S": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _PRED_CACHE": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SEEDS_UNDER_UNITS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SMALL_CV": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SMALL_ON": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SYRACUSE_FEAT_MAXS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SYRACUSE_FEAT_MINS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SYRACUSE_MODE": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SYRACUSE_X_RAW": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _SYRACUSE_Y_RAW": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _TIME_LIMIT_HIT": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _TOLERANT_N2": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _TOLERANT_REFIT": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _TOLERANT_SEEDS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _USE_LINEAR_SCALING": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _VAL_CANDS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _VAL_TRAIN_XS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _VAL_TRAIN_YS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _VAL_XS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _VAL_YS": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _build_near_probes": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _feature_usage_counter": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _fitness_cache": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _has_own_factor": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _lm_plan": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _make_binomial_seeds": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _make_elementary_seeds": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _make_power_law_seeds": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _make_tolerant_seeds": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object _refit_inner": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object evolve": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object evolve_island": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object np": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object time": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object to_string": [
+   "s1",
+   "orig",
+   "orig"
+  ],
+  "mock.patch.object(create=True) VAL_R2_TOLERANCE": [
+   "missing",
+   "s1",
+   "missing"
+  ],
+  "mock.patch.object(create=True) _VAL_CANDS": [
+   "other",
+   "s1",
+   "missing"
+  ],
+  "mock.patch.object(create=True) evolve": [
+   "other",
+   "s1",
+   "other"
+  ],
+  "mp.delattr COGRAPH": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr CSV_FEATURE_NAMES": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr CSV_TARGET_NAME": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr CURRENT_RESIDUAL_SIG": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr FRAGMENT_LIB": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr PROBE_X": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr SEQ_MEM": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr VAL_R2_TOLERANCE": [
+   "AttributeError",
+   null,
+   "orig"
+  ],
+  "mp.delattr _BATTERY_CSV_MODE": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _BINOMIAL_SEEDS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _COMPILE_CACHE": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _CUSTOM_LOSS_FN": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _CUSTOM_LOSS_PARSIMONY": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _CUSTOM_LOSS_ROBUST": [
+   "AttributeError",
+   null,
+   "orig"
+  ],
+  "mp.delattr _CUSTOM_LOSS_USE_SCALING": [
+   "AttributeError",
+   null,
+   "orig"
+  ],
+  "mp.delattr _CUSTOM_SEEDS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _DIM_GATE_DIMS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _DIM_GATE_TARGET": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _DIM_SEARCH": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _DIM_UNKNOWN_CONST": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _E2_SEEDS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _ELEMENTARY_SEEDS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _EXACT_PRIORITY_SWAPS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _EXTRAP_BAND": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _EXTRAP_PROBE_XS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _FAITHFUL_SWAPS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _GENERIC_BINARY_OPS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _GENERIC_BINARY_WEIGHTS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _GENERIC_CSV_MODE": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _GENERIC_UNARY_OPS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _GENERIC_UNARY_WEIGHTS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _LS_SCALE_ONLY": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _NEAR_BAND": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _NEAR_GUARD_SWAPS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _NEAR_PROBE_XS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _PARALLEL_BROKEN": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _PARALLEL_WARNED": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _PARAMETRIC_CACHE": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _POLISH_ADMITTED": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _POLISH_GRACE_S": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _PRED_CACHE": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SEEDS_UNDER_UNITS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SMALL_CV": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SMALL_ON": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SYRACUSE_FEAT_MAXS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SYRACUSE_FEAT_MINS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SYRACUSE_MODE": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SYRACUSE_X_RAW": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _SYRACUSE_Y_RAW": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _TIME_LIMIT_HIT": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _TOLERANT_N2": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _TOLERANT_REFIT": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _TOLERANT_SEEDS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _USE_LINEAR_SCALING": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _VAL_CANDS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _VAL_TRAIN_XS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _VAL_TRAIN_YS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _VAL_XS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _VAL_YS": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _build_near_probes": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _feature_usage_counter": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _fitness_cache": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _has_own_factor": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _lm_plan": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _make_binomial_seeds": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _make_elementary_seeds": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _make_power_law_seeds": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _make_tolerant_seeds": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr _refit_inner": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr evolve": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr evolve_island": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr np": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr time": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.delattr to_string": [
+   "missing",
+   false,
+   "orig"
+  ],
+  "mp.setattr COGRAPH": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr CSV_FEATURE_NAMES": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr CSV_TARGET_NAME": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr CURRENT_RESIDUAL_SIG": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr FRAGMENT_LIB": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr PROBE_X": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr SEQ_MEM": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr VAL_R2_TOLERANCE": [
+   "AttributeError",
+   "AttributeError",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _BATTERY_CSV_MODE": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _BINOMIAL_SEEDS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _COMPILE_CACHE": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _CUSTOM_LOSS_FN": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _CUSTOM_LOSS_PARSIMONY": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _CUSTOM_LOSS_ROBUST": [
+   "AttributeError",
+   "AttributeError",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _CUSTOM_LOSS_USE_SCALING": [
+   "AttributeError",
+   "AttributeError",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _CUSTOM_SEEDS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _DIM_GATE_DIMS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _DIM_GATE_TARGET": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _DIM_SEARCH": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _DIM_UNKNOWN_CONST": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _E2_SEEDS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _ELEMENTARY_SEEDS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _EXACT_PRIORITY_SWAPS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _EXTRAP_BAND": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _EXTRAP_PROBE_XS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _FAITHFUL_SWAPS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _GENERIC_BINARY_OPS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _GENERIC_BINARY_WEIGHTS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _GENERIC_CSV_MODE": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _GENERIC_UNARY_OPS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _GENERIC_UNARY_WEIGHTS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _LS_SCALE_ONLY": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _NEAR_BAND": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _NEAR_GUARD_SWAPS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _NEAR_PROBE_XS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _PARALLEL_BROKEN": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _PARALLEL_WARNED": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _PARAMETRIC_CACHE": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _POLISH_ADMITTED": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _POLISH_GRACE_S": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _PRED_CACHE": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SEEDS_UNDER_UNITS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SMALL_CV": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SMALL_ON": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SYRACUSE_FEAT_MAXS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SYRACUSE_FEAT_MINS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SYRACUSE_MODE": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SYRACUSE_X_RAW": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _SYRACUSE_Y_RAW": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _TIME_LIMIT_HIT": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _TOLERANT_N2": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _TOLERANT_REFIT": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _TOLERANT_SEEDS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _USE_LINEAR_SCALING": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _VAL_CANDS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _VAL_TRAIN_XS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _VAL_TRAIN_YS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _VAL_XS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _VAL_YS": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _build_near_probes": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _feature_usage_counter": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _fitness_cache": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _has_own_factor": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _lm_plan": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _make_binomial_seeds": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _make_elementary_seeds": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _make_power_law_seeds": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _make_tolerant_seeds": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr _refit_inner": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr evolve": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr evolve_island": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr np": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr time": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr to_string": [
+   "s1",
+   "s2",
+   "orig",
+   "orig"
+  ],
+  "mp.setattr(raising=False) A_NAME_1_4_0_NEVER_HAD": [
+   "missing",
+   "missing",
+   "missing",
+   false
+  ],
+  "mp.setattr(raising=False) VAL_R2_TOLERANCE": [
+   "missing",
+   "s1",
+   "missing",
+   false
+  ],
+  "mp.setattr(raising=False) _CUSTOM_LOSS_ROBUST": [
+   "missing",
+   "s1",
+   "missing",
+   false
+  ],
+  "mp.setattr(raising=False) _CUSTOM_LOSS_USE_SCALING": [
+   "missing",
+   "s1",
+   "missing",
+   false
+  ],
+  "mp.setattr(str) COGRAPH": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) CSV_FEATURE_NAMES": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) CSV_TARGET_NAME": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) CURRENT_RESIDUAL_SIG": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) FRAGMENT_LIB": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) PROBE_X": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) SEQ_MEM": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) VAL_R2_TOLERANCE": [
+   "AttributeError",
+   "orig"
+  ],
+  "mp.setattr(str) _BATTERY_CSV_MODE": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _BINOMIAL_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _COMPILE_CACHE": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _CUSTOM_LOSS_FN": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _CUSTOM_LOSS_PARSIMONY": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _CUSTOM_LOSS_ROBUST": [
+   "AttributeError",
+   "orig"
+  ],
+  "mp.setattr(str) _CUSTOM_LOSS_USE_SCALING": [
+   "AttributeError",
+   "orig"
+  ],
+  "mp.setattr(str) _CUSTOM_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _DIM_GATE_DIMS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _DIM_GATE_TARGET": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _DIM_SEARCH": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _DIM_UNKNOWN_CONST": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _E2_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _ELEMENTARY_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _EXACT_PRIORITY_SWAPS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _EXTRAP_BAND": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _EXTRAP_PROBE_XS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _FAITHFUL_SWAPS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _GENERIC_BINARY_OPS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _GENERIC_BINARY_WEIGHTS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _GENERIC_CSV_MODE": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _GENERIC_UNARY_OPS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _GENERIC_UNARY_WEIGHTS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _LS_SCALE_ONLY": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _NEAR_BAND": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _NEAR_GUARD_SWAPS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _NEAR_PROBE_XS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _PARALLEL_BROKEN": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _PARALLEL_WARNED": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _PARAMETRIC_CACHE": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _POLISH_ADMITTED": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _POLISH_GRACE_S": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _PRED_CACHE": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SEEDS_UNDER_UNITS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SMALL_CV": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SMALL_ON": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SYRACUSE_FEAT_MAXS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SYRACUSE_FEAT_MINS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SYRACUSE_MODE": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SYRACUSE_X_RAW": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _SYRACUSE_Y_RAW": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _TIME_LIMIT_HIT": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _TOLERANT_N2": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _TOLERANT_REFIT": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _TOLERANT_SEEDS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _USE_LINEAR_SCALING": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _VAL_CANDS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _VAL_TRAIN_XS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _VAL_TRAIN_YS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _VAL_XS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _VAL_YS": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _build_near_probes": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _feature_usage_counter": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _fitness_cache": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _has_own_factor": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _lm_plan": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _make_binomial_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _make_elementary_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _make_power_law_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _make_tolerant_seeds": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) _refit_inner": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) evolve": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) evolve_island": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) np": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) time": [
+   "s1",
+   "orig"
+  ],
+  "mp.setattr(str) to_string": [
+   "s1",
+   "orig"
+  ],
+  "set/del COGRAPH": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del CSV_FEATURE_NAMES": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del CSV_TARGET_NAME": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del CURRENT_RESIDUAL_SIG": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del FRAGMENT_LIB": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del PROBE_X": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del SEQ_MEM": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del VAL_R2_TOLERANCE": [
+   "s1",
+   "orig",
+   false,
+   "orig"
+  ],
+  "set/del _BATTERY_CSV_MODE": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _BINOMIAL_SEEDS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _COMPILE_CACHE": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _CUSTOM_LOSS_FN": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _CUSTOM_LOSS_PARSIMONY": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _CUSTOM_LOSS_ROBUST": [
+   "s1",
+   "orig",
+   false,
+   "orig"
+  ],
+  "set/del _CUSTOM_LOSS_USE_SCALING": [
+   "s1",
+   "orig",
+   false,
+   "orig"
+  ],
+  "set/del _CUSTOM_SEEDS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _DIM_GATE_DIMS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _DIM_GATE_TARGET": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _DIM_SEARCH": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _DIM_UNKNOWN_CONST": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _E2_SEEDS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _ELEMENTARY_SEEDS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _EXACT_PRIORITY_SWAPS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _EXTRAP_BAND": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _EXTRAP_PROBE_XS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _FAITHFUL_SWAPS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _GENERIC_BINARY_OPS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _GENERIC_BINARY_WEIGHTS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _GENERIC_CSV_MODE": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _GENERIC_UNARY_OPS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _GENERIC_UNARY_WEIGHTS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _LS_SCALE_ONLY": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _NEAR_BAND": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _NEAR_GUARD_SWAPS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _NEAR_PROBE_XS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _PARALLEL_BROKEN": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _PARALLEL_WARNED": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _PARAMETRIC_CACHE": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _POLISH_ADMITTED": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _POLISH_GRACE_S": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _PRED_CACHE": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SEEDS_UNDER_UNITS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SMALL_CV": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SMALL_ON": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SYRACUSE_FEAT_MAXS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SYRACUSE_FEAT_MINS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SYRACUSE_MODE": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SYRACUSE_X_RAW": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _SYRACUSE_Y_RAW": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _TIME_LIMIT_HIT": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _TOLERANT_N2": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _TOLERANT_REFIT": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _TOLERANT_SEEDS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _USE_LINEAR_SCALING": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _VAL_CANDS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _VAL_TRAIN_XS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _VAL_TRAIN_YS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _VAL_XS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _VAL_YS": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _build_near_probes": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _feature_usage_counter": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _fitness_cache": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _has_own_factor": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _lm_plan": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _make_binomial_seeds": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _make_elementary_seeds": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _make_power_law_seeds": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _make_tolerant_seeds": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del _refit_inner": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del evolve": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del evolve_island": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del np": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del time": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "set/del to_string": [
+   "s1",
+   "missing",
+   false,
+   "orig"
+  ],
+  "vars(core) has state names": []
+ },
+ "pytest": "8.4.2",
+ "python": "3.9.25"
+}

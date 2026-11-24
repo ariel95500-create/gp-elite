@@ -1,0 +1,19 @@
+engine 1.5.0
+0. a fit before anything: fit runs: X0 * X1
+A. after monkeypatch.delattr(core, 'evolve_island') and undo:
+   hasattr(core, 'evolve_island') = True
+   fit runs: X0 * X1
+engine 1.5.0
+0. a fit before anything: fit runs: X0 * X1
+B. after mock.patch.object(core, '_VAL_CANDS', [], create=True):
+   hasattr(core, '_VAL_CANDS') = False
+   fit fails: AttributeError: module 'gp_elite.state' has no attribute '_VAL_CANDS'
+engine 1.5.0
+0. a fit before anything: fit runs: X0 * X1
+C. after mock.patch('gp_elite.core._USE_LINEAR_SCALING', False, create=True):
+   hasattr(core, '_USE_LINEAR_SCALING') = False
+   fit runs: X0 * X1
+engine 1.5.0
+0. a fit before anything: fit runs: X0 * X1
+D. importlib.reload(gp_elite.core) after setting _TIME_LIMIT_HIT=True, _POLISH_ADMITTED=7:
+   _TIME_LIMIT_HIT = True ; _POLISH_ADMITTED = 7 ; FRAGMENT_LIB is a new object: False

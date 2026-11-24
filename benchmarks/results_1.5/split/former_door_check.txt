@@ -1,0 +1,4 @@
+Python 3.11.18 pytest 9.2.0 package of 6ba1356: 63 failed, 6 passed, 61 errors in 1.17s
+Python 3.11.18 pytest 9.2.0 package of eb2eac5: 69 passed in 0.76s
+Python 3.9.25 pytest 8.4.2 package of 6ba1356: 69 passed in 0.78s
+Python 3.9.25 pytest 8.4.2 package of eb2eac5: 69 passed in 0.77s
