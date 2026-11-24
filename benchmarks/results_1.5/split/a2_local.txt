@@ -1,0 +1,15 @@
+A2 on the machine, 24 November 2026, the engine in modules at 8b405b0 (the door of eb2eac5): the whole test suite, python -m pytest tests/ -q -p no:cacheprovider, from the root of the repository, each interpreter with gp-elite installed from the working tree.
+
+== Python 3.9.25: numpy 2.0.2 pytest 8.4.2
+.....................................................                    [100%]
+269 passed in 228.34s (0:03:48)
+== Python 3.14.6: numpy 2.5.4 pytest 9.1.1
+.....................................................                    [100%]
+269 passed in 175.19s (0:02:55)
+== Python 3.11.18: numpy 2.4.6 pytest 9.1.1
+.....................................................                    [100%]
+269 passed in 188.77s (0:03:08)
+
+== Python 3.11.18: numpy 2.4.6 pytest 9.2.0 (/venv15s): 269 passed (run at 04:44 UTC, before the door's test was strengthened; the test of the door alone, 69 passed, after)
+
+pytest 9.2 is the first version under which the former door failed (55 tests of 200 in the CI): under 9.1.1 the whole suite passed on the former door too, so the message of eb2eac5 should read 'since pytest 9.2', not 'since pytest 9'.
