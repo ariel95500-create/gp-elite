@@ -12,7 +12,11 @@ time, the date and the path and version of the engine.
     the console fixes no seed, so its other lines (the islands' prints, the
     statistics of the memory, the times) are not compared.
 
-    python compare_a1.py <dir of engine A> <dir of engine B>
+    python compare_a1.py <dir of engine A> <dir of engine B> [--short]
+
+With --short (the short version of A1, after each commit of the split):
+the 13 configurations and the records of F41 only; the TP diagnostic and
+the console are not compared.
 """
 import json
 import os
@@ -26,18 +30,19 @@ sys.path.insert(0, BENCH)
 EXCLUDE = {"time", "date", "engine_file", "engine_version"}
 
 
-def records(path, key):
+def records(path, key, keep=None):
     out = {}
     if os.path.exists(path):
         for line in open(path):
             if line.strip():
                 r = json.loads(line)
-                out[key(r)] = r
+                if keep is None or keep(r):
+                    out[key(r)] = r
     return out
 
 
-def compare_records(name, a, b, key):
-    ra, rb = records(a, key), records(b, key)
+def compare_records(name, a, b, key, keep=None):
+    ra, rb = records(a, key, keep), records(b, key, keep)
     if not ra and not rb:
         print("%-8s no records" % name)
         return True
@@ -73,15 +78,19 @@ def console_result(d):
     return lines, (open(best, encoding="utf-8").read() if os.path.exists(best) else None)
 
 
-def main(a, b):
+def main(a, b, short=False):
     import speed_equivalence as SE
     ok = True
     print("== the 13 configurations")
     ok &= SE.compare(os.path.join(a, "equiv"), os.path.join(b, "equiv"))
-    print("== the records")
+    print("== the records" + (" (short: F41 only)" if short else ""))
     ok &= compare_records("phase1", os.path.join(a, "phase1_defaults.jsonl"),
                           os.path.join(b, "phase1_defaults.jsonl"),
-                          lambda r: (r["kind"], r["problem"], r["split"], r["seed"]))
+                          lambda r: (r["kind"], r["problem"], r["split"], r["seed"]),
+                          (lambda r: r["kind"] == "feyn") if short else None)
+    if short:
+        print("ALL IDENTICAL" if ok else "DIFFERENCES")
+        return ok
     ok &= compare_records("tp", os.path.join(a, "tp.jsonl"), os.path.join(b, "tp.jsonl"),
                           lambda r: (r["arm"], r["exp"], r["n"], r["noise"], r["draw"]))
     ca, cb = console_result(a), console_result(b)
@@ -97,4 +106,5 @@ def main(a, b):
 
 
 if __name__ == "__main__":
-    sys.exit(0 if main(sys.argv[1], sys.argv[2]) else 1)
+    args = [x for x in sys.argv[1:] if x != "--short"]
+    sys.exit(0 if main(args[0], args[1], "--short" in sys.argv[1:]) else 1)
