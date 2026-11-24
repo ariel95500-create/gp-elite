@@ -7,7 +7,8 @@ Jusqu'à la 1.4.0, le moteur de GP_ELITE tenait dans un seul fichier,
 modules, chacun avec un rôle. Le découpage a changé l'organisation du code,
 et rien de ce qu'un utilisateur peut observer : à graine égale et travail
 égal, la 1.5 rend les modèles que rend la 1.4.0, au bit près, avec la même
-interface. Cette page est pour qui veut lire le moteur ou le modifier.
+interface, à la même vitesse (205 ajustements de F41 : 680,1 s contre
+678,2 s). Cette page est pour qui veut lire le moteur ou le modifier.
 
 ## Les modules
 
