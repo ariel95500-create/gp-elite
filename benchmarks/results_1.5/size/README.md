@@ -121,6 +121,22 @@ the budget, and the time to the first generation.
   without added variables, 35 with 5, and 30 with 10 or 20. The tolerant
   seed, tried when neither the binomial nor the elementary seed finder
   returns a seed, is placed in 15, 25, 30 and 55.
+- **Variables, why the seeds lose laws** (read after the run, in the
+  records and the code, deciding nothing): of the 50 laws the seeds lose
+  with 20 added variables, 40 were found without them by the binomial seed
+  finder and 10 by the elementary one (with 5 added: 10 and 5; with 10: 10
+  and 10). Both build a library of monomials of the columns (those of
+  constant sign, here nearly all), and both cap it by the number of
+  columns, to bound their time:
+  - the binomial finder tries monomials of three columns only up to six
+    columns, and gives up when its library passes 4,096 monomials, which
+    happens from 23 columns;
+  - the elementary finder tries monomials of three columns only up to
+    eight columns.
+
+  For example, the binomial finder returns I.34.1 with 3 and 13 columns
+  and nothing with 23; it returns I.27.6, whose form needs the monomial
+  `v1 / (v0 * v2)`, with 3 columns and nothing with 8.
 - **Variables, the formulas:** 12, 16 and 26 returned formulas use an added
   variable at T, and 10 at 10T. Four of them count as exact (two with 5
   added variables, two with 20 at 10T): long expressions that match the
