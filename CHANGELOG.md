@@ -4,33 +4,74 @@
 
 The engine in modules. Until 1.4.0 it was one file, `gp_elite/core.py`, of
 12,999 lines; it is now 17 modules, one per role, and the module of the
-shared state ([`docs/architecture.md`](docs/architecture.md)). Nothing a
-user can observe changes, as the plan required
-(`benchmarks/results_1.5/PLAN.md`). Measured on the package, side by side
-with 1.4.0 installed from PyPI (`benchmarks/results_1.5/release/`):
+shared state ([`docs/architecture.md`](docs/architecture.md)). At equal seed
+and equal work the models, the interface of `gp_elite` and the speed do not
+change, as the plan required (`benchmarks/results_1.5/PLAN.md`). Measured on
+the package, side by side with 1.4.0 installed from PyPI
+(`benchmarks/results_1.5/release/`):
 
-- the same models, field by field and to the bit, at equal seed and equal
-  work: the 13 reference configurations of `benchmarks/speed_equivalence.py`,
-  the 41 Feynman equations without noise, with their units and with 1 %
-  noise under the defaults of the API (615 fits), the TP diagnostic (400
-  fits) and the console;
+- the same models at equal seed and equal work: the 13 reference
+  configurations of `benchmarks/speed_equivalence.py`, compared whole (the
+  tree with its constants to the bit, the printed formula, the errors, the
+  size, `formula_exact`, the Pareto front); the 41 Feynman equations without
+  noise, with their units and with 1 % noise under the defaults of the API
+  (615 fits) and the TP diagnostic (400 fits), compared field by field on
+  their records, which keep the first 160 characters of each formula; and
+  the console, compared on the lines of its result and the formula it
+  writes;
 - the same speed: 205 fits of the 41 equations, the two versions run in
-  turn, take 694.7 s against 695.9 s;
+  turn, take 694.7 s against 695.9 s (the first candidate; the second is
+  being measured);
 - every name `gp_elite.core` had in 1.4.0 can still be read on it, and a
-  name set on it reaches the engine (`tests/test_door.py`, new), so that
-  scripts written for 1.4.0 work unchanged.
+  name set on it, or deleted and set again, reaches the engine
+  (`tests/test_door.py`, new); the tests of 1.4.0 pass unchanged.
 
-The 61 names that change while a fit runs live in `gp_elite/state.py`, and
-every function reads and sets them there when it runs. How the split was
-made and checked, move by move, is in `benchmarks/results_1.5/split/`.
+The 61 names of the shared state, 52 that change while a fit runs and 9
+switches that only the tests set, live in `gp_elite/state.py`, and every
+function reads and sets them there when it runs. How the split was made and
+checked, move by move, is in `benchmarks/results_1.5/split/`; a new test,
+`tests/test_layering.py`, checks that each module imports only the modules
+above it.
+
+What code that reaches inside `gp_elite.core` can see change (the second
+review of the release, `benchmarks/results_1.5/release/M5_review2.md`):
+- `gp_elite.core` is an instance of a subclass of the module type, and its
+  dictionary (`vars(gp_elite.core)`, `gp_elite.core.__dict__`) no longer
+  holds the names of the shared state: a value written there does not reach
+  the engine;
+- `unittest.mock.patch` with `create=True` deletes a name of the shared
+  state when it ends; pytest's `monkeypatch`, or `mock.patch` without
+  `create`, puts it back;
+- `importlib.reload(gp_elite.core)` no longer makes the engine afresh;
+- `from gp_elite.core import *` no longer gives the seven public names of
+  the shared state (`COGRAPH`, `CSV_FEATURE_NAMES`, `CSV_TARGET_NAME`,
+  `CURRENT_RESIDUAL_SIG`, `FRAGMENT_LIB`, `PROBE_X`, `SEQ_MEM`), and gives
+  `state`;
+- the functions and classes belong to the modules where they now live: a
+  model saved with pickle by 1.5 does not load in 1.4.0 (1.5 loads those of
+  1.4.0), `help(gp_elite.core)` lists none of them, and tracebacks name the
+  new files; the warning given to a script without the
+  `if __name__ == "__main__":` guard comes from `gp_elite/search.py`, so a
+  filter on the module `gp_elite.core` no longer silences it;
+- `core.py` no longer runs as a plain script (`python gp_elite/core.py`),
+  and the files of the package no longer work as loose modules in a folder;
+  `gp-elite`, `python -m gp_elite` and `python -m gp_elite.core` work as
+  before;
+- `typing.get_type_hints` fails on four functions whose annotations name a
+  class of a module that comes after theirs (`_detect_dominant_op`, and
+  `build_stigmergic_tree` in its three versions), and
+  `gp_elite.core.__annotations__` is empty;
+- `import gp_elite` takes 0.102 s against 0.093 s for 1.4.0 (median of 20,
+  the first candidate).
 
 What size costs, measured on 1.4.0 (`benchmarks/results_1.5/size/`): up to
-100,000 rows, little, and mostly time (154 exact laws of 205 at 100,000 rows
-against 165 at 100, and ten times the time gives back 6 of the 11); twenty
-variables that play no part in the law, much, and mostly the algorithm (108
-exact laws against 168, and ten times the time gives back 12): the seed
-finders limit their combinations of columns as the columns grow. See point 9
-of the limits.
+100,000 rows, 11 exact laws of 205 (154 at 100,000 rows against 165 at 100),
+mostly a matter of time by the rule written before the measurement, by a
+margin of one fit, and ten times the time brings back 6 of the 12 fits lost;
+twenty variables that play no part in the law, 60 (108 exact laws against
+168), mostly a matter of the algorithm: ten times the time gives 120, and
+the seed finders limit their combinations of columns as the columns grow.
+See point 9 of the limits.
 
 ## 1.4.0 — "Signal"
 
