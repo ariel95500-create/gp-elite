@@ -376,6 +376,7 @@ GP_ELITE.py  —  Genetic Programming symbolique haute performance
 """
 
 from __future__ import annotations
+from . import state
 import bisect
 import math
 import struct
@@ -596,10 +597,10 @@ class FragmentLibrary:
             if h not in self.fragments:
                 op = node.value if isinstance(node.value, str) else "const"
                 # [v17] Calcul de la signature sémantique au premier dépôt
-                sig = compute_semantic_sig(node, PROBE_X)
+                sig = compute_semantic_sig(node, state.PROBE_X)
                 # Bonus δ si le fragment corrige le résidu courant
-                if sig is not None and CURRENT_RESIDUAL_SIG is not None:
-                    sem = semantic_score(sig, CURRENT_RESIDUAL_SIG)
+                if sig is not None and state.CURRENT_RESIDUAL_SIG is not None:
+                    sem = semantic_score(sig, state.CURRENT_RESIDUAL_SIG)
                     if sem > 0.5:
                         delta *= 1.5   # [v17] bonus dépôt sémantique Phase 8
                 self.fragments[h] = FragmentEntry(
@@ -622,7 +623,7 @@ class FragmentLibrary:
                     e.best_fitness = fitness
                 # [v17] Rafraîchir la signature si absente (fragment ancien)
                 if e.semantic_signature is None:
-                    e.semantic_signature = compute_semantic_sig(e.node, PROBE_X)
+                    e.semantic_signature = compute_semantic_sig(e.node, state.PROBE_X)
 
     def deposit_population(self, population: List[Node],
                            fitnesses: List[float],
@@ -748,7 +749,7 @@ class FragmentLibrary:
         en une seule passe matricielle plutôt que N appels séquentiels.
         [v0.8] Table de tirage réutilisée dans une fenêtre begin_sampling().
         """
-        res_sig = CURRENT_RESIDUAL_SIG
+        res_sig = state.CURRENT_RESIDUAL_SIG
         cache = getattr(self, "_sampling", None)
         if cache is not None:
             key = (min_size, max_size, root_op)
@@ -843,7 +844,7 @@ class FragmentLibrary:
 
 
 # Instance globale partagée entre toutes les îles
-FRAGMENT_LIB = FragmentLibrary()
+state.FRAGMENT_LIB = FragmentLibrary()
 
 
 # ============================================================
@@ -870,11 +871,9 @@ FRAGMENT_LIB = FragmentLibrary()
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Points de sonde fixes — mis à jour par init_probe_set() à chaque run
-PROBE_X: np.ndarray = np.zeros((20, 4))
 
 # Résidu du meilleur individu courant projeté sur PROBE_X
 # Mis à jour dans evolve_island() après chaque amélioration du best
-CURRENT_RESIDUAL_SIG: Optional[np.ndarray] = None
 
 
 def init_probe_set(cfg: "Config", n_probe: int = 30) -> np.ndarray:
@@ -1269,7 +1268,7 @@ class FragmentCoGraph:
 
 
 # Instance globale partagée entre toutes les îles
-COGRAPH = FragmentCoGraph()
+state.COGRAPH = FragmentCoGraph()
 
 
 # ============================================================
@@ -1735,15 +1734,12 @@ class FragmentSequenceMemory:
 
 
 # Instance globale
-SEQ_MEM = FragmentSequenceMemory()
+state.SEQ_MEM = FragmentSequenceMemory()
 
 # ============================================================
 # CONFIGURATION GLOBALE
 # ============================================================
 
-_DIM_SEARCH = None
-_DIM_GATE_DIMS = None       # [v0.4] miroir de cfg.FEAT_DIMS pour _track_val_candidate
-_DIM_GATE_TARGET = None
 # [v0.4.1] Linear scaling PUREMENT multiplicatif (regression par l'origine).
 # Actif en mode dimensionnel : voir _linear_scale_params.
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1808,21 +1804,18 @@ class _RunTrace:
 
 TRACE = _RunTrace()
 
-_LS_SCALE_ONLY = False
 # [v0.5] Mode « constante mystere » : la constante multiplicative de tete peut
 # PORTER une dimension, deduite par homogeneite (cible / dimension de l'arbre).
 # Leve la limite « constantes sans dimension » de la v0.4.
-_DIM_UNKNOWN_CONST = False
 
 
 def _ds():
     """[v0.4] Import paresseux de dim_search (évite l'import circulaire :
     dim_search importe core.Node)."""
-    global _DIM_SEARCH
-    if _DIM_SEARCH is None:
+    if state._DIM_SEARCH is None:
         from . import dim_search as _m
-        _DIM_SEARCH = _m
-    return _DIM_SEARCH
+        state._DIM_SEARCH = _m
+    return state._DIM_SEARCH
 
 
 def _dim_active(cfg):
@@ -2107,15 +2100,8 @@ _GENCSV_POOLS = {
                  ["sq", "cos", "sin", "neg"],           [4, 3, 3, 1]),
 }
 
-_GENERIC_CSV_MODE: bool       = False
-_GENERIC_BINARY_OPS: list     = ["+", "-", "*", "/", "pow"]
-_GENERIC_BINARY_WEIGHTS: list = [4, 4, 5, 2, 3]
-_GENERIC_UNARY_OPS: list      = ["exp", "log", "sqrt", "tanh", "sq", "neg", "abs"]
-_GENERIC_UNARY_WEIGHTS: list  = [4, 3, 3, 2, 3, 1, 2]
 
 # Noms réels des colonnes (pour affichage des formules : X[0] → "temperature")
-CSV_FEATURE_NAMES: list = []
-CSV_TARGET_NAME: str    = "y"
 
 # [SYRACUSE] Pool algébrique pour la conjecture de Collatz ────────────────────
 # Opérateurs retenus : ceux utiles à modéliser des croissances irrégulières,
@@ -2136,10 +2122,8 @@ _SYRACUSE_UNARY_WEIGHTS  = [1,     3,     2,      1,     2,     3,    2,      5,
 #                            cos   log    sqrt    abs    neg    sq    cube    is_even     step
 
 # Flag global activé par generate_syracuse_dataset() → tous les pools basculent
-_SYRACUSE_MODE: bool = False
 
 # Flag global activé par load_custom_csv() → tous les pools basculent
-_BATTERY_CSV_MODE: bool = False
 
 def _get_ops_for_role(role: str):
     """Retourne (binary_ops, binary_weights, unary_ops, unary_weights) selon le rôle.
@@ -2149,18 +2133,18 @@ def _get_ops_for_role(role: str):
     En mode CSV batterie (_BATTERY_CSV_MODE=True), pool physique batterie.
     """
     # [SYRACUSE] pool Collatz prioritaire sur tous les rôles
-    if _SYRACUSE_MODE:
+    if state._SYRACUSE_MODE:
         if role == "cleaner":
             return (_CLEANER_BINARY_OPS, _CLEANER_BINARY_WEIGHTS,
                     _CLEANER_UNARY_OPS,  _CLEANER_UNARY_WEIGHTS)
         return (_SYRACUSE_BINARY_OPS, _SYRACUSE_BINARY_WEIGHTS,
                 _SYRACUSE_UNARY_OPS,  _SYRACUSE_UNARY_WEIGHTS)
     # [v22-CSV] pool générique prioritaire (choisi par l'utilisateur)
-    if _GENERIC_CSV_MODE:
-        return (_GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS,
-                _GENERIC_UNARY_OPS,  _GENERIC_UNARY_WEIGHTS)
+    if state._GENERIC_CSV_MODE:
+        return (state._GENERIC_BINARY_OPS, state._GENERIC_BINARY_WEIGHTS,
+                state._GENERIC_UNARY_OPS,  state._GENERIC_UNARY_WEIGHTS)
     # [v16-BATTERY CSV] pool physique prioritaire sur tous les rôles
-    if _BATTERY_CSV_MODE:
+    if state._BATTERY_CSV_MODE:
         return (_BATTERY_BINARY_OPS, _BATTERY_BINARY_WEIGHTS,
                 _BATTERY_UNARY_OPS,  _BATTERY_UNARY_WEIGHTS)
     if role == "cleaner":
@@ -2185,13 +2169,13 @@ def _active_pools():
     Syracuse ; sin/cos/tan en mode batterie) ne s'infiltre dans la population
     via un tirage random non supervisé.
     """
-    if _GENERIC_CSV_MODE:
-        b_ops, b_w = _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS
-        u_ops, u_w = _GENERIC_UNARY_OPS,  _GENERIC_UNARY_WEIGHTS
-    elif _SYRACUSE_MODE:
+    if state._GENERIC_CSV_MODE:
+        b_ops, b_w = state._GENERIC_BINARY_OPS, state._GENERIC_BINARY_WEIGHTS
+        u_ops, u_w = state._GENERIC_UNARY_OPS,  state._GENERIC_UNARY_WEIGHTS
+    elif state._SYRACUSE_MODE:
         b_ops, b_w = _SYRACUSE_BINARY_OPS, _SYRACUSE_BINARY_WEIGHTS
         u_ops, u_w = _SYRACUSE_UNARY_OPS,  _SYRACUSE_UNARY_WEIGHTS
-    elif _BATTERY_CSV_MODE:
+    elif state._BATTERY_CSV_MODE:
         b_ops, b_w = _BATTERY_BINARY_OPS, _BATTERY_BINARY_WEIGHTS
         u_ops, u_w = _BATTERY_UNARY_OPS,  _BATTERY_UNARY_WEIGHTS
     else:
@@ -2438,12 +2422,12 @@ def to_string(node) -> str:
     if isinstance(v, float):
         return str(round(v, 6))
     # [v22-CSV] X[i] → nom réel de la colonne (ex: X[0] → "temperature")
-    if (_GENERIC_CSV_MODE and CSV_FEATURE_NAMES and
+    if (state._GENERIC_CSV_MODE and state.CSV_FEATURE_NAMES and
             isinstance(v, str) and v.startswith("X[") and v.endswith("]")):
         try:
             idx = int(v[2:-1])
-            if 0 <= idx < len(CSV_FEATURE_NAMES):
-                return CSV_FEATURE_NAMES[idx]
+            if 0 <= idx < len(state.CSV_FEATURE_NAMES):
+                return state.CSV_FEATURE_NAMES[idx]
         except (ValueError, IndexError):
             pass
     # "x" (1-D) ou "X[i]" (N-D) : retourné tel quel
@@ -2875,7 +2859,6 @@ def _np_min2(a, b):
 # COMPILATEUR ARBRE → FONCTION NUMPY
 # ============================================================
 
-_COMPILE_CACHE: Dict[int, Any] = {}
 _COMPILE_CACHE_MAX = 4096   # entrées max — élagage FIFO au-delà
 
 _NP_GLOBALS = {
@@ -3045,7 +3028,6 @@ def _to_np_code_parametric(node, const_list: list) -> str:
     return _code(node)
 
 
-_PARAMETRIC_CACHE: Dict[int, Any] = {}
 _PARAMETRIC_CACHE_MAX = 2048
 
 
@@ -3270,7 +3252,7 @@ def compile_parametric(node) -> Tuple[Any, list]:
 
     h = node.structural_hash()
     # Vérifier si le cache a une fonction avec le bon nombre de constantes
-    cached = _PARAMETRIC_CACHE.get(h)
+    cached = state._PARAMETRIC_CACHE.get(h)
     if cached is not None and cached[1] == n_consts:
         return cached[0], consts
 
@@ -3284,10 +3266,10 @@ def compile_parametric(node) -> Tuple[Any, list]:
         fn = None
 
     if fn is not None:
-        _PARAMETRIC_CACHE[h] = (fn, n_consts)
-        if len(_PARAMETRIC_CACHE) > _PARAMETRIC_CACHE_MAX:
-            for old_key in list(_PARAMETRIC_CACHE.keys())[:256]:
-                del _PARAMETRIC_CACHE[old_key]
+        state._PARAMETRIC_CACHE[h] = (fn, n_consts)
+        if len(state._PARAMETRIC_CACHE) > _PARAMETRIC_CACHE_MAX:
+            for old_key in list(state._PARAMETRIC_CACHE.keys())[:256]:
+                del state._PARAMETRIC_CACHE[old_key]
 
     return fn, consts
 
@@ -3301,8 +3283,8 @@ def compile_to_numpy(node):
     ne peuvent pas partager une fonction.
     """
     h = node.exact_hash()
-    if h in _COMPILE_CACHE:
-        return _COMPILE_CACHE[h]
+    if h in state._COMPILE_CACHE:
+        return state._COMPILE_CACHE[h]
     code = _to_np_code(node)
     src  = f"def _f(_x):\n    return {code}\n"
     globs = dict(_NP_GLOBALS)
@@ -3311,12 +3293,12 @@ def compile_to_numpy(node):
         fn = globs["_f"]
     except Exception:
         fn = lambda _x, _n=node: np.array([evaluate(_n, float(xi)) for xi in _x])
-    _COMPILE_CACHE[h] = fn
-    if len(_COMPILE_CACHE) > _COMPILE_CACHE_MAX:
+    state._COMPILE_CACHE[h] = fn
+    if len(state._COMPILE_CACHE) > _COMPILE_CACHE_MAX:
         # Évacuation FIFO ultra-rapide tirant parti de l'ordre d'insertion natif
         for _ in range(512):
-            if _COMPILE_CACHE:
-                _COMPILE_CACHE.pop(next(iter(_COMPILE_CACHE)))
+            if state._COMPILE_CACHE:
+                state._COMPILE_CACHE.pop(next(iter(state._COMPILE_CACHE)))
     return fn
 
 # ============================================================
@@ -3461,7 +3443,7 @@ def evaluate_vector(node, xs) -> np.ndarray:
     La fonction compilée reçoit _x tel quel ; _to_np_code génère le bon indexage.
     """
     h = node.exact_hash()
-    fn = _COMPILE_CACHE.get(h)
+    fn = state._COMPILE_CACHE.get(h)
     if fn is None:
         k = _EVAL_COUNTS.get(h, 0) + 1
         if k >= _COMPILE_AFTER:
@@ -3576,10 +3558,6 @@ _HOT_ZONES: Dict[str, List[float]] = {
 # et l'évaluation finale en unités naturelles (nb d'étapes).
 # ─────────────────────────────────────────────────────────────────────────────
 
-_SYRACUSE_Y_RAW:     np.ndarray = np.array([])  # cible brute avant normalisation
-_SYRACUSE_X_RAW:     np.ndarray = np.array([])  # entiers bruts avant feature-engineering
-_SYRACUSE_FEAT_MINS: np.ndarray = np.array([])  # min de chaque feature (pour dénorm)
-_SYRACUSE_FEAT_MAXS: np.ndarray = np.array([])  # max de chaque feature (pour dénorm)
 
 # Noms humains des 4 features — utilisés dans les logs et la vérification finale
 def _max_height_ratio(n: int, cap: int = 300) -> float:
@@ -3777,8 +3755,6 @@ def generate_syracuse_dataset(n_start: int = 2,
     · Stocke _SYRACUSE_FEAT_MINS/_MAXS pour la dénormalisation finale
     · Enregistre les hot zones dans _HOT_ZONES["SYRACUSE"] sur les 4 features
     """
-    global _SYRACUSE_MODE, _SYRACUSE_Y_RAW, _SYRACUSE_X_RAW
-    global _SYRACUSE_FEAT_MINS, _SYRACUSE_FEAT_MAXS
 
     # ── 1. Calcul des temps de vol ────────────────────────────────────────
     ns      = np.arange(n_start, n_end + 1, dtype=np.int64)
@@ -3786,8 +3762,8 @@ def generate_syracuse_dataset(n_start: int = 2,
     flights = np.array([_collatz_flight_time(int(n)) for n in ns],
                        dtype=np.float64)
 
-    _SYRACUSE_X_RAW = ns_f.copy()
-    _SYRACUSE_Y_RAW = flights.copy()
+    state._SYRACUSE_X_RAW = ns_f.copy()
+    state._SYRACUSE_Y_RAW = flights.copy()
     n_samples = len(ns)
 
     # ── 2. Construction des 5 features ───────────────────────────────────
@@ -3840,8 +3816,8 @@ def generate_syracuse_dataset(n_start: int = 2,
     # ── 3. Normalisation indépendante par feature → [-2.0, 2.0] ──────────
     raw_features = [feat_log2, feat_v2, feat_mhr, feat_mod4_1, feat_inter, feat_lmh2,
                     feat_traj14, feat_traj21, feat_traj28, feat_traj30]
-    _SYRACUSE_FEAT_MINS = np.array([f.min() for f in raw_features])
-    _SYRACUSE_FEAT_MAXS = np.array([f.max() for f in raw_features])
+    state._SYRACUSE_FEAT_MINS = np.array([f.min() for f in raw_features])
+    state._SYRACUSE_FEAT_MAXS = np.array([f.max() for f in raw_features])
 
     X_scaled = np.column_stack([_scale_feature(f) for f in raw_features])
     # (n_samples, 10)
@@ -3867,7 +3843,7 @@ def generate_syracuse_dataset(n_start: int = 2,
     _HOT_ZONES["SYRACUSE"] = hot_zones if hot_zones else [0.0, 1.0, -1.0, 1.5, -1.5]
 
     # ── 6. Activation du mode Syracuse ───────────────────────────────────
-    _SYRACUSE_MODE = True
+    state._SYRACUSE_MODE = True
 
     # ── 7. Logs de démarrage ──────────────────────────────────────────────
     lmh2_max  = float(feat_lmh2.max())
@@ -3987,7 +3963,6 @@ def build_dataset(func, cfg: Config,
 # FITNESS & CACHE GLOBAL
 # ============================================================
 
-_fitness_cache: Dict[int, float] = {}
 
 # ── OBJECTIF 1 : Fitness Hybride ────────────────────────────────────────────
 # Remplace le MSE pur par une métrique composite Corrélation de Pearson + MSE
@@ -4024,7 +3999,6 @@ def _pearson_r(preds: np.ndarray, ys_np: np.ndarray) -> float:
 
 # [OPT] Cache de prédictions par hash structurel — partagé par raw_mse,
 # _pure_mse et raw_pearson_r (élimine 2-3x les évaluations redondantes).
-_PRED_CACHE: dict = {}
 _PRED_CACHE_MAX = 8192
 
 def _predict_cached(node, xs_np):
@@ -4039,15 +4013,15 @@ def _predict_cached(node, xs_np):
     # l'imposait : l'entrée garde désormais une référence faible au tableau
     # et n'est servie que pour lui.
     h = (node.exact_hash(), id(xs_np), xs_np.shape[0])   # [v0.7] exact
-    e = _PRED_CACHE.get(h)
+    e = state._PRED_CACHE.get(h)
     if e is not None and e[0]() is xs_np:
         return e[1]
     preds = evaluate_vector(node, xs_np)
-    _PRED_CACHE[h] = (weakref.ref(xs_np), preds)
-    if len(_PRED_CACHE) > _PRED_CACHE_MAX:
+    state._PRED_CACHE[h] = (weakref.ref(xs_np), preds)
+    if len(state._PRED_CACHE) > _PRED_CACHE_MAX:
         for _ in range(1024):
-            if _PRED_CACHE:
-                _PRED_CACHE.pop(next(iter(_PRED_CACHE)))
+            if state._PRED_CACHE:
+                state._PRED_CACHE.pop(next(iter(state._PRED_CACHE)))
     return preds
 
 # ════════════════════════════════════════════════════════════════
@@ -4060,14 +4034,12 @@ def _predict_cached(node, xs_np):
 # il ne cherche que la FORME de la fonction. C'est la technique au
 # meilleur ratio gain/coût de toute la littérature GP — standard
 # dans Operon, PySR, et tous les moteurs SRBench de tête.
-_USE_LINEAR_SCALING: bool = True   # synchronisé sur cfg dans evolve()
 
 # [CUSTOM-LOSS] Fonction de coût personnalisée optionnelle.
 # Signature : loss_fn(predictions: np.ndarray, X: np.ndarray, y: np.ndarray) -> float
 # Si None → comportement par default (MSE/corrélation hybride supervisé).
 # Si fournie → REMPLACE entièrement le calcul d'erreur, et le linear scaling
 # est ignoré (il suppose le MSE supervisé). Une valeur basse = meilleur.
-_CUSTOM_LOSS_FN = None
 
 # [CUSTOM-SEEDS] Liste optionnelle d'arbres Node injectés dans la population
 # initiale (un par île, round-robin). Sert à amorcer la recherche avec des
@@ -4097,7 +4069,6 @@ def _safe_write(filepath, writer, what="file"):
     return None
 
 
-_CUSTOM_SEEDS = None
 
 # ════════════════════════════════════════════════════════════════
 # [v28-MOTIFS] SEEDING DE MOTIFS DE COMPOSITION
@@ -4115,7 +4086,7 @@ def _make_motif_seeds(cfg, n_max: int = 32) -> list:
     terms = list(getattr(cfg, "TERMINALS", []) or [])
     if not terms:
         return []
-    uops = set(globals().get("_GENERIC_UNARY_OPS", []) or [])
+    uops = set(getattr(state, '_GENERIC_UNARY_OPS', []) or [])
     rng = random.Random((getattr(cfg, "SEED", 0) or 0) ^ 0x0F1F2F)
     T = lambda: Node(rng.choice(terms))
     def T2():                                   # deux terminaux distincts si possible
@@ -4197,12 +4168,11 @@ _POWER_LAW_MIN_R2 = 0.999    # part de la variance de log|y| que le monôme doit
 # neuves ; structure sous bruit 79 -> 113 (1 %) et 80 -> 99 (10 %) ; chaque
 # modèle rendu passe l'audit des unités ; données réelles sous unités
 # inchangées. Actif par défaut depuis son adoption.
-_SEEDS_UNDER_UNITS = True
 
 
 def _seeds_blocked_by_units(cfg) -> bool:
     """Vrai quand units= est actif et que U1 est coupé (comportement 1.0)."""
-    return _dim_active(cfg) and not _SEEDS_UNDER_UNITS
+    return _dim_active(cfg) and not state._SEEDS_UNDER_UNITS
 
 
 def _typed_seeds(seeds: list, cfg) -> list:
@@ -4331,7 +4301,7 @@ def _make_power_law_seeds(xs, ys, cfg, min_r2=None, weighted=False) -> list:
     remplace _POWER_LAW_MIN_R2 (graines tolérantes au bruit, phase 5).
     [1.4-N2] weighted : la seconde passe de ces graines
     (_power_law_exponents_w)."""
-    if not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
+    if not state._GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) \
             or not bool(getattr(cfg, "POWER_LAW_SEEDS", True)):
         return []
@@ -4351,8 +4321,8 @@ def _make_power_law_seeds(xs, ys, cfg, min_r2=None, weighted=False) -> list:
     if fit is None:
         return []
     cols, expo = fit
-    bops = set(_GENERIC_BINARY_OPS)
-    uops = set(_GENERIC_UNARY_OPS)
+    bops = set(state._GENERIC_BINARY_OPS)
+    uops = set(state._GENERIC_UNARY_OPS)
     seeds = []
 
     # 1) exposants arrondis au demi-entier le plus proche
@@ -4426,7 +4396,6 @@ def _make_power_law_seeds(xs, ys, cfg, min_r2=None, weighted=False) -> list:
 # 0 -> 35 sur 90), puis 86 -> 126 sur des graines neuves ; données réelles
 # inchangées (aucune graine injectée sur les 260 ajustements réels).
 
-_BINOMIAL_SEEDS = True
 _BINOM_EXPS = (-2, -1, 1, 2)          # exposants des colonnes dans g
 _BINOM_TOL = 1e-12                    # variance résiduelle de log t, relative
 _POWER_TOL = 1e-12                    # celle qui reconnaît une loi de puissance
@@ -4638,7 +4607,7 @@ def _make_binomial_seeds(xs, ys, cfg, tol=None, weighted=False) -> list:
     """[0.10, phase 4b] Voir le commentaire ci-dessus. Rend 0 à 4 arbres.
     Le drapeau _BINOMIAL_SEEDS (actif par défaut) les coupe. [1.4-N2]
     weighted : la seconde passe des graines tolérantes au bruit."""
-    if not _BINOMIAL_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
+    if not state._BINOMIAL_SEEDS or not state._GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
     terms = list(getattr(cfg, "TERMINALS", []) or [])
@@ -4655,8 +4624,8 @@ def _make_binomial_seeds(xs, ys, cfg, tol=None, weighted=False) -> list:
     t0 = time.time()
     forms = _binomial_forms(X, y, tol=tol, weighted=weighted)
     TRACE.set("binomial_seed_s", round(time.time() - t0, 3))
-    bops = set(_GENERIC_BINARY_OPS)
-    uops = set(_GENERIC_UNARY_OPS)
+    bops = set(state._GENERIC_BINARY_OPS)
+    uops = set(state._GENERIC_UNARY_OPS)
     if not {"+", "*", "/"} <= bops:
         return []
     seeds = []
@@ -4701,7 +4670,6 @@ def _make_binomial_seeds(xs, ys, cfg, tol=None, weighted=False) -> list:
 # 126 -> 155 sur des graines neuves ; données réelles inchangées (aucune
 # graine injectée sur les 520 ajustements réels, pool par défaut et "trig").
 
-_ELEMENTARY_SEEDS = True
 _ELEM_MAX_LIB = 4096                  # monômes f (ou g trigonométriques) au plus
 _ELEM_S_GRID = np.linspace(-6.0, 3.0, 37)
 _ELEM_W_GRID = np.linspace(0.05, 40.0, 800)
@@ -5238,7 +5206,6 @@ def _elem_trig_forms(X, y, cols, tol=_BINOM_TOL, weighted=False,
 # rendue : elle imiterait une droite. Non adoptée par sa campagne
 # (benchmarks/results_1.4/e2/campaign/README.md) : éteinte, son code gardé
 # pour la décision de l'auteur.
-_E2_SEEDS = False
 _E2_C_GRID = np.concatenate([-np.geomspace(50.0, 0.01, 40), np.geomspace(0.01, 50.0, 40)])
 _E2_GATE = 0.05                       # résidu de grille sous lequel on affine
 _E2_CURVE = 0.5                       # |c|·étendue de g au moins : l'exponentielle
@@ -5406,7 +5373,7 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None, weighted=False,
     """[0.10, phase 4a] Voir le commentaire ci-dessus. Rend 0 à 5 arbres.
     Le drapeau _ELEMENTARY_SEEDS (actif par défaut) les coupe. [1.4-N2]
     weighted, scan : voir _elementary_forms (graines tolérantes au bruit)."""
-    if not _ELEMENTARY_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
+    if not state._ELEMENTARY_SEEDS or not state._GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
     terms = list(getattr(cfg, "TERMINALS", []) or [])
@@ -5420,15 +5387,15 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None, weighted=False,
     if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0] \
             or X.shape[1] != len(terms):
         return []
-    bops = set(_GENERIC_BINARY_OPS)
-    uops = set(_GENERIC_UNARY_OPS)
+    bops = set(state._GENERIC_BINARY_OPS)
+    uops = set(state._GENERIC_UNARY_OPS)
     if not {"+", "*", "/"} <= bops:
         return []
     kinds = [k for k, need in (("exp", {"exp"}), ("log", {"log"}),
                                ("tanh", {"tanh"}), ("sech", {"exp"}),
                                ("trig", {"sin", "cos"}),
                                ("arcsin", {"arcsin"})) if need <= uops]   # [1.3-A3]
-    if _E2_SEEDS and "exp" in uops:               # [1.4-E2]
+    if state._E2_SEEDS and "exp" in uops:               # [1.4-E2]
         kinds.append("aexp")
     if not kinds:
         return []
@@ -5502,7 +5469,6 @@ def _make_elementary_seeds(xs, ys, cfg, tol=None, weighted=False,
 # graine exacte ne couvre, une forme approchée peut détourner la recherche
 # (loi de Kepler normalisée par min-max, PLAN_PHASE5.md).
 
-_TOLERANT_SEEDS = True
 _TOLERANT_REL = 0.015
 
 # [1.4-N2] LES CHERCHEURS TOLÉRANTS VOIENT À TRAVERS LE BRUIT
@@ -5540,8 +5506,6 @@ _TOLERANT_REL = 0.015
 # chaque candidat garde les constantes de son chercheur. N2b est adopté et
 # gardé (campagne et confirmation, 13 novembre 2026, benchmarks/
 # results_1.4/n2b/campaign/README.md) : il fait partie de la 1.4.
-_TOLERANT_N2 = True
-_TOLERANT_REFIT = False
 _TOLERANT_MAX = 12
 
 
@@ -5594,9 +5558,9 @@ def _refit_inner(tree, X, y, cfg):
     de mise à l'échelle linéaire (perte personnalisée) : le score des
     graines et l'ajustement ne jugeraient pas la même forme. [1.4-N2b]
     L'arbre d'entrée aussi sans _TOLERANT_REFIT."""
-    if not _TOLERANT_REFIT:
+    if not state._TOLERANT_REFIT:
         return tree
-    if not (_USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None):
+    if not (state._USE_LINEAR_SCALING and state._CUSTOM_LOSS_FN is None):
         return tree
     try:
         with np.errstate(all="ignore"):
@@ -5611,7 +5575,7 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
     ni B1 ni E1 n'ont placé de graine ; sans la loi de puissance si ses
     graines exactes ont déjà été placées (power_done). Le drapeau
     _TOLERANT_SEEDS (actif par défaut) les coupe."""
-    if not _TOLERANT_SEEDS or not _GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
+    if not state._TOLERANT_SEEDS or not state._GENERIC_CSV_MODE or _seeds_blocked_by_units(cfg) \
             or bool(getattr(cfg, "EXTRAPOLATION_MODE", False)):
         return []
     try:
@@ -5639,7 +5603,7 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
         except Exception:
             pass
     n_first = len(cands)                          # [1.4-N2] ceux d'avant
-    if _TOLERANT_N2:
+    if state._TOLERANT_N2:
         more = [(_make_elementary_seeds, dict(tol=1.0, scan=True)),
                 (_make_binomial_seeds, dict(tol=1.0, weighted=True)),
                 (_make_elementary_seeds, dict(tol=1.0, weighted=True)),
@@ -5656,10 +5620,10 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
             TRACE.value.pop(k, None)
         else:
             TRACE.set(k, v)
-    if not _TOLERANT_N2:                          # 1.3.0
+    if not state._TOLERANT_N2:                          # 1.3.0
         scored = sorted(((_seed_rel_error(t, X, y), i, t) for i, t in enumerate(cands)),
                         key=lambda r: (r[0], r[1]))
-        if _SMALL_ON:                             # [1.4-S1] les formes de famille
+        if state._SMALL_ON:                             # [1.4-S1] les formes de famille
             return _small_family(scored, cfg, t0)
         seeds = _typed_seeds([t for r, _, t in scored if r <= _TOLERANT_REL], cfg)
         TRACE.set("tolerant_seed_s", round(time.time() - t0, 3))
@@ -5680,7 +5644,7 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
     # [1.4-N2b] sans ajustement des constantes, une forme que donnent les
     # chercheurs d'avant garde leur arbre, constantes comprises : N2b ne fait
     # qu'ajouter des formes aux graines de 1.3.0
-    order = scored if _TOLERANT_REFIT else sorted(
+    order = scored if state._TOLERANT_REFIT else sorted(
         scored, key=lambda r: (r[1] >= n_first, r[0], r[1]))
     for r, i, t in order:
         h = t.canonical_hash()
@@ -5688,7 +5652,7 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
             first.add(h)
         if h not in forms:
             forms[h] = (r, i, t)
-    if _SMALL_ON:                                 # [1.4-S1] les formes de famille
+    if state._SMALL_ON:                                 # [1.4-S1] les formes de famille
         return _small_family(sorted(forms.values(), key=lambda r: (r[0], r[1])),
                              cfg, t0)
     within = sorted((v for v in forms.values() if v[0] <= _TOLERANT_REL),
@@ -5712,7 +5676,6 @@ def _make_tolerant_seeds(xs, ys, cfg, power_done: bool = False) -> list:
 # [CUSTOM-LOSS PARSIMONY] Poids de la pénalité de taille pour la loss custom
 # (0 = désactivé). Favorise les lois simples ; utile pour la découverte de
 # lois de conservation (sinon des arbres géants exploitent le bruit numérique).
-_CUSTOM_LOSS_PARSIMONY = 0.0
 
 def _linear_scale_params(preds: np.ndarray, ys_np: np.ndarray):
     """Coefficients OLS (a, b) de  y ≈ a + b·preds.  Retourne (a, b, ok).
@@ -5724,7 +5687,7 @@ def _linear_scale_params(preds: np.ndarray, ys_np: np.ndarray):
     forme scalee reste dimensionnellement saine — et surtout MATERIALISABLE
     dans l'arbre livre, ce que l'offset interdisait.
     """
-    if _LS_SCALE_ONLY:
+    if state._LS_SCALE_ONLY:
         if not np.all(np.isfinite(preds)) or float(np.max(np.abs(preds))) > 1e15:
             return 0.0, 1.0, False
         den = float(np.dot(preds, preds))
@@ -5808,7 +5771,7 @@ def raw_mse(node, xs, ys) -> float:
     # pénalité proportionnelle à la taille de l'arbre : rasoir d'Ockham qui
     # favorise les lois simples et neutralise les arbres-monstres exploitant
     # les imperfections numériques (crucial pour la découverte de lois).
-    if _CUSTOM_LOSS_FN is not None:
+    if state._CUSTOM_LOSS_FN is not None:
         try:
             with np.errstate(all='ignore'):
                 preds = _predict_cached(node, xs_np)
@@ -5818,17 +5781,17 @@ def raw_mse(node, xs, ys) -> float:
                 # même pour une loss robuste, et débloque la calibration des
                 # coefficients (sinon le GP peine à trouver la bonne droite).
                 # Désactivé par default (non-supervisé / invariants).
-                if globals().get("_CUSTOM_LOSS_USE_SCALING", False) and float(np.std(preds)) > 1e-9:
-                    if globals().get("_CUSTOM_LOSS_ROBUST", False):
+                if getattr(state, '_CUSTOM_LOSS_USE_SCALING', False) and float(np.std(preds)) > 1e-9:
+                    if getattr(state, '_CUSTOM_LOSS_ROBUST', False):
                         a_ls, b_ls, _ok = _robust_scale_params(preds, ys_np)
                     else:
                         a_ls, b_ls, _ok = _linear_scale_params(preds, ys_np)
                     if _ok:
                         preds = a_ls + b_ls * preds
-                val = float(_CUSTOM_LOSS_FN(preds, xs_np, ys_np))
+                val = float(state._CUSTOM_LOSS_FN(preds, xs_np, ys_np))
             if not math.isfinite(val):
                 return 1000.0
-            _pars = globals().get("_CUSTOM_LOSS_PARSIMONY", 0.0)
+            _pars = getattr(state, '_CUSTOM_LOSS_PARSIMONY', 0.0)
             if _pars > 0.0:
                 val += _pars * tree_size(node)
             return val
@@ -5850,13 +5813,13 @@ def raw_mse(node, xs, ys) -> float:
             # est meilleur que tout arbre non-constant à faible corrélation
             # (r≈0.1 → fitness≈5.4). Résultat : les îles restent bloquées sur des
             # constantes indéfiniment. +5.0 corrige ce biais structurel.
-            _const_penalty = 5.0 if _SYRACUSE_MODE else 2.0
+            _const_penalty = 5.0 if state._SYRACUSE_MODE else 2.0
             return mse + _const_penalty
 
         # [v18-LS] MSE calculé sur les prédictions scalées a + b·f(x).
         # b peut être négatif → une anti-corrélation parfaite devient une
         # solution parfaite : la perte de corrélation utilise |r|.
-        if _USE_LINEAR_SCALING:
+        if state._USE_LINEAR_SCALING:
             a_ls, b_ls, _ok = _linear_scale_params(preds, ys_np)
             if _ok:
                 with np.errstate(all='ignore'):
@@ -5915,7 +5878,7 @@ def _pure_mse(node, xs, ys) -> float:
         if float(np.std(preds)) < 1e-6:
             return float(np.mean((preds - ys_np) ** 2)) + 1000.0
         # [v18-LS] Le BIC juge la forme optimalement scalée (cohérent avec raw_mse)
-        if _USE_LINEAR_SCALING:
+        if state._USE_LINEAR_SCALING:
             a_ls, b_ls, _ok = _linear_scale_params(preds, ys_np)
             if _ok:
                 preds = a_ls + b_ls * preds
@@ -5991,8 +5954,8 @@ def wrap_linear_scaling(node, xs, ys):
     # (IRLS) dans l'arbre final même si le linear scaling MSE est désactivé,
     # pour que l'expression retournée ait les bons coefficients (insensibles
     # aux outliers), pas ceux biaisés par le MSE.
-    _robust = globals().get("_CUSTOM_LOSS_ROBUST", False)
-    if not _USE_LINEAR_SCALING and not _robust:
+    _robust = getattr(state, '_CUSTOM_LOSS_ROBUST', False)
+    if not state._USE_LINEAR_SCALING and not _robust:
         return node.copy()
     xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
     ys_np = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
@@ -6014,7 +5977,7 @@ def wrap_linear_scaling(node, xs, ys):
                 mse_ls  = float(np.mean((a_ls + b_ls * preds - ys_np) ** 2))
                 if not math.isfinite(mse_ls) or mse_ls >= mse_raw - 1e-15:
                     return node.copy()
-        if _LS_SCALE_ONLY:
+        if state._LS_SCALE_ONLY:
             # [v0.4.1] Si l'arbre porte deja une constante multiplicative en
             # tete, on FUSIONNE au lieu d'empiler : sans cela le modele livre
             # gagne deux noeuds et une constante redondante (`b · (c · f(x))`),
@@ -6041,17 +6004,14 @@ def wrap_linear_scaling(node, xs, ys):
 # Réinitialisation à chaque run via reset_feature_usage().
 # Utilisé dans rand_term / random_terminal pour biaiser le tirage.
 
-_feature_usage_counter: List[int] = []   # initialisé par reset_feature_usage()
 
 def reset_feature_usage(n_features: int):
     """Réinitialise le compteur au début d'un run."""
-    global _feature_usage_counter
-    _feature_usage_counter = [1] * n_features   # 1 pour éviter div/0
+    state._feature_usage_counter = [1] * n_features   # 1 pour éviter div/0
 
 def record_feature_usage(node: "Node", terminals: List[str]):
     """Parcourt un arbre et incrémente les compteurs de features utilisées."""
-    global _feature_usage_counter
-    if not _feature_usage_counter:
+    if not state._feature_usage_counter:
         return
     stack = [node]
     while stack:
@@ -6060,8 +6020,8 @@ def record_feature_usage(node: "Node", terminals: List[str]):
             continue
         if isinstance(n.value, str) and n.value in terminals:
             idx = terminals.index(n.value)
-            if idx < len(_feature_usage_counter):
-                _feature_usage_counter[idx] += 1
+            if idx < len(state._feature_usage_counter):
+                state._feature_usage_counter[idx] += 1
         if n.left:  stack.append(n.left)
         if n.right: stack.append(n.right)
 
@@ -6071,10 +6031,10 @@ def get_feature_bias_weights(terminals: List[str]) -> List[float]:
     Retourne une liste de la même longueur que terminals.
     Normalisée autour de 1.0 pour ne pas modifier le taux de tirage global.
     """
-    if not _feature_usage_counter or len(_feature_usage_counter) < len(terminals):
+    if not state._feature_usage_counter or len(state._feature_usage_counter) < len(terminals):
         return [1.0] * len(terminals)
-    total = sum(_feature_usage_counter[:len(terminals)])
-    inv   = [total / (u + 1.0) for u in _feature_usage_counter[:len(terminals)]]
+    total = sum(state._feature_usage_counter[:len(terminals)])
+    inv   = [total / (u + 1.0) for u in state._feature_usage_counter[:len(terminals)]]
     s     = sum(inv)
     return [v / s * len(terminals) for v in inv]
 
@@ -6118,23 +6078,23 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
     # [OPT] Bucket générationnel : même individu → même fitness pendant 10 gens
     gen_bucket = getattr(cfg, '_gen_bucket', 0)
     key = (h, role, gen_bucket)
-    if key in _fitness_cache:
-        return _fitness_cache[key]
+    if key in state._fitness_cache:
+        return state._fitness_cache[key]
 
-    if role == "cleaner" and _CUSTOM_LOSS_FN is None:
+    if role == "cleaner" and state._CUSTOM_LOSS_FN is None:
         mse_pur      = _pure_mse(node, xs, ys)
         n            = len(ys)
         k, n_adj     = tree_complexity(node)
         # [v18-LS] Les 2 constantes de scaling + leurs opérateurs (+, *) ne sont
         # pas gratuits pour le rasoir d'Ockham : coût linéaire forfaitaire +4.
-        if _USE_LINEAR_SCALING:
+        if state._USE_LINEAR_SCALING:
             k += 4
         ln_n         = math.log(n)
         mse_safe     = max(mse_pur, 1e-15)
         score        = (n * math.log(mse_safe)
                         + k * ln_n
                         + _FLOAT_GAMMA * (n_adj ** 2) * ln_n)
-    elif _CUSTOM_LOSS_FN is not None:
+    elif state._CUSTOM_LOSS_FN is not None:
         # [CUSTOM-LOSS] Tous les rôles minimisent la loss custom (via raw_mse,
         # qui la court-circuite). On ajoute une légère pénalité de parcimonie
         # pour garder des expressions lisibles, comme pour les explorers.
@@ -6156,7 +6116,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
     # Casse le monopole de X[2] = log(max_h/n) observé systématiquement.
     # La pénalité décroît progressivement pour laisser le GP converger en fin de run
     # sans contraindre trop fortement les expressions finales.
-    if _SYRACUSE_MODE and hasattr(cfg, 'TERMINALS') and len(cfg.TERMINALS) > 1:
+    if state._SYRACUSE_MODE and hasattr(cfg, 'TERMINALS') and len(cfg.TERMINALS) > 1:
         n_feat = count_distinct_features(node, cfg.TERMINALS)
         if n_feat == 0:
             score += 5.0    # constante pure — pénalité forte et stable
@@ -6169,7 +6129,7 @@ def fitness(node, xs: List[float], ys: List[float], cfg: Config,
             else:
                 score += _mono_pen
 
-    _fitness_cache[key] = score
+    state._fitness_cache[key] = score
     return score
 
 # ============================================================
@@ -6186,7 +6146,7 @@ def random_terminal(cfg: Config) -> Node:
     """
     if random.random() < 0.55:
         # [FIX-E] En mode Syracuse, utiliser les poids d'usage inversés
-        if (_SYRACUSE_MODE and _feature_usage_counter
+        if (state._SYRACUSE_MODE and state._feature_usage_counter
                 and len(cfg.TERMINALS) > 1):
             weights = get_feature_bias_weights(cfg.TERMINALS)
             return Node(random.choices(cfg.TERMINALS, weights=weights)[0])
@@ -6458,8 +6418,8 @@ def optimize_constants_lm(node: Node,
     """
     child = node.copy()
     y  = np.asarray(ys, dtype=float)
-    _varpro = _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
-    _ls_scale_only = _LS_SCALE_ONLY
+    _varpro = state._USE_LINEAR_SCALING and state._CUSTOM_LOSS_FN is None
+    _ls_scale_only = state._LS_SCALE_ONLY
     _ym = float(y.mean())
     _yc = y - _ym
     _LM_NUM_CLIP = 1e150   # [v0.4] borne anti-overflow : au-dela, r@r ou J.T@J
@@ -6798,7 +6758,7 @@ class EpsilonLexicaseSelector:
                 preds = _predict_cached(ind, xs_np)
                 # [v18-LS] erreurs mesurées sur la forme scalée — cohérent
                 # avec raw_mse/_pure_mse qui jugent aussi la forme scalée.
-                if _USE_LINEAR_SCALING and float(np.std(preds)) >= 1e-6:
+                if state._USE_LINEAR_SCALING and float(np.std(preds)) >= 1e-6:
                     a_ls, b_ls, _ok = _linear_scale_params(preds, ys_np)
                     if _ok:
                         preds = a_ls + b_ls * preds
@@ -7060,7 +7020,7 @@ def stigmergic_mutation(node: Node, cfg: Config) -> Node:
     tiré de la bibliothèque de phéromones.
     Si la bibliothèque est vide ou le tirage échoue → subtree_mutation classique.
     """
-    frag = FRAGMENT_LIB.sample(min_size=2, max_size=cfg.MAX_TREE_SIZE // 3)
+    frag = state.FRAGMENT_LIB.sample(min_size=2, max_size=cfg.MAX_TREE_SIZE // 3)
     if frag is None:
         return subtree_mutation(node, cfg)
 
@@ -7092,7 +7052,7 @@ def fragment_inject_mutation(node: Node, cfg: Config) -> Node:
     pas seulement les feuilles — permet de greffer des structures
     entières (ex: sin(x²)) à des endroits stratégiques de l'arbre.
     """
-    if not FRAGMENT_LIB.fragments:
+    if not state.FRAGMENT_LIB.fragments:
         return subtree_mutation(node, cfg)
 
     tree = node.copy()
@@ -7113,9 +7073,9 @@ def fragment_inject_mutation(node: Node, cfg: Config) -> Node:
     if max_frag < min_frag:
         max_frag = min_frag + 4
 
-    frag = FRAGMENT_LIB.sample(min_size=min_frag, max_size=min(max_frag, 12))
+    frag = state.FRAGMENT_LIB.sample(min_size=min_frag, max_size=min(max_frag, 12))
     if frag is None:
-        frag = FRAGMENT_LIB.sample(min_size=2, max_size=8)
+        frag = state.FRAGMENT_LIB.sample(min_size=2, max_size=8)
     if frag is None:
         return subtree_mutation(tree, cfg)
 
@@ -7141,7 +7101,7 @@ def mutate(node: Node,
     if r < cfg.HOIST_RATE + cfg.SHRINK_RATE + cfg.POINT_MUTATION_RATE:
         return point_mutation(node, cfg, role=role)   # [v14.5] role transmis
     # Mutations stigmergiques si lib non vide
-    if FRAGMENT_LIB.fragments:
+    if state.FRAGMENT_LIB.fragments:
         rr = random.random()
         if rr < 0.15:
             return fragment_inject_mutation(node, cfg)   # injection ciblée
@@ -7365,29 +7325,29 @@ def warm_transfer(decay_lib: float = 0.4,
     decay_co  : taux de rétention pour FragmentCoGraph (co)
     decay_seq : taux de rétention pour FragmentSequenceMemory
     """
-    FRAGMENT_LIB.end_sampling()
-    COGRAPH.end_sampling()
+    state.FRAGMENT_LIB.end_sampling()
+    state.COGRAPH.end_sampling()
     # Fragment library : décote τ
-    for e in FRAGMENT_LIB.fragments.values():
+    for e in state.FRAGMENT_LIB.fragments.values():
         e.tau *= decay_lib
     # Élagage post-décote
-    to_del = [h for h, e in FRAGMENT_LIB.fragments.items()
+    to_del = [h for h, e in state.FRAGMENT_LIB.fragments.items()
               if e.tau < FragmentLibrary.MIN_TAU]
     for h in to_del:
-        del FRAGMENT_LIB.fragments[h]
+        del state.FRAGMENT_LIB.fragments[h]
 
     # Co-graph : décote les arêtes
-    for k in list(COGRAPH.co.keys()):
-        COGRAPH.co[k] *= decay_co
-        if COGRAPH.co[k] < FragmentCoGraph.MIN_CO:
-            del COGRAPH.co[k]
+    for k in list(state.COGRAPH.co.keys()):
+        state.COGRAPH.co[k] *= decay_co
+        if state.COGRAPH.co[k] < FragmentCoGraph.MIN_CO:
+            del state.COGRAPH.co[k]
 
     # Sequence memory : décote les transitions
-    SEQ_MEM.warm_transfer(decay=decay_seq)
+    state.SEQ_MEM.warm_transfer(decay=decay_seq)
 
-    kept_frags = len(FRAGMENT_LIB.fragments)
-    kept_edges = len(COGRAPH.co)
-    kept_trans = len(SEQ_MEM.transitions)
+    kept_frags = len(state.FRAGMENT_LIB.fragments)
+    kept_edges = len(state.COGRAPH.co)
+    kept_trans = len(state.SEQ_MEM.transitions)
     print(f"[TRANSFER] Decay applied — "
           f"fragments={kept_frags}  edges={kept_edges}  transitions={kept_trans}")
 
@@ -7562,9 +7522,8 @@ class Island:
 
         # [v0.4] Population initiale dimensionnellement valide par construction.
         if _dim_active(self.cfg):
-            global _DIM_GATE_DIMS, _DIM_GATE_TARGET
-            _DIM_GATE_DIMS   = self.cfg.FEAT_DIMS
-            _DIM_GATE_TARGET = self.cfg.TARGET_DIM
+            state._DIM_GATE_DIMS   = self.cfg.FEAT_DIMS
+            state._DIM_GATE_TARGET = self.cfg.TARGET_DIM
             ds  = _ds()
             pop = []
             fails = 0
@@ -7603,10 +7562,10 @@ class Island:
             self.population = pop
             return
 
-        if self.stigmergic and FRAGMENT_LIB.fragments:
+        if self.stigmergic and state.FRAGMENT_LIB.fragments:
             # Île stigmergique : construction guidée par la bibliothèque
             self.population = [
-                build_stigmergic_tree_v3(FRAGMENT_LIB, COGRAPH, SEQ_MEM, self.cfg)
+                build_stigmergic_tree_v3(state.FRAGMENT_LIB, state.COGRAPH, state.SEQ_MEM, self.cfg)
                 for _ in range(n)
             ]
         elif is_nd:
@@ -7688,10 +7647,10 @@ def migrate(islands: List[Island]):
     # d'un run précédent) reçoivent ici leur signature à jour.
     # On limite à 40 fragments max par migration pour ne pas ralentir les échanges.
     _refreshed = 0
-    FRAGMENT_LIB.end_sampling()
-    for h, e in FRAGMENT_LIB.fragments.items():
+    state.FRAGMENT_LIB.end_sampling()
+    for h, e in state.FRAGMENT_LIB.fragments.items():
         if e.semantic_signature is None and _refreshed < 40:
-            e.semantic_signature = compute_semantic_sig(e.node, PROBE_X)
+            e.semantic_signature = compute_semantic_sig(e.node, state.PROBE_X)
             _refreshed += 1
 
 # ============================================================
@@ -7757,7 +7716,7 @@ def evolve_island(island: Island,
             # Invalidation sélective : seulement les gros arbres affectés
             for n in pop:
                 if tree_size(n) > 20:
-                    _fitness_cache.pop(n.structural_hash(), None)
+                    state._fitness_cache.pop(n.structural_hash(), None)
             pop.sort(key=lambda n: fitness(n, xs, ys, cfg, role=island.role))
 
     # ---- Dépôt de phéromones sur les top 10% ----
@@ -7793,7 +7752,7 @@ def evolve_island(island: Island,
     # qu'une valeur random). Maintenir le seuil à 0.50 bloque définitivement
     # la stigmergie sur ce problème et empêche l'accumulation de fragments utiles.
     # En mode normal les seuils classiques v14.1 sont conservés.
-    if _SYRACUSE_MODE:
+    if state._SYRACUSE_MODE:
         BURN_IN_GENERATIONS      = 3     # chauffe très courte : les fragments utiles
         MIN_CORRELATION_REQUIRED = 0.05  # s'ouvre dès r=0.05 après gen 3
         EARLY_OPEN_CORRELATION   = 0.30  # ouverture anticipée Voie B
@@ -7874,7 +7833,7 @@ def evolve_island(island: Island,
             _new_hash   = _simplified.structural_hash()
             if _new_hash != _old_hash:
                 # La forme a changé : invalider l'entrée stale dans le cache
-                _fitness_cache.pop(_old_hash, None)
+                state._fitness_cache.pop(_old_hash, None)
             pop[i] = _simplified
         # Recalcul de top_fits sur les formes simplifiées
         # (les fitness numériques sont identiques mais les hashes ont pu changer)
@@ -7882,36 +7841,36 @@ def evolve_island(island: Island,
 
     if cfg.USE_LIB:
         if _stigm_allowed:
-            FRAGMENT_LIB.deposit_population(pop, top_fits, top_k, generation,
+            state.FRAGMENT_LIB.deposit_population(pop, top_fits, top_k, generation,
                                             xs=xs, ys=ys)
         # [v16-FIX] Cap de diversité opérateur : plus strict en mode N-D
         # (plusieurs features → l'espace est plus grand, la diversité est vitale)
         _is_nd = (len(cfg.TERMINALS) > 1 or
                   (len(cfg.TERMINALS) == 1 and cfg.TERMINALS[0] != "x"))
         _op_cap = 0.30 if _is_nd else cfg.OP_DIVERSITY_CAP
-        FRAGMENT_LIB.evaporate(evap_rate=cfg.FRAG_EVAP_RATE,
+        state.FRAGMENT_LIB.evaporate(evap_rate=cfg.FRAG_EVAP_RATE,
                                tau_max=cfg.FRAG_TAU_MAX,
                                op_diversity_cap=_op_cap)
 
     # ---- Dépôt co-occurrences (Phase 5a) ----
     if cfg.USE_COGRAPH and cfg.USE_LIB:
         if _stigm_allowed:
-            COGRAPH.deposit_population(pop, top_k)
-        COGRAPH.evaporate()
+            state.COGRAPH.deposit_population(pop, top_k)
+        state.COGRAPH.evaporate()
 
     # ---- Dépôt séquences structurelles (Phase 5b) ----
     if cfg.USE_SEQMEM:
         if _stigm_allowed:
-            SEQ_MEM.deposit_population_with_root(pop, top_k_seq)
-        SEQ_MEM.evaporate()
+            state.SEQ_MEM.deposit_population_with_root(pop, top_k_seq)
+        state.SEQ_MEM.evaporate()
 
     found_better = False
 
     # [v0.8] Fenêtre de tirage figé (voir FragmentLibrary.begin_sampling) :
     # d'ici à la fin de la reproduction, les mémoires stigmergiques ne sont
     # que lues. Tout dépôt ou évaporation referme de toute façon la fenêtre.
-    FRAGMENT_LIB.begin_sampling()
-    COGRAPH.begin_sampling(FRAGMENT_LIB)
+    state.FRAGMENT_LIB.begin_sampling()
+    state.COGRAPH.begin_sampling(state.FRAGMENT_LIB)
 
     if best_fit < island.best_score:
         island.best_score = best_fit
@@ -7919,20 +7878,19 @@ def evolve_island(island: Island,
         island.stagnation = 0
         found_better      = True
         # [FIX-E] Enregistrer l'usage des features du meilleur individu
-        if _SYRACUSE_MODE and hasattr(cfg, 'TERMINALS'):
+        if state._SYRACUSE_MODE and hasattr(cfg, 'TERMINALS'):
             record_feature_usage(best, cfg.TERMINALS)
         # [v17] Mettre à jour le résidu sémantique quand le best s'améliore
-        global CURRENT_RESIDUAL_SIG
         try:
-            probe_preds = evaluate_vector(best, PROBE_X)
+            probe_preds = evaluate_vector(best, state.PROBE_X)
             if np.all(np.isfinite(probe_preds)):
-                _probe_y = np.zeros(len(PROBE_X), dtype=np.float64)
+                _probe_y = np.zeros(len(state.PROBE_X), dtype=np.float64)
                 if xs is not None and len(xs) > 1:
                     try:
                         _probe_y[:] = float(np.mean(ys))
                     except Exception:
                         pass
-                CURRENT_RESIDUAL_SIG = update_residual_sig(best, PROBE_X, _probe_y)
+                state.CURRENT_RESIDUAL_SIG = update_residual_sig(best, state.PROBE_X, _probe_y)
         except Exception:
             pass
     else:
@@ -7948,11 +7906,11 @@ def evolve_island(island: Island,
         _is_nd   = (len(cfg.TERMINALS) > 1 or
                     (len(cfg.TERMINALS) == 1 and cfg.TERMINALS[0] != "x"))
 
-        if island.stigmergic and cfg.USE_LIB and FRAGMENT_LIB.fragments:
+        if island.stigmergic and cfg.USE_LIB and state.FRAGMENT_LIB.fragments:
             # Île stigmergique : renouvelle via stigmergie v3
             for _ in range(n_reset):
                 idx = random.randint(cfg.ELITE_SIZE, len(pop) - 1)
-                pop[idx] = build_stigmergic_tree_v3(FRAGMENT_LIB, COGRAPH, SEQ_MEM, cfg)
+                pop[idx] = build_stigmergic_tree_v3(state.FRAGMENT_LIB, state.COGRAPH, state.SEQ_MEM, cfg)
         elif _is_nd:
             # [v16-FIX] Mode N-D : reset avec couverture opérateur garantie.
             # Détecter l'opérateur dominant dans la pop actuelle et sur-représenter
@@ -8039,12 +7997,12 @@ def evolve_island(island: Island,
         # En ultrafast (N_ISLANDS=2), la lib et le COGRAPH sont pauvres
         # en gen 0. On démarre à 30% et on monte à 70% après gen 20
         # (ou quand le COGRAPH est assez riche).
-        _cograph_rich = len(COGRAPH.co) >= max(5, min(20, len(FRAGMENT_LIB.fragments) * 2))
+        _cograph_rich = len(state.COGRAPH.co) >= max(5, min(20, len(state.FRAGMENT_LIB.fragments) * 2))
         _stim_rate = 0.70 if (_cograph_rich or generation >= 20) else 0.30
 
-        if island.stigmergic and cfg.USE_LIB and FRAGMENT_LIB.fragments and random.random() < _stim_rate:
+        if island.stigmergic and cfg.USE_LIB and state.FRAGMENT_LIB.fragments and random.random() < _stim_rate:
             # Île C : construction v3 (co-graphe + séquences)
-            child = build_stigmergic_tree_v3(FRAGMENT_LIB, COGRAPH, SEQ_MEM, cfg)
+            child = build_stigmergic_tree_v3(state.FRAGMENT_LIB, state.COGRAPH, state.SEQ_MEM, cfg)
             # [v14.5] Adam uniquement si l'enfant est prometteur ET élitiste (top 25%)
             if random.random() < cfg.CONST_OPT_PROB:
                 child_mse = raw_mse(child, xs, ys)
@@ -8112,8 +8070,8 @@ def evolve_island(island: Island,
 
         new_pop.append(child)
 
-    FRAGMENT_LIB.end_sampling()
-    COGRAPH.end_sampling()
+    state.FRAGMENT_LIB.end_sampling()
+    state.COGRAPH.end_sampling()
 
     # [v19] Déduplication sémantique : on retire les clones comportementaux
     # (hors élite, déjà en tête de new_pop), puis on REMPLIT les slots libérés
@@ -8210,12 +8168,8 @@ def _parallel_worker_init(data_path, use_ls, syracuse_mode,
             _spec = _ilu.spec_from_file_location(_key, _this_file)
             _mod  = _ilu.module_from_spec(_spec)
             _sys.modules[_key] = _mod
-    global PROBE_X, _USE_LINEAR_SCALING, _SYRACUSE_MODE
-    global _SYRACUSE_Y_RAW, _SYRACUSE_X_RAW
-    global _LS_SCALE_ONLY                     # [v0.4.1]
-    _LS_SCALE_ONLY = bool(ls_scale_only)
-    global _DIM_UNKNOWN_CONST                 # [v0.5]
-    _DIM_UNKNOWN_CONST = bool(dim_unknown_const)
+    state._LS_SCALE_ONLY = bool(ls_scale_only)
+    state._DIM_UNKNOWN_CONST = bool(dim_unknown_const)
     import pickle as _pickle
     if quiet:
         # [v0.7-PAR] Le parent est silencieux (symbolic_regression(verbose=
@@ -8227,39 +8181,34 @@ def _parallel_worker_init(data_path, use_ls, syracuse_mode,
         xs, ys, probe_x, syracuse_y_raw, syracuse_x_raw = _pickle.load(_fh)
     _PW["xs"] = xs
     _PW["ys"] = ys
-    PROBE_X             = probe_x
-    _USE_LINEAR_SCALING = use_ls
-    _SYRACUSE_MODE      = syracuse_mode
+    state.PROBE_X             = probe_x
+    state._USE_LINEAR_SCALING = use_ls
+    state._SYRACUSE_MODE      = syracuse_mode
     if syracuse_y_raw is not None:
-        _SYRACUSE_Y_RAW = syracuse_y_raw
+        state._SYRACUSE_Y_RAW = syracuse_y_raw
     if syracuse_x_raw is not None:
-        _SYRACUSE_X_RAW = syracuse_x_raw
+        state._SYRACUSE_X_RAW = syracuse_x_raw
     # [v22-CSV] propager le mode CSV générique + pools + noms de colonnes
-    global _GENERIC_CSV_MODE, _BATTERY_CSV_MODE
-    global _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS
-    global _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS
-    global CSV_FEATURE_NAMES, CSV_TARGET_NAME
-    _BATTERY_CSV_MODE = battery_mode
+    state._BATTERY_CSV_MODE = battery_mode
     if gencsv is not None:
-        _GENERIC_CSV_MODE = True
-        (_GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS,
-         _GENERIC_UNARY_OPS,  _GENERIC_UNARY_WEIGHTS,
-         CSV_FEATURE_NAMES, CSV_TARGET_NAME) = gencsv
+        state._GENERIC_CSV_MODE = True
+        (state._GENERIC_BINARY_OPS, state._GENERIC_BINARY_WEIGHTS,
+         state._GENERIC_UNARY_OPS,  state._GENERIC_UNARY_WEIGHTS,
+         state.CSV_FEATURE_NAMES, state.CSV_TARGET_NAME) = gencsv
     else:
-        _GENERIC_CSV_MODE = False
+        state._GENERIC_CSV_MODE = False
 
 def _island_round_task(payload):
     """Évolue UNE île pendant n_gens générations dans le worker.
     Reproduit fidèlement le housekeeping par génération de la boucle
     séquentielle (caches, _gen_bucket, mono_pen Syracuse)."""
     (island, gen_start, n_gens, frag, cog, seq, residual, seed) = payload
-    global FRAGMENT_LIB, COGRAPH, SEQ_MEM, CURRENT_RESIDUAL_SIG
     random.seed(seed)
     np.random.seed(seed & 0x7FFFFFFF)
-    FRAGMENT_LIB         = frag
-    COGRAPH              = cog
-    SEQ_MEM              = seq
-    CURRENT_RESIDUAL_SIG = residual
+    state.FRAGMENT_LIB         = frag
+    state.COGRAPH              = cog
+    state.SEQ_MEM              = seq
+    state.CURRENT_RESIDUAL_SIG = residual
     xs, ys = _PW["xs"], _PW["ys"]
     cfg = island.cfg
     best_local = None
@@ -8270,25 +8219,25 @@ def _island_round_task(payload):
         if _deadline is not None and gen > 0 and time.time() >= _deadline:
             break
         if gen % 10 == 0:
-            _fitness_cache.clear()
+            state._fitness_cache.clear()
         _clear_simplify_caches()
-        if _SYRACUSE_MODE:
+        if state._SYRACUSE_MODE:
             _t = gen / max(cfg.GENERATIONS - 1, 1)
             cfg._mono_pen_cache = 0.10 - _t * 0.07
         cfg._gen_bucket = gen // 10
         nb = evolve_island(island, xs, ys, gen)
         if nb is not None:
             best_local = nb
-    return (island, best_local, FRAGMENT_LIB, COGRAPH, SEQ_MEM)
+    return (island, best_local, state.FRAGMENT_LIB, state.COGRAPH, state.SEQ_MEM)
 
 def _active_pool_ops():
     """[v0.7] Operateurs autorises pour le generateur TYPE (units=). Le pool
     `operators=` vit dans _GENERIC_BINARY_OPS / _GENERIC_UNARY_OPS, restaures
     aussi dans les processus paralleles. None = pas de filtrage (hors mode
     CSV generique, comportement historique)."""
-    if not _GENERIC_CSV_MODE:
+    if not state._GENERIC_CSV_MODE:
         return None
-    return frozenset(_GENERIC_BINARY_OPS) | frozenset(_GENERIC_UNARY_OPS)
+    return frozenset(state._GENERIC_BINARY_OPS) | frozenset(state._GENERIC_UNARY_OPS)
 
 
 def _pool_choice(ops, weights, fallback="neg"):
@@ -8323,8 +8272,6 @@ def _pool_choice(ops, weights, fallback="neg"):
 # se termine SANS bruit, le pool du parent se brise, le parent bascule en
 # sequentiel, previent une seule fois, et ne retente plus le parallele.
 _POOL_CHILD_ENV = "GP_ELITE_POOL_CHILD"
-_PARALLEL_BROKEN = False     # vrai apres un pool brise : plus de tentative
-_PARALLEL_WARNED = False
 
 
 class _SkipLogExport(Exception):
@@ -8356,10 +8303,9 @@ def _exit_if_reimported_by_worker():
 
 def _warn_unguarded_main(err):
     """Avertissement unique, sur stderr (non capture par le mode silencieux)."""
-    global _PARALLEL_WARNED
-    if _PARALLEL_WARNED:
+    if state._PARALLEL_WARNED:
         return
-    _PARALLEL_WARNED = True
+    state._PARALLEL_WARNED = True
     import warnings
     main_file = getattr(sys.modules.get("__main__"), "__file__", None)
     if main_file:
@@ -8384,7 +8330,7 @@ def _parallel_enabled(cfg) -> bool:
     flag = getattr(cfg, "PARALLEL_ISLANDS", None)
     if flag is False or cfg.N_ISLANDS < 2:
         return False
-    if _PARALLEL_BROKEN:          # [v0.7-PAR] deja echoue dans ce processus
+    if state._PARALLEL_BROKEN:          # [v0.7-PAR] deja echoue dans ce processus
         return False
     if flag is True:
         return True
@@ -8400,7 +8346,6 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
     import os as _os
     import concurrent.futures as _cf
     import multiprocessing as _mp
-    global CURRENT_RESIDUAL_SIG, FRAGMENT_LIB, COGRAPH, SEQ_MEM
 
     global_best  = None
     global_score = float("inf")
@@ -8421,13 +8366,13 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
         _seed_base = random.getrandbits(31)
     _worker_rng = random.Random(_seed_base ^ 0x5DEECE66D)
 
-    _syr_y = globals().get("_SYRACUSE_Y_RAW", None) if _SYRACUSE_MODE else None
-    _syr_x = globals().get("_SYRACUSE_X_RAW", None) if _SYRACUSE_MODE else None
+    _syr_y = getattr(state, '_SYRACUSE_Y_RAW', None) if state._SYRACUSE_MODE else None
+    _syr_x = getattr(state, '_SYRACUSE_X_RAW', None) if state._SYRACUSE_MODE else None
     # [v22-CSV] snapshot du mode CSV générique pour les workers
-    _gencsv = ((list(_GENERIC_BINARY_OPS), list(_GENERIC_BINARY_WEIGHTS),
-                list(_GENERIC_UNARY_OPS),  list(_GENERIC_UNARY_WEIGHTS),
-                list(CSV_FEATURE_NAMES), CSV_TARGET_NAME)
-               if _GENERIC_CSV_MODE else None)
+    _gencsv = ((list(state._GENERIC_BINARY_OPS), list(state._GENERIC_BINARY_WEIGHTS),
+                list(state._GENERIC_UNARY_OPS),  list(state._GENERIC_UNARY_WEIGHTS),
+                list(state.CSV_FEATURE_NAMES), state.CSV_TARGET_NAME)
+               if state._GENERIC_CSV_MODE else None)
 
     print(f"[v20-PAR] Parallel mode active: {len(islands)} islands / "
           f"{n_workers} workers — rounds of {round_len} generations "
@@ -8454,15 +8399,15 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
         with _tempfile.NamedTemporaryFile(prefix="gp_elite_pool_", suffix=".pkl",
                                           delete=False) as _fh:
             _data_path = _fh.name
-            _pickle.dump((xs, ys, PROBE_X, _syr_y, _syr_x), _fh,
+            _pickle.dump((xs, ys, state.PROBE_X, _syr_y, _syr_x), _fh,
                          protocol=_pickle.HIGHEST_PROTOCOL)
         with _cf.ProcessPoolExecutor(
                 max_workers=n_workers, mp_context=ctx,
                 initializer=_parallel_worker_init,
-                initargs=(_data_path, _USE_LINEAR_SCALING,
-                          _SYRACUSE_MODE,
-                          _gencsv, _BATTERY_CSV_MODE,
-                          _LS_SCALE_ONLY, _DIM_UNKNOWN_CONST,
+                initargs=(_data_path, state._USE_LINEAR_SCALING,
+                          state._SYRACUSE_MODE,
+                          _gencsv, state._BATTERY_CSV_MODE,
+                          state._LS_SCALE_ONLY, state._DIM_UNKNOWN_CONST,
                           sys.stdout is not sys.__stdout__)) as ex:
             # [v0.7-PAR] Sonde : des taches vides d'abord. Un script sans
             # garde __main__ fait terminer chaque worker pendant son demarrage
@@ -8480,7 +8425,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 # [v0.7-TIME] Echeance atteinte : pas de nouvelle ronde.
                 if _deadline is not None and gen > 0 and time.time() >= _deadline:
                     TRACE.set("time_limit", "atteint (parallele, gen %d)" % gen)
-                    globals()["_TIME_LIMIT_HIT"] = True
+                    state._TIME_LIMIT_HIT = True
                     print(f"[TIME] Time limit reached at generation {gen} — "
                           f"returning the best model so far.")
                     break
@@ -8490,8 +8435,8 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
 
                 futs = [ex.submit(_island_round_task,
                                   (isl, gen, n_gens,
-                                   FRAGMENT_LIB, COGRAPH, SEQ_MEM,
-                                   CURRENT_RESIDUAL_SIG,
+                                   state.FRAGMENT_LIB, state.COGRAPH, state.SEQ_MEM,
+                                   state.CURRENT_RESIDUAL_SIG,
                                    _worker_rng.getrandbits(31)))
                         for isl in islands]
                 results = [f.result() for f in futs]   # lève si un worker meurt
@@ -8499,9 +8444,9 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                 # ── Réintégration (uniquement après round 100% réussi) ──
                 for i, (isl, best_local, frag, cog, seq) in enumerate(results):
                     islands[i] = isl
-                    FRAGMENT_LIB.merge_from(frag)
-                    COGRAPH.merge_from(cog)
-                    SEQ_MEM.merge_from(seq)
+                    state.FRAGMENT_LIB.merge_from(frag)
+                    state.COGRAPH.merge_from(cog)
+                    state.SEQ_MEM.merge_from(seq)
 
                 _gen_end = gen + n_gens - 1
                 for i, (isl, best_local, _f, _c, _s) in enumerate(results):
@@ -8529,9 +8474,9 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
                             "expr": to_string(cand), "elapsed": elapsed})
                         # Résidu sémantique recalculé par le maître
                         try:
-                            _probe_y = np.zeros(PROBE_X.shape[0])
-                            CURRENT_RESIDUAL_SIG = update_residual_sig(
-                                global_best, PROBE_X, _probe_y)
+                            _probe_y = np.zeros(state.PROBE_X.shape[0])
+                            state.CURRENT_RESIDUAL_SIG = update_residual_sig(
+                                global_best, state.PROBE_X, _probe_y)
                         except Exception:
                             pass
 
@@ -8587,7 +8532,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
         # prochain appel : on cesse d'essayer dans ce processus, et on dit
         # pourquoi, une fois, sur stderr.
         if type(_par_err).__name__ == "BrokenProcessPool":
-            globals()["_PARALLEL_BROKEN"] = True
+            state._PARALLEL_BROKEN = True
             _warn_unguarded_main(_par_err)
         return global_best, global_score, False
     finally:
@@ -8615,11 +8560,7 @@ def _evolve_parallel(islands, xs, ys, cfg, t0, log_rows):
 # suivi séparé du meilleur individu EN VALIDATION, early-stopping et
 # sélection finale sur la validation, rapport de généralisation.
 
-_TIME_LIMIT_HIT = False  # [v0.7-TIME] vrai si le dernier evolve() a ete
                          # interrompu par l'echeance cfg.DEADLINE
-_VAL_XS = None          # hold-out features  (None = validation désactivée)
-_VAL_YS = None          # hold-out cible
-_VAL_TRAIN_XS = None    # [v23.1] train features (test de stabilité numérique)
 # [v0.7-NEAR] GARDE DE STABILITE PRES DU DOMAINE (mode par defaut).
 # Constat : sur donnees reelles (210_cloud, validation croisee), un modele a
 # donne R2 = -1.7e10 sur des points jamais vus, alors qu'il etait sain sur
@@ -8633,14 +8574,9 @@ _VAL_TRAIN_XS = None    # [v23.1] train features (test de stabilité numérique)
 # seuil 50) ; a 20 %, 5/41 le seraient (lois relativistes : la sonde traverse
 # v = c). Usage : DEPARTAGE seulement, entre candidats statistiquement
 # indiscernables -- jamais un rejet d'un candidat qui se detache.
-_NEAR_PROBE_XS = None
-_NEAR_BAND = None          # (centre, demi-largeur) en unites de y
 _NEAR_CACHE = {}
-_NEAR_GUARD_SWAPS = 0      # nombre de departages effectifs (diagnostic, tests)
 _EXACT_REL = 1e-12           # [v0.7-EXACT] plancher « exact » relatif a var(y_val)
-_EXACT_PRIORITY_SWAPS = 0   # [v0.7-EXACT] nombre de fois ou la regle a change le choix
 
-_FAITHFUL_SWAPS = 0          # [v0.8] departages par la fidelite de la formule
 _FAITHFUL_CACHE: Dict[int, bool] = {}
 
 
@@ -8649,7 +8585,7 @@ def _formula_faithful(node) -> bool:
     numérique) reproduit l'évaluation du moteur sur les données de
     l'ajustement (entraînement et hold-out, espace normalisé), avec la
     tolérance du contrôle de gp_elite.formula (1e-7 relatif)."""
-    xs = [x for x in (_VAL_TRAIN_XS, _VAL_XS) if x is not None]
+    xs = [x for x in (state._VAL_TRAIN_XS, state._VAL_XS) if x is not None]
     if node is None or not xs:
         return True
     try:
@@ -8683,14 +8619,10 @@ def _formula_faithful(node) -> bool:
     return ok
 _NEAR_EXT = 0.10
 _NEAR_K = 50.0
-_VAL_TRAIN_YS = None    # [v23.1] train cible
 # [v25-EXTRAP] Garde-fou anti-divergence : points-sondes AU-DELÀ de la plage
 # d'entraînement (axe d'extrapolation prolongé) + bande de plausibilité dérivée
 # de y. Un candidat dont la prédiction sort de cette bande sur les sondes est
 # rejeté de la sélection — ce que la validation-frontière (interne) ne peut voir.
-_EXTRAP_PROBE_XS = None
-_EXTRAP_BAND = None     # (y_lo, y_hi) plausibles
-_VAL_CANDS: list = []   # [(val_mse, val_se, size, node)] candidats-champions
 _VAL_CANDS_MAX = 64
 
 def _early_stop_threshold(cfg, ys_train) -> float:
@@ -8707,9 +8639,9 @@ def _early_stop_threshold(cfg, ys_train) -> float:
     (1 - R² <= _EXACT_REL sur le hold-out), le seul cas où chercher encore
     ne peut rien apporter. Les modes démonstration (Syracuse, batterie)
     gardent leur seuil absolu."""
-    if not _GENERIC_CSV_MODE:
+    if not state._GENERIC_CSV_MODE:
         return cfg.EARLY_STOPPING_MSE
-    ref = _VAL_YS if (_VAL_YS is not None and len(_VAL_YS) > 1) else ys_train
+    ref = state._VAL_YS if (state._VAL_YS is not None and len(state._VAL_YS) > 1) else ys_train
     try:
         v = float(np.var(np.asarray(ref, dtype=float)))
     except Exception:
@@ -8752,10 +8684,10 @@ def _holdout_mse(node, xs_train, ys_train) -> float:
     """MSE sur le hold-out si disponible, sinon sur le train (fallback)."""
     if node is None:
         return float("inf")
-    if _VAL_XS is not None:
+    if state._VAL_XS is not None:
         try:
-            preds = evaluate_vector(node, _VAL_XS)
-            m = float(np.mean((preds - _VAL_YS) ** 2))
+            preds = evaluate_vector(node, state._VAL_XS)
+            m = float(np.mean((preds - state._VAL_YS) ** 2))
             return m if math.isfinite(m) else float("inf")
         except Exception:
             return float("inf")
@@ -8768,14 +8700,14 @@ def _is_numerically_stable(cand) -> bool:
     tout en prédisant des milliers ailleurs : sur-apprentissage que le
     hold-out a manqué. On vérifie que les prédictions restent dans une plage
     cohérente avec la cible observée."""
-    if _VAL_TRAIN_XS is None:
+    if state._VAL_TRAIN_XS is None:
         return True
     try:
-        preds = evaluate_vector(cand, _VAL_TRAIN_XS)
+        preds = evaluate_vector(cand, state._VAL_TRAIN_XS)
         if not np.all(np.isfinite(preds)):
             return False
         # tolérance : 100× l'amplitude de la cible (généreux mais borne l'explosion)
-        amp = max(1e-9, float(np.max(np.abs(_VAL_TRAIN_YS))) * 100.0 + 10.0)
+        amp = max(1e-9, float(np.max(np.abs(state._VAL_TRAIN_YS))) * 100.0 + 10.0)
         if float(np.max(np.abs(preds))) > amp:
             return False
     except Exception:
@@ -8786,12 +8718,12 @@ def _is_numerically_stable(cand) -> bool:
     # d'extrapolation est prolongé bien après le max vu, et on exige que la
     # prédiction reste dans une bande de plausibilité dérivée de y. Une droite
     # (ou toute forme bornée par linéaire) passe ; exp/pow/cube/x² sont rejetés.
-    if _EXTRAP_PROBE_XS is not None and _EXTRAP_BAND is not None:
+    if state._EXTRAP_PROBE_XS is not None and state._EXTRAP_BAND is not None:
         try:
-            p2 = evaluate_vector(cand, _EXTRAP_PROBE_XS)
+            p2 = evaluate_vector(cand, state._EXTRAP_PROBE_XS)
             if not np.all(np.isfinite(p2)):
                 return False
-            lo, hi = _EXTRAP_BAND
+            lo, hi = state._EXTRAP_BAND
             if float(np.min(p2)) < lo or float(np.max(p2)) > hi:
                 return False
         except Exception:
@@ -8806,32 +8738,32 @@ def _track_val_candidate(cand):
     on livre une loi lisible, pas un monstre qui gratte 1e-6.
     [v23.1] Les candidats numériquement instables sur le domaine complet
     sont écartés (overfitting que le hold-out peut manquer)."""
-    if cand is None or _VAL_XS is None:
+    if cand is None or state._VAL_XS is None:
         return
     # [v0.4] Le pool de validation alimente la SELECTION FINALE (_select_one_se)
     # sans repasser par fitness() : sans ce filtre, un candidat dimensionnellement
     # invalide peut etre repeche comme modele final. On ferme la fuite ici.
-    if _DIM_GATE_DIMS is not None:
+    if state._DIM_GATE_DIMS is not None:
         try:
-            if not _ds().is_typed_valid(cand, _DIM_GATE_DIMS, _DIM_GATE_TARGET,
-                                        _DIM_UNKNOWN_CONST):
+            if not _ds().is_typed_valid(cand, state._DIM_GATE_DIMS, state._DIM_GATE_TARGET,
+                                        state._DIM_UNKNOWN_CONST):
                 return
         except Exception:
             return
     if not _is_numerically_stable(cand):
         return
     try:
-        preds = evaluate_vector(cand, _VAL_XS)
-        se_sq = (preds - _VAL_YS) ** 2
+        preds = evaluate_vector(cand, state._VAL_XS)
+        se_sq = (preds - state._VAL_YS) ** 2
         m = float(np.mean(se_sq))
         if not math.isfinite(m):
             return
         se = float(np.std(se_sq, ddof=1) / math.sqrt(len(se_sq))) \
              if len(se_sq) > 1 else 0.0
-        _VAL_CANDS.append((m, se, tree_size(cand), cand.copy()))
-        if len(_VAL_CANDS) > _VAL_CANDS_MAX:
-            _VAL_CANDS.sort(key=lambda t: (t[0], t[2]))
-            del _VAL_CANDS[_VAL_CANDS_MAX:]
+        state._VAL_CANDS.append((m, se, tree_size(cand), cand.copy()))
+        if len(state._VAL_CANDS) > _VAL_CANDS_MAX:
+            state._VAL_CANDS.sort(key=lambda t: (t[0], t[2]))
+            del state._VAL_CANDS[_VAL_CANDS_MAX:]
     except Exception:
         pass
 
@@ -8866,7 +8798,6 @@ _WEIGHTED_SUMS_MAX = 6        # au-delà de 6 sommes, pas de variante pondérée
 # prenaient près de deux secondes, que time_limit_check.py voyait dépasser
 # l'échéance (18,5 s pour 15 s). La correction d'échelle, elle, est toujours
 # faite. Sans échéance, rien ne change.
-_POLISH_GRACE_S = 1.0
 
 
 def _has_scale(t) -> bool:
@@ -8942,7 +8873,7 @@ def _refit_scaling(tree, xs, ys):
     ajustée (sur y = 3 sin(2x) + 1 : MSE 0,39 avant LM, 271 après, 2e-31
     pour la forme mise à l'échelle). Les nouveaux a, b sont replacés dans
     les constantes existantes, sinon l'arbre est enveloppé."""
-    if tree is None or not (_USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None):
+    if tree is None or not (state._USE_LINEAR_SCALING and state._CUSTOM_LOSS_FN is None):
         return tree
     try:
         xs_np = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
@@ -8957,7 +8888,7 @@ def _refit_scaling(tree, xs, ys):
         const = lambda n: (n is not None and n.left is None and n.right is None
                            and not isinstance(n.value, str))
         t = tree.copy()
-        if _LS_SCALE_ONLY:
+        if state._LS_SCALE_ONLY:
             if t.value == "*" and const(t.left):
                 t.left = Node(float(b2) * float(t.left.value))
                 return t
@@ -8979,12 +8910,12 @@ def _finalists(cfg, k: int = 8) -> list:
     de I.8.14 (14 nœuds, 1 - R² = 1,8e-4) n'était jamais polie : les huit
     meilleurs sur le hold-out étaient des arbres de 48 à 68 nœuds, et la
     règle de parcimonie livrait ensuite le 14 nœuds tel quel."""
-    ranked = sorted(_VAL_CANDS, key=lambda t: (t[0], t[2]))
+    ranked = sorted(state._VAL_CANDS, key=lambda t: (t[0], t[2]))
     top = ranked[:k]
     if not ranked or not bool(getattr(cfg, "FINAL_POLISH", True)):
         return top
-    var_val = float(np.var(_VAL_YS)) if (_VAL_YS is not None and len(_VAL_YS) > 1) else 0.0
-    tol_r2 = float(globals().get("VAL_R2_TOLERANCE", 0.003))
+    var_val = float(np.var(state._VAL_YS)) if (state._VAL_YS is not None and len(state._VAL_YS) > 1) else 0.0
+    tol_r2 = float(getattr(state, 'VAL_R2_TOLERANCE', 0.003))
     best_mse, best_se = ranked[0][0], ranked[0][1]
     band = tol_r2 * var_val if var_val > 1e-15 else best_mse * 0.20
     thr = best_mse + max(best_se, band)
@@ -9009,7 +8940,6 @@ def _finalists(cfg, k: int = 8) -> list:
     return top + small
 
 
-_POLISH_ADMITTED = 0          # variantes polies admises (diagnostic, bancs)
 
 
 def _track_if_exact(cand) -> None:
@@ -9022,18 +8952,18 @@ def _track_if_exact(cand) -> None:
     est celui qu'on aurait eu sans lui. (Mesuré dans la campagne 5 : sans
     cette règle, des variantes plus ajustées gagnaient la sélection sur le
     hold-out et extrapolaient moins bien.)"""
-    if cand is None or _VAL_XS is None or _VAL_YS is None or len(_VAL_YS) < 2:
+    if cand is None or state._VAL_XS is None or state._VAL_YS is None or len(state._VAL_YS) < 2:
         return
-    var_val = float(np.var(_VAL_YS))
+    var_val = float(np.var(state._VAL_YS))
     if not var_val > 1e-15:
         return
     try:
         with np.errstate(all="ignore"):
-            m = float(np.mean((evaluate_vector(cand, _VAL_XS) - _VAL_YS) ** 2))
+            m = float(np.mean((evaluate_vector(cand, state._VAL_XS) - state._VAL_YS) ** 2))
     except Exception:
         return
     if math.isfinite(m) and m <= _EXACT_REL * var_val:
-        globals()["_POLISH_ADMITTED"] = _POLISH_ADMITTED + 1
+        state._POLISH_ADMITTED = state._POLISH_ADMITTED + 1
         _track_val_candidate(cand)
 
 
@@ -9043,12 +8973,12 @@ def _polish_finalists(top, xs, ys, cfg) -> None:
     ajustées par optimize_constants_adam, donc LM à 20 itérations), recalé
     par _refit_scaling."""
     _dl = getattr(cfg, "DEADLINE", None)
-    _stop = None if _dl is None else max(time.time(), float(_dl)) + _POLISH_GRACE_S
+    _stop = None if _dl is None else max(time.time(), float(_dl)) + state._POLISH_GRACE_S
     for _m, _se, _sz, nd in top:
         pol = _refit_scaling(optimize_constants_adam(nd.copy(), xs, ys, cfg),
                              xs, ys)
         _track_val_candidate(pol)
-        if not bool(getattr(cfg, "FINAL_POLISH", True)) or _CUSTOM_LOSS_FN is not None:
+        if not bool(getattr(cfg, "FINAL_POLISH", True)) or state._CUSTOM_LOSS_FN is not None:
             continue
         if _stop is not None and time.time() > _stop:
             continue                            # budget de temps épuisé
@@ -9075,23 +9005,22 @@ def _build_near_probes(xs_np, ys_np, n=400):
     """[v0.7-NEAR] Sondes par paires de points reels. Generateur DEDIE : ne
     consomme pas l'etat aleatoire global du moteur (sinon tous les resultats
     changeraient, garde active ou non)."""
-    global _NEAR_PROBE_XS, _NEAR_BAND
     Xm = xs_np if xs_np.ndim == 2 else xs_np.reshape(-1, 1)
     if len(Xm) < 2:
         return
     rng = np.random.RandomState(20260924)
     i = rng.randint(0, len(Xm), n); j = rng.randint(0, len(Xm), n)
     lam = rng.uniform(-_NEAR_EXT, 1.0 + _NEAR_EXT, (n, 1))
-    _NEAR_PROBE_XS = lam * Xm[i] + (1.0 - lam) * Xm[j]
+    state._NEAR_PROBE_XS = lam * Xm[i] + (1.0 - lam) * Xm[j]
     y = np.asarray(ys_np, dtype=float)
     r = float(np.ptp(y)) if len(y) else 0.0
-    _NEAR_BAND = (float(np.median(y)), _NEAR_K * max(r, 1e-12))
+    state._NEAR_BAND = (float(np.median(y)), _NEAR_K * max(r, 1e-12))
 
 
 def _near_domain_stable(cand) -> bool:
     """[v0.7-NEAR] Vrai si le candidat reste fini et dans la bande sur les
     sondes pres du domaine. Resultat mis en cache par arbre EXACT."""
-    if _NEAR_PROBE_XS is None or _NEAR_BAND is None or cand is None:
+    if state._NEAR_PROBE_XS is None or state._NEAR_BAND is None or cand is None:
         return True
     try:
         key = cand.exact_hash()
@@ -9101,10 +9030,10 @@ def _near_domain_stable(cand) -> bool:
         return _NEAR_CACHE[key]
     try:
         with np.errstate(all="ignore"):
-            p = np.asarray(evaluate_vector(cand, _NEAR_PROBE_XS), dtype=float)
+            p = np.asarray(evaluate_vector(cand, state._NEAR_PROBE_XS), dtype=float)
         if p.ndim == 0:
-            p = np.full(len(_NEAR_PROBE_XS), float(p))
-        c, half = _NEAR_BAND
+            p = np.full(len(state._NEAR_PROBE_XS), float(p))
+        c, half = state._NEAR_BAND
         ok = bool(np.all(np.isfinite(p)) and float(np.max(np.abs(p - c))) <= half)
     except Exception:
         ok = False
@@ -9127,7 +9056,7 @@ def _select_one_se(champion, champ_val):
     default), OU s'il est dans la barre d'1 erreur-type statistique du
     meilleur (le plus large des deux). Cas batterie : le 10-nœuds (R²=0.9973)
     et le 29-nœuds (R²=0.9981) diffèrent de 0.08% → le 10-nœuds gagne."""
-    pool = list(_VAL_CANDS)
+    pool = list(state._VAL_CANDS)
     if champion is not None and math.isfinite(champ_val) and _is_numerically_stable(champion):
         pool.append((champ_val, 0.0, tree_size(champion), champion))
     if not pool:
@@ -9137,8 +9066,8 @@ def _select_one_se(champion, champ_val):
     pool.sort(key=lambda t: t[0])
     best_mse, best_se = pool[0][0], pool[0][1]
     # Variance de la cible de validation → conversion MSE ↔ R²
-    var_val = float(np.var(_VAL_YS)) if (_VAL_YS is not None and len(_VAL_YS) > 1) else 0.0
-    tol_r2  = float(globals().get("VAL_R2_TOLERANCE", 0.003))   # 0.3 % de R²
+    var_val = float(np.var(state._VAL_YS)) if (state._VAL_YS is not None and len(state._VAL_YS) > 1) else 0.0
+    tol_r2  = float(getattr(state, 'VAL_R2_TOLERANCE', 0.003))   # 0.3 % de R²
     # Seuil = best + max(barre statistique 1-SE, bande de tolérance R²)
     r2_band = tol_r2 * var_val if var_val > 1e-15 else best_mse * 0.20
     thr = best_mse + max(best_se, r2_band)
@@ -9157,7 +9086,7 @@ def _select_one_se(champion, champ_val):
         thr = exact_floor
         tight = min((t for t in pool if t[0] <= thr), key=lambda t: (t[2], t[0]))
         if tight[3] is not loose[3]:
-            globals()["_EXACT_PRIORITY_SWAPS"] = _EXACT_PRIORITY_SWAPS + 1
+            state._EXACT_PRIORITY_SWAPS = state._EXACT_PRIORITY_SWAPS + 1
             TRACE.set("exact_priority", "loi exacte préférée à une "
                       "approximation plus courte")
     eligible = [t for t in pool if t[0] <= thr]
@@ -9174,7 +9103,7 @@ def _select_one_se(champion, champ_val):
         both = [t for t in eligible
                 if _formula_faithful(t[3]) and _near_domain_stable(t[3])]
         if both:
-            globals()["_FAITHFUL_SWAPS"] = _FAITHFUL_SWAPS + 1
+            state._FAITHFUL_SWAPS = state._FAITHFUL_SWAPS + 1
             TRACE.set("faithful_formula", "candidat dont la formule reproduit "
                       "le modèle préféré à un équivalent plus court")
             m, _, _, node = both[0]
@@ -9185,7 +9114,7 @@ def _select_one_se(champion, champ_val):
     if not _near_domain_stable(eligible[0][3]):
         stable = [t for t in eligible if _near_domain_stable(t[3])]
         if stable:
-            globals()["_NEAR_GUARD_SWAPS"] = _NEAR_GUARD_SWAPS + 1
+            state._NEAR_GUARD_SWAPS = state._NEAR_GUARD_SWAPS + 1
             TRACE.set("near_guard", "champion divergent pres du domaine "
                       "remplace par un candidat equivalent stable")
             m, _, _, node = stable[0]
@@ -9237,7 +9166,6 @@ def _select_one_se(champion, champ_val):
 # contre 126, la validation croisée favorisant des structures que la
 # recherche a choisies sur les mêmes points. Retiré du candidat : éteint, le
 # code gardé pour la décision de l'auteur.
-_SMALL_CV = False
 _SMALL_ROWS = 30                  # en dessous : pas de hold-out, S1
 _SMALL_MIN_ROWS = 6
 _SMALL_FAMILY_KEEP = 8
@@ -9246,7 +9174,6 @@ _SMALL_SEARCH = 8                 # meilleurs, et plus petits de la bande
 _SMALL_FINALISTS = 40
 _SMALL_FOLDS = 10
 _SMALL_CANDS_MAX = 64
-_SMALL_ON = False                 # actif pour l'ajustement en cours
 _SMALL_CANDS: list = []           # [(mse_train, se, taille, arbre)]
 _SMALL_FAMILY: list = []          # formes de famille (arbres sans échelle)
 _SMALL_FRONT: list = []           # [(mse_cv, se_cv, taille, arbre, n_par, origine)]
@@ -9256,26 +9183,25 @@ def _small_setup(cfg, ys) -> None:
     """[1.4-S1] Au début d'un ajustement, après _split_holdout : S1 est-il
     actif ? Seulement sans hold-out : une table de 30 à 37 lignes en garde
     un, et son reste d'entraînement, sous 30 lignes, n'est pas concerné."""
-    global _SMALL_ON
     _SMALL_CANDS.clear()
     _SMALL_FAMILY.clear()
     _SMALL_FRONT.clear()
     n = len(ys)
-    _SMALL_ON = bool(_SMALL_CV and _GENERIC_CSV_MODE and _VAL_XS is None
+    state._SMALL_ON = bool(state._SMALL_CV and state._GENERIC_CSV_MODE and state._VAL_XS is None
                      and _SMALL_MIN_ROWS <= n < _SMALL_ROWS
-                     and _USE_LINEAR_SCALING and _CUSTOM_LOSS_FN is None
+                     and state._USE_LINEAR_SCALING and state._CUSTOM_LOSS_FN is None
                      and not bool(getattr(cfg, "EXTRAPOLATION_MODE", False)))
 
 
 def _track_small_candidate(cand, xs, ys) -> None:
     """[1.4-S1] Un champion de la recherche, noté sur les lignes
     d'entraînement (sous units=, seulement s'il passe la porte)."""
-    if not _SMALL_ON or cand is None:
+    if not state._SMALL_ON or cand is None:
         return
-    if _DIM_GATE_DIMS is not None:
+    if state._DIM_GATE_DIMS is not None:
         try:
-            if not _ds().is_typed_valid(cand, _DIM_GATE_DIMS, _DIM_GATE_TARGET,
-                                        _DIM_UNKNOWN_CONST):
+            if not _ds().is_typed_valid(cand, state._DIM_GATE_DIMS, state._DIM_GATE_TARGET,
+                                        state._DIM_UNKNOWN_CONST):
                 return
         except Exception:
             return
@@ -9331,7 +9257,7 @@ def _small_round_powers(f):
     le demi-entier le plus proche, écrit dans la structure (carrés, cubes,
     racines, produits, 1/…) pour que l'ajustement ne le déplace plus. None si
     rien ne change ou si le pool n'a pas les opérateurs nécessaires."""
-    uops, bops = set(_GENERIC_UNARY_OPS), set(_GENERIC_BINARY_OPS)
+    uops, bops = set(state._GENERIC_UNARY_OPS), set(state._GENERIC_BINARY_OPS)
     changed = [False]
 
     def power(B, e2):
@@ -9394,11 +9320,10 @@ def _small_fit(f, X, y, cfg, scale_only):
     """[1.4-S1] f ajusté sur (X, y) par l'étape de finition du moteur, en
     projection variable sur a + b·f (b·f seul si scale_only), et sa mise à
     l'échelle : (f ajusté, a, b), ou None."""
-    global _LS_SCALE_ONLY
-    keep = _LS_SCALE_ONLY
+    keep = state._LS_SCALE_ONLY
     try:
         if scale_only:
-            _LS_SCALE_ONLY = True
+            state._LS_SCALE_ONLY = True
         with np.errstate(all="ignore"):
             g = _lm_to_convergence(f, X, y, cfg)
             g = f if g is None else g
@@ -9414,7 +9339,7 @@ def _small_fit(f, X, y, cfg, scale_only):
     except Exception:
         return None
     finally:
-        _LS_SCALE_ONLY = keep
+        state._LS_SCALE_ONLY = keep
 
 
 def _small_cv(start, X, y, cfg, scale_only):
@@ -9505,11 +9430,11 @@ def _small_specs(champion, X, y):
         bases.append((t[3], "search"))
     if ranked:
         thr = ranked[0][0] + max(ranked[0][1], float(
-            globals().get("VAL_R2_TOLERANCE", 0.003)) * var)
+            getattr(state, 'VAL_R2_TOLERANCE', 0.003)) * var)
         small = sorted((t for t in ranked if t[0] <= thr), key=lambda t: (t[2], t[0]))
         for t in small[:_SMALL_SEARCH]:
             bases.append((t[3], "band"))
-    modes = (True,) if _LS_SCALE_ONLY else (False, True)
+    modes = (True,) if state._LS_SCALE_ONLY else (False, True)
     specs, seen = [], set()
     for tree, origin in bases:
         f = tree if origin == "family" else _small_strip(tree)
@@ -9518,11 +9443,11 @@ def _small_specs(champion, X, y):
             if g is None:
                 continue
             for so in modes:
-                if _DIM_GATE_DIMS is not None:
+                if state._DIM_GATE_DIMS is not None:
                     try:
                         if not _ds().is_typed_valid(Node("*", Node(1.0), g),
-                                                    _DIM_GATE_DIMS, _DIM_GATE_TARGET,
-                                                    _DIM_UNKNOWN_CONST):
+                                                    state._DIM_GATE_DIMS, state._DIM_GATE_TARGET,
+                                                    state._DIM_UNKNOWN_CONST):
                             continue
                     except Exception:
                         continue
@@ -9531,7 +9456,7 @@ def _small_specs(champion, X, y):
                     continue
                 seen.add(key)
                 label = origin + (", exponents rounded" if rounded else "") + \
-                    (", without the constant" if so and not _LS_SCALE_ONLY else "")
+                    (", without the constant" if so and not state._LS_SCALE_ONLY else "")
                 specs.append((g, so, label))
                 if len(specs) >= _SMALL_FINALISTS:
                     return specs
@@ -9541,7 +9466,6 @@ def _small_specs(champion, X, y):
 def _small_table_select(champion, xs, ys, cfg):
     """[1.4-S1] Le modèle d'une table de moins de 30 lignes (voir plus haut).
     Rend le champion si rien n'est noté."""
-    global _VAL_TRAIN_XS, _VAL_TRAIN_YS
     X = xs if isinstance(xs, np.ndarray) else np.asarray(xs, dtype=float)
     y = ys if isinstance(ys, np.ndarray) else np.asarray(ys, dtype=float)
     var = float(np.var(y))
@@ -9549,7 +9473,7 @@ def _small_table_select(champion, xs, ys, cfg):
         return champion
     t0 = time.time()
     _dl = getattr(cfg, "DEADLINE", None)
-    _stop = None if _dl is None else max(time.time(), float(_dl)) + _POLISH_GRACE_S
+    _stop = None if _dl is None else max(time.time(), float(_dl)) + state._POLISH_GRACE_S
     specs = _small_specs(champion, X, y)
     _SMALL_FRONT.clear()
     for g, so, label in specs:
@@ -9581,19 +9505,18 @@ def _small_choose(front, X, y):
     (seulement les exacts si le meilleur l'est), puis le moins de constantes
     ajustées, le plus petit, le plus précis ; départage par la fidélité de la
     formule et la stabilité près du domaine, sur la table. Rend l'entrée."""
-    global _VAL_TRAIN_XS, _VAL_TRAIN_YS
     var = float(np.var(y))
     best_m, best_se = min((t[0], t[1]) for t in front)
-    thr = best_m + max(best_se, float(globals().get("VAL_R2_TOLERANCE", 0.003)) * var)
+    thr = best_m + max(best_se, float(getattr(state, 'VAL_R2_TOLERANCE', 0.003)) * var)
     if best_m <= _EXACT_REL * var:                # priorité à l'exactitude
         thr = _EXACT_REL * var
     elig = sorted((t for t in front if t[0] <= thr),
                   key=lambda t: (t[4], t[2], t[0]))
     pick = elig[0]
     # départages : formule fidèle et stable près du domaine, sur la table
-    keep = (_VAL_TRAIN_XS, _VAL_TRAIN_YS)
+    keep = (state._VAL_TRAIN_XS, state._VAL_TRAIN_YS)
     try:
-        _VAL_TRAIN_XS, _VAL_TRAIN_YS = X, y
+        state._VAL_TRAIN_XS, state._VAL_TRAIN_YS = X, y
         _FAITHFUL_CACHE.clear()
         _NEAR_CACHE.clear()
         _build_near_probes(X, y)
@@ -9603,9 +9526,9 @@ def _small_choose(front, X, y):
             if both:
                 pick = both[0]
     finally:
-        _VAL_TRAIN_XS, _VAL_TRAIN_YS = keep
-        globals()["_NEAR_PROBE_XS"] = None
-        globals()["_NEAR_BAND"] = None
+        state._VAL_TRAIN_XS, state._VAL_TRAIN_YS = keep
+        state._NEAR_PROBE_XS = None
+        state._NEAR_BAND = None
         _FAITHFUL_CACHE.clear()
         _NEAR_CACHE.clear()
     return pick
@@ -9615,14 +9538,12 @@ def _split_holdout(xs, ys, cfg):
     """Découpe (xs, ys) en (train, val). Retourne (xs_tr, ys_tr) et installe
     le hold-out dans les globals _VAL_XS/_VAL_YS. Validation désactivée si
     VALIDATION_SPLIT<=0 ou dataset trop petit (<30 points)."""
-    global _VAL_XS, _VAL_YS, _VAL_TRAIN_XS, _VAL_TRAIN_YS, _EXTRAP_PROBE_XS, _EXTRAP_BAND
-    global _NEAR_PROBE_XS, _NEAR_BAND
-    _VAL_XS = None; _VAL_YS = None
-    _VAL_TRAIN_XS = None; _VAL_TRAIN_YS = None
-    _EXTRAP_PROBE_XS = None; _EXTRAP_BAND = None
-    _NEAR_PROBE_XS = None; _NEAR_BAND = None; _NEAR_CACHE.clear()
+    state._VAL_XS = None; state._VAL_YS = None
+    state._VAL_TRAIN_XS = None; state._VAL_TRAIN_YS = None
+    state._EXTRAP_PROBE_XS = None; state._EXTRAP_BAND = None
+    state._NEAR_PROBE_XS = None; state._NEAR_BAND = None; _NEAR_CACHE.clear()
     _FAITHFUL_CACHE.clear()
-    _VAL_CANDS.clear()
+    state._VAL_CANDS.clear()
     frac = float(getattr(cfg, "VALIDATION_SPLIT", 0.0) or 0.0)
     n = len(ys)
     if frac <= 0.0 or n < 30:
@@ -9661,11 +9582,11 @@ def _split_holdout(xs, ys, cfg):
             grid = np.linspace(hi[j], hi[j] + ext, n_probe)
         med = np.median(Xm, axis=0)
         probe = np.tile(med, (len(grid), 1)); probe[:, j] = grid
-        _EXTRAP_PROBE_XS = probe
+        state._EXTRAP_PROBE_XS = probe
         y_lo = float(np.min(ys_np)); y_hi = float(np.max(ys_np))
         rng_y = max(1e-9, y_hi - y_lo)
         K = 2.0    # la tendance peut se prolonger de 2 amplitudes, pas exploser
-        _EXTRAP_BAND = (y_lo - K * rng_y, y_hi + K * rng_y)
+        state._EXTRAP_BAND = (y_lo - K * rng_y, y_hi + K * rng_y)
 
     # Choix du SPLIT. LEÇON (données batterie) : pour extrapoler, entraîner sur
     # TOUTES les données — surtout les points de bord — donne une meilleure
@@ -9700,12 +9621,12 @@ def _split_holdout(xs, ys, cfg):
         _split_kind = "random" + _guard
         _seed_note = f"seed={getattr(cfg,'HOLDOUT_SEED',1234)}"
 
-    _VAL_XS = xs_np[val_idx]
-    _VAL_YS = ys_np[val_idx]
+    state._VAL_XS = xs_np[val_idx]
+    state._VAL_YS = ys_np[val_idx]
     xs_tr   = xs_np[tr_idx]
     ys_tr   = ys_np[tr_idx]
-    _VAL_TRAIN_XS = xs_tr
-    _VAL_TRAIN_YS = ys_tr
+    state._VAL_TRAIN_XS = xs_tr
+    state._VAL_TRAIN_YS = ys_tr
     _build_near_probes(xs_np, ys_np)          # [v0.7-NEAR]
     print(f"[v21-VAL] Hold-out {_split_kind} : {len(tr_idx)} points train / "
           f"{len(val_idx)} points validation ({len(val_idx)/n:.0%}, {_seed_note})")
@@ -9766,13 +9687,12 @@ def _smart_reset_explorers(islands: List["Island"], cfg: Config,
     squelettes sémantiques ciblés (fragments corrélés au résidu courant) +
     squelettes de diversité + 30% d'arbres randoms. Retourne True si au
     moins une île a été réinitialisée. Partagé séquentiel/parallèle."""
-    global CURRENT_RESIDUAL_SIG
     _skeleton_seeds = []
 
-    _res = CURRENT_RESIDUAL_SIG
-    if _res is not None and len(FRAGMENT_LIB.fragments) > 0:
+    _res = state.CURRENT_RESIDUAL_SIG
+    if _res is not None and len(state.FRAGMENT_LIB.fragments) > 0:
         scored = []
-        for h, e in FRAGMENT_LIB.fragments.items():
+        for h, e in state.FRAGMENT_LIB.fragments.items():
             if e.semantic_signature is not None:
                 sc = semantic_score(e.semantic_signature, _res)
                 if sc > 0.15:
@@ -9830,7 +9750,7 @@ def _smart_reset_explorers(islands: List["Island"], cfg: Config,
         print(f"  [SMART-RESET gen={gen}] {_n_explorer_reset} explorer island(s) "
               f"— {n_skel_used} semantic skeletons + 30% random "
               f"(RAW={cur_raw:.4f})")
-        CURRENT_RESIDUAL_SIG = None
+        state.CURRENT_RESIDUAL_SIG = None
         return True
     return False
 
@@ -9840,36 +9760,31 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     X_override / y_override : si fournis (np.ndarray), remplacent build_dataset.
     Utilisés par le mode CSV réel (BATTERY_SOH + nasa_battery_simulation.csv).
     """
-    global _fitness_cache, _PARAMETRIC_CACHE
-    global PROBE_X, CURRENT_RESIDUAL_SIG     # [v17]
-    global _USE_LINEAR_SCALING               # [v18-LS]
     _exit_if_reimported_by_worker()          # [v0.7-PAR]
-    _USE_LINEAR_SCALING = bool(getattr(cfg, "USE_LINEAR_SCALING", True))
+    state._USE_LINEAR_SCALING = bool(getattr(cfg, "USE_LINEAR_SCALING", True))
     # [v0.4.1] Les drapeaux dimensionnels sont des GLOBALES de module. Sans
     # remise a zero ici, un fit avec units= contaminait tous les fits suivants
     # du meme processus : le garde-fou restait actif sur des donnees sans
     # dimensions declarees, et le champion livre devenait aberrant.
-    global _DIM_GATE_DIMS, _DIM_GATE_TARGET, _LS_SCALE_ONLY
-    global _DIM_UNKNOWN_CONST                # [v0.5]
     TRACE.reset()                            # [v0.7] un journal par exécution
     if _dim_active(cfg):
-        _DIM_GATE_DIMS   = cfg.FEAT_DIMS
-        _DIM_GATE_TARGET = cfg.TARGET_DIM
-        _LS_SCALE_ONLY   = True
-        _DIM_UNKNOWN_CONST = bool(getattr(cfg, "UNKNOWN_CONST", False))
+        state._DIM_GATE_DIMS   = cfg.FEAT_DIMS
+        state._DIM_GATE_TARGET = cfg.TARGET_DIM
+        state._LS_SCALE_ONLY   = True
+        state._DIM_UNKNOWN_CONST = bool(getattr(cfg, "UNKNOWN_CONST", False))
         TRACE.set("dim_mode", "ACTIF — la recherche est contrainte par les unités")
         TRACE.set("unknown_const",
                   "OUI — la constante de tête peut porter une dimension"
-                  if _DIM_UNKNOWN_CONST else "non")
+                  if state._DIM_UNKNOWN_CONST else "non")
         TRACE.set("ls_mode", "multiplicatif seul (régression par l'origine)")
     else:
-        _DIM_GATE_DIMS   = None
-        _DIM_GATE_TARGET = None
-        _LS_SCALE_ONLY   = False
-        _DIM_UNKNOWN_CONST = False
+        state._DIM_GATE_DIMS   = None
+        state._DIM_GATE_TARGET = None
+        state._LS_SCALE_ONLY   = False
+        state._DIM_UNKNOWN_CONST = False
         TRACE.set("dim_mode", "inactif (aucune unité déclarée)")
         TRACE.set("ls_mode", "affine (a + b·f) si linear scaling actif")
-    globals()["VAL_R2_TOLERANCE"] = float(getattr(cfg, "VAL_R2_TOLERANCE", 0.003))
+    state.VAL_R2_TOLERANCE = float(getattr(cfg, "VAL_R2_TOLERANCE", 0.003))
     # [v0.7] Journal relatif au DOSSIER COURANT de l'utilisateur. L'ancienne
     # resolution (dossier du module) ecrivait dans site-packages a chaque
     # ajustement -- y compris depuis l'API --, echouait en silence sur une
@@ -9881,32 +9796,32 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # [v0.7-TIME] Le drapeau d'arret au temps est un etat GLOBAL : il doit
     # etre remis a zero a chaque evolve(), sinon il fuit d'un ajustement au
     # suivant dans un meme processus.
-    globals()["_TIME_LIMIT_HIT"] = False
+    state._TIME_LIMIT_HIT = False
     # FIX v13.7 : vider les caches entre runs pour éviter les biais
     # inter-problèmes (hash structurel identique, domaine différent).
-    _fitness_cache    = {}
-    _PARAMETRIC_CACHE = {}
-    _PRED_CACHE.clear()
-    FRAGMENT_LIB.fragments.clear()
-    FRAGMENT_LIB.generation = 0
-    COGRAPH.co.clear()
-    SEQ_MEM.transitions.clear()
+    state._fitness_cache    = {}
+    state._PARAMETRIC_CACHE = {}
+    state._PRED_CACHE.clear()
+    state.FRAGMENT_LIB.fragments.clear()
+    state.FRAGMENT_LIB.generation = 0
+    state.COGRAPH.co.clear()
+    state.SEQ_MEM.transitions.clear()
 
     # [v17] Initialiser le probe set adapté aux dimensions du problème
-    PROBE_X              = init_probe_set(cfg, n_probe=30)
-    CURRENT_RESIDUAL_SIG = None
+    state.PROBE_X              = init_probe_set(cfg, n_probe=30)
+    state.CURRENT_RESIDUAL_SIG = None
     # [FIX-E] Réinitialiser le compteur d'usage des features
     n_feats = len(cfg.TERMINALS) if hasattr(cfg, 'TERMINALS') else 1
     reset_feature_usage(n_feats)
-    print(f"[v17-SEMANTIC] Probe set initialized: {PROBE_X.shape[0]} points × "
-          f"{PROBE_X.shape[1] if PROBE_X.ndim > 1 else 1} features  "
+    print(f"[v17-SEMANTIC] Probe set initialized: {state.PROBE_X.shape[0]} points × "
+          f"{state.PROBE_X.shape[1] if state.PROBE_X.ndim > 1 else 1} features  "
           f"[{cfg.X_MIN:.1f}, {cfg.X_MAX:.1f}]")
 
     print("=" * 70)
     # [SYRACUSE / v16-BATTERY CSV] Afficher le pool d'opérateurs réellement actif
-    if _SYRACUSE_MODE:
+    if state._SYRACUSE_MODE:
         _active_ops = _SYRACUSE_BINARY_OPS + _SYRACUSE_UNARY_OPS
-    elif _BATTERY_CSV_MODE:
+    elif state._BATTERY_CSV_MODE:
         _active_ops = _BATTERY_BINARY_OPS + _BATTERY_UNARY_OPS
     else:
         _active_ops = ALL_OPS
@@ -9932,7 +9847,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # candidats-champions. Elle est ajustée sur le train (intérieur) puis jugée,
     # comme tous les candidats, sur la bande-frontière. Opt-in : sans effet sur
     # les runs normaux (EXTRAPOLATION_MODE reste False par default).
-    if bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) and _VAL_XS is not None:
+    if bool(getattr(cfg, "EXTRAPOLATION_MODE", False)) and state._VAL_XS is not None:
         _lin = _make_linear_candidate(xs, ys, cfg)
         if _lin is not None:
             _track_val_candidate(_lin)
@@ -9960,7 +9875,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
                             key=lambda n: fitness(n, xs, ys, cfg))
         top_k    = max(3, len(pop_sorted) // 10)
         top_fits = [fitness(ind, xs, ys, cfg) for ind in pop_sorted[:top_k]]
-        FRAGMENT_LIB.deposit_population(pop_sorted, top_fits, top_k, gen=0,
+        state.FRAGMENT_LIB.deposit_population(pop_sorted, top_fits, top_k, gen=0,
                                         xs=xs, ys=ys)  # FIX v13.8 : filtre numérique
 
     # Île C : initialisée après le premier dépôt (lib déjà peuplée)
@@ -10201,7 +10116,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # [CUSTOM-SEEDS] Injection des arbres fournis par l'utilisateur (round-robin).
     # On les place dans des slots distincts pour ne pas écraser les seeds
     # standard. Chaque île reçoit une copie pour préserver l'isolation.
-    _cseeds = globals().get("_CUSTOM_SEEDS", None)
+    _cseeds = getattr(state, '_CUSTOM_SEEDS', None)
     if _cseeds:
         base = len(seeds)
         for j, seed_node in enumerate(_cseeds):
@@ -10314,7 +10229,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # [v0.7-TIME] Echeance atteinte : arret propre, meilleur modele conserve.
         if _deadline is not None and gen > 0 and time.time() >= _deadline:
             TRACE.set("time_limit", "atteint (sequentiel, gen %d)" % gen)
-            globals()["_TIME_LIMIT_HIT"] = True
+            state._TIME_LIMIT_HIT = True
             print(f"[TIME] Time limit reached at generation {gen} — "
                   f"returning the best model so far.")
             break
@@ -10322,13 +10237,13 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # Entre deux vidages, la clé (hash, role, gen//10) garantit la fraîcheur.
         # Évite de recalculer la fitness d'individus stables entre générations.
         if gen % 10 == 0:
-            _fitness_cache.clear()
+            state._fitness_cache.clear()
         # [OPT] Vider le cache de simplification pour libérer la mémoire
         # et éviter des résultats périmés après mutations.
         _clear_simplify_caches()
         # [FIX-A] Mettre à jour la pénalité mono-feature progressive
         # 0.10 en gen=0 → 0.03 en fin de run (décroissance linéaire)
-        if _SYRACUSE_MODE:
+        if state._SYRACUSE_MODE:
             _t = gen / max(cfg.GENERATIONS - 1, 1)
             cfg._mono_pen_cache = 0.10 - _t * 0.07   # 0.10 → 0.03
         # [OPT] Bucket générationnel pour le cache fitness (gen//10)
@@ -10422,7 +10337,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             migrate(islands)
 
     if _deadline is not None and time.time() >= _deadline:
-        globals()["_TIME_LIMIT_HIT"] = True
+        state._TIME_LIMIT_HIT = True
     # Optimisation finale des constantes sur le meilleur
     # [v14.4] Correction du bug de référence : copy.deepcopy() avant Adam+simplify
     # pour garantir que global_best n'est jamais corrompu si des nœuds sont
@@ -10447,7 +10362,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
 
     # [1.4-S1] Sous 30 lignes, pas de hold-out : les candidats en validation
     # croisée (voir _small_table_select).
-    if _VAL_XS is None and global_best is not None and _SMALL_ON:
+    if state._VAL_XS is None and global_best is not None and state._SMALL_ON:
         try:
             global_best = _small_table_select(global_best, xs, ys, cfg)
         except Exception:
@@ -10457,7 +10372,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
     # Le champion LIVRÉ est celui qui généralise le mieux : si un candidat
     # suivi en cours de run bat le champion-train sur le hold-out, il prend
     # sa place. Puis rapport train vs validation, avec alerte surapprentissage.
-    if _VAL_XS is not None and global_best is not None:
+    if state._VAL_XS is not None and global_best is not None:
         # [v26-LM] POLISSAGE DES FINALISTES : avant la sélection parcimonieuse,
         # on affine par LM les constantes des meilleurs candidats suivis. Sans
         # cela, la règle 1-SE compare des structures aux constantes brutes — une
@@ -10494,14 +10409,14 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         # livrer un modèle qui diverge hors-plage. Si, malgré tout, le champion
         # final échoue encore au garde (aucun candidat stable n'avait été suivi),
         # on retombe sur la droite OLS — sûre par construction.
-        if _EXTRAP_PROBE_XS is not None and not _is_numerically_stable(global_best):
+        if state._EXTRAP_PROBE_XS is not None and not _is_numerically_stable(global_best):
             _lin_fb = _make_linear_candidate(xs, ys, cfg)
             if _lin_fb is not None and _is_numerically_stable(_lin_fb):
                 print("[v25-EXTRAP] ⚠ Champion still divergent → falling back to the line (safe floor).")
                 global_best = _lin_fb
                 _champ_val  = _holdout_mse(global_best, xs, ys)
         _champ_train = _pure_mse(global_best, xs, ys)
-        _var_val     = float(np.var(_VAL_YS)) if len(_VAL_YS) > 1 else 0.0
+        _var_val     = float(np.var(state._VAL_YS)) if len(state._VAL_YS) > 1 else 0.0
         _r2_val      = (1.0 - _champ_val / _var_val) if _var_val > 1e-15 else float("nan")
         _ratio       = (_champ_val / _champ_train) if _champ_train > 1e-15 else 1.0
         # solution exacte (bruit numérique pur) : ratio non significatif
@@ -10539,23 +10454,23 @@ def evolve(func, cfg: Config, problem_key: str = '1',
         pass  # filesystem en lecture seule — ignoré silencieusement
 
     # Stats bibliothèque de fragments
-    s = FRAGMENT_LIB.stats()
+    s = state.FRAGMENT_LIB.stats()
     print(f"[STIGM] Fragments accumulated: {s['count']}")
     print(f"[STIGM] τ max : {s['max_tau']:.4f}  |  τ moyen : {s['mean_tau']:.4f}")
     if s['top_ops']:
         print(f"[STIGM] Dominant operators: {s['top_ops']}")
-    if FRAGMENT_LIB.fragments:
+    if state.FRAGMENT_LIB.fragments:
         print("[STIGM] Top 3 fragments :")
-        for e in FRAGMENT_LIB.top_fragments(3):
+        for e in state.FRAGMENT_LIB.top_fragments(3):
             from_str = to_string(e.node)
             print(f"  τ={e.tau:.3f}  freq={e.freq}  {from_str}")
 
     # Stats graphe de co-occurrences (Phase 5a)
-    cg = COGRAPH.stats()
+    cg = state.COGRAPH.stats()
     print()
     print(f"[COGRAPH] Co-occurrence edges: {cg['edges']}")
     print(f"[COGRAPH] co max : {cg['max_co']:.5f}  |  co moyen : {cg['mean_co']:.5f}")
-    top_pairs = COGRAPH.top_pairs(5, FRAGMENT_LIB)
+    top_pairs = state.COGRAPH.top_pairs(5, state.FRAGMENT_LIB)
     if top_pairs:
         print("[COGRAPH] Top 5 paires co-occurrentes :")
         for w, l1, l2 in top_pairs:
@@ -10564,7 +10479,7 @@ def evolve(func, cfg: Config, problem_key: str = '1',
             print(f"  co={w:.4f}  [{l1s}]  ×  [{l2s}]")
 
     # Stats mémoire de séquences (Phase 5b)
-    sm = SEQ_MEM.stats()
+    sm = state.SEQ_MEM.stats()
     print()
     print(f"[SEQ_MEM] Transitions apprises : {sm['n_transitions']}  "
           f"(poids total : {sm['total_weight']})")
@@ -10696,7 +10611,7 @@ def decoy_report(problem_key: str, best: "Node",
     print()
     print("  [1] Feature Importance (SEQ_MEM)")
     fi: Dict[str, float] = {}
-    for key, dist in SEQ_MEM.transitions.items():
+    for key, dist in state.SEQ_MEM.transitions.items():
         for op, w in dist.items():
             if isinstance(op, str) and (op == "x" or op.startswith("X[")):
                 fi[op] = fi.get(op, 0.0) + w
@@ -11104,9 +11019,6 @@ def load_generic_csv(file_path: str,
     Installe aussi le pool d'opérateurs choisi et les noms de colonnes
     dans les globals du module (CSV_FEATURE_NAMES, _GENERIC_*).
     """
-    global _GENERIC_CSV_MODE, _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS
-    global _GENERIC_UNARY_OPS, _GENERIC_UNARY_WEIGHTS
-    global CSV_FEATURE_NAMES, CSV_TARGET_NAME
 
     if not _csv_deps_ok():
         raise ImportError("pandas et scikit-learn requis : "
@@ -11173,11 +11085,11 @@ def load_generic_csv(file_path: str,
         print(f"[CSV] Unknown pool '{op_pool}' — using 'physical'.")
         op_pool = "physical"
     b_ops, b_w, u_ops, u_w = _GENCSV_POOLS[op_pool]
-    _GENERIC_BINARY_OPS, _GENERIC_BINARY_WEIGHTS = list(b_ops), list(b_w)
-    _GENERIC_UNARY_OPS,  _GENERIC_UNARY_WEIGHTS  = list(u_ops), list(u_w)
-    _GENERIC_CSV_MODE = True
-    CSV_FEATURE_NAMES = list(feature_cols)
-    CSV_TARGET_NAME   = str(target_col)
+    state._GENERIC_BINARY_OPS, state._GENERIC_BINARY_WEIGHTS = list(b_ops), list(b_w)
+    state._GENERIC_UNARY_OPS,  state._GENERIC_UNARY_WEIGHTS  = list(u_ops), list(u_w)
+    state._GENERIC_CSV_MODE = True
+    state.CSV_FEATURE_NAMES = list(feature_cols)
+    state.CSV_TARGET_NAME   = str(target_col)
 
     print(f"[CSV] ✓ {n} samples | {len(feature_cols)} features → target '{target_col}'")
     print(f"      Features : {feature_cols}")
@@ -11298,8 +11210,7 @@ def load_custom_csv(file_path: str):
     # sin/cos/tan retirés — sans justification physique sur données batterie réelles.
     # Opérateurs retenus : exp (Arrhenius), log (Fick), pow (Wöhler),
     #                      sq (Joule), sqrt (diffusion), tanh (saturation)
-    global _BATTERY_CSV_MODE
-    _BATTERY_CSV_MODE = True
+    state._BATTERY_CSV_MODE = True
     print(
         f"  Operator pool: battery physics "
         f"[{', '.join(_BATTERY_UNARY_OPS)}] "
@@ -11976,8 +11887,8 @@ def _interactive_menu():
         print()
 
         # --- NOUVEAU : CHARGEMENT DE LA GRAMMAIRE ---
-        if 'SEQ_MEM' in globals():
-            globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json", decay=0.5)
+        if hasattr(state, 'SEQ_MEM'):
+            state.SEQ_MEM.import_grammar("grammar_shared_base.json", decay=0.5)
 
         best, xs, ys = evolve(func, cfg, problem_key=key)
         if best:
@@ -11985,9 +11896,9 @@ def _interactive_menu():
             try_plot(name, func, best, xs, ys, cfg.LOG_CSV)
 
             # --- NOUVEAU : SAUVEGARDE DE LA GRAMMAIRE ---
-            if 'SEQ_MEM' in globals():
-                globals()['SEQ_MEM'].export_grammar(f"grammar_meta_p{key}.json")
-                globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
+            if hasattr(state, 'SEQ_MEM'):
+                state.SEQ_MEM.export_grammar(f"grammar_meta_p{key}.json")
+                state.SEQ_MEM.export_grammar("grammar_shared_base.json")
         else:
             print("[ERROR] No solution found.")
         _pause()
@@ -12140,8 +12051,8 @@ def _interactive_menu():
         # Seules les règles de composition neutres (+,-,*,/) sont transférées.
         # Cela évite que le prior de ND1 (dominé par sin/tanh) biaise ND2 (exp).
         import os
-        if 'SEQ_MEM' in globals() and os.path.exists("grammar_shared_base.json"):
-            globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json",
+        if hasattr(state, 'SEQ_MEM') and os.path.exists("grammar_shared_base.json"):
+            state.SEQ_MEM.import_grammar("grammar_shared_base.json",
                                                 decay=0.4,
                                                 structural_only=True)
             print(f"[TRANSFER] Structural grammar loaded (structural_only, decay=0.4)")
@@ -12193,9 +12104,9 @@ def _interactive_menu():
             # [v16-DECOY] Rapport leurre uniquement en mode synthétique (4 features)
             if nd_key in DECOY_FEATURES and not _use_csv:
                 decoy_report(nd_key, best, X_data, y_data, cfg_nd)
-            if 'SEQ_MEM' in globals():
-                globals()['SEQ_MEM'].export_grammar(f"grammar_meta_{nd_key}.json")
-                globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
+            if hasattr(state, 'SEQ_MEM'):
+                state.SEQ_MEM.export_grammar(f"grammar_meta_{nd_key}.json")
+                state.SEQ_MEM.export_grammar("grammar_shared_base.json")
         else:
             print("[ERROR] No solution found.")
         _pause()
@@ -12273,8 +12184,8 @@ def _interactive_menu():
         # terminaux inexistants → crash silencieux ou arbres invalides.
         _grammar_ok = (os.path.exists("grammar_shared_base.json") and
                        nd_key == "SYRACUSE")   # uniquement si même type de problème
-        if 'SEQ_MEM' in globals() and _grammar_ok:
-            globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json",
+        if hasattr(state, 'SEQ_MEM') and _grammar_ok:
+            state.SEQ_MEM.import_grammar("grammar_shared_base.json",
                                                 decay=0.4, structural_only=True)
             print(f"[TRANSFER] Structural grammar loaded (structural_only, decay=0.4)")
 
@@ -12299,7 +12210,7 @@ def _interactive_menu():
             # X[2] + (_mid / 3.902016)
             _seed_tree = Node("+", Node(_t[2]),
                               Node("/", _mid, Node(3.902016)))
-            FRAGMENT_LIB.deposit(_seed_tree, rank=1, fitness=-9999.0, gen=0)
+            state.FRAGMENT_LIB.deposit(_seed_tree, rank=1, fitness=-9999.0, gen=0)
             print(f"[SEED] Seed expression deposited → {to_string(_seed_tree)[:80]}...")
         except Exception as _e:
             print(f"[SEED] Injection skipped: {_e}")
@@ -12317,8 +12228,8 @@ def _interactive_menu():
             print(f"[VALIDATION] Final MSE (normalized space): {val_mse:.8e}")
             print()
             print("  Verification on a few famous values:")
-            y_min_r = float(_SYRACUSE_Y_RAW.min())
-            y_max_r = float(_SYRACUSE_Y_RAW.max())
+            y_min_r = float(state._SYRACUSE_Y_RAW.min())
+            y_max_r = float(state._SYRACUSE_Y_RAW.max())
             n_min_r = 2.0
             n_max_r = float(n_end_raw)
             print(f"  {'n':>6}  {'true_ft':>10}  {'pred_ft':>12}  {'abs_err':>12}")
@@ -12339,8 +12250,8 @@ def _interactive_menu():
                 ], dtype=np.float64)
                 # Normaliser chaque feature avec les min/max du dataset
                 feats_scaled = np.array([
-                    -2.0 + 4.0 * (feats_raw[i] - _SYRACUSE_FEAT_MINS[i])
-                    / max(_SYRACUSE_FEAT_MAXS[i] - _SYRACUSE_FEAT_MINS[i], 1e-12)
+                    -2.0 + 4.0 * (feats_raw[i] - state._SYRACUSE_FEAT_MINS[i])
+                    / max(state._SYRACUSE_FEAT_MAXS[i] - state._SYRACUSE_FEAT_MINS[i], 1e-12)
                     for i in range(SYRACUSE_N_FEATURES)
                 ])
                 x_arr       = feats_scaled.reshape(1, -1)
@@ -12350,9 +12261,9 @@ def _interactive_menu():
                 err = abs(y_pred_nat - true_flight)
                 print(f"  {n_check:>6}  {true_flight:>10}  {y_pred_nat:>12.2f}  {err:>12.2f}")
             print()
-            if 'SEQ_MEM' in globals():
-                globals()['SEQ_MEM'].export_grammar("grammar_meta_SYRACUSE.json")
-                globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
+            if hasattr(state, 'SEQ_MEM'):
+                state.SEQ_MEM.export_grammar("grammar_meta_SYRACUSE.json")
+                state.SEQ_MEM.export_grammar("grammar_shared_base.json")
                 print("[META] Grammars exported → grammar_meta_SYRACUSE.json "
                       "/ grammar_shared_base.json")
         else:
@@ -12605,13 +12516,13 @@ def _interactive_menu():
             # loi 250 * elongation) induisait en erreur : pendant cet
             # affichage, chaque colonne porte un prime (elongation′ = colonne
             # remise à l'échelle), et la loi dans les colonnes réelles suit.
-            _names_real = list(globals().get("CSV_FEATURE_NAMES") or feat_names)
-            globals()["CSV_FEATURE_NAMES"] = [f"{nm}′" for nm in _names_real]
+            _names_real = list(getattr(state, 'CSV_FEATURE_NAMES', None) or feat_names)
+            state.CSV_FEATURE_NAMES = [f"{nm}′" for nm in _names_real]
             try:
                 print_result(f"CSV: {target_name} = f({', '.join(feat_names)})",
                              best, X_data, y_data, cfg)
             finally:
-                globals()["CSV_FEATURE_NAMES"] = _names_real
+                state.CSV_FEATURE_NAMES = _names_real
             print("\n  Note: 'Expression' above is the engine's internal form, on")
             print("  rescaled columns (a prime marks a rescaled column, e.g.")
             print(f"  {feat_names[0]}′). Use the formula below.")
@@ -12665,7 +12576,7 @@ def _interactive_menu():
         else:
             print("[ERROR] No solution found.")
         # Réinitialiser le mode pour ne pas polluer un run suivant
-        globals()['_GENERIC_CSV_MODE'] = False
+        state._GENERIC_CSV_MODE = False
         _pause()
 
 
@@ -12753,6 +12664,55 @@ def _pause():
     input("  Done. Press Enter to quit...")
 
 
+# ── The door ─────────────────────────────────────────────────────────────
+# gp_elite.core keeps every name it had in 1.4.0. The names of the shared
+# state live in gp_elite.state: read on gp_elite.core, they are read there;
+# set on it, they are set there. Any other name set on gp_elite.core (a
+# test that replaces a function, a bench that wraps one) is also set in the
+# engine's modules that hold the same object, as every function of core.py
+# saw it in 1.4.0.
+_STATE_NAMES = frozenset(('COGRAPH', 'CSV_FEATURE_NAMES', 'CSV_TARGET_NAME', 'CURRENT_RESIDUAL_SIG', 'FRAGMENT_LIB', 'PROBE_X', 'SEQ_MEM', 'VAL_R2_TOLERANCE', '_BATTERY_CSV_MODE', '_BINOMIAL_SEEDS', '_COMPILE_CACHE', '_CUSTOM_LOSS_FN', '_CUSTOM_LOSS_PARSIMONY', '_CUSTOM_LOSS_ROBUST', '_CUSTOM_LOSS_USE_SCALING', '_CUSTOM_SEEDS', '_DIM_GATE_DIMS', '_DIM_GATE_TARGET', '_DIM_SEARCH', '_DIM_UNKNOWN_CONST', '_E2_SEEDS', '_ELEMENTARY_SEEDS', '_EXACT_PRIORITY_SWAPS', '_EXTRAP_BAND', '_EXTRAP_PROBE_XS', '_FAITHFUL_SWAPS', '_GENERIC_BINARY_OPS', '_GENERIC_BINARY_WEIGHTS', '_GENERIC_CSV_MODE', '_GENERIC_UNARY_OPS', '_GENERIC_UNARY_WEIGHTS', '_LS_SCALE_ONLY', '_NEAR_BAND', '_NEAR_GUARD_SWAPS', '_NEAR_PROBE_XS', '_PARALLEL_BROKEN', '_PARALLEL_WARNED', '_PARAMETRIC_CACHE', '_POLISH_ADMITTED', '_POLISH_GRACE_S', '_PRED_CACHE', '_SEEDS_UNDER_UNITS', '_SMALL_CV', '_SMALL_ON', '_SYRACUSE_FEAT_MAXS', '_SYRACUSE_FEAT_MINS', '_SYRACUSE_MODE', '_SYRACUSE_X_RAW', '_SYRACUSE_Y_RAW', '_TIME_LIMIT_HIT', '_TOLERANT_N2', '_TOLERANT_REFIT', '_TOLERANT_SEEDS', '_USE_LINEAR_SCALING', '_VAL_CANDS', '_VAL_TRAIN_XS', '_VAL_TRAIN_YS', '_VAL_XS', '_VAL_YS', '_feature_usage_counter', '_fitness_cache'))
+_ENGINE_MODULES = ()          # the modules made of core.py, as they come
+_MISSING = object()
+
+
+def __getattr__(name):
+    if name in _STATE_NAMES and hasattr(state, name):
+        return getattr(state, name)
+    raise AttributeError("module %r has no attribute %r" % (__name__, name))
+
+
+def __dir__():
+    return sorted(set(globals()) | {n for n in _STATE_NAMES if hasattr(state, n)})
+
+
+class _Door(type(sys)):
+    def __setattr__(self, name, value):
+        if name in _STATE_NAMES:
+            setattr(state, name, value)
+            return
+        old = self.__dict__.get(name, _MISSING)
+        if old is not _MISSING:
+            for m in _ENGINE_MODULES:
+                if getattr(m, name, _MISSING) is old:
+                    setattr(m, name, value)
+        super().__setattr__(name, value)
+
+    def __delattr__(self, name):
+        if name in _STATE_NAMES:
+            delattr(state, name)
+            return
+        old = self.__dict__.get(name, _MISSING)
+        if old is not _MISSING:
+            for m in _ENGINE_MODULES:
+                if getattr(m, name, _MISSING) is old:
+                    delattr(m, name)
+        super().__delattr__(name)
+
+
+sys.modules[__name__].__class__ = _Door
+
+
 if __name__ == "__main__":
     import traceback as _tb
 
@@ -12809,8 +12769,8 @@ if __name__ == "__main__":
 
         # [v15] MÉTA-APPRENTISSAGE — chargement de la grammaire partagée
         # decay=0.5 : guide sans bloquer la découverte de nouvelles structures
-        if 'SEQ_MEM' in globals():
-            globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json", decay=0.5)
+        if hasattr(state, 'SEQ_MEM'):
+            state.SEQ_MEM.import_grammar("grammar_shared_base.json", decay=0.5)
 
         best, xs, ys = evolve(func, cfg, problem_key=key)
 
@@ -12819,11 +12779,11 @@ if __name__ == "__main__":
             try_plot(name, func, best, xs, ys, cfg.LOG_CSV)
 
             # [v15] MÉTA-APPRENTISSAGE — export après succès
-            if 'SEQ_MEM' in globals():
+            if hasattr(state, 'SEQ_MEM'):
                 # Archive locale au problème (pour analyse et replay)
-                globals()['SEQ_MEM'].export_grammar(f"grammar_meta_p{key}.json")
+                state.SEQ_MEM.export_grammar(f"grammar_meta_p{key}.json")
                 # Mise à jour de la base partagée pour le prochain run / problème
-                globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
+                state.SEQ_MEM.export_grammar("grammar_shared_base.json")
         else:
             print("[ERROR] No solution found.")
         _pause()
@@ -12870,8 +12830,8 @@ if __name__ == "__main__":
             cfg_nd.N_POINTS = 200
             cfg_nd.PARSIMONY = getattr(cfg_nd, 'PARSIMONY', 0.001) * 3.0
         import os
-        if 'SEQ_MEM' in globals() and os.path.exists("grammar_shared_base.json"):
-            globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json",
+        if hasattr(state, 'SEQ_MEM') and os.path.exists("grammar_shared_base.json"):
+            state.SEQ_MEM.import_grammar("grammar_shared_base.json",
                                                 decay=0.4,
                                                 structural_only=True)
             print(f"[TRANSFER] Structural grammar loaded (structural_only, decay=0.4)")
@@ -12916,9 +12876,9 @@ if __name__ == "__main__":
             print(f"[VALIDATION] MSE final : {val_mse:.8e}")
             if mode in DECOY_FEATURES and not _use_csv:
                 decoy_report(mode, best, X_data, y_data, cfg_nd)
-            if 'SEQ_MEM' in globals():
-                globals()['SEQ_MEM'].export_grammar(f"grammar_meta_{mode}.json")
-                globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
+            if hasattr(state, 'SEQ_MEM'):
+                state.SEQ_MEM.export_grammar(f"grammar_meta_{mode}.json")
+                state.SEQ_MEM.export_grammar("grammar_shared_base.json")
         else:
             print("[ERROR] No solution found.")
         _pause()
@@ -12956,8 +12916,8 @@ if __name__ == "__main__":
         cfg_syrac.RESET_FRACTION     = 0.45
 
         import os
-        if 'SEQ_MEM' in globals() and os.path.exists("grammar_shared_base.json"):
-            globals()['SEQ_MEM'].import_grammar("grammar_shared_base.json",
+        if hasattr(state, 'SEQ_MEM') and os.path.exists("grammar_shared_base.json"):
+            state.SEQ_MEM.import_grammar("grammar_shared_base.json",
                                                 decay=0.4, structural_only=True)
 
         _syrac_func = lambda X: np.zeros(X.shape[0])
@@ -12970,9 +12930,9 @@ if __name__ == "__main__":
             y_pred  = evaluate_vector(best, X_data)
             val_mse = float(np.mean((y_pred - y_data) ** 2))
             print(f"[VALIDATION] Final MSE (normalized space): {val_mse:.8e}")
-            if 'SEQ_MEM' in globals():
-                globals()['SEQ_MEM'].export_grammar("grammar_meta_SYRACUSE.json")
-                globals()['SEQ_MEM'].export_grammar("grammar_shared_base.json")
+            if hasattr(state, 'SEQ_MEM'):
+                state.SEQ_MEM.export_grammar("grammar_meta_SYRACUSE.json")
+                state.SEQ_MEM.export_grammar("grammar_shared_base.json")
         else:
             print("[ERROR] No solution found.")
         _pause()
