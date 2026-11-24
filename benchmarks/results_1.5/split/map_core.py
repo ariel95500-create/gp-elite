@@ -7,11 +7,19 @@ It reads core.py, the other modules of the package and the tests at a commit
 (their syntax trees, without running anything) and prints the map.
 
 A run-time name is a module-level name of core.py that is rebound inside one
-of its functions (a `global` statement), or set on `core` from outside: by
-the other modules of the package or by the tests (`core.NAME = ...`, also
-through an index, `core.NAME[...] = ...`). The names the benches set on
-`core` are listed apart: they wrap functions to observe a fit, and Part A
-handles them in the benches.
+of its functions (a `global` statement, or through the module's dictionary,
+`globals()["NAME"] = ...`), or set on `core` from outside: by the other
+modules of the package or by the tests (`core.NAME = ...`, also through an
+index, `core.NAME[...] = ...`, and `setattr(core, "NAME", ...)`, as pytest's
+`monkeypatch.setattr` does). A function also uses a name when it reads it
+through the module's dictionary (`globals().get("NAME")`). The names the
+benches set on `core` are listed apart: they wrap functions to observe a
+fit, and Part A handles them in the benches.
+
+The first version of this map (0a0090e) saw only the `global` statements
+and the assignments `core.NAME = ...`; this one also sees the module's
+dictionary and `setattr`, and says whether each name holds data or a
+function or class of core.py (a test that replaces a function on `core`).
 
     python benchmarks/results_1.5/split/map_core.py [commit] > map.txt
 """
@@ -71,6 +79,70 @@ def role_of(line):
 
 SET_ON_CORE = re.compile(r"\b(?:core|C|_core|_C)\.([A-Za-z_][A-Za-z0-9_]*)"
                          r"\s*(?:\[[^\]]*\])?\s*=(?!=)")
+CORE_ALIASES = {"core", "C", "_core", "_C"}
+
+
+def _const_str(node):
+    if isinstance(node, ast.Index):                 # Python 3.8
+        node = node.value
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    return None
+
+
+def _is_globals_call(node):
+    return (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+            and node.func.id == "globals" and not node.args)
+
+
+def globals_access(sub):
+    """(name, "set" or "read") for an access to the module's dictionary:
+    globals()["N"] = ..., del globals()["N"], globals()["N"],
+    globals().get/setdefault/pop/update(...), "N" in globals()."""
+    out = []
+    if isinstance(sub, ast.Subscript) and _is_globals_call(sub.value):
+        n = _const_str(sub.slice)
+        if n is not None:
+            out.append((n, "read" if isinstance(sub.ctx, ast.Load) else "set"))
+    elif (isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute)
+          and _is_globals_call(sub.func.value)):
+        how = "read" if sub.func.attr in ("get", "__getitem__", "__contains__") else "set"
+        if sub.func.attr == "update":
+            for a in sub.args:
+                if isinstance(a, ast.Dict):
+                    out += [(_const_str(k), how) for k in a.keys if _const_str(k)]
+            out += [(k.arg, how) for k in sub.keywords if k.arg]
+        elif sub.args and _const_str(sub.args[0]) is not None:
+            out.append((_const_str(sub.args[0]), how))
+    elif (isinstance(sub, ast.Compare) and len(sub.comparators) == 1
+          and isinstance(sub.ops[0], (ast.In, ast.NotIn))
+          and _is_globals_call(sub.comparators[0]) and _const_str(sub.left)):
+        out.append((_const_str(sub.left), "read"))
+    return out
+
+
+def set_on_core(src):
+    """The names a file sets on core: core.NAME = ..., core.NAME[...] = ...,
+    setattr(core, "NAME", ...) and monkeypatch.setattr(core, "NAME", ...) or
+    ("gp_elite.core.NAME", ...)."""
+    out = {m.group(1) for m in SET_ON_CORE.finditer(src)}
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return out
+    for sub in ast.walk(tree):
+        if not (isinstance(sub, ast.Call) and len(sub.args) >= 2):
+            continue
+        f = sub.func
+        if not ((isinstance(f, ast.Name) and f.id == "setattr")
+                or (isinstance(f, ast.Attribute) and f.attr == "setattr")):
+            continue
+        a0, a1 = sub.args[0], sub.args[1]
+        if isinstance(a0, ast.Name) and a0.id in CORE_ALIASES and _const_str(a1):
+            out.add(_const_str(a1))
+        elif _const_str(a0) and _const_str(a0).startswith("gp_elite.core."):
+            out.add(_const_str(a0).split(".", 2)[2])
+    return out
 
 
 def main():
@@ -78,25 +150,36 @@ def main():
     lines = src.count("\n") + (0 if src.endswith("\n") else 1)
     tree = ast.parse(src)
 
+    kind = {}                                       # module-level def -> kind
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef):
+            kind[node.name] = "function"
+        elif isinstance(node, ast.ClassDef):
+            kind[node.name] = "class"
+
     rebound = collections.defaultdict(set)          # name -> functions
+    read_by_dict = collections.defaultdict(set)     # name -> functions
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
             for sub in ast.walk(node):
                 if isinstance(sub, ast.Global):
                     for n in sub.names:
                         rebound[n].add(node.name)
+                for n, how in globals_access(sub):
+                    (rebound if how == "set" else read_by_dict)[n].add(node.name)
 
     def set_from(paths):
         out = collections.defaultdict(set)
         for p in paths:
-            for m in SET_ON_CORE.finditer(git_show(p)):
-                out[m.group(1)].add(p)
+            for n in set_on_core(git_show(p)):
+                out[n].add(p)
         return out
 
     by_package = set_from([p for p in git_ls("gp_elite") if p != "gp_elite/core.py"])
     by_tests = set_from(git_ls("tests"))
     by_benches = set_from([p for p in git_ls("benchmarks") if p.count("/") == 1])
     runtime = set(rebound) | set(by_package) | set(by_tests)
+    data = {n for n in runtime if n not in kind}
 
     print("# The map of core.py at %s (Part A of benchmarks/results_1.5/PLAN.md)" % REV)
     print()
@@ -104,14 +187,19 @@ def main():
     defs = [n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.ClassDef))]
     print("top-level functions and classes: %d" % len(defs))
     print("run-time names: %d (rebound inside core's functions %d; set on core "
-          "by the package %d, by the tests %d)" % (
-              len(runtime), len(rebound), len(by_package), len(by_tests)))
+          "by the package %d, by the tests %d); %d hold data, %d a function or "
+          "class of core.py that the tests or the package replace" % (
+              len(runtime), len(rebound), len(by_package), len(by_tests),
+              len(data), len(runtime - data)))
     print()
     print("## Run-time names: who rebinds them, who sets them from outside")
+    print("%-28s %-9s %s" % ("name", "holds", "rebound by (core's functions); "
+                             "set by (other files); read through globals() by"))
     for n in sorted(runtime):
-        print("%-28s rebound by %-40s set by %s" % (
-            n, ",".join(sorted(rebound.get(n, []))) or "-",
-            ",".join(sorted(by_package.get(n, set()) | by_tests.get(n, set()))) or "-"))
+        print("%-28s %-9s rebound by %s; set by %s; read through globals() by %s" % (
+            n, kind.get(n, "data"), ",".join(sorted(rebound.get(n, []))) or "-",
+            ",".join(sorted(by_package.get(n, set()) | by_tests.get(n, set()))) or "-",
+            ",".join(sorted(read_by_dict.get(n, []))) or "-"))
     print()
     print("## Names the benches (benchmarks/*.py) set on core, apart")
     for n in sorted(by_benches):
@@ -120,6 +208,7 @@ def main():
 
     def used(node):
         names = {x.id for x in ast.walk(node) if isinstance(x, ast.Name)}
+        names |= {n for sub in ast.walk(node) for n, _how in globals_access(sub)}
         return names & runtime
 
     def sets(node):
@@ -127,20 +216,27 @@ def main():
         for sub in ast.walk(node):
             if isinstance(sub, ast.Global):
                 out |= set(sub.names)
+            out |= {n for n, how in globals_access(sub) if how == "set"}
         return out & runtime
 
     print("## Functions and classes, in the order of the file")
+    print("(run-time names that hold data, * if the function sets them; "
+          "name() for a function of core.py that a test or the package replaces)")
     print("%-6s %-6s %5s  %-10s %-34s %s" % ("first", "last", "lines", "module", "name", "run-time names used (set*)"))
-    per_mod = collections.defaultdict(lambda: dict(defs=0, lines=0, state=0, state_lines=0, names=set()))
+    per_mod = collections.defaultdict(lambda: dict(defs=0, lines=0, state=0, state_lines=0,
+                                                   calls=0, names=set()))
     for n in defs:
         span = n.end_lineno - n.lineno + 1
         mod = role_of(n.lineno)
-        u, s = used(n), sets(n)
-        tag = ", ".join(sorted(x + ("*" if x in s else "") for x in u))
+        found, s = used(n), sets(n)
+        u, fu = found & data, found - data - {n.name}
+        tag = ", ".join(sorted(x + ("*" if x in s else "") for x in u)
+                        + sorted(x + "()" for x in fu))
         print("%-6d %-6d %5d  %-10s %-34s %s" % (n.lineno, n.end_lineno, span, mod, n.name[:34], tag))
         pm = per_mod[mod]
         pm["defs"] += 1
         pm["lines"] += span
+        pm["calls"] += bool(fu)
         if u:
             pm["state"] += 1
             pm["state_lines"] += span
@@ -155,21 +251,24 @@ def main():
         print("%-10s %5d lines" % (mod, n))
     print()
     print("## By module")
-    print("%-10s %5s %6s %12s %12s  %s" % ("module", "defs", "lines", "with state", "state lines", "run-time names used"))
+    print("%-10s %5s %6s %12s %12s %8s  %s" % ("module", "defs", "lines", "with state",
+                                              "state lines", "calls()", "run-time names used (data)"))
     tot = collections.Counter()
     for mod in sorted(per_mod, key=lambda m: -per_mod[m]["lines"]):
         pm = per_mod[mod]
-        print("%-10s %5d %6d %12d %12d  %s" % (mod, pm["defs"], pm["lines"] + other.get(mod, 0),
-                                              pm["state"], pm["state_lines"],
-                                              ", ".join(sorted(pm["names"]))))
+        print("%-10s %5d %6d %12d %12d %8d  %s" % (mod, pm["defs"], pm["lines"] + other.get(mod, 0),
+                                                   pm["state"], pm["state_lines"], pm["calls"],
+                                                   ", ".join(sorted(pm["names"]))))
         tot["defs"] += pm["defs"]
         tot["state"] += pm["state"]
+        tot["calls"] += pm["calls"]
         tot["state_lines"] += pm["state_lines"]
         tot["free_lines"] += pm["lines"] - pm["state_lines"]
     print()
-    print("functions and classes that use run-time names: %d (%d lines); the "
-          "others: %d (%d lines)" % (tot["state"], tot["state_lines"],
-                                     tot["defs"] - tot["state"], tot["free_lines"]))
+    print("functions and classes that use run-time names holding data: %d (%d lines); "
+          "the others: %d (%d lines); that call a function a test or the package "
+          "replaces: %d" % (tot["state"], tot["state_lines"], tot["defs"] - tot["state"],
+                            tot["free_lines"], tot["calls"]))
     print()
     print("## The roles")
     for a, b, mod, what in ROLES:
