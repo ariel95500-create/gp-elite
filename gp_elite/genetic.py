@@ -2,7 +2,8 @@
 deduplication, epsilon-lexicase and tournament selection, crossover,
 the mutations, Pareto ranks and the stigmergic trees.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -13,6 +14,7 @@ from typing import Optional, List, Tuple, Dict, Any
 from . import state
 from .config import (ALL_BINARY_OPS, ALL_UNARY_OPS, _active_pools,
                      _get_ops_for_role, _pool_choice)
+from .config import Config   # [1.5] named in annotations only
 from .tree import (Node, get_all_nodes, tree_depth, tree_size)
 from .simplification import (simplify)
 from .evaluation import (_predict_cached)

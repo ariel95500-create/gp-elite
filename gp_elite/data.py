@@ -1,7 +1,8 @@
 """The data of the console: the scalers, the loading of CSV files and
 their optional dependencies, and the problems of the console.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 

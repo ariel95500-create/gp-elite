@@ -1,7 +1,8 @@
 """The islands: Island, migration, one generation of an island
 (evolve_island), and the reset of the explorer islands.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -15,6 +16,7 @@ from typing import Optional, List, Tuple, Dict, Any
 from . import state
 from .config import (TRACE, _active_pool_ops, _detect_dominant_op, _dim_active,
                      _ds)
+from .config import Config   # [1.5] named in annotations only
 from .tree import (Node, get_all_nodes, tree_depth, tree_size)
 from .simplification import (simplify)
 from .evaluation import (evaluate_vector)

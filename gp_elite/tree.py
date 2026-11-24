@@ -1,7 +1,8 @@
 """The tree of a formula: Node, its hashes, its text (to_string) and its
 sympy form, its size, depth and complexity, and its constants.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 

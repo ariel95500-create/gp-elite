@@ -1,7 +1,8 @@
 """The datasets the console builds: the Collatz (Syracuse) features and
 data, the decoy features, and build_dataset.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ from typing import Optional, List, Tuple, Dict, Any
 
 from . import state
 from .config import (_SYRACUSE_BINARY_OPS, _SYRACUSE_UNARY_OPS)
+from .config import Config   # [1.5] named in annotations only
 from .evaluation import (_HOT_ZONES)
 
 # ============================================================

@@ -1,7 +1,8 @@
 """The seeds placed before the first generation: motifs, power laws,
 binomial forms, elementary forms and noise-tolerant forms.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 

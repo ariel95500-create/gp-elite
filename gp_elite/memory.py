@@ -2,7 +2,8 @@
 the semantic signatures, the co-graph of fragments, the sequence
 memory, and what they pass on to the next run (warm_transfer).
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -16,6 +17,7 @@ from typing import Optional, List, Tuple, Dict, Any
 
 from . import state
 from .config import (_active_pools)
+from .config import Config   # [1.5] named in annotations only
 from .tree import (Node, get_all_nodes, to_string, tree_depth, tree_size)
 from .simplification import (_TRIVIAL_CACHE, simplify)
 from .evaluation import (_safe_write, evaluate_vector)

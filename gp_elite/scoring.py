@@ -1,7 +1,8 @@
 """The score of a formula: linear and robust scaling, the errors, the
 scale of the target, the usage of the variables, and fitness.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ from typing import Optional, List, Tuple, Dict, Any
 
 from . import state
 from .config import (TRACE, _dim_active, _ds)
+from .config import Config   # [1.5] named in annotations only
 from .tree import (Node, _FLOAT_GAMMA, tree_complexity, tree_depth, tree_size)
 from .simplification import (simplify)
 from .evaluation import (_pearson_r, _predict_cached, evaluate_vector)

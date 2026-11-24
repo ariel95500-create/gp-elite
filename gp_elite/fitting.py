@@ -1,7 +1,8 @@
 """The fitting of the constants of a formula: Levenberg-Marquardt and
 Adam.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -10,7 +11,9 @@ import numpy as np
 
 from . import state
 from .numeric import (_np_maximum, _np_minimum)
+from .config import Config   # [1.5] named in annotations only
 from .tree import (tree_complexity, tree_depth)
+from .tree import Node       # [1.5] named in annotations only
 from .simplification import (_invalidate_all_hashes)
 from .evaluation import (_collect_constants_ordered, _lm_column, _lm_plan,
                          compile_parametric)

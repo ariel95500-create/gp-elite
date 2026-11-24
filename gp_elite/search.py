@@ -1,7 +1,8 @@
 """The search: the hold-out split, the linear candidate, and evolve,
 which runs a fit from the seeds to the final choice.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -16,6 +17,7 @@ from typing import Optional, List, Tuple, Dict, Any
 from . import state
 from .config import (ALL_OPS, TRACE, _BATTERY_BINARY_OPS, _BATTERY_UNARY_OPS,
                      _SYRACUSE_BINARY_OPS, _SYRACUSE_UNARY_OPS, _dim_active)
+from .config import Config   # [1.5] named in annotations only
 from .tree import (Node, to_string, tree_depth, tree_size)
 from .simplification import (_clear_simplify_caches, simplify)
 from .datasets import (build_dataset)

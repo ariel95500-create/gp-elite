@@ -1,7 +1,8 @@
 """The console: the printed result, the decoy report, the plot, run,
 the benchmark of the console and the interactive menu.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -1093,7 +1094,8 @@ def _interactive_menu():
         print("    Note: for forecasting, only variables that TREND are")
         print("    usable — other columns are ignored (validated in v25).")
         import sys as _sys7
-        _sys7.modules.setdefault("core", _sys7.modules[__name__])
+        # [1.5] gp_elite.core, the module that held this code in 1.4.0
+        _sys7.modules.setdefault("core", _sys7.modules[__package__ + ".core"])
         try:
             import api as _api7
         except Exception as _e:

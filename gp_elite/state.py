@@ -6,12 +6,13 @@ runs (`state.NAME`), never through a copy; gp_elite.core passes on to this
 module the names set on it. The values below are those core.py gave them
 when it was imported. Three are not defined until a fit sets them, as in
 1.4.0: VAL_R2_TOLERANCE, _CUSTOM_LOSS_ROBUST, _CUSTOM_LOSS_USE_SCALING. The
-three memories (FRAGMENT_LIB, COGRAPH, SEQ_MEM) are made by gp_elite.core
-when it is imported, at the place where 1.4.0 made them.
+three memories (FRAGMENT_LIB, COGRAPH, SEQ_MEM) are made by gp_elite.memory
+when it is imported, each after its class, as core.py made them in 1.4.0.
 """
 from __future__ import annotations
 
 import numpy as np
+from typing import Any, Dict, List, Optional   # named in the annotations below
 
 PROBE_X: np.ndarray = np.zeros((20, 4))
 CURRENT_RESIDUAL_SIG: Optional[np.ndarray] = None
@@ -52,6 +53,7 @@ _feature_usage_counter: List[int] = []   # initialisé par reset_feature_usage()
 _PARALLEL_BROKEN = False     # vrai apres un pool brise : plus de tentative
 _PARALLEL_WARNED = False
 _TIME_LIMIT_HIT = False  # [v0.7-TIME] vrai si le dernier evolve() a ete
+                         # interrompu par l'echeance cfg.DEADLINE
 _VAL_XS = None          # hold-out features  (None = validation désactivée)
 _VAL_YS = None          # hold-out cible
 _VAL_TRAIN_XS = None    # [v23.1] train features (test de stabilité numérique)

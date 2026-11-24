@@ -2,7 +2,8 @@
 of operators and how a run draws from them, and the configurations
 the console makes (make_cfg, make_cfg_nd).
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 

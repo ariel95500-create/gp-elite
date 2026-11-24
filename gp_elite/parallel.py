@@ -1,7 +1,8 @@
 """The islands in parallel: the workers, the pools of processes, and the
 guard of the main module.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
@@ -42,7 +43,10 @@ def _parallel_worker_init(data_path, use_ls, syracuse_mode,
     évite le ModuleNotFoundError quand le fichier s'appelle GP_ELITE_v20_PARALLEL
     mais que le code l'a importé sous la clé "gp_v20"."""
     import sys as _sys, importlib.util as _ilu, os as _os
-    _this_file = _os.path.abspath(__file__)
+    # [1.5] core.py, the file that held this code in 1.4.0: the names
+    # registered stay "core" and "gp_v20"
+    _this_file = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)),
+                               "core.py")
     _mod_name  = _os.path.splitext(_os.path.basename(_this_file))[0]
     for _key in (_mod_name, "gp_v20"):
         if _key not in _sys.modules:

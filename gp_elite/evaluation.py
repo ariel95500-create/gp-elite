@@ -3,7 +3,8 @@ the Jacobian for Levenberg-Marquardt, the compiled functions and
 their caches, the scalar and vector evaluation, Pearson's r, the cache
 of predictions, and the safe writing of files.
 
-Part of gp_elite/core.py until 1.4.0, moved without change in 1.5.
+Part of gp_elite/core.py until 1.4.0, moved in 1.5, where it reads and
+sets the names of the shared state in gp_elite.state (state.NAME).
 """
 from __future__ import annotations
 
