@@ -103,7 +103,9 @@ formes que ses chercheurs ajustent aux données : d'où les gains sous bruit
 ([nouveautés](docs/fr/caracteristiques.md#nouveautés), [CHANGELOG](CHANGELOG.md)).
 La 1.5 ne change aucun modèle : elle organise le moteur en modules et, à graine
 égale et travail égal, rend les modèles de la 1.4.0, au bit près, à la même
-vitesse ; ces chiffres valent donc pour elle
+vitesse ; ces chiffres valent donc pour elle, aux variations près qu'un budget
+de 30 s par ajustement produit entre deux campagnes d'une même version (jusqu'à
+trois ajustements sur ces suites)
 ([comment le moteur est organisé](docs/fr/architecture.md)).
 
 La structure de la loi est retrouvée quand le modèle rendu, ses constantes

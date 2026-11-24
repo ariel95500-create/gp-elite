@@ -1,0 +1,6 @@
+TARGET : CSV: force = f(elongation)
+EXPR   : (24.974004 * elongation′)
+RAW    : 0.0000000059
+FIT    : 0.0000000162
+SIZE   : 3
+DEPTH  : 2

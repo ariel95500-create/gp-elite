@@ -62,8 +62,9 @@ becomes 17 modules by role and the module of the shared state
 ([how the engine is organised](architecture.md)). At equal seed and equal work
 it returns the models of 1.4, bit for bit, at the same speed, and
 `gp_elite.core` keeps every name it had. And a measurement of what size costs,
-on 1.4: up to 100,000 rows, little, and mostly time; twenty variables that play
-no part in the law, much, and mostly the algorithm
+on 1.4: up to 100,000 rows, 11 exact laws of 205, mostly a matter of time (by
+one fit, under the rule written before the measurement); twenty variables that
+play no part in the law, 60, mostly a matter of the algorithm
 ([limits, point 9](../LIMITATIONS.md#9-size-and-kind-of-data)). **1.4 "Signal"** — more noise-tolerant seeds: on the 41 Feynman equations of the
 decision bench with Gaussian noise on the target, the structure of the law comes
 back in 152 and 95 fits of 205 (1 % and 10 % noise) against 116 and 87 for 1.3

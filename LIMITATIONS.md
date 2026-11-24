@@ -78,7 +78,8 @@ they do from one campaign to the next. The figures of 1.4.0 are given first:
 
 Version 1.5 changes the organisation of the code only: at equal seed and
 equal work it returns the models of 1.4.0, bit for bit
-(`benchmarks/results_1.5/split/`), so the figures of 1.4.0 hold for it.
+(`benchmarks/results_1.5/split/`), so the figures of 1.4.0 hold for it,
+within what the budget of 30 s moves from one campaign to the next (above).
 Point 9 adds what the size study of 1.5 measured on 1.4.0.
 
 ## 1. Laws it still misses
@@ -251,10 +252,12 @@ bench without noise, five seeds, 30 s per fit:
 - **rows:** 165 exact laws of 205 at 100 rows, 168 at 1,000, 161 at 10,000 and
   154 at 100,000. The seeds find the same laws at every size; the search loses
   the others: the fits that run to their budget reach a median of 3 generations
-  at 100,000 rows, against 116 at 100. Ten times the time gives back 6 of the 11.
+  at 100,000 rows, against 116 at 100. Ten times the time gives 160: of the 12
+  fits lost at 100,000 rows, 6 come back.
 - **variables that play no part in the law:** with 5, 10 and 20 of them added to
   1,000 rows, 144, 139 and 108 exact laws against 168, and ten times the time
-  gives back 12 of the 60. The seed finders limit their combinations of columns
+  gives 120: of the 61 fits lost with 20 added, 10 come back, 4 others become
+  exact and 2 are lost. The seed finders limit their combinations of columns
   as the columns grow, and lose a third of their laws with 20 added; 26
   returned formulas take in an added variable.
 

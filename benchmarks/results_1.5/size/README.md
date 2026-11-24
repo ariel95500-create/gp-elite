@@ -15,18 +15,27 @@ output in `reading.txt`), where E is the number of exact laws of a cell, of
 | rows | 165 (100 rows) | 154 (100,000 rows) | 11 | 160 | 6 | mostly brute force |
 | variables | 168 (no added variable) | 108 (20 added) | 60 | 120 | 12 | mostly the algorithm |
 
-- **Rows:** up to 100,000 rows, size costs little, and what it costs is
-  mostly time. Both numbers are small: L = 11 is one fit above the
-  threshold of 10, and R = 6 is half a fit above L / 2. The budget study of
-  1.2 measured up to three fits between two campaigns of the same version.
+- **Rows:** mostly brute force, by a margin of one fit: L = 11 is one fit
+  above the threshold of 10, under which the reading would have been "size
+  costs little", and R = 6 is half a fit above L / 2. Both numbers are
+  small: the release campaigns of 1.0 to 1.2 moved by up to three fits
+  between two campaigns of the same version (as the plan of the budget
+  study of 1.2 cites them, `../../results_1.2/budget_study/PLAN.md`). Fit
+  by fit (`fit_by_fit.txt`, written after the release's reviews), 12 fits
+  exact at 100 rows are not at 100,000 and 1 is the other way round; at
+  10T, 6 of the 12 come back, 1 other becomes exact and 1 exact at T is
+  lost.
 - **Variables:** twenty added variables cost 60 exact laws of 205, and ten
-  times the time gives back 12.
+  times the time gives 12 more. Fit by fit, 61 fits exact without added
+  variables are not with 20, and 1 is the other way round; at 10T, 10 of
+  the 61 come back (2 of them through a formula that uses an added
+  variable), 4 others become exact, and 2 exact at T are lost.
 
 So, to the question of the plan: the number of rows is mostly a matter of
-brute force, and costs little up to 100,000 rows; the number of variables
-is mostly a matter of the algorithm, and costs much. The variables added
-here are irrelevant to the law (distractors), drawn over the ranges of the
-law's own variables.
+brute force, by a margin of one fit, and up to 100,000 rows it costs 11
+exact laws of 205; the number of variables is mostly a matter of the
+algorithm, and costs much. The variables added here are irrelevant to the
+law (distractors), drawn over the ranges of the law's own variables.
 
 ## Where the exact laws come from
 
@@ -71,8 +80,9 @@ placed before it; the others are found by the search after it.
   NumPy 2.4.6.
 - **Run:** from 21:11 UTC on 23 November to 01:23 UTC on 24 November, in
   three slices (`driver.sh`, `driver.log`), the records committed after each
-  slice (`checkpoint.sh`). The container did not restart: one driver process
-  ran from the first fit to the last.
+  slice (`checkpoint.sh`). The machine did not restart during the campaign:
+  one driver process ran from the first fit to the last (`driver.log` has
+  one header line).
 - **Guard:** after the first slice, the median time of the first ten fits of
   each cell was 0.3 s to 5.3 s, far under twice the budgets.
 - **Records:** 1,845 fits in `campaign.jsonl`, each job once, no crash, and
@@ -112,10 +122,12 @@ the budget, and the time to the first generation.
   III.9.52) reach their first generation after their budget. 45 fits end
   past their budget, by 8.1 s
   (median) and 16 s at most: the final choice runs after the deadline.
-- **Variables, the equations lost:** ten equations exact in all five seeds
-  without added variables fall to 0 or 1: I.27.6, I.44.4 and II.24.17 from
-  5 added variables; III.15.12 from 10; I.10.7, I.15.10, I.34.1, II.11.3,
-  II.11.27 and II.13.23 at 20. I.8.14 falls from 5 to 1 from 5 added
+- **Variables, the equations lost:** eleven equations exact in all five
+  seeds without added variables fall to 0 or 1. Ten are laws the seeds
+  held: I.27.6, I.44.4 and II.24.17 from 5 added variables; III.15.12 from
+  10; I.10.7, I.15.10, I.34.1, II.11.3, II.11.27 and II.13.23 at 20. The
+  eleventh, I.8.14, is a law the search finds (after 83 to 100 generations
+  at 1,000 rows): it falls from 5 to 1, 1 and 0 with 5, 10 and 20 added
   variables.
 - **Variables, the seeds:** the elementary seed is placed in 40 fits
   without added variables, 35 with 5, and 30 with 10 or 20. The tolerant
@@ -164,25 +176,25 @@ The plain and profiled runs return the same formula in all 21 pairs.
 - **I.11.19** (6 variables): 3.9 s at 100 rows, 300 s at 100,000, where 70 %
   of the profiled time is under the constant fitters (Levenberg-Marquardt on
   all the rows) and 35 % in the protected operators evaluating formulas.
-- **With added variables** the time of a fit hardly grows (I.8.14: 4.4 s,
-  3.9 s and 4.1 s with 5, 10 and 20), but the seeds take a growing share:
-  under the seed makers, 59 % of the profiled time of I.8.14 with 20 added
-  variables, against 7 % without (1,000 rows).
+- **With added variables** the time of the 20 generations of I.8.14 falls,
+  from 7.0 s without them to 4.4 s, 3.9 s and 4.1 s with 5, 10 and 20
+  (1,000 rows), but the seeds take a growing share: under the seed makers,
+  59 % of the profiled time with 20 added variables, against 7 % without.
 
-cProfile slows Python code more than NumPy code: a profiled fit takes 2.4
-times its plain time at 100 rows and 1.05 times at 100,000, so the shares
-lean to the Python side on small tables.
+cProfile slows Python code more than NumPy code: a profiled fit takes 2.26
+to 2.40 times its plain time at 100 rows, and 1.05 to 1.17 times at
+100,000, so the shares lean to the Python side on small tables.
 
 ## Deviations
 
 - **The profiles were cut once:** the machine of the session restarted
-  after 01:28 UTC on 24 November, after the campaign (its uptime counts
-  from 02:00 UTC), and the profile run stopped with it, at 21 of 42
-  records. The files on its disk were kept. The run was resumed at 02:00
-  UTC and skipped the recorded profiles; the fit running at the restart
-  (I.8.14 at 100,000 rows, profiled) left no record and was run again. The
-  name of the processor is the same in all 42 records; the kernel, read
-  after the restart, is 6.18.44-fc-v819, and was not read before it.
+  after the campaign, during the profile run, which stopped with it at 21 of
+  42 records: the last record before the stop was written at 01:28:31 UTC
+  on 24 November, and the next, that of the fit running at the restart
+  (I.8.14 at 100,000 rows, profiled), at 02:03:33, after it was run again
+  from about 02:00 (`profiles.jsonl`). The files on the disk were kept, and
+  the resumed run skipped the recorded profiles. The name of the processor
+  is the same in all 42 records; the kernel was not recorded.
 - Nothing else: no crash, no restart of the machine during the campaign
   (one driver process ran from the first fit to the last), the same
   processor, the same engine before and after.
@@ -216,6 +228,8 @@ of rows):
   the run; `reading.txt`: its output.
 - `beside.py`: written after the run, deciding nothing; `beside.txt`: its
   output.
+- `fit_by_fit.py`: written after the reviews of the release (M5), deciding
+  nothing: L and R split by fit; `fit_by_fit.txt`: its output.
 - `profile_size.py`: the profiles, committed before they ran;
   `profiles.jsonl` and `profiles.txt`.
 - `campaign.jsonl`: the 1,845 records.

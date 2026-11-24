@@ -105,7 +105,8 @@ finders fit to the data: hence the gains under noise
 [CHANGELOG](https://github.com/ariel95500-create/gp-elite/blob/main/CHANGELOG.md)).
 1.5 changes no model: it organises the engine in modules, and at equal seed
 and equal work returns the models of 1.4.0, bit for bit, at the same speed,
-so these figures hold for it
+so these figures hold for it, within what a budget of 30 s per fit moves
+between two campaigns of the same version (up to three fits on these suites)
 ([how the engine is organised](https://github.com/ariel95500-create/gp-elite/blob/main/docs/architecture.md)).
 
 The structure of the law is retrieved when the returned model, its constants

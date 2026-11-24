@@ -15,8 +15,8 @@ publication of 1.5 after its measurement (gate 14).
 Gate 13: the author validated this plan in full on 23 November 2026.
 
 Amendment of 24 November 2026, approved by the author before any move:
-- the map of `core.py` (`split/map.txt`, corrected in 81ed9c3 and c7e00fa)
-  counts 66 run-time names, not the 45 of the first reading given under
+- the map of `core.py` (`split/map.txt`, made again in c7e00fa by the
+  script corrected in 81ed9c3) counts 66 run-time names, not the 45 of the first reading given under
   "The shared state": 44 rebound by core's own functions (through `global`
   or through `globals()`), 12 set on `core` by the package and 32 by the
   tests; 61 hold data, and 5 are functions of `core.py` that the tests

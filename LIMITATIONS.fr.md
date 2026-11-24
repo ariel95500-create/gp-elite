@@ -87,7 +87,8 @@ premier :
 La version 1.5 ne change que l'organisation du code : à graine égale et
 travail égal, elle rend les modèles de la 1.4.0, au bit près
 (`benchmarks/results_1.5/split/`), et les chiffres de la 1.4.0 valent donc pour
-elle. Le point 9 ajoute ce que l'étude de taille de la 1.5 a mesuré sur la
+elle, aux variations près que le budget de 30 s produit d'une campagne à l'autre
+(plus haut). Le point 9 ajoute ce que l'étude de taille de la 1.5 a mesuré sur la
 1.4.0.
 
 ## 1. Les lois qu'il manque encore
@@ -277,10 +278,12 @@ sur les 41 équations de Feynman du banc de décision sans bruit, cinq graines,
   10 000 et 154 à 100 000. Les graines trouvent les mêmes lois à chaque taille ;
   la recherche perd les autres : les ajustements qui vont jusqu'à leur budget
   atteignent une médiane de 3 générations à 100 000 lignes, contre 116 à 100.
-  Dix fois plus de temps en rend 6 sur 11.
+  Dix fois plus de temps donne 160 : des 12 ajustements perdus à 100 000
+  lignes, 6 reviennent.
 - **les variables qui ne jouent aucun rôle dans la loi :** avec 5, 10 et 20
   ajoutées à 1 000 lignes, 144, 139 et 108 lois exactes contre 168, et dix fois
-  plus de temps en rend 12 sur 60. Les chercheurs de graines limitent leurs
+  plus de temps donne 120 : des 61 ajustements perdus avec 20 ajoutées, 10
+  reviennent, 4 autres deviennent exacts et 2 sont perdus. Les chercheurs de graines limitent leurs
   combinaisons de colonnes quand les colonnes augmentent, et perdent un tiers de
   leurs lois avec 20 ajoutées ; 26 formules rendues utilisent une variable
   ajoutée.
