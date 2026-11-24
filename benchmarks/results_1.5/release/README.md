@@ -142,10 +142,13 @@ and the source archive (`candidate2/m4/twine_check.txt`).
 The **Tests** workflow of the repository (Python 3.9 to 3.14 on Linux, 3.12
 and 3.14 on Windows) runs on every push that changes more than documents:
 it ignores the pushes that change only `*.md` files or `paper/`.
-`ci_runs.txt` lists its runs on the branch, read after they ended. From
-eb2eac5, the door that holds the names of the state as data descriptors, it
-is green on every commit that has a run; from the push of Split 1 to the commit
-before eb2eac5 it failed, as `../split/README.md` tells.
+`ci_runs.txt` lists its runs on the branch, read after they ended, up to
+9245f6a. From eb2eac5, the door that holds the names of the state as data
+descriptors, it is green on every commit that has a run, the two candidates
+and the corrections included; 8b405b0, f6a3134, 32d3dce and 6950444 changed
+only documents and have none. In the run of 9245f6a, the jobs pass the 279
+tests (under Python 3.11, with pytest 9.2.0). From the push of Split 1 to
+the commit before eb2eac5 it failed, as `../split/README.md` tells.
 
 ## Gate 14
 

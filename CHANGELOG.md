@@ -32,8 +32,19 @@ checked, move by move, is in `benchmarks/results_1.5/split/`; a new test,
 `tests/test_layering.py`, checks that each module imports only the modules
 above it.
 
-What code that reaches inside `gp_elite.core` can see change (the second
-review of the release, `benchmarks/results_1.5/release/M5_review2.md`):
+What can be seen to change (the second review of the release,
+`benchmarks/results_1.5/release/M5_review2.md`):
+- a model saved with pickle by 1.5 (a result, a fitted `GPEliteRegressor`)
+  does not load in 1.4.0, since its classes now live in other modules; 1.5
+  loads those of 1.4.0, and they predict the same;
+- `import gp_elite` takes about 8 ms more: 0.118 s against 0.110 s for
+  1.4.0 (median of 20);
+- `core.py` no longer runs as a plain script (`python gp_elite/core.py`),
+  and the files of the package no longer work as loose modules in a folder;
+  `gp-elite`, `python -m gp_elite` and `python -m gp_elite.core` work as
+  before;
+
+and, for code that reaches inside `gp_elite.core`:
 - `gp_elite.core` is an instance of a subclass of the module type, and its
   dictionary (`vars(gp_elite.core)`, `gp_elite.core.__dict__`) no longer
   holds the names of the shared state: a value written there does not reach
@@ -46,22 +57,15 @@ review of the release, `benchmarks/results_1.5/release/M5_review2.md`):
   the shared state (`COGRAPH`, `CSV_FEATURE_NAMES`, `CSV_TARGET_NAME`,
   `CURRENT_RESIDUAL_SIG`, `FRAGMENT_LIB`, `PROBE_X`, `SEQ_MEM`), and gives
   `state`;
-- the functions and classes belong to the modules where they now live: a
-  model saved with pickle by 1.5 does not load in 1.4.0 (1.5 loads those of
-  1.4.0), `help(gp_elite.core)` lists none of them, and tracebacks name the
-  new files; the warning given to a script without the
+- the functions and classes belong to the modules where they now live:
+  `help(gp_elite.core)` lists none of them, and tracebacks name the new
+  files; the warning given to a script without the
   `if __name__ == "__main__":` guard comes from `gp_elite/search.py`, so a
   filter on the module `gp_elite.core` no longer silences it;
-- `core.py` no longer runs as a plain script (`python gp_elite/core.py`),
-  and the files of the package no longer work as loose modules in a folder;
-  `gp-elite`, `python -m gp_elite` and `python -m gp_elite.core` work as
-  before;
 - `typing.get_type_hints` fails on four functions whose annotations name a
   class of a module that comes after theirs (`_detect_dominant_op`, and
   `build_stigmergic_tree` in its three versions), and
-  `gp_elite.core.__annotations__` is empty;
-- `import gp_elite` takes about 8 ms more: 0.118 s against 0.110 s for
-  1.4.0 (median of 20).
+  `gp_elite.core.__annotations__` is empty.
 
 What size costs, measured on 1.4.0 (`benchmarks/results_1.5/size/`): up to
 100,000 rows, 11 exact laws of 205 (154 at 100,000 rows against 165 at 100),
