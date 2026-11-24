@@ -1,0 +1,14 @@
+same      __init__.py 934b9dbab06e2709cbd46f51e941e174889d49de7d48136ad417e5a1aad22541
+same      __main__.py e16f123ed31905a07d35fabaad6f115ae7880b04e3db20bb722bb3d0e73d04fe
+same      api.py 1bd578285ffc3e64d2f2e48646294ce97a0c11bafd61b86821bda4ce8c914af9
+same      cli.py 63e5e7837baca40a01848d1f60f4ecf94fff7005716343a69c19cd2d23f11ec7
+same      core.py e0c59463320c503e85f00233f1ee362dfa54ed5be241b0f7ce6ae429a2ab6bf7
+same      dim_search.py 52ad8bfcdfa9f7cc58309c0a13954675a4ed36edf8c64b88eb771e5f99366852
+same      dimensions.py a3f29bff57ca8383afb5d3d2ce032fe2bea63281a83738eb329a70c0f994e327
+same      formula.py f0789e704b68310f3133175e6207eab04b9cad9e9f8cfbddc2200230472386fa
+same      py.typed e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+same      sklearn_api.py 22a83eed8f0e76112ff8f83753f387e4a125d254ef2a9de9a0e4da10cfdb79fe
+same      stability.py 400ffd9fa29def6e6bbda6325ba89a512607b422ddb3794c2c92ebfbd1b67e66
+version 1.4.0 /venv14p/lib/python3.11/site-packages/gp_elite/__init__.py
+the 11 files are those of 6dc1e35
+2026-11-24T01:23:53Z

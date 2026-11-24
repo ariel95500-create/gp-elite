@@ -1,0 +1,13 @@
+cell          fits  exact  near  crash  med.gen  med.first  elem.seed  tol.seed  uses.added  past.budget
+r100           205    165     7      0        1       0.17         40        15           0            0
+r1000          205    168     5      0        1       0.21         40        15           0            0
+r10000         205    161     3      0        1       0.52         40        15           0            4
+r100000        205    154     1      0        1       5.01         40        15           0           45
+r100000_10T    205    160     8      0        1       4.95         40        15           0            0
+k5             205    144    23      0        1       0.28         35        25          12            0
+k10            205    139    23      0        1       0.36         30        30          16            0
+k20            205    108    41      0       15       0.54         30        55          26            0
+k20_10T        205    120    67      0       15       0.54         30        55          10            0
+
+rows: E at T r100 165, r1000 168, r10000 161, r100000 154; L = 11, R = 6: mostly brute force
+variables: E at T r1000 168, k5 144, k10 139, k20 108; L = 60, R = 12: mostly the algorithm
