@@ -196,6 +196,17 @@ The author decides. As the plan gives for example:
   indicators show: the seeds no longer find a third of their laws once
   variables are added, and returned formulas take in irrelevant variables.
 
+**The author's decision, 24 November 2026,** on three proposals put to the
+study (screening the variables, a sample of the rows, lexicase by blocks
+of rows):
+1. 1.5 does not change: its plan promises the models of 1.4.0, bit for bit.
+2. 1.6 takes the variables first, starting with the seed finders, by a
+   plan whose criteria are written before any measurement, once 1.5 is
+   done.
+3. Then the rows, with a sample of the rows only above a number of rows,
+   so that GP_ELITE stays the same, bit for bit, below it.
+4. Lexicase by blocks of rows only if the sample does not suffice.
+
 ## Files
 
 - `../PLAN.md`: the plan, Part B, validated before the first fit (gate 13).
