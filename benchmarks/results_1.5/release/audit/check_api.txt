@@ -1,0 +1,38 @@
+engine 1.5.0 | A
+  call 1 raised: ValueError time_limit must be a positive number of seconds (got -1.0)
+  state after: {'_GENERIC_CSV_MODE': True, '_CUSTOM_LOSS_ROBUST': True, '_CUSTOM_LOSS_USE_SCALING': True, '_CUSTOM_LOSS_PARSIMONY': 0.005}
+  state after a plain call: {'_GENERIC_CSV_MODE': False, '_CUSTOM_LOSS_ROBUST': False, '_CUSTOM_LOSS_USE_SCALING': False, '_CUSTOM_LOSS_PARSIMONY': 0.0}
+  plain call after the failed one: X0 * X1 5
+engine 1.5.0 | A0
+  plain call alone: X0 * X1 5
+engine 1.5.0 | B
+  constant target: 3 mse_train 1000.0 mse_validation 0.0
+engine 1.5.0 | C
+  after the fit, random.random() = 0.2854734806721313 np.random.rand() = 0.8501965476785818
+  without a fit, the caller would get 0.41661987254534116 0.9296160928171479
+engine 1.5.0 | C2
+  seed=None twice: 0.0504919 + 1.00681 * X0 * X1 | 0.0504919 + 1.00681 * X0 * X1
+engine 1.5.0 | D
+  extrapolate_feature=3 restarts=1: ran, X0 * X1
+  extrapolate_feature=3 restarts=2: IndexError index 3 is out of bounds for axis 1 with size 2
+  extrapolate_feature=-1 restarts=1: ran, X0 * X1
+  extrapolate_feature=-1 restarts=2: ran, X1 * |X0|
+engine 1.4.0 | A
+  call 1 raised: ValueError time_limit must be a positive number of seconds (got -1.0)
+  state after: {'_GENERIC_CSV_MODE': True, '_CUSTOM_LOSS_ROBUST': True, '_CUSTOM_LOSS_USE_SCALING': True, '_CUSTOM_LOSS_PARSIMONY': 0.005}
+  state after a plain call: {'_GENERIC_CSV_MODE': False, '_CUSTOM_LOSS_ROBUST': False, '_CUSTOM_LOSS_USE_SCALING': False, '_CUSTOM_LOSS_PARSIMONY': 0.0}
+  plain call after the failed one: X0 * X1 5
+engine 1.4.0 | A0
+  plain call alone: X0 * X1 5
+engine 1.4.0 | B
+  constant target: 3 mse_train 1000.0 mse_validation 0.0
+engine 1.4.0 | C
+  after the fit, random.random() = 0.2854734806721313 np.random.rand() = 0.8501965476785818
+  without a fit, the caller would get 0.41661987254534116 0.9296160928171479
+engine 1.4.0 | C2
+  seed=None twice: 0.0504919 + 1.00681 * X0 * X1 | 0.0504919 + 1.00681 * X0 * X1
+engine 1.4.0 | D
+  extrapolate_feature=3 restarts=1: ran, X0 * X1
+  extrapolate_feature=3 restarts=2: IndexError index 3 is out of bounds for axis 1 with size 2
+  extrapolate_feature=-1 restarts=1: ran, X0 * X1
+  extrapolate_feature=-1 restarts=2: ran, X1 * |X0|

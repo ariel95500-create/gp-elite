@@ -1,0 +1,28 @@
+engine 1.5.0
+  parse_unit_string('m*2') = {'m': 1, '2': 1}
+  parse_unit_string('10*m') = {'10': 1, 'm': 1}
+  parse_unit_string('()') = {')': 1}
+  parse_unit_string('(m/s)^2'): ValueError unite invalide '(m/s)^2' : fin de chaine inattendue
+  parse_unit_string('kg*(m/s)^2'): ValueError unite invalide 'kg*(m/s)^2' : fin de chaine inattendue
+  parse_unit_string('kg*m^2/s^2') = {'kg': 1, 'm': 2.0, 's': -2.0}
+  parse_unit_string('m/s') = {'m': 1, 's': -1}
+  check_dimensions(X[0], {0: {'m': 1}}, target) = (True, 'consistent, output [m]')
+  check_dimensions(X[0], {'mass': {'kg': 1}}, target) = (False, 'output is [dimensionless] but target is [kg]')
+  check_dimensions(X[0], {'X0': {'kg': 1}}, target) = (False, 'output is [dimensionless] but target is [kg]')
+  check_dimensions(max2(X0, X1), both m, target m) = (False, 'output is [m^2] but target is [m]')
+  max2 in the pools of operators: ['ALL_BINARY_OPS']
+  stability_analysis with a misspelled operators: {'n_bootstrap': 0, 'median_r2': None} | printed: 
+engine 1.4.0
+  parse_unit_string('m*2') = {'m': 1, '2': 1}
+  parse_unit_string('10*m') = {'10': 1, 'm': 1}
+  parse_unit_string('()') = {')': 1}
+  parse_unit_string('(m/s)^2'): ValueError unite invalide '(m/s)^2' : fin de chaine inattendue
+  parse_unit_string('kg*(m/s)^2'): ValueError unite invalide 'kg*(m/s)^2' : fin de chaine inattendue
+  parse_unit_string('kg*m^2/s^2') = {'kg': 1, 'm': 2.0, 's': -2.0}
+  parse_unit_string('m/s') = {'m': 1, 's': -1}
+  check_dimensions(X[0], {0: {'m': 1}}, target) = (True, 'consistent, output [m]')
+  check_dimensions(X[0], {'mass': {'kg': 1}}, target) = (False, 'output is [dimensionless] but target is [kg]')
+  check_dimensions(X[0], {'X0': {'kg': 1}}, target) = (False, 'output is [dimensionless] but target is [kg]')
+  check_dimensions(max2(X0, X1), both m, target m) = (False, 'output is [m^2] but target is [m]')
+  max2 in the pools of operators: ['ALL_BINARY_OPS']
+  stability_analysis with a misspelled operators: {'n_bootstrap': 0, 'median_r2': None} | printed: 
